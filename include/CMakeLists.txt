@@ -1,0 +1,1 @@
+list(APPEND NHMM_PUBLIC_HEADERS "${PROJECT_SOURCE_DIR}/include/nhmm.h")
