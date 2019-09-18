@@ -7,6 +7,7 @@
 struct nhmm_alphabet
 {
     sds abc;
+    int idx[128];
 };
 
 #endif
