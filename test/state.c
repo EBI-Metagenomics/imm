@@ -22,6 +22,8 @@ void test_state_normal(void)
     TEST_ASSERT_EQUAL_DOUBLE(log(0.5), nhmm_state_emission(s, "G", 1));
     TEST_ASSERT_DOUBLE_IS_NEG_INF(nhmm_state_emission(s, "T", 1));
 
+    nhmm_state_set_end(s, true);
+
     nhmm_state_destroy(s);
     nhmm_alphabet_destroy(a);
 }

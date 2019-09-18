@@ -13,6 +13,8 @@ struct nhmm_state
 {
     sds name;
     const struct nhmm_alphabet *a;
+    int end;
+
     state_destroy destroy;
     state_emission emission;
     void *impl;

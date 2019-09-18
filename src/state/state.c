@@ -21,6 +21,11 @@ NHMM_API struct nhmm_state *nhmm_state_create_normal(const char *name,
 
 NHMM_API const char *nhmm_state_name(struct nhmm_state *s) { return s->name; }
 
+NHMM_API void nhmm_state_set_end(struct nhmm_state *s, bool is_end)
+{
+    s->end = is_end;
+}
+
 NHMM_API double nhmm_state_emission(struct nhmm_state *s, const char *x, size_t xlen)
 {
     return s->emission(s, x, xlen);
