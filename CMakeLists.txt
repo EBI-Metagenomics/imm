@@ -62,6 +62,7 @@ function(nhmm_add_test name)
   add_executable(test_${name} test/${name}.c test/unity/unity.c)
   target_link_libraries(test_${name} nhmm)
   target_include_directories(test_${name} PUBLIC test/unity)
+  target_compile_definitions(test_${name} PUBLIC UNITY_INCLUDE_DOUBLE)
   add_test(NAME ${name} COMMAND test_${name})
 endfunction()
 

@@ -1,5 +1,7 @@
+#include "alphabet.h"
 #include "state/normal.h"
 
+#include <math.h>
 #include <stdlib.h>
 
 void normal_state_create(struct nhmm_state *state, double *emission)
@@ -11,13 +13,13 @@ void normal_state_create(struct nhmm_state *state, double *emission)
 
 double normal_state_emission(struct nhmm_state *state, const char* x, size_t xlen)
 {
-    return 0.0;
-    /* if (xlen == 1) */
-    /* { */
-    /*     return -NHMM_INF; */
-    /* } */
-
-    /* return ns->emission[s->a->char2int[x[0]]]; */
+    struct normal_state *s = state->impl;
+    if (xlen == 1)
+    {
+        if (alphabet_has_symbol(state->a, x[0]))
+            return s->emission[alphabet_symbol_idx(state->a, x[0])];
+    }
+    return -INFINITY;
 }
 
 void normal_state_destroy(struct nhmm_state *state)
