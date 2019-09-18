@@ -51,3 +51,11 @@ add_library(nhmm SHARED ${NHMM_SOURCES})
 set_target_properties(nhmm PROPERTIES VERSION ${NHMM_VERSION})
 set_target_properties(nhmm PROPERTIES SOVERSION ${NHMM_VERSION_MAJOR})
 set_target_properties(nhmm PROPERTIES PUBLIC_HEADER ${NHMM_PUBLIC_HEADERS})
+
+# Test setup
+enable_testing()
+
+add_executable(test_alphabet test/alphabet.c test/unity/unity.c)
+target_link_libraries(test_alphabet nhmm)
+target_include_directories(test_alphabet PUBLIC test/unity)
+add_test(NAME alphabet COMMAND test_alphabet)

@@ -4,19 +4,21 @@
 #include "nhmm.h"
 #include <stdlib.h>
 
-NHMM_API struct nhmm_alphabet *nhmm_create_alphabet(const char *abc)
+NHMM_API struct nhmm_alphabet *nhmm_alphabet_create(const char *abc)
 {
-    struct nhmm_alphabet *alphabet = malloc(sizeof(struct nhmm_alphabet));
-
-    alphabet->abc = sdsnew(abc);
-
-    return alphabet;
+    struct nhmm_alphabet *a = malloc(sizeof(struct nhmm_alphabet));
+    a->abc = sdsnew(abc);
+    return a;
 }
 
-NHMM_API void nhmm_destroy_alphabet(struct nhmm_alphabet *alphabet) {
-  if (!alphabet)
+NHMM_API int nhmm_alphabet_length(const struct nhmm_alphabet *a){
+  return sdslen(a->abc);
+}
+
+NHMM_API void nhmm_alphabet_destroy(struct nhmm_alphabet *a) {
+  if (!a)
     return;
 
-  if (alphabet->abc)
-    sdsfree(alphabet->abc);
+  if (a->abc)
+    sdsfree(a->abc);
 }
