@@ -11,14 +11,16 @@ NHMM_API struct nhmm_alphabet *nhmm_alphabet_create(const char *abc)
     return a;
 }
 
-NHMM_API int nhmm_alphabet_length(const struct nhmm_alphabet *a){
-  return sdslen(a->abc);
+NHMM_API int nhmm_alphabet_length(const struct nhmm_alphabet *a)
+{
+    return sdslen(a->abc);
 }
 
-NHMM_API void nhmm_alphabet_destroy(struct nhmm_alphabet *a) {
-  if (!a)
-    return;
+NHMM_API void nhmm_alphabet_destroy(struct nhmm_alphabet *a)
+{
+    if (!a)
+        return;
 
-  if (a->abc)
     sdsfree(a->abc);
+    free(a);
 }

@@ -44,6 +44,7 @@ set(NHMM_PRIVATE_HEADERS
 set(NHMM_SOURCES
   src/alphabet.c
   src/hmm.c
+  src/state.c
   deps/sds/sds.c
 )
 
@@ -55,7 +56,12 @@ set_target_properties(nhmm PROPERTIES PUBLIC_HEADER ${NHMM_PUBLIC_HEADERS})
 # Test setup
 enable_testing()
 
-add_executable(test_alphabet test/alphabet.c test/unity/unity.c)
-target_link_libraries(test_alphabet nhmm)
-target_include_directories(test_alphabet PUBLIC test/unity)
-add_test(NAME alphabet COMMAND test_alphabet)
+function(nhmm_add_test name)
+  add_executable(test_${name} test/${name}.c test/unity/unity.c)
+  target_link_libraries(test_${name} nhmm)
+  target_include_directories(test_${name} PUBLIC test/unity)
+  add_test(NAME ${name} COMMAND test_${name})
+endfunction()
+
+nhmm_add_test(alphabet)
+nhmm_add_test(state)
