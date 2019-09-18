@@ -8,7 +8,8 @@ struct normal_state
     double *emission;
 };
 
-struct normal_state *create_normal_state(double *emission);
-void destroy_normal_state(struct nhmm_state *s);
+void normal_state_create(struct nhmm_state *state, double *emission);
+double normal_state_emission(struct nhmm_state *state, const char* x, size_t xlen);
+void normal_state_destroy(struct nhmm_state *state);
 
 #endif
