@@ -44,7 +44,9 @@ set(NHMM_PRIVATE_HEADERS
 set(NHMM_SOURCES
   src/alphabet.c
   src/hmm.c
-  src/state.c
+  src/state/state.c
+  src/state/normal.c
+  src/state/silent.c
   deps/sds/sds.c
 )
 

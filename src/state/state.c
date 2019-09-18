@@ -1,11 +1,10 @@
 #define NHMM_API_EXPORTS
 
-#include "state.h"
 #include "alphabet.h"
-#include <stdlib.h>
+#include "state/normal.h"
+#include "state/state.h"
 
-struct normal_state *create_normal_state(double *emission);
-void destroy_normal_state(struct nhmm_state *s);
+#include <stdlib.h>
 
 NHMM_API struct nhmm_state *nhmm_state_create_normal(const char *name,
                                                      const struct nhmm_alphabet *a,
@@ -35,25 +34,4 @@ NHMM_API void nhmm_state_destroy(struct nhmm_state *s)
 {
     if (!s)
         return s->destroy(s);
-}
-
-struct normal_state *create_normal_state(double *emission)
-{
-    struct normal_state *s = malloc(sizeof(struct nhmm_state));
-    s->emission = emission;
-    return s;
-}
-
-void destroy_normal_state(struct nhmm_state *s)
-{
-    sdsfree(s->name);
-    s->a = NULL;
-    if (s->data)
-    {
-        struct normal_state *ns = s->data;
-        if (ns->emission)
-            free(ns->emission);
-        free(ns);
-    }
-    free(s);
 }

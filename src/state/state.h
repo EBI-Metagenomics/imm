@@ -1,7 +1,8 @@
-#ifndef _NHMM_STATE_H
-#define _NHMM_STATE_H
+#ifndef _NHMM_STATE_STATE_H
+#define _NHMM_STATE_STATE_H
 
 #include "nhmm/alphabet.h"
+
 #include "sds.h"
 
 struct nhmm_state
@@ -11,11 +12,6 @@ struct nhmm_state
     void (*destroy)(struct nhmm_state *);
     void (*emission)(const char* x, size_t xlen);
     void *data;
-};
-
-struct normal_state
-{
-    double *emission;
 };
 
 #endif
