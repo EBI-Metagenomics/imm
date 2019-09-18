@@ -18,9 +18,14 @@ NHMM_API int nhmm_alphabet_length(const struct nhmm_alphabet *a)
     return sdslen(a->abc);
 }
 
-NHMM_API int nhmm_alphabet_symbol_idx(const struct nhmm_alphabet *a, char symbol)
+NHMM_API int nhmm_alphabet_symbol_idx(const struct nhmm_alphabet *a, char id)
 {
-    return a->idx[symbol];
+    return a->idx[id];
+}
+
+NHMM_API char nhmm_alphabet_symbol_id(const struct nhmm_alphabet *a, int idx)
+{
+    return a->abc[idx];
 }
 
 NHMM_API void nhmm_alphabet_destroy(struct nhmm_alphabet *a)
