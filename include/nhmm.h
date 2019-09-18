@@ -16,11 +16,11 @@ extern "C"
 {
 #endif
 
+#include "nhmm/api.h"
+#include "nhmm/alphabet.h"
 
 #ifdef __cplusplus
 }
 #endif
-
-static_assert(sizeof(int) >= 4, "Code relies on int being at least 4 bytes");
 
 #endif
