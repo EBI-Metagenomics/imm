@@ -33,6 +33,12 @@ else()
   set(DEBUG 0)
 endif()
 
+option(CLANG_ASAN_UBSAN "Enable Clang address & undefined behavior sanitizer for nhmm library." OFF)
+if(CLANG_ASAN_UBSAN AND NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
+  message(FATAL_ERROR "Sanitizers are only supported for Clang")
+endif()
+
+
 # Simple Dynamic Strings library: https://github.com/antirez/sds
 set(SDS_INCLUDE_DIRS deps/sds)
 set(SDS_SOURCES deps/sds/sds.c)
@@ -66,6 +72,14 @@ add_library(nhmm SHARED ${NHMM_SOURCES} ${SDS_SOURCES})
 set_target_properties(nhmm PROPERTIES VERSION ${NHMM_VERSION})
 set_target_properties(nhmm PROPERTIES SOVERSION ${NHMM_VERSION_MAJOR})
 set_target_properties(nhmm PROPERTIES PUBLIC_HEADER ${NHMM_PUBLIC_HEADER})
+
+if(CLANG_ASAN_UBSAN)
+  message(STATUS "Enabling Clang address sanitizer and undefined behavior sanitizer for nhmm library.")
+  set_property(TARGET nhmm APPEND PROPERTY COMPILE_DEFINITIONS EXITFREE)
+  set_property(TARGET nhmm APPEND PROPERTY COMPILE_OPTIONS -fno-sanitize-recover=all
+    -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=address -fsanitize=undefined)
+  set_property(TARGET nhmm APPEND_STRING PROPERTY LINK_FLAGS "-fsanitize=address -fsanitize=undefined ")
+endif()
 
 # Begin of test setup block.
 enable_testing()

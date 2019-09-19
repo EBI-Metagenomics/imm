@@ -54,7 +54,7 @@ NHMM_API void nhmm_state_destroy(struct nhmm_state *state)
 
     sdsfree(state->name);
     state->alphabet = NULL;
-    state->destroy(state->impl);
+    state->destroy(state);
     free(state);
 }
 
