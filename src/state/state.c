@@ -3,19 +3,29 @@
 #include "state/state.h"
 #include "alphabet.h"
 #include "state/normal.h"
+#include "state/silent.h"
 
 #include <stdlib.h>
 
 struct nhmm_state *state_create(const char *name, const struct nhmm_alphabet *alphabet);
 
-NHMM_API struct nhmm_state *
-nhmm_state_create_normal(const char *name, const struct nhmm_alphabet *alphabet,
-                         double *emission_lprobs)
+NHMM_API struct nhmm_state *nhmm_state_create_normal(
+    const char *name, const struct nhmm_alphabet *alphabet, double *emission_lprobs)
 {
     struct nhmm_state *s = state_create(name, alphabet);
     s->destroy = normal_state_destroy;
     s->emission_lprob = normal_state_emission_lprob;
     normal_state_create(s, emission_lprobs);
+    return s;
+}
+
+NHMM_API struct nhmm_state *nhmm_state_create_silent(
+    const char *name, const struct nhmm_alphabet *alphabet)
+{
+    struct nhmm_state *s = state_create(name, alphabet);
+    s->destroy = silent_state_destroy;
+    s->emission_lprob = silent_state_emission_lprob;
+    silent_state_create(s);
     return s;
 }
 
