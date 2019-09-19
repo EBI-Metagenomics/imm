@@ -17,8 +17,6 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # Generate compile_commands.json file
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# find_package(GSL REQUIRED)
-
 message(STATUS "NHMM_VERSION=${NHMM_VERSION}")
 message(STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 
@@ -39,7 +37,6 @@ endif()
 set(SDS_INCLUDE_DIRS deps/sds)
 set(SDS_SOURCES deps/sds/sds.c)
 
-# include_directories(SYSTEM ${GSL_INCLUDE_DIRS})
 include_directories(include)
 include_directories(${SDS_INCLUDE_DIRS})
 include_directories(src)
@@ -66,7 +63,6 @@ set(NHMM_SOURCES
 )
 
 add_library(nhmm SHARED ${NHMM_SOURCES} ${SDS_SOURCES})
-# target_link_libraries(nhmm ${GSL_LIBRARIES})
 set_target_properties(nhmm PROPERTIES VERSION ${NHMM_VERSION})
 set_target_properties(nhmm PROPERTIES SOVERSION ${NHMM_VERSION_MAJOR})
 set_target_properties(nhmm PROPERTIES PUBLIC_HEADER ${NHMM_PUBLIC_HEADER})
