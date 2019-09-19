@@ -39,6 +39,10 @@ if(CLANG_ASAN_UBSAN AND NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
 endif()
 
 
+if(CMAKE_C_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -pedantic -Wstrict-prototypes)
+endif()
+
 # Simple Dynamic Strings library: https://github.com/antirez/sds
 set(SDS_INCLUDE_DIRS deps/sds)
 set(SDS_SOURCES deps/sds/sds.c)
