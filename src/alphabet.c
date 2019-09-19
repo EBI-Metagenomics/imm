@@ -4,30 +4,30 @@
 #include "nhmm.h"
 #include <stdlib.h>
 
-NHMM_API struct nhmm_alphabet *nhmm_alphabet_create(const char *abc)
+NHMM_API struct nhmm_alphabet *nhmm_alphabet_create(const char *symbols)
 {
     struct nhmm_alphabet *a = malloc(sizeof(struct nhmm_alphabet));
-    a->abc = sdsnew(abc);
+    a->symbols = sdsnew(symbols);
 
-    for (int i = 0; i < sizeof(a->idx); ++i)
-        a->idx[i] = -1;
+    for (int i = 0; i < sizeof(a->symbol_idx); ++i)
+        a->symbol_idx[i] = -1;
 
-    for (int idx = 0; idx < sdslen(a->abc); ++idx)
-        a->idx[a->abc[idx]] = idx;
+    for (int idx = 0; idx < sdslen(a->symbols); ++idx)
+        a->symbol_idx[a->symbols[idx]] = idx;
 
     return a;
 }
 
-NHMM_API int nhmm_alphabet_length(const struct nhmm_alphabet *a)
+NHMM_API int nhmm_alphabet_length(const struct nhmm_alphabet *alphabet)
 {
-    return sdslen(a->abc);
+    return sdslen(alphabet->symbols);
 }
 
-NHMM_API void nhmm_alphabet_destroy(struct nhmm_alphabet *a)
+NHMM_API void nhmm_alphabet_destroy(struct nhmm_alphabet *alphabet)
 {
-    if (!a)
+    if (!alphabet)
         return;
 
-    sdsfree(a->abc);
-    free(a);
+    sdsfree(alphabet->symbols);
+    free(alphabet);
 }

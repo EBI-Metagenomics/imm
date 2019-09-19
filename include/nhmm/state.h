@@ -10,11 +10,12 @@
 struct nhmm_state;
 
 NHMM_API struct nhmm_state *nhmm_state_create_normal(const char *name,
-                                                     const struct nhmm_alphabet *a,
-                                                     double *emission);
-NHMM_API const char *nhmm_state_name(struct nhmm_state *s);
-NHMM_API void nhmm_state_set_end(struct nhmm_state *s, bool is_end);
-NHMM_API double nhmm_state_emission(struct nhmm_state *s, const char* x, size_t xlen);
-NHMM_API void nhmm_state_destroy(struct nhmm_state *s);
+                                                     const struct nhmm_alphabet *alphabet,
+                                                     double *emission_lprobs);
+NHMM_API const char *nhmm_state_name(const struct nhmm_state *state);
+NHMM_API const struct nhmm_alphabet *nhmm_state_alphabet(const struct nhmm_state *state);
+NHMM_API void nhmm_state_set_end_state(struct nhmm_state *state, bool end_state);
+NHMM_API double nhmm_state_emission_lprob(struct nhmm_state *state, const char* seq, size_t seq_len);
+NHMM_API void nhmm_state_destroy(struct nhmm_state *state);
 
 #endif

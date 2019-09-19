@@ -1,23 +1,24 @@
-#include "alphabet.h"
 #include "state/normal.h"
+#include "alphabet.h"
 
 #include <math.h>
 #include <stdlib.h>
 
-void normal_state_create(struct nhmm_state *state, double *emission)
+void normal_state_create(struct nhmm_state *state, double *emission_lprobs)
 {
     struct normal_state *s = malloc(sizeof(struct nhmm_state));
-    s->emission = emission;
+    s->emission =
+        emission_create(emission_lprobs, nhmm_alphabet_length(state->alphabet));
     state->impl = s;
 }
 
-double normal_state_emission(struct nhmm_state *state, const char* x, size_t xlen)
+double normal_state_emission_lprob(struct nhmm_state *state, const char *seq,
+                                   size_t seq_len)
 {
     struct normal_state *s = state->impl;
-    if (xlen == 1)
-    {
-        if (alphabet_has_symbol(state->a, x[0]))
-            return s->emission[alphabet_symbol_idx(state->a, x[0])];
+    if (seq_len == 1) {
+        if (alphabet_has_symbol(state->alphabet, seq[0]))
+            return s->emission->lprobs[alphabet_symbol_idx(state->alphabet, seq[0])];
     }
     return -INFINITY;
 }

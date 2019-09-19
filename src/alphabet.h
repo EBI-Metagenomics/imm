@@ -6,23 +6,26 @@
 
 struct nhmm_alphabet
 {
-    sds abc;
-    int idx[128];
+    sds symbols;
+    int symbol_idx[128];
 };
 
-inline static int alphabet_has_symbol(const struct nhmm_alphabet *a, char id)
+inline static int alphabet_has_symbol(const struct nhmm_alphabet *alphabet,
+                                      char symbol_id)
 {
-    return a->idx[id] != -1;
+    return alphabet->symbol_idx[symbol_id] != -1;
 }
 
-inline static int alphabet_symbol_idx(const struct nhmm_alphabet *a, char id)
+inline static int alphabet_symbol_idx(const struct nhmm_alphabet *alphabet,
+                                      char symbol_id)
 {
-    return a->idx[id];
+    return alphabet->symbol_idx[symbol_id];
 }
 
-inline static char alphabet_symbol_id(const struct nhmm_alphabet *a, int idx)
+inline static char alphabet_symbol_id(const struct nhmm_alphabet *alphabet,
+                                      int symbol_idx)
 {
-    return a->abc[idx];
+    return alphabet->symbols[symbol_idx];
 }
 
 #endif
