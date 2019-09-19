@@ -3,6 +3,10 @@
 #include <math.h>
 #include <stdlib.h>
 
+void setUp(void) {}
+
+void tearDown(void) {}
+
 void test_state_normal(void)
 {
     struct nhmm_alphabet *a = nhmm_alphabet_create("ACGT");

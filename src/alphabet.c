@@ -9,7 +9,7 @@ NHMM_API struct nhmm_alphabet *nhmm_alphabet_create(const char *symbols)
     struct nhmm_alphabet *a = malloc(sizeof(struct nhmm_alphabet));
     a->symbols = sdsnew(symbols);
 
-    for (int i = 0; i < sizeof(a->symbol_idx); ++i)
+    for (int i = 0; i <= NHMM_SYMBOL_ID_LAST; ++i)
         a->symbol_idx[i] = -1;
 
     for (int idx = 0; idx < sdslen(a->symbols); ++idx)

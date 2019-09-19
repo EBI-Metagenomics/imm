@@ -6,7 +6,7 @@
 
 void normal_state_create(struct nhmm_state *state, double *emission_lprobs)
 {
-    struct normal_state *s = malloc(sizeof(struct nhmm_state));
+    struct normal_state *s = malloc(sizeof(struct normal_state));
     s->emission =
         emission_create(emission_lprobs, nhmm_alphabet_length(state->alphabet));
     state->impl = s;
@@ -32,8 +32,7 @@ void normal_state_destroy(struct nhmm_state *state)
         return;
 
     struct normal_state *s = state->impl;
-    if (s->emission)
-        free(s->emission);
+    emission_destroy(s->emission);
 
     free(state->impl);
 }
