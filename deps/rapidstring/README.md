@@ -1,4 +1,4 @@
-# rapidstring
+# rapidstring library
 
 We have modified the [original implementation](https://raw.githubusercontent.com/boyerjohn/rapidstring/master/include/rapidstring.h)
 by adding an explicit type conversion:

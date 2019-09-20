@@ -7,6 +7,8 @@
 struct nhmm_hmm
 {
     const struct nhmm_alphabet *alphabet;
+
+    struct nhmm_state *states;
     struct counter* state_id_counter;
 };
 

@@ -15,6 +15,7 @@ struct nhmm_hmm *nhmm_hmm_create(const struct nhmm_alphabet *alphabet)
 int nhmm_hmm_add_state(struct nhmm_hmm *hmm, const struct nhmm_state *state, double start_lprob) {
 
     int state_id = counter_next(hmm->state_id_counter);
+    /* add(hmm->states, state_id, state); */
     return state_id;
 }
 
