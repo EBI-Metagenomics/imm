@@ -41,7 +41,7 @@ endif()
 
 if(CMAKE_C_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -pedantic -Wstrict-prototypes -Wshadow
-    -Wconversion -Wmissing-prototypes)
+    -Wconversion -Wmissing-prototypes -Wno-unused-parameter)
 endif()
 
 # rapidstring: https://github.com/boyerjohn/rapidstring
@@ -67,6 +67,7 @@ set(NHMM_SOURCES
   src/alphabet.c
   src/emission.c
   src/hmm.c
+  src/report.c
   src/state/normal.c
   src/state/silent.c
   src/state/state.c

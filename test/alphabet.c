@@ -1,6 +1,15 @@
 #include "nhmm.h"
 #include "unity.h"
 
+void test_alphabet(void);
+
+int main(void)
+{
+    UNITY_BEGIN();
+    RUN_TEST(test_alphabet);
+    return UNITY_END();
+}
+
 void test_alphabet(void)
 {
     struct nhmm_alphabet *a = nhmm_alphabet_create("ACGT");
@@ -10,9 +19,3 @@ void test_alphabet(void)
     nhmm_alphabet_destroy(a);
 }
 
-int main(void)
-{
-    UNITY_BEGIN();
-    RUN_TEST(test_alphabet);
-    return UNITY_END();
-}

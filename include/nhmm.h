@@ -16,8 +16,8 @@ extern "C"
 {
 #endif
 
-#include "nhmm/api.h"
 #include "nhmm/alphabet.h"
+#include "nhmm/api.h"
 #include "nhmm/state.h"
 
 #ifdef __cplusplus

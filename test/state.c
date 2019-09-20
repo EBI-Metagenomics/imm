@@ -7,6 +7,17 @@ void setUp(void) {}
 
 void tearDown(void) {}
 
+void test_state_normal(void);
+void test_state_silent(void);
+
+int main(void)
+{
+    UNITY_BEGIN();
+    RUN_TEST(test_state_normal);
+    RUN_TEST(test_state_silent);
+    return UNITY_END();
+}
+
 void test_state_normal(void)
 {
     struct nhmm_alphabet *a = nhmm_alphabet_create("ACGT");
@@ -49,12 +60,4 @@ void test_state_silent(void)
 
     nhmm_state_destroy(s);
     nhmm_alphabet_destroy(a);
-}
-
-int main(void)
-{
-    UNITY_BEGIN();
-    RUN_TEST(test_state_normal);
-    RUN_TEST(test_state_silent);
-    return UNITY_END();
 }

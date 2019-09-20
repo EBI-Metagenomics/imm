@@ -4,13 +4,13 @@
 #include "nhmm.h"
 #include "rapidstring.h"
 
-#define NHMM_SYMBOL_ID_FIRST 0
-#define NHMM_SYMBOL_ID_LAST 127
+#define NHMM_SYMBOL_ID_MIN 0
+#define NHMM_SYMBOL_ID_MAX 127
 
 struct nhmm_alphabet
 {
     rapidstring symbols;
-    int symbol_idx[NHMM_SYMBOL_ID_LAST + 1];
+    int symbol_idx[NHMM_SYMBOL_ID_MAX + 1];
 };
 
 inline static int alphabet_has_symbol(const struct nhmm_alphabet *alphabet,
