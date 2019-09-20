@@ -23,11 +23,10 @@ NHMM_API struct nhmm_alphabet *nhmm_alphabet_create(const char *symbols)
     const char *ids = rs_data_c(&a->symbols);
     for (int idx = 0; idx < (int) rs_len(&a->symbols); ++idx)
     {
-        if (ids[idx] < NHMM_SYMBOL_ID_MIN || ids[idx] > NHMM_SYMBOL_ID_MAX)
-        {
-            error("symbols must be non-extended ASCII characters");
+        if (check_symbol_id_range(ids[idx])) {
             rs_free(&a->symbols);
             free(a);
+            return NULL;
         }
 
         a->symbol_idx[(size_t) ids[idx]] = idx;
