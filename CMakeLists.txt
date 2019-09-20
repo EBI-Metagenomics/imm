@@ -44,12 +44,11 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang")
     -Wconversion -Wmissing-prototypes)
 endif()
 
-# Simple Dynamic Strings library: https://github.com/antirez/sds
-set(SDS_INCLUDE_DIRS deps/sds)
-set(SDS_SOURCES deps/sds/sds.c)
+# rapidstring: https://github.com/boyerjohn/rapidstring
+set(RS_INCLUDE_DIRS deps/rapidstring)
 
 include_directories(include)
-include_directories(${SDS_INCLUDE_DIRS})
+include_directories(${RS_INCLUDE_DIRS})
 include_directories(src)
 
 # Interface header that that the user is used to include.
@@ -73,7 +72,7 @@ set(NHMM_SOURCES
   src/state/state.c
 )
 
-add_library(nhmm SHARED ${NHMM_SOURCES} ${SDS_SOURCES})
+add_library(nhmm SHARED ${NHMM_SOURCES})
 set_target_properties(nhmm PROPERTIES VERSION ${NHMM_VERSION})
 set_target_properties(nhmm PROPERTIES SOVERSION ${NHMM_VERSION_MAJOR})
 set_target_properties(nhmm PROPERTIES PUBLIC_HEADER ${NHMM_PUBLIC_HEADER})

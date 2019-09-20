@@ -4,7 +4,6 @@
 #include "alphabet.h"
 #include "state/normal.h"
 #include "state/silent.h"
-
 #include <stdlib.h>
 
 struct nhmm_state *state_create(const char *name, const struct nhmm_alphabet *alphabet);
@@ -29,7 +28,7 @@ NHMM_API struct nhmm_state *nhmm_state_create_silent(
     return s;
 }
 
-NHMM_API const char *nhmm_state_name(const struct nhmm_state *s) { return s->name; }
+NHMM_API const char *nhmm_state_name(const struct nhmm_state *s) { return rs_data_c(&s->name); }
 
 NHMM_API const struct nhmm_alphabet *nhmm_state_alphabet(const struct nhmm_state *s)
 {
@@ -52,7 +51,7 @@ NHMM_API void nhmm_state_destroy(struct nhmm_state *state)
     if (!state)
         return;
 
-    sdsfree(state->name);
+    rs_free(&state->name);
     state->alphabet = NULL;
     state->destroy(state);
     free(state);
@@ -61,7 +60,7 @@ NHMM_API void nhmm_state_destroy(struct nhmm_state *state)
 struct nhmm_state *state_create(const char *name, const struct nhmm_alphabet *alphabet)
 {
     struct nhmm_state *s = malloc(sizeof(struct nhmm_state));
-    s->name = sdsnew(name);
+    rs_init_w(&s->name, name);
     s->alphabet = alphabet;
     return s;
 }

@@ -3,8 +3,7 @@
 
 #include "nhmm/alphabet.h"
 #include "nhmm/state.h"
-
-#include "sds.h"
+#include "rapidstring.h"
 
 typedef void (*state_destroy)(struct nhmm_state *state);
 typedef double (*state_emission_lprob)(struct nhmm_state *state, const char *seq,
@@ -12,7 +11,7 @@ typedef double (*state_emission_lprob)(struct nhmm_state *state, const char *seq
 
 struct nhmm_state
 {
-    sds name;
+    rapidstring name;
     const struct nhmm_alphabet *alphabet;
     bool end_state;
 

@@ -2,14 +2,14 @@
 #define _NHMM_ALPHABET_H
 
 #include "nhmm.h"
-#include "sds.h"
+#include "rapidstring.h"
 
 #define NHMM_SYMBOL_ID_FIRST 0
 #define NHMM_SYMBOL_ID_LAST 127
 
 struct nhmm_alphabet
 {
-    sds symbols;
+    rapidstring symbols;
     int symbol_idx[NHMM_SYMBOL_ID_LAST + 1];
 };
 
@@ -28,7 +28,7 @@ inline static int alphabet_symbol_idx(const struct nhmm_alphabet *alphabet,
 inline static char alphabet_symbol_id(const struct nhmm_alphabet *alphabet,
                                       int symbol_idx)
 {
-    return alphabet->symbols[symbol_idx];
+    return rs_data_c(&alphabet->symbols)[symbol_idx];
 }
 
 #endif
