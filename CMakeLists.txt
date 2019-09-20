@@ -40,7 +40,8 @@ endif()
 
 
 if(CMAKE_C_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -pedantic -Wstrict-prototypes)
+  add_compile_options(-Wall -Wextra -pedantic -Wstrict-prototypes -Wshadow
+    -Wconversion -Wmissing-prototypes)
 endif()
 
 # Simple Dynamic Strings library: https://github.com/antirez/sds
