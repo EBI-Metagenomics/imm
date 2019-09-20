@@ -1321,7 +1321,7 @@ RS_API unsigned char rs_is_heap(const rapidstring *s)
 {
 	RS_ASSERT_RS(s);
 
-	return RS_HEAP_LIKELY(s->heap.flag == RS_HEAP_FLAG);
+	return (unsigned char) RS_HEAP_LIKELY(s->heap.flag == RS_HEAP_FLAG);
 }
 
 RS_API unsigned char rs_is_stack(const rapidstring *s)
