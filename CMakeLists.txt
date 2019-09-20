@@ -47,8 +47,12 @@ endif()
 # rapidstring: https://github.com/boyerjohn/rapidstring
 set(RS_INCLUDE_DIRS deps/rapidstring)
 
+# uthash: https://github.com/troydhanson/uthash
+set(UTHASH_INCLUDE_DIRS deps/uthash)
+
 include_directories(include)
 include_directories(${RS_INCLUDE_DIRS})
+include_directories(${UTHASH_INCLUDE_DIRS})
 include_directories(src)
 
 # Interface header that that the user is used to include.

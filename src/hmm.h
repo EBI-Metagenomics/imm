@@ -4,11 +4,13 @@
 #include "nhmm/hmm.h"
 #include "nhmm/alphabet.h"
 
+struct tbl_state;
+
 struct nhmm_hmm
 {
     const struct nhmm_alphabet *alphabet;
 
-    struct nhmm_state *states;
+    struct tbl_state *tbl_states;
     struct counter* state_id_counter;
 };
 
