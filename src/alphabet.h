@@ -27,7 +27,7 @@ inline static int alphabet_has_symbol(const struct nhmm_alphabet *alphabet,
                                       char symbol_id)
 {
     check_symbol_id_range(symbol_id);
-    return alphabet->symbol_idx[(size_t) symbol_id] != -1;
+    return alphabet->symbol_idx[(size_t)symbol_id] != -1;
 }
 
 inline static int alphabet_symbol_idx(const struct nhmm_alphabet *alphabet,
@@ -35,7 +35,7 @@ inline static int alphabet_symbol_idx(const struct nhmm_alphabet *alphabet,
 {
     if (check_symbol_id_range(symbol_id))
         return -1;
-    return alphabet->symbol_idx[(size_t) symbol_id];
+    return alphabet->symbol_idx[(size_t)symbol_id];
 }
 
 inline static char alphabet_symbol_id(const struct nhmm_alphabet *alphabet,

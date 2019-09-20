@@ -18,6 +18,7 @@ extern "C"
 
 #include "nhmm/alphabet.h"
 #include "nhmm/api.h"
+#include "nhmm/hmm.h"
 #include "nhmm/state.h"
 
 #ifdef __cplusplus

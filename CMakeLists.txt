@@ -65,6 +65,7 @@ set(NHMM_PRIVATE_HEADERS
 
 set(NHMM_SOURCES
   src/alphabet.c
+  src/counter.c
   src/emission.c
   src/hmm.c
   src/report.c
@@ -103,4 +104,5 @@ endfunction()
 
 nhmm_add_test(alphabet)
 nhmm_add_test(state)
+nhmm_add_test(hmm)
 # End of test setup block.

@@ -3,8 +3,8 @@
 #include "alphabet.h"
 #include "nhmm.h"
 #include "report.h"
-#include <stdlib.h>
 #include <limits.h>
+#include <stdlib.h>
 
 int check_symbols_length(const char *symbols);
 
@@ -21,15 +21,14 @@ NHMM_API struct nhmm_alphabet *nhmm_alphabet_create(const char *symbols)
         a->symbol_idx[i] = -1;
 
     const char *ids = rs_data_c(&a->symbols);
-    for (int idx = 0; idx < (int) rs_len(&a->symbols); ++idx)
-    {
+    for (int idx = 0; idx < (int)rs_len(&a->symbols); ++idx) {
         if (check_symbol_id_range(ids[idx])) {
             rs_free(&a->symbols);
             free(a);
             return NULL;
         }
 
-        a->symbol_idx[(size_t) ids[idx]] = idx;
+        a->symbol_idx[(size_t)ids[idx]] = idx;
     }
 
     return a;
@@ -51,8 +50,7 @@ NHMM_API void nhmm_alphabet_destroy(struct nhmm_alphabet *alphabet)
 
 int check_symbols_length(const char *symbols)
 {
-    if (strlen(symbols) > INT_MAX)
-    {
+    if (strlen(symbols) > INT_MAX) {
         error("symbols length is greater than %d", INT_MAX);
         return 1;
     }
