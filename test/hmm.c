@@ -7,6 +7,7 @@ void test_hmm_state_id(void);
 void test_hmm_del_get_state(void);
 void test_hmm_set_trans(void);
 void test_hmm_likelihood_single_state(void);
+void test_hmm_likelihood_two_states(void);
 
 int main(void)
 {
@@ -15,6 +16,7 @@ int main(void)
     RUN_TEST(test_hmm_del_get_state);
     RUN_TEST(test_hmm_set_trans);
     RUN_TEST(test_hmm_likelihood_single_state);
+    RUN_TEST(test_hmm_likelihood_two_states);
     return UNITY_END();
 }
 
@@ -110,6 +112,34 @@ void test_hmm_likelihood_single_state(void)
     nhmm_path_create(&path);
     nhmm_path_add(&path, state_id, 1);
     TEST_ASSERT_EQUAL_DOUBLE(-1.386294361120, nhmm_hmm_likelihood(hmm, "A", path));
+    nhmm_path_destroy(&path);
+
+    nhmm_hmm_destroy(hmm);
+    nhmm_state_destroy(state);
+    nhmm_alphabet_destroy(alphabet);
+}
+
+void test_hmm_likelihood_two_states(void)
+{
+    struct nhmm_alphabet *alphabet = nhmm_alphabet_create("ACGT");
+
+    double *emission_lprobs = malloc(4 * sizeof(double));
+    emission_lprobs[0] = log(0.25);
+    emission_lprobs[1] = log(0.25);
+    emission_lprobs[2] = log(0.5);
+    emission_lprobs[3] = -INFINITY;
+
+    struct nhmm_state *state = nhmm_state_create_normal("State0", alphabet, emission_lprobs);
+    struct nhmm_hmm *hmm = nhmm_hmm_create(alphabet);
+
+    int state_id = nhmm_hmm_add_state(hmm, state, log(1.0));
+    nhmm_hmm_set_trans(hmm, state_id, state_id, log(1.0));
+
+    struct nhmm_path *path = NULL;
+    nhmm_path_create(&path);
+    nhmm_path_add(&path, state_id, 1);
+    nhmm_path_add(&path, state_id, 1);
+    TEST_ASSERT_EQUAL_DOUBLE(-2.772588722240, nhmm_hmm_likelihood(hmm, "AA", path));
     nhmm_path_destroy(&path);
 
     nhmm_hmm_destroy(hmm);

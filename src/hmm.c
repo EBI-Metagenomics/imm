@@ -75,6 +75,24 @@ int nhmm_hmm_set_trans(struct nhmm_hmm *hmm, int src_state_id, int dst_state_id,
     return 0;
 }
 
+double nhmm_hmm_get_trans(const struct nhmm_hmm *hmm, int src_state_id, int dst_state_id)
+{
+    struct tbl_trans **tbl_transitions =
+        tbl_state_get_transitions(hmm->tbl_states, src_state_id);
+
+    if (!tbl_transitions) {
+        error("source state not found");
+        return NAN;
+    }
+
+    if (!tbl_state_get_state(hmm->tbl_states, dst_state_id)) {
+        error("destination state not found");
+        return NAN;
+    }
+
+    return tbl_trans_get_lprob(*tbl_transitions, dst_state_id);
+}
+
 const struct nhmm_alphabet *nhmm_hmm_get_alphabet(const struct nhmm_hmm *hmm)
 {
     return hmm->alphabet;
@@ -88,17 +106,20 @@ double nhmm_hmm_likelihood(const struct nhmm_hmm *hmm, const char *seq,
     double lprob = 0.0;
     const char *sub_seq = seq;
     size_t seq_len = 0;
-    int state_id = NHMM_INVALID_STATE_ID;
+    int prev_state_id = NHMM_INVALID_STATE_ID;
+    const struct nhmm_state *state = NULL;
     DL_FOREACH(path, item)
     {
         if (i == 0) {
-            state_id = item->state_id;
-            seq_len = item->seq_len;
-            const struct nhmm_state *state = nhmm_hmm_get_state(hmm, item->state_id);
-            lprob = hmm_start_lprob(hmm, state_id) +
-                    nhmm_state_emission_lprob(state, sub_seq, seq_len);
+            state = nhmm_hmm_get_state(hmm, item->state_id);
+            lprob = hmm_start_lprob(hmm, item->state_id) +
+                    nhmm_state_emission_lprob(state, sub_seq, item->seq_len);
         } else {
+            state = nhmm_hmm_get_state(hmm, item->state_id);
+            lprob += nhmm_state_emission_lprob(state, sub_seq, item->seq_len) +
+                nhmm_hmm_get_trans(hmm, prev_state_id, item->state_id);
         }
+        prev_state_id  = item->state_id;
         sub_seq += seq_len;
         ++i;
     }
