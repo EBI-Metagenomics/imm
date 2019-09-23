@@ -78,6 +78,7 @@ void test_hmm_set_trans(void)
     TEST_ASSERT_NOT_NULL(nhmm_hmm_get_state(hmm, state_id1));
 
     TEST_ASSERT_EQUAL_INT(-1, nhmm_hmm_set_trans(hmm, state_id0, 5, log(0.5)));
+    TEST_ASSERT_EQUAL_INT(-1, nhmm_hmm_set_trans(hmm, 5, state_id1, log(0.5)));
     TEST_ASSERT_EQUAL_INT(0, nhmm_hmm_set_trans(hmm, state_id0, state_id1, log(0.5)));
 
     nhmm_hmm_destroy(hmm);

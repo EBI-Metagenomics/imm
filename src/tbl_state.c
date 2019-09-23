@@ -46,6 +46,15 @@ void tbl_trans_set_lprob(struct tbl_trans **tbl_transitions, int state_id, doubl
     tbl_trans->lprob = lprob;
 }
 
+double tbl_trans_get_lprob(const struct tbl_trans *tbl_transitions, int state_id)
+{
+    struct tbl_trans *tbl_trans = NULL;
+    HASH_FIND_INT(tbl_transitions, &state_id, tbl_trans);
+    if (!tbl_trans)
+        return NAN;
+    return tbl_trans->lprob;
+}
+
 void tbl_state_create(struct tbl_state **tbl_states) { *tbl_states = NULL; }
 
 void tbl_state_add_state(struct tbl_state **tbl_states, int state_id,

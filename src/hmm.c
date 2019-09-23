@@ -3,6 +3,7 @@
 #include "counter.h"
 #include "state/state.h"
 #include "tbl_state.h"
+#include <math.h>
 #include <stdlib.h>
 
 struct nhmm_hmm *nhmm_hmm_create(const struct nhmm_alphabet *alphabet)
@@ -44,8 +45,10 @@ const struct nhmm_state *nhmm_hmm_get_state(const struct nhmm_hmm *hmm, int stat
 int nhmm_hmm_set_trans(struct nhmm_hmm *hmm, int src_state_id, int dst_state_id,
                        double lprob)
 {
-    struct tbl_trans **tbl_transitions = tbl_state_get_transitions(hmm->tbl_states, src_state_id);
-    if (!tbl_transitions ) {
+    struct tbl_trans **tbl_transitions =
+        tbl_state_get_transitions(hmm->tbl_states, src_state_id);
+
+    if (!tbl_transitions) {
         error("source state not found");
         return -1;
     }
