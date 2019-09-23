@@ -1,10 +1,6 @@
 #ifndef NHMM_ALPHABET_H
 #define NHMM_ALPHABET_H
 
-#include "nhmm.h"
-#include "rapidstring.h"
-#include "report.h"
-
 struct nhmm_alphabet;
 
 int alphabet_has_symbol(const struct nhmm_alphabet *alphabet, char symbol_id);

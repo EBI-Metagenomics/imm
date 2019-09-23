@@ -2,13 +2,13 @@
 
 #include "alphabet.h"
 #include "nhmm.h"
+#include "rapidstring.h"
 #include "report.h"
 #include <limits.h>
 #include <stdlib.h>
 
 #define NHMM_SYMBOL_ID_MIN 0
 #define NHMM_SYMBOL_ID_MAX 127
-
 
 struct nhmm_alphabet
 {
@@ -59,23 +59,20 @@ NHMM_API void nhmm_alphabet_destroy(struct nhmm_alphabet *alphabet)
     free(alphabet);
 }
 
-int alphabet_has_symbol(const struct nhmm_alphabet *alphabet,
-                                      char symbol_id)
+int alphabet_has_symbol(const struct nhmm_alphabet *alphabet, char symbol_id)
 {
     check_symbol_id_range(symbol_id);
     return alphabet->symbol_idx[(size_t)symbol_id] != -1;
 }
 
-int alphabet_symbol_idx(const struct nhmm_alphabet *alphabet,
-                                      char symbol_id)
+int alphabet_symbol_idx(const struct nhmm_alphabet *alphabet, char symbol_id)
 {
     if (check_symbol_id_range(symbol_id))
         return -1;
     return alphabet->symbol_idx[(size_t)symbol_id];
 }
 
-char alphabet_symbol_id(const struct nhmm_alphabet *alphabet,
-                                      int symbol_idx)
+char alphabet_symbol_id(const struct nhmm_alphabet *alphabet, int symbol_idx)
 {
     return rs_data_c(&alphabet->symbols)[symbol_idx];
 }
@@ -97,4 +94,3 @@ int check_symbol_id_range(char symbol_id)
     }
     return 0;
 }
-
