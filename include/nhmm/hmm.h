@@ -2,6 +2,7 @@
 #define NHMM_HMM_H_API
 
 #include "nhmm/alphabet.h"
+#include "nhmm/path.h"
 #include "nhmm/state.h"
 
 struct nhmm_hmm;
@@ -14,6 +15,7 @@ const struct nhmm_state *nhmm_hmm_get_state(const struct nhmm_hmm *hmm, int stat
 int nhmm_hmm_set_trans(struct nhmm_hmm *hmm, int src_state_id, int dst_state_id,
                        double lprob);
 const struct nhmm_alphabet *nhmm_hmm_alphabet(const struct nhmm_hmm *hmm);
+double nhmm_hmm_likelihood(const char *seq, const struct nhmm_path *path);
 void nhmm_hmm_destroy(struct nhmm_hmm *hmm);
 
 #endif

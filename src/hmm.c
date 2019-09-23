@@ -67,6 +67,11 @@ const struct nhmm_alphabet *nhmm_hmm_alphabet(const struct nhmm_hmm *hmm)
     return hmm->alphabet;
 }
 
+double nhmm_hmm_likelihood(const char *seq, const struct nhmm_path *path)
+{
+
+}
+
 void nhmm_hmm_destroy(struct nhmm_hmm *hmm)
 {
     if (!hmm)
