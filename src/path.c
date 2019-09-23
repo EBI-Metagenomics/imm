@@ -1,6 +1,6 @@
 #define NHMM_API_EXPORTS
 
-#include "nhmm/path.h"
+#include "nhmm.h"
 #include "path.h"
 #include "utlist.h"
 #include <stdlib.h>
@@ -20,7 +20,7 @@ NHMM_API void nhmm_path_destroy(struct nhmm_path **path)
     struct nhmm_path *elem, *tmp;
     DL_FOREACH_SAFE(*path, elem, tmp)
     {
-        elem->state_id = NHMM_STATE_ID_INVALID;
+        elem->state_id = NHMM_INVALID_STATE_ID;
         elem->seq_len = 0;
         DL_DELETE(*path, elem);
         free(elem);

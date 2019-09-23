@@ -1,8 +1,7 @@
 #ifndef NHMM_STATE_STATE_H
 #define NHMM_STATE_STATE_H
 
-#include "nhmm/alphabet.h"
-#include "nhmm/state.h"
+#include "nhmm.h"
 #include "rapidstring.h"
 
 typedef void (*state_destroy)(struct nhmm_state *state);

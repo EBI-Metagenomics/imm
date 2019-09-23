@@ -33,7 +33,7 @@ int nhmm_hmm_add_state(struct nhmm_hmm *hmm, const struct nhmm_state *state,
 {
     int state_id = counter_next(hmm->state_id_counter);
     if (state_id == -1)
-        return NHMM_STATE_ID_INVALID;
+        return NHMM_INVALID_STATE_ID;
     tbl_state_add_state(&hmm->tbl_states, state_id, state, start_lprob);
     return state_id;
 }
@@ -88,7 +88,7 @@ double nhmm_hmm_likelihood(const struct nhmm_hmm *hmm, const char *seq,
     double lprob = 0.0;
     const char *sub_seq = seq;
     size_t seq_len = 0;
-    int state_id = NHMM_STATE_ID_INVALID;
+    int state_id = NHMM_INVALID_STATE_ID;
     DL_FOREACH(path, item)
     {
         if (i == 0) {

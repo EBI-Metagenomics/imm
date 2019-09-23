@@ -1,5 +1,4 @@
 #include "state/silent.h"
-
 #include <math.h>
 
 void silent_state_create(struct nhmm_state *state) { state->impl = NULL; }

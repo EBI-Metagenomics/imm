@@ -2,7 +2,7 @@
 #define NHMM_PATH_H_API
 
 #include "nhmm/api.h"
-#include "nhmm/state.h"
+#include <stddef.h>
 
 struct nhmm_path;
 

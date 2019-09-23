@@ -1,6 +1,5 @@
 #include "state/normal.h"
 #include "alphabet.h"
-
 #include <math.h>
 #include <stdlib.h>
 
