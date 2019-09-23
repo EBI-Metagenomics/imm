@@ -51,6 +51,9 @@ void test_hmm_del_get_state(void)
     nhmm_hmm_del_state(hmm, state_id1);
     TEST_ASSERT_NULL(nhmm_hmm_get_state(hmm, state_id1));
 
+    TEST_ASSERT_EQUAL_INT(-1, nhmm_hmm_del_state(hmm, state_id0));
+    TEST_ASSERT_EQUAL_INT(-1, nhmm_hmm_del_state(hmm, state_id1));
+
     nhmm_hmm_destroy(hmm);
     nhmm_state_destroy(state0);
     nhmm_state_destroy(state1);
