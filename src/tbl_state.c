@@ -13,6 +13,7 @@ struct tbl_state
 {
     int state_id;
     const struct nhmm_state *state;
+    double start_lprob;
     struct tbl_trans *tbl_transitions;
     UT_hash_handle hh;
 };
@@ -58,11 +59,12 @@ double tbl_trans_get_lprob(const struct tbl_trans *tbl_transitions, int state_id
 void tbl_state_create(struct tbl_state **tbl_states) { *tbl_states = NULL; }
 
 void tbl_state_add_state(struct tbl_state **tbl_states, int state_id,
-                         const struct nhmm_state *state)
+                         const struct nhmm_state *state, double start_lprob)
 {
     struct tbl_state *tbl_state = malloc(sizeof(struct tbl_state));
     tbl_trans_create(&tbl_state->tbl_transitions);
     tbl_state->state_id = state_id;
+    tbl_state->start_lprob = start_lprob;
     tbl_state->state = state;
     HASH_ADD_INT(*tbl_states, state_id, tbl_state);
 }
@@ -97,6 +99,15 @@ struct tbl_trans **tbl_state_get_transitions(struct tbl_state *tbl_states, int s
     return NULL;
 }
 
+double tbl_state_get_start_lprob(const struct tbl_state *tbl_states, int state_id)
+{
+    struct tbl_state *tbl_state = NULL;
+    HASH_FIND_INT(tbl_states, &state_id, tbl_state);
+    if (tbl_state)
+        return tbl_state->start_lprob;
+    return NAN;
+}
+
 void tbl_state_destroy(struct tbl_state **tbl_states)
 {
     struct tbl_state *tbl_state, *tmp;
@@ -106,6 +117,7 @@ void tbl_state_destroy(struct tbl_state **tbl_states)
             tbl_trans_destroy(&tbl_state->tbl_transitions);
             tbl_state->tbl_transitions = NULL;
             tbl_state->state = NULL;
+            tbl_state->start_lprob = NAN;
             tbl_state->state_id = -1;
             HASH_DEL(*tbl_states, tbl_state);
             free(tbl_state);

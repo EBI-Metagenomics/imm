@@ -17,6 +17,8 @@ struct nhmm_hmm
     struct counter *state_id_counter;
 };
 
+double hmm_start_lprob(const struct nhmm_hmm *hmm, int state_id);
+
 struct nhmm_hmm *nhmm_hmm_create(const struct nhmm_alphabet *alphabet)
 {
     struct nhmm_hmm *hmm = malloc(sizeof(struct nhmm_hmm));
@@ -32,7 +34,7 @@ int nhmm_hmm_add_state(struct nhmm_hmm *hmm, const struct nhmm_state *state,
     int state_id = counter_next(hmm->state_id_counter);
     if (state_id == -1)
         return NHMM_STATE_ID_INVALID;
-    tbl_state_add_state(&hmm->tbl_states, state_id, state);
+    tbl_state_add_state(&hmm->tbl_states, state_id, state, start_lprob);
     return state_id;
 }
 
@@ -90,8 +92,7 @@ double nhmm_hmm_likelihood(const struct nhmm_hmm *hmm, const char *seq, const st
             int state_id = elem->state_id;
             size_t seq_len = elem->seq_len;
             const struct nhmm_state *state = nhmm_hmm_get_state(hmm, elem->state_id);
-            /* lprob = hmm_init_lprob(state_id) + nhmm_state_emission_lprob(state, sub_seq, seq_len); */
-
+            lprob = hmm_start_lprob(hmm ,state_id) + nhmm_state_emission_lprob(state, sub_seq, seq_len);
         } else {
 
         }
@@ -112,4 +113,14 @@ void nhmm_hmm_destroy(struct nhmm_hmm *hmm)
     hmm->alphabet = NULL;
     hmm->state_id_counter = NULL;
     free(hmm);
+}
+
+double hmm_start_lprob(const struct nhmm_hmm *hmm, int state_id)
+{
+    double lprob = tbl_state_get_start_lprob(hmm->tbl_states, state_id);
+    if (isnan(lprob)) {
+        error("state not found");
+        return NAN;
+    }
+    return lprob;
 }
