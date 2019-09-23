@@ -26,20 +26,17 @@ int nhmm_hmm_add_state(struct nhmm_hmm *hmm, const struct nhmm_state *state,
 
 int nhmm_hmm_del_state(struct nhmm_hmm *hmm, int state_id)
 {
-    if (tbl_state_del_state(&hmm->tbl_states, state_id)) {
-        error("state not found");
+    if (tbl_state_del_state(&hmm->tbl_states, state_id))
         return -1;
-    }
+
     return 0;
 }
 
 const struct nhmm_state *nhmm_hmm_get_state(const struct nhmm_hmm *hmm, int state_id)
 {
     const struct nhmm_state *state = tbl_state_get_state(hmm->tbl_states, state_id);
-    if (!state) {
-        error("state not found");
+    if (!state)
         return NULL;
-    }
 
     return state;
 }

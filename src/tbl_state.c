@@ -11,7 +11,7 @@ struct tbl_trans
 struct tbl_state
 {
     int state_id;
-    struct nhmm_state *state;
+    const struct nhmm_state *state;
     struct tbl_trans *tbl_transitions;
     UT_hash_handle hh;
 };
@@ -65,7 +65,8 @@ int tbl_state_del_state(struct tbl_state **tbl_states, int state_id)
     return -1;
 }
 
-const struct nhmm_state *tbl_state_get_state(const struct tbl_state *tbl_states, int state_id)
+const struct nhmm_state *tbl_state_get_state(const struct tbl_state *tbl_states,
+                                             int state_id)
 {
     struct tbl_state *tbl_state = NULL;
     HASH_FIND_INT(tbl_states, &state_id, tbl_state);
@@ -90,8 +91,10 @@ void tbl_state_destroy(struct tbl_state **tbl_states)
         HASH_ITER(hh, *tbl_states, tbl_state, tmp)
         {
             tbl_trans_destroy(&tbl_state->tbl_transitions);
-            HASH_DEL(*tbl_states, tbl_state);
             tbl_state->tbl_transitions = NULL;
+            tbl_state->state = NULL;
+            tbl_state->state_id = -1;
+            HASH_DEL(*tbl_states, tbl_state);
             free(tbl_state);
         }
     }
