@@ -40,7 +40,7 @@ NHMM_API void nhmm_state_set_end_state(struct nhmm_state *state, bool end_state)
     state->end_state = end_state;
 }
 
-NHMM_API double nhmm_state_emission_lprob(struct nhmm_state *state, const char *seq,
+NHMM_API double nhmm_state_emission_lprob(const struct nhmm_state *state, const char *seq,
                                           size_t seq_len)
 {
     return state->emission_lprob(state, seq, seq_len);

@@ -6,7 +6,7 @@
 #include "rapidstring.h"
 
 typedef void (*state_destroy)(struct nhmm_state *state);
-typedef double (*state_emission_lprob)(struct nhmm_state *state, const char *seq,
+typedef double (*state_emission_lprob)(const struct nhmm_state *state, const char *seq,
                                        size_t seq_len);
 
 struct nhmm_state

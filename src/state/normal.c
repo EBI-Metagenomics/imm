@@ -12,7 +12,7 @@ void normal_state_create(struct nhmm_state *state, double *emission_lprobs)
     state->impl = s;
 }
 
-double normal_state_emission_lprob(struct nhmm_state *state, const char *seq,
+double normal_state_emission_lprob(const struct nhmm_state *state, const char *seq,
                                    size_t seq_len)
 {
     struct normal_state *s = state->impl;

@@ -4,7 +4,7 @@
 
 void silent_state_create(struct nhmm_state *state) { state->impl = NULL; }
 
-double silent_state_emission_lprob(struct nhmm_state *state, const char *seq,
+double silent_state_emission_lprob(const struct nhmm_state *state, const char *seq,
                                    size_t seq_len)
 {
     if (seq_len == 0)

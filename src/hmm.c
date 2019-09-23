@@ -80,24 +80,29 @@ const struct nhmm_alphabet *nhmm_hmm_alphabet(const struct nhmm_hmm *hmm)
     return hmm->alphabet;
 }
 
-double nhmm_hmm_likelihood(const struct nhmm_hmm *hmm, const char *seq, const struct nhmm_path *path)
+double nhmm_hmm_likelihood(const struct nhmm_hmm *hmm, const char *seq,
+                           const struct nhmm_path *path)
 {
-    struct nhmm_path *elem = NULL;
+    const struct nhmm_path *item = NULL;
     int i = 0;
     double lprob = 0.0;
     const char *sub_seq = seq;
-    DL_FOREACH(path, elem) {
-        if (i == 0)
-        {
-            int state_id = elem->state_id;
-            size_t seq_len = elem->seq_len;
-            const struct nhmm_state *state = nhmm_hmm_get_state(hmm, elem->state_id);
-            lprob = hmm_start_lprob(hmm ,state_id) + nhmm_state_emission_lprob(state, sub_seq, seq_len);
+    size_t seq_len = 0;
+    int state_id = NHMM_STATE_ID_INVALID;
+    DL_FOREACH(path, item)
+    {
+        if (i == 0) {
+            state_id = item->state_id;
+            seq_len = item->seq_len;
+            const struct nhmm_state *state = nhmm_hmm_get_state(hmm, item->state_id);
+            lprob = hmm_start_lprob(hmm, state_id) +
+                    nhmm_state_emission_lprob(state, sub_seq, seq_len);
         } else {
-
         }
+        sub_seq += seq_len;
         ++i;
     }
+    return lprob;
 }
 
 void nhmm_hmm_destroy(struct nhmm_hmm *hmm)
