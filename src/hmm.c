@@ -20,7 +20,7 @@ int nhmm_hmm_add_state(struct nhmm_hmm *hmm, const struct nhmm_state *state,
 {
     int state_id = counter_next(hmm->state_id_counter);
     if (state_id == -1)
-        return -1;
+        return NHMM_STATE_ID_INVALID;
     tbl_state_add_state(&hmm->tbl_states, state_id, state);
     return state_id;
 }

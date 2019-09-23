@@ -7,6 +7,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#define NHMM_STATE_ID_INVALID -1
+
 struct nhmm_state;
 
 NHMM_API struct nhmm_state *nhmm_state_create_normal(

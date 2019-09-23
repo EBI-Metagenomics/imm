@@ -7,13 +7,13 @@
 #include <limits.h>
 #include <stdlib.h>
 
-#define NHMM_SYMBOL_ID_MIN 0
-#define NHMM_SYMBOL_ID_MAX 127
+#define SYMBOL_ID_MIN 0
+#define SYMBOL_ID_MAX 127
 
 struct nhmm_alphabet
 {
     rapidstring symbols;
-    int symbol_idx[NHMM_SYMBOL_ID_MAX + 1];
+    int symbol_idx[SYMBOL_ID_MAX + 1];
 };
 
 int check_symbols_length(const char *symbols);
@@ -28,7 +28,7 @@ NHMM_API struct nhmm_alphabet *nhmm_alphabet_create(const char *symbols)
 
     rs_init_w(&a->symbols, symbols);
 
-    for (int i = 0; i <= NHMM_SYMBOL_ID_MAX; ++i)
+    for (int i = 0; i <= SYMBOL_ID_MAX; ++i)
         a->symbol_idx[i] = -1;
 
     const char *ids = rs_data_c(&a->symbols);
@@ -88,7 +88,7 @@ int check_symbols_length(const char *symbols)
 
 int check_symbol_id_range(char symbol_id)
 {
-    if (symbol_id < NHMM_SYMBOL_ID_MIN || symbol_id > NHMM_SYMBOL_ID_MAX) {
+    if (symbol_id < SYMBOL_ID_MIN || symbol_id > SYMBOL_ID_MAX) {
         error("symbols must be non-extended ASCII characters");
         return 1;
     }
