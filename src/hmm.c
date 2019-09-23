@@ -102,26 +102,39 @@ double nhmm_hmm_likelihood(const struct nhmm_hmm *hmm, const char *seq,
                            const struct nhmm_path *path)
 {
     const struct nhmm_path *item = NULL;
+    size_t seq_len = strlen(seq);
     int i = 0;
     double lprob = 0.0;
-    const char *sub_seq = seq;
-    size_t seq_len = 0;
     int prev_state_id = NHMM_INVALID_STATE_ID;
     const struct nhmm_state *state = NULL;
     DL_FOREACH(path, item)
     {
+        if (item->seq_len > seq_len) {
+            error("path emitted more symbols than sequence");
+            return NAN;
+        }
         if (i == 0) {
             state = nhmm_hmm_get_state(hmm, item->state_id);
+            if (!state)
+                return NAN;
             lprob = hmm_start_lprob(hmm, item->state_id) +
-                    nhmm_state_emission_lprob(state, sub_seq, item->seq_len);
+                    nhmm_state_emission_lprob(state, seq, item->seq_len);
         } else {
             state = nhmm_hmm_get_state(hmm, item->state_id);
-            lprob += nhmm_state_emission_lprob(state, sub_seq, item->seq_len) +
+            if (!state)
+                return NAN;
+            lprob += nhmm_state_emission_lprob(state, seq, item->seq_len) +
                 nhmm_hmm_get_trans(hmm, prev_state_id, item->state_id);
         }
         prev_state_id  = item->state_id;
-        sub_seq += seq_len;
+        seq += item->seq_len;
+        seq_len -= item->seq_len;
         ++i;
+    }
+    if (seq_len > 0)
+    {
+        error("path emitted less symbols than sequence");
+        return NAN;
     }
     return lprob;
 }
