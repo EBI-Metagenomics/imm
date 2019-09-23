@@ -72,6 +72,7 @@ set(NHMM_SOURCES
   src/counter.c
   src/emission.c
   src/hmm.c
+  src/path.c
   src/report.c
   src/state/normal.c
   src/state/silent.c
