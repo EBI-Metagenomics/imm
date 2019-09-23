@@ -1,5 +1,5 @@
-#ifndef _NHMM_HMM_H
-#define _NHMM_HMM_H
+#ifndef NHMM_HMM_H
+#define NHMM_HMM_H
 
 #include "nhmm/hmm.h"
 #include "nhmm/alphabet.h"

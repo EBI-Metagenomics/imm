@@ -1,5 +1,5 @@
-#ifndef NHMM_ALPHABET_H
-#define NHMM_ALPHABET_H
+#ifndef NHMM_ALPHABET_H_API
+#define NHMM_ALPHABET_H_API
 
 #include "nhmm/api.h"
 #include <stddef.h>

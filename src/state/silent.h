@@ -1,5 +1,5 @@
-#ifndef _NHMM_STATE_SILENT_H
-#define _NHMM_STATE_SILENT_H
+#ifndef NHMM_STATE_SILENT_H
+#define NHMM_STATE_SILENT_H
 
 #include "emission.h"
 #include "state/state.h"

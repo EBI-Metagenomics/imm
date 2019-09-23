@@ -1,5 +1,5 @@
-#ifndef _NHMM_REPORT_H
-#define _NHMM_REPORT_H
+#ifndef NHMM_REPORT_H
+#define NHMM_REPORT_H
 
 #include <stdarg.h>
 

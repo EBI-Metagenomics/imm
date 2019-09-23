@@ -1,5 +1,5 @@
-#ifndef NHMM_HMM_H
-#define NHMM_HMM_H
+#ifndef NHMM_HMM_H_API
+#define NHMM_HMM_H_API
 
 #include "nhmm/alphabet.h"
 #include "nhmm/state.h"

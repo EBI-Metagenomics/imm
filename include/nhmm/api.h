@@ -1,5 +1,5 @@
-#ifndef NHMM_API_H
-#define NHMM_API_H
+#ifndef NHMM_API_H_API
+#define NHMM_API_H_API
 
 #ifdef _WIN32
 #ifdef NHMM_API_EXPORTS

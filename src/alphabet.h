@@ -1,5 +1,5 @@
-#ifndef _NHMM_ALPHABET_H
-#define _NHMM_ALPHABET_H
+#ifndef NHMM_ALPHABET_H
+#define NHMM_ALPHABET_H
 
 #include "nhmm.h"
 #include "rapidstring.h"

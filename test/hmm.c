@@ -40,6 +40,9 @@ void test_hmm_del_get_state(void)
     int state_id0 = nhmm_hmm_add_state(hmm, state0, log(0.5));
     int state_id1 = nhmm_hmm_add_state(hmm, state1, log(0.5));
 
+    TEST_ASSERT_EQUAL_INT(0, state_id0);
+    TEST_ASSERT_EQUAL_INT(1, state_id1);
+
     TEST_ASSERT_NOT_NULL(nhmm_hmm_get_state(hmm, state_id0));
     nhmm_hmm_del_state(hmm, state_id0);
     TEST_ASSERT_NULL(nhmm_hmm_get_state(hmm, state_id0));

@@ -1,5 +1,5 @@
-#ifndef _NHMM_STATE_STATE_H
-#define _NHMM_STATE_STATE_H
+#ifndef NHMM_STATE_STATE_H
+#define NHMM_STATE_STATE_H
 
 #include "nhmm/alphabet.h"
 #include "nhmm/state.h"

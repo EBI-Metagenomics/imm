@@ -1,5 +1,5 @@
-#ifndef _NHMM_EMISSION_H
-#define _NHMM_EMISSION_H
+#ifndef NHMM_EMISSION_H
+#define NHMM_EMISSION_H
 
 #include <stddef.h>
 

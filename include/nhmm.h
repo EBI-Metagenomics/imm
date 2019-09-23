@@ -1,5 +1,5 @@
-#ifndef NHMM_H
-#define NHMM_H
+#ifndef NHMM_H_API
+#define NHMM_H_API
 
 #define NHMM_VERSION_MAJOR 0
 #define NHMM_VERSION_MINOR 0

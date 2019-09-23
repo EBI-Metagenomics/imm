@@ -76,6 +76,7 @@ set(NHMM_SOURCES
   src/state/normal.c
   src/state/silent.c
   src/state/state.c
+  src/tbl_state.c
 )
 
 add_library(nhmm SHARED ${NHMM_SOURCES})
