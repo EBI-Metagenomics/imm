@@ -3,10 +3,6 @@
 #include <math.h>
 #include <stdlib.h>
 
-void setUp(void) {}
-
-void tearDown(void) {}
-
 void test_state_normal(void);
 void test_state_silent(void);
 

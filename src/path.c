@@ -20,7 +20,7 @@ NHMM_API void nhmm_path_add(struct nhmm_path **path, struct nhmm_state *state,
     struct nhmm_path *elem = malloc(sizeof(struct nhmm_path));
     elem->state = state;
     elem->seq_len = seq_len;
-    LL_APPEND(*path, elem);
+    DL_APPEND(*path, elem);
 }
 
 NHMM_API void nhmm_path_destroy(struct nhmm_path **path)

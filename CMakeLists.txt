@@ -111,4 +111,5 @@ endfunction()
 nhmm_add_test(alphabet)
 nhmm_add_test(state)
 nhmm_add_test(hmm)
+nhmm_add_test(path)
 # End of test setup block.
