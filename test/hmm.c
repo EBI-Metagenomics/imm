@@ -97,13 +97,9 @@ void test_hmm_likelihood_single_state(void)
 {
     struct nhmm_alphabet *alphabet = nhmm_alphabet_create("ACGT");
 
-    double *emission_lprobs = malloc(4 * sizeof(double));
-    emission_lprobs[0] = log(0.25);
-    emission_lprobs[1] = log(0.25);
-    emission_lprobs[2] = log(0.5);
-    emission_lprobs[3] = -INFINITY;
+    double lprobs[] = {log(0.25), log(0.25), log(0.5), -INFINITY};
 
-    struct nhmm_state *state = nhmm_state_create_normal("State0", alphabet, emission_lprobs);
+    struct nhmm_state *state = nhmm_state_create_normal("State0", alphabet, lprobs);
     struct nhmm_hmm *hmm = nhmm_hmm_create(alphabet);
 
     int state_id = nhmm_hmm_add_state(hmm, state, log(1.0));
@@ -123,13 +119,9 @@ void test_hmm_likelihood_two_states(void)
 {
     struct nhmm_alphabet *alphabet = nhmm_alphabet_create("ACGT");
 
-    double *emission_lprobs = malloc(4 * sizeof(double));
-    emission_lprobs[0] = log(0.25);
-    emission_lprobs[1] = log(0.25);
-    emission_lprobs[2] = log(0.5);
-    emission_lprobs[3] = -INFINITY;
+    double lprobs[] = {log(0.25), log(0.25), log(0.5), -INFINITY};
 
-    struct nhmm_state *state = nhmm_state_create_normal("State0", alphabet, emission_lprobs);
+    struct nhmm_state *state = nhmm_state_create_normal("State0", alphabet, lprobs);
     struct nhmm_hmm *hmm = nhmm_hmm_create(alphabet);
 
     int state_id = nhmm_hmm_add_state(hmm, state, log(1.0));

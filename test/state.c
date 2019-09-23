@@ -18,13 +18,8 @@ void test_state_normal(void)
 {
     struct nhmm_alphabet *a = nhmm_alphabet_create("ACGT");
 
-    double *emission_lprobs = malloc(4 * sizeof(double));
-    emission_lprobs[0] = log(0.25);
-    emission_lprobs[1] = log(0.25);
-    emission_lprobs[2] = log(0.5);
-    emission_lprobs[3] = -INFINITY;
-
-    struct nhmm_state *s = nhmm_state_create_normal("State0", a, emission_lprobs);
+    double lprobs[] = {log(0.25), log(0.25), log(0.5), -INFINITY};
+    struct nhmm_state *s = nhmm_state_create_normal("State0", a, lprobs);
 
     TEST_ASSERT_EQUAL_STRING("State0", nhmm_state_get_name(s));
     TEST_ASSERT_EQUAL_DOUBLE(log(0.25), nhmm_state_emission_lprob(s, "A", 1));
