@@ -52,7 +52,7 @@ double tbl_trans_get_lprob(const struct tbl_trans *tbl_transitions, int state_id
     struct tbl_trans *tbl_trans = NULL;
     HASH_FIND_INT(tbl_transitions, &state_id, tbl_trans);
     if (!tbl_trans)
-        return NAN;
+        return -INFINITY;
     return tbl_trans->lprob;
 }
 

@@ -123,6 +123,7 @@ double nhmm_hmm_likelihood(const struct nhmm_hmm *hmm, const char *seq,
             state = nhmm_hmm_get_state(hmm, item->state_id);
             if (!state)
                 return NAN;
+            /* lprob += nhmm_state_emission_lprob(state, seq, item->seq_len); */
             lprob += nhmm_state_emission_lprob(state, seq, item->seq_len) +
                 nhmm_hmm_get_trans(hmm, prev_state_id, item->state_id);
         }
