@@ -1,16 +1,9 @@
 #define NHMM_API_EXPORTS
 
 #include "nhmm/path.h"
+#include "path.h"
 #include "utlist.h"
 #include <stdlib.h>
-
-struct nhmm_path
-{
-    int state_id;
-    size_t seq_len;
-    struct nhmm_path *next;
-    struct nhmm_path *prev;
-};
 
 NHMM_API void nhmm_path_create(struct nhmm_path **path) { *path = NULL; }
 

@@ -1,10 +1,21 @@
-#include "hmm.h"
-#include "alphabet.h"
 #include "counter.h"
+#include "nhmm.h"
+#include "path.h"
 #include "state/state.h"
 #include "tbl_state.h"
+#include "utlist.h"
 #include <math.h>
 #include <stdlib.h>
+
+struct nhmm_hmm
+{
+    const struct nhmm_alphabet *alphabet;
+
+    /* Maps `state_id` to `state`. */
+    struct tbl_state *tbl_states;
+    /* `state_id`s pool: starts with 0, then 1, and so on. */
+    struct counter *state_id_counter;
+};
 
 struct nhmm_hmm *nhmm_hmm_create(const struct nhmm_alphabet *alphabet)
 {
@@ -67,9 +78,25 @@ const struct nhmm_alphabet *nhmm_hmm_alphabet(const struct nhmm_hmm *hmm)
     return hmm->alphabet;
 }
 
-double nhmm_hmm_likelihood(const char *seq, const struct nhmm_path *path)
+double nhmm_hmm_likelihood(const struct nhmm_hmm *hmm, const char *seq, const struct nhmm_path *path)
 {
+    struct nhmm_path *elem = NULL;
+    int i = 0;
+    double lprob = 0.0;
+    const char *sub_seq = seq;
+    DL_FOREACH(path, elem) {
+        if (i == 0)
+        {
+            int state_id = elem->state_id;
+            size_t seq_len = elem->seq_len;
+            const struct nhmm_state *state = nhmm_hmm_get_state(hmm, elem->state_id);
+            /* lprob = hmm_init_lprob(state_id) + nhmm_state_emission_lprob(state, sub_seq, seq_len); */
 
+        } else {
+
+        }
+        ++i;
+    }
 }
 
 void nhmm_hmm_destroy(struct nhmm_hmm *hmm)
