@@ -75,7 +75,7 @@ int nhmm_hmm_set_trans(struct nhmm_hmm *hmm, int src_state_id, int dst_state_id,
     return 0;
 }
 
-const struct nhmm_alphabet *nhmm_hmm_alphabet(const struct nhmm_hmm *hmm)
+const struct nhmm_alphabet *nhmm_hmm_get_alphabet(const struct nhmm_hmm *hmm)
 {
     return hmm->alphabet;
 }

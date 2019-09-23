@@ -14,8 +14,8 @@ NHMM_API struct nhmm_state *nhmm_state_create_normal(
     const char *name, const struct nhmm_alphabet *alphabet, double *emission_lprobs);
 NHMM_API struct nhmm_state *nhmm_state_create_silent(
     const char *name, const struct nhmm_alphabet *alphabet);
-NHMM_API const char *nhmm_state_name(const struct nhmm_state *state);
-NHMM_API const struct nhmm_alphabet *nhmm_state_alphabet(
+NHMM_API const char *nhmm_state_get_name(const struct nhmm_state *state);
+NHMM_API const struct nhmm_alphabet *nhmm_state_get_alphabet(
     const struct nhmm_state *state);
 NHMM_API void nhmm_state_set_end_state(struct nhmm_state *state, bool end_state);
 NHMM_API double nhmm_state_emission_lprob(const struct nhmm_state *state,

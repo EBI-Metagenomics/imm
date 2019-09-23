@@ -28,12 +28,12 @@ NHMM_API struct nhmm_state *nhmm_state_create_silent(
     return s;
 }
 
-NHMM_API const char *nhmm_state_name(const struct nhmm_state *s)
+NHMM_API const char *nhmm_state_get_name(const struct nhmm_state *s)
 {
     return rs_data_c(&s->name);
 }
 
-NHMM_API const struct nhmm_alphabet *nhmm_state_alphabet(const struct nhmm_state *s)
+NHMM_API const struct nhmm_alphabet *nhmm_state_get_alphabet(const struct nhmm_state *s)
 {
     return s->alphabet;
 }
