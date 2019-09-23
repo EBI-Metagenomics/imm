@@ -1,5 +1,6 @@
 #include "tbl_state.h"
 #include "uthash.h"
+#include <math.h>
 
 struct tbl_trans
 {
@@ -24,10 +25,13 @@ void tbl_trans_destroy(struct tbl_trans **tbl_transitions)
     if (*tbl_transitions) {
         HASH_ITER(hh, *tbl_transitions, tbl_trans, tmp)
         {
+            tbl_trans->state_id = -1;
+            tbl_trans->lprob = -INFINITY;
             HASH_DEL(*tbl_transitions, tbl_trans);
             free(tbl_trans);
         }
     }
+    *tbl_transitions = NULL;
 }
 
 void tbl_trans_set_lprob(struct tbl_trans **tbl_transitions, int state_id, double lprob)
@@ -87,7 +91,7 @@ struct tbl_trans **tbl_state_get_transitions(struct tbl_state *tbl_states, int s
 void tbl_state_destroy(struct tbl_state **tbl_states)
 {
     struct tbl_state *tbl_state, *tmp;
-    if (tbl_states) {
+    if (*tbl_states) {
         HASH_ITER(hh, *tbl_states, tbl_state, tmp)
         {
             tbl_trans_destroy(&tbl_state->tbl_transitions);
@@ -98,4 +102,5 @@ void tbl_state_destroy(struct tbl_state **tbl_states)
             free(tbl_state);
         }
     }
+    *tbl_states = NULL;
 }
