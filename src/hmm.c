@@ -19,7 +19,7 @@ struct nhmm_hmm
 
 double hmm_start_lprob(const struct nhmm_hmm *hmm, int state_id);
 
-struct nhmm_hmm *nhmm_hmm_create(const struct nhmm_alphabet *alphabet)
+NHMM_API struct nhmm_hmm *nhmm_hmm_create(const struct nhmm_alphabet *alphabet)
 {
     struct nhmm_hmm *hmm = malloc(sizeof(struct nhmm_hmm));
     hmm->alphabet = alphabet;
@@ -28,7 +28,7 @@ struct nhmm_hmm *nhmm_hmm_create(const struct nhmm_alphabet *alphabet)
     return hmm;
 }
 
-int nhmm_hmm_add_state(struct nhmm_hmm *hmm, const struct nhmm_state *state,
+NHMM_API int nhmm_hmm_add_state(struct nhmm_hmm *hmm, const struct nhmm_state *state,
                        double start_lprob)
 {
     int state_id = counter_next(hmm->state_id_counter);
@@ -38,7 +38,7 @@ int nhmm_hmm_add_state(struct nhmm_hmm *hmm, const struct nhmm_state *state,
     return state_id;
 }
 
-int nhmm_hmm_del_state(struct nhmm_hmm *hmm, int state_id)
+NHMM_API int nhmm_hmm_del_state(struct nhmm_hmm *hmm, int state_id)
 {
     if (tbl_state_del_state(&hmm->tbl_states, state_id))
         return -1;
@@ -46,7 +46,7 @@ int nhmm_hmm_del_state(struct nhmm_hmm *hmm, int state_id)
     return 0;
 }
 
-const struct nhmm_state *nhmm_hmm_get_state(const struct nhmm_hmm *hmm, int state_id)
+NHMM_API const struct nhmm_state *nhmm_hmm_get_state(const struct nhmm_hmm *hmm, int state_id)
 {
     const struct nhmm_state *state = tbl_state_get_state(hmm->tbl_states, state_id);
     if (!state)
@@ -55,7 +55,7 @@ const struct nhmm_state *nhmm_hmm_get_state(const struct nhmm_hmm *hmm, int stat
     return state;
 }
 
-int nhmm_hmm_set_trans(struct nhmm_hmm *hmm, int src_state_id, int dst_state_id,
+NHMM_API int nhmm_hmm_set_trans(struct nhmm_hmm *hmm, int src_state_id, int dst_state_id,
                        double lprob)
 {
     struct tbl_trans **tbl_transitions =
@@ -75,7 +75,7 @@ int nhmm_hmm_set_trans(struct nhmm_hmm *hmm, int src_state_id, int dst_state_id,
     return 0;
 }
 
-double nhmm_hmm_get_trans(const struct nhmm_hmm *hmm, int src_state_id, int dst_state_id)
+NHMM_API double nhmm_hmm_get_trans(const struct nhmm_hmm *hmm, int src_state_id, int dst_state_id)
 {
     struct tbl_trans **tbl_transitions =
         tbl_state_get_transitions(hmm->tbl_states, src_state_id);
@@ -93,12 +93,12 @@ double nhmm_hmm_get_trans(const struct nhmm_hmm *hmm, int src_state_id, int dst_
     return tbl_trans_get_lprob(*tbl_transitions, dst_state_id);
 }
 
-const struct nhmm_alphabet *nhmm_hmm_get_alphabet(const struct nhmm_hmm *hmm)
+NHMM_API const struct nhmm_alphabet *nhmm_hmm_get_alphabet(const struct nhmm_hmm *hmm)
 {
     return hmm->alphabet;
 }
 
-double nhmm_hmm_likelihood(const struct nhmm_hmm *hmm, const char *seq,
+NHMM_API double nhmm_hmm_likelihood(const struct nhmm_hmm *hmm, const char *seq,
                            const struct nhmm_path *path)
 {
     const struct nhmm_path *item = NULL;
@@ -123,7 +123,6 @@ double nhmm_hmm_likelihood(const struct nhmm_hmm *hmm, const char *seq,
             state = nhmm_hmm_get_state(hmm, item->state_id);
             if (!state)
                 return NAN;
-            /* lprob += nhmm_state_emission_lprob(state, seq, item->seq_len); */
             lprob += nhmm_state_emission_lprob(state, seq, item->seq_len) +
                 nhmm_hmm_get_trans(hmm, prev_state_id, item->state_id);
         }
@@ -140,7 +139,12 @@ double nhmm_hmm_likelihood(const struct nhmm_hmm *hmm, const char *seq,
     return lprob;
 }
 
-void nhmm_hmm_destroy(struct nhmm_hmm *hmm)
+NHMM_API void nhmm_hmm_normalize(const struct nhmm_hmm *hmm)
+{
+
+}
+
+NHMM_API void nhmm_hmm_destroy(struct nhmm_hmm *hmm)
 {
     if (!hmm)
         return;

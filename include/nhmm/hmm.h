@@ -21,6 +21,7 @@ NHMM_API double nhmm_hmm_get_trans(const struct nhmm_hmm *hmm, int src_state_id,
 NHMM_API const struct nhmm_alphabet *nhmm_hmm_get_alphabet(const struct nhmm_hmm *hmm);
 NHMM_API double nhmm_hmm_likelihood(const struct nhmm_hmm *hmm, const char *seq,
                                     const struct nhmm_path *path);
+NHMM_API void nhmm_hmm_normalize(const struct nhmm_hmm *hmm);
 NHMM_API void nhmm_hmm_destroy(struct nhmm_hmm *hmm);
 
 #endif
