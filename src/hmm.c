@@ -157,7 +157,12 @@ not_found_state:
     return NAN;
 }
 
-NHMM_API void nhmm_hmm_normalize(const struct nhmm_hmm *hmm) {}
+NHMM_API void nhmm_hmm_normalize(const struct nhmm_hmm *hmm)
+{
+    const struct tbl_state *tbl_state = hmm->tbl_states;
+    /* tbl_state_next(tbl_state); */
+
+}
 
 NHMM_API void nhmm_hmm_destroy(struct nhmm_hmm *hmm)
 {

@@ -50,6 +50,9 @@ set(RS_INCLUDE_DIRS deps/rapidstring)
 # uthash: https://github.com/troydhanson/uthash
 set(UTHASH_INCLUDE_DIRS deps/uthash)
 
+# logaddexp: https://github.com/horta/logaddexp
+set(UTHASH_INCLUDE_DIRS deps/logaddexp)
+
 include_directories(include)
 include_directories(${RS_INCLUDE_DIRS})
 include_directories(${UTHASH_INCLUDE_DIRS})

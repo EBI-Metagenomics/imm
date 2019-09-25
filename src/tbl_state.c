@@ -108,6 +108,11 @@ double tbl_state_get_start_lprob(const struct tbl_state *tbl_states, int state_i
     return NAN;
 }
 
+const struct tbl_state *tbl_state_next(const struct tbl_state *tbl_state)
+{
+    return tbl_state->hh.next;
+}
+
 void tbl_state_destroy(struct tbl_state **tbl_states)
 {
     struct tbl_state *tbl_state, *tmp;

@@ -21,6 +21,7 @@ const struct nhmm_state *tbl_state_get_state(const struct tbl_state *tbl_states,
 double tbl_state_get_start_lprob(const struct tbl_state *tbl_states, int state_id);
 struct tbl_trans **tbl_state_get_transitions(struct tbl_state *tbl_states,
                                              int state_id);
+const struct tbl_state *tbl_state_next(const struct tbl_state *tbl_state);
 void tbl_state_destroy(struct tbl_state **tbl_states);
 
 #endif
