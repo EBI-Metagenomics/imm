@@ -4,6 +4,7 @@
 #include "path.h"
 #include "state/state.h"
 #include "tbl_state.h"
+#include "tbl_trans.h"
 #include "utlist.h"
 #include <math.h>
 #include <stdlib.h>
@@ -225,6 +226,4 @@ void hmm_normalize_start(struct nhmm_hmm *hmm)
     }
 }
 
-void hmm_normalize_trans(struct tbl_state *tbl_state) {
-
-}
+void hmm_normalize_trans(struct tbl_state *tbl_state) {}

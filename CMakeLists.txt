@@ -82,6 +82,7 @@ set(NHMM_SOURCES
   src/state/silent.c
   src/state/state.c
   src/tbl_state.c
+  src/tbl_trans.c
 )
 
 add_library(nhmm SHARED ${NHMM_SOURCES})
