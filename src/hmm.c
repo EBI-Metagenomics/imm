@@ -29,7 +29,7 @@ NHMM_API struct nhmm_hmm *nhmm_hmm_create(const struct nhmm_alphabet *alphabet)
 }
 
 NHMM_API int nhmm_hmm_add_state(struct nhmm_hmm *hmm, const struct nhmm_state *state,
-                       double start_lprob)
+                                double start_lprob)
 {
     int state_id = counter_next(hmm->state_id_counter);
     if (state_id == -1)
@@ -46,7 +46,8 @@ NHMM_API int nhmm_hmm_del_state(struct nhmm_hmm *hmm, int state_id)
     return 0;
 }
 
-NHMM_API const struct nhmm_state *nhmm_hmm_get_state(const struct nhmm_hmm *hmm, int state_id)
+NHMM_API const struct nhmm_state *nhmm_hmm_get_state(const struct nhmm_hmm *hmm,
+                                                     int state_id)
 {
     const struct nhmm_state *state = tbl_state_get_state(hmm->tbl_states, state_id);
     if (!state)
@@ -55,8 +56,8 @@ NHMM_API const struct nhmm_state *nhmm_hmm_get_state(const struct nhmm_hmm *hmm,
     return state;
 }
 
-NHMM_API int nhmm_hmm_set_trans(struct nhmm_hmm *hmm, int src_state_id, int dst_state_id,
-                       double lprob)
+NHMM_API int nhmm_hmm_set_trans(struct nhmm_hmm *hmm, int src_state_id,
+                                int dst_state_id, double lprob)
 {
     struct tbl_trans **tbl_transitions =
         tbl_state_get_transitions(hmm->tbl_states, src_state_id);
@@ -75,7 +76,8 @@ NHMM_API int nhmm_hmm_set_trans(struct nhmm_hmm *hmm, int src_state_id, int dst_
     return 0;
 }
 
-NHMM_API double nhmm_hmm_get_trans(const struct nhmm_hmm *hmm, int src_state_id, int dst_state_id)
+NHMM_API double nhmm_hmm_get_trans(const struct nhmm_hmm *hmm, int src_state_id,
+                                   int dst_state_id)
 {
     struct tbl_trans **tbl_transitions =
         tbl_state_get_transitions(hmm->tbl_states, src_state_id);
@@ -99,10 +101,9 @@ NHMM_API const struct nhmm_alphabet *nhmm_hmm_get_alphabet(const struct nhmm_hmm
 }
 
 NHMM_API double nhmm_hmm_likelihood(const struct nhmm_hmm *hmm, const char *seq,
-                           const struct nhmm_path *path)
+                                    const struct nhmm_path *path)
 {
-    if (!path)
-    {
+    if (!path) {
         if (seq) {
             error("path is NULL but seq is not");
             return NAN;
@@ -116,48 +117,56 @@ NHMM_API double nhmm_hmm_likelihood(const struct nhmm_hmm *hmm, const char *seq,
     }
 
     const struct nhmm_path *item = path;
+    size_t item_seq_len = path_get_seq_len(item);
     size_t seq_len = strlen(seq);
-    int i = 0;
-    double lprob = 0.0;
+    if (item_seq_len > seq_len) {
+        error("path emitted more symbols than sequence");
+        return NAN;
+    }
+
+    int state_id = path_get_state_id(item);
+    const struct nhmm_state *state = nhmm_hmm_get_state(hmm, state_id);
+    if (!state) {
+        error("state is NULL");
+        return NAN;
+    }
+
+    double lprob = hmm_start_lprob(hmm, state_id) +
+                   nhmm_state_emission_lprob(state, seq, item_seq_len);
+
     int prev_state_id = NHMM_INVALID_STATE_ID;
-    const struct nhmm_state *state = NULL;
-    while (item)
-    {
-        if (path_get_seq_len(item) > seq_len) {
+    goto enter;
+    while (item) {
+        item_seq_len = path_get_seq_len(item);
+        if (item_seq_len > seq_len) {
             error("path emitted more symbols than sequence");
             return NAN;
         }
-        if (i == 0) {
-            state = nhmm_hmm_get_state(hmm, path_get_state_id(item));
-            if (!state)
-                return NAN;
-            lprob = hmm_start_lprob(hmm, path_get_state_id(item)) +
-                    nhmm_state_emission_lprob(state, seq, path_get_seq_len(item));
-        } else {
-            state = nhmm_hmm_get_state(hmm, path_get_state_id(item));
-            if (!state)
-                return NAN;
-            lprob += nhmm_state_emission_lprob(state, seq, path_get_seq_len(item)) +
-                nhmm_hmm_get_trans(hmm, prev_state_id, path_get_state_id(item));
+
+        state_id = path_get_state_id(item);
+        state = nhmm_hmm_get_state(hmm, state_id);
+        if (!state) {
+            error("state is NULL");
+            return NAN;
         }
-        prev_state_id  = path_get_state_id(item);
-        seq += path_get_seq_len(item);
-        seq_len -= path_get_seq_len(item);
-        ++i;
+
+        lprob += nhmm_state_emission_lprob(state, seq, item_seq_len) +
+                 nhmm_hmm_get_trans(hmm, prev_state_id, state_id);
+
+    enter:
+        prev_state_id = state_id;
+        seq += item_seq_len;
+        seq_len -= item_seq_len;
         item = path_next_item(item);
     }
-    if (seq_len > 0)
-    {
+    if (seq_len > 0) {
         error("path emitted less symbols than sequence");
         return NAN;
     }
     return lprob;
 }
 
-NHMM_API void nhmm_hmm_normalize(const struct nhmm_hmm *hmm)
-{
-
-}
+NHMM_API void nhmm_hmm_normalize(const struct nhmm_hmm *hmm) {}
 
 NHMM_API void nhmm_hmm_destroy(struct nhmm_hmm *hmm)
 {
