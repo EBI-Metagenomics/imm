@@ -5,6 +5,14 @@
 #include "utlist.h"
 #include <stdlib.h>
 
+struct nhmm_path
+{
+    int state_id;
+    size_t seq_len;
+    struct nhmm_path *next;
+    struct nhmm_path *prev;
+};
+
 NHMM_API void nhmm_path_create(struct nhmm_path **path) { *path = NULL; }
 
 NHMM_API void nhmm_path_add(struct nhmm_path **path, int state_id, size_t seq_len)
@@ -25,4 +33,19 @@ NHMM_API void nhmm_path_destroy(struct nhmm_path **path)
         DL_DELETE(*path, elem);
         free(elem);
     }
+}
+
+const struct nhmm_path *path_next_item(const struct nhmm_path *item)
+{
+    return item->next;
+}
+
+int path_get_state_id(const struct nhmm_path *item)
+{
+    return item->state_id;
+}
+
+size_t path_get_seq_len(const struct nhmm_path *item)
+{
+    return item->seq_len;
 }

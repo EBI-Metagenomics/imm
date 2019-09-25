@@ -101,35 +101,50 @@ NHMM_API const struct nhmm_alphabet *nhmm_hmm_get_alphabet(const struct nhmm_hmm
 NHMM_API double nhmm_hmm_likelihood(const struct nhmm_hmm *hmm, const char *seq,
                            const struct nhmm_path *path)
 {
-    const struct nhmm_path *item = NULL;
+    if (!path)
+    {
+        if (seq) {
+            error("path is NULL but seq is not");
+            return NAN;
+        }
+        return 0.0;
+    } else {
+        if (!seq) {
+            error("seq is NULL but path is not");
+            return NAN;
+        }
+    }
+
+    const struct nhmm_path *item = path;
     size_t seq_len = strlen(seq);
     int i = 0;
     double lprob = 0.0;
     int prev_state_id = NHMM_INVALID_STATE_ID;
     const struct nhmm_state *state = NULL;
-    DL_FOREACH(path, item)
+    while (item)
     {
-        if (item->seq_len > seq_len) {
+        if (path_get_seq_len(item) > seq_len) {
             error("path emitted more symbols than sequence");
             return NAN;
         }
         if (i == 0) {
-            state = nhmm_hmm_get_state(hmm, item->state_id);
+            state = nhmm_hmm_get_state(hmm, path_get_state_id(item));
             if (!state)
                 return NAN;
-            lprob = hmm_start_lprob(hmm, item->state_id) +
-                    nhmm_state_emission_lprob(state, seq, item->seq_len);
+            lprob = hmm_start_lprob(hmm, path_get_state_id(item)) +
+                    nhmm_state_emission_lprob(state, seq, path_get_seq_len(item));
         } else {
-            state = nhmm_hmm_get_state(hmm, item->state_id);
+            state = nhmm_hmm_get_state(hmm, path_get_state_id(item));
             if (!state)
                 return NAN;
-            lprob += nhmm_state_emission_lprob(state, seq, item->seq_len) +
-                nhmm_hmm_get_trans(hmm, prev_state_id, item->state_id);
+            lprob += nhmm_state_emission_lprob(state, seq, path_get_seq_len(item)) +
+                nhmm_hmm_get_trans(hmm, prev_state_id, path_get_state_id(item));
         }
-        prev_state_id  = item->state_id;
-        seq += item->seq_len;
-        seq_len -= item->seq_len;
+        prev_state_id  = path_get_state_id(item);
+        seq += path_get_seq_len(item);
+        seq_len -= path_get_seq_len(item);
         ++i;
+        item = path_next_item(item);
     }
     if (seq_len > 0)
     {

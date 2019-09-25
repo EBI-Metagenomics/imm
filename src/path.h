@@ -3,12 +3,10 @@
 
 #include <stddef.h>
 
-struct nhmm_path
-{
-    int state_id;
-    size_t seq_len;
-    struct nhmm_path *next;
-    struct nhmm_path *prev;
-};
+struct nhmm_path;
+
+const struct nhmm_path *path_next_item(const struct nhmm_path *item);
+int path_get_state_id(const struct nhmm_path *item);
+size_t path_get_seq_len(const struct nhmm_path *item);
 
 #endif
