@@ -51,11 +51,12 @@ set(RS_INCLUDE_DIRS deps/rapidstring)
 set(UTHASH_INCLUDE_DIRS deps/uthash)
 
 # logaddexp: https://github.com/horta/logaddexp
-set(UTHASH_INCLUDE_DIRS deps/logaddexp)
+set(LOGADDEXP_INCLUDE_DIRS deps/logaddexp)
 
 include_directories(include)
 include_directories(${RS_INCLUDE_DIRS})
 include_directories(${UTHASH_INCLUDE_DIRS})
+include_directories(${LOGADDEXP_INCLUDE_DIRS})
 include_directories(src)
 
 # Interface header that that the user is used to include.
