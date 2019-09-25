@@ -22,10 +22,10 @@ void test_state_normal(void)
     struct nhmm_state *s = nhmm_state_create_normal("State0", a, lprobs);
 
     TEST_ASSERT_EQUAL_STRING("State0", nhmm_state_get_name(s));
-    TEST_ASSERT_EQUAL_DOUBLE(log(0.25), nhmm_state_emission_lprob(s, "A", 1));
-    TEST_ASSERT_EQUAL_DOUBLE(log(0.25), nhmm_state_emission_lprob(s, "C", 1));
-    TEST_ASSERT_EQUAL_DOUBLE(log(0.5), nhmm_state_emission_lprob(s, "G", 1));
-    TEST_ASSERT_DOUBLE_IS_NEG_INF(nhmm_state_emission_lprob(s, "T", 1));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.25), nhmm_state_emiss_lprob(s, "A", 1));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.25), nhmm_state_emiss_lprob(s, "C", 1));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.5), nhmm_state_emiss_lprob(s, "G", 1));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(nhmm_state_emiss_lprob(s, "T", 1));
 
     TEST_ASSERT_EQUAL_INT(4, nhmm_alphabet_length(nhmm_state_get_alphabet(s)));
 
@@ -42,8 +42,8 @@ void test_state_silent(void)
     struct nhmm_state *s = nhmm_state_create_silent("State0", a);
 
     TEST_ASSERT_EQUAL_STRING("State0", nhmm_state_get_name(s));
-    TEST_ASSERT_EQUAL_DOUBLE(0.0, nhmm_state_emission_lprob(s, "", 0));
-    TEST_ASSERT_DOUBLE_IS_NEG_INF(nhmm_state_emission_lprob(s, "A", 1));
+    TEST_ASSERT_EQUAL_DOUBLE(0.0, nhmm_state_emiss_lprob(s, "", 0));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(nhmm_state_emiss_lprob(s, "A", 1));
 
     TEST_ASSERT_EQUAL_INT(4, nhmm_alphabet_length(nhmm_state_get_alphabet(s)));
 

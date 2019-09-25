@@ -142,6 +142,7 @@ void test_hmm_likelihood_single_state(void)
     nhmm_path_destroy(&path);
 
     TEST_ASSERT_DOUBLE_IS_NAN(nhmm_hmm_likelihood(hmm, "A", NULL));
+    TEST_ASSERT_DOUBLE_IS_NAN(nhmm_hmm_likelihood(hmm, NULL, NULL));
 
     /* nhmm_path_create(&path); */
     /* nhmm_path_add(&path, state_id, 1); */

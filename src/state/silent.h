@@ -5,7 +5,7 @@
 #include "state/state.h"
 
 void silent_state_create(struct nhmm_state *state);
-double silent_state_emission_lprob(const struct nhmm_state *state, const char *seq,
+double silent_state_emiss_lprob(const struct nhmm_state *state, const char *seq,
                                    size_t seq_len);
 void silent_state_destroy(struct nhmm_state *state);
 

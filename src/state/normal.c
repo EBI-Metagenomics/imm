@@ -3,16 +3,15 @@
 #include <math.h>
 #include <stdlib.h>
 
-void normal_state_create(struct nhmm_state *state, double *emission_lprobs)
+void normal_state_create(struct nhmm_state *state, double *emiss_lprobs)
 {
     struct normal_state *s = malloc(sizeof(struct normal_state));
-    s->emission =
-        emission_create(emission_lprobs, nhmm_alphabet_length(state->alphabet));
+    s->emission = emission_create(emiss_lprobs, nhmm_alphabet_length(state->alphabet));
     state->impl = s;
 }
 
-double normal_state_emission_lprob(const struct nhmm_state *state, const char *seq,
-                                   size_t seq_len)
+double normal_state_emiss_lprob(const struct nhmm_state *state, const char *seq,
+                                size_t seq_len)
 {
     struct normal_state *s = state->impl;
     if (seq_len == 1) {

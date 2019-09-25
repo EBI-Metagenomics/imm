@@ -9,8 +9,8 @@ struct normal_state
     struct emission *emission;
 };
 
-void normal_state_create(struct nhmm_state *state, double *emission_lprobs);
-double normal_state_emission_lprob(const struct nhmm_state *state, const char *seq,
+void normal_state_create(struct nhmm_state *state, double *emiss_lprobs);
+double normal_state_emiss_lprob(const struct nhmm_state *state, const char *seq,
                                    size_t seq_len);
 void normal_state_destroy(struct nhmm_state *state);
 

@@ -103,67 +103,58 @@ NHMM_API const struct nhmm_alphabet *nhmm_hmm_get_alphabet(const struct nhmm_hmm
 NHMM_API double nhmm_hmm_likelihood(const struct nhmm_hmm *hmm, const char *seq,
                                     const struct nhmm_path *path)
 {
-    if (!path) {
-        if (seq) {
-            error("path is NULL but seq is not");
-            return NAN;
-        }
-        return 0.0;
-    } else {
-        if (!seq) {
-            error("seq is NULL but path is not");
-            return NAN;
-        }
+    if (!path || !seq) {
+        error("path or seq is NULL");
+        return NAN;
     }
-
-    const struct nhmm_path *item = path;
-    size_t item_seq_len = path_get_seq_len(item);
     size_t seq_len = strlen(seq);
-    if (item_seq_len > seq_len) {
-        error("path emitted more symbols than sequence");
-        return NAN;
-    }
 
-    int state_id = path_get_state_id(item);
+    size_t len = path_get_seq_len(path);
+    int state_id = path_get_state_id(path);
     const struct nhmm_state *state = nhmm_hmm_get_state(hmm, state_id);
-    if (!state) {
-        error("state is NULL");
-        return NAN;
-    }
 
-    double lprob = hmm_start_lprob(hmm, state_id) +
-                   nhmm_state_emission_lprob(state, seq, item_seq_len);
+    if (len > seq_len)
+        goto len_mismatch;
+    if (!state)
+        goto not_found_state;
+
+    double lprob =
+        hmm_start_lprob(hmm, state_id) + nhmm_state_emiss_lprob(state, seq, len);
 
     int prev_state_id = NHMM_INVALID_STATE_ID;
+
     goto enter;
-    while (item) {
-        item_seq_len = path_get_seq_len(item);
-        if (item_seq_len > seq_len) {
-            error("path emitted more symbols than sequence");
-            return NAN;
-        }
-
-        state_id = path_get_state_id(item);
+    while (path) {
+        len = path_get_seq_len(path);
+        state_id = path_get_state_id(path);
         state = nhmm_hmm_get_state(hmm, state_id);
-        if (!state) {
-            error("state is NULL");
-            return NAN;
-        }
 
-        lprob += nhmm_state_emission_lprob(state, seq, item_seq_len) +
-                 nhmm_hmm_get_trans(hmm, prev_state_id, state_id);
+        if (len > seq_len)
+            goto len_mismatch;
+        if (!state)
+            goto not_found_state;
+
+        lprob += nhmm_hmm_get_trans(hmm, prev_state_id, state_id) +
+                 nhmm_state_emiss_lprob(state, seq, len);
 
     enter:
         prev_state_id = state_id;
-        seq += item_seq_len;
-        seq_len -= item_seq_len;
-        item = path_next_item(item);
+        seq += len;
+        seq_len -= len;
+        path = path_next_item(path);
     }
-    if (seq_len > 0) {
-        error("path emitted less symbols than sequence");
-        return NAN;
-    }
+    if (seq_len > 0)
+        goto len_mismatch;
+
     return lprob;
+
+len_mismatch:
+    error("path emitted more symbols than sequence");
+    return NAN;
+
+not_found_state:
+    error("state was not found");
+    return NAN;
 }
 
 NHMM_API void nhmm_hmm_normalize(const struct nhmm_hmm *hmm) {}
