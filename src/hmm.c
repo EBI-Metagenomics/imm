@@ -20,6 +20,7 @@ struct nhmm_hmm
 
 double hmm_start_lprob(const struct nhmm_hmm *hmm, int state_id);
 void hmm_normalize_start(struct nhmm_hmm *hmm);
+void hmm_normalize_trans(struct tbl_state *tbl_state);
 
 NHMM_API struct nhmm_hmm *nhmm_hmm_create(const struct nhmm_alphabet *alphabet)
 {
@@ -165,7 +166,16 @@ not_found_state:
     return NAN;
 }
 
-NHMM_API void nhmm_hmm_normalize(struct nhmm_hmm *hmm) { hmm_normalize_start(hmm); }
+NHMM_API void nhmm_hmm_normalize(struct nhmm_hmm *hmm)
+{
+    hmm_normalize_start(hmm);
+
+    struct tbl_state *tbl_state = hmm->tbl_states;
+    while (tbl_state) {
+        hmm_normalize_trans(tbl_state);
+        tbl_state = tbl_state_next(tbl_state);
+    }
+}
 
 NHMM_API void nhmm_hmm_destroy(struct nhmm_hmm *hmm)
 {
@@ -213,4 +223,8 @@ void hmm_normalize_start(struct nhmm_hmm *hmm)
         tbl_state_set_start_lprob(tbl_state, lprob - lnorm);
         tbl_state = tbl_state_next(tbl_state);
     }
+}
+
+void hmm_normalize_trans(struct tbl_state *tbl_state) {
+
 }
