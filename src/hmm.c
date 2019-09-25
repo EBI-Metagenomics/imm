@@ -1,4 +1,5 @@
 #include "counter.h"
+#include "logaddexp.h"
 #include "nhmm.h"
 #include "path.h"
 #include "state/state.h"
@@ -18,6 +19,7 @@ struct nhmm_hmm
 };
 
 double hmm_start_lprob(const struct nhmm_hmm *hmm, int state_id);
+void hmm_normalize_start(struct nhmm_hmm *hmm);
 
 NHMM_API struct nhmm_hmm *nhmm_hmm_create(const struct nhmm_alphabet *alphabet)
 {
@@ -31,9 +33,15 @@ NHMM_API struct nhmm_hmm *nhmm_hmm_create(const struct nhmm_alphabet *alphabet)
 NHMM_API int nhmm_hmm_add_state(struct nhmm_hmm *hmm, const struct nhmm_state *state,
                                 double start_lprob)
 {
+    if (!state) {
+        error("state cannot be NULL");
+        return NHMM_INVALID_STATE_ID;
+    }
+
     int state_id = counter_next(hmm->state_id_counter);
     if (state_id == -1)
         return NHMM_INVALID_STATE_ID;
+
     tbl_state_add_state(&hmm->tbl_states, state_id, state, start_lprob);
     return state_id;
 }
@@ -49,11 +57,11 @@ NHMM_API int nhmm_hmm_del_state(struct nhmm_hmm *hmm, int state_id)
 NHMM_API const struct nhmm_state *nhmm_hmm_get_state(const struct nhmm_hmm *hmm,
                                                      int state_id)
 {
-    const struct nhmm_state *state = tbl_state_get_state(hmm->tbl_states, state_id);
-    if (!state)
+    const struct tbl_state *tbl_state = tbl_state_find(hmm->tbl_states, state_id);
+    if (!tbl_state)
         return NULL;
 
-    return state;
+    return tbl_state_get_state(tbl_state);
 }
 
 NHMM_API int nhmm_hmm_set_trans(struct nhmm_hmm *hmm, int src_state_id,
@@ -67,7 +75,7 @@ NHMM_API int nhmm_hmm_set_trans(struct nhmm_hmm *hmm, int src_state_id,
         return -1;
     }
 
-    if (!tbl_state_get_state(hmm->tbl_states, dst_state_id)) {
+    if (!tbl_state_find(hmm->tbl_states, dst_state_id)) {
         error("destination state not found");
         return -1;
     }
@@ -87,7 +95,7 @@ NHMM_API double nhmm_hmm_get_trans(const struct nhmm_hmm *hmm, int src_state_id,
         return NAN;
     }
 
-    if (!tbl_state_get_state(hmm->tbl_states, dst_state_id)) {
+    if (!tbl_state_find(hmm->tbl_states, dst_state_id)) {
         error("destination state not found");
         return NAN;
     }
@@ -157,12 +165,7 @@ not_found_state:
     return NAN;
 }
 
-NHMM_API void nhmm_hmm_normalize(const struct nhmm_hmm *hmm)
-{
-    const struct tbl_state *tbl_state = hmm->tbl_states;
-    /* tbl_state_next(tbl_state); */
-
-}
+NHMM_API void nhmm_hmm_normalize(struct nhmm_hmm *hmm) { hmm_normalize_start(hmm); }
 
 NHMM_API void nhmm_hmm_destroy(struct nhmm_hmm *hmm)
 {
@@ -181,10 +184,33 @@ NHMM_API void nhmm_hmm_destroy(struct nhmm_hmm *hmm)
 
 double hmm_start_lprob(const struct nhmm_hmm *hmm, int state_id)
 {
-    double lprob = tbl_state_get_start_lprob(hmm->tbl_states, state_id);
-    if (isnan(lprob)) {
+    const struct tbl_state *tbl_state = tbl_state_find(hmm->tbl_states, state_id);
+    if (!tbl_state) {
         error("state not found");
         return NAN;
     }
-    return lprob;
+    return tbl_state_get_start_lprob(tbl_state);
+}
+
+void hmm_normalize_start(struct nhmm_hmm *hmm)
+{
+    struct tbl_state *tbl_state = hmm->tbl_states;
+    if (!tbl_state)
+        return;
+
+    double lnorm = tbl_state_get_start_lprob(tbl_state);
+
+    goto enter;
+    while (tbl_state) {
+        lnorm = logaddexp(lnorm, tbl_state_get_start_lprob(tbl_state));
+    enter:
+        tbl_state = tbl_state_next(tbl_state);
+    }
+
+    tbl_state = hmm->tbl_states;
+    while (tbl_state) {
+        double lprob = tbl_state_get_start_lprob(tbl_state);
+        tbl_state_set_start_lprob(tbl_state, lprob - lnorm);
+        tbl_state = tbl_state_next(tbl_state);
+    }
 }

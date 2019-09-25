@@ -102,7 +102,8 @@ void test_hmm_likelihood_single_state(void)
     struct nhmm_state *state = nhmm_state_create_normal("State0", alphabet, lprobs);
     struct nhmm_hmm *hmm = nhmm_hmm_create(alphabet);
 
-    int state_id = nhmm_hmm_add_state(hmm, state, log(1.0));
+    int state_id = nhmm_hmm_add_state(hmm, state, log(0.5));
+    nhmm_hmm_normalize(hmm);
 
     struct nhmm_path *path = NULL;
     nhmm_path_create(&path);

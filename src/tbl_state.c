@@ -80,14 +80,24 @@ int tbl_state_del_state(struct tbl_state **tbl_states, int state_id)
     return -1;
 }
 
-const struct nhmm_state *tbl_state_get_state(const struct tbl_state *tbl_states,
-                                             int state_id)
+const struct tbl_state *tbl_state_find_c(const struct tbl_state *tbl_states,
+                                         int state_id)
 {
     struct tbl_state *tbl_state = NULL;
     HASH_FIND_INT(tbl_states, &state_id, tbl_state);
-    if (tbl_state)
-        return tbl_state->state;
-    return NULL;
+    return tbl_state;
+}
+
+struct tbl_state *tbl_state_find(struct tbl_state *tbl_states, int state_id)
+{
+    struct tbl_state *tbl_state = NULL;
+    HASH_FIND_INT(tbl_states, &state_id, tbl_state);
+    return tbl_state;
+}
+
+const struct nhmm_state *tbl_state_get_state(const struct tbl_state *tbl_state)
+{
+    return tbl_state->state;
 }
 
 struct tbl_trans **tbl_state_get_transitions(struct tbl_state *tbl_states, int state_id)
@@ -99,16 +109,22 @@ struct tbl_trans **tbl_state_get_transitions(struct tbl_state *tbl_states, int s
     return NULL;
 }
 
-double tbl_state_get_start_lprob(const struct tbl_state *tbl_states, int state_id)
+double tbl_state_get_start_lprob(const struct tbl_state *tbl_state)
 {
-    struct tbl_state *tbl_state = NULL;
-    HASH_FIND_INT(tbl_states, &state_id, tbl_state);
-    if (tbl_state)
-        return tbl_state->start_lprob;
-    return NAN;
+    return tbl_state->start_lprob;
 }
 
-const struct tbl_state *tbl_state_next(const struct tbl_state *tbl_state)
+void tbl_state_set_start_lprob(struct tbl_state *tbl_state, double lprob)
+{
+    tbl_state->start_lprob = lprob;
+}
+
+const struct tbl_state *tbl_state_next_c(const struct tbl_state *tbl_state)
+{
+    return tbl_state->hh.next;
+}
+
+struct tbl_state *tbl_state_next(struct tbl_state *tbl_state)
 {
     return tbl_state->hh.next;
 }
