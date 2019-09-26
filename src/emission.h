@@ -6,9 +6,10 @@
 struct emission
 {
     double *lprobs;
-    double *probs;
+    /* double *probs; */
     size_t length;
 };
+
 
 struct emission *emission_create(double *lprobs, size_t length);
 void emission_destroy(struct emission *emission);

@@ -213,16 +213,11 @@ void test_hmm_likelihood_two_states(void)
     TEST_ASSERT_EQUAL_DOUBLE(1.0 / 3.0, exp(nhmm_hmm_likelihood(hmm, "GT", path)));
     nhmm_path_destroy(&path);
 
+    /* nhmm_state_normalize(state1); */
     /* nhmm_path_create(&path); */
     /* nhmm_path_add(&path, state_id0, 1); */
-    /* TEST_ASSERT_EQUAL_DOUBLE(0, exp(nhmm_hmm_likelihood(hmm, "T", path))); */
-    /* printf("%.12f\n", exp(nhmm_hmm_likelihood(hmm, "T", path))); */
-    /* nhmm_path_destroy(&path); */
-
-    /* nhmm_path_create(&path); */
-    /* nhmm_path_add(&path, state_id0, 1); */
-    /* TEST_ASSERT_EQUAL_DOUBLE(0, exp(nhmm_hmm_likelihood(hmm, "T", path))); */
-    /* printf("%.12f\n", exp(nhmm_hmm_likelihood(hmm, "T", path))); */
+    /* nhmm_path_add(&path, state_id1, 1); */
+    /* TEST_ASSERT_EQUAL_DOUBLE(0.148148148148, exp(nhmm_hmm_likelihood(hmm, "GT", path))); */
     /* nhmm_path_destroy(&path); */
 
     nhmm_hmm_destroy(hmm);

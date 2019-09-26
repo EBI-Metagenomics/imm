@@ -14,6 +14,7 @@ NHMM_API struct nhmm_state *nhmm_state_create_normal(
     struct nhmm_state *s = state_create(name, alphabet);
     s->destroy = normal_state_destroy;
     s->emiss_lprob = normal_state_emiss_lprob;
+    s->normalize = normal_state_normalize;
     normal_state_create(s, emiss_lprobs);
     return s;
 }
@@ -24,6 +25,7 @@ NHMM_API struct nhmm_state *nhmm_state_create_silent(
     struct nhmm_state *s = state_create(name, alphabet);
     s->destroy = silent_state_destroy;
     s->emiss_lprob = silent_state_emiss_lprob;
+    s->normalize = silent_state_normalize;
     silent_state_create(s);
     return s;
 }
@@ -49,6 +51,11 @@ NHMM_API double nhmm_state_emiss_lprob(const struct nhmm_state *state, const cha
     return state->emiss_lprob(state, seq, seq_len);
 }
 
+NHMM_API int nhmm_state_normalize(struct nhmm_state *state)
+{
+    return state->normalize(state);
+}
+
 NHMM_API void nhmm_state_destroy(struct nhmm_state *state)
 {
     if (!state)
@@ -57,6 +64,9 @@ NHMM_API void nhmm_state_destroy(struct nhmm_state *state)
     rs_free(&state->name);
     state->alphabet = NULL;
     state->destroy(state);
+    state->destroy = NULL;
+    state->emiss_lprob = NULL;
+    state->normalize = NULL;
     free(state);
 }
 

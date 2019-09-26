@@ -3,6 +3,11 @@
 #include <math.h>
 #include <stdlib.h>
 
+struct normal_state
+{
+    struct emission *emission;
+};
+
 void normal_state_create(struct nhmm_state *state, double *emiss_lprobs)
 {
     struct normal_state *s = malloc(sizeof(struct normal_state));
@@ -20,6 +25,8 @@ double normal_state_emiss_lprob(const struct nhmm_state *state, const char *seq,
     }
     return -INFINITY;
 }
+
+int normal_state_normalize(struct nhmm_state *state) {}
 
 void normal_state_destroy(struct nhmm_state *state)
 {
