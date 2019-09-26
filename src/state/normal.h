@@ -1,7 +1,6 @@
 #ifndef NHMM_STATE_NORMAL_H
 #define NHMM_STATE_NORMAL_H
 
-#include "emission.h"
 #include "state/state.h"
 
 struct normal_state;

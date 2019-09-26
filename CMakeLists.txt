@@ -74,7 +74,6 @@ set(NHMM_PRIVATE_HEADERS
 set(NHMM_SOURCES
   src/alphabet.c
   src/counter.c
-  src/emission.c
   src/hmm.c
   src/path.c
   src/report.c

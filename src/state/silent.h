@@ -1,7 +1,6 @@
 #ifndef NHMM_STATE_SILENT_H
 #define NHMM_STATE_SILENT_H
 
-#include "emission.h"
 #include "state/state.h"
 
 void silent_state_create(struct nhmm_state *state);
