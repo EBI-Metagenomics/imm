@@ -20,8 +20,8 @@ struct nhmm_hmm
 };
 
 double hmm_start_lprob(const struct nhmm_hmm *hmm, int state_id);
-void hmm_normalize_start(struct nhmm_hmm *hmm);
-void hmm_normalize_trans(struct tbl_state *tbl_state);
+int hmm_normalize_start(struct nhmm_hmm *hmm);
+int hmm_normalize_trans(struct tbl_state *tbl_state);
 
 NHMM_API struct nhmm_hmm *nhmm_hmm_create(const struct nhmm_alphabet *alphabet)
 {
@@ -174,15 +174,18 @@ not_found_state:
     return NAN;
 }
 
-NHMM_API void nhmm_hmm_normalize(struct nhmm_hmm *hmm)
+NHMM_API int nhmm_hmm_normalize(struct nhmm_hmm *hmm)
 {
-    hmm_normalize_start(hmm);
+    if (hmm_normalize_start(hmm))
+        return -1;
 
     struct tbl_state *tbl_state = hmm->tbl_states;
     while (tbl_state) {
-        hmm_normalize_trans(tbl_state);
+        if (hmm_normalize_trans(tbl_state))
+            return -1;
         tbl_state = tbl_state_next(tbl_state);
     }
+    return 0;
 }
 
 NHMM_API void nhmm_hmm_destroy(struct nhmm_hmm *hmm)
@@ -210,11 +213,11 @@ double hmm_start_lprob(const struct nhmm_hmm *hmm, int state_id)
     return tbl_state_get_start_lprob(tbl_state);
 }
 
-void hmm_normalize_start(struct nhmm_hmm *hmm)
+int hmm_normalize_start(struct nhmm_hmm *hmm)
 {
-    struct tbl_state *tbl_state = hmm->tbl_states;
+    const struct tbl_state *tbl_state = hmm->tbl_states;
     if (!tbl_state)
-        return;
+        return 0;
 
     double lnorm = tbl_state_get_start_lprob(tbl_state);
 
@@ -222,15 +225,43 @@ void hmm_normalize_start(struct nhmm_hmm *hmm)
     while (tbl_state) {
         lnorm = logaddexp(lnorm, tbl_state_get_start_lprob(tbl_state));
     enter:
-        tbl_state = tbl_state_next(tbl_state);
+        tbl_state = tbl_state_next_c(tbl_state);
     }
 
-    tbl_state = hmm->tbl_states;
-    while (tbl_state) {
-        double lprob = tbl_state_get_start_lprob(tbl_state);
-        tbl_state_set_start_lprob(tbl_state, lprob - lnorm);
-        tbl_state = tbl_state_next(tbl_state);
+    if (!isfinite(lnorm)) {
+        error("no starting state is possible");
+        return -1;
     }
+
+    struct tbl_state *t = hmm->tbl_states;
+    while (t) {
+        tbl_state_set_start_lprob(t, tbl_state_get_start_lprob(t) - lnorm);
+        t = tbl_state_next(t);
+    }
+
+    return 0;
 }
 
-void hmm_normalize_trans(struct tbl_state *tbl_state) {}
+int hmm_normalize_trans(struct tbl_state *tbl_state)
+{
+    const struct tbl_trans *tbl_trans = tbl_state_get_trans_c(tbl_state);
+    double lnorm = -INFINITY;
+
+    while (tbl_trans) {
+        lnorm = logaddexp(lnorm, tbl_trans_get_lprob(tbl_trans));
+        tbl_trans = tbl_trans_next_c(tbl_trans);
+    }
+
+    if (!isfinite(lnorm)) {
+        error("a state has no transition");
+        return -1;
+    }
+
+    struct tbl_trans *t = tbl_state_get_trans(tbl_state);
+    while (t) {
+        tbl_trans_set_lprob(t, tbl_trans_get_lprob(t) - lnorm);
+        t = tbl_trans_next(t);
+    }
+
+    return 0;
+}

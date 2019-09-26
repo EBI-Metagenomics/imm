@@ -103,7 +103,7 @@ void test_hmm_likelihood_single_state(void)
     struct nhmm_hmm *hmm = nhmm_hmm_create(alphabet);
 
     int state_id = nhmm_hmm_add_state(hmm, state, log(0.5));
-    nhmm_hmm_normalize(hmm);
+    TEST_ASSERT_EQUAL_INT(-1, nhmm_hmm_normalize(hmm));
 
     struct nhmm_path *path = NULL;
     nhmm_path_create(&path);
@@ -145,11 +145,23 @@ void test_hmm_likelihood_single_state(void)
     TEST_ASSERT_DOUBLE_IS_NAN(nhmm_hmm_likelihood(hmm, "A", NULL));
     TEST_ASSERT_DOUBLE_IS_NAN(nhmm_hmm_likelihood(hmm, NULL, NULL));
 
-    /* nhmm_path_create(&path); */
-    /* nhmm_path_add(&path, state_id, 1); */
-    /* nhmm_path_add(&path, state_id, 1); */
-    /* TEST_ASSERT_EQUAL_DOUBLE(-2.772588722240, nhmm_hmm_likelihood(hmm, "AA", path)); */
-    /* nhmm_path_destroy(&path); */
+    TEST_ASSERT_EQUAL_INT(-1, nhmm_hmm_normalize(hmm));
+    nhmm_hmm_set_trans(hmm, state_id, state_id, -INFINITY);
+    TEST_ASSERT_EQUAL_INT(-1, nhmm_hmm_normalize(hmm));
+    nhmm_hmm_set_trans(hmm, state_id, state_id, log(0.5));
+
+    nhmm_path_create(&path);
+    nhmm_path_add(&path, state_id, 1);
+    nhmm_path_add(&path, state_id, 1);
+    TEST_ASSERT_EQUAL_DOUBLE(-3.465735902800, nhmm_hmm_likelihood(hmm, "AA", path));
+    nhmm_path_destroy(&path);
+
+    TEST_ASSERT_EQUAL_INT(0, nhmm_hmm_normalize(hmm));
+    nhmm_path_create(&path);
+    nhmm_path_add(&path, state_id, 1);
+    nhmm_path_add(&path, state_id, 1);
+    TEST_ASSERT_EQUAL_DOUBLE(-2.772588722240, nhmm_hmm_likelihood(hmm, "AA", path));
+    nhmm_path_destroy(&path);
 
     nhmm_hmm_destroy(hmm);
     nhmm_state_destroy(state);

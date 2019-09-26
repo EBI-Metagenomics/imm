@@ -15,5 +15,8 @@ const struct tbl_trans *tbl_trans_find_c(const struct tbl_trans *head, int state
 void tbl_trans_set_lprob(struct tbl_trans *tbl_trans, double lprob);
 double tbl_trans_get_lprob(const struct tbl_trans *tbl_trans);
 
+struct tbl_trans *tbl_trans_next(struct tbl_trans *tbl_trans);
+const struct tbl_trans *tbl_trans_next_c(const struct tbl_trans *tbl_trans);
+
 #endif
 

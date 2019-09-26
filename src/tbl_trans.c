@@ -56,3 +56,13 @@ double tbl_trans_get_lprob(const struct tbl_trans *tbl_trans)
 {
     return tbl_trans->lprob;
 }
+
+struct tbl_trans *tbl_trans_next(struct tbl_trans *tbl_trans)
+{
+    return tbl_trans->hh.next;
+}
+
+const struct tbl_trans *tbl_trans_next_c(const struct tbl_trans *tbl_trans)
+{
+    return tbl_trans->hh.next;
+}
