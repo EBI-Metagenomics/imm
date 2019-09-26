@@ -1,11 +1,11 @@
-#define NHMM_API_EXPORTS
-
 #include "alphabet.h"
 #include "nhmm.h"
 #include "rapidstring.h"
 #include "report.h"
 #include <limits.h>
 #include <stdlib.h>
+
+#define NHMM_API_EXPORTS
 
 #define SYMBOL_ID_MIN 0
 #define SYMBOL_ID_MAX 127

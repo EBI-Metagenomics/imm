@@ -11,6 +11,6 @@ double silent_state_emiss_lprob(const struct nhmm_state *state, const char *seq,
     return -INFINITY;
 }
 
-int silent_state_normalize(struct nhmm_state *state) {}
+int silent_state_normalize(struct nhmm_state *state) { return 0; }
 
 void silent_state_destroy(struct nhmm_state *state) {}

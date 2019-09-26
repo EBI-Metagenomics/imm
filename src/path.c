@@ -1,9 +1,9 @@
-#define NHMM_API_EXPORTS
-
 #include "path.h"
 #include "nhmm.h"
 #include "utlist.h"
 #include <stdlib.h>
+
+#define NHMM_API_EXPORTS
 
 struct nhmm_path
 {

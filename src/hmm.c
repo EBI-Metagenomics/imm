@@ -9,6 +9,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+#define NHMM_API_EXPORTS
+
 struct nhmm_hmm
 {
     const struct nhmm_alphabet *alphabet;

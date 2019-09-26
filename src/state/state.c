@@ -1,16 +1,21 @@
-#define NHMM_API_EXPORTS
-
 #include "state/state.h"
 #include "alphabet.h"
+#include "report.h"
 #include "state/normal.h"
 #include "state/silent.h"
 #include <stdlib.h>
+
+#define NHMM_API_EXPORTS
 
 struct nhmm_state *state_create(const char *name, const struct nhmm_alphabet *alphabet);
 
 NHMM_API struct nhmm_state *nhmm_state_create_normal(
     const char *name, const struct nhmm_alphabet *alphabet, double *emiss_lprobs)
 {
+    if (nhmm_alphabet_length(alphabet) == 0) {
+        error("empty alphabet");
+        return NULL;
+    }
     struct nhmm_state *s = state_create(name, alphabet);
     s->destroy = normal_state_destroy;
     s->emiss_lprob = normal_state_emiss_lprob;
