@@ -69,40 +69,47 @@ NHMM_API const struct nhmm_state *nhmm_hmm_get_state(const struct nhmm_hmm *hmm,
 NHMM_API int nhmm_hmm_set_trans(struct nhmm_hmm *hmm, int src_state_id,
                                 int dst_state_id, double lprob)
 {
-    struct tbl_trans **tbl_transitions =
-        tbl_state_get_transitions(hmm->tbl_states, src_state_id);
-
-    if (!tbl_transitions) {
+    struct tbl_state *src = tbl_state_find(hmm->tbl_states, src_state_id);
+    if (!src) {
         error("source state not found");
         return -1;
     }
 
-    if (!tbl_state_find(hmm->tbl_states, dst_state_id)) {
+    if (!tbl_state_find_c(hmm->tbl_states, dst_state_id)) {
         error("destination state not found");
         return -1;
     }
 
-    tbl_trans_set_lprob(tbl_transitions, dst_state_id, lprob);
+    struct tbl_trans **head_ptr = tbl_state_get_trans_ptr(src);
+    struct tbl_trans *tbl_trans = tbl_trans_find(*head_ptr, dst_state_id);
+    if (tbl_trans)
+        tbl_trans_set_lprob(tbl_trans, lprob);
+    else
+        tbl_trans_add(head_ptr, dst_state_id, lprob);
+
     return 0;
 }
 
 NHMM_API double nhmm_hmm_get_trans(const struct nhmm_hmm *hmm, int src_state_id,
                                    int dst_state_id)
 {
-    struct tbl_trans **tbl_transitions =
-        tbl_state_get_transitions(hmm->tbl_states, src_state_id);
-
-    if (!tbl_transitions) {
+    const struct tbl_state *src = tbl_state_find_c(hmm->tbl_states, src_state_id);
+    if (!src) {
         error("source state not found");
         return NAN;
     }
 
-    if (!tbl_state_find(hmm->tbl_states, dst_state_id)) {
+    if (!tbl_state_find_c(hmm->tbl_states, dst_state_id)) {
         error("destination state not found");
         return NAN;
     }
 
-    return tbl_trans_get_lprob(*tbl_transitions, dst_state_id);
+    const struct tbl_trans *tbl_trans =
+        tbl_trans_find_c(tbl_state_get_trans_c(src), dst_state_id);
+    if (!tbl_trans)
+        return -INFINITY;
+
+    return tbl_trans_get_lprob(tbl_trans);
 }
 
 NHMM_API const struct nhmm_alphabet *nhmm_hmm_get_alphabet(const struct nhmm_hmm *hmm)

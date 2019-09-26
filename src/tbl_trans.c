@@ -9,40 +9,50 @@ struct tbl_trans
     UT_hash_handle hh;
 };
 
-void tbl_trans_create(struct tbl_trans **tbl_transitions) { *tbl_transitions = NULL; }
+void tbl_trans_create(struct tbl_trans **head_ptr) { *head_ptr = NULL; }
 
-void tbl_trans_destroy(struct tbl_trans **tbl_transitions)
+void tbl_trans_destroy(struct tbl_trans **head_ptr)
 {
     struct tbl_trans *tbl_trans, *tmp;
-    if (*tbl_transitions) {
-        HASH_ITER(hh, *tbl_transitions, tbl_trans, tmp)
+    if (*head_ptr) {
+        HASH_ITER(hh, *head_ptr, tbl_trans, tmp)
         {
-            tbl_trans->state_id = -1;
-            tbl_trans->lprob = -INFINITY;
-            HASH_DEL(*tbl_transitions, tbl_trans);
+            HASH_DEL(*head_ptr, tbl_trans);
             free(tbl_trans);
         }
     }
-    *tbl_transitions = NULL;
+    *head_ptr = NULL;
 }
 
-void tbl_trans_set_lprob(struct tbl_trans **tbl_transitions, int state_id, double lprob)
+struct tbl_trans *tbl_trans_add(struct tbl_trans **head_ptr, int state_id, double lprob)
+{
+    struct tbl_trans *tbl_trans = malloc(sizeof(struct tbl_trans));
+    tbl_trans->state_id = state_id;
+    tbl_trans->lprob = lprob;
+    HASH_ADD_INT(*head_ptr, state_id, tbl_trans);
+    return tbl_trans;
+}
+
+struct tbl_trans *tbl_trans_find(struct tbl_trans *head, int state_id)
 {
     struct tbl_trans *tbl_trans = NULL;
-    HASH_FIND_INT(*tbl_transitions, &state_id, tbl_trans);
-    if (!tbl_trans) {
-        tbl_trans = malloc(sizeof(struct tbl_trans));
-        tbl_trans->state_id = state_id;
-        HASH_ADD_INT(*tbl_transitions, state_id, tbl_trans);
-    }
+    HASH_FIND_INT(head, &state_id, tbl_trans);
+    return tbl_trans;
+}
+
+const struct tbl_trans *tbl_trans_find_c(const struct tbl_trans *head, int state_id)
+{
+    const struct tbl_trans *tbl_trans = NULL;
+    HASH_FIND_INT(head, &state_id, tbl_trans);
+    return tbl_trans;
+}
+
+void tbl_trans_set_lprob(struct tbl_trans *tbl_trans, double lprob)
+{
     tbl_trans->lprob = lprob;
 }
 
-double tbl_trans_get_lprob(const struct tbl_trans *tbl_transitions, int state_id)
+double tbl_trans_get_lprob(const struct tbl_trans *tbl_trans)
 {
-    struct tbl_trans *tbl_trans = NULL;
-    HASH_FIND_INT(tbl_transitions, &state_id, tbl_trans);
-    if (!tbl_trans)
-        return -INFINITY;
     return tbl_trans->lprob;
 }
