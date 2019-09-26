@@ -217,7 +217,8 @@ void test_hmm_likelihood_two_states(void)
     nhmm_path_create(&path);
     nhmm_path_add(&path, state_id0, 1);
     nhmm_path_add(&path, state_id1, 1);
-    TEST_ASSERT_EQUAL_DOUBLE(0.14814814814815, exp(nhmm_hmm_likelihood(hmm, "GT", path)));
+    TEST_ASSERT_EQUAL_DOUBLE(0.14814814814815,
+                             exp(nhmm_hmm_likelihood(hmm, "GT", path)));
     nhmm_path_destroy(&path);
 
     nhmm_hmm_destroy(hmm);
