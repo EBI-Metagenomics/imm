@@ -1,6 +1,7 @@
 #include "state/state.h"
 #include "alphabet.h"
 #include "report.h"
+#include "state/frame.h"
 #include "state/normal.h"
 #include "state/silent.h"
 #include <stdlib.h>
@@ -10,7 +11,7 @@
 struct nhmm_state *state_create(const char *name, const struct nhmm_alphabet *alphabet);
 
 NHMM_API struct nhmm_state *nhmm_state_create_normal(
-    const char *name, const struct nhmm_alphabet *alphabet, double *emiss_lprobs)
+    const char *name, const struct nhmm_alphabet *alphabet, const double *emiss_lprobs)
 {
     if (nhmm_alphabet_length(alphabet) == 0) {
         error("empty alphabet");
@@ -32,6 +33,18 @@ NHMM_API struct nhmm_state *nhmm_state_create_silent(
     s->emiss_lprob = silent_state_emiss_lprob;
     s->normalize = silent_state_normalize;
     silent_state_create(s);
+    return s;
+}
+
+NHMM_API struct nhmm_state *nhmm_state_create_frame(
+    const char *name, const struct nhmm_alphabet *alphabet,
+    const double *base_emiss_lprobs, const double *codon_emiss_lprobs, double epsilon)
+{
+    struct nhmm_state *s = state_create(name, alphabet);
+    s->destroy = frame_state_destroy;
+    s->emiss_lprob = frame_state_emiss_lprob;
+    s->normalize = frame_state_normalize;
+    frame_state_create(s, base_emiss_lprobs, codon_emiss_lprobs, epsilon);
     return s;
 }
 

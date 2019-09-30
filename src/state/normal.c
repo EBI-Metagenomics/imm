@@ -10,7 +10,7 @@ struct normal_state
     double *emiss_lprobs;
 };
 
-void normal_state_create(struct nhmm_state *state, double *emiss_lprobs)
+void normal_state_create(struct nhmm_state *state, const double *emiss_lprobs)
 {
     struct normal_state *s = malloc(sizeof(struct normal_state));
 
@@ -48,7 +48,7 @@ int normal_state_normalize(struct nhmm_state *state)
 
     for (size_t i = 1; i < length; ++i)
         s->emiss_lprobs[i] -= lnorm;
-    
+
     return 0;
 }
 

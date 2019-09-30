@@ -14,6 +14,7 @@ extern "C"
 
 #include "nhmm/alphabet.h"
 #include "nhmm/api.h"
+#include "nhmm/codon.h"
 #include "nhmm/hmm.h"
 #include "nhmm/path.h"
 #include "nhmm/state.h"
