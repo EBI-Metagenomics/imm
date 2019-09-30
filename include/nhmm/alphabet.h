@@ -4,6 +4,8 @@
 #include "nhmm/api.h"
 #include <stddef.h>
 
+#define NHMM_ANY_SYMBOL '*'
+
 struct nhmm_alphabet;
 
 NHMM_API struct nhmm_alphabet *nhmm_alphabet_create(const char *symbols);

@@ -38,13 +38,13 @@ NHMM_API struct nhmm_state *nhmm_state_create_silent(
 
 NHMM_API struct nhmm_state *nhmm_state_create_frame(
     const char *name, const struct nhmm_alphabet *alphabet,
-    const double *base_emiss_lprobs, const double *codon_emiss_lprobs, double epsilon)
+    const double *base_emiss_lprobs, const struct nhmm_codon *codon, double epsilon)
 {
     struct nhmm_state *s = state_create(name, alphabet);
     s->destroy = frame_state_destroy;
     s->emiss_lprob = frame_state_emiss_lprob;
     s->normalize = frame_state_normalize;
-    frame_state_create(s, base_emiss_lprobs, codon_emiss_lprobs, epsilon);
+    frame_state_create(s, base_emiss_lprobs, codon, epsilon);
     return s;
 }
 
