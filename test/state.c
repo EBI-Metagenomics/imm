@@ -67,14 +67,19 @@ void test_state_frame(void)
 
     struct nhmm_codon *codon = nhmm_codon_create();
     nhmm_codon_set_ninfs(codon);
-    nhmm_codon_set_lprob(codon, A, A, A, log(0.5));
-    nhmm_codon_set_lprob(codon, A, G, A, log(0.4));
-    nhmm_codon_set_lprob(codon, C, G, T, log(0.1));
+    /* nhmm_codon_set_lprob(codon, A, T, G, log(0.8/0.9)); */
+    /* nhmm_codon_set_lprob(codon, A, T, T, log(0.1/0.9)); */
 
-    struct nhmm_state *s = nhmm_state_create_frame("State", a, base_emiss_lprobs,
-                                                   codon, 0.0);
+    nhmm_codon_set_lprob(codon, A, T, G, log(0.8 / 0.9));
+    nhmm_codon_set_lprob(codon, A, T, T, log(0.1 / 0.9));
 
-    /* TEST_ASSERT_EQUAL_DOUBLE(0.0, exp(nhmm_state_emiss_lprob(s, "", 0))); */
+    struct nhmm_state *s =
+        nhmm_state_create_frame("State", a, base_emiss_lprobs, codon, 0.1);
+
+    TEST_ASSERT_EQUAL_DOUBLE(0.0027000000000000006,
+                             exp(nhmm_state_emiss_lprob(s, "A", 1)));
+    TEST_ASSERT_EQUAL_DOUBLE(0.054158333333333336,
+                             exp(nhmm_state_emiss_lprob(s, "AT", 2)));
     /* TEST_ASSERT_EQUAL_DOUBLE(0.4, exp(nhmm_state_emiss_lprob(s, "AGA", 3))); */
 
     nhmm_state_destroy(s);

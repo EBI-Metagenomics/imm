@@ -20,6 +20,7 @@ double joint_seq_len3(const struct nhmm_state *state, const char *seq);
 double joint_seq_len4(const struct nhmm_state *state, const char *seq);
 double joint_seq_len5(const struct nhmm_state *state, const char *seq);
 double codon_lprob(const struct nhmm_state *state, const char *codon);
+double base_lprob(const struct nhmm_state *state, char id);
 
 void frame_state_create(struct nhmm_state *state, const double *base_emiss_lprobs,
                         const struct nhmm_codon *codon, double epsilon)
@@ -104,41 +105,53 @@ void frame_state_destroy(struct nhmm_state *state)
 
 double joint_seq_len1(const struct nhmm_state *state, const char *seq)
 {
-    char codon[3] = {NHMM_ANY_SYMBOL, NHMM_ANY_SYMBOL, NHMM_ANY_SYMBOL};
-
-    codon[0] = seq[0];
-    codon[1] = NHMM_ANY_SYMBOL;
-    codon[2] = NHMM_ANY_SYMBOL;
-    double e0 = codon_lprob(state, codon);
-
-    codon[0] = NHMM_ANY_SYMBOL;
-    codon[1] = seq[0];
-    codon[2] = NHMM_ANY_SYMBOL;
-    double e1 = codon_lprob(state, codon);
-
-    codon[0] = NHMM_ANY_SYMBOL;
-    codon[1] = NHMM_ANY_SYMBOL;
-    codon[2] = seq[0];
-    double e2 = codon_lprob(state, codon);
+    const char codon0AA[3] = {seq[0], NHMM_ANY_SYMBOL, NHMM_ANY_SYMBOL};
+    const char codonA0A[3] = {NHMM_ANY_SYMBOL, seq[0], NHMM_ANY_SYMBOL};
+    const char codonAA0[3] = {NHMM_ANY_SYMBOL, NHMM_ANY_SYMBOL, seq[0]};
 
     const struct frame_state *s = state->impl;
     double c = 2 * s->leps + 2 * s->l1eps;
+
+    double e0 = codon_lprob(state, codon0AA);
+    double e1 = codon_lprob(state, codonA0A);
+    double e2 = codon_lprob(state, codonAA0);
     return c + logaddexp(logaddexp(e0, e1), e2) - log(3);
 }
 
 double joint_seq_len2(const struct nhmm_state *state, const char *seq)
 {
-    /* i = self._base_emission.get */
-    /* e = self._codon_prob */
+    const char codonA01[3] = {NHMM_ANY_SYMBOL, seq[0], seq[1]};
+    const char codon0A1[3] = {seq[0], NHMM_ANY_SYMBOL, seq[1]};
+    const char codon01A[3] = {seq[0], seq[1], NHMM_ANY_SYMBOL};
 
-    /* c = LOG(2) + self._loge + self._log1e * 3 - LOG(3) */
-    /* p = [c + logsumexp([e(_, z1, z2), e(z1, _, z2), e(z1, z2, _)])] */
+    const char codon0AA[3] = {seq[0], NHMM_ANY_SYMBOL, NHMM_ANY_SYMBOL};
+    const char codonA0A[3] = {NHMM_ANY_SYMBOL, seq[0], NHMM_ANY_SYMBOL};
+    const char codonAA0[3] = {NHMM_ANY_SYMBOL, NHMM_ANY_SYMBOL, seq[0]};
 
-    /* c = 3 * self._loge + self._log1e - LOG(3) */
-    /* p += [c + logsumexp([e(z1, _, _), e(_, z1, _), e(_, _, z1)]) + i(z2)] */
-    /* p += [c + logsumexp([e(z2, _, _), e(_, z2, _), e(_, _, z2)]) + i(z1)] */
+    const char codon1AA[3] = {seq[1], NHMM_ANY_SYMBOL, NHMM_ANY_SYMBOL};
+    const char codonA1A[3] = {NHMM_ANY_SYMBOL, seq[1], NHMM_ANY_SYMBOL};
+    const char codonAA1[3] = {NHMM_ANY_SYMBOL, NHMM_ANY_SYMBOL, seq[1]};
 
-    /* return logsumexp(p) */
+    const struct frame_state *s = state->impl;
+
+    double c = log(2) + s->leps + s->l1eps * 3 - log(3);
+    double eA01 = codon_lprob(state, codonA01);
+    double e0A1 = codon_lprob(state, codon0A1);
+    double e01A = codon_lprob(state, codon01A);
+    double v0 = c + logaddexp(logaddexp(eA01, e0A1), e01A);
+
+    c = 3 * s->leps + s->l1eps - log(3);
+    double e0AA = codon_lprob(state, codon0AA);
+    double eA0A = codon_lprob(state, codonA0A);
+    double eAA0 = codon_lprob(state, codonAA0);
+    double v1 = c + logaddexp(logaddexp(e0AA, eA0A), eAA0) + base_lprob(state, seq[1]);
+
+    double e1AA = codon_lprob(state, codon1AA);
+    double eA1A = codon_lprob(state, codonA1A);
+    double eAA1 = codon_lprob(state, codonAA1);
+    double v2 = c + logaddexp(logaddexp(e1AA, eA1A), eAA1) + base_lprob(state, seq[0]);
+
+    return logaddexp(logaddexp(v0, v1), v2);
 }
 
 double joint_seq_len3(const struct nhmm_state *state, const char *seq)
@@ -209,7 +222,7 @@ double joint_seq_len5(const struct nhmm_state *state, const char *seq)
 
 double codon_lprob(const struct nhmm_state *state, const char *codon)
 {
-    const struct nhmm_alphabet* alphabet = nhmm_state_get_alphabet(state);
+    const struct nhmm_alphabet *alphabet = nhmm_state_get_alphabet(state);
     double lprob = -INFINITY;
     int bases_idx[3 * 4] = {0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3};
     size_t nbases[3] = {4, 4, 4};
@@ -221,16 +234,26 @@ double codon_lprob(const struct nhmm_state *state, const char *codon)
         }
     }
 
+    const int *a_idx = bases_idx;
+    const int *b_idx = bases_idx + 4;
+    const int *c_idx = bases_idx + 8;
     const struct frame_state *s = state->impl;
     for (size_t a = 0; a < nbases[0]; ++a) {
         for (size_t b = 0; b < nbases[1]; ++b) {
             for (size_t c = 0; c < nbases[2]; ++c) {
-                double t = nhmm_codon_get_lprob(s->codon, bases_idx[a],
-                                                bases_idx[b], bases_idx[c]);
-                lprob = logaddexp(lprob, t);
+                lprob = logaddexp(lprob, nhmm_codon_get_lprob(s->codon, a_idx[a],
+                                                              b_idx[b], c_idx[c]));
             }
         }
     }
 
     return lprob;
 }
+
+double base_lprob(const struct nhmm_state *state, char id)
+{
+    int idx = alphabet_symbol_idx(nhmm_state_get_alphabet(state), id);
+    const struct frame_state *s = state->impl;
+    return s->base_emiss_lprobs[(size_t)idx];
+}
+
