@@ -33,11 +33,17 @@ else()
   set(DEBUG 0)
 endif()
 
-option(CLANG_ASAN_UBSAN "Enable Clang address & undefined behavior sanitizer for nhmm library." OFF)
+option(CLANG_ASAN_UBSAN "Enable Clang address & undefined behavior sanitizer for nhmm library" OFF)
 if(CLANG_ASAN_UBSAN AND NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
   message(FATAL_ERROR "Sanitizers are only supported for Clang")
 endif()
 
+option(CLANG_CODE_COVERAGE "Enable code coverage metrics in Clang" OFF)
+if (CLANG_CODE_COVERAGE)
+    message(STATUS "Code coverage metrics enabled for debug build")
+    set(CMAKE_C_FLAGS_DEBUG
+      "${CMAKE_C_FLAGS_DEBUG} -fprofile-instr-generate -fcoverage-mapping")
+endif()
 
 if(CMAKE_C_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -pedantic -Wstrict-prototypes -Wshadow
@@ -84,7 +90,9 @@ set(NHMM_SOURCES
   src/tbl_trans.c
 )
 
-add_library(nhmm SHARED ${NHMM_SOURCES})
+add_library(nhmmlib OBJECT ${NHMM_SOURCES})
+
+add_library(nhmm SHARED $<TARGET_OBJECTS:nhmmlib>)
 set_target_properties(nhmm PROPERTIES VERSION ${NHMM_VERSION})
 set_target_properties(nhmm PROPERTIES SOVERSION ${NHMM_VERSION_MAJOR})
 set_target_properties(nhmm PROPERTIES PUBLIC_HEADER ${NHMM_PUBLIC_HEADER})
@@ -110,6 +118,9 @@ function(nhmm_add_test name)
   target_include_directories(test_${name} PUBLIC ${UNITY_INCLUDE_DIRS})
   target_compile_definitions(test_${name} PUBLIC UNITY_INCLUDE_DOUBLE)
   add_test(NAME ${name} COMMAND test_${name})
+  if (CLANG_CODE_COVERAGE)
+    set_tests_properties(${name} PROPERTIES ENVIRONMENT LLVM_PROFILE_FILE=test_${name}.profraw)
+  endif()
 endfunction()
 
 nhmm_add_test(alphabet)
@@ -117,3 +128,23 @@ nhmm_add_test(state)
 nhmm_add_test(hmm)
 nhmm_add_test(path)
 # End of test setup block.
+
+foreach(SRC ${NHMM_SOURCES})
+  set(NHMM_SOURCES_PATH ${NHMM_SOURCES_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/${SRC})
+endforeach()
+
+message(STATUS "${NHMM_SOURCES_PATH}")
+
+if (CLANG_CODE_COVERAGE)
+  add_custom_target(coverage
+    COMMAND llvm-profdata merge -sparse *.profraw -o all.profdata
+    COMMAND llvm-cov show -format=html -o coverage -instr-profile=all.profdata
+      $<TARGET_FILE:nhmm>
+      -object $<TARGET_FILE:test_alphabet>
+      -object $<TARGET_FILE:test_state>
+      -object $<TARGET_FILE:test_hmm>
+      -object $<TARGET_FILE:test_path>
+      ${NHMM_SOURCES_PATH}
+    BYPRODUCTS coverage/index.html
+    COMMENT "The coverage summary will be written to coverage/index.html")
+endif()

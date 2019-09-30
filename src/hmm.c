@@ -114,11 +114,6 @@ NHMM_API double nhmm_hmm_get_trans(const struct nhmm_hmm *hmm, int src_state_id,
     return tbl_trans_get_lprob(tbl_trans);
 }
 
-NHMM_API const struct nhmm_alphabet *nhmm_hmm_get_alphabet(const struct nhmm_hmm *hmm)
-{
-    return hmm->alphabet;
-}
-
 NHMM_API double nhmm_hmm_likelihood(const struct nhmm_hmm *hmm, const char *seq,
                                     const struct nhmm_path *path)
 {

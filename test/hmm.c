@@ -8,6 +8,7 @@ void test_hmm_del_get_state(void);
 void test_hmm_set_trans(void);
 void test_hmm_likelihood_single_state(void);
 void test_hmm_likelihood_two_states(void);
+void test_hmm_likelihood_silent_state(void);
 
 int main(void)
 {
@@ -17,6 +18,7 @@ int main(void)
     RUN_TEST(test_hmm_set_trans);
     RUN_TEST(test_hmm_likelihood_single_state);
     RUN_TEST(test_hmm_likelihood_two_states);
+    RUN_TEST(test_hmm_likelihood_silent_state);
     return UNITY_END();
 }
 
@@ -46,9 +48,15 @@ void test_hmm_del_get_state(void)
 
     int state_id0 = nhmm_hmm_add_state(hmm, state0, log(0.5));
     int state_id1 = nhmm_hmm_add_state(hmm, state1, log(0.5));
+    TEST_ASSERT_EQUAL_INT(NHMM_INVALID_STATE_ID,
+                          nhmm_hmm_add_state(hmm, NULL, log(0.5)));
 
     TEST_ASSERT_EQUAL_INT(0, state_id0);
     TEST_ASSERT_EQUAL_INT(1, state_id1);
+
+    TEST_ASSERT_DOUBLE_IS_NAN(nhmm_hmm_get_trans(hmm, 0, 5));
+    TEST_ASSERT_DOUBLE_IS_NAN(nhmm_hmm_get_trans(hmm, 5, 0));
+    TEST_ASSERT_DOUBLE_IS_NAN(nhmm_hmm_get_trans(hmm, 5, 5));
 
     TEST_ASSERT_NOT_NULL(nhmm_hmm_get_state(hmm, state_id0));
     nhmm_hmm_del_state(hmm, state_id0);
@@ -224,5 +232,57 @@ void test_hmm_likelihood_two_states(void)
     nhmm_hmm_destroy(hmm);
     nhmm_state_destroy(state0);
     nhmm_state_destroy(state1);
+    nhmm_alphabet_destroy(alphabet);
+}
+
+void test_hmm_likelihood_silent_state(void)
+{
+    struct nhmm_alphabet *alphabet = nhmm_alphabet_create("ACGT");
+    struct nhmm_hmm *hmm = nhmm_hmm_create(alphabet);
+
+    struct nhmm_state *state = nhmm_state_create_silent("State0", alphabet);
+    TEST_ASSERT_EQUAL_INT(0, nhmm_state_normalize(state));
+
+    int state_id = nhmm_hmm_add_state(hmm, state, log(1.0));
+
+    nhmm_hmm_set_trans(hmm, state_id, state_id, log(0.1));
+    TEST_ASSERT_EQUAL_INT(0, nhmm_hmm_normalize(hmm));
+
+    struct nhmm_path *path = NULL;
+    nhmm_path_create(&path);
+    nhmm_path_add(&path, state_id, 1);
+    TEST_ASSERT_EQUAL_DOUBLE(0, exp(nhmm_hmm_likelihood(hmm, "A", path)));
+    nhmm_path_destroy(&path);
+
+    nhmm_path_create(&path);
+    nhmm_path_add(&path, state_id, 1);
+    TEST_ASSERT_EQUAL_DOUBLE(0, exp(nhmm_hmm_likelihood(hmm, "T", path)));
+    nhmm_path_destroy(&path);
+
+    nhmm_path_create(&path);
+    nhmm_path_add(&path, state_id, 1);
+    TEST_ASSERT_EQUAL_DOUBLE(0, exp(nhmm_hmm_likelihood(hmm, "G", path)));
+    nhmm_path_destroy(&path);
+
+    nhmm_path_create(&path);
+    nhmm_path_add(&path, state_id, 1);
+    TEST_ASSERT_EQUAL_DOUBLE(0, exp(nhmm_hmm_likelihood(hmm, "G", path)));
+    nhmm_path_destroy(&path);
+
+    nhmm_path_create(&path);
+    nhmm_path_add(&path, state_id, 1);
+    nhmm_path_add(&path, state_id, 1);
+    TEST_ASSERT_EQUAL_DOUBLE(0, exp(nhmm_hmm_likelihood(hmm, "GT", path)));
+    nhmm_path_destroy(&path);
+
+    TEST_ASSERT_EQUAL_INT(0, nhmm_state_normalize(state));
+    nhmm_path_create(&path);
+    nhmm_path_add(&path, state_id, 1);
+    nhmm_path_add(&path, state_id, 1);
+    TEST_ASSERT_EQUAL_DOUBLE(0, exp(nhmm_hmm_likelihood(hmm, "GT", path)));
+    nhmm_path_destroy(&path);
+
+    nhmm_hmm_destroy(hmm);
+    nhmm_state_destroy(state);
     nhmm_alphabet_destroy(alphabet);
 }
