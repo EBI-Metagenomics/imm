@@ -59,7 +59,6 @@ void test_state_frame(void)
 {
     struct nhmm_alphabet *a = nhmm_alphabet_create("ACGT");
     const int A = 0;
-    const int C = 1;
     const int G = 2;
     const int T = 3;
 
@@ -67,8 +66,6 @@ void test_state_frame(void)
 
     struct nhmm_codon *codon = nhmm_codon_create();
     nhmm_codon_set_ninfs(codon);
-    /* nhmm_codon_set_lprob(codon, A, T, G, log(0.8/0.9)); */
-    /* nhmm_codon_set_lprob(codon, A, T, T, log(0.1/0.9)); */
 
     nhmm_codon_set_lprob(codon, A, T, G, log(0.8 / 0.9));
     nhmm_codon_set_lprob(codon, A, T, T, log(0.1 / 0.9));
@@ -80,7 +77,8 @@ void test_state_frame(void)
                              exp(nhmm_state_emiss_lprob(s, "A", 1)));
     TEST_ASSERT_EQUAL_DOUBLE(0.054158333333333336,
                              exp(nhmm_state_emiss_lprob(s, "AT", 2)));
-    /* TEST_ASSERT_EQUAL_DOUBLE(0.4, exp(nhmm_state_emiss_lprob(s, "AGA", 3))); */
+    TEST_ASSERT_EQUAL_DOUBLE(0.5858020833333333,
+                             exp(nhmm_state_emiss_lprob(s, "ATG", 3)));
 
     nhmm_state_destroy(s);
     nhmm_alphabet_destroy(a);
