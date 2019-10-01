@@ -79,6 +79,12 @@ void test_state_frame(void)
                              exp(nhmm_state_emiss_lprob(s, "AT", 2)));
     TEST_ASSERT_EQUAL_DOUBLE(0.5858020833333333,
                              exp(nhmm_state_emiss_lprob(s, "ATG", 3)));
+    TEST_ASSERT_EQUAL_DOUBLE(0.0010021604938271608,
+                             exp(nhmm_state_emiss_lprob(s, "ATA", 3)));
+    TEST_ASSERT_EQUAL_DOUBLE(0.07500223765432103,
+                             exp(nhmm_state_emiss_lprob(s, "ATT", 3)));
+    TEST_ASSERT_EQUAL_DOUBLE(0.0010270833333333336,
+                             exp(nhmm_state_emiss_lprob(s, "ATTA", 4)));
 
     nhmm_state_destroy(s);
     nhmm_alphabet_destroy(a);
