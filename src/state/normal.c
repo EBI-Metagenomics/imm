@@ -1,6 +1,6 @@
 #include "state/normal.h"
 #include "alphabet.h"
-#include "logaddexp.h"
+#include "array.h"
 #include "report.h"
 #include <math.h>
 #include <stdlib.h>
@@ -35,21 +35,9 @@ double normal_state_emiss_lprob(const struct nhmm_state *state, const char *seq,
 int normal_state_normalize(struct nhmm_state *state)
 {
 
-    size_t length = nhmm_alphabet_length(nhmm_state_get_alphabet(state));
+    size_t len = nhmm_alphabet_length(nhmm_state_get_alphabet(state));
     struct normal_state *s = state->impl;
-    double lnorm = s->emiss_lprobs[0];
-    for (size_t i = 1; i < length; ++i)
-        lnorm = logaddexp(lnorm, s->emiss_lprobs[i]);
-
-    if (!isfinite(lnorm)) {
-        error("zero-probability alphabet");
-        return -1;
-    }
-
-    for (size_t i = 1; i < length; ++i)
-        s->emiss_lprobs[i] -= lnorm;
-
-    return 0;
+    return log_normalize(s->emiss_lprobs, len);
 }
 
 void normal_state_destroy(struct nhmm_state *state)

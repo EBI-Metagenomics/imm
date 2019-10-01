@@ -79,6 +79,7 @@ set(NHMM_PRIVATE_HEADERS
 
 set(NHMM_SOURCES
   src/alphabet.c
+  src/array.c
   src/codon.c
   src/counter.c
   src/hmm.c

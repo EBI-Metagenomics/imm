@@ -62,7 +62,7 @@ void test_state_frame(void)
     const int G = 2;
     const int T = 3;
 
-    double base_emiss_lprobs[] = {log(0.25), log(0.25), log(0.25), log(0.25)};
+    double base_emiss_lprobs[] = {log(0.2), log(0.2), log(0.2), log(0.2)};
 
     struct nhmm_codon *codon = nhmm_codon_create();
     nhmm_codon_set_ninfs(codon);
@@ -72,6 +72,7 @@ void test_state_frame(void)
 
     struct nhmm_state *s =
         nhmm_state_create_frame("State", a, base_emiss_lprobs, codon, 0.1);
+    nhmm_state_normalize(s);
 
     TEST_ASSERT_EQUAL_DOUBLE(0.0027000000000000006,
                              exp(nhmm_state_emiss_lprob(s, "A", 1)));

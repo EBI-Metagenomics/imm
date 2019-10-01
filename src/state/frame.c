@@ -1,5 +1,6 @@
 #include "state/frame.h"
 #include "alphabet.h"
+#include "array.h"
 #include "logaddexp.h"
 #include "report.h"
 #include <math.h>
@@ -25,7 +26,6 @@ inline static double logaddexp3(double a, double b, double c)
 {
     return logaddexp(logaddexp(a, b), c);
 }
-double logsumexp(double *a, size_t n);
 
 void frame_state_create(struct nhmm_state *state, const double *base_emiss_lprobs,
                         const struct nhmm_codon *codon, double epsilon)
@@ -49,8 +49,6 @@ void frame_state_create(struct nhmm_state *state, const double *base_emiss_lprob
 double frame_state_emiss_lprob(const struct nhmm_state *state, const char *seq,
                                size_t seq_len)
 {
-    /* struct frame_state *s = state->impl; */
-
     if (seq_len == 1)
         return joint_seq_len1(state, seq);
     else if (seq_len == 2)
@@ -67,21 +65,9 @@ double frame_state_emiss_lprob(const struct nhmm_state *state, const char *seq,
 
 int frame_state_normalize(struct nhmm_state *state)
 {
-    return 0;
-    /* size_t length = nhmm_alphabet_length(nhmm_state_get_alphabet(state)); */
-    /* struct frame_state *s = state->impl; */
-    /* double lnorm = s->emiss_lprobs[0]; */
-    /* for (size_t i = 1; i < length; ++i) */
-    /*     lnorm = logaddexp(lnorm, s->emiss_lprobs[i]); */
-
-    /* if (!isfinite(lnorm)) { */
-    /*     error("zero-probability alphabet"); */ /*     return -1; */
-    /* } */
-
-    /* for (size_t i = 1; i < length; ++i) */
-    /*     s->emiss_lprobs[i] -= lnorm; */
-
-    /* return 0; */
+    size_t len = nhmm_alphabet_length(nhmm_state_get_alphabet(state));
+    struct frame_state *s = state->impl;
+    return log_normalize(s->base_emiss_lprobs, len);
 }
 
 void frame_state_destroy(struct nhmm_state *state)
@@ -340,12 +326,4 @@ double base_lprob(const struct nhmm_state *state, char id)
     int idx = alphabet_symbol_idx(nhmm_state_get_alphabet(state), id);
     const struct frame_state *s = state->impl;
     return s->base_emiss_lprobs[(size_t)idx];
-}
-
-double logsumexp(double *a, size_t n)
-{
-    double r = -INFINITY;
-    for (size_t i = 0; i < n; ++i)
-        r = logaddexp(r, a[i]);
-    return r;
 }
