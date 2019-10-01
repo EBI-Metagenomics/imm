@@ -85,8 +85,9 @@ void test_state_frame(void)
                              exp(nhmm_state_emiss_lprob(s, "ATT", 3)));
     TEST_ASSERT_EQUAL_DOUBLE(0.0010270833333333336,
                              exp(nhmm_state_emiss_lprob(s, "ATTA", 4)));
-    TEST_ASSERT_EQUAL_DOUBLE(-12.08828960987379,
-                             nhmm_state_emiss_lprob(s, "ATTAA", 5));
+    TEST_ASSERT_EQUAL_DOUBLE(-12.08828960987379, nhmm_state_emiss_lprob(s, "ATTAA", 5));
+
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(nhmm_state_emiss_lprob(s, "ATTAAT", 6));
 
     nhmm_state_destroy(s);
     nhmm_alphabet_destroy(a);
