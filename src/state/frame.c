@@ -275,22 +275,34 @@ double joint_seq_len4(const struct nhmm_state *state, const char *seq)
 
 double joint_seq_len5(const struct nhmm_state *state, const char *seq)
 {
-    /* i = self._base_emission.get */
-    /* e = self._codon_prob */
+#define c_lp(codon) codon_lprob(state, codon)
+    const char c012[3] = {seq[0], seq[1], seq[2]};
+    const char c013[3] = {seq[0], seq[1], seq[3]};
+    const char c014[3] = {seq[0], seq[1], seq[4]};
+    const char c023[3] = {seq[0], seq[2], seq[3]};
+    const char c024[3] = {seq[0], seq[2], seq[4]};
+    const char c034[3] = {seq[0], seq[3], seq[4]};
+    const char c123[3] = {seq[1], seq[2], seq[3]};
+    const char c124[3] = {seq[1], seq[2], seq[4]};
+    const char c134[3] = {seq[1], seq[3], seq[4]};
+    const char c234[3] = {seq[2], seq[3], seq[4]};
 
-    /* c = 2 * self._loge + 2 * self._log1e - LOG(10) */
-    /* p = [logsumexp([i(z1) + i(z2) + e(z3, z4, z5), i(z1) + i(z3) + e(z2, z4, z5)])]
-     */
-    /* p += [logsumexp([i(z1) + i(z4) + e(z2, z3, z5), i(z1) + i(z5) + e(z2, z3, z4)])]
-     */
-    /* p += [logsumexp([i(z2) + i(z3) + e(z1, z4, z5), i(z2) + i(z4) + e(z1, z3, z5)])]
-     */
-    /* p += [logsumexp([i(z2) + i(z5) + e(z1, z3, z4), i(z3) + i(z4) + e(z1, z2, z5)])]
-     */
-    /* p += [logsumexp([i(z3) + i(z5) + e(z1, z2, z4), i(z4) + i(z5) + e(z1, z2, z3)])]
-     */
+    const double b_lp0 = base_lprob(state, seq[0]);
+    const double b_lp1 = base_lprob(state, seq[1]);
+    const double b_lp2 = base_lprob(state, seq[2]);
+    const double b_lp3 = base_lprob(state, seq[3]);
+    const double b_lp4 = base_lprob(state, seq[4]);
 
-    /* return c + logsumexp(p) */
+    double v[] = {logaddexp(b_lp0 + b_lp1 + c_lp(c234), b_lp0 + b_lp2 + c_lp(c134)),
+                  logaddexp(b_lp0 + b_lp3 + c_lp(c124), b_lp0 + b_lp4 + c_lp(c123)),
+                  logaddexp(b_lp1 + b_lp2 + c_lp(c034), b_lp1 + b_lp3 + c_lp(c024)),
+                  logaddexp(b_lp1 + b_lp4 + c_lp(c023), b_lp2 + b_lp3 + c_lp(c014)),
+                  logaddexp(b_lp2 + b_lp4 + c_lp(c013), b_lp3 + b_lp4 + c_lp(c012))};
+
+    const struct frame_state *s = state->impl;
+
+    return 2 * s->leps + 2 * s->l1eps - log(10) + logsumexp(v, 5);
+#undef c_lprob
 }
 
 double codon_lprob(const struct nhmm_state *state, const char *codon)
