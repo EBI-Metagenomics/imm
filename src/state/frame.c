@@ -113,7 +113,6 @@ double joint_seq_len1(const struct nhmm_state *state, const char *seq)
 double joint_seq_len2(const struct nhmm_state *state, const char *seq)
 {
 #define c_lprob(codon) codon_lprob(state, codon)
-#define b_lprob(codon) base_lprob(state, codon)
     const char _ = NHMM_ANY_SYMBOL;
 
     const char c_01[3] = {_, seq[0], seq[1]};
@@ -129,22 +128,21 @@ double joint_seq_len2(const struct nhmm_state *state, const char *seq)
     const char c__1[3] = {_, _, seq[1]};
 
     const struct frame_state *s = state->impl;
-    const double b_lprob0 = base_lprob(state, seq[0]);
-    const double b_lprob1 = base_lprob(state, seq[1]);
+    const double b_lp0 = base_lprob(state, seq[0]);
+    const double b_lp1 = base_lprob(state, seq[1]);
 
     double v0 = log(2) + s->leps + s->l1eps * 3 - log(3);
     v0 += logaddexp3(c_lprob(c_01), c_lprob(c0_1), c_lprob(c01_));
 
     double c = 3 * s->leps + s->l1eps - log(3);
     double v1 = c;
-    v1 += logaddexp3(c_lprob(c0__), c_lprob(c_0_), c_lprob(c__0)) + b_lprob1;
+    v1 += logaddexp3(c_lprob(c0__), c_lprob(c_0_), c_lprob(c__0)) + b_lp1;
 
     double v2 = c;
-    v2 += logaddexp3(c_lprob(c1__), c_lprob(c_1_), c_lprob(c__1)) + b_lprob0;
+    v2 += logaddexp3(c_lprob(c1__), c_lprob(c_1_), c_lprob(c__1)) + b_lp0;
 
     return logaddexp3(v0, v1, v2);
 #undef c_lprob
-#undef b_lprob
 }
 
 double joint_seq_len3(const struct nhmm_state *state, const char *seq)
@@ -179,25 +177,24 @@ double joint_seq_len3(const struct nhmm_state *state, const char *seq)
     const char c__2[3] = {_, _, seq[2]};
 
     const struct frame_state *s = state->impl;
-    const double b_lprob0 = base_lprob(state, seq[0]);
-    const double b_lprob1 = base_lprob(state, seq[1]);
-    const double b_lprob2 = base_lprob(state, seq[2]);
+    const double b_lp0 = base_lprob(state, seq[0]);
+    const double b_lp1 = base_lprob(state, seq[1]);
+    const double b_lp2 = base_lprob(state, seq[2]);
 
     double v0 = 4 * s->l1eps + c_lprob(c012);
 
-    double v1 = log(4) + 2 * s->leps + 2 * s->l1eps - log(9);
-    v1 +=
-        logaddexp3(logaddexp3(c_lprob(c_12), c_lprob(c1_2), c_lprob(c12_)) + b_lprob0,
-                   logaddexp3(c_lprob(c_02), c_lprob(c0_2), c_lprob(c02_)) + b_lprob1,
-                   logaddexp3(c_lprob(c_01), c_lprob(c0_1), c_lprob(c01_)) + b_lprob2);
+    double c1 = log(4) + 2 * s->leps + 2 * s->l1eps - log(9);
+    double v1[] = {logaddexp3(c_lprob(c_12), c_lprob(c1_2), c_lprob(c12_)) + b_lp0,
+                   logaddexp3(c_lprob(c_02), c_lprob(c0_2), c_lprob(c02_)) + b_lp1,
+                   logaddexp3(c_lprob(c_01), c_lprob(c0_1), c_lprob(c01_)) + b_lp2};
 
-    double v2 = 4 * s->leps - log(9);
-    v2 += logaddexp3(
-        logaddexp3(c_lprob(c2__), c_lprob(c_2_), c_lprob(c__2)) + b_lprob0 + b_lprob1,
-        logaddexp3(c_lprob(c1__), c_lprob(c_1_), c_lprob(c__1)) + b_lprob0 + b_lprob2,
-        logaddexp3(c_lprob(c0__), c_lprob(c_0_), c_lprob(c__0)) + b_lprob1 + b_lprob2);
+    double c2 = 4 * s->leps - log(9);
+    double v2[] = {
+        logaddexp3(c_lprob(c2__), c_lprob(c_2_), c_lprob(c__2)) + b_lp0 + b_lp1,
+        logaddexp3(c_lprob(c1__), c_lprob(c_1_), c_lprob(c__1)) + b_lp0 + b_lp2,
+        logaddexp3(c_lprob(c0__), c_lprob(c_0_), c_lprob(c__0)) + b_lp1 + b_lp2};
 
-    return logaddexp3(v0, v1, v2);
+    return logaddexp3(v0, c1 + logsumexp(v1, 3), c2 + logsumexp(v2, 3));
 #undef c_lprob
 }
 
@@ -312,8 +309,8 @@ double codon_lprob(const struct nhmm_state *state, const char *codon)
     for (size_t a = 0; a < nbases[0]; ++a) {
         for (size_t b = 0; b < nbases[1]; ++b) {
             for (size_t c = 0; c < nbases[2]; ++c) {
-                lprob = logaddexp(lprob, nhmm_codon_get_lprob(s->codon, a_idx[a],
-                                                              b_idx[b], c_idx[c]));
+                double t = nhmm_codon_get_lprob(s->codon, a_idx[a], b_idx[b], c_idx[c]);
+                lprob = logaddexp(lprob, t);
             }
         }
     }
