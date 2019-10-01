@@ -1,3 +1,4 @@
+#include "array.h"
 #include "nhmm.h"
 #include "report.h"
 #include "stdlib.h"
@@ -42,12 +43,18 @@ NHMM_API void nhmm_codon_set_ninfs(struct nhmm_codon *codon)
         codon->emiss_lprobs[i] = -INFINITY;
 }
 
-NHMM_API double nhmm_codon_get_lprob(struct nhmm_codon *codon, int a, int b, int c)
+NHMM_API double nhmm_codon_get_lprob(const struct nhmm_codon *codon, int a, int b,
+                                     int c)
 {
     if (codon_check_range(a, b, c))
         return NAN;
 
     return codon->emiss_lprobs[4 * 4 * a + 4 * b + c];
+}
+
+NHMM_API int nhmm_codon_normalize(struct nhmm_codon *codon)
+{
+    return log_normalize(codon->emiss_lprobs, 4 * 4 * 4);
 }
 
 NHMM_API void nhmm_codon_destroy(struct nhmm_codon *codon)
