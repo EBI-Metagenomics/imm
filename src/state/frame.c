@@ -25,6 +25,7 @@ inline static double logaddexp3(double a, double b, double c)
 {
     return logaddexp(logaddexp(a, b), c);
 }
+double logsumexp(double *a, size_t n);
 
 void frame_state_create(struct nhmm_state *state, const double *base_emiss_lprobs,
                         const struct nhmm_codon *codon, double epsilon)
@@ -216,27 +217,60 @@ double joint_seq_len3(const struct nhmm_state *state, const char *seq)
 
 double joint_seq_len4(const struct nhmm_state *state, const char *seq)
 {
-    /* i = self._base_emission.get */
-    /* e = self._codon_prob */
+#define c_lp(codon) codon_lprob(state, codon)
+    const char _ = NHMM_ANY_SYMBOL;
 
-    /* c = self._loge + self._log1e * 3 - LOG(2) */
-    /* p = [logsumexp([e(z2, z3, z4) + i(z1), e(z1, z3, z4) + i(z2)])] */
-    /* p += [logsumexp([e(z1, z2, z4) + i(z3), e(z1, z2, z3) + i(z4)])] */
-    /* p0 = c + logsumexp(p) */
+    const char c012[3] = {seq[0], seq[1], seq[2]};
+    const char c013[3] = {seq[0], seq[1], seq[3]};
+    const char c023[3] = {seq[0], seq[2], seq[3]};
+    const char c123[3] = {seq[1], seq[2], seq[3]};
 
-    /* c = 3 * self._loge + self._log1e - LOG(9) */
-    /* p = [logsumexp([e(_, z3, z4) + i(z1) + i(z2), e(_, z2, z4) + i(z1) + i(z3)])] */
-    /* p += [logsumexp([e(_, z2, z3) + i(z1) + i(z4), e(_, z1, z4) + i(z2) + i(z3)])] */
-    /* p += [logsumexp([e(_, z1, z3) + i(z2) + i(z4), e(_, z1, z2) + i(z3) + i(z4)])] */
-    /* p += [logsumexp([e(z3, _, z4) + i(z1) + i(z2), e(z2, _, z4) + i(z1) + i(z3)])] */
-    /* p += [logsumexp([e(z2, _, z3) + i(z1) + i(z4), e(z1, _, z4) + i(z2) + i(z3)])] */
-    /* p += [logsumexp([e(z1, _, z3) + i(z2) + i(z4), e(z1, _, z2) + i(z3) + i(z4)])] */
-    /* p += [logsumexp([e(z3, z4, _) + i(z1) + i(z2), e(z2, z4, _) + i(z1) + i(z3)])] */
-    /* p += [logsumexp([e(z2, z3, _) + i(z1) + i(z4), e(z1, z4, _) + i(z2) + i(z3)])] */
-    /* p += [logsumexp([e(z1, z3, _) + i(z2) + i(z4), e(z1, z2, _) + i(z3) + i(z4)])] */
-    /* p1 = c + logsumexp(p) */
+    const double b_lp0 = base_lprob(state, seq[0]);
+    const double b_lp1 = base_lprob(state, seq[1]);
+    const double b_lp2 = base_lprob(state, seq[2]);
+    const double b_lp3 = base_lprob(state, seq[3]);
 
-    /* return logsumexp([p0, p1]) */
+    const struct frame_state *s = state->impl;
+
+    double v0 = s->leps + s->l1eps * 3 - log(2);
+    double v00 = logaddexp(c_lp(c123) + b_lp0, c_lp(c023) + b_lp1);
+    double v01 = logaddexp(c_lp(c013) + b_lp2, c_lp(c012) + b_lp3);
+    v0 += logaddexp(v00, v01);
+
+    const char c_01[3] = {_, seq[0], seq[1]};
+    const char c_02[3] = {_, seq[0], seq[2]};
+    const char c_03[3] = {_, seq[0], seq[3]};
+    const char c_12[3] = {_, seq[1], seq[2]};
+    const char c_13[3] = {_, seq[1], seq[3]};
+    const char c_23[3] = {_, seq[2], seq[3]};
+
+    const char c0_1[3] = {seq[0], _, seq[1]};
+    const char c0_2[3] = {seq[0], _, seq[2]};
+    const char c0_3[3] = {seq[0], _, seq[3]};
+    const char c1_2[3] = {seq[1], _, seq[2]};
+    const char c1_3[3] = {seq[1], _, seq[3]};
+    const char c2_3[3] = {seq[2], _, seq[3]};
+
+    const char c01_[3] = {seq[0], seq[1], _};
+    const char c02_[3] = {seq[0], seq[2], _};
+    const char c03_[3] = {seq[0], seq[3], _};
+    const char c12_[3] = {seq[1], seq[2], _};
+    const char c13_[3] = {seq[1], seq[3], _};
+    const char c23_[3] = {seq[2], seq[3], _};
+
+    double c = 3 * s->leps + s->l1eps - log(9);
+    double v1[] = {logaddexp(c_lp(c_23) + b_lp0 + b_lp1, c_lp(c_13) + b_lp0 + b_lp2),
+                   logaddexp(c_lp(c_12) + b_lp0 + b_lp3, c_lp(c_03) + b_lp1 + b_lp2),
+                   logaddexp(c_lp(c_02) + b_lp1 + b_lp3, c_lp(c_01) + b_lp2 + b_lp3),
+                   logaddexp(c_lp(c2_3) + b_lp0 + b_lp1, c_lp(c1_3) + b_lp0 + b_lp2),
+                   logaddexp(c_lp(c1_2) + b_lp0 + b_lp3, c_lp(c0_3) + b_lp1 + b_lp2),
+                   logaddexp(c_lp(c0_2) + b_lp1 + b_lp3, c_lp(c0_1) + b_lp2 + b_lp3),
+                   logaddexp(c_lp(c23_) + b_lp0 + b_lp1, c_lp(c13_) + b_lp0 + b_lp2),
+                   logaddexp(c_lp(c12_) + b_lp0 + b_lp3, c_lp(c03_) + b_lp1 + b_lp2),
+                   logaddexp(c_lp(c02_) + b_lp1 + b_lp3, c_lp(c01_) + b_lp2 + b_lp3)};
+
+    return logaddexp(v0, c + logsumexp(v1, 9));
+#undef c_lprob
 }
 
 double joint_seq_len5(const struct nhmm_state *state, const char *seq)
@@ -296,3 +330,10 @@ double base_lprob(const struct nhmm_state *state, char id)
     return s->base_emiss_lprobs[(size_t)idx];
 }
 
+double logsumexp(double *a, size_t n)
+{
+    double r = -INFINITY;
+    for (size_t i = 0; i < n; ++i)
+        r = logaddexp(r, a[i]);
+    return r;
+}
