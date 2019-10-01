@@ -74,20 +74,14 @@ void test_state_frame(void)
         nhmm_state_create_frame("State", a, base_emiss_lprobs, codon, 0.1);
     nhmm_state_normalize(s);
 
-    TEST_ASSERT_EQUAL_DOUBLE(0.0027000000000000006,
-                             exp(nhmm_state_emiss_lprob(s, "A", 1)));
-    TEST_ASSERT_EQUAL_DOUBLE(0.054158333333333336,
-                             exp(nhmm_state_emiss_lprob(s, "AT", 2)));
-    TEST_ASSERT_EQUAL_DOUBLE(0.5858020833333333,
-                             exp(nhmm_state_emiss_lprob(s, "ATG", 3)));
-    TEST_ASSERT_EQUAL_DOUBLE(0.0010021604938271608,
-                             exp(nhmm_state_emiss_lprob(s, "ATA", 3)));
-    TEST_ASSERT_EQUAL_DOUBLE(0.07500223765432103,
-                             exp(nhmm_state_emiss_lprob(s, "ATT", 3)));
-    TEST_ASSERT_EQUAL_DOUBLE(0.0010270833333333336,
-                             exp(nhmm_state_emiss_lprob(s, "ATTA", 4)));
+    TEST_ASSERT_EQUAL_DOUBLE(-5.914503505971854, nhmm_state_emiss_lprob(s, "A", 1));
+    TEST_ASSERT_EQUAL_DOUBLE(-2.915843423869834, nhmm_state_emiss_lprob(s, "AT", 2));
+    TEST_ASSERT_EQUAL_DOUBLE(-6.905597115665666, nhmm_state_emiss_lprob(s, "ATA", 3));
+    TEST_ASSERT_EQUAL_DOUBLE(-0.534773288204706, nhmm_state_emiss_lprob(s, "ATG", 3));
+    TEST_ASSERT_EQUAL_DOUBLE(-6.905597115665666, nhmm_state_emiss_lprob(s, "ATA", 3));
+    TEST_ASSERT_EQUAL_DOUBLE(-2.590237330499946, nhmm_state_emiss_lprob(s, "ATT", 3));
+    TEST_ASSERT_EQUAL_DOUBLE(-6.881032208841384, nhmm_state_emiss_lprob(s, "ATTA", 4));
     TEST_ASSERT_EQUAL_DOUBLE(-12.08828960987379, nhmm_state_emiss_lprob(s, "ATTAA", 5));
-
     TEST_ASSERT_DOUBLE_IS_NEG_INF(nhmm_state_emiss_lprob(s, "ATTAAT", 6));
 
     nhmm_state_destroy(s);
