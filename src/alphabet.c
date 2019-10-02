@@ -17,7 +17,7 @@ struct imm_alphabet
 };
 
 int check_symbols_length(const char *symbols);
-int check_symbol_id_range(char symbol_id);
+int check_symbol_id(char symbol_id);
 
 IMM_API struct imm_alphabet *imm_alphabet_create(const char *symbols)
 {
@@ -33,7 +33,7 @@ IMM_API struct imm_alphabet *imm_alphabet_create(const char *symbols)
 
     const char *ids = rs_data_c(&a->symbols);
     for (int idx = 0; idx < (int)rs_len(&a->symbols); ++idx) {
-        if (check_symbol_id_range(ids[idx])) {
+        if (check_symbol_id(ids[idx])) {
             rs_free(&a->symbols);
             free(a);
             return NULL;
@@ -61,13 +61,13 @@ size_t alphabet_length(const struct imm_alphabet *alphabet)
 
 int alphabet_has_symbol(const struct imm_alphabet *alphabet, char symbol_id)
 {
-    check_symbol_id_range(symbol_id);
+    check_symbol_id(symbol_id);
     return alphabet->symbol_idx[(size_t)symbol_id] != -1;
 }
 
 int alphabet_symbol_idx(const struct imm_alphabet *alphabet, char symbol_id)
 {
-    if (check_symbol_id_range(symbol_id))
+    if (check_symbol_id(symbol_id))
         return -1;
     return alphabet->symbol_idx[(size_t)symbol_id];
 }
@@ -86,10 +86,14 @@ int check_symbols_length(const char *symbols)
     return 0;
 }
 
-int check_symbol_id_range(char symbol_id)
+int check_symbol_id(char symbol_id)
 {
     if (symbol_id < SYMBOL_ID_MIN || symbol_id > SYMBOL_ID_MAX) {
         error("symbols must be non-extended ASCII characters");
+        return 1;
+    }
+    if (symbol_id == IMM_ANY_SYMBOL)  {
+        error("symbol cannot be `%c`", IMM_ANY_SYMBOL);
         return 1;
     }
     return 0;

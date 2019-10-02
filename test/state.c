@@ -62,7 +62,7 @@ void test_state_frame1(void)
     const int G = 2;
     const int T = 3;
 
-    double base_emiss_lprobs[] = {log(0.2), log(0.2), log(0.2), log(0.2)};
+    double base_lprobs[] = {log(0.2), log(0.2), log(0.2), log(0.2)};
 
     struct imm_codon *codon = imm_codon_create();
     imm_codon_set_ninfs(codon);
@@ -71,7 +71,7 @@ void test_state_frame1(void)
     imm_codon_set_lprob(codon, A, T, T, log(0.1 / 0.9));
 
     struct imm_state *s =
-        imm_state_create_frame("State", a, base_emiss_lprobs, codon, 0.1);
+        imm_state_create_frame("State", a, base_lprobs, codon, 0.1);
     imm_state_normalize(s);
 
     TEST_ASSERT_EQUAL_DOUBLE(-5.914503505971854, imm_state_emiss_lprob(s, "A", 1));
@@ -95,7 +95,7 @@ void test_state_frame2(void)
     const int G = 2;
     const int T = 3;
 
-    double base_emiss_lprobs[] = {log(0.1), log(0.2), log(0.3), log(0.4)};
+    double base_lprobs[] = {log(0.1), log(0.2), log(0.3), log(0.4)};
 
     struct imm_codon *codon = imm_codon_create();
     imm_codon_set_ninfs(codon);
@@ -104,7 +104,7 @@ void test_state_frame2(void)
     imm_codon_set_lprob(codon, A, T, T, log(0.1 / 0.9));
 
     struct imm_state *s =
-        imm_state_create_frame("State", a, base_emiss_lprobs, codon, 0.1);
+        imm_state_create_frame("State", a, base_lprobs, codon, 0.1);
     imm_state_normalize(s);
 
     TEST_ASSERT_EQUAL_DOUBLE(-5.914503505971854, imm_state_emiss_lprob(s, "A", 1));
@@ -139,7 +139,7 @@ void test_state_frame3(void)
     const int G = 2;
     const int T = 3;
 
-    double base_emiss_lprobs[] = {log(0.1), log(0.2), log(0.3), log(0.4)};
+    double base_lprobs[] = {log(0.1), log(0.2), log(0.3), log(0.4)};
 
     struct imm_codon *codon = imm_codon_create();
     imm_codon_set_ninfs(codon);
@@ -151,7 +151,7 @@ void test_state_frame3(void)
     TEST_ASSERT_EQUAL_INT(0, imm_codon_normalize(codon));
 
     struct imm_state *s =
-        imm_state_create_frame("State", a, base_emiss_lprobs, codon, 0.1);
+        imm_state_create_frame("State", a, base_lprobs, codon, 0.1);
     imm_state_normalize(s);
 
     TEST_ASSERT_EQUAL_DOUBLE(-6.282228286097171, imm_state_emiss_lprob(s, "A", 1));
