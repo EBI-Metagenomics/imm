@@ -92,7 +92,7 @@ int check_symbol_id(char symbol_id)
         error("symbols must be non-extended ASCII characters");
         return 1;
     }
-    if (symbol_id == IMM_ANY_SYMBOL)  {
+    if (symbol_id == IMM_ANY_SYMBOL) {
         error("symbol cannot be `%c`", IMM_ANY_SYMBOL);
         return 1;
     }

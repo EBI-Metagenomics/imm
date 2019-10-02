@@ -40,6 +40,10 @@ int normal_state_normalize(struct imm_state *state)
     return log_normalize(s->emiss_lprobs, len);
 }
 
+int normal_state_min_seq(const struct imm_state *state) { return 1; }
+
+int normal_state_max_seq(const struct imm_state *state) { return 1; }
+
 void normal_state_destroy(struct imm_state *state)
 {
     if (!state)

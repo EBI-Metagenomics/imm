@@ -20,7 +20,7 @@ IMM_API struct imm_state *imm_state_create_silent(const char *name,
 
 IMM_API struct imm_state *imm_state_create_frame(const char *name,
                                                  const struct imm_alphabet *alphabet,
-                                                 const double *base_emiss_lprobs,
+                                                 const double *base_lprobs,
                                                  const struct imm_codon *codon,
                                                  double epsilon);
 
@@ -35,6 +35,9 @@ IMM_API double imm_state_emiss_lprob(const struct imm_state *state, const char *
                                      size_t seq_len);
 
 IMM_API int imm_state_normalize(struct imm_state *state);
+
+IMM_API int imm_state_min_seq(const struct imm_state *state);
+IMM_API int imm_state_max_seq(const struct imm_state *state);
 
 IMM_API void imm_state_destroy(struct imm_state *state);
 
