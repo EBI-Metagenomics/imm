@@ -83,12 +83,12 @@ IMM_API int imm_state_normalize(struct imm_state *state)
     return state->normalize(state);
 }
 
-IMM_API int imm_state_min_seq(const struct imm_state *state)
+IMM_API size_t imm_state_min_seq(const struct imm_state *state)
 {
     return state->min_seq(state);
 }
 
-IMM_API int imm_state_max_seq(const struct imm_state *state)
+IMM_API size_t imm_state_max_seq(const struct imm_state *state)
 {
     return state->max_seq(state);
 }

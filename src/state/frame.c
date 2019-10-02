@@ -76,9 +76,9 @@ int frame_state_normalize(struct imm_state *state)
     return log_normalize(s->base_emiss_lprobs, len);
 }
 
-int frame_state_min_seq(const struct imm_state *state) { return 1; }
+size_t frame_state_min_seq(const struct imm_state *state) { return 1; }
 
-int frame_state_max_seq(const struct imm_state *state) { return 5; }
+size_t frame_state_max_seq(const struct imm_state *state) { return 5; }
 
 void frame_state_destroy(struct imm_state *state)
 {

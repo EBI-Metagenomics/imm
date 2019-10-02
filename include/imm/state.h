@@ -36,8 +36,8 @@ IMM_API double imm_state_emiss_lprob(const struct imm_state *state, const char *
 
 IMM_API int imm_state_normalize(struct imm_state *state);
 
-IMM_API int imm_state_min_seq(const struct imm_state *state);
-IMM_API int imm_state_max_seq(const struct imm_state *state);
+IMM_API size_t imm_state_min_seq(const struct imm_state *state);
+IMM_API size_t imm_state_max_seq(const struct imm_state *state);
 
 IMM_API void imm_state_destroy(struct imm_state *state);
 

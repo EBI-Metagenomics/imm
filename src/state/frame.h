@@ -10,8 +10,8 @@ void frame_state_create(struct imm_state *state, const double *base_emiss_lprobs
 double frame_state_emiss_lprob(const struct imm_state *state, const char *seq,
                                size_t seq_len);
 int frame_state_normalize(struct imm_state *state);
-int frame_state_min_seq(const struct imm_state *state);
-int frame_state_max_seq(const struct imm_state *state);
+size_t frame_state_min_seq(const struct imm_state *state);
+size_t frame_state_max_seq(const struct imm_state *state);
 void frame_state_destroy(struct imm_state *state);
 
 #endif

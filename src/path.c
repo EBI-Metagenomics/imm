@@ -40,6 +40,19 @@ const struct imm_path *path_next_item(const struct imm_path *item)
     return item->next;
 }
 
-int path_get_state_id(const struct imm_path *item) { return item->state_id; }
+int path_item_state_id(const struct imm_path *item) { return item->state_id; }
 
-size_t path_get_seq_len(const struct imm_path *item) { return item->seq_len; }
+size_t path_item_seq_len(const struct imm_path *item) { return item->seq_len; }
+
+size_t path_seq_len(const struct imm_path *path)
+{
+    const struct imm_path *item = path;
+
+    size_t seq_len = 0;
+    while (item) {
+        seq_len += path_item_seq_len(item);
+        item = path_next_item(item);
+    }
+
+    return seq_len;
+}

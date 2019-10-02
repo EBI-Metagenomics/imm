@@ -9,6 +9,7 @@ void test_hmm_set_trans(void);
 void test_hmm_likelihood_single_state(void);
 void test_hmm_likelihood_two_states(void);
 void test_hmm_likelihood_silent_state(void);
+void test_hmm_viterbi(void);
 
 int main(void)
 {
@@ -19,6 +20,7 @@ int main(void)
     RUN_TEST(test_hmm_likelihood_single_state);
     RUN_TEST(test_hmm_likelihood_two_states);
     RUN_TEST(test_hmm_likelihood_silent_state);
+    RUN_TEST(test_hmm_viterbi);
     return UNITY_END();
 }
 
@@ -284,5 +286,67 @@ void test_hmm_likelihood_silent_state(void)
 
     imm_hmm_destroy(hmm);
     imm_state_destroy(state);
+    imm_alphabet_destroy(alphabet);
+}
+
+void test_hmm_viterbi(void)
+{
+    struct imm_alphabet *alphabet = imm_alphabet_create("ACGT");
+    struct imm_hmm *hmm = imm_hmm_create(alphabet);
+
+    double lprobs0[] = {log(0.25), log(0.25), log(0.5), -INFINITY};
+    struct imm_state *state0 = imm_state_create_normal("State0", alphabet, lprobs0);
+
+    double lprobs1[] = {log(0.5), log(0.25), log(0.5), log(1.0)};
+    struct imm_state *state1 = imm_state_create_normal("State1", alphabet, lprobs1);
+
+    int state_id0 = imm_hmm_add_state(hmm, state0, log(1.0));
+    int state_id1 = imm_hmm_add_state(hmm, state1, -INFINITY);
+
+    imm_hmm_set_trans(hmm, state_id0, state_id0, log(0.1));
+    imm_hmm_set_trans(hmm, state_id0, state_id1, log(0.2));
+    imm_hmm_set_trans(hmm, state_id1, state_id1, log(1.0));
+
+    struct imm_path *path = NULL;
+    imm_path_create(&path);
+    imm_path_add(&path, state_id0, 1);
+    /* TEST_ASSERT_EQUAL_DOUBLE(0.25, exp(imm_hmm_likelihood(hmm, "A", path))); */
+    imm_hmm_viterbi(hmm, "A", path, state_id1);
+    imm_path_destroy(&path);
+
+    /* imm_path_create(&path); */
+    /* imm_path_add(&path, state_id0, 1); */
+    /* TEST_ASSERT_EQUAL_DOUBLE(0, exp(imm_hmm_likelihood(hmm, "T", path))); */
+    /* imm_path_destroy(&path); */
+
+    /* imm_path_create(&path); */
+    /* imm_path_add(&path, state_id1, 1); */
+    /* TEST_ASSERT_EQUAL_DOUBLE(0, exp(imm_hmm_likelihood(hmm, "G", path))); */
+    /* imm_path_destroy(&path); */
+
+    /* TEST_ASSERT_EQUAL_INT(0, imm_hmm_normalize(hmm)); */
+
+    /* imm_path_create(&path); */
+    /* imm_path_add(&path, state_id0, 1); */
+    /* TEST_ASSERT_EQUAL_DOUBLE(0.5, exp(imm_hmm_likelihood(hmm, "G", path))); */
+    /* imm_path_destroy(&path); */
+
+    /* imm_path_create(&path); */
+    /* imm_path_add(&path, state_id0, 1); */
+    /* imm_path_add(&path, state_id1, 1); */
+    /* TEST_ASSERT_EQUAL_DOUBLE(1.0 / 3.0, exp(imm_hmm_likelihood(hmm, "GT", path))); */
+    /* imm_path_destroy(&path); */
+
+    /* TEST_ASSERT_EQUAL_INT(0, imm_state_normalize(state1)); */
+    /* imm_path_create(&path); */
+    /* imm_path_add(&path, state_id0, 1); */
+    /* imm_path_add(&path, state_id1, 1); */
+    /* TEST_ASSERT_EQUAL_DOUBLE(0.14814814814815, */
+    /*                          exp(imm_hmm_likelihood(hmm, "GT", path))); */
+    /* imm_path_destroy(&path); */
+
+    imm_hmm_destroy(hmm);
+    imm_state_destroy(state0);
+    imm_state_destroy(state1);
     imm_alphabet_destroy(alphabet);
 }

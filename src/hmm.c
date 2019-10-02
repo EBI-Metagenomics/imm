@@ -3,6 +3,7 @@
 #include "counter.h"
 #include "imm.h"
 #include "logaddexp.h"
+#include "matrix.h"
 #include "path.h"
 #include "state/state.h"
 #include "tbl_state.h"
@@ -24,6 +25,7 @@ struct imm_hmm
 double hmm_start_lprob(const struct imm_hmm *hmm, int state_id);
 int hmm_normalize_start(struct imm_hmm *hmm);
 int hmm_normalize_trans(struct tbl_state *tbl_state);
+size_t hmm_nstates(const struct imm_hmm *hmm);
 
 IMM_API struct imm_hmm *imm_hmm_create(const struct imm_alphabet *alphabet)
 {
@@ -123,8 +125,8 @@ IMM_API double imm_hmm_likelihood(const struct imm_hmm *hmm, const char *seq,
     }
     size_t seq_len = strlen(seq);
 
-    size_t len = path_get_seq_len(path);
-    int state_id = path_get_state_id(path);
+    size_t len = path_item_seq_len(path);
+    int state_id = path_item_state_id(path);
     const struct imm_state *state = imm_hmm_get_state(hmm, state_id);
 
     if (len > seq_len)
@@ -139,8 +141,8 @@ IMM_API double imm_hmm_likelihood(const struct imm_hmm *hmm, const char *seq,
 
     goto enter;
     while (path) {
-        len = path_get_seq_len(path);
-        state_id = path_get_state_id(path);
+        len = path_item_seq_len(path);
+        state_id = path_item_state_id(path);
         state = imm_hmm_get_state(hmm, state_id);
 
         if (len > seq_len)
@@ -169,6 +171,26 @@ len_mismatch:
 not_found_state:
     error("state was not found");
     return NAN;
+}
+
+IMM_API double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq,
+                               const struct imm_path *path, int end_state_id)
+
+{
+    const struct tbl_state *tbl_state = hmm->tbl_states;
+    size_t state_space = 0;
+
+    while (tbl_state) {
+        state_space += imm_state_max_seq(tbl_state_get_state(tbl_state));
+        tbl_state = tbl_state_next_c(tbl_state);
+    }
+
+    /* size_t seq_len = path_seq_len(path); */
+    /* struct matrix *matrix = matrix_create(seq_len, state_space); */
+
+    /* matrix_destroy(matrix); */
+
+    return 0.0;
 }
 
 IMM_API int imm_hmm_normalize(struct imm_hmm *hmm)
@@ -261,4 +283,17 @@ int hmm_normalize_trans(struct tbl_state *tbl_state)
     }
 
     return 0;
+}
+
+size_t hmm_nstates(const struct imm_hmm *hmm)
+{
+    struct tbl_state *state = hmm->tbl_states;
+    size_t nstates = 0;
+
+    while (state) {
+        nstates += 1;
+        state = tbl_state_next(state);
+    }
+
+    return nstates;
 }

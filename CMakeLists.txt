@@ -83,6 +83,7 @@ set(IMM_SOURCES
   src/codon.c
   src/counter.c
   src/hmm.c
+  src/matrix.c
   src/path.c
   src/report.c
   src/state/frame.c

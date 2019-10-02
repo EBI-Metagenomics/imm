@@ -8,8 +8,8 @@ typedef void (*state_destroy)(struct imm_state *state);
 typedef double (*state_emiss_lprob)(const struct imm_state *state, const char *seq,
                                     size_t seq_len);
 typedef int (*state_normalize)(struct imm_state *state);
-typedef int (*state_min_seq)(const struct imm_state *state);
-typedef int (*state_max_seq)(const struct imm_state *state);
+typedef size_t (*state_min_seq)(const struct imm_state *state);
+typedef size_t (*state_max_seq)(const struct imm_state *state);
 
 struct imm_state
 {
