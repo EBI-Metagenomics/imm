@@ -1,5 +1,5 @@
-#ifndef NHMM_COUNTER_H
-#define NHMM_COUNTER_H
+#ifndef IMM_COUNTER_H
+#define IMM_COUNTER_H
 
 #include "report.h"
 #include <stdlib.h>

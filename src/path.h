@@ -1,12 +1,12 @@
-#ifndef NHMM_PATH_H
-#define NHMM_PATH_H
+#ifndef IMM_PATH_H
+#define IMM_PATH_H
 
 #include <stddef.h>
 
-struct nhmm_path;
+struct imm_path;
 
-const struct nhmm_path *path_next_item(const struct nhmm_path *item);
-int path_get_state_id(const struct nhmm_path *item);
-size_t path_get_seq_len(const struct nhmm_path *item);
+const struct imm_path *path_next_item(const struct imm_path *item);
+int path_get_state_id(const struct imm_path *item);
+size_t path_get_seq_len(const struct imm_path *item);
 
 #endif

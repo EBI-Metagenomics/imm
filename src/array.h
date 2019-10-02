@@ -1,5 +1,5 @@
-#ifndef NHMM_ARRAY_H
-#define NHMM_ARRAY_H
+#ifndef IMM_ARRAY_H
+#define IMM_ARRAY_H
 
 #include <stddef.h>
 

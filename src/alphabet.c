@@ -1,16 +1,16 @@
 #include "alphabet.h"
-#include "nhmm.h"
+#include "imm.h"
 #include "rapidstring.h"
 #include "report.h"
 #include <limits.h>
 #include <stdlib.h>
 
-#define NHMM_API_EXPORTS
+#define IMM_API_EXPORTS
 
 #define SYMBOL_ID_MIN 0
 #define SYMBOL_ID_MAX 127
 
-struct nhmm_alphabet
+struct imm_alphabet
 {
     rapidstring symbols;
     int symbol_idx[SYMBOL_ID_MAX + 1];
@@ -19,12 +19,12 @@ struct nhmm_alphabet
 int check_symbols_length(const char *symbols);
 int check_symbol_id_range(char symbol_id);
 
-NHMM_API struct nhmm_alphabet *nhmm_alphabet_create(const char *symbols)
+IMM_API struct imm_alphabet *imm_alphabet_create(const char *symbols)
 {
     if (check_symbols_length(symbols))
         return NULL;
 
-    struct nhmm_alphabet *a = malloc(sizeof(struct nhmm_alphabet));
+    struct imm_alphabet *a = malloc(sizeof(struct imm_alphabet));
 
     rs_init_w(&a->symbols, symbols);
 
@@ -45,12 +45,12 @@ NHMM_API struct nhmm_alphabet *nhmm_alphabet_create(const char *symbols)
     return a;
 }
 
-NHMM_API size_t nhmm_alphabet_length(const struct nhmm_alphabet *alphabet)
+IMM_API size_t imm_alphabet_length(const struct imm_alphabet *alphabet)
 {
     return rs_len(&alphabet->symbols);
 }
 
-NHMM_API void nhmm_alphabet_destroy(struct nhmm_alphabet *alphabet)
+IMM_API void imm_alphabet_destroy(struct imm_alphabet *alphabet)
 {
     if (!alphabet)
         return;
@@ -59,20 +59,20 @@ NHMM_API void nhmm_alphabet_destroy(struct nhmm_alphabet *alphabet)
     free(alphabet);
 }
 
-int alphabet_has_symbol(const struct nhmm_alphabet *alphabet, char symbol_id)
+int alphabet_has_symbol(const struct imm_alphabet *alphabet, char symbol_id)
 {
     check_symbol_id_range(symbol_id);
     return alphabet->symbol_idx[(size_t)symbol_id] != -1;
 }
 
-int alphabet_symbol_idx(const struct nhmm_alphabet *alphabet, char symbol_id)
+int alphabet_symbol_idx(const struct imm_alphabet *alphabet, char symbol_id)
 {
     if (check_symbol_id_range(symbol_id))
         return -1;
     return alphabet->symbol_idx[(size_t)symbol_id];
 }
 
-char alphabet_symbol_id(const struct nhmm_alphabet *alphabet, int symbol_idx)
+char alphabet_symbol_id(const struct imm_alphabet *alphabet, int symbol_idx)
 {
     return rs_data_c(&alphabet->symbols)[symbol_idx];
 }

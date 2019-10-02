@@ -6,7 +6,7 @@
 struct tbl_state
 {
     int state_id;
-    const struct nhmm_state *state;
+    const struct imm_state *state;
     double start_lprob;
     struct tbl_trans *tbl_transitions;
     UT_hash_handle hh;
@@ -33,7 +33,7 @@ void tbl_state_destroy(struct tbl_state **head_ptr)
 }
 
 void tbl_state_add_state(struct tbl_state **head_ptr, int state_id,
-                         const struct nhmm_state *state, double start_lprob)
+                         const struct imm_state *state, double start_lprob)
 {
     struct tbl_state *tbl_state = malloc(sizeof(struct tbl_state));
     tbl_trans_create(&tbl_state->tbl_transitions);
@@ -69,7 +69,7 @@ const struct tbl_state *tbl_state_find_c(const struct tbl_state *head,
     return tbl_state;
 }
 
-const struct nhmm_state *tbl_state_get_state(const struct tbl_state *tbl_state)
+const struct imm_state *tbl_state_get_state(const struct tbl_state *tbl_state)
 {
     return tbl_state->state;
 }

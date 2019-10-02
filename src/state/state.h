@@ -1,18 +1,18 @@
-#ifndef NHMM_STATE_STATE_H
-#define NHMM_STATE_STATE_H
+#ifndef IMM_STATE_STATE_H
+#define IMM_STATE_STATE_H
 
-#include "nhmm.h"
+#include "imm.h"
 #include "rapidstring.h"
 
-typedef void (*state_destroy)(struct nhmm_state *state);
-typedef double (*state_emiss_lprob)(const struct nhmm_state *state, const char *seq,
+typedef void (*state_destroy)(struct imm_state *state);
+typedef double (*state_emiss_lprob)(const struct imm_state *state, const char *seq,
                                     size_t seq_len);
-typedef int (*state_normalize)(struct nhmm_state *state);
+typedef int (*state_normalize)(struct imm_state *state);
 
-struct nhmm_state
+struct imm_state
 {
     rapidstring name;
-    const struct nhmm_alphabet *alphabet;
+    const struct imm_alphabet *alphabet;
     bool end_state;
 
     state_destroy destroy;

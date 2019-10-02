@@ -1,6 +1,6 @@
 #include "counter.h"
 #include "logaddexp.h"
-#include "nhmm.h"
+#include "imm.h"
 #include "path.h"
 #include "state/state.h"
 #include "tbl_state.h"
@@ -9,11 +9,11 @@
 #include <math.h>
 #include <stdlib.h>
 
-#define NHMM_API_EXPORTS
+#define IMM_API_EXPORTS
 
-struct nhmm_hmm
+struct imm_hmm
 {
-    const struct nhmm_alphabet *alphabet;
+    const struct imm_alphabet *alphabet;
 
     /* Maps `state_id` to `state`. */
     struct tbl_state *tbl_states;
@@ -21,36 +21,36 @@ struct nhmm_hmm
     struct counter *state_id_counter;
 };
 
-double hmm_start_lprob(const struct nhmm_hmm *hmm, int state_id);
-int hmm_normalize_start(struct nhmm_hmm *hmm);
+double hmm_start_lprob(const struct imm_hmm *hmm, int state_id);
+int hmm_normalize_start(struct imm_hmm *hmm);
 int hmm_normalize_trans(struct tbl_state *tbl_state);
 
-NHMM_API struct nhmm_hmm *nhmm_hmm_create(const struct nhmm_alphabet *alphabet)
+IMM_API struct imm_hmm *imm_hmm_create(const struct imm_alphabet *alphabet)
 {
-    struct nhmm_hmm *hmm = malloc(sizeof(struct nhmm_hmm));
+    struct imm_hmm *hmm = malloc(sizeof(struct imm_hmm));
     hmm->alphabet = alphabet;
     hmm->state_id_counter = counter_create();
     tbl_state_create(&hmm->tbl_states);
     return hmm;
 }
 
-NHMM_API int nhmm_hmm_add_state(struct nhmm_hmm *hmm, const struct nhmm_state *state,
+IMM_API int imm_hmm_add_state(struct imm_hmm *hmm, const struct imm_state *state,
                                 double start_lprob)
 {
     if (!state) {
         error("state cannot be NULL");
-        return NHMM_INVALID_STATE_ID;
+        return IMM_INVALID_STATE_ID;
     }
 
     int state_id = counter_next(hmm->state_id_counter);
     if (state_id == -1)
-        return NHMM_INVALID_STATE_ID;
+        return IMM_INVALID_STATE_ID;
 
     tbl_state_add_state(&hmm->tbl_states, state_id, state, start_lprob);
     return state_id;
 }
 
-NHMM_API int nhmm_hmm_del_state(struct nhmm_hmm *hmm, int state_id)
+IMM_API int imm_hmm_del_state(struct imm_hmm *hmm, int state_id)
 {
     if (tbl_state_del_state(&hmm->tbl_states, state_id))
         return -1;
@@ -58,7 +58,7 @@ NHMM_API int nhmm_hmm_del_state(struct nhmm_hmm *hmm, int state_id)
     return 0;
 }
 
-NHMM_API const struct nhmm_state *nhmm_hmm_get_state(const struct nhmm_hmm *hmm,
+IMM_API const struct imm_state *imm_hmm_get_state(const struct imm_hmm *hmm,
                                                      int state_id)
 {
     const struct tbl_state *tbl_state = tbl_state_find(hmm->tbl_states, state_id);
@@ -68,7 +68,7 @@ NHMM_API const struct nhmm_state *nhmm_hmm_get_state(const struct nhmm_hmm *hmm,
     return tbl_state_get_state(tbl_state);
 }
 
-NHMM_API int nhmm_hmm_set_trans(struct nhmm_hmm *hmm, int src_state_id,
+IMM_API int imm_hmm_set_trans(struct imm_hmm *hmm, int src_state_id,
                                 int dst_state_id, double lprob)
 {
     struct tbl_state *src = tbl_state_find(hmm->tbl_states, src_state_id);
@@ -92,7 +92,7 @@ NHMM_API int nhmm_hmm_set_trans(struct nhmm_hmm *hmm, int src_state_id,
     return 0;
 }
 
-NHMM_API double nhmm_hmm_get_trans(const struct nhmm_hmm *hmm, int src_state_id,
+IMM_API double imm_hmm_get_trans(const struct imm_hmm *hmm, int src_state_id,
                                    int dst_state_id)
 {
     const struct tbl_state *src = tbl_state_find_c(hmm->tbl_states, src_state_id);
@@ -114,8 +114,8 @@ NHMM_API double nhmm_hmm_get_trans(const struct nhmm_hmm *hmm, int src_state_id,
     return tbl_trans_get_lprob(tbl_trans);
 }
 
-NHMM_API double nhmm_hmm_likelihood(const struct nhmm_hmm *hmm, const char *seq,
-                                    const struct nhmm_path *path)
+IMM_API double imm_hmm_likelihood(const struct imm_hmm *hmm, const char *seq,
+                                    const struct imm_path *path)
 {
     if (!path || !seq) {
         error("path or seq is NULL");
@@ -125,7 +125,7 @@ NHMM_API double nhmm_hmm_likelihood(const struct nhmm_hmm *hmm, const char *seq,
 
     size_t len = path_get_seq_len(path);
     int state_id = path_get_state_id(path);
-    const struct nhmm_state *state = nhmm_hmm_get_state(hmm, state_id);
+    const struct imm_state *state = imm_hmm_get_state(hmm, state_id);
 
     if (len > seq_len)
         goto len_mismatch;
@@ -133,23 +133,23 @@ NHMM_API double nhmm_hmm_likelihood(const struct nhmm_hmm *hmm, const char *seq,
         goto not_found_state;
 
     double lprob =
-        hmm_start_lprob(hmm, state_id) + nhmm_state_emiss_lprob(state, seq, len);
+        hmm_start_lprob(hmm, state_id) + imm_state_emiss_lprob(state, seq, len);
 
-    int prev_state_id = NHMM_INVALID_STATE_ID;
+    int prev_state_id = IMM_INVALID_STATE_ID;
 
     goto enter;
     while (path) {
         len = path_get_seq_len(path);
         state_id = path_get_state_id(path);
-        state = nhmm_hmm_get_state(hmm, state_id);
+        state = imm_hmm_get_state(hmm, state_id);
 
         if (len > seq_len)
             goto len_mismatch;
         if (!state)
             goto not_found_state;
 
-        lprob += nhmm_hmm_get_trans(hmm, prev_state_id, state_id) +
-                 nhmm_state_emiss_lprob(state, seq, len);
+        lprob += imm_hmm_get_trans(hmm, prev_state_id, state_id) +
+                 imm_state_emiss_lprob(state, seq, len);
 
     enter:
         prev_state_id = state_id;
@@ -171,7 +171,7 @@ not_found_state:
     return NAN;
 }
 
-NHMM_API int nhmm_hmm_normalize(struct nhmm_hmm *hmm)
+IMM_API int imm_hmm_normalize(struct imm_hmm *hmm)
 {
     if (hmm_normalize_start(hmm))
         return -1;
@@ -185,7 +185,7 @@ NHMM_API int nhmm_hmm_normalize(struct nhmm_hmm *hmm)
     return 0;
 }
 
-NHMM_API void nhmm_hmm_destroy(struct nhmm_hmm *hmm)
+IMM_API void imm_hmm_destroy(struct imm_hmm *hmm)
 {
     if (!hmm)
         return;
@@ -200,7 +200,7 @@ NHMM_API void nhmm_hmm_destroy(struct nhmm_hmm *hmm)
     free(hmm);
 }
 
-double hmm_start_lprob(const struct nhmm_hmm *hmm, int state_id)
+double hmm_start_lprob(const struct imm_hmm *hmm, int state_id)
 {
     const struct tbl_state *tbl_state = tbl_state_find(hmm->tbl_states, state_id);
     if (!tbl_state) {
@@ -210,7 +210,7 @@ double hmm_start_lprob(const struct nhmm_hmm *hmm, int state_id)
     return tbl_state_get_start_lprob(tbl_state);
 }
 
-int hmm_normalize_start(struct nhmm_hmm *hmm)
+int hmm_normalize_start(struct imm_hmm *hmm)
 {
     const struct tbl_state *tbl_state = hmm->tbl_states;
     if (!tbl_state)

@@ -1,32 +1,32 @@
 #include "array.h"
-#include "nhmm.h"
+#include "imm.h"
 #include "report.h"
 #include "stdlib.h"
 #include <math.h>
 #include <string.h>
 
-#define NHMM_API_EXPORTS
+#define IMM_API_EXPORTS
 
-struct nhmm_codon
+struct imm_codon
 {
     double emiss_lprobs[4 * 4 * 4];
 };
 
 int codon_check_range(int a, int b, int c);
 
-NHMM_API struct nhmm_codon *nhmm_codon_create(void)
+IMM_API struct imm_codon *imm_codon_create(void)
 {
-    return malloc(sizeof(struct nhmm_codon));
+    return malloc(sizeof(struct imm_codon));
 }
 
-NHMM_API struct nhmm_codon *nhmm_codon_clone(const struct nhmm_codon *codon)
+IMM_API struct imm_codon *imm_codon_clone(const struct imm_codon *codon)
 {
-    struct nhmm_codon *c = malloc(sizeof(struct nhmm_codon));
+    struct imm_codon *c = malloc(sizeof(struct imm_codon));
     memcpy(c->emiss_lprobs, codon->emiss_lprobs, sizeof(double) * 4 * 4 * 4);
     return c;
 }
 
-NHMM_API void nhmm_codon_set_lprob(struct nhmm_codon *codon, int a, int b, int c,
+IMM_API void imm_codon_set_lprob(struct imm_codon *codon, int a, int b, int c,
                                    double lprob)
 {
     codon_check_range(a, b, c);
@@ -37,13 +37,13 @@ NHMM_API void nhmm_codon_set_lprob(struct nhmm_codon *codon, int a, int b, int c
     codon->emiss_lprobs[4 * 4 * a + 4 * b + c] = lprob;
 }
 
-NHMM_API void nhmm_codon_set_ninfs(struct nhmm_codon *codon)
+IMM_API void imm_codon_set_ninfs(struct imm_codon *codon)
 {
     for (size_t i = 0; i < 4 * 4 * 4; ++i)
         codon->emiss_lprobs[i] = -INFINITY;
 }
 
-NHMM_API double nhmm_codon_get_lprob(const struct nhmm_codon *codon, int a, int b,
+IMM_API double imm_codon_get_lprob(const struct imm_codon *codon, int a, int b,
                                      int c)
 {
     if (codon_check_range(a, b, c))
@@ -52,12 +52,12 @@ NHMM_API double nhmm_codon_get_lprob(const struct nhmm_codon *codon, int a, int 
     return codon->emiss_lprobs[4 * 4 * a + 4 * b + c];
 }
 
-NHMM_API int nhmm_codon_normalize(struct nhmm_codon *codon)
+IMM_API int imm_codon_normalize(struct imm_codon *codon)
 {
     return log_normalize(codon->emiss_lprobs, 4 * 4 * 4);
 }
 
-NHMM_API void nhmm_codon_destroy(struct nhmm_codon *codon)
+IMM_API void imm_codon_destroy(struct imm_codon *codon)
 {
     if (codon)
         free(codon);

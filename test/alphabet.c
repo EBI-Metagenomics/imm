@@ -1,4 +1,4 @@
-#include "nhmm.h"
+#include "imm.h"
 #include "unity.h"
 
 void test_alphabet(void);
@@ -14,20 +14,20 @@ int main(void)
 
 void test_alphabet(void)
 {
-    struct nhmm_alphabet *a = nhmm_alphabet_create("ACGT");
+    struct imm_alphabet *a = imm_alphabet_create("ACGT");
 
-    TEST_ASSERT_EQUAL_INT(4, nhmm_alphabet_length(a));
+    TEST_ASSERT_EQUAL_INT(4, imm_alphabet_length(a));
 
-    nhmm_alphabet_destroy(a);
+    imm_alphabet_destroy(a);
 }
 
 
 void test_alphabet_symbol_range(void)
 {
     char symbols[] = {(char) 128, '\0'};
-    struct nhmm_alphabet *a = nhmm_alphabet_create(symbols);
+    struct imm_alphabet *a = imm_alphabet_create(symbols);
 
     TEST_ASSERT_NULL(a);
 
-    nhmm_alphabet_destroy(a);
+    imm_alphabet_destroy(a);
 }

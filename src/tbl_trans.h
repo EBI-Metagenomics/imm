@@ -1,5 +1,5 @@
-#ifndef NHMM_TBL_TRANS_H
-#define NHMM_TBL_TRANS_H
+#ifndef IMM_TBL_TRANS_H
+#define IMM_TBL_TRANS_H
 
 struct tbl_trans;
 

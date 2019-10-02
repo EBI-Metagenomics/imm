@@ -9,42 +9,42 @@
 struct frame_state
 {
     double *base_emiss_lprobs;
-    struct nhmm_codon *codon;
+    struct imm_codon *codon;
     double epsilon;
     double leps;
     double l1eps;
 };
 
-double joint_seq_len1(const struct nhmm_state *state, const char *seq);
-double joint_seq_len2(const struct nhmm_state *state, const char *seq);
-double joint_seq_len3(const struct nhmm_state *state, const char *seq);
-double joint_seq_len4(const struct nhmm_state *state, const char *seq);
-double joint_seq_len5(const struct nhmm_state *state, const char *seq);
-double codon_lprob(const struct nhmm_state *state, const char *codon);
-double base_lprob(const struct nhmm_state *state, char id);
+double joint_seq_len1(const struct imm_state *state, const char *seq);
+double joint_seq_len2(const struct imm_state *state, const char *seq);
+double joint_seq_len3(const struct imm_state *state, const char *seq);
+double joint_seq_len4(const struct imm_state *state, const char *seq);
+double joint_seq_len5(const struct imm_state *state, const char *seq);
+double codon_lprob(const struct imm_state *state, const char *codon);
+double base_lprob(const struct imm_state *state, char id);
 inline static double logaddexp3(double a, double b, double c)
 {
     return logaddexp(logaddexp(a, b), c);
 }
-inline static double ecodon_lprob(const struct nhmm_state *state, const char *seq,
+inline static double ecodon_lprob(const struct imm_state *state, const char *seq,
                                   size_t a, size_t b, size_t c)
 {
     const char codon[3] = {seq[a], seq[b], seq[c]};
     return codon_lprob(state, codon);
 }
 
-void frame_state_create(struct nhmm_state *state, const double *base_emiss_lprobs,
-                        const struct nhmm_codon *codon, double epsilon)
+void frame_state_create(struct imm_state *state, const double *base_emiss_lprobs,
+                        const struct imm_codon *codon, double epsilon)
 {
     struct frame_state *s = malloc(sizeof(struct frame_state));
 
-    if (nhmm_alphabet_length(state->alphabet) != 4)
+    if (imm_alphabet_length(state->alphabet) != 4)
         error("alphabet length is not four");
 
     s->base_emiss_lprobs = malloc(sizeof(double) * 4);
     memcpy(s->base_emiss_lprobs, base_emiss_lprobs, sizeof(double) * 4);
 
-    s->codon = nhmm_codon_clone(codon);
+    s->codon = imm_codon_clone(codon);
     s->epsilon = epsilon;
     s->leps = log(epsilon);
     s->l1eps = log(1 - epsilon);
@@ -52,7 +52,7 @@ void frame_state_create(struct nhmm_state *state, const double *base_emiss_lprob
     state->impl = s;
 }
 
-double frame_state_emiss_lprob(const struct nhmm_state *state, const char *seq,
+double frame_state_emiss_lprob(const struct imm_state *state, const char *seq,
                                size_t seq_len)
 {
     if (seq_len == 1)
@@ -69,14 +69,14 @@ double frame_state_emiss_lprob(const struct nhmm_state *state, const char *seq,
     return -INFINITY;
 }
 
-int frame_state_normalize(struct nhmm_state *state)
+int frame_state_normalize(struct imm_state *state)
 {
-    size_t len = nhmm_alphabet_length(nhmm_state_get_alphabet(state));
+    size_t len = imm_alphabet_length(imm_state_get_alphabet(state));
     struct frame_state *s = state->impl;
     return log_normalize(s->base_emiss_lprobs, len);
 }
 
-void frame_state_destroy(struct nhmm_state *state)
+void frame_state_destroy(struct imm_state *state)
 {
     if (!state)
         return;
@@ -92,7 +92,7 @@ void frame_state_destroy(struct nhmm_state *state)
     }
 
     if (s->codon) {
-        nhmm_codon_destroy(s->codon);
+        imm_codon_destroy(s->codon);
         s->codon = NULL;
     }
 
@@ -100,9 +100,9 @@ void frame_state_destroy(struct nhmm_state *state)
     state->impl = NULL;
 }
 
-double joint_seq_len1(const struct nhmm_state *state, const char *seq)
+double joint_seq_len1(const struct imm_state *state, const char *seq)
 {
-    const char _ = NHMM_ANY_SYMBOL;
+    const char _ = IMM_ANY_SYMBOL;
     const char c0__[3] = {seq[0], _, _};
     const char c_0_[3] = {_, seq[0], _};
     const char c__0[3] = {_, _, seq[0]};
@@ -116,10 +116,10 @@ double joint_seq_len1(const struct nhmm_state *state, const char *seq)
     return c + logaddexp3(e0, e1, e2) - log(3);
 }
 
-double joint_seq_len2(const struct nhmm_state *state, const char *seq)
+double joint_seq_len2(const struct imm_state *state, const char *seq)
 {
 #define c_lprob(codon) codon_lprob(state, codon)
-    const char _ = NHMM_ANY_SYMBOL;
+    const char _ = IMM_ANY_SYMBOL;
 
     const char c_01[3] = {_, seq[0], seq[1]};
     const char c0_1[3] = {seq[0], _, seq[1]};
@@ -151,10 +151,10 @@ double joint_seq_len2(const struct nhmm_state *state, const char *seq)
 #undef c_lprob
 }
 
-double joint_seq_len3(const struct nhmm_state *state, const char *seq)
+double joint_seq_len3(const struct imm_state *state, const char *seq)
 {
 #define C(a, b, c) ecodon_lprob(state, eseq, a, b, c)
-    const char eseq[] = {seq[0], seq[1], seq[2], NHMM_ANY_SYMBOL};
+    const char eseq[] = {seq[0], seq[1], seq[2], IMM_ANY_SYMBOL};
     const char _ = sizeof(eseq) - 1;
 
     const double B[] = {base_lprob(state, seq[0]), base_lprob(state, seq[1]),
@@ -178,10 +178,10 @@ double joint_seq_len3(const struct nhmm_state *state, const char *seq)
 #undef C
 }
 
-double joint_seq_len4(const struct nhmm_state *state, const char *seq)
+double joint_seq_len4(const struct imm_state *state, const char *seq)
 {
 #define C(a, b, c) ecodon_lprob(state, eseq, a, b, c)
-    const char eseq[] = {seq[0], seq[1], seq[2], seq[3], NHMM_ANY_SYMBOL};
+    const char eseq[] = {seq[0], seq[1], seq[2], seq[3], IMM_ANY_SYMBOL};
     const char _ = sizeof(eseq) - 1;
 
     const double B[] = {base_lprob(state, seq[0]), base_lprob(state, seq[1]),
@@ -207,7 +207,7 @@ double joint_seq_len4(const struct nhmm_state *state, const char *seq)
 #undef C
 }
 
-double joint_seq_len5(const struct nhmm_state *state, const char *seq)
+double joint_seq_len5(const struct imm_state *state, const char *seq)
 {
 #define c_lp(codon) codon_lprob(state, codon)
     const char c012[3] = {seq[0], seq[1], seq[2]};
@@ -239,15 +239,15 @@ double joint_seq_len5(const struct nhmm_state *state, const char *seq)
 #undef c_lprob
 }
 
-double codon_lprob(const struct nhmm_state *state, const char *codon)
+double codon_lprob(const struct imm_state *state, const char *codon)
 {
-    const struct nhmm_alphabet *alphabet = nhmm_state_get_alphabet(state);
+    const struct imm_alphabet *alphabet = imm_state_get_alphabet(state);
     double lprob = -INFINITY;
     int bases_idx[3 * 4] = {0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3};
     size_t nbases[3] = {4, 4, 4};
 
     for (size_t i = 0; i < 3; ++i) {
-        if (codon[i] != NHMM_ANY_SYMBOL) {
+        if (codon[i] != IMM_ANY_SYMBOL) {
             bases_idx[i * 4] = alphabet_symbol_idx(alphabet, codon[i]);
             nbases[i] = 1;
         }
@@ -260,7 +260,7 @@ double codon_lprob(const struct nhmm_state *state, const char *codon)
     for (size_t a = 0; a < nbases[0]; ++a) {
         for (size_t b = 0; b < nbases[1]; ++b) {
             for (size_t c = 0; c < nbases[2]; ++c) {
-                double t = nhmm_codon_get_lprob(s->codon, a_idx[a], b_idx[b], c_idx[c]);
+                double t = imm_codon_get_lprob(s->codon, a_idx[a], b_idx[b], c_idx[c]);
                 lprob = logaddexp(lprob, t);
             }
         }
@@ -269,9 +269,9 @@ double codon_lprob(const struct nhmm_state *state, const char *codon)
     return lprob;
 }
 
-double base_lprob(const struct nhmm_state *state, char id)
+double base_lprob(const struct imm_state *state, char id)
 {
-    int idx = alphabet_symbol_idx(nhmm_state_get_alphabet(state), id);
+    int idx = alphabet_symbol_idx(imm_state_get_alphabet(state), id);
     const struct frame_state *s = state->impl;
     return s->base_emiss_lprobs[(size_t)idx];
 }

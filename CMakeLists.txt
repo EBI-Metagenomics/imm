@@ -2,12 +2,12 @@ cmake_minimum_required(VERSION 3.4 FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-# Fetch nhmm version from header file
-include(GetNHMMVersion)
-GetNHMMVersion(${CMAKE_CURRENT_SOURCE_DIR}/include/nhmm.h NHMM_VERSION_MAJOR NHMM_VERSION_MINOR NHMM_VERSION_PATCH)
-set(NHMM_VERSION ${NHMM_VERSION_MAJOR}.${NHMM_VERSION_MINOR}.${NHMM_VERSION_PATCH})
+# Fetch imm version from header file
+include(GetIMMVersion)
+GetIMMVersion(${CMAKE_CURRENT_SOURCE_DIR}/include/imm.h IMM_VERSION_MAJOR IMM_VERSION_MINOR IMM_VERSION_PATCH)
+set(IMM_VERSION ${IMM_VERSION_MAJOR}.${IMM_VERSION_MINOR}.${IMM_VERSION_PATCH})
 
-project(nhmm VERSION ${NHMM_VERSION} LANGUAGES C)
+project(imm VERSION ${IMM_VERSION} LANGUAGES C)
 
 set(CMAKE_C_STANDARD 11)
 
@@ -17,7 +17,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # Generate compile_commands.json file
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-message(STATUS "NHMM_VERSION=${NHMM_VERSION}")
+message(STATUS "IMM_VERSION=${IMM_VERSION}")
 message(STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 
 # Build type.
@@ -33,7 +33,7 @@ else()
   set(DEBUG 0)
 endif()
 
-option(CLANG_ASAN_UBSAN "Enable Clang address & undefined behavior sanitizer for nhmm library" OFF)
+option(CLANG_ASAN_UBSAN "Enable Clang address & undefined behavior sanitizer for imm library" OFF)
 if(CLANG_ASAN_UBSAN AND NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
   message(FATAL_ERROR "Sanitizers are only supported for Clang")
 endif()
@@ -66,18 +66,18 @@ include_directories(${LOGADDEXP_INCLUDE_DIRS})
 include_directories(src)
 
 # Interface header that that the user is used to include.
-set(NHMM_PUBLIC_HEADER
-  include/nhmm.h
+set(IMM_PUBLIC_HEADER
+  include/imm.h
 )
 
 # Headers that are included by the interface header, and therefore
 # installed alongside it.
-set(NHMM_PRIVATE_HEADERS
-  include/nhmm/api.h
-  include/nhmm/alphabet.h
+set(IMM_PRIVATE_HEADERS
+  include/imm/api.h
+  include/imm/alphabet.h
 )
 
-set(NHMM_SOURCES
+set(IMM_SOURCES
   src/alphabet.c
   src/array.c
   src/codon.c
@@ -93,19 +93,19 @@ set(NHMM_SOURCES
   src/tbl_trans.c
 )
 
-add_library(nhmmlib OBJECT ${NHMM_SOURCES})
+add_library(immlib OBJECT ${IMM_SOURCES})
 
-add_library(nhmm SHARED $<TARGET_OBJECTS:nhmmlib>)
-set_target_properties(nhmm PROPERTIES VERSION ${NHMM_VERSION})
-set_target_properties(nhmm PROPERTIES SOVERSION ${NHMM_VERSION_MAJOR})
-set_target_properties(nhmm PROPERTIES PUBLIC_HEADER ${NHMM_PUBLIC_HEADER})
+add_library(imm SHARED $<TARGET_OBJECTS:immlib>)
+set_target_properties(imm PROPERTIES VERSION ${IMM_VERSION})
+set_target_properties(imm PROPERTIES SOVERSION ${IMM_VERSION_MAJOR})
+set_target_properties(imm PROPERTIES PUBLIC_HEADER ${IMM_PUBLIC_HEADER})
 
 if(CLANG_ASAN_UBSAN)
-  message(STATUS "Enabling Clang address sanitizer and undefined behavior sanitizer for nhmm library.")
-  set_property(TARGET nhmm APPEND PROPERTY COMPILE_DEFINITIONS EXITFREE)
-  set_property(TARGET nhmm APPEND PROPERTY COMPILE_OPTIONS -fno-sanitize-recover=all
+  message(STATUS "Enabling Clang address sanitizer and undefined behavior sanitizer for imm library.")
+  set_property(TARGET imm APPEND PROPERTY COMPILE_DEFINITIONS EXITFREE)
+  set_property(TARGET imm APPEND PROPERTY COMPILE_OPTIONS -fno-sanitize-recover=all
     -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=address -fsanitize=undefined)
-  set_property(TARGET nhmm APPEND_STRING PROPERTY LINK_FLAGS "-fsanitize=address -fsanitize=undefined ")
+  set_property(TARGET imm APPEND_STRING PROPERTY LINK_FLAGS "-fsanitize=address -fsanitize=undefined ")
 endif()
 
 # Begin of test setup block.
@@ -115,9 +115,9 @@ enable_testing()
 set(UNITY_INCLUDE_DIRS test/unity)
 set(UNITY_SOURCES test/unity/unity.c)
 
-function(nhmm_add_test name)
+function(imm_add_test name)
   add_executable(test_${name} test/${name}.c ${UNITY_SOURCES})
-  target_link_libraries(test_${name} nhmm)
+  target_link_libraries(test_${name} imm)
   target_include_directories(test_${name} PUBLIC ${UNITY_INCLUDE_DIRS})
   target_compile_definitions(test_${name} PUBLIC UNITY_INCLUDE_DOUBLE)
   add_test(NAME ${name} COMMAND test_${name})
@@ -126,28 +126,28 @@ function(nhmm_add_test name)
   endif()
 endfunction()
 
-nhmm_add_test(alphabet)
-nhmm_add_test(state)
-nhmm_add_test(hmm)
-nhmm_add_test(path)
+imm_add_test(alphabet)
+imm_add_test(state)
+imm_add_test(hmm)
+imm_add_test(path)
 # End of test setup block.
 
-foreach(SRC ${NHMM_SOURCES})
-  set(NHMM_SOURCES_PATH ${NHMM_SOURCES_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/${SRC})
+foreach(SRC ${IMM_SOURCES})
+  set(IMM_SOURCES_PATH ${IMM_SOURCES_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/${SRC})
 endforeach()
 
-message(STATUS "${NHMM_SOURCES_PATH}")
+message(STATUS "${IMM_SOURCES_PATH}")
 
 if (CLANG_CODE_COVERAGE)
   add_custom_target(coverage
     COMMAND llvm-profdata merge -sparse *.profraw -o all.profdata
     COMMAND llvm-cov show -format=html -o coverage -instr-profile=all.profdata
-      $<TARGET_FILE:nhmm>
+      $<TARGET_FILE:imm>
       -object $<TARGET_FILE:test_alphabet>
       -object $<TARGET_FILE:test_state>
       -object $<TARGET_FILE:test_hmm>
       -object $<TARGET_FILE:test_path>
-      ${NHMM_SOURCES_PATH}
+      ${IMM_SOURCES_PATH}
     BYPRODUCTS coverage/index.html
     COMMENT "The coverage summary will be written to coverage/index.html")
 endif()
