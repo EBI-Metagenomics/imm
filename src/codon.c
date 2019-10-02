@@ -1,11 +1,11 @@
+#define IMM_API_EXPORTS
+
 #include "array.h"
 #include "imm.h"
 #include "report.h"
 #include "stdlib.h"
 #include <math.h>
 #include <string.h>
-
-#define IMM_API_EXPORTS
 
 struct imm_codon
 {

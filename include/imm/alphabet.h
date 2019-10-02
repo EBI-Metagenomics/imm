@@ -9,7 +9,6 @@
 struct imm_alphabet;
 
 IMM_API struct imm_alphabet *imm_alphabet_create(const char *symbols);
-IMM_API size_t imm_alphabet_length(const struct imm_alphabet *alphabet);
 IMM_API void imm_alphabet_destroy(struct imm_alphabet *alphabet);
 
 #endif

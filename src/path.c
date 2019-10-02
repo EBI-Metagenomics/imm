@@ -1,9 +1,9 @@
+#define IMM_API_EXPORTS
+
 #include "path.h"
 #include "imm.h"
 #include "utlist.h"
 #include <stdlib.h>
-
-#define IMM_API_EXPORTS
 
 struct imm_path
 {

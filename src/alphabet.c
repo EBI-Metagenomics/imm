@@ -1,11 +1,11 @@
+#define IMM_API_EXPORTS
+
 #include "alphabet.h"
 #include "imm.h"
 #include "rapidstring.h"
 #include "report.h"
 #include <limits.h>
 #include <stdlib.h>
-
-#define IMM_API_EXPORTS
 
 #define SYMBOL_ID_MIN 0
 #define SYMBOL_ID_MAX 127
@@ -45,11 +45,6 @@ IMM_API struct imm_alphabet *imm_alphabet_create(const char *symbols)
     return a;
 }
 
-IMM_API size_t imm_alphabet_length(const struct imm_alphabet *alphabet)
-{
-    return rs_len(&alphabet->symbols);
-}
-
 IMM_API void imm_alphabet_destroy(struct imm_alphabet *alphabet)
 {
     if (!alphabet)
@@ -57,6 +52,11 @@ IMM_API void imm_alphabet_destroy(struct imm_alphabet *alphabet)
 
     rs_free(&alphabet->symbols);
     free(alphabet);
+}
+
+size_t alphabet_length(const struct imm_alphabet *alphabet)
+{
+    return rs_len(&alphabet->symbols);
 }
 
 int alphabet_has_symbol(const struct imm_alphabet *alphabet, char symbol_id)

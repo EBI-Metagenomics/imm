@@ -14,7 +14,7 @@ void normal_state_create(struct imm_state *state, const double *emiss_lprobs)
 {
     struct normal_state *s = malloc(sizeof(struct normal_state));
 
-    size_t length = imm_alphabet_length(state->alphabet);
+    size_t length = alphabet_length(state->alphabet);
     s->emiss_lprobs = malloc(sizeof(double) * length);
     memcpy(s->emiss_lprobs, emiss_lprobs, sizeof(double) * length);
 
@@ -35,7 +35,7 @@ double normal_state_emiss_lprob(const struct imm_state *state, const char *seq,
 int normal_state_normalize(struct imm_state *state)
 {
 
-    size_t len = imm_alphabet_length(imm_state_get_alphabet(state));
+    size_t len = alphabet_length(imm_state_get_alphabet(state));
     struct normal_state *s = state->impl;
     return log_normalize(s->emiss_lprobs, len);
 }

@@ -15,16 +15,13 @@ int main(void)
 void test_alphabet(void)
 {
     struct imm_alphabet *a = imm_alphabet_create("ACGT");
-
-    TEST_ASSERT_EQUAL_INT(4, imm_alphabet_length(a));
-
+    TEST_ASSERT_NOT_NULL(a);
     imm_alphabet_destroy(a);
 }
 
-
 void test_alphabet_symbol_range(void)
 {
-    char symbols[] = {(char) 128, '\0'};
+    char symbols[] = {(char)128, '\0'};
     struct imm_alphabet *a = imm_alphabet_create(symbols);
 
     TEST_ASSERT_NULL(a);

@@ -10,10 +10,11 @@
 
 struct imm_state *state_create(const char *name, const struct imm_alphabet *alphabet);
 
-IMM_API struct imm_state *imm_state_create_normal(
-    const char *name, const struct imm_alphabet *alphabet, const double *emiss_lprobs)
+IMM_API struct imm_state *imm_state_create_normal(const char *name,
+                                                  const struct imm_alphabet *alphabet,
+                                                  const double *emiss_lprobs)
 {
-    if (imm_alphabet_length(alphabet) == 0) {
+    if (alphabet_length(alphabet) == 0) {
         error("empty alphabet");
         return NULL;
     }
@@ -25,8 +26,8 @@ IMM_API struct imm_state *imm_state_create_normal(
     return s;
 }
 
-IMM_API struct imm_state *imm_state_create_silent(
-    const char *name, const struct imm_alphabet *alphabet)
+IMM_API struct imm_state *imm_state_create_silent(const char *name,
+                                                  const struct imm_alphabet *alphabet)
 {
     struct imm_state *s = state_create(name, alphabet);
     s->destroy = silent_state_destroy;
@@ -36,9 +37,11 @@ IMM_API struct imm_state *imm_state_create_silent(
     return s;
 }
 
-IMM_API struct imm_state *imm_state_create_frame(
-    const char *name, const struct imm_alphabet *alphabet,
-    const double *base_emiss_lprobs, const struct imm_codon *codon, double epsilon)
+IMM_API struct imm_state *imm_state_create_frame(const char *name,
+                                                 const struct imm_alphabet *alphabet,
+                                                 const double *base_emiss_lprobs,
+                                                 const struct imm_codon *codon,
+                                                 double epsilon)
 {
     struct imm_state *s = state_create(name, alphabet);
     s->destroy = frame_state_destroy;
@@ -64,7 +67,7 @@ IMM_API void imm_state_set_end_state(struct imm_state *state, bool end_state)
 }
 
 IMM_API double imm_state_emiss_lprob(const struct imm_state *state, const char *seq,
-                                       size_t seq_len)
+                                     size_t seq_len)
 {
     return state->emiss_lprob(state, seq, seq_len);
 }

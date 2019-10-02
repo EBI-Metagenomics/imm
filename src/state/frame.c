@@ -38,7 +38,7 @@ void frame_state_create(struct imm_state *state, const double *base_emiss_lprobs
 {
     struct frame_state *s = malloc(sizeof(struct frame_state));
 
-    if (imm_alphabet_length(state->alphabet) != 4)
+    if (alphabet_length(state->alphabet) != 4)
         error("alphabet length is not four");
 
     s->base_emiss_lprobs = malloc(sizeof(double) * 4);
@@ -71,7 +71,7 @@ double frame_state_emiss_lprob(const struct imm_state *state, const char *seq,
 
 int frame_state_normalize(struct imm_state *state)
 {
-    size_t len = imm_alphabet_length(imm_state_get_alphabet(state));
+    size_t len = alphabet_length(imm_state_get_alphabet(state));
     struct frame_state *s = state->impl;
     return log_normalize(s->base_emiss_lprobs, len);
 }
@@ -190,18 +190,17 @@ double joint_seq_len4(const struct imm_state *state, const char *seq)
     const struct frame_state *s = state->impl;
 
     double c0 = s->leps + s->l1eps * 3 - log(2);
-    double v0[] = {C(1, 2, 3) + B[0], C(0, 2, 3) + B[1], C(0, 1, 3) + B[2], C(0, 1, 2) + B[3]};
+    double v0[] = {C(1, 2, 3) + B[0], C(0, 2, 3) + B[1], C(0, 1, 3) + B[2],
+                   C(0, 1, 2) + B[3]};
 
     double c1 = 3 * s->leps + s->l1eps - log(9);
-    double v1[] = {C(_, 2, 3) + B[0] + B[1], C(_, 1, 3) + B[0] + B[2],
-                   C(_, 1, 2) + B[0] + B[3], C(_, 0, 3) + B[1] + B[2],
-                   C(_, 0, 2) + B[1] + B[3], C(_, 0, 1) + B[2] + B[3],
-                   C(2, _, 3) + B[0] + B[1], C(1, _, 3) + B[0] + B[2],
-                   C(1, _, 2) + B[0] + B[3], C(0, _, 3) + B[1] + B[2],
-                   C(0, _, 2) + B[1] + B[3], C(0, _, 1) + B[2] + B[3],
-                   C(2, 3, _) + B[0] + B[1], C(1, 3, _) + B[0] + B[2],
-                   C(1, 2, _) + B[0] + B[3], C(0, 3, _) + B[1] + B[2],
-                   C(0, 2, _) + B[1] + B[3], C(0, 1, _) + B[2] + B[3]};
+    double v1[] = {
+        C(_, 2, 3) + B[0] + B[1], C(_, 1, 3) + B[0] + B[2], C(_, 1, 2) + B[0] + B[3],
+        C(_, 0, 3) + B[1] + B[2], C(_, 0, 2) + B[1] + B[3], C(_, 0, 1) + B[2] + B[3],
+        C(2, _, 3) + B[0] + B[1], C(1, _, 3) + B[0] + B[2], C(1, _, 2) + B[0] + B[3],
+        C(0, _, 3) + B[1] + B[2], C(0, _, 2) + B[1] + B[3], C(0, _, 1) + B[2] + B[3],
+        C(2, 3, _) + B[0] + B[1], C(1, 3, _) + B[0] + B[2], C(1, 2, _) + B[0] + B[3],
+        C(0, 3, _) + B[1] + B[2], C(0, 2, _) + B[1] + B[3], C(0, 1, _) + B[2] + B[3]};
 
     return logaddexp(c0 + logsumexp(v0, 4), c1 + logsumexp(v1, 18));
 #undef C

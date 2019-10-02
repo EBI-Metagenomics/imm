@@ -1,6 +1,8 @@
+#define IMM_API_EXPORTS
+
 #include "counter.h"
-#include "logaddexp.h"
 #include "imm.h"
+#include "logaddexp.h"
 #include "path.h"
 #include "state/state.h"
 #include "tbl_state.h"
@@ -8,8 +10,6 @@
 #include "utlist.h"
 #include <math.h>
 #include <stdlib.h>
-
-#define IMM_API_EXPORTS
 
 struct imm_hmm
 {
@@ -35,7 +35,7 @@ IMM_API struct imm_hmm *imm_hmm_create(const struct imm_alphabet *alphabet)
 }
 
 IMM_API int imm_hmm_add_state(struct imm_hmm *hmm, const struct imm_state *state,
-                                double start_lprob)
+                              double start_lprob)
 {
     if (!state) {
         error("state cannot be NULL");
@@ -59,7 +59,7 @@ IMM_API int imm_hmm_del_state(struct imm_hmm *hmm, int state_id)
 }
 
 IMM_API const struct imm_state *imm_hmm_get_state(const struct imm_hmm *hmm,
-                                                     int state_id)
+                                                  int state_id)
 {
     const struct tbl_state *tbl_state = tbl_state_find(hmm->tbl_states, state_id);
     if (!tbl_state)
@@ -68,8 +68,8 @@ IMM_API const struct imm_state *imm_hmm_get_state(const struct imm_hmm *hmm,
     return tbl_state_get_state(tbl_state);
 }
 
-IMM_API int imm_hmm_set_trans(struct imm_hmm *hmm, int src_state_id,
-                                int dst_state_id, double lprob)
+IMM_API int imm_hmm_set_trans(struct imm_hmm *hmm, int src_state_id, int dst_state_id,
+                              double lprob)
 {
     struct tbl_state *src = tbl_state_find(hmm->tbl_states, src_state_id);
     if (!src) {
@@ -93,7 +93,7 @@ IMM_API int imm_hmm_set_trans(struct imm_hmm *hmm, int src_state_id,
 }
 
 IMM_API double imm_hmm_get_trans(const struct imm_hmm *hmm, int src_state_id,
-                                   int dst_state_id)
+                                 int dst_state_id)
 {
     const struct tbl_state *src = tbl_state_find_c(hmm->tbl_states, src_state_id);
     if (!src) {
@@ -115,7 +115,7 @@ IMM_API double imm_hmm_get_trans(const struct imm_hmm *hmm, int src_state_id,
 }
 
 IMM_API double imm_hmm_likelihood(const struct imm_hmm *hmm, const char *seq,
-                                    const struct imm_path *path)
+                                  const struct imm_path *path)
 {
     if (!path || !seq) {
         error("path or seq is NULL");

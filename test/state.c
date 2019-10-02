@@ -33,8 +33,6 @@ void test_state_normal(void)
     TEST_ASSERT_EQUAL_DOUBLE(log(0.5), imm_state_emiss_lprob(s, "G", 1));
     TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_state_emiss_lprob(s, "T", 1));
 
-    TEST_ASSERT_EQUAL_INT(4, imm_alphabet_length(imm_state_get_alphabet(s)));
-
     imm_state_set_end_state(s, true);
 
     imm_state_destroy(s);
@@ -50,8 +48,6 @@ void test_state_silent(void)
     TEST_ASSERT_EQUAL_STRING("State0", imm_state_get_name(s));
     TEST_ASSERT_EQUAL_DOUBLE(0.0, imm_state_emiss_lprob(s, "", 0));
     TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_state_emiss_lprob(s, "A", 1));
-
-    TEST_ASSERT_EQUAL_INT(4, imm_alphabet_length(imm_state_get_alphabet(s)));
 
     imm_state_set_end_state(s, true);
 
