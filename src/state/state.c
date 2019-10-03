@@ -83,16 +83,6 @@ IMM_API int imm_state_normalize(struct imm_state *state)
     return state->normalize(state);
 }
 
-IMM_API size_t imm_state_min_seq(const struct imm_state *state)
-{
-    return state->min_seq(state);
-}
-
-IMM_API size_t imm_state_max_seq(const struct imm_state *state)
-{
-    return state->max_seq(state);
-}
-
 IMM_API void imm_state_destroy(struct imm_state *state)
 {
     if (!state)
@@ -114,3 +104,7 @@ struct imm_state *state_create(const char *name, const struct imm_alphabet *alph
     s->alphabet = alphabet;
     return s;
 }
+
+size_t state_min_seq(const struct imm_state *state) { return state->min_seq(state); }
+
+size_t state_max_seq(const struct imm_state *state) { return state->max_seq(state); }

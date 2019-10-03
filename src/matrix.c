@@ -3,8 +3,9 @@
 
 struct matrix *matrix_create(size_t nrows, size_t ncols)
 {
-    struct matrix *matrix = malloc(sizeof(double) * nrows * ncols);
-
+    struct matrix *matrix = malloc(sizeof(struct matrix));
+    matrix->data = malloc(sizeof(double) * nrows * ncols);
+    matrix->ncols = ncols;
     return matrix;
 }
 

@@ -3,6 +3,7 @@
 #include "counter.h"
 #include "imm.h"
 #include "logaddexp.h"
+#include "macro.h"
 #include "matrix.h"
 #include "path.h"
 #include "state/state.h"
@@ -25,7 +26,6 @@ struct imm_hmm
 double hmm_start_lprob(const struct imm_hmm *hmm, int state_id);
 int hmm_normalize_start(struct imm_hmm *hmm);
 int hmm_normalize_trans(struct tbl_state *tbl_state);
-size_t hmm_nstates(const struct imm_hmm *hmm);
 
 IMM_API struct imm_hmm *imm_hmm_create(const struct imm_alphabet *alphabet)
 {
@@ -181,14 +181,34 @@ IMM_API double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq,
     size_t state_space = 0;
 
     while (tbl_state) {
-        state_space += imm_state_max_seq(tbl_state_get_state(tbl_state));
+        state_space += state_max_seq(tbl_state_get_state(tbl_state));
         tbl_state = tbl_state_next_c(tbl_state);
     }
 
-    /* size_t seq_len = path_seq_len(path); */
-    /* struct matrix *matrix = matrix_create(seq_len, state_space); */
+    size_t seq_len = path_seq_len(path);
+    struct matrix *matrix = matrix_create(seq_len, state_space);
 
-    /* matrix_destroy(matrix); */
+    const struct imm_path *path_item = path;
+
+    size_t r = 0;
+    while (path_item) {
+        tbl_state = hmm->tbl_states;
+        size_t state_idx = 0;
+        while (tbl_state) {
+            const struct imm_state *state = tbl_state_get_state(tbl_state);
+            size_t max_len = MIN(state_max_seq(state), seq_len - r);
+            for (size_t len = state_min_seq(state); len <= max_len; ++len) {
+
+                imm_state_emiss_lprob(state, seq + r, len);
+            }
+
+            tbl_state = tbl_state_next_c(tbl_state);
+            ++state_idx;
+        }
+        path_item = path_next_item(path_item);
+    }
+
+    matrix_destroy(matrix);
 
     return 0.0;
 }
@@ -283,17 +303,4 @@ int hmm_normalize_trans(struct tbl_state *tbl_state)
     }
 
     return 0;
-}
-
-size_t hmm_nstates(const struct imm_hmm *hmm)
-{
-    struct tbl_state *state = hmm->tbl_states;
-    size_t nstates = 0;
-
-    while (state) {
-        nstates += 1;
-        state = tbl_state_next(state);
-    }
-
-    return nstates;
 }
