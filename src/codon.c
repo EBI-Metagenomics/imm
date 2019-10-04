@@ -39,7 +39,7 @@ IMM_API void imm_codon_set_lprob(struct imm_codon *codon, int a, int b, int c,
 
 IMM_API void imm_codon_set_ninfs(struct imm_codon *codon)
 {
-    for (size_t i = 0; i < 4 * 4 * 4; ++i)
+    for (int i = 0; i < 4 * 4 * 4; ++i)
         codon->emiss_lprobs[i] = -INFINITY;
 }
 

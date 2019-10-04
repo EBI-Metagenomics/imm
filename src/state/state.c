@@ -73,7 +73,7 @@ IMM_API void imm_state_set_end_state(struct imm_state *state, bool end_state)
 }
 
 IMM_API double imm_state_emiss_lprob(const struct imm_state *state, const char *seq,
-                                     size_t seq_len)
+                                     int seq_len)
 {
     return state->emiss_lprob(state, seq, seq_len);
 }
@@ -105,6 +105,6 @@ struct imm_state *state_create(const char *name, const struct imm_alphabet *alph
     return s;
 }
 
-size_t state_min_seq(const struct imm_state *state) { return state->min_seq(state); }
+int state_min_seq(const struct imm_state *state) { return state->min_seq(state); }
 
-size_t state_max_seq(const struct imm_state *state) { return state->max_seq(state); }
+int state_max_seq(const struct imm_state *state) { return state->max_seq(state); }

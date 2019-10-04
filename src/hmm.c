@@ -124,9 +124,9 @@ IMM_API double imm_hmm_likelihood(const struct imm_hmm *hmm, const char *seq,
         error("path or seq is NULL");
         return NAN;
     }
-    size_t seq_len = strlen(seq);
+    int seq_len = (int) strlen(seq);
 
-    size_t len = path_item_seq_len(path);
+    int len = path_item_seq_len(path);
     int state_id = path_item_state_id(path);
     const struct imm_state *state = imm_hmm_get_state(hmm, state_id);
 
@@ -175,7 +175,7 @@ not_found_state:
 }
 
 IMM_API double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq,
-                               size_t seq_len, int end_state_id)
+                               int seq_len, int end_state_id)
 
 {
     struct dp *dp = dp_create(hmm->tbl_states, seq, seq_len);

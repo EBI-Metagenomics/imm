@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-double logsumexp(double *arr, size_t len);
-int log_normalize(double *arr, size_t len);
+double logsumexp(double *arr, int len);
+int log_normalize(double *arr, int len);
 
 #endif

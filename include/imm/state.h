@@ -32,7 +32,7 @@ IMM_API const struct imm_alphabet *imm_state_get_alphabet(
 IMM_API void imm_state_set_end_state(struct imm_state *state, bool end_state);
 
 IMM_API double imm_state_emiss_lprob(const struct imm_state *state, const char *seq,
-                                     size_t seq_len);
+                                     int seq_len);
 
 IMM_API int imm_state_normalize(struct imm_state *state);
 

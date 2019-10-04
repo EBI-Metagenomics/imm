@@ -27,7 +27,7 @@ inline static double logaddexp3(double a, double b, double c)
     return logaddexp(logaddexp(a, b), c);
 }
 inline static double ecodon_lprob(const struct imm_state *state, const char *seq,
-                                  size_t a, size_t b, size_t c)
+                                  int a, int b, int c)
 {
     const char codon[3] = {seq[a], seq[b], seq[c]};
     return codon_lprob(state, codon);
@@ -53,7 +53,7 @@ void frame_state_create(struct imm_state *state, const double *base_emiss_lprobs
 }
 
 double frame_state_emiss_lprob(const struct imm_state *state, const char *seq,
-                               size_t seq_len)
+                               int seq_len)
 {
     if (seq_len == 1)
         return joint_seq_len1(state, seq);
@@ -71,14 +71,14 @@ double frame_state_emiss_lprob(const struct imm_state *state, const char *seq,
 
 int frame_state_normalize(struct imm_state *state)
 {
-    size_t len = alphabet_length(imm_state_get_alphabet(state));
+    int len = alphabet_length(imm_state_get_alphabet(state));
     struct frame_state *s = state->impl;
     return log_normalize(s->base_emiss_lprobs, len);
 }
 
-size_t frame_state_min_seq(const struct imm_state *state) { return 1; }
+int frame_state_min_seq(const struct imm_state *state) { return 1; }
 
-size_t frame_state_max_seq(const struct imm_state *state) { return 5; }
+int frame_state_max_seq(const struct imm_state *state) { return 5; }
 
 void frame_state_destroy(struct imm_state *state)
 {
@@ -247,9 +247,9 @@ double codon_lprob(const struct imm_state *state, const char *codon)
     const struct imm_alphabet *alphabet = imm_state_get_alphabet(state);
     double lprob = -INFINITY;
     int bases_idx[3 * 4] = {0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3};
-    size_t nbases[3] = {4, 4, 4};
+    int nbases[3] = {4, 4, 4};
 
-    for (size_t i = 0; i < 3; ++i) {
+    for (int i = 0; i < 3; ++i) {
         if (codon[i] != IMM_ANY_SYMBOL) {
             bases_idx[i * 4] = alphabet_symbol_idx(alphabet, codon[i]);
             nbases[i] = 1;
@@ -260,9 +260,9 @@ double codon_lprob(const struct imm_state *state, const char *codon)
     const int *b_idx = bases_idx + 4;
     const int *c_idx = bases_idx + 8;
     const struct frame_state *s = state->impl;
-    for (size_t a = 0; a < nbases[0]; ++a) {
-        for (size_t b = 0; b < nbases[1]; ++b) {
-            for (size_t c = 0; c < nbases[2]; ++c) {
+    for (int a = 0; a < nbases[0]; ++a) {
+        for (int b = 0; b < nbases[1]; ++b) {
+            for (int c = 0; c < nbases[2]; ++c) {
                 double t = imm_codon_get_lprob(s->codon, a_idx[a], b_idx[b], c_idx[c]);
                 lprob = logaddexp(lprob, t);
             }
@@ -276,5 +276,5 @@ double base_lprob(const struct imm_state *state, char id)
 {
     int idx = alphabet_symbol_idx(imm_state_get_alphabet(state), id);
     const struct frame_state *s = state->impl;
-    return s->base_emiss_lprobs[(size_t)idx];
+    return s->base_emiss_lprobs[(int)idx];
 }

@@ -6,16 +6,16 @@
 struct matrix
 {
     double *data;
-    size_t nrows;
-    size_t ncols;
+    int nrows;
+    int ncols;
 };
 
-struct matrix *matrix_create(size_t nrows, size_t ncols);
-inline static double matrix_get(const struct matrix *matrix, size_t r, size_t c)
+struct matrix *matrix_create(int nrows, int ncols);
+inline static double matrix_get(const struct matrix *matrix, int r, int c)
 {
     return matrix->data[r * matrix->ncols + c];
 }
-inline static void matrix_set(struct matrix *matrix, size_t r, size_t c, double v)
+inline static void matrix_set(struct matrix *matrix, int r, int c, double v)
 {
     matrix->data[r * matrix->ncols + c] = v;
 }

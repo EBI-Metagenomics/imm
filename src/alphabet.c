@@ -39,7 +39,7 @@ IMM_API struct imm_alphabet *imm_alphabet_create(const char *symbols)
             return NULL;
         }
 
-        a->symbol_idx[(size_t)ids[idx]] = idx;
+        a->symbol_idx[(int)ids[idx]] = idx;
     }
 
     return a;
@@ -54,22 +54,22 @@ IMM_API void imm_alphabet_destroy(struct imm_alphabet *alphabet)
     free(alphabet);
 }
 
-size_t alphabet_length(const struct imm_alphabet *alphabet)
+int alphabet_length(const struct imm_alphabet *alphabet)
 {
-    return rs_len(&alphabet->symbols);
+    return (int) rs_len(&alphabet->symbols);
 }
 
 int alphabet_has_symbol(const struct imm_alphabet *alphabet, char symbol_id)
 {
     check_symbol_id(symbol_id);
-    return alphabet->symbol_idx[(size_t)symbol_id] != -1;
+    return alphabet->symbol_idx[(int)symbol_id] != -1;
 }
 
 int alphabet_symbol_idx(const struct imm_alphabet *alphabet, char symbol_id)
 {
     if (check_symbol_id(symbol_id))
         return -1;
-    return alphabet->symbol_idx[(size_t)symbol_id];
+    return alphabet->symbol_idx[(int)symbol_id];
 }
 
 char alphabet_symbol_id(const struct imm_alphabet *alphabet, int symbol_idx)
