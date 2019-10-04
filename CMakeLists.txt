@@ -87,6 +87,7 @@ set(IMM_SOURCES
   src/matrix.c
   src/path.c
   src/report.c
+  src/state_idx.c
   src/state/frame.c
   src/state/normal.c
   src/state/silent.c

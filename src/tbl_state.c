@@ -54,10 +54,7 @@ int tbl_state_del_state(struct tbl_state **head_ptr, int state_id)
     return -1;
 }
 
-int tbl_state_nitems(const struct tbl_state *head)
-{
-    return (int) HASH_COUNT(head);
-}
+int tbl_state_nitems(const struct tbl_state *head) { return (int)HASH_COUNT(head); }
 
 struct tbl_state *tbl_state_find(struct tbl_state *head, int state_id)
 {
@@ -66,8 +63,7 @@ struct tbl_state *tbl_state_find(struct tbl_state *head, int state_id)
     return tbl_state;
 }
 
-const struct tbl_state *tbl_state_find_c(const struct tbl_state *head,
-                                         int state_id)
+const struct tbl_state *tbl_state_find_c(const struct tbl_state *head, int state_id)
 {
     struct tbl_state *tbl_state = NULL;
     HASH_FIND_INT(head, &state_id, tbl_state);
@@ -108,6 +104,8 @@ const struct tbl_trans *tbl_state_get_trans_c(const struct tbl_state *tbl_state)
 {
     return *tbl_state_get_trans_ptr_c(tbl_state);
 }
+
+int tbl_state_get_id(const struct tbl_state *tbl_state) { return tbl_state->state_id; }
 
 struct tbl_trans **tbl_state_get_trans_ptr(struct tbl_state *tbl_state)
 {

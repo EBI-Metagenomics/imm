@@ -6,6 +6,7 @@
 struct matrix
 {
     double *data;
+    size_t nrows;
     size_t ncols;
 };
 
@@ -18,6 +19,7 @@ inline static void matrix_set(struct matrix *matrix, size_t r, size_t c, double 
 {
     matrix->data[r * matrix->ncols + c] = v;
 }
+void matrix_set_all(struct matrix *matrix, double v);
 void matrix_destroy(struct matrix *matrix);
 
 #endif

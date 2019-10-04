@@ -26,6 +26,8 @@ const struct tbl_state *tbl_state_next_c(const struct tbl_state *tbl_state);
 struct tbl_trans *tbl_state_get_trans(struct tbl_state *tbl_state);
 const struct tbl_trans *tbl_state_get_trans_c(const struct tbl_state *tbl_state);
 
+int tbl_state_get_id(const struct tbl_state *tbl_state);
+
 struct tbl_trans **tbl_state_get_trans_ptr(struct tbl_state *tbl_state);
 struct tbl_trans *const *tbl_state_get_trans_ptr_c(const struct tbl_state *tbl_state);
 

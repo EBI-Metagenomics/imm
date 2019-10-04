@@ -18,5 +18,7 @@ double tbl_trans_get_lprob(const struct tbl_trans *tbl_trans);
 struct tbl_trans *tbl_trans_next(struct tbl_trans *tbl_trans);
 const struct tbl_trans *tbl_trans_next_c(const struct tbl_trans *tbl_trans);
 
+int tbl_trans_get_id(const struct tbl_trans *tbl_trans);
+
 #endif
 

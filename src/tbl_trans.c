@@ -66,3 +66,5 @@ const struct tbl_trans *tbl_trans_next_c(const struct tbl_trans *tbl_trans)
 {
     return tbl_trans->hh.next;
 }
+
+int tbl_trans_get_id(const struct tbl_trans *tbl_trans) { return tbl_trans->state_id; }
