@@ -174,42 +174,9 @@ not_found_state:
 }
 
 IMM_API double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq,
-                               const struct imm_path *path, int end_state_id)
+                               size_t seq_len, int end_state_id)
 
 {
-    const struct tbl_state *tbl_state = hmm->tbl_states;
-    size_t state_space = 0;
-
-    while (tbl_state) {
-        state_space += state_max_seq(tbl_state_get_state(tbl_state));
-        tbl_state = tbl_state_next_c(tbl_state);
-    }
-
-    size_t seq_len = path_seq_len(path);
-    struct matrix *matrix = matrix_create(seq_len, state_space);
-
-    const struct imm_path *path_item = path;
-
-    size_t r = 0;
-    while (path_item) {
-        tbl_state = hmm->tbl_states;
-        size_t state_idx = 0;
-        while (tbl_state) {
-            const struct imm_state *state = tbl_state_get_state(tbl_state);
-            size_t max_len = MIN(state_max_seq(state), seq_len - r);
-            for (size_t len = state_min_seq(state); len <= max_len; ++len) {
-
-                imm_state_emiss_lprob(state, seq + r, len);
-            }
-
-            tbl_state = tbl_state_next_c(tbl_state);
-            ++state_idx;
-        }
-        path_item = path_next_item(path_item);
-    }
-
-    matrix_destroy(matrix);
-
     return 0.0;
 }
 

@@ -307,12 +307,8 @@ void test_hmm_viterbi(void)
     imm_hmm_set_trans(hmm, state_id0, state_id1, log(0.2));
     imm_hmm_set_trans(hmm, state_id1, state_id1, log(1.0));
 
-    struct imm_path *path = NULL;
-    imm_path_create(&path);
-    imm_path_add(&path, state_id0, 1);
     /* TEST_ASSERT_EQUAL_DOUBLE(0.25, exp(imm_hmm_likelihood(hmm, "A", path))); */
-    imm_hmm_viterbi(hmm, "A", path, state_id1);
-    imm_path_destroy(&path);
+    imm_hmm_viterbi(hmm, "A", 1, state_id1);
 
     /* imm_path_create(&path); */
     /* imm_path_add(&path, state_id0, 1); */
