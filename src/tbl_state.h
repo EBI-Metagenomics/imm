@@ -11,6 +11,8 @@ void tbl_state_add_state(struct tbl_state **head_ptr, int state_id,
                          const struct imm_state *state, double start_lprob);
 int tbl_state_del_state(struct tbl_state **head_ptr, int state_id);
 
+int tbl_state_nitems(const struct tbl_state *head);
+
 struct tbl_state *tbl_state_find(struct tbl_state *head, int state_id);
 const struct tbl_state *tbl_state_find_c(const struct tbl_state *head, int state_id);
 

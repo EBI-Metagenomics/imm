@@ -1,6 +1,7 @@
 #define IMM_API_EXPORTS
 
 #include "counter.h"
+#include "dp.h"
 #include "imm.h"
 #include "logaddexp.h"
 #include "macro.h"
@@ -177,7 +178,10 @@ IMM_API double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq,
                                size_t seq_len, int end_state_id)
 
 {
-    return 0.0;
+    struct dp *dp = dp_create(hmm->tbl_states, seq, seq_len);
+    double cost = dp_viterbi(dp);
+    dp_destroy(dp);
+    return cost;
 }
 
 IMM_API int imm_hmm_normalize(struct imm_hmm *hmm)

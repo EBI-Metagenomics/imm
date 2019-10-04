@@ -54,6 +54,11 @@ int tbl_state_del_state(struct tbl_state **head_ptr, int state_id)
     return -1;
 }
 
+int tbl_state_nitems(const struct tbl_state *head)
+{
+    return (int) HASH_COUNT(head);
+}
+
 struct tbl_state *tbl_state_find(struct tbl_state *head, int state_id)
 {
     struct tbl_state *tbl_state = NULL;
