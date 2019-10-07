@@ -5,6 +5,7 @@
 
 void test_state_normal(void);
 void test_state_silent(void);
+void test_state_table(void);
 void test_state_frame1(void);
 void test_state_frame2(void);
 void test_state_frame3(void);
@@ -14,6 +15,7 @@ int main(void)
     UNITY_BEGIN();
     RUN_TEST(test_state_normal);
     RUN_TEST(test_state_silent);
+    RUN_TEST(test_state_table);
     RUN_TEST(test_state_frame1);
     RUN_TEST(test_state_frame2);
     RUN_TEST(test_state_frame3);
@@ -53,6 +55,22 @@ void test_state_silent(void)
 
     imm_state_destroy(s);
     imm_alphabet_destroy(a);
+}
+
+void test_state_table(void)
+{
+    /* struct imm_alphabet *a = imm_alphabet_create("ACGT"); */
+
+    /* struct imm_state *s = imm_state_create_table("S0", a); */
+
+    /* TEST_ASSERT_EQUAL_STRING("S0", imm_state_get_name(s)); */
+    /* TEST_ASSERT_EQUAL_DOUBLE(0.0, imm_state_emiss_lprob(s, "", 0)); */
+    /* TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_state_emiss_lprob(s, "A", 1)); */
+
+    /* imm_state_set_end_state(s, true); */
+
+    /* imm_state_destroy(s); */
+    /* imm_alphabet_destroy(a); */
 }
 
 void test_state_frame1(void)
