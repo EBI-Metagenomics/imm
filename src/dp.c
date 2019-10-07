@@ -32,8 +32,9 @@ struct state_info
     int state_id;
 };
 
-double get_score(const struct dp *dp, int r, int state_idx, int seq_len);
-void set_score(const struct dp *dp, int r, int state_idx, int seq_len, double score);
+double get_score(const struct dp *dp, int row, int state_idx, int seq_len);
+void set_score(const struct dp *dp, int row, int state_idx, int seq_len, double score);
+double best_trans_score(const struct dp *dp, int row, int dst_state_idx);
 struct matrix *create_trans(const struct tbl_state *tbl_states,
                             const struct state_idx *state_idx);
 
@@ -79,29 +80,18 @@ struct dp *dp_create(const struct tbl_state *tbl_states, const char *seq, int se
 
 double dp_viterbi(struct dp *dp)
 {
-    const struct state_info *cur, *pre;
-
     for (int r = 0; r < dp->seq_len; ++r) {
         const char *seq = dp->seq + r;
         int seq_len = dp->seq_len - r;
 
         for (int i = 0; i < dp->nstates; ++i) {
-            cur = dp->states + i;
+            const struct state_info *cur = dp->states + i;
 
             for (int len = cur->min_seq; len <= MIN(cur->max_seq, seq_len); ++len) {
                 double emiss = imm_state_emiss_lprob(cur->state, seq, len);
 
-                for (int j = 0; j < dp->nstates; ++j) {
-                    pre = dp->states + j;
-                    double trans = matrix_get(dp->trans, j, i);
-
-                    for (int plen = pre->min_seq; plen <= MIN(pre->max_seq, seq_len);
-                         ++plen) {
-                        double v = get_score(dp, r - plen, j, plen) + trans + emiss;
-                        double score = get_score(dp, r, i, len);
-                        set_score(dp, r, i, len, MAX(v, score));
-                    }
-                }
+                double score = best_trans_score(dp, r, i);
+                set_score(dp, r, i, len, score + emiss);
             }
         }
     }
@@ -130,18 +120,34 @@ void dp_destroy(struct dp *dp)
     free(dp);
 }
 
-void set_score(const struct dp *dp, int r, int state_idx, int seq_len, double score)
+void set_score(const struct dp *dp, int row, int state_idx, int seq_len, double score)
 {
     int c = dp->states[state_idx].col + seq_len - dp->states[state_idx].min_seq;
-    matrix_set(dp->score, r, c, score);
+    matrix_set(dp->score, row, c, score);
 }
 
-double get_score(const struct dp *dp, int r, int state_idx, int seq_len)
+double get_score(const struct dp *dp, int row, int state_idx, int seq_len)
 {
-    if (r < 0)
+    if (row < 0)
         return dp->states[state_idx].start_lprob;
     int c = dp->states[state_idx].col + seq_len - dp->states[state_idx].min_seq;
-    return matrix_get(dp->score, r, c);
+    return matrix_get(dp->score, row, c);
+}
+
+double best_trans_score(const struct dp *dp, int row, int dst_state_idx)
+{
+    double score = -INFINITY;
+    int seq_len = dp->seq_len - row;
+    for (int i = 0; i < dp->nstates; ++i) {
+        const struct state_info *state = dp->states + i;
+        double trans = matrix_get(dp->trans, i, dst_state_idx);
+
+        for (int len = state->min_seq; len <= MIN(state->max_seq, seq_len); ++len) {
+            double v = get_score(dp, row - len, i, len) + trans;
+            score = MAX(v, score);
+        }
+    }
+    return score;
 }
 
 struct matrix *create_trans(const struct tbl_state *tbl_states,
