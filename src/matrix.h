@@ -21,5 +21,6 @@ inline static void matrix_set(struct matrix *matrix, int r, int c, double v)
 }
 void matrix_set_all(struct matrix *matrix, double v);
 void matrix_destroy(struct matrix *matrix);
+void matrix_print(const struct matrix *matrix);
 
 #endif
