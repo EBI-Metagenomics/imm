@@ -82,8 +82,8 @@ set(IMM_SOURCES
   src/imm/state.c
   src/imm/state_idx.c
   # src/imm/table_state.c
-  src/imm/tbl_state.c
-  src/imm/tbl_trans.c
+  src/imm/mm_state.c
+  src/imm/mm_trans.c
 )
 
 add_library(immlib OBJECT ${IMM_SOURCES})

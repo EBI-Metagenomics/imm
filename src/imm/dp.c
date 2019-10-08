@@ -3,9 +3,9 @@
 #include "src/imm/hide.h"
 #include "src/imm/matrix.h"
 #include "src/imm/min.h"
+#include "src/imm/mm_state.h"
+#include "src/imm/mm_trans.h"
 #include "src/imm/state_idx.h"
-#include "src/imm/tbl_state.h"
-#include "src/imm/tbl_trans.h"
 #include "src/uthash/uthash.h"
 #include <limits.h>
 #include <math.h>
@@ -35,14 +35,14 @@ struct state_info
 HIDE double get_score(const struct dp *dp, int row, int state_idx, int seq_len);
 HIDE void set_score(const struct dp *dp, int row, int state_idx, int seq_len, double score);
 HIDE double best_trans_score(const struct dp *dp, int row, int dst_state_idx);
-HIDE struct matrix *create_trans(const struct tbl_state *tbl_states,
+HIDE struct matrix *create_trans(const struct mm_state *mm_states,
                                  const struct state_idx *state_idx);
 
-struct dp *dp_create(const struct tbl_state *tbl_states, const char *seq, int seq_len)
+struct dp *dp_create(const struct mm_state *mm_states, const char *seq, int seq_len)
 {
     struct dp *dp = malloc(sizeof(struct dp));
 
-    dp->nstates = tbl_state_nitems(tbl_states);
+    dp->nstates = mm_state_nitems(mm_states);
     dp->states = malloc(sizeof(struct state_info) * ((size_t)dp->nstates));
 
     struct state_idx *state_idx = NULL;
@@ -53,23 +53,23 @@ struct dp *dp_create(const struct tbl_state *tbl_states, const char *seq, int se
 
     int next_col = 0;
 
-    const struct tbl_state *tbl_state = tbl_states;
+    const struct mm_state *mm_state = mm_states;
     for (int i = 0; i < dp->nstates; ++i) {
-        dp->states[i].state = tbl_state_get_state(tbl_state);
-        dp->states[i].start_lprob = tbl_state_get_start_lprob(tbl_state);
+        dp->states[i].state = mm_state_get_state(mm_state);
+        dp->states[i].start_lprob = mm_state_get_start_lprob(mm_state);
         dp->states[i].min_seq = imm_state_min_seq(dp->states[i].state);
         dp->states[i].max_seq = imm_state_max_seq(dp->states[i].state);
 
         dp->states[i].col = next_col;
         next_col += dp->states[i].max_seq - dp->states[i].min_seq + 1;
 
-        dp->states[i].state_id = tbl_state_get_id(tbl_state);
+        dp->states[i].state_id = mm_state_get_id(mm_state);
 
         state_idx_add(&state_idx, dp->states[i].state_id, i);
-        tbl_state = tbl_state_next_c(tbl_state);
+        mm_state = mm_state_next_c(mm_state);
     }
 
-    dp->trans = create_trans(tbl_states, state_idx);
+    dp->trans = create_trans(mm_states, state_idx);
     state_idx_destroy(&state_idx);
 
     dp->score = matrix_create(seq_len, next_col);
@@ -150,21 +150,21 @@ double best_trans_score(const struct dp *dp, int row, int dst_state_idx)
     return score;
 }
 
-struct matrix *create_trans(const struct tbl_state *tbl_states,
+struct matrix *create_trans(const struct mm_state *mm_states,
                             const struct state_idx *state_idx)
 {
-    int nstates = tbl_state_nitems(tbl_states);
+    int nstates = mm_state_nitems(mm_states);
     struct matrix *trans = matrix_create(nstates, nstates);
     matrix_set_all(trans, -INFINITY);
 
-    for (const struct tbl_state *s = tbl_states; s; s = tbl_state_next_c(s)) {
+    for (const struct mm_state *s = mm_states; s; s = mm_state_next_c(s)) {
 
-        int src = state_idx_find(state_idx, tbl_state_get_id(s));
-        const struct tbl_trans *t = NULL;
-        for (t = tbl_state_get_trans_c(s); t; t = tbl_trans_next_c(t)) {
+        int src = state_idx_find(state_idx, mm_state_get_id(s));
+        const struct mm_trans *t = NULL;
+        for (t = mm_state_get_trans_c(s); t; t = mm_trans_next_c(t)) {
 
-            int dst = state_idx_find(state_idx, tbl_trans_get_id(t));
-            matrix_set(trans, src, dst, tbl_trans_get_lprob(t));
+            int dst = state_idx_find(state_idx, mm_trans_get_id(t));
+            matrix_set(trans, src, dst, mm_trans_get_lprob(t));
         }
     }
     return trans;
