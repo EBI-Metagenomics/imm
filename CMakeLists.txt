@@ -84,20 +84,4 @@ imm_add_test(state imm)
 imm_add_test(hmm imm)
 imm_add_test(path imm)
 
-foreach(SRC ${IMM_SOURCES})
-    set(IMM_SOURCES_PATH ${IMM_SOURCES_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/${SRC})
-endforeach()
-
-if (CLANG_CODE_COVERAGE)
-    add_custom_target(coverage
-        COMMAND llvm-profdata merge -sparse *.profraw -o all.profdata
-        COMMAND llvm-cov show -format=html -o coverage -instr-profile=all.profdata
-            $<TARGET_FILE:imm>
-            -object $<TARGET_FILE:test_abc>
-            -object $<TARGET_FILE:test_state>
-            -object $<TARGET_FILE:test_hmm>
-            -object $<TARGET_FILE:test_path>
-            ${IMM_SOURCES_PATH}
-        BYPRODUCTS coverage/index.html
-        COMMENT "The coverage summary will be written to coverage/index.html")
-endif()
+imm_enable_coverage("${IMM_SOURCES}")

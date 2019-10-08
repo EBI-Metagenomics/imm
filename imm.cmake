@@ -51,6 +51,7 @@ macro(imm_enable_testing)
     enable_testing()
     add_library(unity OBJECT test/unity/unity.c)
     target_compile_definitions(unity PUBLIC UNITY_INCLUDE_DOUBLE)
+    set(IMM_TESTS)
 endmacro()
 
 function(imm_add_test name target_lib)
@@ -61,5 +62,32 @@ function(imm_add_test name target_lib)
     add_test(NAME ${name} COMMAND test_${name})
     if (CLANG_CODE_COVERAGE)
         set_tests_properties(${name} PROPERTIES ENVIRONMENT LLVM_PROFILE_FILE=test_${name}.profraw)
+    endif()
+    list(APPEND IMM_TESTS test_${name})
+    set(IMM_TESTS ${IMM_TESTS} PARENT_SCOPE)
+endfunction()
+
+
+function(imm_enable_coverage sources)
+    if (CLANG_CODE_COVERAGE)
+
+        set(ARGS "$<TARGET_FILE:imm>")
+        foreach(TEST ${IMM_TESTS})
+            list(APPEND ARGS "-object")
+            list(APPEND ARGS "$<TARGET_FILE:${TEST}>")
+            list(APPEND PROFILES "${TEST}.profraw")
+        endforeach()
+
+        foreach(SRC ${sources})
+            list(APPEND IMM_ABS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/${SRC})
+        endforeach()
+
+        add_custom_target(coverage
+            COMMAND llvm-profdata merge -sparse ${PROFILES} -o all.profdata
+            COMMAND llvm-cov show -format=html -o coverage -instr-profile=all.profdata
+                ${ARGS}
+                ${IMM_ABS_SOURCES}
+            BYPRODUCTS coverage ${PROFILES} all.profdata
+            COMMENT "The coverage summary will be written to coverage/index.html")
     endif()
 endfunction()
