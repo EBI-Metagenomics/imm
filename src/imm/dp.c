@@ -1,5 +1,6 @@
 #include "src/imm/dp.h"
 #include "imm.h"
+#include "src/imm/hide.h"
 #include "src/imm/matrix.h"
 #include "src/imm/min.h"
 #include "src/imm/state_idx.h"
@@ -31,11 +32,11 @@ struct state_info
     int state_id;
 };
 
-double get_score(const struct dp *dp, int row, int state_idx, int seq_len);
-void set_score(const struct dp *dp, int row, int state_idx, int seq_len, double score);
-double best_trans_score(const struct dp *dp, int row, int dst_state_idx);
-struct matrix *create_trans(const struct tbl_state *tbl_states,
-                            const struct state_idx *state_idx);
+HIDE double get_score(const struct dp *dp, int row, int state_idx, int seq_len);
+HIDE void set_score(const struct dp *dp, int row, int state_idx, int seq_len, double score);
+HIDE double best_trans_score(const struct dp *dp, int row, int dst_state_idx);
+HIDE struct matrix *create_trans(const struct tbl_state *tbl_states,
+                                 const struct state_idx *state_idx);
 
 struct dp *dp_create(const struct tbl_state *tbl_states, const char *seq, int seq_len)
 {

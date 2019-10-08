@@ -1,5 +1,6 @@
 #include "imm.h"
 #include "src/imm/abc.h"
+#include "src/imm/hide.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,9 +11,9 @@ struct imm_normal_state
     struct imm_state *interface;
 };
 
-double normal_state_lprob(const struct imm_state *state, const char *seq, int seq_len);
-int normal_state_min_seq(const struct imm_state *state);
-int normal_state_max_seq(const struct imm_state *state);
+HIDE double normal_state_lprob(const struct imm_state *state, const char *seq, int seq_len);
+HIDE int normal_state_min_seq(const struct imm_state *state);
+HIDE int normal_state_max_seq(const struct imm_state *state);
 
 struct imm_normal_state *imm_normal_state_create(const char *name, const struct imm_abc *abc,
                                                  const double *lprobs)

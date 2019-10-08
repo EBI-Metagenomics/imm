@@ -1,4 +1,5 @@
 #include "imm.h"
+#include "src/imm/hide.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -7,16 +8,15 @@ struct imm_mute_state
     struct imm_state *interface;
 };
 
-double mute_state_lprob(const struct imm_state *state, const char *seq, int seq_len);
-int mute_state_min_seq(const struct imm_state *state);
-int mute_state_max_seq(const struct imm_state *state);
+HIDE double mute_state_lprob(const struct imm_state *state, const char *seq, int seq_len);
+HIDE int mute_state_min_seq(const struct imm_state *state);
+HIDE int mute_state_max_seq(const struct imm_state *state);
 
 struct imm_mute_state *imm_mute_state_create(const char *name, const struct imm_abc *abc)
 {
     struct imm_mute_state *state = malloc(sizeof(struct imm_mute_state));
 
-    struct imm_state_funcs funcs = {mute_state_lprob, mute_state_min_seq,
-                                    mute_state_max_seq};
+    struct imm_state_funcs funcs = {mute_state_lprob, mute_state_min_seq, mute_state_max_seq};
     state->interface = imm_state_create(name, abc, funcs, state);
     return state;
 }

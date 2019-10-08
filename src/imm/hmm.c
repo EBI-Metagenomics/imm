@@ -1,6 +1,7 @@
 #include "imm.h"
 #include "src/imm/counter.h"
 #include "src/imm/dp.h"
+#include "src/imm/hide.h"
 #include "src/imm/matrix.h"
 #include "src/imm/path.h"
 #include "src/imm/tbl_state.h"
@@ -21,9 +22,9 @@ struct imm_hmm
     struct counter *state_id_counter;
 };
 
-double hmm_start_lprob(const struct imm_hmm *hmm, int state_id);
-int hmm_normalize_start(struct imm_hmm *hmm);
-int hmm_normalize_trans(struct tbl_state *tbl_state);
+HIDE double hmm_start_lprob(const struct imm_hmm *hmm, int state_id);
+HIDE int hmm_normalize_start(struct imm_hmm *hmm);
+HIDE int hmm_normalize_trans(struct tbl_state *tbl_state);
 
 struct imm_hmm *imm_hmm_create(const struct imm_abc *abc)
 {

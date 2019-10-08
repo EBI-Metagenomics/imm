@@ -1,4 +1,5 @@
 #include "src/imm/abc.h"
+#include "src/imm/hide.h"
 #include "src/rapidstring/rapidstring.h"
 #include <limits.h>
 #include <stdlib.h>
@@ -12,8 +13,8 @@ struct imm_abc
     int symbol_idx[SYMBOL_ID_MAX + 1];
 };
 
-int check_symbols_length(const char *symbols);
-int check_symbol_id(char symbol_id);
+HIDE int check_symbols_length(const char *symbols);
+HIDE int check_symbol_id(char symbol_id);
 
 struct imm_abc *imm_abc_create(const char *symbols)
 {
