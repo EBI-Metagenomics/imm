@@ -69,11 +69,15 @@ set(IMM_SOURCES
 )
 
 add_library(immobj OBJECT ${IMM_SOURCES})
+set_property(TARGET immobj PROPERTY POSITION_INDEPENDENT_CODE 1)
 
 add_library(imm SHARED $<TARGET_OBJECTS:immobj>)
 set_target_properties(imm PROPERTIES VERSION ${IMM_VERSION})
 set_target_properties(imm PROPERTIES SOVERSION ${IMM_VERSION_MAJOR})
 set_target_properties(imm PROPERTIES PUBLIC_HEADER ${IMM_PUBLIC_HEADER})
+if(NOT WIN32)
+    target_link_libraries(imm m)
+endif()
 target_compile_definitions(imm PUBLIC IMM_API_EXPORTS)
 imm_sanitizer_add_target(imm)
 
