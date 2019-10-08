@@ -71,7 +71,7 @@ void imm_table_state_add(struct imm_table_state *state, const char *seq, double 
 {
     struct emission *emiss = malloc(sizeof(struct emission));
     emiss->seq = strdup(seq);
-    int seq_len = (int) strlen(seq);
+    int seq_len = (int)strlen(seq);
     emiss->lprob = lprob;
     HASH_ADD_STR(state->emissions, seq, emiss);
     state->min_seq = MIN(state->min_seq, seq_len);
@@ -80,32 +80,29 @@ void imm_table_state_add(struct imm_table_state *state, const char *seq, double 
 
 int imm_table_state_normalize(struct imm_table_state *state)
 {
-    /* struct table_state *s = state->impl; */
-    /* int len = (int)HASH_CNT(hh, s->emissions); */
-    /* double *lprobs = malloc(sizeof(double) * (size_t)len); */
+    int len = (int)HASH_CNT(hh, state->emissions);
+    double *lprobs = malloc(sizeof(double) * (size_t)len);
 
-    /* size_t i = 0; */
-    /* struct emission *emiss, *tmp; */
-    /* HASH_ITER(hh, s->emissions, emiss, tmp) */
-    /* { */
-    /*     lprobs[i] = emiss->lprob; */
-    /*     ++i; */
-    /* } */
+    struct emission *emiss, *tmp;
+    size_t i = 0;
+    HASH_ITER(hh, state->emissions, emiss, tmp)
+    {
+        lprobs[i] = emiss->lprob;
+        ++i;
+    }
+    if (imm_log_normalize(lprobs, len)) {
+        free(lprobs);
+        return -1;
+    }
 
-    /* int err = log_normalize(lprobs, len); */
-    /* if (err) { */
-    /*     free(lprobs); */
-    /*     return err; */
-    /* } */
+    i = 0;
+    HASH_ITER(hh, state->emissions, emiss, tmp)
+    {
+        emiss->lprob = lprobs[i];
+        ++i;
+    }
 
-    /* i = 0; */
-    /* HASH_ITER(hh, s->emissions, emiss, tmp) */
-    /* { */
-    /*     emiss->lprob = lprobs[i]; */
-    /*     ++i; */
-    /* } */
-
-    /* free(lprobs); */
+    free(lprobs);
     return 0;
 }
 

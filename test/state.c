@@ -51,17 +51,27 @@ void test_mute_state(void)
 
 void test_table_state(void)
 {
-    /* struct imm_abc *a = imm_abc_create("ACGT"); */
+    struct imm_abc *abc = imm_abc_create("ACGT");
 
-    /* struct imm_state *s = imm_state_create_table("S0", a); */
+    struct imm_table_state *state = imm_table_state_create("S0", abc);
+    const struct imm_state *s = imm_table_state_cast_c(state);
 
-    /* TEST_ASSERT_EQUAL_STRING("S0", imm_state_get_name(s)); */
-    /* TEST_ASSERT_EQUAL_DOUBLE(0.0, imm_state_lprob(s, "", 0)); */
-    /* TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_state_lprob(s, "A", 1)); */
+    TEST_ASSERT_EQUAL_STRING("S0", imm_state_get_name(s));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_state_lprob(s, "", 0));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_state_lprob(s, "AGT", 3));
 
-    /* imm_state_set_end_state(s, true); */
+    imm_table_state_add(state, "GG", log(0.5));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.5), imm_state_lprob(s, "GG", 2));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_state_lprob(s, "GGT", 3));
 
-    /* imm_state_destroy(s); */
-    /* imm_abc_destroy(a); */
+    imm_table_state_add(state, "", log(0.1));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.1), imm_state_lprob(s, "", 0));
+
+    TEST_ASSERT_EQUAL_INT(0, imm_table_state_normalize(state));
+
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.5 / 0.6), imm_state_lprob(s, "GG", 2));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.1 / 0.6), imm_state_lprob(s, "", 0));
+
+    imm_table_state_destroy(state);
+    imm_abc_destroy(abc);
 }
-
