@@ -1,10 +1,9 @@
 cmake_minimum_required(VERSION 3.4 FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+include(imm)
 
-# Fetch imm version from header file
-include(GetIMMVersion)
-GetIMMVersion(${CMAKE_CURRENT_SOURCE_DIR}/include/imm.h IMM_VERSION_MAJOR IMM_VERSION_MINOR IMM_VERSION_PATCH)
+imm_get_version(${CMAKE_CURRENT_SOURCE_DIR}/include/imm.h IMM_VERSION_MAJOR IMM_VERSION_MINOR IMM_VERSION_PATCH)
 set(IMM_VERSION ${IMM_VERSION_MAJOR}.${IMM_VERSION_MINOR}.${IMM_VERSION_PATCH})
 
 project(imm VERSION ${IMM_VERSION} LANGUAGES C)
@@ -20,25 +19,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 message(STATUS "IMM_VERSION=${IMM_VERSION}")
 message(STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 
-# Build type.
-if(NOT CMAKE_BUILD_TYPE)
-  message(STATUS "CMAKE_BUILD_TYPE not specified, default is 'Debug'")
-  set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build" FORCE)
-else()
-  message(STATUS "CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
-endif()
-
-option(CLANG_ASAN_UBSAN "Enable Clang address & undefined behavior sanitizer for imm library" OFF)
-if(CLANG_ASAN_UBSAN AND NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
-  message(FATAL_ERROR "Sanitizers are only supported for Clang")
-endif()
-
-option(CLANG_CODE_COVERAGE "Enable code coverage metrics in Clang" OFF)
-if (CLANG_CODE_COVERAGE)
-    message(STATUS "Code coverage metrics enabled for debug build")
-    set(CMAKE_C_FLAGS_DEBUG
-      "${CMAKE_C_FLAGS_DEBUG} -fprofile-instr-generate -fcoverage-mapping")
-endif()
+imm_enable_default_build_type()
+imm_enable_sanitizer_option()
+imm_enable_coverage_option()
 
 if(CMAKE_C_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -pedantic -Wstrict-prototypes -Wshadow
@@ -86,23 +69,15 @@ set(IMM_SOURCES
   src/imm/mm_trans.c
 )
 
-add_library(immlib OBJECT ${IMM_SOURCES})
+add_library(immobj OBJECT ${IMM_SOURCES})
 
-add_library(imm SHARED $<TARGET_OBJECTS:immlib>)
+add_library(imm SHARED $<TARGET_OBJECTS:immobj>)
 set_target_properties(imm PROPERTIES VERSION ${IMM_VERSION})
 set_target_properties(imm PROPERTIES SOVERSION ${IMM_VERSION_MAJOR})
 set_target_properties(imm PROPERTIES PUBLIC_HEADER ${IMM_PUBLIC_HEADER})
 target_compile_definitions(imm PUBLIC IMM_API_EXPORTS)
+imm_sanitizer_add_target(imm)
 
-if(CLANG_ASAN_UBSAN)
-  message(STATUS "Enabling Clang address sanitizer and undefined behavior sanitizer for imm library.")
-  set_property(TARGET imm APPEND PROPERTY COMPILE_DEFINITIONS EXITFREE)
-  set_property(TARGET imm APPEND PROPERTY COMPILE_OPTIONS -fno-sanitize-recover=all
-    -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=address -fsanitize=undefined)
-  set_property(TARGET imm APPEND_STRING PROPERTY LINK_FLAGS "-fsanitize=address -fsanitize=undefined ")
-endif()
-
-# Begin of test setup block.
 enable_testing()
 
 # Unit library for testing C projects: https://github.com/ThrowTheSwitch/Unity
