@@ -12,12 +12,15 @@ extern "C"
 {
 #endif
 
-#include "imm/alphabet.h"
-#include "imm/api.h"
-#include "imm/codon.h"
+#include "imm/abc.h"
 #include "imm/hmm.h"
+#include "imm/log.h"
+#include "imm/mute_state.h"
+#include "imm/normal_state.h"
 #include "imm/path.h"
+#include "imm/report.h"
 #include "imm/state.h"
+#include "imm/table_state.h"
 
 #ifdef __cplusplus
 }

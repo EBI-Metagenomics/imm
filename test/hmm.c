@@ -8,7 +8,7 @@ void test_hmm_del_get_state(void);
 void test_hmm_set_trans(void);
 void test_hmm_likelihood_single_state(void);
 void test_hmm_likelihood_two_states(void);
-void test_hmm_likelihood_silent_state(void);
+void test_hmm_likelihood_mute_state(void);
 void test_hmm_viterbi(void);
 
 int main(void)
@@ -19,39 +19,38 @@ int main(void)
     RUN_TEST(test_hmm_set_trans);
     RUN_TEST(test_hmm_likelihood_single_state);
     RUN_TEST(test_hmm_likelihood_two_states);
-    RUN_TEST(test_hmm_likelihood_silent_state);
+    RUN_TEST(test_hmm_likelihood_mute_state);
     RUN_TEST(test_hmm_viterbi);
     return UNITY_END();
 }
 
 void test_hmm_state_id(void)
 {
-    struct imm_alphabet *alphabet = imm_alphabet_create("ACGT");
-    struct imm_state *state = imm_state_create_silent("State0", alphabet);
-    struct imm_hmm *hmm = imm_hmm_create(alphabet);
+    struct imm_abc *abc = imm_abc_create("ACGT");
+    struct imm_mute_state *state = imm_mute_state_create("State0", abc);
+    struct imm_hmm *hmm = imm_hmm_create(abc);
 
-    int state_id = imm_hmm_add_state(hmm, state, log(1.0));
+    int state_id = imm_hmm_add_state(hmm, imm_mute_state_cast_c(state), log(1.0));
     TEST_ASSERT_EQUAL_INT(0, state_id);
 
-    state_id = imm_hmm_add_state(hmm, state, log(1.0));
+    state_id = imm_hmm_add_state(hmm, imm_mute_state_cast_c(state), log(1.0));
     TEST_ASSERT_EQUAL_INT(1, state_id);
 
     imm_hmm_destroy(hmm);
-    imm_state_destroy(state);
-    imm_alphabet_destroy(alphabet);
+    imm_mute_state_destroy(state);
+    imm_abc_destroy(abc);
 }
 
 void test_hmm_del_get_state(void)
 {
-    struct imm_alphabet *alphabet = imm_alphabet_create("ACGT");
-    struct imm_state *state0 = imm_state_create_silent("State0", alphabet);
-    struct imm_state *state1 = imm_state_create_silent("State1", alphabet);
-    struct imm_hmm *hmm = imm_hmm_create(alphabet);
+    struct imm_abc *abc = imm_abc_create("ACGT");
+    struct imm_mute_state *state0 = imm_mute_state_create("State0", abc);
+    struct imm_mute_state *state1 = imm_mute_state_create("State1", abc);
+    struct imm_hmm *hmm = imm_hmm_create(abc);
 
-    int state_id0 = imm_hmm_add_state(hmm, state0, log(0.5));
-    int state_id1 = imm_hmm_add_state(hmm, state1, log(0.5));
-    TEST_ASSERT_EQUAL_INT(IMM_INVALID_STATE_ID,
-                          imm_hmm_add_state(hmm, NULL, log(0.5)));
+    int state_id0 = imm_hmm_add_state(hmm, imm_mute_state_cast_c(state0), log(0.5));
+    int state_id1 = imm_hmm_add_state(hmm, imm_mute_state_cast_c(state1), log(0.5));
+    TEST_ASSERT_EQUAL_INT(IMM_INVALID_STATE_ID, imm_hmm_add_state(hmm, NULL, log(0.5)));
 
     TEST_ASSERT_EQUAL_INT(0, state_id0);
     TEST_ASSERT_EQUAL_INT(1, state_id1);
@@ -72,21 +71,24 @@ void test_hmm_del_get_state(void)
     TEST_ASSERT_EQUAL_INT(-1, imm_hmm_del_state(hmm, state_id1));
 
     imm_hmm_destroy(hmm);
-    imm_state_destroy(state0);
-    imm_state_destroy(state1);
-    imm_alphabet_destroy(alphabet);
+    imm_mute_state_destroy(state0);
+    imm_mute_state_destroy(state1);
+    imm_abc_destroy(abc);
 }
 
 void test_hmm_set_trans(void)
 {
 
-    struct imm_alphabet *alphabet = imm_alphabet_create("ACGT");
-    struct imm_state *state0 = imm_state_create_silent("State0", alphabet);
-    struct imm_state *state1 = imm_state_create_silent("State1", alphabet);
-    struct imm_hmm *hmm = imm_hmm_create(alphabet);
+    struct imm_abc *abc = imm_abc_create("ACGT");
+    struct imm_mute_state *state0 = imm_mute_state_create("State0", abc);
+    struct imm_mute_state *state1 = imm_mute_state_create("State1", abc);
+    struct imm_hmm *hmm = imm_hmm_create(abc);
 
-    int state_id0 = imm_hmm_add_state(hmm, state0, log(0.5));
-    int state_id1 = imm_hmm_add_state(hmm, state1, log(0.5));
+    const struct imm_state *s0 = imm_mute_state_cast_c(state0);
+    const struct imm_state *s1 = imm_mute_state_cast_c(state1);
+
+    int state_id0 = imm_hmm_add_state(hmm, s0, log(0.5));
+    int state_id1 = imm_hmm_add_state(hmm, s1, log(0.5));
 
     TEST_ASSERT_NOT_NULL(imm_hmm_get_state(hmm, state_id0));
     TEST_ASSERT_NOT_NULL(imm_hmm_get_state(hmm, state_id1));
@@ -96,21 +98,21 @@ void test_hmm_set_trans(void)
     TEST_ASSERT_EQUAL_INT(0, imm_hmm_set_trans(hmm, state_id0, state_id1, log(0.5)));
 
     imm_hmm_destroy(hmm);
-    imm_state_destroy(state0);
-    imm_state_destroy(state1);
-    imm_alphabet_destroy(alphabet);
+    imm_mute_state_destroy(state0);
+    imm_mute_state_destroy(state1);
+    imm_abc_destroy(abc);
 }
 
 void test_hmm_likelihood_single_state(void)
 {
-    struct imm_alphabet *alphabet = imm_alphabet_create("ACGT");
+    struct imm_abc *abc = imm_abc_create("ACGT");
 
     double lprobs[] = {log(0.25), log(0.25), log(0.5), -INFINITY};
 
-    struct imm_state *state = imm_state_create_normal("State0", alphabet, lprobs);
-    struct imm_hmm *hmm = imm_hmm_create(alphabet);
+    struct imm_normal_state *state = imm_normal_state_create("State0", abc, lprobs);
+    struct imm_hmm *hmm = imm_hmm_create(abc);
 
-    int state_id = imm_hmm_add_state(hmm, state, log(0.5));
+    int state_id = imm_hmm_add_state(hmm, imm_normal_state_cast_c(state), log(0.5));
     TEST_ASSERT_EQUAL_INT(-1, imm_hmm_normalize(hmm));
 
     struct imm_path *path = NULL;
@@ -172,23 +174,23 @@ void test_hmm_likelihood_single_state(void)
     imm_path_destroy(&path);
 
     imm_hmm_destroy(hmm);
-    imm_state_destroy(state);
-    imm_alphabet_destroy(alphabet);
+    imm_normal_state_destroy(state);
+    imm_abc_destroy(abc);
 }
 
 void test_hmm_likelihood_two_states(void)
 {
-    struct imm_alphabet *alphabet = imm_alphabet_create("ACGT");
-    struct imm_hmm *hmm = imm_hmm_create(alphabet);
+    struct imm_abc *abc = imm_abc_create("ACGT");
+    struct imm_hmm *hmm = imm_hmm_create(abc);
 
     double lprobs0[] = {log(0.25), log(0.25), log(0.5), -INFINITY};
-    struct imm_state *state0 = imm_state_create_normal("State0", alphabet, lprobs0);
+    struct imm_normal_state *state0 = imm_normal_state_create("State0", abc, lprobs0);
 
     double lprobs1[] = {log(0.5), log(0.25), log(0.5), log(1.0)};
-    struct imm_state *state1 = imm_state_create_normal("State1", alphabet, lprobs1);
+    struct imm_normal_state *state1 = imm_normal_state_create("State1", abc, lprobs1);
 
-    int state_id0 = imm_hmm_add_state(hmm, state0, log(1.0));
-    int state_id1 = imm_hmm_add_state(hmm, state1, -INFINITY);
+    int state_id0 = imm_hmm_add_state(hmm, imm_normal_state_cast_c(state0), log(1.0));
+    int state_id1 = imm_hmm_add_state(hmm, imm_normal_state_cast_c(state1), -INFINITY);
 
     imm_hmm_set_trans(hmm, state_id0, state_id0, log(0.1));
     imm_hmm_set_trans(hmm, state_id0, state_id1, log(0.2));
@@ -223,32 +225,29 @@ void test_hmm_likelihood_two_states(void)
     TEST_ASSERT_EQUAL_DOUBLE(1.0 / 3.0, exp(imm_hmm_likelihood(hmm, "GT", path)));
     imm_path_destroy(&path);
 
-    TEST_ASSERT_EQUAL_INT(0, imm_state_normalize(state1));
+    TEST_ASSERT_EQUAL_INT(0, imm_normal_state_normalize(state1));
     imm_path_create(&path);
     imm_path_add(&path, state_id0, 1);
     imm_path_add(&path, state_id1, 1);
-    TEST_ASSERT_EQUAL_DOUBLE(0.14814814814815,
-                             exp(imm_hmm_likelihood(hmm, "GT", path)));
+    TEST_ASSERT_EQUAL_DOUBLE(0.14814814814815, exp(imm_hmm_likelihood(hmm, "GT", path)));
     imm_path_destroy(&path);
 
     imm_hmm_destroy(hmm);
-    imm_state_destroy(state0);
-    imm_state_destroy(state1);
-    imm_alphabet_destroy(alphabet);
+    imm_normal_state_destroy(state0);
+    imm_normal_state_destroy(state1);
+    imm_abc_destroy(abc);
 }
 
-void test_hmm_likelihood_silent_state(void)
+void test_hmm_likelihood_mute_state(void)
 {
-    struct imm_alphabet *alphabet = imm_alphabet_create("ACGT");
-    struct imm_hmm *hmm = imm_hmm_create(alphabet);
+    struct imm_abc *abc = imm_abc_create("ACGT");
+    struct imm_hmm *hmm = imm_hmm_create(abc);
 
-    struct imm_state *state = imm_state_create_silent("State0", alphabet);
-    TEST_ASSERT_EQUAL_INT(0, imm_state_normalize(state));
+    struct imm_mute_state *state = imm_mute_state_create("State0", abc);
 
-    int state_id = imm_hmm_add_state(hmm, state, log(1.0));
+    int state_id = imm_hmm_add_state(hmm, imm_mute_state_cast_c(state), log(1.0));
 
     imm_hmm_set_trans(hmm, state_id, state_id, log(0.1));
-    TEST_ASSERT_EQUAL_INT(0, imm_hmm_normalize(hmm));
 
     struct imm_path *path = NULL;
     imm_path_create(&path);
@@ -277,7 +276,6 @@ void test_hmm_likelihood_silent_state(void)
     TEST_ASSERT_EQUAL_DOUBLE(0, exp(imm_hmm_likelihood(hmm, "GT", path)));
     imm_path_destroy(&path);
 
-    TEST_ASSERT_EQUAL_INT(0, imm_state_normalize(state));
     imm_path_create(&path);
     imm_path_add(&path, state_id, 1);
     imm_path_add(&path, state_id, 1);
@@ -285,23 +283,23 @@ void test_hmm_likelihood_silent_state(void)
     imm_path_destroy(&path);
 
     imm_hmm_destroy(hmm);
-    imm_state_destroy(state);
-    imm_alphabet_destroy(alphabet);
+    imm_mute_state_destroy(state);
+    imm_abc_destroy(abc);
 }
 
 void test_hmm_viterbi(void)
 {
-    struct imm_alphabet *alphabet = imm_alphabet_create("ACGT");
-    struct imm_hmm *hmm = imm_hmm_create(alphabet);
+    struct imm_abc *abc = imm_abc_create("ACGT");
+    struct imm_hmm *hmm = imm_hmm_create(abc);
 
     double lprobs0[] = {log(0.25), log(0.25), log(0.5), -INFINITY};
-    struct imm_state *state0 = imm_state_create_normal("State0", alphabet, lprobs0);
+    struct imm_normal_state *state0 = imm_normal_state_create("State0", abc, lprobs0);
 
     double lprobs1[] = {log(0.5), log(0.25), log(0.5), log(1.0)};
-    struct imm_state *state1 = imm_state_create_normal("State1", alphabet, lprobs1);
+    struct imm_normal_state *state1 = imm_normal_state_create("State1", abc, lprobs1);
 
-    int state_id0 = imm_hmm_add_state(hmm, state0, log(1.0));
-    int state_id1 = imm_hmm_add_state(hmm, state1, -INFINITY);
+    int state_id0 = imm_hmm_add_state(hmm, imm_normal_state_cast_c(state0), log(1.0));
+    int state_id1 = imm_hmm_add_state(hmm, imm_normal_state_cast_c(state1), -INFINITY);
 
     imm_hmm_set_trans(hmm, state_id0, state_id0, log(0.1));
     imm_hmm_set_trans(hmm, state_id0, state_id1, log(0.2));
@@ -342,7 +340,7 @@ void test_hmm_viterbi(void)
     /* imm_path_destroy(&path); */
 
     imm_hmm_destroy(hmm);
-    imm_state_destroy(state0);
-    imm_state_destroy(state1);
-    imm_alphabet_destroy(alphabet);
+    imm_normal_state_destroy(state0);
+    imm_normal_state_destroy(state1);
+    imm_abc_destroy(abc);
 }

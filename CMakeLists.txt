@@ -27,11 +27,6 @@ if(NOT CMAKE_BUILD_TYPE)
 else()
   message(STATUS "CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 endif()
-if(CMAKE_BUILD_TYPE MATCHES Debug)
-  set(DEBUG 1)
-else()
-  set(DEBUG 0)
-endif()
 
 option(CLANG_ASAN_UBSAN "Enable Clang address & undefined behavior sanitizer for imm library" OFF)
 if(CLANG_ASAN_UBSAN AND NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
@@ -50,51 +45,45 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang")
     -Wconversion -Wmissing-prototypes -Wno-unused-parameter)
 endif()
 
-# rapidstring: https://github.com/boyerjohn/rapidstring
-set(RS_INCLUDE_DIRS deps/rapidstring)
-
-# uthash: https://github.com/troydhanson/uthash
-set(UTHASH_INCLUDE_DIRS deps/uthash)
-
-# logaddexp: https://github.com/horta/logaddexp
-set(LOGADDEXP_INCLUDE_DIRS deps/logaddexp)
-
 include_directories(include)
-include_directories(${RS_INCLUDE_DIRS})
-include_directories(${UTHASH_INCLUDE_DIRS})
-include_directories(${LOGADDEXP_INCLUDE_DIRS})
-include_directories(src)
+include_directories(.)
 
 # Interface header that that the user is used to include.
 set(IMM_PUBLIC_HEADER
   include/imm.h
 )
 
-# Headers that are included by the interface header, and therefore
+# Headers that are included by the interface header and
 # installed alongside it.
 set(IMM_PRIVATE_HEADERS
+  include/imm/abc.h
   include/imm/api.h
-  include/imm/alphabet.h
+  include/imm/hmm.h
+  include/imm/log.h
+  include/imm/mute_state.h
+  include/imm/normal_state.h
+  include/imm/path.h
+  include/imm/report.h
+  include/imm/state.h
+  include/imm/table_state.h
 )
 
 set(IMM_SOURCES
-  src/alphabet.c
-  src/array.c
-  src/codon.c
-  src/counter.c
-  src/dp.c
-  src/hmm.c
-  src/matrix.c
-  src/path.c
-  src/report.c
-  src/state/frame.c
-  src/state/normal.c
-  src/state/silent.c
-  src/state/state.c
-  src/state/table.c
-  src/state_idx.c
-  src/tbl_state.c
-  src/tbl_trans.c
+  src/imm/abc.c
+  src/imm/counter.c
+  src/imm/dp.c
+  src/imm/hmm.c
+  src/imm/log.c
+  src/imm/matrix.c
+  src/imm/normal_state.c
+  src/imm/path.c
+  src/imm/report.c
+  src/imm/mute_state.c
+  src/imm/state.c
+  src/imm/state_idx.c
+  # src/imm/table_state.c
+  src/imm/tbl_state.c
+  src/imm/tbl_trans.c
 )
 
 add_library(immlib OBJECT ${IMM_SOURCES})
@@ -103,6 +92,7 @@ add_library(imm SHARED $<TARGET_OBJECTS:immlib>)
 set_target_properties(imm PROPERTIES VERSION ${IMM_VERSION})
 set_target_properties(imm PROPERTIES SOVERSION ${IMM_VERSION_MAJOR})
 set_target_properties(imm PROPERTIES PUBLIC_HEADER ${IMM_PUBLIC_HEADER})
+target_compile_definitions(imm PUBLIC IMM_API_EXPORTS)
 
 if(CLANG_ASAN_UBSAN)
   message(STATUS "Enabling Clang address sanitizer and undefined behavior sanitizer for imm library.")
@@ -130,7 +120,7 @@ function(imm_add_test name)
   endif()
 endfunction()
 
-imm_add_test(alphabet)
+imm_add_test(abc)
 imm_add_test(state)
 imm_add_test(hmm)
 imm_add_test(path)
@@ -147,7 +137,7 @@ if (CLANG_CODE_COVERAGE)
     COMMAND llvm-profdata merge -sparse *.profraw -o all.profdata
     COMMAND llvm-cov show -format=html -o coverage -instr-profile=all.profdata
       $<TARGET_FILE:imm>
-      -object $<TARGET_FILE:test_alphabet>
+      -object $<TARGET_FILE:test_abc>
       -object $<TARGET_FILE:test_state>
       -object $<TARGET_FILE:test_hmm>
       -object $<TARGET_FILE:test_path>
