@@ -77,7 +77,7 @@ set_target_properties(imm PROPERTIES PUBLIC_HEADER ${IMM_PUBLIC_HEADER})
 target_compile_definitions(imm PUBLIC IMM_API_EXPORTS)
 imm_sanitizer_add_target(imm)
 
-enable_testing()
+imm_enable_testing()
 
 imm_add_test(abc imm)
 imm_add_test(state imm)
@@ -89,15 +89,15 @@ foreach(SRC ${IMM_SOURCES})
 endforeach()
 
 if (CLANG_CODE_COVERAGE)
-  add_custom_target(coverage
-    COMMAND llvm-profdata merge -sparse *.profraw -o all.profdata
-    COMMAND llvm-cov show -format=html -o coverage -instr-profile=all.profdata
-      $<TARGET_FILE:imm>
-      -object $<TARGET_FILE:test_abc>
-      -object $<TARGET_FILE:test_state>
-      -object $<TARGET_FILE:test_hmm>
-      -object $<TARGET_FILE:test_path>
-      ${IMM_SOURCES_PATH}
-    BYPRODUCTS coverage/index.html
-    COMMENT "The coverage summary will be written to coverage/index.html")
+    add_custom_target(coverage
+        COMMAND llvm-profdata merge -sparse *.profraw -o all.profdata
+        COMMAND llvm-cov show -format=html -o coverage -instr-profile=all.profdata
+            $<TARGET_FILE:imm>
+            -object $<TARGET_FILE:test_abc>
+            -object $<TARGET_FILE:test_state>
+            -object $<TARGET_FILE:test_hmm>
+            -object $<TARGET_FILE:test_path>
+            ${IMM_SOURCES_PATH}
+        BYPRODUCTS coverage/index.html
+        COMMENT "The coverage summary will be written to coverage/index.html")
 endif()
