@@ -63,7 +63,7 @@ set(IMM_SOURCES
     src/imm/mute_state.c
     src/imm/state.c
     src/imm/state_idx.c
-    # src/imm/table_state.c
+    src/imm/table_state.c
     src/imm/mm_state.c
     src/imm/mm_trans.c
 )

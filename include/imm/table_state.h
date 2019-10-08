@@ -17,4 +17,6 @@ IMM_API const struct imm_state *imm_table_state_cast_c(const struct imm_table_st
 IMM_API void imm_table_state_add(struct imm_table_state *state, const char *seq,
                                  double lprob);
 
+IMM_API int imm_table_state_normalize(struct imm_table_state *state);
+
 #endif

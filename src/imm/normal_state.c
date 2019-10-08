@@ -20,9 +20,9 @@ struct imm_normal_state *imm_normal_state_create(const char *name, const struct 
 {
     struct imm_normal_state *state = malloc(sizeof(struct imm_normal_state));
 
-    size_t length = (size_t)abc_length(abc);
-    state->lprobs = malloc(sizeof(double) * length);
-    memcpy(state->lprobs, lprobs, sizeof(double) * length);
+    size_t len = (size_t)abc_length(abc);
+    state->lprobs = malloc(sizeof(double) * len);
+    memcpy(state->lprobs, lprobs, sizeof(double) * len);
 
     struct imm_state_funcs funcs = {normal_state_lprob, normal_state_min_seq,
                                     normal_state_max_seq};
