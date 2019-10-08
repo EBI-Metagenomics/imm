@@ -65,6 +65,8 @@ void imm_table_state_destroy(struct imm_table_state *state)
     state->emissions = NULL;
     state->min_seq = 0;
     state->max_seq = 0;
+
+    free(state);
 }
 
 void imm_table_state_add(struct imm_table_state *state, const char *seq, double lprob)

@@ -49,6 +49,7 @@ int mm_state_del_state(struct mm_state **head_ptr, int state_id)
     HASH_FIND_INT(*head_ptr, &state_id, mm_state);
     if (mm_state) {
         HASH_DEL(*head_ptr, mm_state);
+        free(mm_state);
         return 0;
     }
     return -1;

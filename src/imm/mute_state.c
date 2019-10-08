@@ -38,6 +38,8 @@ void imm_mute_state_destroy(struct imm_mute_state *state)
 
     imm_state_destroy(state->interface);
     state->interface = NULL;
+
+    free(state);
 }
 
 double mute_state_lprob(const struct imm_state *state, const char *seq, int seq_len)

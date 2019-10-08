@@ -50,6 +50,8 @@ void imm_normal_state_destroy(struct imm_normal_state *state)
 
     free(state->lprobs);
     state->lprobs = NULL;
+
+    free(state);
 }
 
 int imm_normal_state_normalize(struct imm_normal_state *state)
