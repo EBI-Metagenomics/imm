@@ -25,8 +25,7 @@ IMM_API double imm_hmm_get_trans(const struct imm_hmm *hmm, int src_state_id,
 IMM_API double imm_hmm_likelihood(const struct imm_hmm *hmm, const char *seq,
                                   const struct imm_path *path);
 
-IMM_API double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq, int seq_len,
-                               int end_state_id);
+IMM_API double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq, int end_state_id);
 
 IMM_API int imm_hmm_normalize(struct imm_hmm *hmm);
 

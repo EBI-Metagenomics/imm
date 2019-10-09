@@ -335,17 +335,17 @@ void test_hmm_viterbi_normal_states(void)
 
     imm_hmm_normalize(hmm);
 
-    TEST_ASSERT_EQUAL_DOUBLE(-1.386294361120, imm_hmm_viterbi(hmm, "A", 1, state_id0));
-    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "A", 1, state_id1));
+    TEST_ASSERT_EQUAL_DOUBLE(-1.386294361120, imm_hmm_viterbi(hmm, "A", state_id0));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "A", state_id1));
 
-    TEST_ASSERT_EQUAL_DOUBLE(-3.178053830348, imm_hmm_viterbi(hmm, "AG", 2, state_id0));
-    TEST_ASSERT_EQUAL_DOUBLE(-3.295836866004, imm_hmm_viterbi(hmm, "AG", 2, state_id1));
+    TEST_ASSERT_EQUAL_DOUBLE(-3.178053830348, imm_hmm_viterbi(hmm, "AG", state_id0));
+    TEST_ASSERT_EQUAL_DOUBLE(-3.295836866004, imm_hmm_viterbi(hmm, "AG", state_id1));
 
-    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "AGT", 3, state_id0));
-    TEST_ASSERT_EQUAL_DOUBLE(-4.106767082221, imm_hmm_viterbi(hmm, "AGT", 3, state_id1));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "AGT", state_id0));
+    TEST_ASSERT_EQUAL_DOUBLE(-4.106767082221, imm_hmm_viterbi(hmm, "AGT", state_id1));
 
-    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "AGTC", 4, state_id0));
-    TEST_ASSERT_EQUAL_DOUBLE(-6.303991659557, imm_hmm_viterbi(hmm, "AGTC", 4, state_id1));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "AGTC", state_id0));
+    TEST_ASSERT_EQUAL_DOUBLE(-6.303991659557, imm_hmm_viterbi(hmm, "AGTC", state_id1));
 
     imm_hmm_destroy(hmm);
     imm_normal_state_destroy(state0);

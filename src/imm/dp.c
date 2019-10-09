@@ -39,7 +39,7 @@ HIDE double best_trans_score(const struct dp *dp, double start_lprob, int row,
 HIDE struct matrix *create_trans(const struct mm_state *mm_states,
                                  const struct state_idx *state_idx);
 
-struct dp *dp_create(const struct mm_state *mm_states, const char *seq, int seq_len)
+struct dp *dp_create(const struct mm_state *mm_states, const char *seq)
 {
     struct dp *dp = malloc(sizeof(struct dp));
 
@@ -50,7 +50,7 @@ struct dp *dp_create(const struct mm_state *mm_states, const char *seq, int seq_
     state_idx_create(&state_idx);
 
     dp->seq = seq;
-    dp->seq_len = seq_len;
+    dp->seq_len = (int) strlen(seq);
 
     int next_col = 0;
 
@@ -73,7 +73,7 @@ struct dp *dp_create(const struct mm_state *mm_states, const char *seq, int seq_
     dp->trans = create_trans(mm_states, state_idx);
     state_idx_destroy(&state_idx);
 
-    dp->score = matrix_create(seq_len, next_col);
+    dp->score = matrix_create(dp->seq_len, next_col);
     matrix_set_all(dp->score, -INFINITY);
 
     return dp;

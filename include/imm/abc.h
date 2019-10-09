@@ -4,6 +4,7 @@
 #include "imm/api.h"
 
 #define IMM_ANY_SYMBOL '*'
+#define IMM_NULL_SYMBOL '\0'
 
 struct imm_abc;
 

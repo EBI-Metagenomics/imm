@@ -3,9 +3,9 @@
 #include "src/imm/dp.h"
 #include "src/imm/hide.h"
 #include "src/imm/matrix.h"
-#include "src/imm/path.h"
 #include "src/imm/mm_state.h"
 #include "src/imm/mm_trans.h"
+#include "src/imm/path.h"
 #include "src/logaddexp/logaddexp.h"
 #include "src/uthash/utlist.h"
 #include <math.h>
@@ -167,11 +167,10 @@ not_found_state:
     return NAN;
 }
 
-double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq, int seq_len,
-                       int end_state_id)
+double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq, int end_state_id)
 
 {
-    struct dp *dp = dp_create(hmm->mm_states, seq, seq_len);
+    struct dp *dp = dp_create(hmm->mm_states, seq);
     double score = dp_viterbi(dp, end_state_id);
     dp_destroy(dp);
     return score;
