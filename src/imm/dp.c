@@ -152,7 +152,6 @@ double best_trans_score(const struct dp *dp, double start_lprob, int row, int ds
     double score = -INFINITY;
     if (row == 0)
         score = start_lprob;
-    int seq_len = dp->seq_len - row;
     for (int i = 0; i < dp->nstates; ++i) {
         const struct state_info *state = dp->states + i;
         if (row - state->min_seq < 0)
@@ -160,7 +159,7 @@ double best_trans_score(const struct dp *dp, double start_lprob, int row, int ds
 
         double trans = matrix_get(dp->trans, i, dst_state_idx);
 
-        for (int len = state->min_seq; len <= MIN(state->max_seq, seq_len); ++len) {
+        for (int len = state->min_seq; len <= MIN(state->max_seq, row); ++len) {
             double v = get_score(dp, row - len, i, len) + trans;
             score = MAX(v, score);
         }
