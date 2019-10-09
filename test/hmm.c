@@ -12,7 +12,7 @@ void test_hmm_likelihood_mute_state(void);
 void test_hmm_viterbi_no_state(void);
 void test_hmm_viterbi_mute_states(void);
 void test_hmm_viterbi_normal_states(void);
-void test_hmm_viterbi_profile(void);
+void test_hmm_viterbi_profile1(void);
 
 int main(void)
 {
@@ -26,7 +26,7 @@ int main(void)
     RUN_TEST(test_hmm_viterbi_no_state);
     RUN_TEST(test_hmm_viterbi_mute_states);
     RUN_TEST(test_hmm_viterbi_normal_states);
-    RUN_TEST(test_hmm_viterbi_profile);
+    RUN_TEST(test_hmm_viterbi_profile1);
     return UNITY_END();
 }
 
@@ -428,7 +428,7 @@ void test_hmm_viterbi_normal_states(void)
     imm_abc_destroy(abc);
 }
 
-void test_hmm_viterbi_profile(void)
+void test_hmm_viterbi_profile1(void)
 {
     struct imm_abc *abc = imm_abc_create("AB");
     struct imm_hmm *hmm = imm_hmm_create(abc);
@@ -463,7 +463,23 @@ void test_hmm_viterbi_profile(void)
     TEST_ASSERT_EQUAL_DOUBLE(log(1.0), imm_hmm_viterbi(hmm, "", start_id));
 
     TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "", M0_id));
-    TEST_ASSERT_EQUAL_DOUBLE(log(0.5) + log(0.4) + log(0.8), imm_hmm_viterbi(hmm, "A", end_id));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "A", start_id));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "A", D0_id));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "A", I0_id));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.5) + log(0.4), imm_hmm_viterbi(hmm, "A", M0_id));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.5) + log(0.4) + log(0.8),
+                             imm_hmm_viterbi(hmm, "A", end_id));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.5) + log(0.2), imm_hmm_viterbi(hmm, "B", M0_id));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.5) + log(0.2) + log(0.8),
+                             imm_hmm_viterbi(hmm, "B", end_id));
+
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "AA", M0_id));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.5) + log(0.4) + log(0.1) + log(0.5),
+                             imm_hmm_viterbi(hmm, "AA", end_id));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.5) + log(0.4) + log(0.1) + log(0.5),
+                             imm_hmm_viterbi(hmm, "AA", end_id));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.5) + log(0.4) + log(0.1) + log(0.2) + 2 * log(0.5),
+                             imm_hmm_viterbi(hmm, "AAB", end_id));
 
     imm_hmm_destroy(hmm);
     imm_mute_state_destroy(start);
