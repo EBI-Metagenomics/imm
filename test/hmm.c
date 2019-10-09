@@ -335,6 +335,9 @@ void test_hmm_viterbi_normal_states(void)
 
     imm_hmm_normalize(hmm);
 
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "", state_id0));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "", state_id1));
+
     TEST_ASSERT_EQUAL_DOUBLE(-1.386294361120, imm_hmm_viterbi(hmm, "A", state_id0));
     TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "A", state_id1));
 

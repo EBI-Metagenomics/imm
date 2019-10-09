@@ -73,7 +73,7 @@ struct dp *dp_create(const struct mm_state *mm_states, const char *seq)
     dp->trans = create_trans(mm_states, state_idx);
     state_idx_destroy(&state_idx);
 
-    dp->score = matrix_create(dp->seq_len, next_col);
+    dp->score = matrix_create(dp->seq_len + 1, next_col);
     matrix_set_all(dp->score, -INFINITY);
 
     return dp;
@@ -81,7 +81,7 @@ struct dp *dp_create(const struct mm_state *mm_states, const char *seq)
 
 double dp_viterbi(struct dp *dp, int end_state_id)
 {
-    for (int r = 0; r < dp->seq_len; ++r) {
+    for (int r = 0; r <= dp->seq_len; ++r) {
         const char *seq = dp->seq + r;
         int seq_len = dp->seq_len - r;
 
