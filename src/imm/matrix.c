@@ -35,8 +35,8 @@ void matrix_print(const struct matrix *matrix)
     for (int r = 0; r < matrix->nrows; ++r) {
         printf("|");
         for (int c = 0; c < matrix->ncols - 1; ++c) {
-            printf("%0.4f, ", exp(matrix_get(matrix, r, c)));
+            printf("%0.7f, ", exp(matrix_get(matrix, r, c)));
         }
-        printf("%0.4f|\n", exp(matrix_get(matrix, r, matrix->ncols - 1)));
+        printf("%0.7f|\n", exp(matrix_get(matrix, r, matrix->ncols - 1)));
     }
 }

@@ -172,9 +172,9 @@ double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq, int seq_len,
 
 {
     struct dp *dp = dp_create(hmm->mm_states, seq, seq_len);
-    double cost = dp_viterbi(dp);
+    double score = dp_viterbi(dp, end_state_id);
     dp_destroy(dp);
-    return cost;
+    return score;
 }
 
 int imm_hmm_normalize(struct imm_hmm *hmm)

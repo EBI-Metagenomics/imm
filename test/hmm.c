@@ -305,39 +305,22 @@ void test_hmm_viterbi(void)
     imm_hmm_set_trans(hmm, state_id0, state_id1, log(0.2));
     imm_hmm_set_trans(hmm, state_id1, state_id1, log(1.0));
 
-    /* TEST_ASSERT_EQUAL_DOUBLE(0.25, exp(imm_hmm_likelihood(hmm, "A", path))); */
-    imm_hmm_viterbi(hmm, "A", 1, state_id1);
+    TEST_ASSERT_EQUAL_INT(0, imm_normal_state_normalize(state0));
+    TEST_ASSERT_EQUAL_INT(0, imm_normal_state_normalize(state1));
 
-    /* imm_path_create(&path); */
-    /* imm_path_add(&path, state_id0, 1); */
-    /* TEST_ASSERT_EQUAL_DOUBLE(0, exp(imm_hmm_likelihood(hmm, "T", path))); */
-    /* imm_path_destroy(&path); */
+    imm_hmm_normalize(hmm);
 
-    /* imm_path_create(&path); */
-    /* imm_path_add(&path, state_id1, 1); */
-    /* TEST_ASSERT_EQUAL_DOUBLE(0, exp(imm_hmm_likelihood(hmm, "G", path))); */
-    /* imm_path_destroy(&path); */
+    TEST_ASSERT_EQUAL_DOUBLE(-1.386294361120, imm_hmm_viterbi(hmm, "A", 1, state_id0));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "A", 1, state_id1));
 
-    /* TEST_ASSERT_EQUAL_INT(0, imm_hmm_normalize(hmm)); */
+    TEST_ASSERT_EQUAL_DOUBLE(-3.178053830348, imm_hmm_viterbi(hmm, "AG", 2, state_id0));
+    TEST_ASSERT_EQUAL_DOUBLE(-3.295836866004, imm_hmm_viterbi(hmm, "AG", 2, state_id1));
 
-    /* imm_path_create(&path); */
-    /* imm_path_add(&path, state_id0, 1); */
-    /* TEST_ASSERT_EQUAL_DOUBLE(0.5, exp(imm_hmm_likelihood(hmm, "G", path))); */
-    /* imm_path_destroy(&path); */
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "AGT", 3, state_id0));
+    TEST_ASSERT_EQUAL_DOUBLE(-4.106767082221, imm_hmm_viterbi(hmm, "AGT", 3, state_id1));
 
-    /* imm_path_create(&path); */
-    /* imm_path_add(&path, state_id0, 1); */
-    /* imm_path_add(&path, state_id1, 1); */
-    /* TEST_ASSERT_EQUAL_DOUBLE(1.0 / 3.0, exp(imm_hmm_likelihood(hmm, "GT", path))); */
-    /* imm_path_destroy(&path); */
-
-    /* TEST_ASSERT_EQUAL_INT(0, imm_state_normalize(state1)); */
-    /* imm_path_create(&path); */
-    /* imm_path_add(&path, state_id0, 1); */
-    /* imm_path_add(&path, state_id1, 1); */
-    /* TEST_ASSERT_EQUAL_DOUBLE(0.14814814814815, */
-    /*                          exp(imm_hmm_likelihood(hmm, "GT", path))); */
-    /* imm_path_destroy(&path); */
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "AGTC", 4, state_id0));
+    TEST_ASSERT_EQUAL_DOUBLE(-6.303991659557, imm_hmm_viterbi(hmm, "AGTC", 4, state_id1));
 
     imm_hmm_destroy(hmm);
     imm_normal_state_destroy(state0);
