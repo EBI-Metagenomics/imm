@@ -9,6 +9,7 @@ void test_hmm_set_trans(void);
 void test_hmm_likelihood_single_state(void);
 void test_hmm_likelihood_two_states(void);
 void test_hmm_likelihood_mute_state(void);
+void test_hmm_viterbi_no_state(void);
 void test_hmm_viterbi_mute_states(void);
 void test_hmm_viterbi_normal_states(void);
 
@@ -21,6 +22,7 @@ int main(void)
     RUN_TEST(test_hmm_likelihood_single_state);
     RUN_TEST(test_hmm_likelihood_two_states);
     RUN_TEST(test_hmm_likelihood_mute_state);
+    RUN_TEST(test_hmm_viterbi_no_state);
     RUN_TEST(test_hmm_viterbi_mute_states);
     RUN_TEST(test_hmm_viterbi_normal_states);
     return UNITY_END();
@@ -289,27 +291,52 @@ void test_hmm_likelihood_mute_state(void)
     imm_abc_destroy(abc);
 }
 
+/* printf("\n"); */
+/* printf("score: %.12f\n", imm_hmm_viterbi(hmm, "", state_id0)); */
+/* printf("score: %.12f\n", imm_hmm_viterbi(hmm, "", state_id1)); */
+
+void test_hmm_viterbi_no_state(void)
+{
+    struct imm_abc *abc = imm_abc_create("ACGT");
+    struct imm_hmm *hmm = imm_hmm_create(abc);
+
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "", 0));
+
+    imm_hmm_destroy(hmm);
+    imm_abc_destroy(abc);
+}
+
 void test_hmm_viterbi_mute_states(void)
 {
-    /* struct imm_abc *abc = imm_abc_create("ACGT"); */
-    /* struct imm_hmm *hmm = imm_hmm_create(abc); */
+    struct imm_abc *abc = imm_abc_create("ACGT");
+    struct imm_hmm *hmm = imm_hmm_create(abc);
 
-    /* struct imm_mute_state *state0 = imm_mute_state_create("State0", abc); */
+    struct imm_mute_state *state0 = imm_mute_state_create("State0", abc);
 
-    /* int state_id0 = imm_hmm_add_state(hmm, imm_mute_state_cast_c(state0), log(0.5)); */
+    int state_id0 = imm_hmm_add_state(hmm, imm_mute_state_cast_c(state0), log(0.5));
 
-    /* imm_hmm_set_trans(hmm, state_id0, state_id0, log(0.1)); */
+    imm_hmm_set_trans(hmm, state_id0, state_id0, log(0.1));
 
-    /* printf("score: %.12f\n", imm_hmm_viterbi(hmm, "A", 1, state_id0)); */
+    TEST_ASSERT_EQUAL_DOUBLE(-0.693147180560, imm_hmm_viterbi(hmm, "", state_id0));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "A", state_id0));
 
-    /* /1* TEST_ASSERT_EQUAL_DOUBLE(-1.386294361120, imm_hmm_viterbi(hmm, "A", 1, state_id0)); *1/ */
-    /* /1* TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "A", 1, state_id0)); *1/ */
+    struct imm_mute_state *state1 = imm_mute_state_create("State1", abc);
+    int state_id1 = imm_hmm_add_state(hmm, imm_mute_state_cast_c(state1), log(0.2));
 
-    /* /1* imm_hmm_normalize(hmm); *1/ */
+    imm_hmm_set_trans(hmm, state_id0, state_id1, log(0.2));
 
-    /* imm_hmm_destroy(hmm); */
-    /* imm_mute_state_destroy(state0); */
-    /* imm_abc_destroy(abc); */
+    TEST_ASSERT_EQUAL_DOUBLE(-0.693147180560, imm_hmm_viterbi(hmm, "", state_id0));
+    TEST_ASSERT_EQUAL_DOUBLE(-1.609437912434, imm_hmm_viterbi(hmm, "", state_id1));
+
+    TEST_ASSERT_EQUAL_INT(0, imm_hmm_set_start_lprob(hmm, state_id1, -INFINITY));
+
+    TEST_ASSERT_EQUAL_DOUBLE(-0.693147180560, imm_hmm_viterbi(hmm, "", state_id0));
+    TEST_ASSERT_EQUAL_DOUBLE(-2.302585092994, imm_hmm_viterbi(hmm, "", state_id1));
+
+    imm_hmm_destroy(hmm);
+    imm_mute_state_destroy(state0);
+    imm_mute_state_destroy(state1);
+    imm_abc_destroy(abc);
 }
 
 void test_hmm_viterbi_normal_states(void)
@@ -349,6 +376,49 @@ void test_hmm_viterbi_normal_states(void)
 
     TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "AGTC", state_id0));
     TEST_ASSERT_EQUAL_DOUBLE(-6.303991659557, imm_hmm_viterbi(hmm, "AGTC", state_id1));
+
+    imm_hmm_set_trans(hmm, state_id0, state_id0, -INFINITY);
+    imm_hmm_set_trans(hmm, state_id0, state_id1, -INFINITY);
+    imm_hmm_set_trans(hmm, state_id1, state_id0, -INFINITY);
+    imm_hmm_set_trans(hmm, state_id1, state_id1, -INFINITY);
+
+    imm_hmm_set_start_lprob(hmm, state_id0, -INFINITY);
+    imm_hmm_set_start_lprob(hmm, state_id1, -INFINITY);
+
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "", state_id0));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "", state_id1));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "A", state_id0));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "A", state_id1));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "AA", state_id0));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "AA", state_id1));
+
+    imm_hmm_set_start_lprob(hmm, state_id0, 0.0);
+
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "", state_id0));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "", state_id1));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.25), imm_hmm_viterbi(hmm, "A", state_id0));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "A", state_id1));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "AA", state_id0));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "AA", state_id1));
+
+    imm_hmm_set_trans(hmm, state_id0, state_id0, log(0.9));
+
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "", state_id0));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "", state_id1));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.25), imm_hmm_viterbi(hmm, "A", state_id0));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "A", state_id1));
+    TEST_ASSERT_EQUAL_DOUBLE(2 * log(0.25) + log(0.9), imm_hmm_viterbi(hmm, "AA", state_id0));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "AA", state_id1));
+
+    imm_hmm_set_trans(hmm, state_id0, state_id1, log(0.2));
+
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "", state_id0));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "", state_id1));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.25), imm_hmm_viterbi(hmm, "A", state_id0));
+    TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "A", state_id1));
+    TEST_ASSERT_EQUAL_DOUBLE(2 * log(0.25) + log(0.9), imm_hmm_viterbi(hmm, "AA", state_id0));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.25) + log(0.5 / 2.25) + log(0.2),
+                             imm_hmm_viterbi(hmm, "AA", state_id1));
 
     imm_hmm_destroy(hmm);
     imm_normal_state_destroy(state0);

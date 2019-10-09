@@ -67,6 +67,16 @@ const struct imm_state *imm_hmm_get_state(const struct imm_hmm *hmm, int state_i
     return mm_state_get_state(mm_state);
 }
 
+int imm_hmm_set_start_lprob(struct imm_hmm *hmm, int state_id, double start_lprob)
+{
+    struct mm_state *mm_state = mm_state_find(hmm->mm_states, state_id);
+    if (!mm_state)
+        return 1;
+
+    mm_state_set_start_lprob(mm_state, start_lprob);
+    return 0;
+}
+
 int imm_hmm_set_trans(struct imm_hmm *hmm, int src_state_id, int dst_state_id, double lprob)
 {
     struct mm_state *src = mm_state_find(hmm->mm_states, src_state_id);
