@@ -13,6 +13,7 @@ void test_hmm_viterbi_no_state(void);
 void test_hmm_viterbi_mute_states(void);
 void test_hmm_viterbi_normal_states(void);
 void test_hmm_viterbi_profile1(void);
+void test_hmm_viterbi_profile2(void);
 
 int main(void)
 {
@@ -27,6 +28,7 @@ int main(void)
     RUN_TEST(test_hmm_viterbi_mute_states);
     RUN_TEST(test_hmm_viterbi_normal_states);
     RUN_TEST(test_hmm_viterbi_profile1);
+    RUN_TEST(test_hmm_viterbi_profile2);
     return UNITY_END();
 }
 
@@ -489,3 +491,80 @@ void test_hmm_viterbi_profile1(void)
     imm_mute_state_destroy(end);
     imm_abc_destroy(abc);
 }
+
+void test_hmm_viterbi_profile2(void)
+{
+    struct imm_abc *abc = imm_abc_create("ABCD");
+    struct imm_hmm *hmm = imm_hmm_create(abc);
+
+    struct imm_mute_state *start = imm_mute_state_create("START", abc);
+
+    double ins_lprobs[] = {log(0.1), log(0.1), log(0.1), log(0.7)};
+
+    double M0_lprobs[] = {log(0.4), -INFINITY, log(0.6), -INFINITY};
+    double M1_lprobs[] = {log(0.6), -INFINITY, log(0.4), -INFINITY};
+    double M2_lprobs[] = {0, 0, 0, 0};
+
+    struct imm_normal_state *M0 = imm_normal_state_create("M0", abc, M0_lprobs);
+    struct imm_normal_state *I0 = imm_normal_state_create("I0", abc, ins_lprobs);
+
+    struct imm_mute_state *D1 = imm_mute_state_create("D1", abc);
+    struct imm_normal_state *M1 = imm_normal_state_create("M1", abc, M1_lprobs);
+    struct imm_normal_state *I1 = imm_normal_state_create("I1", abc, ins_lprobs);
+
+    struct imm_mute_state *D2 = imm_mute_state_create("D2", abc);
+    struct imm_normal_state *M2 = imm_normal_state_create("M2", abc, M2_lprobs);
+
+    struct imm_mute_state *end = imm_mute_state_create("END", abc);
+
+    int start_id = imm_hmm_add_state(hmm, imm_mute_state_cast_c(start), 0.0);
+
+    int M0_id = imm_hmm_add_state(hmm, imm_normal_state_cast_c(M0), -INFINITY);
+    int I0_id = imm_hmm_add_state(hmm, imm_normal_state_cast_c(I0), -INFINITY);
+
+    int D1_id = imm_hmm_add_state(hmm, imm_mute_state_cast_c(D1), -INFINITY);
+    int M1_id = imm_hmm_add_state(hmm, imm_normal_state_cast_c(M1), -INFINITY);
+    int I1_id = imm_hmm_add_state(hmm, imm_normal_state_cast_c(I1), -INFINITY);
+
+    int D2_id = imm_hmm_add_state(hmm, imm_mute_state_cast_c(D2), -INFINITY);
+    int M2_id = imm_hmm_add_state(hmm, imm_normal_state_cast_c(M2), -INFINITY);
+
+    int end_id = imm_hmm_add_state(hmm, imm_mute_state_cast_c(end), -INFINITY);
+
+    imm_hmm_set_trans(hmm, start_id, M0_id, 0.0);
+    imm_hmm_set_trans(hmm, start_id, M1_id, 0.0);
+    imm_hmm_set_trans(hmm, start_id, M2_id, 0.0);
+    imm_hmm_set_trans(hmm, M0_id, M1_id, 0.0);
+    imm_hmm_set_trans(hmm, M0_id, M2_id, 0.0);
+    imm_hmm_set_trans(hmm, M0_id, end_id, 0.0);
+    imm_hmm_set_trans(hmm, M1_id, M2_id, 0.0);
+    imm_hmm_set_trans(hmm, M1_id, end_id, 0.0);
+    imm_hmm_set_trans(hmm, M2_id, end_id, 0.0);
+
+    imm_hmm_set_trans(hmm, M0_id, I0_id, log(0.2));
+    imm_hmm_set_trans(hmm, M0_id, D1_id, log(0.1));
+    imm_hmm_set_trans(hmm, I0_id, I0_id, log(0.5));
+    imm_hmm_set_trans(hmm, I0_id, M1_id, log(0.5));
+
+    imm_hmm_set_trans(hmm, M1_id, D2_id, log(0.1));
+    imm_hmm_set_trans(hmm, M1_id, I1_id, log(0.2));
+    imm_hmm_set_trans(hmm, I1_id, I1_id, log(0.5));
+    imm_hmm_set_trans(hmm, I1_id, M2_id, log(0.5));
+    imm_hmm_set_trans(hmm, D1_id, D2_id, log(0.3));
+    imm_hmm_set_trans(hmm, D1_id, M2_id, log(0.7));
+
+    imm_hmm_set_trans(hmm, D2_id, end_id, log(1.0));
+
+    imm_hmm_destroy(hmm);
+    imm_mute_state_destroy(start);
+    imm_normal_state_destroy(M0);
+    imm_normal_state_destroy(I0);
+    imm_mute_state_destroy(D1);
+    imm_normal_state_destroy(M1);
+    imm_normal_state_destroy(I1);
+    imm_mute_state_destroy(D2);
+    imm_normal_state_destroy(M2);
+    imm_mute_state_destroy(end);
+    imm_abc_destroy(abc);
+}
+
