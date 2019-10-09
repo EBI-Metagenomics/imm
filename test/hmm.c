@@ -503,7 +503,7 @@ void test_hmm_viterbi_profile2(void)
 
     double M0_lprobs[] = {log(0.4), -INFINITY, log(0.6), -INFINITY};
     double M1_lprobs[] = {log(0.6), -INFINITY, log(0.4), -INFINITY};
-    double M2_lprobs[] = {0, 0, 0, 0};
+    double M2_lprobs[] = {log(0.05), log(0.05), log(0.05), log(0.05)};
 
     struct imm_normal_state *M0 = imm_normal_state_create("M0", abc, M0_lprobs);
     struct imm_normal_state *I0 = imm_normal_state_create("I0", abc, ins_lprobs);
@@ -554,6 +554,37 @@ void test_hmm_viterbi_profile2(void)
     imm_hmm_set_trans(hmm, D1_id, M2_id, log(0.7));
 
     imm_hmm_set_trans(hmm, D2_id, end_id, log(1.0));
+
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.05), imm_hmm_viterbi(hmm, "A", M2_id));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.05), imm_hmm_viterbi(hmm, "B", M2_id));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.05), imm_hmm_viterbi(hmm, "C", M2_id));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.05), imm_hmm_viterbi(hmm, "D", M2_id));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.6), imm_hmm_viterbi(hmm, "A", end_id));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.05), imm_hmm_viterbi(hmm, "B", end_id));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.6), imm_hmm_viterbi(hmm, "C", end_id));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.05), imm_hmm_viterbi(hmm, "D", end_id));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.6), imm_hmm_viterbi(hmm, "A", M1_id));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.4), imm_hmm_viterbi(hmm, "C", M1_id));
+
+    TEST_ASSERT_EQUAL_DOUBLE(2 * log(0.6), imm_hmm_viterbi(hmm, "CA", end_id));
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.6) + log(0.2) + log(0.7), imm_hmm_viterbi(hmm, "CD", I0_id));
+
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.6) + log(0.2) + 3 * log(0.7) + 3 * log(0.5) + log(0.6),
+                             imm_hmm_viterbi(hmm, "CDDDA", end_id));
+
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.6) + log(0.2) + 3 * log(0.7) + 3 * log(0.5) + log(0.6) +
+                                 log(0.05),
+                             imm_hmm_viterbi(hmm, "CDDDAB", end_id));
+
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.6) + log(0.2) + 3 * log(0.7) + 3 * log(0.5) + log(0.6) +
+                                 log(0.2) + log(0.1) + log(0.5) + log(0.05),
+                             imm_hmm_viterbi(hmm, "CDDDABA", M2_id));
+    
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.6) + log(0.2) + 5 * log(0.5) + 3 * log(0.7) + 2 * log(0.1) + log(0.6),
+                             imm_hmm_viterbi(hmm, "CDDDABA", M1_id));
+
+    TEST_ASSERT_EQUAL_DOUBLE(log(0.6) + log(0.2) + 5 * log(0.5) + 3 * log(0.7) + 2 * log(0.1) + log(0.6),
+                             imm_hmm_viterbi(hmm, "CDDDABA", end_id));
 
     imm_hmm_destroy(hmm);
     imm_mute_state_destroy(start);
