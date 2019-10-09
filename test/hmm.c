@@ -9,7 +9,8 @@ void test_hmm_set_trans(void);
 void test_hmm_likelihood_single_state(void);
 void test_hmm_likelihood_two_states(void);
 void test_hmm_likelihood_mute_state(void);
-void test_hmm_viterbi(void);
+void test_hmm_viterbi_mute_states(void);
+void test_hmm_viterbi_normal_states(void);
 
 int main(void)
 {
@@ -20,7 +21,8 @@ int main(void)
     RUN_TEST(test_hmm_likelihood_single_state);
     RUN_TEST(test_hmm_likelihood_two_states);
     RUN_TEST(test_hmm_likelihood_mute_state);
-    RUN_TEST(test_hmm_viterbi);
+    RUN_TEST(test_hmm_viterbi_mute_states);
+    RUN_TEST(test_hmm_viterbi_normal_states);
     return UNITY_END();
 }
 
@@ -287,7 +289,30 @@ void test_hmm_likelihood_mute_state(void)
     imm_abc_destroy(abc);
 }
 
-void test_hmm_viterbi(void)
+void test_hmm_viterbi_mute_states(void)
+{
+    /* struct imm_abc *abc = imm_abc_create("ACGT"); */
+    /* struct imm_hmm *hmm = imm_hmm_create(abc); */
+
+    /* struct imm_mute_state *state0 = imm_mute_state_create("State0", abc); */
+
+    /* int state_id0 = imm_hmm_add_state(hmm, imm_mute_state_cast_c(state0), log(0.5)); */
+
+    /* imm_hmm_set_trans(hmm, state_id0, state_id0, log(0.1)); */
+
+    /* printf("score: %.12f\n", imm_hmm_viterbi(hmm, "A", 1, state_id0)); */
+
+    /* /1* TEST_ASSERT_EQUAL_DOUBLE(-1.386294361120, imm_hmm_viterbi(hmm, "A", 1, state_id0)); *1/ */
+    /* /1* TEST_ASSERT_DOUBLE_IS_NEG_INF(imm_hmm_viterbi(hmm, "A", 1, state_id0)); *1/ */
+
+    /* /1* imm_hmm_normalize(hmm); *1/ */
+
+    /* imm_hmm_destroy(hmm); */
+    /* imm_mute_state_destroy(state0); */
+    /* imm_abc_destroy(abc); */
+}
+
+void test_hmm_viterbi_normal_states(void)
 {
     struct imm_abc *abc = imm_abc_create("ACGT");
     struct imm_hmm *hmm = imm_hmm_create(abc);
