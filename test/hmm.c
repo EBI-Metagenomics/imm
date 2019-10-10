@@ -162,7 +162,7 @@ void test_hmm_likelihood_single_state(void)
     cass_condition(isnan(imm_hmm_likelihood(hmm, "A", NULL)));
     cass_condition(isnan(imm_hmm_likelihood(hmm, NULL, NULL)));
 
-    cass_condition( imm_hmm_normalize(hmm) == -1);
+    cass_condition(imm_hmm_normalize(hmm) == -1);
     imm_hmm_set_trans(hmm, state_id, state_id, -INFINITY);
     cass_condition(imm_hmm_normalize(hmm) == -1);
     imm_hmm_set_trans(hmm, state_id, state_id, log(0.5));
@@ -454,24 +454,24 @@ void test_hmm_viterbi_profile1(void)
     imm_hmm_set_trans(hmm, I0_id, I0_id, log(0.2));
     imm_hmm_set_trans(hmm, I0_id, end_id, log(1.0));
 
-    cass_close(log(0.1) + log(1.0), imm_hmm_viterbi(hmm, "", end_id));
-    cass_close(log(0.1), imm_hmm_viterbi(hmm, "", D0_id));
-    cass_close(log(1.0), imm_hmm_viterbi(hmm, "", start_id));
+    cass_close(imm_hmm_viterbi(hmm, "", end_id), log(0.1) + log(1.0));
+    cass_close(imm_hmm_viterbi(hmm, "", D0_id), log(0.1));
+    cass_close(imm_hmm_viterbi(hmm, "", start_id), log(1.0));
 
     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", M0_id)));
     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "A", start_id)));
     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "A", D0_id)));
     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "A", I0_id)));
-    cass_close(log(0.5) + log(0.4), imm_hmm_viterbi(hmm, "A", M0_id));
-    cass_close(log(0.5) + log(0.4) + log(0.8), imm_hmm_viterbi(hmm, "A", end_id));
-    cass_close(log(0.5) + log(0.2), imm_hmm_viterbi(hmm, "B", M0_id));
-    cass_close(log(0.5) + log(0.2) + log(0.8), imm_hmm_viterbi(hmm, "B", end_id));
+    cass_close(imm_hmm_viterbi(hmm, "A", M0_id), log(0.5) + log(0.4));
+    cass_close(imm_hmm_viterbi(hmm, "A", end_id), log(0.5) + log(0.4) + log(0.8));
+    cass_close(imm_hmm_viterbi(hmm, "B", M0_id), log(0.5) + log(0.2));
+    cass_close(imm_hmm_viterbi(hmm, "B", end_id), log(0.5) + log(0.2) + log(0.8));
 
     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "AA", M0_id)));
-    cass_close(log(0.5) + log(0.4) + log(0.1) + log(0.5), imm_hmm_viterbi(hmm, "AA", end_id));
-    cass_close(log(0.5) + log(0.4) + log(0.1) + log(0.5), imm_hmm_viterbi(hmm, "AA", end_id));
-    cass_close(log(0.5) + log(0.4) + log(0.1) + log(0.2) + 2 * log(0.5),
-               imm_hmm_viterbi(hmm, "AAB", end_id));
+    cass_close(imm_hmm_viterbi(hmm, "AA", end_id), log(0.5) + log(0.4) + log(0.1) + log(0.5));
+    cass_close(imm_hmm_viterbi(hmm, "AA", end_id), log(0.5) + log(0.4) + log(0.1) + log(0.5));
+    cass_close(imm_hmm_viterbi(hmm, "AAB", end_id),
+               log(0.5) + log(0.4) + log(0.1) + log(0.2) + 2 * log(0.5));
 
     imm_hmm_destroy(hmm);
     imm_mute_state_destroy(start);
