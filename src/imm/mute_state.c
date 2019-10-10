@@ -21,16 +21,6 @@ struct imm_state *imm_mute_state_create(const char *name, const struct imm_abc *
     return state->interface;
 }
 
-/* struct imm_state *imm_mute_state_cast(struct imm_mute_state *state) */
-/* { */
-/*     return state->interface; */
-/* } */
-
-/* const struct imm_state *imm_mute_state_cast_c(const struct imm_mute_state *state) */
-/* { */
-/*     return state->interface; */
-/* } */
-
 void imm_mute_state_destroy(struct imm_state *state)
 {
     if (!state)

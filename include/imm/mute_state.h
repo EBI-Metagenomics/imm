@@ -10,7 +10,4 @@ IMM_API struct imm_state *imm_mute_state_create(const char *name,
                                                      const struct imm_abc *abc);
 IMM_API void imm_mute_state_destroy(struct imm_state *state);
 
-/* IMM_API struct imm_state *imm_mute_state_cast(struct imm_state *state); */
-/* IMM_API const struct imm_state *imm_mute_state_cast_c(const struct imm_state *state); */
-
 #endif

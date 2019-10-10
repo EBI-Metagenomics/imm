@@ -37,16 +37,6 @@ struct imm_state *imm_table_state_create(const char *name, const struct imm_abc 
     return state->interface;
 }
 
-/* struct imm_state *imm_table_state_cast(struct imm_table_state *state) */
-/* { */
-/*     return state->interface; */
-/* } */
-
-/* const struct imm_state *imm_table_state_cast_c(const struct imm_table_state *state) */
-/* { */
-/*     return state->interface; */
-/* } */
-
 void imm_table_state_destroy(struct imm_state *state)
 {
     if (!state)
