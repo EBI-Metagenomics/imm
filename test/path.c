@@ -1,13 +1,12 @@
 #include "imm.h"
-#include "unity.h"
+#include "cass/cass.h"
 
 void test_path(void);
 
 int main(void)
 {
-    UNITY_BEGIN();
-    RUN_TEST(test_path);
-    return UNITY_END();
+    test_path();
+    return cass_status();
 }
 
 void test_path(void)

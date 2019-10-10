@@ -83,7 +83,7 @@ endif()
 target_compile_definitions(imm PUBLIC IMM_API_EXPORTS)
 imm_sanitizer_add_target(imm)
 
-imm_enable_testing()
+enable_testing()
 
 imm_add_test(abc imm)
 imm_add_test(state imm)
