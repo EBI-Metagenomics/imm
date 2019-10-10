@@ -3,7 +3,7 @@
 
 struct state_idx
 {
-    int state_id;
+    const struct imm_state* state;
     int idx;
     UT_hash_handle hh;
 };
@@ -16,7 +16,7 @@ void state_idx_destroy(struct state_idx **head_ptr)
     if (*head_ptr) {
         HASH_ITER(hh, *head_ptr, state_idx, tmp)
         {
-            state_idx->state_id = -1;
+            state_idx->state = NULL;
             state_idx->idx = -1;
             HASH_DEL(*head_ptr, state_idx);
             free(state_idx);
@@ -25,17 +25,17 @@ void state_idx_destroy(struct state_idx **head_ptr)
     *head_ptr = NULL;
 }
 
-void state_idx_add(struct state_idx **head_ptr, int state_id, int idx)
+void state_idx_add(struct state_idx **head_ptr, const struct imm_state* state, int idx)
 {
     struct state_idx *state_idx = malloc(sizeof(struct state_idx));
-    state_idx->state_id = state_id;
+    state_idx->state = state;
     state_idx->idx = idx;
-    HASH_ADD_INT(*head_ptr, state_id, state_idx);
+    HASH_ADD_PTR(*head_ptr, state, state_idx);
 }
 
-int state_idx_find(const struct state_idx *head, int state_id)
+int state_idx_find(const struct state_idx *head, const struct imm_state* state)
 {
     struct state_idx *state_idx = NULL;
-    HASH_FIND_INT(head, &state_id, state_idx);
+    HASH_FIND_PTR(head, &state, state_idx);
     return state_idx->idx;
 }

@@ -29,7 +29,6 @@ struct state_info
     int min_seq;
     int max_seq;
     int col;
-    int state_id;
 };
 
 HIDE double get_score(const struct dp *dp, int row, int state_idx, int seq_len);
@@ -64,9 +63,9 @@ struct dp *dp_create(const struct mm_state *mm_states, const char *seq)
         dp->states[i].col = next_col;
         next_col += dp->states[i].max_seq - dp->states[i].min_seq + 1;
 
-        dp->states[i].state_id = mm_state_get_id(mm_state);
+        dp->states[i].state = mm_state_get_state(mm_state);
 
-        state_idx_add(&state_idx, dp->states[i].state_id, i);
+        state_idx_add(&state_idx, dp->states[i].state, i);
         mm_state = mm_state_next_c(mm_state);
     }
 
@@ -79,7 +78,7 @@ struct dp *dp_create(const struct mm_state *mm_states, const char *seq)
     return dp;
 }
 
-double dp_viterbi(struct dp *dp, int end_state_id)
+double dp_viterbi(struct dp *dp, const struct imm_state *end_state)
 {
     for (int r = 0; r <= dp->seq_len; ++r) {
         const char *seq = dp->seq + r;
@@ -100,7 +99,7 @@ double dp_viterbi(struct dp *dp, int end_state_id)
     double score = -INFINITY;
     for (int i = 0; i < dp->nstates; ++i) {
         const struct state_info *cur = dp->states + i;
-        if (cur->state_id == end_state_id) {
+        if (cur->state == end_state) {
 
             for (int len = MIN(cur->max_seq, dp->seq_len); cur->min_seq <= len; --len) {
                 score = MAX(score, get_score(dp, dp->seq_len - len, i, len));
@@ -176,11 +175,11 @@ struct matrix *create_trans(const struct mm_state *mm_states,
 
     for (const struct mm_state *s = mm_states; s; s = mm_state_next_c(s)) {
 
-        int src = state_idx_find(state_idx, mm_state_get_id(s));
+        int src = state_idx_find(state_idx, mm_state_get_state(s));
         const struct mm_trans *t = NULL;
         for (t = mm_state_get_trans_c(s); t; t = mm_trans_next_c(t)) {
 
-            int dst = state_idx_find(state_idx, mm_trans_get_id(t));
+            int dst = state_idx_find(state_idx, mm_trans_get_state(t));
             matrix_set(trans, src, dst, mm_trans_get_lprob(t));
         }
     }
