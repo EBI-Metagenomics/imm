@@ -19,7 +19,7 @@ int main(void)
 {
     test_hmm_state_id();
     test_hmm_del_get_state();
-    /* test_hmm_set_trans(); */
+    test_hmm_set_trans();
     /* test_hmm_likelihood_single_state(); */
     /* test_hmm_likelihood_two_states(); */
     /* test_hmm_likelihood_mute_state(); */
@@ -72,32 +72,29 @@ void test_hmm_del_get_state(void)
     imm_abc_destroy(abc);
 }
 
-/* void test_hmm_set_trans(void) */
-/* { */
+void test_hmm_set_trans(void)
+{
 
-/*     struct imm_abc *abc = imm_abc_create("ACGT"); */
-/*     struct imm_mute_state *state0 = imm_mute_state_create("State0", abc); */
-/*     struct imm_mute_state *state1 = imm_mute_state_create("State1", abc); */
-/*     struct imm_hmm *hmm = imm_hmm_create(abc); */
+    struct imm_abc *abc = imm_abc_create("ACGT");
+    struct imm_mute_state *state0 = imm_mute_state_create("State0", abc);
+    struct imm_mute_state *state1 = imm_mute_state_create("State1", abc);
+    struct imm_hmm *hmm = imm_hmm_create(abc);
 
-/*     const struct imm_state *s0 = imm_mute_state_cast_c(state0); */
-/*     const struct imm_state *s1 = imm_mute_state_cast_c(state1); */
+    const struct imm_state *s0 = imm_mute_state_cast_c(state0);
+    const struct imm_state *s1 = imm_mute_state_cast_c(state1);
 
-/*     int state_id0 = imm_hmm_add_state(hmm, s0, log(0.5)); */
-/*     int state_id1 = imm_hmm_add_state(hmm, s1, log(0.5)); */
+    imm_hmm_add_state(hmm, s0, log(0.5));
+    imm_hmm_add_state(hmm, s1, log(0.5));
 
-/*     cass_condition(imm_hmm_get_state(hmm, state_id0) != NULL); */
-/*     cass_condition(imm_hmm_get_state(hmm, state_id1) != NULL); */
+    cass_condition(imm_hmm_set_trans(hmm, s0, NULL, log(0.5)) == 1);
+    cass_condition(imm_hmm_set_trans(hmm, NULL, s1, log(0.5)) == 1);
+    cass_condition(imm_hmm_set_trans(hmm, s0, s1, log(0.5)) == 0);
 
-/*     cass_condition(imm_hmm_set_trans(hmm, state_id0, 5, log(0.5)) == -1); */
-/*     cass_condition(imm_hmm_set_trans(hmm, 5, state_id1, log(0.5)) == -1); */
-/*     cass_condition(imm_hmm_set_trans(hmm, state_id0, state_id1, log(0.5)) == 0); */
-
-/*     imm_hmm_destroy(hmm); */
-/*     imm_mute_state_destroy(state0); */
-/*     imm_mute_state_destroy(state1); */
-/*     imm_abc_destroy(abc); */
-/* } */
+    imm_hmm_destroy(hmm);
+    imm_mute_state_destroy(state0);
+    imm_mute_state_destroy(state1);
+    imm_abc_destroy(abc);
+}
 
 /* void test_hmm_likelihood_single_state(void) */
 /* { */

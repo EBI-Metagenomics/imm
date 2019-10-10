@@ -74,12 +74,12 @@ int imm_hmm_set_trans(struct imm_hmm *hmm, const struct imm_state *src_state,
     struct mm_state *src = mm_state_find(hmm->mm_states, src_state);
     if (!src) {
         imm_error("source state not found");
-        return -1;
+        return 1;
     }
 
     if (!mm_state_find_c(hmm->mm_states, dst_state)) {
         imm_error("destination state not found");
-        return -1;
+        return 1;
     }
 
     struct mm_trans **head_ptr = mm_state_get_trans_ptr(src);
@@ -179,12 +179,12 @@ double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq,
 int imm_hmm_normalize(struct imm_hmm *hmm)
 {
     if (hmm_normalize_start(hmm))
-        return -1;
+        return 1;
 
     struct mm_state *mm_state = hmm->mm_states;
     while (mm_state) {
         if (hmm_normalize_trans(mm_state))
-            return -1;
+            return 1;
         mm_state = mm_state_next(mm_state);
     }
     return 0;
@@ -228,7 +228,7 @@ int hmm_normalize_start(struct imm_hmm *hmm)
 
     if (!isfinite(lnorm)) {
         imm_error("no starting state is possible");
-        return -1;
+        return 1;
     }
 
     struct mm_state *t = hmm->mm_states;
@@ -252,7 +252,7 @@ int hmm_normalize_trans(struct mm_state *mm_state)
 
     if (!isfinite(lnorm)) {
         imm_error("a state has no transition");
-        return -1;
+        return 1;
     }
 
     struct mm_trans *t = mm_state_get_trans(mm_state);
