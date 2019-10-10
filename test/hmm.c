@@ -295,10 +295,6 @@ void test_hmm_likelihood_mute_state(void)
     imm_abc_destroy(abc);
 }
 
-/* printf("\n"); */
-/* printf("score: %.12f\n", imm_hmm_viterbi(hmm, "", state_id0)); */
-/* printf("score: %.12f\n", imm_hmm_viterbi(hmm, "", state_id1)); */
-
 void test_hmm_viterbi_no_state(void)
 {
     struct imm_abc *abc = imm_abc_create("ACGT");

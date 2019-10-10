@@ -42,6 +42,7 @@ set(IMM_PRIVATE_HEADERS
     include/imm/api.h
     include/imm/hmm.h
     include/imm/log.h
+    include/imm/math.h
     include/imm/mute_state.h
     include/imm/normal_state.h
     include/imm/path.h
@@ -56,16 +57,17 @@ set(IMM_SOURCES
     src/imm/dp.c
     src/imm/hmm.c
     src/imm/log.c
+    src/imm/math.c
     src/imm/matrix.c
+    src/imm/mm_state.c
+    src/imm/mm_trans.c
+    src/imm/mute_state.c
     src/imm/normal_state.c
     src/imm/path.c
     src/imm/report.c
-    src/imm/mute_state.c
     src/imm/state.c
     src/imm/state_idx.c
     src/imm/table_state.c
-    src/imm/mm_state.c
-    src/imm/mm_trans.c
 )
 
 add_library(immobj OBJECT ${IMM_SOURCES})
