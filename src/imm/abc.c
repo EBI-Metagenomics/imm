@@ -1,15 +1,15 @@
 #include "src/imm/abc.h"
 #include "src/imm/hide.h"
-#include "src/rapidstring/rapidstring.h"
 #include <limits.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define SYMBOL_ID_MIN 0
 #define SYMBOL_ID_MAX 127
 
 struct imm_abc
 {
-    rapidstring symbols;
+    const char *symbols;
     int symbol_idx[SYMBOL_ID_MAX + 1];
 };
 
@@ -21,25 +21,26 @@ struct imm_abc *imm_abc_create(const char *symbols)
     if (check_symbols_length(symbols))
         return NULL;
 
-    struct imm_abc *a = malloc(sizeof(struct imm_abc));
+    struct imm_abc *abc = malloc(sizeof(struct imm_abc));
 
-    rs_init_w(&a->symbols, symbols);
+    abc->symbols = strdup(symbols);
 
     for (int i = 0; i <= SYMBOL_ID_MAX; ++i)
-        a->symbol_idx[i] = -1;
+        abc->symbol_idx[i] = -1;
 
-    const char *ids = rs_data_c(&a->symbols);
-    for (int idx = 0; idx < (int)rs_len(&a->symbols); ++idx) {
+    const char *ids = abc->symbols;
+    int len = (int)strlen(abc->symbols);
+    for (int idx = 0; idx < len; ++idx) {
         if (check_symbol_id(ids[idx])) {
-            rs_free(&a->symbols);
-            free(a);
+            free((char *)abc->symbols);
+            free(abc);
             return NULL;
         }
 
-        a->symbol_idx[(int)ids[idx]] = idx;
+        abc->symbol_idx[(int)ids[idx]] = idx;
     }
 
-    return a;
+    return abc;
 }
 
 void imm_abc_destroy(struct imm_abc *abc)
@@ -47,11 +48,11 @@ void imm_abc_destroy(struct imm_abc *abc)
     if (!abc)
         return;
 
-    rs_free(&abc->symbols);
+    free((char *)abc->symbols);
     free(abc);
 }
 
-int abc_length(const struct imm_abc *abc) { return (int)rs_len(&abc->symbols); }
+int abc_length(const struct imm_abc *abc) { return (int)strlen(abc->symbols); }
 
 int abc_has_symbol(const struct imm_abc *abc, char symbol_id)
 {
@@ -68,7 +69,7 @@ int abc_symbol_idx(const struct imm_abc *abc, char symbol_id)
 
 char abc_symbol_id(const struct imm_abc *abc, int symbol_idx)
 {
-    return rs_data_c(&abc->symbols)[symbol_idx];
+    return abc->symbols[symbol_idx];
 }
 
 int check_symbols_length(const char *symbols)

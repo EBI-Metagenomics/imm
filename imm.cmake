@@ -58,7 +58,6 @@ function(imm_add_test name target_lib)
     set(IMM_TESTS ${IMM_TESTS} PARENT_SCOPE)
 endfunction()
 
-
 function(imm_enable_coverage sources)
     if (CLANG_CODE_COVERAGE)
 
