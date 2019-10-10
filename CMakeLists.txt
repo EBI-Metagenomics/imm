@@ -88,6 +88,6 @@ enable_testing()
 imm_add_test(abc imm)
 imm_add_test(state imm)
 # imm_add_test(hmm imm)
-# imm_add_test(path imm)
+imm_add_test(path imm)
 
 imm_enable_coverage("${IMM_SOURCES}")
