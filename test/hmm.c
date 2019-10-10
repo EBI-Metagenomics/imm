@@ -22,10 +22,10 @@ int main(void)
     test_hmm_set_trans();
     test_hmm_likelihood_single_state();
     test_hmm_likelihood_two_states();
-    /* test_hmm_likelihood_mute_state(); */
-    /* test_hmm_viterbi_no_state(); */
-    /* test_hmm_viterbi_mute_states(); */
-    /* test_hmm_viterbi_normal_states(); */
+    test_hmm_likelihood_mute_state();
+    test_hmm_viterbi_no_state();
+    test_hmm_viterbi_mute_states();
+    test_hmm_viterbi_normal_states();
     /* test_hmm_viterbi_profile1(); */
     /* test_hmm_viterbi_profile2(); */
     return cass_status();
@@ -235,185 +235,190 @@ void test_hmm_likelihood_two_states(void)
     imm_abc_destroy(abc);
 }
 
-/* void test_hmm_likelihood_mute_state(void) */
-/* { */
-/*     struct imm_abc *abc = imm_abc_create("ACGT"); */
-/*     struct imm_hmm *hmm = imm_hmm_create(abc); */
+void test_hmm_likelihood_mute_state(void)
+{
+    struct imm_abc *abc = imm_abc_create("ACGT");
+    struct imm_hmm *hmm = imm_hmm_create(abc);
 
-/*     struct imm_mute_state *state = imm_mute_state_create("State0", abc); */
+    struct imm_mute_state *state = imm_mute_state_create("State0", abc);
 
-/*     int state_id = imm_hmm_add_state(hmm, imm_mute_state_cast_c(state), log(1.0)); */
+    const struct imm_state *s = imm_mute_state_cast_c(state);
+    imm_hmm_add_state(hmm, s, log(1.0));
 
-/*     imm_hmm_set_trans(hmm, state_id, state_id, log(0.1)); */
+    imm_hmm_set_trans(hmm, s, s, log(0.1));
 
-/*     struct imm_path *path = NULL; */
-/*     imm_path_create(&path); */
-/*     imm_path_add(&path, state_id, 1); */
-/*     cass_condition(imm_isninf(imm_hmm_likelihood(hmm, "A", path))); */
-/*     imm_path_destroy(&path); */
+    struct imm_path *path = NULL;
+    imm_path_create(&path);
+    imm_path_add(&path, s, 1);
+    cass_condition(imm_isninf(imm_hmm_likelihood(hmm, "A", path)));
+    imm_path_destroy(&path);
 
-/*     imm_path_create(&path); */
-/*     imm_path_add(&path, state_id, 1); */
-/*     cass_condition(imm_isninf(imm_hmm_likelihood(hmm, "T", path))); */
-/*     imm_path_destroy(&path); */
+    imm_path_create(&path);
+    imm_path_add(&path, s, 1);
+    cass_condition(imm_isninf(imm_hmm_likelihood(hmm, "T", path)));
+    imm_path_destroy(&path);
 
-/*     imm_path_create(&path); */
-/*     imm_path_add(&path, state_id, 1); */
-/*     cass_condition(imm_isninf(imm_hmm_likelihood(hmm, "G", path))); */
-/*     imm_path_destroy(&path); */
+    imm_path_create(&path);
+    imm_path_add(&path, s, 1);
+    cass_condition(imm_isninf(imm_hmm_likelihood(hmm, "G", path)));
+    imm_path_destroy(&path);
 
-/*     imm_path_create(&path); */
-/*     imm_path_add(&path, state_id, 1); */
-/*     cass_condition(imm_isninf(imm_hmm_likelihood(hmm, "G", path))); */
-/*     imm_path_destroy(&path); */
+    imm_path_create(&path);
+    imm_path_add(&path, s, 1);
+    cass_condition(imm_isninf(imm_hmm_likelihood(hmm, "G", path)));
+    imm_path_destroy(&path);
 
-/*     imm_path_create(&path); */
-/*     imm_path_add(&path, state_id, 1); */
-/*     imm_path_add(&path, state_id, 1); */
-/*     cass_condition(imm_isninf(imm_hmm_likelihood(hmm, "GT", path))); */
-/*     imm_path_destroy(&path); */
+    imm_path_create(&path);
+    imm_path_add(&path, s, 1);
+    imm_path_add(&path, s, 1);
+    cass_condition(imm_isninf(imm_hmm_likelihood(hmm, "GT", path)));
+    imm_path_destroy(&path);
 
-/*     imm_path_create(&path); */
-/*     imm_path_add(&path, state_id, 1); */
-/*     imm_path_add(&path, state_id, 1); */
-/*     cass_condition(imm_isninf(imm_hmm_likelihood(hmm, "GT", path))); */
-/*     imm_path_destroy(&path); */
+    imm_path_create(&path);
+    imm_path_add(&path, s, 1);
+    imm_path_add(&path, s, 1);
+    cass_condition(imm_isninf(imm_hmm_likelihood(hmm, "GT", path)));
+    imm_path_destroy(&path);
 
-/*     imm_hmm_destroy(hmm); */
-/*     imm_mute_state_destroy(state); */
-/*     imm_abc_destroy(abc); */
-/* } */
+    imm_hmm_destroy(hmm);
+    imm_mute_state_destroy(state);
+    imm_abc_destroy(abc);
+}
 
-/* void test_hmm_viterbi_no_state(void) */
-/* { */
-/*     struct imm_abc *abc = imm_abc_create("ACGT"); */
-/*     struct imm_hmm *hmm = imm_hmm_create(abc); */
+void test_hmm_viterbi_no_state(void)
+{
+    struct imm_abc *abc = imm_abc_create("ACGT");
+    struct imm_hmm *hmm = imm_hmm_create(abc);
 
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", 0))); */
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", 0)));
 
-/*     imm_hmm_destroy(hmm); */
-/*     imm_abc_destroy(abc); */
-/* } */
+    imm_hmm_destroy(hmm);
+    imm_abc_destroy(abc);
+}
 
-/* void test_hmm_viterbi_mute_states(void) */
-/* { */
-/*     struct imm_abc *abc = imm_abc_create("ACGT"); */
-/*     struct imm_hmm *hmm = imm_hmm_create(abc); */
+void test_hmm_viterbi_mute_states(void)
+{
+    struct imm_abc *abc = imm_abc_create("ACGT");
+    struct imm_hmm *hmm = imm_hmm_create(abc);
 
-/*     struct imm_mute_state *state0 = imm_mute_state_create("State0", abc); */
+    struct imm_mute_state *state0 = imm_mute_state_create("State0", abc);
 
-/*     int state_id0 = imm_hmm_add_state(hmm, imm_mute_state_cast_c(state0), log(0.5)); */
+    const struct imm_state *s0 = imm_mute_state_cast_c(state0);
+    imm_hmm_add_state(hmm, s0, log(0.5));
 
-/*     imm_hmm_set_trans(hmm, state_id0, state_id0, log(0.1)); */
+    imm_hmm_set_trans(hmm, s0, s0, log(0.1));
 
-/*     cass_close(imm_hmm_viterbi(hmm, "", state_id0), -0.693147180560); */
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "A", state_id0))); */
+    cass_close(imm_hmm_viterbi(hmm, "", s0), -0.693147180560);
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "A", s0)));
 
-/*     struct imm_mute_state *state1 = imm_mute_state_create("State1", abc); */
-/*     int state_id1 = imm_hmm_add_state(hmm, imm_mute_state_cast_c(state1), log(0.2)); */
+    struct imm_mute_state *state1 = imm_mute_state_create("State1", abc);
+    const struct imm_state *s1 = imm_mute_state_cast_c(state1);
+    imm_hmm_add_state(hmm, s1, log(0.2));
 
-/*     imm_hmm_set_trans(hmm, state_id0, state_id1, log(0.2)); */
+    imm_hmm_set_trans(hmm, s0, s1, log(0.2));
 
-/*     cass_close(imm_hmm_viterbi(hmm, "", state_id0), -0.693147180560); */
-/*     cass_close(imm_hmm_viterbi(hmm, "", state_id1), -1.609437912434); */
+    cass_close(imm_hmm_viterbi(hmm, "", s0), -0.693147180560);
+    cass_close(imm_hmm_viterbi(hmm, "", s1), -1.609437912434);
 
-/*     cass_condition(imm_hmm_set_start_lprob(hmm, state_id1, -INFINITY) == 0); */
+    cass_condition(imm_hmm_set_start_lprob(hmm, s1, -INFINITY) == 0);
 
-/*     cass_close(imm_hmm_viterbi(hmm, "", state_id0), -0.693147180560); */
-/*     cass_close(imm_hmm_viterbi(hmm, "", state_id1), -2.302585092994); */
+    cass_close(imm_hmm_viterbi(hmm, "", s0), -0.693147180560);
+    cass_close(imm_hmm_viterbi(hmm, "", s1), -2.302585092994);
 
-/*     imm_hmm_destroy(hmm); */
-/*     imm_mute_state_destroy(state0); */
-/*     imm_mute_state_destroy(state1); */
-/*     imm_abc_destroy(abc); */
-/* } */
+    imm_hmm_destroy(hmm);
+    imm_mute_state_destroy(state0);
+    imm_mute_state_destroy(state1);
+    imm_abc_destroy(abc);
+}
 
-/* void test_hmm_viterbi_normal_states(void) */
-/* { */
-/*     struct imm_abc *abc = imm_abc_create("ACGT"); */
-/*     struct imm_hmm *hmm = imm_hmm_create(abc); */
+void test_hmm_viterbi_normal_states(void)
+{
+    struct imm_abc *abc = imm_abc_create("ACGT");
+    struct imm_hmm *hmm = imm_hmm_create(abc);
 
-/*     double lprobs0[] = {log(0.25), log(0.25), log(0.5), -INFINITY}; */
-/*     struct imm_normal_state *state0 = imm_normal_state_create("State0", abc, lprobs0); */
+    double lprobs0[] = {log(0.25), log(0.25), log(0.5), -INFINITY};
+    struct imm_normal_state *state0 = imm_normal_state_create("State0", abc, lprobs0);
 
-/*     double lprobs1[] = {log(0.5), log(0.25), log(0.5), log(1.0)}; */
-/*     struct imm_normal_state *state1 = imm_normal_state_create("State1", abc, lprobs1); */
+    double lprobs1[] = {log(0.5), log(0.25), log(0.5), log(1.0)};
+    struct imm_normal_state *state1 = imm_normal_state_create("State1", abc, lprobs1);
 
-/*     int state_id0 = imm_hmm_add_state(hmm, imm_normal_state_cast_c(state0), log(1.0)); */
-/*     int state_id1 = imm_hmm_add_state(hmm, imm_normal_state_cast_c(state1), -INFINITY); */
+    const struct imm_state *s0 = imm_normal_state_cast_c(state0);
+    const struct imm_state *s1 = imm_normal_state_cast_c(state1);
 
-/*     imm_hmm_set_trans(hmm, state_id0, state_id0, log(0.1)); */
-/*     imm_hmm_set_trans(hmm, state_id0, state_id1, log(0.2)); */
-/*     imm_hmm_set_trans(hmm, state_id1, state_id1, log(1.0)); */
+    imm_hmm_add_state(hmm, s0, log(1.0));
+    imm_hmm_add_state(hmm, s1, -INFINITY);
 
-/*     cass_condition(imm_normal_state_normalize(state0) == 0); */
-/*     cass_condition(imm_normal_state_normalize(state1) == 0); */
+    imm_hmm_set_trans(hmm, s0, s0, log(0.1));
+    imm_hmm_set_trans(hmm, s0, s1, log(0.2));
+    imm_hmm_set_trans(hmm, s1, s1, log(1.0));
 
-/*     imm_hmm_normalize(hmm); */
+    cass_condition(imm_normal_state_normalize(state0) == 0);
+    cass_condition(imm_normal_state_normalize(state1) == 0);
 
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", state_id0))); */
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", state_id1))); */
+    imm_hmm_normalize(hmm);
 
-/*     cass_close(imm_hmm_viterbi(hmm, "A", state_id0), -1.386294361120); */
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "A", state_id1))); */
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", s0)));
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", s1)));
 
-/*     cass_close(imm_hmm_viterbi(hmm, "AG", state_id0), -3.178053830348); */
-/*     cass_close(imm_hmm_viterbi(hmm, "AG", state_id1), -3.295836866004); */
+    cass_close(imm_hmm_viterbi(hmm, "A", s0), -1.386294361120);
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "A", s1)));
 
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "AGT", state_id0))); */
-/*     cass_close(imm_hmm_viterbi(hmm, "AGT", state_id1), -4.106767082221); */
+    cass_close(imm_hmm_viterbi(hmm, "AG", s0), -3.178053830348);
+    cass_close(imm_hmm_viterbi(hmm, "AG", s1), -3.295836866004);
 
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "AGTC", state_id0))); */
-/*     cass_close(imm_hmm_viterbi(hmm, "AGTC", state_id1), -6.303991659557); */
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "AGT", s0)));
+    cass_close(imm_hmm_viterbi(hmm, "AGT", s1), -4.106767082221);
 
-/*     imm_hmm_set_trans(hmm, state_id0, state_id0, -INFINITY); */
-/*     imm_hmm_set_trans(hmm, state_id0, state_id1, -INFINITY); */
-/*     imm_hmm_set_trans(hmm, state_id1, state_id0, -INFINITY); */
-/*     imm_hmm_set_trans(hmm, state_id1, state_id1, -INFINITY); */
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "AGTC", s0)));
+    cass_close(imm_hmm_viterbi(hmm, "AGTC", s1), -6.303991659557);
 
-/*     imm_hmm_set_start_lprob(hmm, state_id0, -INFINITY); */
-/*     imm_hmm_set_start_lprob(hmm, state_id1, -INFINITY); */
+    imm_hmm_set_trans(hmm, s0, s0, -INFINITY);
+    imm_hmm_set_trans(hmm, s0, s1, -INFINITY);
+    imm_hmm_set_trans(hmm, s1, s0, -INFINITY);
+    imm_hmm_set_trans(hmm, s1, s1, -INFINITY);
 
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", state_id0))); */
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", state_id1))); */
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "A", state_id0))); */
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "A", state_id1))); */
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "AA", state_id0))); */
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "AA", state_id1))); */
+    imm_hmm_set_start_lprob(hmm, s0, -INFINITY);
+    imm_hmm_set_start_lprob(hmm, s1, -INFINITY);
 
-/*     imm_hmm_set_start_lprob(hmm, state_id0, 0.0); */
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", s0)));
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", s1)));
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "A", s0)));
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "A", s1)));
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "AA", s0)));
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "AA", s1)));
 
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", state_id0))); */
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", state_id1))); */
-/*     cass_close(imm_hmm_viterbi(hmm, "A", state_id0), log(0.25)); */
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "A", state_id1))); */
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "AA", state_id0))); */
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "AA", state_id1))); */
+    imm_hmm_set_start_lprob(hmm, s0, 0.0);
 
-/*     imm_hmm_set_trans(hmm, state_id0, state_id0, log(0.9)); */
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", s0)));
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", s1)));
+    cass_close(imm_hmm_viterbi(hmm, "A", s0), log(0.25));
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "A", s1)));
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "AA", s0)));
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "AA", s1)));
 
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", state_id0))); */
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", state_id1))); */
-/*     cass_close(imm_hmm_viterbi(hmm, "A", state_id0), log(0.25)); */
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "A", state_id1))); */
-/*     cass_close(imm_hmm_viterbi(hmm, "AA", state_id0), 2 * log(0.25) + log(0.9)); */
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "AA", state_id1))); */
+    imm_hmm_set_trans(hmm, s0, s0, log(0.9));
 
-/*     imm_hmm_set_trans(hmm, state_id0, state_id1, log(0.2)); */
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", s0)));
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", s1)));
+    cass_close(imm_hmm_viterbi(hmm, "A", s0), log(0.25));
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "A", s1)));
+    cass_close(imm_hmm_viterbi(hmm, "AA", s0), 2 * log(0.25) + log(0.9));
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "AA", s1)));
 
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", state_id0))); */
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", state_id1))); */
-/*     cass_close(imm_hmm_viterbi(hmm, "A", state_id0), log(0.25)); */
-/*     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "A", state_id1))); */
-/*     cass_close(imm_hmm_viterbi(hmm, "AA", state_id0), 2 * log(0.25) + log(0.9)); */
-/*     cass_close(imm_hmm_viterbi(hmm, "AA", state_id1), log(0.25) + log(0.5 / 2.25) +
- * log(0.2)); */
+    imm_hmm_set_trans(hmm, s0, s1, log(0.2));
 
-/*     imm_hmm_destroy(hmm); */
-/*     imm_normal_state_destroy(state0); */
-/*     imm_normal_state_destroy(state1); */
-/*     imm_abc_destroy(abc); */
-/* } */
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", s0)));
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "", s1)));
+    cass_close(imm_hmm_viterbi(hmm, "A", s0), log(0.25));
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "A", s1)));
+    cass_close(imm_hmm_viterbi(hmm, "AA", s0), 2 * log(0.25) + log(0.9));
+    cass_close(imm_hmm_viterbi(hmm, "AA", s1), log(0.25) + log(0.5 / 2.25) + log(0.2));
+
+    imm_hmm_destroy(hmm);
+    imm_normal_state_destroy(state0);
+    imm_normal_state_destroy(state1);
+    imm_abc_destroy(abc);
+}
 
 /* void test_hmm_viterbi_profile1(void) */
 /* { */
