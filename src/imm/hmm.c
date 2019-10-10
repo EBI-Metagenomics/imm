@@ -38,6 +38,11 @@ int imm_hmm_add_state(struct imm_hmm *hmm, const struct imm_state *state, double
         return 1;
     }
 
+    if (mm_state_find(hmm->mm_states, state) != NULL) {
+        imm_error("state already exists");
+        return 1;
+    }
+
     mm_state_add_state(&hmm->mm_states, state, start_lprob);
     return 0;
 }
