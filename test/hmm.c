@@ -33,7 +33,7 @@ int main(void)
     test_hmm_viterbi_profile1();
     test_hmm_viterbi_profile2();
     /* test_hmm_viterbi_profile_delete(); */
-    /* test_hmm_viterbi_global_profile(); */
+    test_hmm_viterbi_global_profile();
     return cass_status();
 }
 
