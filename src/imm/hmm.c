@@ -9,6 +9,7 @@
 #include "src/imm/path.h"
 #include "src/logaddexp/logaddexp.h"
 #include "src/uthash/utlist.h"
+#include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -174,6 +175,10 @@ double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq,
     const struct mm_state *const *mm_states = mm_state_sort(hmm->mm_states);
     if (!mm_states)
         return NAN;
+
+    for (int i = 0; i < mm_state_nitems(hmm->mm_states); ++i)
+        printf("%s ", imm_state_get_name(mm_state_get_state(mm_states[i])));
+    printf("\n");
 
     struct dp *dp = dp_create(mm_states, mm_state_nitems(hmm->mm_states), seq);
     double score = dp_viterbi(dp, end_state);

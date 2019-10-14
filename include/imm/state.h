@@ -3,8 +3,6 @@
 
 #include "imm/api.h"
 
-#define IMM_INVALID_STATE_ID -1
-
 struct imm_abc;
 struct imm_state;
 

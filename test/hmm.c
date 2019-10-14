@@ -16,6 +16,7 @@ void test_hmm_viterbi_profile1(void);
 void test_hmm_viterbi_profile2(void);
 void test_hmm_viterbi_profile_delete(void);
 void test_hmm_viterbi_global_profile(void);
+void test_hmm_viterbi_table_states(void);
 
 int main(void)
 {
@@ -32,6 +33,7 @@ int main(void)
     test_hmm_viterbi_profile2();
     test_hmm_viterbi_profile_delete();
     test_hmm_viterbi_global_profile();
+    test_hmm_viterbi_table_states();
     return cass_status();
 }
 
@@ -601,8 +603,8 @@ void test_hmm_viterbi_profile_delete(void)
     imm_hmm_set_trans(hmm, M, N2, log(0.5));
 
     cass_close(imm_hmm_viterbi(hmm, "A", N0), log(0.5));
-    cass_close(imm_hmm_viterbi(hmm, "A", M), 2*log(0.5));
-    cass_close(imm_hmm_viterbi(hmm, "AB", N2), 4*log(0.5));
+    cass_close(imm_hmm_viterbi(hmm, "A", M), 2 * log(0.5));
+    cass_close(imm_hmm_viterbi(hmm, "AB", N2), 4 * log(0.5));
 
     imm_hmm_destroy(hmm);
     imm_normal_state_destroy(N0);
@@ -716,5 +718,65 @@ void test_hmm_viterbi_global_profile(void)
     imm_normal_state_destroy(Z);
     imm_mute_state_destroy(E);
     imm_mute_state_destroy(end);
+    imm_abc_destroy(abc);
+}
+
+void test_hmm_viterbi_table_states(void)
+{
+    struct imm_abc *abc = imm_abc_create("ACGTX");
+    struct imm_hmm *hmm = imm_hmm_create(abc);
+
+    struct imm_state *S = imm_mute_state_create("S", abc);
+    struct imm_state *T = imm_table_state_create("T", abc);
+    imm_table_state_add(T, "", log(0.5));
+    imm_table_state_add(T, "A", log(0.1));
+    imm_table_state_add(T, "TAT", log(0.2));
+
+    struct imm_state *D = imm_mute_state_create("D", abc);
+
+    double N0_lprobs[] = {LOG0, log(0.5), log(0.5), LOG0, LOG0};
+    struct imm_state *N0 = imm_normal_state_create("N0", abc, N0_lprobs);
+
+    double N1_lprobs[] = {log(0.25), log(0.25), log(0.25), log(0.25), LOG0};
+    struct imm_state *N1 = imm_normal_state_create("N1", abc, N1_lprobs);
+
+    struct imm_state *E = imm_mute_state_create("E", abc);
+
+    double Z_lprobs[] = {LOG0, LOG0, LOG0, LOG0, log(1.0)};
+    struct imm_state *Z = imm_normal_state_create("Z", abc, Z_lprobs);
+
+    imm_hmm_add_state(hmm, S, log(1.0));
+    imm_hmm_add_state(hmm, T, LOG0);
+    imm_hmm_add_state(hmm, N0, LOG0);
+    imm_hmm_add_state(hmm, D, LOG0);
+    imm_hmm_add_state(hmm, N1, LOG0);
+    imm_hmm_add_state(hmm, E, LOG0);
+    imm_hmm_add_state(hmm, Z, LOG0);
+
+    imm_hmm_set_trans(hmm, S, T, log(1.0));
+    imm_hmm_set_trans(hmm, T, D, log(0.1));
+    imm_hmm_set_trans(hmm, T, N0, log(0.2));
+    imm_hmm_set_trans(hmm, D, N1, log(0.3));
+    imm_hmm_set_trans(hmm, N0, N1, log(0.4));
+    imm_hmm_set_trans(hmm, N1, E, log(1.0));
+    imm_hmm_set_trans(hmm, E, Z, log(0.5));
+    imm_hmm_set_trans(hmm, Z, Z, log(2.0));
+    imm_hmm_set_trans(hmm, Z, T, log(0.6));
+
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "TATX", E)));
+    cass_close(imm_hmm_viterbi(hmm, "TATA", N1), -6.502290170873972);
+    cass_close(imm_hmm_viterbi(hmm, "TATA", E), -6.502290170873972);
+    printf("\n");
+    cass_close(imm_hmm_viterbi(hmm, "TATTX", Z), -7.1954373514);
+    printf("\n");
+
+    imm_hmm_destroy(hmm);
+    imm_mute_state_destroy(S);
+    imm_table_state_destroy(T);
+    imm_mute_state_destroy(D);
+    imm_normal_state_destroy(N0);
+    imm_normal_state_destroy(N1);
+    imm_mute_state_destroy(E);
+    imm_normal_state_destroy(Z);
     imm_abc_destroy(abc);
 }

@@ -5,6 +5,7 @@
 #include "src/imm/state_idx.h"
 #include "src/uthash/uthash.h"
 #include "src/uthash/utlist.h"
+#include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
 
@@ -66,9 +67,11 @@ const struct mm_state *const *mm_state_sort(const struct mm_state *mm_state_head
     size_t nstates = (size_t)mm_state_nitems(mm_state_head);
     const struct mm_state **mm_state = malloc(sizeof(struct mm_state *) * nstates);
     const struct mm_state **cur = mm_state + nstates;
+    printf("Going to visit:\n");
     while (node_head) {
         visit(&node_head, node_head, &cur);
     }
+    printf("\nacabou\n");
 
     destroy_nodes(&node_head);
 
@@ -88,7 +91,10 @@ void create_nodes(const struct mm_state *head, struct node **nodes,
         node->mm_state = mm_state;
         node->mark = INITIAL_MARK;
         node->edges = NULL;
-        DL_PREPEND(*nodes, node);
+        if (imm_isninf(mm_state_get_start_lprob(node->mm_state)))
+            DL_APPEND(*nodes, node);
+        else
+            DL_PREPEND(*nodes, node);
 
         struct state_node *state_node = malloc(sizeof(struct state_node));
         state_node->state = node->state;
@@ -157,6 +163,8 @@ void visit(struct node **node_head, struct node *node, const struct mm_state ***
         return;
     if (node->mark == TEMPORARY_MARK)
         return;
+
+    printf("%s ", imm_state_get_name(node->state));
 
     node->mark = TEMPORARY_MARK;
     const struct edge *edge = NULL;
