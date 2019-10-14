@@ -32,7 +32,7 @@ int main(void)
     test_hmm_viterbi_normal_states();
     test_hmm_viterbi_profile1();
     test_hmm_viterbi_profile2();
-    /* dont active for now test_hmm_viterbi_profile_delete(); */
+    test_hmm_viterbi_profile_delete();
     test_hmm_viterbi_global_profile();
     return cass_status();
 }
@@ -703,11 +703,7 @@ void test_hmm_viterbi_global_profile(void)
     cass_close(imm_hmm_viterbi(hmm, "AA", D1), log(0.01) + log(0.9));
     cass_close(imm_hmm_viterbi(hmm, "AA", D2), log(0.01) + log(0.9));
     cass_close(imm_hmm_viterbi(hmm, "AA", E), log(0.01) + log(0.9));
-    /* imm_hmm_set_trans(hmm, B, M1, LOG0); */
-    /* imm_hmm_set_trans(hmm, B, M2, LOG0); */
-    /* printf("\n\n"); */
-    /* cass_close(imm_hmm_viterbi(hmm, "AAB", M2), log(0.01) + log(0.9) + log(0.5)); */
-    /* printf("\n\n"); */
+    cass_close(imm_hmm_viterbi(hmm, "AAB", M2), log(0.01) + log(0.9) + log(0.5));
 
     imm_hmm_destroy(hmm);
     imm_mute_state_destroy(start);
