@@ -50,12 +50,12 @@ HIDE int check_mute_cycles(struct node *node_head);
 HIDE int check_mute_visit(struct node *node);
 HIDE void unmark_nodes(struct node *node_head);
 
-const struct mm_state **mm_state_sort(struct mm_state *const *head_ptr)
+const struct mm_state *const *mm_state_sort(const struct mm_state *mm_state_head)
 {
     struct node *node_head = NULL;
     struct state_node *state_node_head = NULL;
 
-    create_nodes(*head_ptr, &node_head, &state_node_head);
+    create_nodes(mm_state_head, &node_head, &state_node_head);
 
     if (check_mute_cycles(node_head)) {
         destroy_nodes(&node_head);
@@ -63,9 +63,9 @@ const struct mm_state **mm_state_sort(struct mm_state *const *head_ptr)
     }
     unmark_nodes(node_head);
 
-    int nstates = mm_state_nitems(*head_ptr);
-    const struct mm_state **mm_state = malloc(sizeof(struct mm_state *) * (size_t)nstates);
-    const struct mm_state **cur = mm_state;
+    size_t nstates = (size_t)mm_state_nitems(mm_state_head);
+    const struct mm_state **mm_state = malloc(sizeof(struct mm_state *) * nstates);
+    const struct mm_state **cur = mm_state + nstates;
     while (node_head) {
         visit(&node_head, node_head, &cur);
     }
@@ -162,8 +162,8 @@ void visit(struct node **node_head, struct node *node, const struct mm_state ***
     const struct edge *edge = NULL;
     LL_FOREACH(node->edges, edge) { visit(node_head, edge->node, mm_state); }
     node->mark = PERMANENT_MARK;
+    *mm_state -= 1;
     **mm_state = node->mm_state;
-    *mm_state += 1;
     DL_DELETE(*node_head, node);
 }
 

@@ -35,41 +35,39 @@ HIDE double get_score(const struct dp *dp, int row, int state_idx, int seq_len);
 HIDE void set_score(const struct dp *dp, int row, int state_idx, int seq_len, double score);
 HIDE double best_trans_score(const struct dp *dp, double start_lprob, int row,
                              int dst_state_idx);
-HIDE struct matrix *create_trans(const struct mm_state *mm_states,
+HIDE struct matrix *create_trans(const struct mm_state *const *mm_states, int nstates,
                                  const struct state_idx *state_idx);
 
-struct dp *dp_create(const struct mm_state *mm_states, const char *seq)
+struct dp *dp_create(const struct mm_state *const *mm_states, int nstates, const char *seq)
 {
     struct dp *dp = malloc(sizeof(struct dp));
 
-    dp->nstates = mm_state_nitems(mm_states);
+    dp->nstates = nstates;
     dp->states = malloc(sizeof(struct state_info) * ((size_t)dp->nstates));
 
     struct state_idx *state_idx = NULL;
     state_idx_create(&state_idx);
 
     dp->seq = seq;
-    dp->seq_len = (int) strlen(seq);
+    dp->seq_len = (int)strlen(seq);
 
     int next_col = 0;
 
-    const struct mm_state *mm_state = mm_states;
     for (int i = 0; i < dp->nstates; ++i) {
-        dp->states[i].state = mm_state_get_state(mm_state);
-        dp->states[i].start_lprob = mm_state_get_start_lprob(mm_state);
+        dp->states[i].state = mm_state_get_state(mm_states[i]);
+        dp->states[i].start_lprob = mm_state_get_start_lprob(mm_states[i]);
         dp->states[i].min_seq = imm_state_min_seq(dp->states[i].state);
         dp->states[i].max_seq = imm_state_max_seq(dp->states[i].state);
 
         dp->states[i].col = next_col;
         next_col += dp->states[i].max_seq - dp->states[i].min_seq + 1;
 
-        dp->states[i].state = mm_state_get_state(mm_state);
+        dp->states[i].state = mm_state_get_state(mm_states[i]);
 
         state_idx_add(&state_idx, dp->states[i].state, i);
-        mm_state = mm_state_next_c(mm_state);
     }
 
-    dp->trans = create_trans(mm_states, state_idx);
+    dp->trans = create_trans(mm_states, nstates, state_idx);
     state_idx_destroy(&state_idx);
 
     dp->score = matrix_create(dp->seq_len + 1, next_col);
@@ -166,18 +164,17 @@ double best_trans_score(const struct dp *dp, double start_lprob, int row, int ds
     return score;
 }
 
-struct matrix *create_trans(const struct mm_state *mm_states,
+struct matrix *create_trans(const struct mm_state *const *mm_states, int nstates,
                             const struct state_idx *state_idx)
 {
-    int nstates = mm_state_nitems(mm_states);
     struct matrix *trans = matrix_create(nstates, nstates);
     matrix_set_all(trans, -INFINITY);
 
-    for (const struct mm_state *s = mm_states; s; s = mm_state_next_c(s)) {
+    for (int i = 0; i < nstates; ++i) {
 
-        int src = state_idx_find(state_idx, mm_state_get_state(s));
+        int src = state_idx_find(state_idx, mm_state_get_state(mm_states[i]));
         const struct mm_trans *t = NULL;
-        for (t = mm_state_get_trans_c(s); t; t = mm_trans_next_c(t)) {
+        for (t = mm_state_get_trans_c(mm_states[i]); t; t = mm_trans_next_c(t)) {
 
             int dst = state_idx_find(state_idx, mm_trans_get_state(t));
             matrix_set(trans, src, dst, mm_trans_get_lprob(t));

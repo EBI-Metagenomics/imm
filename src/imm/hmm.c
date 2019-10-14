@@ -171,15 +171,15 @@ double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq,
                        const struct imm_state *end_state)
 
 {
-    const struct mm_state **mm_states = mm_state_sort(&hmm->mm_states);
+    const struct mm_state *const *mm_states = mm_state_sort(hmm->mm_states);
     if (!mm_states)
         return NAN;
 
-    struct dp *dp = dp_create(hmm->mm_states, seq);
+    struct dp *dp = dp_create(mm_states, mm_state_nitems(hmm->mm_states), seq);
     double score = dp_viterbi(dp, end_state);
     dp_destroy(dp);
 
-    free(mm_states);
+    free((struct mm_state **)mm_states);
     return score;
 }
 
