@@ -4,5 +4,6 @@
 #include "imm/api.h"
 
 IMM_API int imm_isninf(double a);
+IMM_API int imm_isnan(double a);
 
 #endif

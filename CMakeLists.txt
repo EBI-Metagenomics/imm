@@ -60,6 +60,7 @@ set(IMM_SOURCES
     src/imm/math.c
     src/imm/matrix.c
     src/imm/mm_state.c
+    src/imm/mm_state_sort.c
     src/imm/mm_trans.c
     src/imm/mute_state.c
     src/imm/normal_state.c

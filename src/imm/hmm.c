@@ -4,6 +4,7 @@
 #include "src/imm/hide.h"
 #include "src/imm/matrix.h"
 #include "src/imm/mm_state.h"
+#include "src/imm/mm_state_sort.h"
 #include "src/imm/mm_trans.h"
 #include "src/imm/path.h"
 #include "src/logaddexp/logaddexp.h"
@@ -170,6 +171,9 @@ double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq,
                        const struct imm_state *end_state)
 
 {
+    if (mm_state_sort(&hmm->mm_states))
+        return NAN;
+
     struct dp *dp = dp_create(hmm->mm_states, seq);
     double score = dp_viterbi(dp, end_state);
     dp_destroy(dp);

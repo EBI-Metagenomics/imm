@@ -12,7 +12,7 @@ void test_hmm_likelihood_single_state(void);
 void test_hmm_likelihood_two_states(void);
 void test_hmm_likelihood_mute_state(void);
 void test_hmm_viterbi_no_state(void);
-void test_hmm_viterbi_mute_states(void);
+void test_hmm_viterbi_mute_cycle(void);
 void test_hmm_viterbi_normal_states(void);
 void test_hmm_viterbi_profile1(void);
 void test_hmm_viterbi_profile2(void);
@@ -28,11 +28,11 @@ int main(void)
     test_hmm_likelihood_two_states();
     test_hmm_likelihood_mute_state();
     test_hmm_viterbi_no_state();
-    test_hmm_viterbi_mute_states();
+    test_hmm_viterbi_mute_cycle();
     test_hmm_viterbi_normal_states();
     test_hmm_viterbi_profile1();
     test_hmm_viterbi_profile2();
-    /* test_hmm_viterbi_profile_delete(); */
+    /* dont active for now test_hmm_viterbi_profile_delete(); */
     test_hmm_viterbi_global_profile();
     return cass_status();
 }
@@ -294,7 +294,7 @@ void test_hmm_viterbi_no_state(void)
     imm_abc_destroy(abc);
 }
 
-void test_hmm_viterbi_mute_states(void)
+void test_hmm_viterbi_mute_cycle(void)
 {
     struct imm_abc *abc = imm_abc_create("ACGT");
     struct imm_hmm *hmm = imm_hmm_create(abc);
@@ -302,24 +302,23 @@ void test_hmm_viterbi_mute_states(void)
     struct imm_state *state0 = imm_mute_state_create("State0", abc);
 
     imm_hmm_add_state(hmm, state0, log(0.5));
-
-    imm_hmm_set_trans(hmm, state0, state0, log(0.1));
-
     cass_close(imm_hmm_viterbi(hmm, "", state0), -0.693147180560);
-    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "A", state0)));
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "C", state0)));
+    cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "X", state0)));
 
     struct imm_state *state1 = imm_mute_state_create("State1", abc);
     imm_hmm_add_state(hmm, state1, log(0.2));
 
+    cass_close(imm_hmm_viterbi(hmm, "", state0), -0.693147180560);
+    cass_close(imm_hmm_viterbi(hmm, "", state1), -1.6094379124);
+
     imm_hmm_set_trans(hmm, state0, state1, log(0.2));
 
-    cass_close(imm_hmm_viterbi(hmm, "", state0), -0.693147180560);
-    cass_close(imm_hmm_viterbi(hmm, "", state1), -1.609437912434);
+    cass_close(imm_hmm_viterbi(hmm, "", state1), -1.6094379124);
 
-    cass_condition(imm_hmm_set_start_lprob(hmm, state1, LOG0) == 0);
+    imm_hmm_set_trans(hmm, state1, state0, log(0.2));
 
-    cass_close(imm_hmm_viterbi(hmm, "", state0), -0.693147180560);
-    cass_close(imm_hmm_viterbi(hmm, "", state1), -2.302585092994);
+    cass_condition(imm_isnan(imm_hmm_viterbi(hmm, "", state1)));
 
     imm_hmm_destroy(hmm);
     imm_mute_state_destroy(state0);
