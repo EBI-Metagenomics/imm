@@ -44,23 +44,26 @@ HIDE void destroy_nodes(struct node **nodes);
 HIDE void destroy_node(struct node *node);
 HIDE void create_edges(struct node *nodes, struct state_node *state_nodes);
 HIDE void destroy_edges(struct edge **edges);
-HIDE void visit(struct node **node_head, struct node *node, const struct mm_state ***mm_state);
+HIDE void visit(struct node **node_head, struct node *node,
+                const struct mm_state ***mm_state);
 HIDE int check_mute_cycles(struct node *node_head);
 HIDE int check_mute_visit(struct node *node);
 HIDE void unmark_nodes(struct node *node_head);
 
-int mm_state_sort(struct mm_state *const *head_ptr)
+const struct mm_state **mm_state_sort(struct mm_state *const *head_ptr)
 {
     struct node *node_head = NULL;
     struct state_node *state_node_head = NULL;
 
     create_nodes(*head_ptr, &node_head, &state_node_head);
-    int nstates = mm_state_nitems(*head_ptr);
 
-    if (check_mute_cycles(node_head))
-        return 1;
+    if (check_mute_cycles(node_head)) {
+        destroy_nodes(&node_head);
+        return NULL;
+    }
     unmark_nodes(node_head);
 
+    int nstates = mm_state_nitems(*head_ptr);
     const struct mm_state **mm_state = malloc(sizeof(struct mm_state *) * (size_t)nstates);
     const struct mm_state **cur = mm_state;
     while (node_head) {
@@ -69,7 +72,7 @@ int mm_state_sort(struct mm_state *const *head_ptr)
 
     destroy_nodes(&node_head);
 
-    return 0;
+    return mm_state;
 }
 
 void create_nodes(const struct mm_state *head, struct node **nodes,
@@ -157,10 +160,7 @@ void visit(struct node **node_head, struct node *node, const struct mm_state ***
 
     node->mark = TEMPORARY_MARK;
     const struct edge *edge = NULL;
-    LL_FOREACH(node->edges, edge)
-    {
-        visit(node_head, edge->node, mm_state);
-    }
+    LL_FOREACH(node->edges, edge) { visit(node_head, edge->node, mm_state); }
     node->mark = PERMANENT_MARK;
     **mm_state = node->mm_state;
     *mm_state += 1;
