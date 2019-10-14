@@ -3,7 +3,7 @@
 
 double imm_log_sumexp(double *arr, int len)
 {
-    double r = -INFINITY;
+    double r = LOG0;
     for (int i = 0; i < len; ++i)
         r = logaddexp(r, arr[i]);
     return r;

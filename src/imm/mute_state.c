@@ -37,7 +37,7 @@ double mute_state_lprob(const struct imm_state *state, const char *seq, int seq_
 {
     if (seq_len == 0)
         return 0.0;
-    return -INFINITY;
+    return LOG0;
 }
 
 int mute_state_min_seq(const struct imm_state *state) { return 0; }

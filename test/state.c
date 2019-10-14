@@ -17,7 +17,7 @@ void test_normal_state(void)
 {
     struct imm_abc *abc = imm_abc_create("ACGT");
 
-    double lprobs[] = {log(0.25), log(0.25), log(0.5), -INFINITY};
+    double lprobs[] = {log(0.25), log(0.25), log(0.5), LOG0};
     struct imm_state *state = imm_normal_state_create("State0", abc, lprobs);
 
     cass_condition(strcmp(imm_state_get_name(state), "State0") == 0);

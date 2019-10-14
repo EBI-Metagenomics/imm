@@ -112,7 +112,7 @@ double table_state_lprob(const struct imm_state *state, const char *seq, int seq
     if (emiss)
         return emiss->lprob;
 
-    return -INFINITY;
+    return LOG0;
 }
 
 int table_state_min_seq(const struct imm_state *state)

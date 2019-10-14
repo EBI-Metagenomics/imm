@@ -3,8 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define LOG0 -INFINITY
-
 void test_hmm_state_id(void);
 void test_hmm_del_get_state(void);
 void test_hmm_set_trans(void);

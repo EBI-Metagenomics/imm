@@ -71,7 +71,7 @@ struct dp *dp_create(const struct mm_state *const *mm_states, int nstates, const
     state_idx_destroy(&state_idx);
 
     dp->score = matrix_create(dp->seq_len + 1, next_col);
-    matrix_set_all(dp->score, -INFINITY);
+    matrix_set_all(dp->score, LOG0);
 
     return dp;
 }
@@ -94,7 +94,7 @@ double dp_viterbi(struct dp *dp, const struct imm_state *end_state)
         }
     }
 
-    double score = -INFINITY;
+    double score = LOG0;
     for (int i = 0; i < dp->nstates; ++i) {
         const struct state_info *cur = dp->states + i;
         if (cur->state == end_state) {
@@ -146,7 +146,7 @@ double get_score(const struct dp *dp, int row, int state_idx, int seq_len)
 
 double best_trans_score(const struct dp *dp, double start_lprob, int row, int dst_state_idx)
 {
-    double score = -INFINITY;
+    double score = LOG0;
     if (row == 0)
         score = start_lprob;
     for (int i = 0; i < dp->nstates; ++i) {
@@ -168,7 +168,7 @@ struct matrix *create_trans(const struct mm_state *const *mm_states, int nstates
                             const struct state_idx *state_idx)
 {
     struct matrix *trans = matrix_create(nstates, nstates);
-    matrix_set_all(trans, -INFINITY);
+    matrix_set_all(trans, LOG0);
 
     for (int i = 0; i < nstates; ++i) {
 

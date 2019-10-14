@@ -61,7 +61,7 @@ double normal_state_lprob(const struct imm_state *state, const char *seq, int se
         if (abc_has_symbol(abc, seq[0]))
             return s->lprobs[abc_symbol_idx(abc, seq[0])];
     }
-    return -INFINITY;
+    return LOG0;
 }
 
 int normal_state_min_seq(const struct imm_state *state) { return 1; }

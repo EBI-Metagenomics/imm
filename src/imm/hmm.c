@@ -109,7 +109,7 @@ double imm_hmm_get_trans(const struct imm_hmm *hmm, const struct imm_state *src_
 
     const struct mm_trans *mm_trans = mm_trans_find_c(mm_state_get_trans_c(src), dst_state);
     if (!mm_trans)
-        return -INFINITY;
+        return LOG0;
 
     return mm_trans_get_lprob(mm_trans);
 }
@@ -250,7 +250,7 @@ int hmm_normalize_start(struct imm_hmm *hmm)
 int hmm_normalize_trans(struct mm_state *mm_state)
 {
     const struct mm_trans *mm_trans = mm_state_get_trans_c(mm_state);
-    double lnorm = -INFINITY;
+    double lnorm = LOG0;
 
     while (mm_trans) {
         lnorm = logaddexp(lnorm, mm_trans_get_lprob(mm_trans));

@@ -13,7 +13,7 @@ void test_path(void)
 {
     struct imm_abc *abc = imm_abc_create("ACGT");
 
-    double lprobs[] = {log(0.25), log(0.25), log(0.5), -INFINITY};
+    double lprobs[] = {log(0.25), log(0.25), log(0.5), LOG0};
     struct imm_state *state0 = imm_normal_state_create("State0", abc, lprobs);
     struct imm_state *state1 = imm_normal_state_create("State1", abc, lprobs);
 
