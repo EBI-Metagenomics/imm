@@ -86,7 +86,7 @@ int imm_table_state_normalize(struct imm_state *state)
         lprobs[i] = emiss->lprob;
         ++i;
     }
-    if (imm_log_normalize(lprobs, len)) {
+    if (imm_lognormalize(lprobs, len)) {
         free(lprobs);
         return -1;
     }

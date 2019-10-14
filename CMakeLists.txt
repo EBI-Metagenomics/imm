@@ -41,7 +41,6 @@ set(IMM_PRIVATE_HEADERS
     include/imm/abc.h
     include/imm/api.h
     include/imm/hmm.h
-    include/imm/log.h
     include/imm/math.h
     include/imm/mute_state.h
     include/imm/normal_state.h
@@ -56,7 +55,6 @@ set(IMM_SOURCES
     src/imm/counter.c
     src/imm/dp.c
     src/imm/hmm.c
-    src/imm/log.c
     src/imm/math.c
     src/imm/matrix.c
     src/imm/mm_state.c

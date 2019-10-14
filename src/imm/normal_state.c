@@ -50,7 +50,7 @@ int imm_normal_state_normalize(struct imm_state *state)
 {
     int len = abc_length(imm_state_get_abc(state));
     const struct imm_normal_state *s = imm_state_get_impl_c(state);
-    return imm_log_normalize(s->lprobs, len);
+    return imm_lognormalize(s->lprobs, len);
 }
 
 double normal_state_lprob(const struct imm_state *state, const char *seq, int seq_len)
