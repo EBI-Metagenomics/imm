@@ -123,8 +123,9 @@ double imm_hmm_likelihood(const struct imm_hmm *hmm, const char *seq,
     }
     int seq_len = (int)strlen(seq);
 
-    int len = path_item_seq_len(path);
-    const struct imm_state *state = path_item_state(path);
+    const struct imm_step *step = path_first_step(path);
+    int len = path_step_seq_len(step);
+    const struct imm_state *state = path_step_state(step);
 
     if (len > seq_len)
         goto len_mismatch;
@@ -136,9 +137,9 @@ double imm_hmm_likelihood(const struct imm_hmm *hmm, const char *seq,
     const struct imm_state *prev_state = NULL;
 
     goto enter;
-    while (path) {
-        len = path_item_seq_len(path);
-        state = path_item_state(path);
+    while (step) {
+        len = path_step_seq_len(step);
+        state = path_step_state(step);
 
         if (len > seq_len)
             goto len_mismatch;
@@ -151,7 +152,7 @@ double imm_hmm_likelihood(const struct imm_hmm *hmm, const char *seq,
         prev_state = state;
         seq += len;
         seq_len -= len;
-        path = path_next_item(path);
+        step = path_next_step(path, step);
     }
     if (seq_len > 0)
         goto len_mismatch;

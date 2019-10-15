@@ -1,52 +1,73 @@
 #include "src/imm/path.h"
 #include "imm.h"
-#include "src/uthash/utlist.h"
+#include "src/linux/list.h"
 #include <stdlib.h>
 
-struct imm_path
+struct imm_step
 {
     const struct imm_state *state;
     int seq_len;
-    struct imm_path *next;
-    struct imm_path *prev;
+    struct list_head list;
 };
 
-void imm_path_create(struct imm_path **path) { *path = NULL; }
-
-void imm_path_add(struct imm_path **path, const struct imm_state *state, int seq_len)
+struct imm_path
 {
-    struct imm_path *elem = malloc(sizeof(struct imm_path));
-    elem->state = state;
-    elem->seq_len = seq_len;
-    DL_APPEND(*path, elem);
+    struct list_head steps;
+};
+
+struct imm_path *imm_path_create(void)
+{
+    struct imm_path *path = malloc(sizeof(struct imm_path));
+    INIT_LIST_HEAD(&path->steps);
+    return path;
 }
 
-void imm_path_destroy(struct imm_path **path)
+void imm_path_add(struct imm_path *path, const struct imm_state *state, int seq_len)
 {
-    struct imm_path *elem, *tmp;
-    DL_FOREACH_SAFE(*path, elem, tmp)
+    struct imm_step *step = malloc(sizeof(struct imm_step));
+    step->state = state;
+    step->seq_len = seq_len;
+    list_add_tail(&step->list, &path->steps);
+}
+
+void imm_path_destroy(struct imm_path *path)
+{
+    struct list_head *entry = NULL, *tmp = NULL;
+    list_for_each_safe(entry, tmp, &path->steps)
     {
-        elem->state = NULL;
-        elem->seq_len = 0;
-        DL_DELETE(*path, elem);
-        free(elem);
+        struct imm_step *step = list_entry(entry, struct imm_step, list);
+        step->state = NULL;
+        step->seq_len = -1;
+        list_del(entry);
+        free(step);
     }
 }
 
-const struct imm_path *path_next_item(const struct imm_path *item) { return item->next; }
+const struct imm_step *path_first_step(const struct imm_path *path)
+{
+    return list_first_entry_or_null(&path->steps, struct imm_step, list);
+}
 
-const struct imm_state *path_item_state(const struct imm_path *item) { return item->state; }
+const struct imm_step *path_next_step(const struct imm_path *path, const struct imm_step *step)
+{
+    const struct imm_step *next = list_next_entry(step, list);
+    if (&path->steps != &next->list)
+        return next;
+    return NULL;
+}
 
-int path_item_seq_len(const struct imm_path *item) { return item->seq_len; }
+const struct imm_state *path_step_state(const struct imm_step *step) { return step->state; }
+
+int path_step_seq_len(const struct imm_step *step) { return step->seq_len; }
 
 int path_seq_len(const struct imm_path *path)
 {
-    const struct imm_path *item = path;
+    const struct imm_step *step = path_first_step(path);
 
     int seq_len = 0;
-    while (item) {
-        seq_len += path_item_seq_len(item);
-        item = path_next_item(item);
+    while (step) {
+        seq_len += path_step_seq_len(step);
+        step = path_next_step(path, step);
     }
 
     return seq_len;
