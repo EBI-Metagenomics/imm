@@ -1,6 +1,5 @@
 #include "cass/cass.h"
 #include "imm.h"
-#include <stdio.h>
 #include <stdlib.h>
 
 void test_hmm_state_id(void);
@@ -766,9 +765,9 @@ void test_hmm_viterbi_table_states(void)
     cass_condition(imm_isninf(imm_hmm_viterbi(hmm, "TATX", E)));
     cass_close(imm_hmm_viterbi(hmm, "TATA", N1), -6.502290170873972);
     cass_close(imm_hmm_viterbi(hmm, "TATA", E), -6.502290170873972);
-    printf("\n");
-    cass_close(imm_hmm_viterbi(hmm, "TATTX", Z), -7.1954373514);
-    printf("\n");
+    cass_close(imm_hmm_viterbi(hmm, "TATTX", Z), -7.195437351433918);
+    cass_close(imm_hmm_viterbi(hmm, "TATTXX", Z), -6.502290170873972);
+    cass_close(imm_hmm_viterbi(hmm, "CAXCA", E), -11.800607537422009);
 
     imm_hmm_destroy(hmm);
     imm_mute_state_destroy(S);
