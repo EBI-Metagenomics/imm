@@ -5,6 +5,7 @@
 #include "src/imm/state_idx.h"
 #include "src/uthash/uthash.h"
 #include "src/uthash/utlist.h"
+#include "src/list.h"
 #include <stddef.h>
 #include <stdlib.h>
 
@@ -20,7 +21,7 @@ struct node
     const struct mm_state *mm_state;
     int idx;
     int mark;
-    struct edge *edges;
+    struct list_head edges;
     struct node *next;
     struct node *prev;
 };
@@ -28,7 +29,7 @@ struct node
 struct edge
 {
     struct node *node;
-    struct edge *next;
+    struct list_head list;
 };
 
 struct state_node
@@ -44,7 +45,7 @@ HIDE void destroy_nodes(struct node **nodes);
 HIDE void destroy_node(struct node *node);
 HIDE void destroy_state_nodes(struct state_node **state_nodes);
 HIDE void create_edges(struct node *nodes, struct state_node *state_nodes);
-HIDE void destroy_edges(struct edge **edges);
+HIDE void destroy_edges(struct list_head *edges);
 HIDE void visit(struct node *node, const struct mm_state ***mm_state);
 HIDE int check_mute_cycles(struct node *node_head);
 HIDE int check_mute_visit(struct node *node);
@@ -91,7 +92,7 @@ void create_nodes(const struct mm_state *head, struct node **nodes,
         node->state = mm_state_get_state(mm_state);
         node->mm_state = mm_state;
         node->mark = INITIAL_MARK;
-        node->edges = NULL;
+        INIT_LIST_HEAD(&node->edges);
         if (imm_isninf(mm_state_get_start_lprob(node->mm_state)))
             DL_APPEND(*nodes, node);
         else
@@ -164,20 +165,20 @@ void create_edges(struct node *nodes, struct state_node *state_nodes)
             const struct imm_state *state = mm_trans_get_state(trans);
             HASH_FIND_PTR(state_nodes, &state, sn);
             edge->node = sn->node;
-            LL_PREPEND(node->edges, edge);
+            list_add(&edge->list, &node->edges);
 
             trans = mm_trans_next_c(trans);
         }
     }
 }
 
-void destroy_edges(struct edge **edges)
+void destroy_edges(struct list_head *edges)
 {
     struct edge *edge = NULL, *tmp = NULL;
-    LL_FOREACH_SAFE(*edges, edge, tmp)
+    list_for_each_entry_safe(edge, tmp, edges, list)
     {
         edge->node = NULL;
-        LL_DELETE(*edges, edge);
+        list_del(&edge->list);
         free(edge);
     }
 }
@@ -191,7 +192,10 @@ void visit(struct node *node, const struct mm_state ***mm_state)
 
     node->mark = TEMPORARY_MARK;
     const struct edge *edge = NULL;
-    LL_FOREACH(node->edges, edge) { visit(edge->node, mm_state); }
+    list_for_each_entry(edge, &node->edges, list)
+    {
+        visit(edge->node, mm_state);
+    }
     node->mark = PERMANENT_MARK;
     *mm_state -= 1;
     **mm_state = node->mm_state;
@@ -223,7 +227,7 @@ int check_mute_visit(struct node *node)
 
     node->mark = TEMPORARY_MARK;
     const struct edge *edge = NULL;
-    LL_FOREACH(node->edges, edge)
+    list_for_each_entry(edge, &node->edges, list)
     {
         if (check_mute_visit(edge->node))
             return 1;

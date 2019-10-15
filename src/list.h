@@ -138,13 +138,11 @@ static inline int list_is_last(const struct list_head *list, const struct list_h
  */
 #define list_first_entry_or_null(ptr, type, member)                                          \
     __extension__({                                                                          \
-        const struct list_head *head__ = (ptr);                                                    \
-        const struct list_head *pos__ = head__->next;                                              \
+        const struct list_head *head__ = (ptr);                                              \
+        const struct list_head *pos__ = head__->next;                                        \
         pos__ != head__ ? list_entry(pos__, type, member) : NULL;                            \
     })
-
-/**
- * list_for_each	-	iterate over a list
+/** list_for_each	-	iterate over a list
  * @pos:	the &struct list_head to use as a loop cursor.
  * @head:	the head for your list.
  */
@@ -165,5 +163,28 @@ static inline int list_is_last(const struct list_head *list, const struct list_h
  * @member:	the name of the list_head within the struct.
  */
 #define list_next_entry(pos, member) list_entry((pos)->member.next, typeof(*(pos)), member)
+
+/**
+ * list_for_each_entry	-	iterate over list of given type
+ * @pos:	the type * to use as a loop cursor.
+ * @head:	the head for your list.
+ * @member:	the name of the list_head within the struct.
+ */
+#define list_for_each_entry(pos, head, member)                                               \
+    for (pos = list_first_entry(head, typeof(*pos), member); &pos->member != (head);         \
+         pos = list_next_entry(pos, member))
+
+/**
+ * list_for_each_entry_safe - iterate over list of given type safe against removal of list
+ * entry
+ * @pos:	the type * to use as a loop cursor.
+ * @n:		another type * to use as temporary storage
+ * @head:	the head for your list.
+ * @member:	the name of the list_head within the struct.
+ */
+#define list_for_each_entry_safe(pos, n, head, member)                                       \
+    for (pos = list_first_entry(head, typeof(*pos), member),                                 \
+        n = list_next_entry(pos, member);                                                    \
+         &pos->member != (head); pos = n, n = list_next_entry(n, member))
 
 #endif
