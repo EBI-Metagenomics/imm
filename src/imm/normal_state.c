@@ -7,15 +7,15 @@
 
 struct imm_normal_state
 {
-    double *lprobs;
     struct imm_state *interface;
+    double *lprobs;
 };
 
 HIDE double normal_state_lprob(const struct imm_state *state, const char *seq, int seq_len);
 HIDE int normal_state_min_seq(const struct imm_state *state);
 HIDE int normal_state_max_seq(const struct imm_state *state);
 
-struct imm_state *imm_normal_state_create(const char *name, const struct imm_abc *abc,
+struct imm_normal_state *imm_normal_state_create(const char *name, const struct imm_abc *abc,
                                                  const double *lprobs)
 {
     struct imm_normal_state *state = malloc(sizeof(struct imm_normal_state));
@@ -27,30 +27,27 @@ struct imm_state *imm_normal_state_create(const char *name, const struct imm_abc
     struct imm_state_funcs funcs = {normal_state_lprob, normal_state_min_seq,
                                     normal_state_max_seq};
     state->interface = imm_state_create(name, abc, funcs, state);
-    return state->interface;
+    return state;
 }
 
-void imm_normal_state_destroy(struct imm_state *state)
+void imm_normal_state_destroy(struct imm_normal_state *state)
 {
     if (!state)
         return;
 
-    struct imm_normal_state *s = imm_state_get_impl(state);
+    imm_state_destroy(state->interface);
+    state->interface = NULL;
 
-    imm_state_destroy(s->interface);
-    s->interface = NULL;
+    free(state->lprobs);
+    state->lprobs = NULL;
 
-    free(s->lprobs);
-    s->lprobs = NULL;
-
-    free(s);
+    free(state);
 }
 
-int imm_normal_state_normalize(struct imm_state *state)
+int imm_normal_state_normalize(struct imm_normal_state *state)
 {
-    int len = abc_length(imm_state_get_abc(state));
-    const struct imm_normal_state *s = imm_state_get_impl_c(state);
-    return imm_lognormalize(s->lprobs, len);
+    int len = abc_length(imm_state_get_abc(imm_state_cast_c(state)));
+    return imm_lognormalize(state->lprobs, len);
 }
 
 double normal_state_lprob(const struct imm_state *state, const char *seq, int seq_len)

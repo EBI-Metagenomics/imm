@@ -32,6 +32,7 @@ void matrix_destroy(struct matrix *matrix)
 
 void matrix_print(const struct matrix *matrix)
 {
+    return;
     for (int r = 0; r < matrix->nrows; ++r) {
         printf("|");
         for (int c = 0; c < matrix->ncols - 1; ++c) {

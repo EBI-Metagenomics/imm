@@ -61,3 +61,21 @@ void imm_state_destroy(struct imm_state *state)
 int imm_state_min_seq(const struct imm_state *state) { return state->min_seq(state); }
 
 int imm_state_max_seq(const struct imm_state *state) { return state->max_seq(state); }
+
+struct imm_state *imm_state_cast(void *state)
+{
+    struct type
+    {
+        struct imm_state *state;
+    } *t = state;
+    return t->state;
+}
+
+const struct imm_state *imm_state_cast_c(const void *state)
+{
+    const struct type_c
+    {
+        const struct imm_state *state;
+    } *t = state;
+    return t->state;
+}

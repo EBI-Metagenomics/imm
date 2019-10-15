@@ -4,10 +4,9 @@
 #include "imm/api.h"
 
 struct imm_abc;
-struct imm_state;
+struct imm_mute_state;
 
-IMM_API struct imm_state *imm_mute_state_create(const char *name,
-                                                     const struct imm_abc *abc);
-IMM_API void imm_mute_state_destroy(struct imm_state *state);
+IMM_API struct imm_mute_state *imm_mute_state_create(const char *name, const struct imm_abc *abc);
+IMM_API void imm_mute_state_destroy(struct imm_mute_state *state);
 
 #endif

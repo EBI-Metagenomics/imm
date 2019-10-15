@@ -33,4 +33,7 @@ IMM_API double imm_state_lprob(const struct imm_state *state, const char *seq, i
 IMM_API int imm_state_min_seq(const struct imm_state *state);
 IMM_API int imm_state_max_seq(const struct imm_state *state);
 
+IMM_API struct imm_state *imm_state_cast(void *state);
+IMM_API const struct imm_state *imm_state_cast_c(const void *state);
+
 #endif
