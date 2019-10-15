@@ -1,3 +1,9 @@
+#ifndef IMM_LIST_H
+#define IMM_LIST_H
+
+/* This is a copy-and-paste code from linux list implementation.
+ */
+
 #include <stddef.h>
 
 /*
@@ -16,13 +22,6 @@ struct list_head
 {
     struct list_head *next, *prev;
 };
-
-#define LIST_HEAD_INIT(name)                                                                 \
-    {                                                                                        \
-        &(name), &(name)                                                                     \
-    }
-
-#define LIST_HEAD(name) struct list_head name = LIST_HEAD_INIT(name)
 
 static inline void INIT_LIST_HEAD(struct list_head *list)
 {
@@ -166,3 +165,5 @@ static inline int list_is_last(const struct list_head *list, const struct list_h
  * @member:	the name of the list_head within the struct.
  */
 #define list_next_entry(pos, member) list_entry((pos)->member.next, typeof(*(pos)), member)
+
+#endif

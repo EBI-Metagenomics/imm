@@ -1,6 +1,6 @@
 #include "src/imm/path.h"
 #include "imm.h"
-#include "src/linux/list.h"
+#include "src/list.h"
 #include <stdlib.h>
 
 struct imm_step
@@ -52,7 +52,8 @@ const struct imm_step *path_first_step(const struct imm_path *path)
     return list_first_entry_or_null(&path->steps, struct imm_step, list);
 }
 
-const struct imm_step *path_next_step(const struct imm_path *path, const struct imm_step *step)
+const struct imm_step *path_next_step(const struct imm_path *path,
+                                      const struct imm_step *step)
 {
     const struct imm_step *next = list_next_entry(step, list);
     if (&path->steps != &next->list)
