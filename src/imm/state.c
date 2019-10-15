@@ -1,6 +1,4 @@
-#include "src/imm/state.h"
 #include "imm.h"
-#include "src/imm/abc.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -18,7 +16,7 @@ struct imm_state
 struct imm_state *imm_state_create(const char *name, const struct imm_abc *abc,
                                    struct imm_state_funcs funcs, void *impl)
 {
-    if (abc_length(abc) == 0) {
+    if (imm_abc_length(abc) == 0) {
         imm_error("empty alphabet");
         return NULL;
     }

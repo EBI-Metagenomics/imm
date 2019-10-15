@@ -7,6 +7,7 @@
 
 IMM_API int imm_isninf(double a);
 IMM_API int imm_isnan(double a);
+IMM_API double imm_logaddexp(double a, double b);
 IMM_API double imm_logsumexp(double *arr, int len);
 IMM_API int imm_lognormalize(double *arr, int len);
 

@@ -1,4 +1,4 @@
-#include "src/imm/abc.h"
+#include "imm.h"
 #include "src/imm/hide.h"
 #include <limits.h>
 #include <stdlib.h>
@@ -52,22 +52,22 @@ void imm_abc_destroy(struct imm_abc *abc)
     free(abc);
 }
 
-int abc_length(const struct imm_abc *abc) { return (int)strlen(abc->symbols); }
+int imm_abc_length(const struct imm_abc *abc) { return (int)strlen(abc->symbols); }
 
-int abc_has_symbol(const struct imm_abc *abc, char symbol_id)
+int imm_abc_has_symbol(const struct imm_abc *abc, char symbol_id)
 {
     check_symbol_id(symbol_id);
     return abc->symbol_idx[(int)symbol_id] != -1;
 }
 
-int abc_symbol_idx(const struct imm_abc *abc, char symbol_id)
+int imm_abc_symbol_idx(const struct imm_abc *abc, char symbol_id)
 {
     if (check_symbol_id(symbol_id))
         return -1;
     return abc->symbol_idx[(int)symbol_id];
 }
 
-char abc_symbol_id(const struct imm_abc *abc, int symbol_idx)
+char imm_abc_symbol_id(const struct imm_abc *abc, int symbol_idx)
 {
     return abc->symbols[symbol_idx];
 }

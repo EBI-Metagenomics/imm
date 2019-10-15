@@ -33,4 +33,7 @@ IMM_API int imm_state_max_seq(const struct imm_state *state);
 IMM_API struct imm_state *imm_state_cast(void *state);
 IMM_API const struct imm_state *imm_state_cast_c(const void *state);
 
+IMM_API void *imm_state_get_impl(struct imm_state *state);
+IMM_API const void *imm_state_get_impl_c(const struct imm_state *state);
+
 #endif
