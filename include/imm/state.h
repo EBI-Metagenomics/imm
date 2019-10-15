@@ -22,9 +22,6 @@ IMM_API struct imm_state *imm_state_create(const char *name, const struct imm_ab
                                            struct imm_state_funcs funcs, void *impl);
 IMM_API void imm_state_destroy(struct imm_state *state);
 
-IMM_API void *imm_state_get_impl(struct imm_state *state);
-IMM_API const void *imm_state_get_impl_c(const struct imm_state *state);
-
 IMM_API const char *imm_state_get_name(const struct imm_state *state);
 
 IMM_API const struct imm_abc *imm_state_get_abc(const struct imm_state *state);

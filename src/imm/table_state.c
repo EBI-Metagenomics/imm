@@ -1,6 +1,7 @@
 #include "imm.h"
 #include "src/imm/hide.h"
 #include "src/imm/min.h"
+#include "src/imm/state.h"
 #include "src/uthash/uthash.h"
 #include <math.h>
 #include <stdlib.h>
