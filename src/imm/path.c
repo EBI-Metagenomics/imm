@@ -32,6 +32,9 @@ void imm_path_add(struct imm_path *path, const struct imm_state *state, int seq_
 
 void imm_path_destroy(struct imm_path *path)
 {
+    if (!path)
+        return;
+
     struct list_head *entry = NULL, *tmp = NULL;
     list_for_each_safe(entry, tmp, &path->steps)
     {
@@ -41,6 +44,7 @@ void imm_path_destroy(struct imm_path *path)
         list_del(entry);
         free(step);
     }
+    free(path);
 }
 
 const struct imm_step *path_first_step(const struct imm_path *path)
