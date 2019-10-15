@@ -8,7 +8,6 @@
 #include "src/imm/mm_trans.h"
 #include "src/imm/path.h"
 #include "src/logaddexp/logaddexp.h"
-#include "src/uthash/utlist.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
