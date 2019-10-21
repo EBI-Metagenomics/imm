@@ -12,6 +12,7 @@ HIDE void mm_state_destroy(struct mm_state **head_ptr);
 HIDE void mm_state_add_state(struct mm_state **head_ptr, const struct imm_state *state,
                              double start_lprob);
 HIDE int mm_state_del_state(struct mm_state **head_ptr, const struct imm_state *state);
+HIDE void mm_state_del_trans(struct mm_state *head, const struct imm_state *state);
 
 HIDE int mm_state_nitems(const struct mm_state *head);
 

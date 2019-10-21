@@ -11,6 +11,7 @@ HIDE void mm_trans_destroy(struct mm_trans **head_ptr);
 
 HIDE struct mm_trans *mm_trans_add(struct mm_trans **head_ptr, const struct imm_state *state,
                                    double lprob);
+HIDE void mm_trans_del(struct mm_trans **head_ptr, struct mm_trans *trans);
 
 HIDE struct mm_trans *mm_trans_find(struct mm_trans *head, const struct imm_state *state);
 HIDE const struct mm_trans *mm_trans_find_c(const struct mm_trans *head,

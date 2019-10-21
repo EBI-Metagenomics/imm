@@ -34,6 +34,12 @@ struct mm_trans *mm_trans_add(struct mm_trans **head_ptr, const struct imm_state
     return mm_trans;
 }
 
+void mm_trans_del(struct mm_trans **head_ptr, struct mm_trans *trans)
+{
+    HASH_DEL(*head_ptr, trans);
+    free(trans);
+}
+
 struct mm_trans *mm_trans_find(struct mm_trans *head, const struct imm_state *state)
 {
     struct mm_trans *mm_trans = NULL;

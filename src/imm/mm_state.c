@@ -54,6 +54,13 @@ int mm_state_del_state(struct mm_state **head_ptr, const struct imm_state *state
     return 1;
 }
 
+void mm_state_del_trans(struct mm_state *head, const struct imm_state *state)
+{
+    struct mm_trans *trans = mm_trans_find(head->mm_transitions, state);
+    if (trans)
+        mm_trans_del(&head->mm_transitions, trans);
+}
+
 int mm_state_nitems(const struct mm_state *head)
 {
     size_t n = HASH_COUNT(head);

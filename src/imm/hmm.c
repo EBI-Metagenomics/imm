@@ -54,6 +54,12 @@ int imm_hmm_del_state(struct imm_hmm *hmm, const struct imm_state *state)
         return 1;
     }
 
+    struct mm_state *curr = hmm->mm_states;
+    while (curr) {
+        mm_state_del_trans(curr, state);
+        curr = mm_state_next(curr);
+    }
+
     return 0;
 }
 

@@ -620,6 +620,9 @@ void test_hmm_viterbi_profile_delete(void)
     cass_close(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(M)), 2 * log(0.5));
     cass_close(imm_hmm_viterbi(hmm, "AB", imm_state_cast_c(N2)), 4 * log(0.5));
 
+    cass_condition(imm_hmm_del_state(hmm, imm_state_cast_c(N2)) == 0);
+    cass_close(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(M)), 2 * log(0.5));
+
     imm_hmm_destroy(hmm);
     imm_normal_state_destroy(N0);
     imm_mute_state_destroy(M);
