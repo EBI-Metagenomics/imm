@@ -318,12 +318,13 @@ void test_hmm_viterbi_mute_cycle(void)
     cass_close(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state1)), -1.6094379124);
 
     imm_hmm_set_trans(hmm, imm_state_cast_c(state0), imm_state_cast_c(state1), log(0.2));
-
     cass_close(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state1)), -1.6094379124);
 
     imm_hmm_set_trans(hmm, imm_state_cast_c(state1), imm_state_cast_c(state0), log(0.2));
-
     cass_condition(imm_isnan(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state1))));
+
+    imm_hmm_set_trans(hmm, imm_state_cast_c(state1), imm_state_cast_c(state0), LOG0);
+    cass_close(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state1)), -1.6094379124);
 
     imm_hmm_destroy(hmm);
     imm_mute_state_destroy(state0);

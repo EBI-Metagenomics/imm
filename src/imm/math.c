@@ -6,6 +6,8 @@ int imm_isninf(double a) { return isinf(a) && a < 0.0; }
 
 int imm_isnan(double a) { return isnan(a); }
 
+int imm_lprobable(double a) { return isfinite(a); }
+
 double imm_logaddexp(double a, double b) { return logaddexp(a, b); }
 
 double imm_logsumexp(double *arr, int len)
