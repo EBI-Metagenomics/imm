@@ -123,6 +123,11 @@ double imm_hmm_likelihood(const struct imm_hmm *hmm, const char *seq,
     int seq_len = (int)strlen(seq);
 
     const struct imm_step *step = path_first_step(path);
+
+    if (step == NULL) {
+        return (seq_len == 0) ? 0.0 : -INFINITY;
+    }
+
     int len = path_step_seq_len(step);
     const struct imm_state *state = path_step_state(step);
 

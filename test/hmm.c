@@ -122,6 +122,14 @@ void test_hmm_likelihood_single_state(void)
     imm_path_destroy(path);
 
     path = imm_path_create();
+    cass_close(imm_hmm_likelihood(hmm, "", path), 0.0);
+    imm_path_destroy(path);
+
+    path = imm_path_create();
+    cass_condition(imm_isninf(imm_hmm_likelihood(hmm, "A", path)));
+    imm_path_destroy(path);
+
+    path = imm_path_create();
     imm_path_add(path, imm_state_cast_c(state), 1);
     cass_condition(isnan(imm_hmm_likelihood(hmm, "AG", path)));
     imm_path_destroy(path);
