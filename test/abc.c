@@ -16,14 +16,14 @@ int main(void)
 void test_abc(void)
 {
     struct imm_abc *abc = imm_abc_create("ACGT");
-    cass_condition(abc != NULL);
+    cass_cond(abc != NULL);
     imm_abc_destroy(abc);
 }
 
 void test_abc_any_symbol(void)
 {
     struct imm_abc *abc = imm_abc_create("AC*T");
-    cass_condition(abc == NULL);
+    cass_cond(abc == NULL);
 }
 
 void test_abc_symbol_range(void)
@@ -31,7 +31,7 @@ void test_abc_symbol_range(void)
     char symbols[] = {(char)128, '\0'};
     struct imm_abc *abc = imm_abc_create(symbols);
 
-    cass_condition(abc == NULL);
+    cass_cond(abc == NULL);
 
     imm_abc_destroy(abc);
 }

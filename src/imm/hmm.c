@@ -88,6 +88,11 @@ int imm_hmm_set_trans(struct imm_hmm *hmm, const struct imm_state *src_state,
         return 1;
     }
 
+    if (imm_isnan(lprob)) {
+        imm_error("transition probability is invalid");
+        return 1;
+    }
+
     struct mm_trans **head_ptr = mm_state_get_trans_ptr(src);
     struct mm_trans *mm_trans = mm_trans_find(*head_ptr, dst_state);
     if (mm_trans)
