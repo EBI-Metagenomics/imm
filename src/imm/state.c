@@ -1,4 +1,5 @@
 #include "imm.h"
+#include "src/imm/ascii.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -18,6 +19,11 @@ struct imm_state *imm_state_create(const char *name, const struct imm_abc *abc,
 {
     if (imm_abc_length(abc) == 0) {
         imm_error("empty alphabet");
+        return NULL;
+    }
+
+    if (!is_std_ascii(name, strlen(name))) {
+        imm_error("name must be a string of non-extended ASCII characters");
         return NULL;
     }
 

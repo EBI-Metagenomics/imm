@@ -20,7 +20,6 @@ struct imm_hmm
 };
 
 HIDE double hmm_start_lprob(const struct imm_hmm *hmm, const struct imm_state *state);
-HIDE int hmm_normalize_start(struct imm_hmm *hmm);
 HIDE int hmm_normalize_trans(struct mm_state *mm_state);
 
 struct imm_hmm *imm_hmm_create(const struct imm_abc *abc)
@@ -201,7 +200,7 @@ double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq,
 
 int imm_hmm_normalize(struct imm_hmm *hmm)
 {
-    if (hmm_normalize_start(hmm))
+    if (imm_hmm_normalize_start(hmm))
         return 1;
 
     struct mm_state *mm_state = hmm->mm_states;
@@ -224,17 +223,7 @@ void imm_hmm_destroy(struct imm_hmm *hmm)
     free(hmm);
 }
 
-double hmm_start_lprob(const struct imm_hmm *hmm, const struct imm_state *state)
-{
-    const struct mm_state *mm_state = mm_state_find(hmm->mm_states, state);
-    if (!mm_state) {
-        imm_error("state not found");
-        return NAN;
-    }
-    return mm_state_get_start_lprob(mm_state);
-}
-
-int hmm_normalize_start(struct imm_hmm *hmm)
+int imm_hmm_normalize_start(struct imm_hmm *hmm)
 {
     const struct mm_state *mm_state = hmm->mm_states;
     if (!mm_state)
@@ -263,6 +252,26 @@ int hmm_normalize_start(struct imm_hmm *hmm)
     return 0;
 }
 
+int imm_hmm_normalize_trans(struct imm_hmm *hmm, const struct imm_state *src)
+{
+    struct mm_state *state = mm_state_find(hmm->mm_states, src);
+    if (!state) {
+        imm_error("source state not found");
+        return 1;
+    }
+    return hmm_normalize_trans(state);
+}
+
+double hmm_start_lprob(const struct imm_hmm *hmm, const struct imm_state *state)
+{
+    const struct mm_state *mm_state = mm_state_find(hmm->mm_states, state);
+    if (!mm_state) {
+        imm_error("state not found");
+        return NAN;
+    }
+    return mm_state_get_start_lprob(mm_state);
+}
+
 int hmm_normalize_trans(struct mm_state *mm_state)
 {
     const struct mm_trans *mm_trans = mm_state_get_trans_c(mm_state);
@@ -274,7 +283,7 @@ int hmm_normalize_trans(struct mm_state *mm_state)
     }
 
     if (!isfinite(lnorm)) {
-        imm_error("a state has no transition");
+        imm_error("state has no transition");
         return 1;
     }
 

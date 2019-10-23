@@ -52,6 +52,7 @@ set(IMM_PRIVATE_HEADERS
 
 set(IMM_SOURCES
     src/imm/abc.c
+    src/imm/ascii.c
     src/imm/counter.c
     src/imm/dp.c
     src/imm/hmm.c

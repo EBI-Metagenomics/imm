@@ -1,16 +1,14 @@
 #include "imm.h"
+#include "src/imm/ascii.h"
 #include "src/imm/hide.h"
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define SYMBOL_ID_MIN 0
-#define SYMBOL_ID_MAX 127
-
 struct imm_abc
 {
     const char *symbols;
-    int symbol_idx[SYMBOL_ID_MAX + 1];
+    int symbol_idx[LAST_STD_ASCII + 1];
 };
 
 HIDE int check_symbols_length(const char *symbols);
@@ -25,7 +23,7 @@ struct imm_abc *imm_abc_create(const char *symbols)
 
     abc->symbols = strdup(symbols);
 
-    for (int i = 0; i <= SYMBOL_ID_MAX; ++i)
+    for (int i = 0; i <= LAST_STD_ASCII; ++i)
         abc->symbol_idx[i] = -1;
 
     const char *ids = abc->symbols;
@@ -83,7 +81,7 @@ int check_symbols_length(const char *symbols)
 
 int check_symbol_id(char symbol_id)
 {
-    if (symbol_id < SYMBOL_ID_MIN || symbol_id > SYMBOL_ID_MAX) {
+    if (!is_std_ascii(&symbol_id, 1)) {
         imm_error("symbols must be non-extended ASCII characters");
         return 1;
     }

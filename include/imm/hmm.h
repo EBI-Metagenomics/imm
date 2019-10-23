@@ -31,4 +31,8 @@ IMM_API double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq,
 
 IMM_API int imm_hmm_normalize(struct imm_hmm *hmm);
 
+IMM_API int imm_hmm_normalize_start(struct imm_hmm *hmm);
+
+IMM_API int imm_hmm_normalize_trans(struct imm_hmm *hmm, const struct imm_state *src);
+
 #endif
