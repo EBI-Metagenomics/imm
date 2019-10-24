@@ -2,6 +2,7 @@
 #include "imm.h"
 #include "src/imm/hide.h"
 #include "src/imm/matrix.h"
+#include "src/imm/matrix_ptr.h"
 #include "src/imm/min.h"
 #include "src/imm/mm_state.h"
 #include "src/imm/mm_trans.h"
@@ -20,6 +21,7 @@ struct dp
 
     struct matrix *trans;
     struct matrix *score;
+    struct matrix_ptr *ptrans;
 
     struct state_info const *end_state;
 };
@@ -31,6 +33,12 @@ struct state_info
     int min_seq;
     int max_seq;
     int col;
+};
+
+struct step
+{
+    struct state_info const *state;
+    int seq_len;
 };
 
 static inline int column(struct state_info const *state, int seq_len)
@@ -84,7 +92,9 @@ struct dp *dp_create(const struct mm_state *const *mm_states, int nstates, const
     state_idx_destroy(&state_idx);
 
     dp->score = matrix_create(dp->seq_len + 1, next_col);
+    dp->ptrans = matrix_ptr_create(dp->seq_len + 1, next_col);
     matrix_set_all(dp->score, LOG0);
+    matrix_ptr_set_all(dp->ptrans, NULL);
 
     return dp;
 }
@@ -134,6 +144,9 @@ void dp_destroy(struct dp *dp)
 
     matrix_destroy(dp->score);
     dp->score = NULL;
+
+    matrix_ptr_destroy(dp->ptrans);
+    dp->ptrans = NULL;
 
     dp->end_state = NULL;
 
