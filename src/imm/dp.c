@@ -3,7 +3,6 @@
 #include "src/imm/gmatrix.h"
 #include "src/imm/hide.h"
 #include "src/imm/matrix.h"
-#include "src/imm/matrix_ptr.h"
 #include "src/imm/min.h"
 #include "src/imm/mm_state.h"
 #include "src/imm/mm_trans.h"
@@ -16,8 +15,6 @@ struct state_info
 {
     const struct imm_state *state;
     double start_lprob;
-    int min_seq;
-    int max_seq;
     int idx;
 };
 
@@ -55,7 +52,7 @@ struct dp
 static inline int column(struct dp_matrix const *dp_matrix, struct state_info const *state,
                          int seq_len)
 {
-    return dp_matrix->state_col[state->idx] + seq_len - state->min_seq;
+    return dp_matrix->state_col[state->idx] + seq_len - imm_state_min_seq(state->state);
 }
 
 HIDE double get_score(struct dp_matrix const *dp_matrix, int row,
@@ -66,7 +63,7 @@ HIDE double best_trans_score(const struct dp *dp, struct state_info const *state
                              struct step *step);
 HIDE struct matrix *create_trans(const struct mm_state *const *mm_states, int nstates,
                                  const struct state_idx *state_idx);
-HIDE double best_score(struct dp const *dp, int *seq_len);
+HIDE double final_score(struct dp const *dp, int *seq_len);
 HIDE int viterbi_path(struct dp *dp, struct imm_path *path, int end_seq_len);
 
 struct dp *dp_create(const struct mm_state *const *mm_states, int nstates, const char *seq,
@@ -91,14 +88,13 @@ struct dp *dp_create(const struct mm_state *const *mm_states, int nstates, const
     for (int i = 0; i < nstates; ++i) {
         dp->states[i].state = mm_state_get_state(mm_states[i]);
         dp->states[i].start_lprob = mm_state_get_start_lprob(mm_states[i]);
-        dp->states[i].min_seq = imm_state_min_seq(dp->states[i].state);
-        dp->states[i].max_seq = imm_state_max_seq(dp->states[i].state);
         dp->states[i].idx = i;
 
         dp->dp_matrix.state_col[i] = next_col;
 
         state_idx_add(&state_idx, dp->states[i].state, i);
-        next_col += dp->states[i].max_seq - dp->states[i].min_seq + 1;
+        next_col += imm_state_max_seq(dp->states[i].state) -
+                    imm_state_min_seq(dp->states[i].state) + 1;
     }
     dp->end_state = dp->states + state_idx_find(state_idx, end_state);
 
@@ -120,7 +116,8 @@ double dp_viterbi(struct dp *dp, struct imm_path *path)
         struct state_info const *cur = dp->states;
         for (int i = 0; i < dp->nstates; ++i, ++cur) {
 
-            for (int len = cur->min_seq; len <= MIN(cur->max_seq, seq_len); ++len) {
+            for (int len = imm_state_min_seq(cur->state);
+                 len <= MIN(imm_state_max_seq(cur->state), seq_len); ++len) {
 
                 int col = column(&dp->dp_matrix, cur, len);
                 struct step *step = gmatrix_step_get(dp->dp_matrix.step, r, col);
@@ -132,7 +129,7 @@ double dp_viterbi(struct dp *dp, struct imm_path *path)
     }
 
     int end_seq_len = -1;
-    double score = best_score(dp, &end_seq_len);
+    double score = final_score(dp, &end_seq_len);
 
     if (path) {
         if (viterbi_path(dp, path, end_seq_len))
@@ -194,12 +191,13 @@ double best_trans_score(const struct dp *dp, struct state_info const *state, int
 
     for (int i = 0; i < dp->nstates; ++i) {
         struct state_info const *prev = dp->states + i;
-        if (row - prev->min_seq < 0)
+        if (row - imm_state_min_seq(prev->state) < 0)
             continue;
 
         double trans = matrix_get(dp->trans, i, state->idx);
 
-        for (int len = prev->min_seq; len <= MIN(prev->max_seq, row); ++len) {
+        for (int len = imm_state_min_seq(prev->state);
+             len <= MIN(imm_state_max_seq(prev->state), row); ++len) {
             double v = get_score(&dp->dp_matrix, row - len, prev, len) + trans;
             if (v > score) {
                 score = v;
@@ -230,12 +228,13 @@ struct matrix *create_trans(const struct mm_state *const *mm_states, int nstates
     return trans;
 }
 
-double best_score(struct dp const *dp, int *seq_len)
+double final_score(struct dp const *dp, int *seq_len)
 {
     double score = LOG0;
     struct state_info const *e = dp->end_state;
 
-    for (int len = MIN(e->max_seq, dp->seq_len); e->min_seq <= len; --len) {
+    for (int len = MIN(imm_state_max_seq(e->state), dp->seq_len);
+         imm_state_min_seq(e->state) <= len; --len) {
         double s = get_score(&dp->dp_matrix, dp->seq_len - len, e, len);
         if (s > score) {
             score = s;
