@@ -1,6 +1,4 @@
 #include "src/imm/matrix.h"
-#include <math.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 struct matrix *matrix_create(int nrows, int ncols)
@@ -30,14 +28,14 @@ void matrix_destroy(struct matrix *matrix)
     free(matrix);
 }
 
-void matrix_print(const struct matrix *matrix)
-{
-    return;
-    for (int r = 0; r < matrix->nrows; ++r) {
-        printf("|");
-        for (int c = 0; c < matrix->ncols - 1; ++c) {
-            printf("%0.9f, ", exp(matrix_get(matrix, r, c)));
-        }
-        printf("%0.9f|\n", exp(matrix_get(matrix, r, matrix->ncols - 1)));
-    }
-}
+/* void matrix_print(const struct matrix *matrix) */
+/* { */
+/*     return; */
+/*     for (int r = 0; r < matrix->nrows; ++r) { */
+/*         printf("|"); */
+/*         for (int c = 0; c < matrix->ncols - 1; ++c) { */
+/*             printf("%0.9f, ", exp(matrix_get(matrix, r, c))); */
+/*         } */
+/*         printf("%0.9f|\n", exp(matrix_get(matrix, r, matrix->ncols - 1))); */
+/*     } */
+/* } */
