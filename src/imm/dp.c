@@ -18,6 +18,15 @@ struct state_info
     int                     idx;
 };
 
+static inline int min_seq(struct state_info const* state_info)
+{
+    return imm_state_min_seq(state_info->state);
+}
+static inline int max_seq(struct state_info const* state_info)
+{
+    return imm_state_max_seq(state_info->state);
+}
+
 struct step
 {
     struct state_info const* state;
@@ -54,8 +63,8 @@ HIDE double get_score(struct dp_matrix const* dp_matrix, int row, struct step co
 HIDE void   set_score(struct dp_matrix const* dp_matrix, int row, struct step const* step,
                       double score);
 
-HIDE double best_trans_score(const struct dp* dp, struct state_info const* state, int row,
-                             struct step* step);
+HIDE double best_trans_score(const struct dp* dp, struct state_info const* dst_state, int row,
+                             struct step* prev_step);
 HIDE double final_score(struct dp const* dp, int* seq_len);
 HIDE int    viterbi_path(struct dp* dp, struct imm_path* path, int end_seq_len);
 
@@ -117,8 +126,8 @@ double dp_viterbi(struct dp* dp, struct imm_path* path)
 
                 struct step  cur_step = {cur, len};
                 int          col = column(&dp->dp_matrix, &cur_step);
-                struct step* step = gmatrix_step_get(dp->dp_matrix.step, r, col);
-                double       score = best_trans_score(dp, cur, r, step);
+                struct step* prev_step = gmatrix_step_get(dp->dp_matrix.step, r, col);
+                double       score = best_trans_score(dp, cur, r, prev_step);
                 double       emiss = imm_state_lprob(cur->state, seq, len);
                 set_score(&dp->dp_matrix, r, &cur_step, score + emiss);
             }
@@ -181,31 +190,31 @@ void set_score(struct dp_matrix const* dp_matrix, int row, struct step const* st
     matrix_set(dp_matrix->score, row, column(dp_matrix, step), score);
 }
 
-double best_trans_score(const struct dp* dp, struct state_info const* state, int row,
-                        struct step* step)
+double best_trans_score(const struct dp* dp, struct state_info const* dst_state, int row,
+                        struct step* prev_step)
 {
     double score = LOG0;
-    step->state = NULL;
-    step->seq_len = -1;
+    prev_step->state = NULL;
+    prev_step->seq_len = -1;
 
     if (row == 0)
-        score = state->start_lprob;
+        score = dst_state->start_lprob;
 
-    for (int i = 0; i < dp->nstates; ++i) {
-        struct state_info const* prev = dp->states + i;
-        if (row - imm_state_min_seq(prev->state) < 0)
+    struct state_info const* prev = dp->states;
+    for (int i = 0; i < dp->nstates; ++i, ++prev) {
+        if (row - min_seq(prev) < 0)
             continue;
 
-        double trans = matrix_get(dp->trans, i, state->idx);
+        double trans = matrix_get(dp->trans, i, dst_state->idx);
 
-        for (int len = imm_state_min_seq(prev->state);
-             len <= MIN(imm_state_max_seq(prev->state), row); ++len) {
-            struct step prev_step = {prev, len};
-            double      v = get_score(&dp->dp_matrix, row - len, &prev_step) + trans;
+        for (int len = min_seq(prev); len <= MIN(max_seq(prev), row); ++len) {
+            struct step tmp_step = {prev, len};
+            int         prev_row = row - len;
+            double      v = get_score(&dp->dp_matrix, prev_row, &tmp_step) + trans;
             if (v > score) {
                 score = v;
-                step->state = prev;
-                step->seq_len = len;
+                prev_step->state = prev;
+                prev_step->seq_len = len;
             }
         }
     }
