@@ -1,5 +1,6 @@
 #include "src/imm/dp.h"
 #include "imm.h"
+#include "src/imm/gmatrix.h"
 #include "src/imm/hide.h"
 #include "src/imm/matrix.h"
 #include "src/imm/matrix_ptr.h"
@@ -10,21 +11,6 @@
 #include "src/uthash/uthash.h"
 #include <limits.h>
 #include <math.h>
-
-struct dp
-{
-    int nstates;
-    struct state_info *states;
-
-    const char *seq;
-    int seq_len;
-
-    struct matrix *trans;
-    struct matrix *score;
-    struct matrix_ptr *ptrans;
-
-    struct state_info const *end_state;
-};
 
 struct state_info
 {
@@ -40,6 +26,27 @@ struct step
     struct state_info const *state;
     int seq_len;
 };
+MAKE_GMATRIX_STRUCT(step, struct step)
+MAKE_GMATRIX_CREATE(step, struct step)
+MAKE_GMATRIX_GET(step, struct step)
+/* MAKE_GMATRIX_SET(step, struct step) */
+/* MAKE_GMATRIX_SET_ALL(step, struct step) */
+MAKE_GMATRIX_DESTROY(step, struct step)
+
+struct dp
+{
+    int nstates;
+    struct state_info *states;
+
+    const char *seq;
+    int seq_len;
+
+    struct matrix *trans;
+    struct matrix *score;
+    struct gmatrix_step *step;
+
+    struct state_info const *end_state;
+};
 
 static inline int column(struct state_info const *state, int seq_len)
 {
@@ -51,7 +58,7 @@ HIDE double get_score(const struct dp *dp, int row, struct state_info const *sta
 HIDE void set_score(const struct dp *dp, int row, struct state_info const *state, int seq_len,
                     double score);
 HIDE double best_trans_score(const struct dp *dp, double start_lprob, int row,
-                             int dst_state_idx);
+                             int dst_state_idx, struct step *step);
 HIDE struct matrix *create_trans(const struct mm_state *const *mm_states, int nstates,
                                  const struct state_idx *state_idx);
 HIDE double best_score(struct dp const *dp, int *seq_len);
@@ -92,9 +99,7 @@ struct dp *dp_create(const struct mm_state *const *mm_states, int nstates, const
     state_idx_destroy(&state_idx);
 
     dp->score = matrix_create(dp->seq_len + 1, next_col);
-    dp->ptrans = matrix_ptr_create(dp->seq_len + 1, next_col);
-    matrix_set_all(dp->score, LOG0);
-    matrix_ptr_set_all(dp->ptrans, NULL);
+    dp->step = gmatrix_step_create(dp->seq_len + 1, next_col);
 
     return dp;
 }
@@ -110,7 +115,8 @@ double dp_viterbi(struct dp *dp, struct imm_path *path)
 
             for (int len = cur->min_seq; len <= MIN(cur->max_seq, seq_len); ++len) {
 
-                double score = best_trans_score(dp, cur->start_lprob, r, i);
+                struct step *step = gmatrix_step_get(dp->step, r, column(cur, len));
+                double score = best_trans_score(dp, cur->start_lprob, r, i, step);
                 double emiss = imm_state_lprob(cur->state, seq, len);
                 set_score(dp, r, cur, len, score + emiss);
             }
@@ -145,8 +151,8 @@ void dp_destroy(struct dp *dp)
     matrix_destroy(dp->score);
     dp->score = NULL;
 
-    matrix_ptr_destroy(dp->ptrans);
-    dp->ptrans = NULL;
+    gmatrix_step_destroy(dp->step);
+    dp->step = NULL;
 
     dp->end_state = NULL;
 
@@ -166,11 +172,16 @@ double get_score(const struct dp *dp, int row, struct state_info const *state, i
     return matrix_get(dp->score, row, column(state, seq_len));
 }
 
-double best_trans_score(const struct dp *dp, double start_lprob, int row, int dst_state_idx)
+double best_trans_score(const struct dp *dp, double start_lprob, int row, int dst_state_idx,
+                        struct step *step)
 {
     double score = LOG0;
+    step->seq_len = -1;
+    step->state = NULL;
+
     if (row == 0)
         score = start_lprob;
+
     for (int i = 0; i < dp->nstates; ++i) {
         struct state_info const *state = dp->states + i;
         if (row - state->min_seq < 0)
@@ -180,7 +191,11 @@ double best_trans_score(const struct dp *dp, double start_lprob, int row, int ds
 
         for (int len = state->min_seq; len <= MIN(state->max_seq, row); ++len) {
             double v = get_score(dp, row - len, state, len) + trans;
-            score = MAX(v, score);
+            if (v > score) {
+                score = v;
+                step->seq_len = len;
+                step->state = state;
+            }
         }
     }
     return score;
