@@ -49,16 +49,10 @@ struct dp
     struct dp_matrix dp_matrix;
 };
 
-static inline int column(struct dp_matrix const *dp_matrix, struct state_info const *state,
-                         int seq_len)
-{
-    return dp_matrix->state_col[state->idx] + seq_len - imm_state_min_seq(state->state);
-}
-
-HIDE double get_score(struct dp_matrix const *dp_matrix, int row,
-                      struct state_info const *state, int seq_len);
-HIDE void set_score(struct dp_matrix const *dp_matrix, int row,
-                    struct state_info const *state, int seq_len, double score);
+HIDE int column(struct dp_matrix const *dp_matrix, struct step const *step);
+HIDE double get_score(struct dp_matrix const *dp_matrix, int row, struct step const *step);
+HIDE void set_score(struct dp_matrix const *dp_matrix, int row, struct step const *step,
+                    double score);
 HIDE double best_trans_score(const struct dp *dp, struct state_info const *state, int row,
                              struct step *step);
 HIDE struct matrix *create_trans(const struct mm_state *const *mm_states, int nstates,
@@ -119,11 +113,12 @@ double dp_viterbi(struct dp *dp, struct imm_path *path)
             for (int len = imm_state_min_seq(cur->state);
                  len <= MIN(imm_state_max_seq(cur->state), seq_len); ++len) {
 
-                int col = column(&dp->dp_matrix, cur, len);
+                struct step cur_step = {cur, len};
+                int col = column(&dp->dp_matrix, &cur_step);
                 struct step *step = gmatrix_step_get(dp->dp_matrix.step, r, col);
                 double score = best_trans_score(dp, cur, r, step);
                 double emiss = imm_state_lprob(cur->state, seq, len);
-                set_score(&dp->dp_matrix, r, cur, len, score + emiss);
+                set_score(&dp->dp_matrix, r, &cur_step, score + emiss);
             }
         }
     }
@@ -165,18 +160,17 @@ void dp_destroy(struct dp *dp)
     free(dp);
 }
 
-void set_score(struct dp_matrix const *dp_matrix, int row, struct state_info const *state,
-               int seq_len, double score)
+void set_score(struct dp_matrix const *dp_matrix, int row, struct step const *step,
+               double score)
 {
-    matrix_set(dp_matrix->score, row, column(dp_matrix, state, seq_len), score);
+    matrix_set(dp_matrix->score, row, column(dp_matrix, step), score);
 }
 
-double get_score(struct dp_matrix const *dp_matrix, int row, struct state_info const *state,
-                 int seq_len)
+double get_score(struct dp_matrix const *dp_matrix, int row, struct step const *step)
 {
     if (row < 0)
-        return state->start_lprob;
-    return matrix_get(dp_matrix->score, row, column(dp_matrix, state, seq_len));
+        return step->state->start_lprob;
+    return matrix_get(dp_matrix->score, row, column(dp_matrix, step));
 }
 
 double best_trans_score(const struct dp *dp, struct state_info const *state, int row,
@@ -198,7 +192,8 @@ double best_trans_score(const struct dp *dp, struct state_info const *state, int
 
         for (int len = imm_state_min_seq(prev->state);
              len <= MIN(imm_state_max_seq(prev->state), row); ++len) {
-            double v = get_score(&dp->dp_matrix, row - len, prev, len) + trans;
+            struct step prev_step = {prev, len};
+            double v = get_score(&dp->dp_matrix, row - len, &prev_step) + trans;
             if (v > score) {
                 score = v;
                 step->state = prev;
@@ -235,7 +230,9 @@ double final_score(struct dp const *dp, int *seq_len)
 
     for (int len = MIN(imm_state_max_seq(e->state), dp->seq_len);
          imm_state_min_seq(e->state) <= len; --len) {
-        double s = get_score(&dp->dp_matrix, dp->seq_len - len, e, len);
+
+        struct step step = {e, len};
+        double s = get_score(&dp->dp_matrix, dp->seq_len - len, &step);
         if (s > score) {
             score = s;
             *seq_len = len;
@@ -245,3 +242,9 @@ double final_score(struct dp const *dp, int *seq_len)
 }
 
 int viterbi_path(struct dp *dp, struct imm_path *path, int end_seq_len) { return 0; }
+
+int column(struct dp_matrix const *dp_matrix, struct step const *step)
+{
+    return dp_matrix->state_col[step->state->idx] + step->seq_len -
+           imm_state_min_seq(step->state->state);
+}
