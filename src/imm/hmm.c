@@ -183,7 +183,7 @@ not_found_state:
 }
 
 double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq,
-                       const struct imm_state *end_state)
+                       const struct imm_state *end_state, struct imm_path *path)
 
 {
     const struct mm_state *const *mm_states = mm_state_sort(hmm->mm_states);
@@ -191,7 +191,7 @@ double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq,
         return NAN;
 
     struct dp *dp = dp_create(mm_states, mm_state_nitems(hmm->mm_states), seq);
-    double score = dp_viterbi(dp, end_state);
+    double score = dp_viterbi(dp, end_state, path);
     dp_destroy(dp);
 
     free((struct mm_state **)mm_states);

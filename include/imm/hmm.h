@@ -27,7 +27,7 @@ IMM_API double imm_hmm_likelihood(const struct imm_hmm *hmm, const char *seq,
                                   const struct imm_path *path);
 
 IMM_API double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq,
-                               const struct imm_state *end_state);
+                               const struct imm_state *end_state, struct imm_path *path);
 
 IMM_API int imm_hmm_normalize(struct imm_hmm *hmm);
 
