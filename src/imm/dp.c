@@ -65,8 +65,8 @@ HIDE void   set_score(struct dp_matrix const* dp_matrix, int row, struct step co
 
 HIDE double best_trans_score(const struct dp* dp, struct state_info const* dst_state, int row,
                              struct step* prev_step);
-HIDE double final_score(struct dp const* dp, int* seq_len);
-HIDE int    viterbi_path(struct dp* dp, struct imm_path* path, int end_seq_len);
+HIDE double final_score(struct dp const* dp, struct step* end_step);
+HIDE int    viterbi_path(struct dp* dp, struct imm_path* path, struct step const* end_step);
 
 HIDE struct matrix* create_trans(const struct mm_state* const* mm_states, int nstates,
                                  const struct state_idx* state_idx);
@@ -134,11 +134,11 @@ double dp_viterbi(struct dp* dp, struct imm_path* path)
         }
     }
 
-    int    end_seq_len = -1;
-    double score = final_score(dp, &end_seq_len);
+    struct step end_step = {NULL, -1};
+    double      score = final_score(dp, &end_step);
 
     if (path) {
-        if (viterbi_path(dp, path, end_seq_len))
+        if (viterbi_path(dp, path, &end_step))
             return NAN;
     }
 
@@ -221,10 +221,11 @@ double best_trans_score(const struct dp* dp, struct state_info const* dst_state,
     return score;
 }
 
-double final_score(struct dp const* dp, int* seq_len)
+double final_score(struct dp const* dp, struct step* end_step)
 {
     double                   score = LOG0;
     struct state_info const* e = dp->end_state;
+    end_step->state = dp->end_state;
 
     for (int len = MIN(imm_state_max_seq(e->state), dp->seq_len);
          imm_state_min_seq(e->state) <= len; --len) {
@@ -233,13 +234,16 @@ double final_score(struct dp const* dp, int* seq_len)
         double      s = get_score(&dp->dp_matrix, dp->seq_len - len, &step);
         if (s > score) {
             score = s;
-            *seq_len = len;
+            end_step->seq_len = len;
         }
     }
     return score;
 }
 
-int viterbi_path(struct dp* dp, struct imm_path* path, int end_seq_len) { return 0; }
+int viterbi_path(struct dp* dp, struct imm_path* path, struct step const* end_step)
+{
+    return 0;
+}
 
 struct matrix* create_trans(const struct mm_state* const* mm_states, int nstates,
                             const struct state_idx* state_idx)
