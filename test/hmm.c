@@ -320,7 +320,7 @@ void test_hmm_viterbi_no_state(void)
     struct imm_abc *abc = imm_abc_create("ACGT");
     struct imm_hmm *hmm = imm_hmm_create(abc);
 
-    cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "", NULL, NULL)));
+    cass_cond(imm_isnan(imm_hmm_viterbi(hmm, "", NULL, NULL)));
 
     imm_hmm_destroy(hmm);
     imm_abc_destroy(abc);

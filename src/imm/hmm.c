@@ -186,11 +186,23 @@ double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq,
                        const struct imm_state *end_state, struct imm_path *path)
 
 {
+    if (!hmm || !seq || !end_state)
+    {
+        imm_error("viterbi input cannot be NULL");
+        return NAN;
+    }
+
+    if (!mm_state_find_c(hmm->mm_states, end_state))
+    {
+        imm_error("end_state not found");
+        return NAN;
+    }
+
     const struct mm_state *const *mm_states = mm_state_sort(hmm->mm_states);
     if (!mm_states)
         return NAN;
 
-    struct dp *dp = dp_create(mm_states, mm_state_nitems(hmm->mm_states), seq);
+    struct dp *dp = dp_create(mm_states, mm_state_nitems(hmm->mm_states), seq, end_state);
     double score = dp_viterbi(dp, end_state, path);
     dp_destroy(dp);
 
