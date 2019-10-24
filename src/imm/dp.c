@@ -46,9 +46,8 @@ HIDE double best_trans_score(const struct dp *dp, double start_lprob, int row,
                              int dst_state_idx);
 HIDE struct matrix *create_trans(const struct mm_state *const *mm_states, int nstates,
                                  const struct state_idx *state_idx);
-HIDE double best_score(struct dp const *dp, struct imm_state const *end_state);
-HIDE int viterbi_path(struct dp *dp, struct imm_state const *end_state,
-                      struct imm_path *path);
+HIDE double best_score(struct dp const *dp, int *seq_len);
+HIDE int viterbi_path(struct dp *dp, struct imm_path *path, int end_seq_len);
 
 struct dp *dp_create(const struct mm_state *const *mm_states, int nstates, const char *seq,
                      struct imm_state const *end_state)
@@ -90,7 +89,7 @@ struct dp *dp_create(const struct mm_state *const *mm_states, int nstates, const
     return dp;
 }
 
-double dp_viterbi(struct dp *dp, const struct imm_state *end_state, struct imm_path *path)
+double dp_viterbi(struct dp *dp, struct imm_path *path)
 {
     for (int r = 0; r <= dp->seq_len; ++r) {
         char const *seq = dp->seq + r;
@@ -108,10 +107,11 @@ double dp_viterbi(struct dp *dp, const struct imm_state *end_state, struct imm_p
         }
     }
 
-    double score = best_score(dp, end_state);
+    int end_seq_len = -1;
+    double score = best_score(dp, &end_seq_len);
 
     if (path) {
-        if (viterbi_path(dp, end_state, path))
+        if (viterbi_path(dp, path, end_seq_len))
             return NAN;
     }
 
@@ -192,25 +192,19 @@ struct matrix *create_trans(const struct mm_state *const *mm_states, int nstates
     return trans;
 }
 
-double best_score(struct dp const *dp, struct imm_state const *end_state)
+double best_score(struct dp const *dp, int *seq_len)
 {
     double score = LOG0;
-    const struct state_info *cur = dp->states;
-    for (int i = 0; i < dp->nstates; ++i, ++cur) {
+    struct state_info const *e = dp->end_state;
 
-        if (cur->state == end_state) {
-            for (int len = MIN(cur->max_seq, dp->seq_len); cur->min_seq <= len; --len) {
-                score = MAX(score, get_score(dp, dp->seq_len - len, cur, len));
-            }
-            break;
+    for (int len = MIN(e->max_seq, dp->seq_len); e->min_seq <= len; --len) {
+        double s = get_score(dp, dp->seq_len - len, e, len);
+        if (s > score) {
+            score = s;
+            *seq_len = len;
         }
     }
-
     return score;
 }
 
-int viterbi_path(struct dp *dp, struct imm_state const *end_state, struct imm_path *path)
-{
-
-    return 0;
-}
+int viterbi_path(struct dp *dp, struct imm_path *path, int end_seq_len) { return 0; }
