@@ -4,9 +4,9 @@
 
 double imm_lprob_impossible(void) { return -INFINITY; }
 
-int imm_lprob_is_possible(double a) { return !isinf(a) && a <= 0.0; }
+int imm_lprob_is_possible(double a) { return !(isinf(a) && a < 0.0); }
 
-int imm_lprob_is_valid(double a) { return !isnan(a) && a <= 0.0; }
+int imm_lprob_is_valid(double a) { return !isnan(a); }
 
 double imm_lprob_invalid(void) { return NAN; }
 
@@ -15,7 +15,7 @@ double imm_lprob_add(double a, double b) { return logaddexp(a, b); }
 double imm_lprob_sum(double* arr, int len)
 {
 
-    double r = LOG0;
+    double r = -INFINITY;
     for (int i = 0; i < len; ++i)
         r = logaddexp(r, arr[i]);
     return r;
@@ -23,11 +23,10 @@ double imm_lprob_sum(double* arr, int len)
 
 int imm_lprob_normalize(double* arr, int len)
 {
-
-    double lnorm = imm_logsumexp(arr, len);
+    double lnorm = imm_lprob_sum(arr, len);
     if (!isfinite(lnorm)) {
         imm_error("non-finite normalization denominator");
-        return -1;
+        return 1;
     }
 
     for (int i = 0; i < len; ++i)

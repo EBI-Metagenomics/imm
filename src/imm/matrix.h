@@ -5,22 +5,22 @@
 
 struct matrix
 {
-    double *data;
-    int nrows;
-    int ncols;
+    double* data;
+    int     nrows;
+    int     ncols;
 };
 
-HIDE struct matrix *matrix_create(int nrows, int ncols);
-inline static double matrix_get(const struct matrix *matrix, int r, int c)
+HIDE struct matrix*  matrix_create(int nrows, int ncols);
+inline static double matrix_get(const struct matrix* matrix, int r, int c)
 {
     return matrix->data[r * matrix->ncols + c];
 }
-inline static void matrix_set(struct matrix *matrix, int r, int c, double v)
+inline static void matrix_set(struct matrix* matrix, int r, int c, double v)
 {
     matrix->data[r * matrix->ncols + c] = v;
 }
-HIDE void matrix_set_all(struct matrix *matrix, double v);
-HIDE void matrix_destroy(struct matrix *matrix);
+HIDE void matrix_set_all(struct matrix* matrix, double v);
+HIDE void matrix_destroy(struct matrix* matrix);
 /* HIDE void matrix_print(const struct matrix *matrix); */
 
 #endif

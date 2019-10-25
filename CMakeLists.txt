@@ -42,7 +42,6 @@ set(IMM_PRIVATE_HEADERS
     include/imm/api.h
     include/imm/hmm.h
     include/imm/lprob.h
-    include/imm/math.h
     include/imm/mute_state.h
     include/imm/normal_state.h
     include/imm/path.h
@@ -58,7 +57,6 @@ set(IMM_SOURCES
     src/imm/dp.c
     src/imm/hmm.c
     src/imm/lprob.c
-    src/imm/math.c
     src/imm/matrix.c
     src/imm/matrix_ptr.c
     src/imm/mm_state.c

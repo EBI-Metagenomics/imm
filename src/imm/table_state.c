@@ -7,26 +7,26 @@
 
 struct imm_table_state
 {
-    struct imm_state *interface;
-    struct emission *emissions;
-    int min_seq;
-    int max_seq;
+    struct imm_state* interface;
+    struct emission*  emissions;
+    int               min_seq;
+    int               max_seq;
 };
 
 struct emission
 {
-    char *seq;
-    double lprob;
+    char*          seq;
+    double         lprob;
     UT_hash_handle hh;
 };
 
-HIDE double table_state_lprob(const struct imm_state *state, const char *seq, int seq_len);
-HIDE int table_state_min_seq(const struct imm_state *state);
-HIDE int table_state_max_seq(const struct imm_state *state);
+HIDE double table_state_lprob(const struct imm_state* state, const char* seq, int seq_len);
+HIDE int    table_state_min_seq(const struct imm_state* state);
+HIDE int    table_state_max_seq(const struct imm_state* state);
 
-struct imm_table_state *imm_table_state_create(const char *name, const struct imm_abc *abc)
+struct imm_table_state* imm_table_state_create(const char* name, const struct imm_abc* abc)
 {
-    struct imm_table_state *state = malloc(sizeof(struct imm_table_state));
+    struct imm_table_state* state = malloc(sizeof(struct imm_table_state));
     state->emissions = NULL;
     state->min_seq = 0;
     state->max_seq = 0;
@@ -37,7 +37,7 @@ struct imm_table_state *imm_table_state_create(const char *name, const struct im
     return state;
 }
 
-void imm_table_state_destroy(struct imm_table_state *state)
+void imm_table_state_destroy(struct imm_table_state* state)
 {
     if (!state)
         return;
@@ -59,9 +59,9 @@ void imm_table_state_destroy(struct imm_table_state *state)
     free(state);
 }
 
-void imm_table_state_add(struct imm_table_state *state, const char *seq, double lprob)
+void imm_table_state_add(struct imm_table_state* state, const char* seq, double lprob)
 {
-    struct emission *emiss = malloc(sizeof(struct emission));
+    struct emission* emiss = malloc(sizeof(struct emission));
     emiss->seq = strdup(seq);
     int seq_len = (int)strlen(seq);
     emiss->lprob = lprob;
@@ -70,19 +70,19 @@ void imm_table_state_add(struct imm_table_state *state, const char *seq, double 
     state->max_seq = MAX(state->max_seq, seq_len);
 }
 
-int imm_table_state_normalize(struct imm_table_state *state)
+int imm_table_state_normalize(struct imm_table_state* state)
 {
-    int len = (int)HASH_CNT(hh, state->emissions);
-    double *lprobs = malloc(sizeof(double) * (size_t)len);
+    int     len = (int)HASH_CNT(hh, state->emissions);
+    double* lprobs = malloc(sizeof(double) * (size_t)len);
 
     struct emission *emiss, *tmp;
-    size_t i = 0;
+    size_t           i = 0;
     HASH_ITER(hh, state->emissions, emiss, tmp)
     {
         lprobs[i] = emiss->lprob;
         ++i;
     }
-    if (imm_lognormalize(lprobs, len)) {
+    if (imm_lprob_normalize(lprobs, len)) {
         free(lprobs);
         return -1;
     }
@@ -98,27 +98,27 @@ int imm_table_state_normalize(struct imm_table_state *state)
     return 0;
 }
 
-double table_state_lprob(const struct imm_state *state, const char *seq, int seq_len)
+double table_state_lprob(const struct imm_state* state, const char* seq, int seq_len)
 {
-    const struct imm_table_state *s = imm_state_get_impl_c(state);
+    const struct imm_table_state* s = imm_state_get_impl_c(state);
 
-    struct emission *emiss = NULL;
+    struct emission* emiss = NULL;
     HASH_FIND(hh, s->emissions, seq, (size_t)seq_len, emiss);
 
     if (emiss)
         return emiss->lprob;
 
-    return LOG0;
+    return imm_lprob_impossible();
 }
 
-int table_state_min_seq(const struct imm_state *state)
+int table_state_min_seq(const struct imm_state* state)
 {
-    const struct imm_table_state *s = imm_state_get_impl_c(state);
+    const struct imm_table_state* s = imm_state_get_impl_c(state);
     return s->min_seq;
 }
 
-int table_state_max_seq(const struct imm_state *state)
+int table_state_max_seq(const struct imm_state* state)
 {
-    const struct imm_table_state *s = imm_state_get_impl_c(state);
+    const struct imm_table_state* s = imm_state_get_impl_c(state);
     return s->max_seq;
 }

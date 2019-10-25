@@ -6,6 +6,6 @@
 
 #define LAST_STD_ASCII 127
 
-HIDE int is_std_ascii(char const *str, size_t len);
+HIDE int is_std_ascii(char const* str, size_t len);
 
 #endif

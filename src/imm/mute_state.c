@@ -5,23 +5,23 @@
 
 struct imm_mute_state
 {
-    struct imm_state *interface;
+    struct imm_state* interface;
 };
 
-HIDE double mute_state_lprob(const struct imm_state *state, const char *seq, int seq_len);
-HIDE int mute_state_min_seq(const struct imm_state *state);
-HIDE int mute_state_max_seq(const struct imm_state *state);
+HIDE double mute_state_lprob(const struct imm_state* state, const char* seq, int seq_len);
+HIDE int    mute_state_min_seq(const struct imm_state* state);
+HIDE int    mute_state_max_seq(const struct imm_state* state);
 
-struct imm_mute_state *imm_mute_state_create(const char *name, const struct imm_abc *abc)
+struct imm_mute_state* imm_mute_state_create(const char* name, const struct imm_abc* abc)
 {
-    struct imm_mute_state *state = malloc(sizeof(struct imm_mute_state));
+    struct imm_mute_state* state = malloc(sizeof(struct imm_mute_state));
 
     struct imm_state_funcs funcs = {mute_state_lprob, mute_state_min_seq, mute_state_max_seq};
     state->interface = imm_state_create(name, abc, funcs, state);
     return state;
 }
 
-void imm_mute_state_destroy(struct imm_mute_state *state)
+void imm_mute_state_destroy(struct imm_mute_state* state)
 {
     if (!state)
         return;
@@ -32,13 +32,13 @@ void imm_mute_state_destroy(struct imm_mute_state *state)
     free(state);
 }
 
-double mute_state_lprob(const struct imm_state *state, const char *seq, int seq_len)
+double mute_state_lprob(const struct imm_state* state, const char* seq, int seq_len)
 {
     if (seq_len == 0)
         return 0.0;
-    return LOG0;
+    return imm_lprob_impossible();
 }
 
-int mute_state_min_seq(const struct imm_state *state) { return 0; }
+int mute_state_min_seq(const struct imm_state* state) { return 0; }
 
-int mute_state_max_seq(const struct imm_state *state) { return 0; }
+int mute_state_max_seq(const struct imm_state* state) { return 0; }

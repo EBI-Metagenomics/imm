@@ -88,7 +88,7 @@ int imm_hmm_set_trans(struct imm_hmm* hmm, const struct imm_state* src_state,
         return 1;
     }
 
-    if (imm_isnan(lprob)) {
+    if (!imm_lprob_is_valid(lprob)) {
         imm_error("transition probability is invalid");
         return 1;
     }
@@ -119,7 +119,7 @@ double imm_hmm_get_trans(const struct imm_hmm* hmm, const struct imm_state* src_
 
     const struct mm_trans* mm_trans = mm_trans_find_c(mm_state_get_trans_c(src), dst_state);
     if (!mm_trans)
-        return LOG0;
+        return imm_lprob_impossible();
 
     return mm_trans_get_lprob(mm_trans);
 }
@@ -202,7 +202,7 @@ double imm_hmm_viterbi(const struct imm_hmm* hmm, const char* seq,
         return NAN;
     }
 
-    int seq_len = (int) strlen(seq);
+    int seq_len = (int)strlen(seq);
     if (!abc_has_symbols(hmm->abc, seq, seq_len)) {
         imm_error("symbols must belong to alphabet");
         return NAN;
@@ -302,7 +302,7 @@ double hmm_start_lprob(const struct imm_hmm* hmm, const struct imm_state* state)
 int hmm_normalize_trans(struct mm_state* mm_state)
 {
     const struct mm_trans* mm_trans = mm_state_get_trans_c(mm_state);
-    double                 lnorm = LOG0;
+    double                 lnorm = imm_lprob_impossible();
 
     while (mm_trans) {
         lnorm = logaddexp(lnorm, mm_trans_get_lprob(mm_trans));

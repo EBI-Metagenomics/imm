@@ -193,7 +193,7 @@ void set_score(struct dp_matrix const* dp_matrix, int row, struct step const* st
 double best_trans_score(const struct dp* dp, struct state_info const* dst_state, int row,
                         struct step* prev_step)
 {
-    double score = LOG0;
+    double score = imm_lprob_impossible();
     prev_step->state = NULL;
     prev_step->seq_len = -1;
 
@@ -223,7 +223,7 @@ double best_trans_score(const struct dp* dp, struct state_info const* dst_state,
 
 double final_score(struct dp const* dp, struct step* end_step)
 {
-    double                   score = LOG0;
+    double                   score = imm_lprob_impossible();
     struct state_info const* end_state = dp->end_state;
     end_step->state = dp->end_state;
     end_step->seq_len = min_seq(end_state);
@@ -259,7 +259,7 @@ struct matrix* create_trans(const struct mm_state* const* mm_states, int nstates
                             const struct state_idx* state_idx)
 {
     struct matrix* trans = matrix_create(nstates, nstates);
-    matrix_set_all(trans, LOG0);
+    matrix_set_all(trans, imm_lprob_impossible());
 
     for (int i = 0; i < nstates; ++i) {
 

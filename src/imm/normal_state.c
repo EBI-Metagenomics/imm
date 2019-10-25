@@ -6,18 +6,18 @@
 
 struct imm_normal_state
 {
-    struct imm_state *interface;
-    double *lprobs;
+    struct imm_state* interface;
+    double*           lprobs;
 };
 
-HIDE double normal_state_lprob(const struct imm_state *state, const char *seq, int seq_len);
-HIDE int normal_state_min_seq(const struct imm_state *state);
-HIDE int normal_state_max_seq(const struct imm_state *state);
+HIDE double normal_state_lprob(const struct imm_state* state, const char* seq, int seq_len);
+HIDE int    normal_state_min_seq(const struct imm_state* state);
+HIDE int    normal_state_max_seq(const struct imm_state* state);
 
-struct imm_normal_state *imm_normal_state_create(const char *name, const struct imm_abc *abc,
-                                                 const double *lprobs)
+struct imm_normal_state* imm_normal_state_create(const char* name, const struct imm_abc* abc,
+                                                 const double* lprobs)
 {
-    struct imm_normal_state *state = malloc(sizeof(struct imm_normal_state));
+    struct imm_normal_state* state = malloc(sizeof(struct imm_normal_state));
 
     size_t len = (size_t)imm_abc_length(abc);
     state->lprobs = malloc(sizeof(double) * len);
@@ -29,7 +29,7 @@ struct imm_normal_state *imm_normal_state_create(const char *name, const struct 
     return state;
 }
 
-void imm_normal_state_destroy(struct imm_normal_state *state)
+void imm_normal_state_destroy(struct imm_normal_state* state)
 {
     if (!state)
         return;
@@ -43,23 +43,23 @@ void imm_normal_state_destroy(struct imm_normal_state *state)
     free(state);
 }
 
-int imm_normal_state_normalize(struct imm_normal_state *state)
+int imm_normal_state_normalize(struct imm_normal_state* state)
 {
     int len = imm_abc_length(imm_state_get_abc(imm_state_cast_c(state)));
-    return imm_lognormalize(state->lprobs, len);
+    return imm_lprob_normalize(state->lprobs, len);
 }
 
-double normal_state_lprob(const struct imm_state *state, const char *seq, int seq_len)
+double normal_state_lprob(const struct imm_state* state, const char* seq, int seq_len)
 {
-    const struct imm_normal_state *s = imm_state_get_impl_c(state);
+    const struct imm_normal_state* s = imm_state_get_impl_c(state);
     if (seq_len == 1) {
-        const struct imm_abc *abc = imm_state_get_abc(state);
+        const struct imm_abc* abc = imm_state_get_abc(state);
         if (imm_abc_has_symbol(abc, seq[0]))
             return s->lprobs[imm_abc_symbol_idx(abc, seq[0])];
     }
-    return LOG0;
+    return imm_lprob_impossible();
 }
 
-int normal_state_min_seq(const struct imm_state *state) { return 1; }
+int normal_state_min_seq(const struct imm_state* state) { return 1; }
 
-int normal_state_max_seq(const struct imm_state *state) { return 1; }
+int normal_state_max_seq(const struct imm_state* state) { return 1; }
