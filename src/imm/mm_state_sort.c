@@ -88,7 +88,7 @@ void create_nodes(const struct mm_state* head, struct list_head* nodes,
         node->mm_state = mm_state;
         node->mark = INITIAL_MARK;
         INIT_LIST_HEAD(&node->edges);
-        if (!imm_lprob_is_possible(mm_state_get_start_lprob(node->mm_state)))
+        if (imm_lprob_is_zero(mm_state_get_start_lprob(node->mm_state)))
             list_add_tail(&node->list_entry, nodes);
         else
             list_add(&node->list_entry, nodes);
@@ -151,7 +151,7 @@ void create_edges(struct list_head* nodes, struct state_node* state_nodes)
     {
         const struct mm_trans* trans = mm_state_get_trans_c(node->mm_state);
         while (trans) {
-            if (imm_lprob_is_possible(mm_trans_get_lprob(trans))) {
+            if (!imm_lprob_is_zero(mm_trans_get_lprob(trans))) {
                 struct edge*             edge = malloc(sizeof(struct edge));
                 const struct state_node* sn = NULL;
                 const struct imm_state*  state = mm_trans_get_state(trans);

@@ -24,7 +24,7 @@ imm_enable_coverage_option()
 
 if(CMAKE_C_COMPILER_ID MATCHES "Clang")
     add_compile_options(-Wall -Wextra -pedantic -Wstrict-prototypes -Wshadow -Wconversion
-        -Wmissing-prototypes -Wno-unused-parameter)
+        -Wmissing-prototypes -Wno-unused-parameter -Wno-empty-translation-unit)
 endif()
 
 include_directories(include)
