@@ -202,8 +202,14 @@ double imm_hmm_viterbi(const struct imm_hmm* hmm, const char* seq,
         return NAN;
     }
 
-    if (!abc_has_symbols(hmm->abc, seq, (int) strlen(seq))) {
+    int seq_len = (int) strlen(seq);
+    if (!abc_has_symbols(hmm->abc, seq, seq_len)) {
         imm_error("symbols must belong to alphabet");
+        return NAN;
+    }
+
+    if (seq_len < imm_state_min_seq(end_state)) {
+        imm_error("sequence is shorter than end_state's lower bound");
         return NAN;
     }
 
