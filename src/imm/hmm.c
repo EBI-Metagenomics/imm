@@ -1,4 +1,5 @@
 #include "imm.h"
+#include "src/imm/abc.h"
 #include "src/imm/counter.h"
 #include "src/imm/dp.h"
 #include "src/imm/hide.h"
@@ -144,9 +145,12 @@ double imm_hmm_likelihood(const struct imm_hmm* hmm, const char* seq,
     if (!state)
         goto not_found_state;
 
-    double lprob = hmm_start_lprob(hmm, state) + imm_state_lprob(state, seq, len);
-    if (isnan(lprob))
+    if (!abc_has_symbols(hmm->abc, seq, seq_len)) {
+        imm_error("symbols must belong to alphabet");
         return NAN;
+    }
+
+    double lprob = hmm_start_lprob(hmm, state) + imm_state_lprob(state, seq, len);
 
     const struct imm_state* prev_state = NULL;
 
@@ -195,6 +199,11 @@ double imm_hmm_viterbi(const struct imm_hmm* hmm, const char* seq,
 
     if (!mm_state_find_c(hmm->mm_states, end_state)) {
         imm_error("end_state not found");
+        return NAN;
+    }
+
+    if (!abc_has_symbols(hmm->abc, seq, (int) strlen(seq))) {
+        imm_error("symbols must belong to alphabet");
         return NAN;
     }
 

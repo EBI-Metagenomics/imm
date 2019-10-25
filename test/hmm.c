@@ -336,7 +336,7 @@ void test_hmm_viterbi_mute_cycle(void)
     imm_hmm_add_state(hmm, imm_state_cast_c(state0), log(0.5));
     cass_close(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state0), NULL), -0.693147180560);
     cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "C", imm_state_cast_c(state0), NULL)));
-    cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "X", imm_state_cast_c(state0), NULL)));
+    cass_cond(imm_isnan(imm_hmm_viterbi(hmm, "X", imm_state_cast_c(state0), NULL)));
 
     struct imm_mute_state *state1 = imm_mute_state_create("State1", abc);
     imm_hmm_add_state(hmm, imm_state_cast_c(state1), log(0.2));
