@@ -14,6 +14,7 @@ extern "C"
 
 #include "imm/abc.h"
 #include "imm/hmm.h"
+#include "imm/lprob.h"
 #include "imm/math.h"
 #include "imm/mute_state.h"
 #include "imm/normal_state.h"
