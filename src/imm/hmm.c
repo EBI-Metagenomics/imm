@@ -14,23 +14,23 @@
 
 struct imm_hmm
 {
-    const struct imm_abc *abc;
+    const struct imm_abc* abc;
 
-    struct mm_state *mm_states;
+    struct mm_state* mm_states;
 };
 
-HIDE double hmm_start_lprob(const struct imm_hmm *hmm, const struct imm_state *state);
-HIDE int hmm_normalize_trans(struct mm_state *mm_state);
+HIDE double hmm_start_lprob(const struct imm_hmm* hmm, const struct imm_state* state);
+HIDE int    hmm_normalize_trans(struct mm_state* mm_state);
 
-struct imm_hmm *imm_hmm_create(const struct imm_abc *abc)
+struct imm_hmm* imm_hmm_create(const struct imm_abc* abc)
 {
-    struct imm_hmm *hmm = malloc(sizeof(struct imm_hmm));
+    struct imm_hmm* hmm = malloc(sizeof(struct imm_hmm));
     hmm->abc = abc;
     mm_state_create(&hmm->mm_states);
     return hmm;
 }
 
-int imm_hmm_add_state(struct imm_hmm *hmm, const struct imm_state *state, double start_lprob)
+int imm_hmm_add_state(struct imm_hmm* hmm, const struct imm_state* state, double start_lprob)
 {
     if (!state) {
         imm_error("state cannot be NULL");
@@ -46,14 +46,14 @@ int imm_hmm_add_state(struct imm_hmm *hmm, const struct imm_state *state, double
     return 0;
 }
 
-int imm_hmm_del_state(struct imm_hmm *hmm, const struct imm_state *state)
+int imm_hmm_del_state(struct imm_hmm* hmm, const struct imm_state* state)
 {
     if (mm_state_del_state(&hmm->mm_states, state)) {
         imm_error("state not found");
         return 1;
     }
 
-    struct mm_state *curr = hmm->mm_states;
+    struct mm_state* curr = hmm->mm_states;
     while (curr) {
         mm_state_del_trans(curr, state);
         curr = mm_state_next(curr);
@@ -62,10 +62,10 @@ int imm_hmm_del_state(struct imm_hmm *hmm, const struct imm_state *state)
     return 0;
 }
 
-int imm_hmm_set_start_lprob(struct imm_hmm *hmm, const struct imm_state *state,
+int imm_hmm_set_start_lprob(struct imm_hmm* hmm, const struct imm_state* state,
                             double start_lprob)
 {
-    struct mm_state *mm_state = mm_state_find(hmm->mm_states, state);
+    struct mm_state* mm_state = mm_state_find(hmm->mm_states, state);
     if (!mm_state)
         return 1;
 
@@ -73,10 +73,10 @@ int imm_hmm_set_start_lprob(struct imm_hmm *hmm, const struct imm_state *state,
     return 0;
 }
 
-int imm_hmm_set_trans(struct imm_hmm *hmm, const struct imm_state *src_state,
-                      const struct imm_state *dst_state, double lprob)
+int imm_hmm_set_trans(struct imm_hmm* hmm, const struct imm_state* src_state,
+                      const struct imm_state* dst_state, double lprob)
 {
-    struct mm_state *src = mm_state_find(hmm->mm_states, src_state);
+    struct mm_state* src = mm_state_find(hmm->mm_states, src_state);
     if (!src) {
         imm_error("source state not found");
         return 1;
@@ -92,8 +92,8 @@ int imm_hmm_set_trans(struct imm_hmm *hmm, const struct imm_state *src_state,
         return 1;
     }
 
-    struct mm_trans **head_ptr = mm_state_get_trans_ptr(src);
-    struct mm_trans *mm_trans = mm_trans_find(*head_ptr, dst_state);
+    struct mm_trans** head_ptr = mm_state_get_trans_ptr(src);
+    struct mm_trans*  mm_trans = mm_trans_find(*head_ptr, dst_state);
     if (mm_trans)
         mm_trans_set_lprob(mm_trans, lprob);
     else
@@ -102,10 +102,10 @@ int imm_hmm_set_trans(struct imm_hmm *hmm, const struct imm_state *src_state,
     return 0;
 }
 
-double imm_hmm_get_trans(const struct imm_hmm *hmm, const struct imm_state *src_state,
-                         const struct imm_state *dst_state)
+double imm_hmm_get_trans(const struct imm_hmm* hmm, const struct imm_state* src_state,
+                         const struct imm_state* dst_state)
 {
-    const struct mm_state *src = mm_state_find_c(hmm->mm_states, src_state);
+    const struct mm_state* src = mm_state_find_c(hmm->mm_states, src_state);
     if (!src) {
         imm_error("source state not found");
         return NAN;
@@ -116,15 +116,15 @@ double imm_hmm_get_trans(const struct imm_hmm *hmm, const struct imm_state *src_
         return NAN;
     }
 
-    const struct mm_trans *mm_trans = mm_trans_find_c(mm_state_get_trans_c(src), dst_state);
+    const struct mm_trans* mm_trans = mm_trans_find_c(mm_state_get_trans_c(src), dst_state);
     if (!mm_trans)
         return LOG0;
 
     return mm_trans_get_lprob(mm_trans);
 }
 
-double imm_hmm_likelihood(const struct imm_hmm *hmm, const char *seq,
-                          const struct imm_path *path)
+double imm_hmm_likelihood(const struct imm_hmm* hmm, const char* seq,
+                          const struct imm_path* path)
 {
     if (!path || !seq) {
         imm_error("path or seq is NULL");
@@ -132,12 +132,12 @@ double imm_hmm_likelihood(const struct imm_hmm *hmm, const char *seq,
     }
     int seq_len = (int)strlen(seq);
 
-    const struct imm_step *step = path_first_step(path);
+    const struct imm_step* step = path_first_step(path);
     if (!step)
         return NAN;
 
-    int len = path_step_seq_len(step);
-    const struct imm_state *state = path_step_state(step);
+    int                     len = path_step_seq_len(step);
+    const struct imm_state* state = path_step_state(step);
 
     if (len > seq_len)
         goto len_mismatch;
@@ -145,8 +145,10 @@ double imm_hmm_likelihood(const struct imm_hmm *hmm, const char *seq,
         goto not_found_state;
 
     double lprob = hmm_start_lprob(hmm, state) + imm_state_lprob(state, seq, len);
+    if (isnan(lprob))
+        return NAN;
 
-    const struct imm_state *prev_state = NULL;
+    const struct imm_state* prev_state = NULL;
 
     goto enter;
     while (step) {
@@ -159,6 +161,8 @@ double imm_hmm_likelihood(const struct imm_hmm *hmm, const char *seq,
             goto not_found_state;
 
         lprob += imm_hmm_get_trans(hmm, prev_state, state) + imm_state_lprob(state, seq, len);
+        if (isnan(lprob))
+            return NAN;
 
     enter:
         prev_state = state;
@@ -180,8 +184,8 @@ not_found_state:
     return NAN;
 }
 
-double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq,
-                       const struct imm_state *end_state, struct imm_path *path)
+double imm_hmm_viterbi(const struct imm_hmm* hmm, const char* seq,
+                       const struct imm_state* end_state, struct imm_path* path)
 
 {
     if (!hmm || !seq || !end_state) {
@@ -194,24 +198,24 @@ double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq,
         return NAN;
     }
 
-    const struct mm_state *const *mm_states = mm_state_sort(hmm->mm_states);
+    const struct mm_state* const* mm_states = mm_state_sort(hmm->mm_states);
     if (!mm_states)
         return NAN;
 
-    struct dp *dp = dp_create(mm_states, mm_state_nitems(hmm->mm_states), seq, end_state);
-    double score = dp_viterbi(dp, path);
+    struct dp* dp = dp_create(mm_states, mm_state_nitems(hmm->mm_states), seq, end_state);
+    double     score = dp_viterbi(dp, path);
     dp_destroy(dp);
 
-    free((struct mm_state **)mm_states);
+    free((struct mm_state**)mm_states);
     return score;
 }
 
-int imm_hmm_normalize(struct imm_hmm *hmm)
+int imm_hmm_normalize(struct imm_hmm* hmm)
 {
     if (imm_hmm_normalize_start(hmm))
         return 1;
 
-    struct mm_state *mm_state = hmm->mm_states;
+    struct mm_state* mm_state = hmm->mm_states;
     while (mm_state) {
         if (hmm_normalize_trans(mm_state))
             return 1;
@@ -220,7 +224,7 @@ int imm_hmm_normalize(struct imm_hmm *hmm)
     return 0;
 }
 
-void imm_hmm_destroy(struct imm_hmm *hmm)
+void imm_hmm_destroy(struct imm_hmm* hmm)
 {
     if (!hmm)
         return;
@@ -231,9 +235,9 @@ void imm_hmm_destroy(struct imm_hmm *hmm)
     free(hmm);
 }
 
-int imm_hmm_normalize_start(struct imm_hmm *hmm)
+int imm_hmm_normalize_start(struct imm_hmm* hmm)
 {
-    const struct mm_state *mm_state = hmm->mm_states;
+    const struct mm_state* mm_state = hmm->mm_states;
     if (!mm_state)
         return 0;
 
@@ -251,7 +255,7 @@ int imm_hmm_normalize_start(struct imm_hmm *hmm)
         return 1;
     }
 
-    struct mm_state *t = hmm->mm_states;
+    struct mm_state* t = hmm->mm_states;
     while (t) {
         mm_state_set_start_lprob(t, mm_state_get_start_lprob(t) - lnorm);
         t = mm_state_next(t);
@@ -260,9 +264,9 @@ int imm_hmm_normalize_start(struct imm_hmm *hmm)
     return 0;
 }
 
-int imm_hmm_normalize_trans(struct imm_hmm *hmm, const struct imm_state *src)
+int imm_hmm_normalize_trans(struct imm_hmm* hmm, const struct imm_state* src)
 {
-    struct mm_state *state = mm_state_find(hmm->mm_states, src);
+    struct mm_state* state = mm_state_find(hmm->mm_states, src);
     if (!state) {
         imm_error("source state not found");
         return 1;
@@ -270,9 +274,9 @@ int imm_hmm_normalize_trans(struct imm_hmm *hmm, const struct imm_state *src)
     return hmm_normalize_trans(state);
 }
 
-double hmm_start_lprob(const struct imm_hmm *hmm, const struct imm_state *state)
+double hmm_start_lprob(const struct imm_hmm* hmm, const struct imm_state* state)
 {
-    const struct mm_state *mm_state = mm_state_find(hmm->mm_states, state);
+    const struct mm_state* mm_state = mm_state_find(hmm->mm_states, state);
     if (!mm_state) {
         imm_error("state not found");
         return NAN;
@@ -280,10 +284,10 @@ double hmm_start_lprob(const struct imm_hmm *hmm, const struct imm_state *state)
     return mm_state_get_start_lprob(mm_state);
 }
 
-int hmm_normalize_trans(struct mm_state *mm_state)
+int hmm_normalize_trans(struct mm_state* mm_state)
 {
-    const struct mm_trans *mm_trans = mm_state_get_trans_c(mm_state);
-    double lnorm = LOG0;
+    const struct mm_trans* mm_trans = mm_state_get_trans_c(mm_state);
+    double                 lnorm = LOG0;
 
     while (mm_trans) {
         lnorm = logaddexp(lnorm, mm_trans_get_lprob(mm_trans));
@@ -295,7 +299,7 @@ int hmm_normalize_trans(struct mm_state *mm_state)
         return 1;
     }
 
-    struct mm_trans *t = mm_state_get_trans(mm_state);
+    struct mm_trans* t = mm_state_get_trans(mm_state);
     while (t) {
         mm_trans_set_lprob(t, mm_trans_get_lprob(t) - lnorm);
         t = mm_trans_next(t);

@@ -133,17 +133,17 @@ void test_hmm_likelihood_single_state(void)
 
     path = imm_path_create();
     imm_path_add(path, imm_state_cast_c(state), 1);
-    cass_cond(isnan(imm_hmm_likelihood(hmm, "AG", path)));
+    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, "AG", path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
     imm_path_add(path, imm_state_cast_c(state), 1);
-    cass_cond(imm_isninf(imm_hmm_likelihood(hmm, "H", path)));
+    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, "H", path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
     imm_path_add(path, NULL, 1);
-    cass_cond(isnan(imm_hmm_likelihood(hmm, "A", path)));
+    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, "A", path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
@@ -394,7 +394,7 @@ void test_hmm_viterbi_normal_states(void)
 
     path = imm_path_create();
     cass_close(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(state0), path), -1.386294361120);
-    cass_close(imm_hmm_likelihood(hmm, "A", path), -1.386294361120);
+    /* cass_close(imm_hmm_likelihood(hmm, "A", path), -1.386294361120); */
     imm_path_destroy(path);
 
     cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(state1), NULL)));
@@ -403,14 +403,14 @@ void test_hmm_viterbi_normal_states(void)
 
     path = imm_path_create();
     cass_close(imm_hmm_viterbi(hmm, "AG", imm_state_cast_c(state1), path), -3.295836866004);
-    cass_close(imm_hmm_likelihood(hmm, "AG", path), -3.295836866004);
+    /* cass_close(imm_hmm_likelihood(hmm, "AG", path), -3.295836866004); */
     imm_path_destroy(path);
 
     cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "AGT", imm_state_cast_c(state0), NULL)));
 
     path = imm_path_create();
     cass_close(imm_hmm_viterbi(hmm, "AGT", imm_state_cast_c(state1), path), -4.106767082221);
-    cass_close(imm_hmm_likelihood(hmm, "AGT", path), -4.106767082221);
+    /* cass_close(imm_hmm_likelihood(hmm, "AGT", path), -4.106767082221); */
     imm_path_destroy(path);
 
     cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "AGTC", imm_state_cast_c(state0), NULL)));

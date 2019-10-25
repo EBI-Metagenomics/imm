@@ -25,6 +25,7 @@ void test_normal_state(void)
     cass_close(log(0.25), imm_state_lprob(imm_state_cast_c(state), "C", 1));
     cass_close(log(0.5), imm_state_lprob(imm_state_cast_c(state), "G", 1));
     cass_cond(imm_isninf(imm_state_lprob(imm_state_cast_c(state), "T", 1)));
+    cass_cond(imm_isnan(imm_state_lprob(imm_state_cast_c(state), "X", 1)));
 
     imm_normal_state_destroy(state);
     imm_abc_destroy(abc);

@@ -1,12 +1,12 @@
 #include "src/imm/dp.h"
 #include "imm.h"
-#include "src/imm/path.h"
 #include "src/imm/gmatrix.h"
 #include "src/imm/hide.h"
 #include "src/imm/matrix.h"
 #include "src/imm/min.h"
 #include "src/imm/mm_state.h"
 #include "src/imm/mm_trans.h"
+#include "src/imm/path.h"
 #include "src/imm/state_idx.h"
 #include "src/uthash/uthash.h"
 #include <limits.h>
@@ -224,13 +224,13 @@ double best_trans_score(const struct dp* dp, struct state_info const* dst_state,
 double final_score(struct dp const* dp, struct step* end_step)
 {
     double                   score = LOG0;
-    struct state_info const* e = dp->end_state;
+    struct state_info const* end_state = dp->end_state;
     end_step->state = dp->end_state;
+    end_step->seq_len = min_seq(end_state);
 
-    for (int len = MIN(imm_state_max_seq(e->state), dp->seq_len);
-         imm_state_min_seq(e->state) <= len; --len) {
+    for (int len = MIN(max_seq(end_state), dp->seq_len); min_seq(end_state) <= len; --len) {
 
-        struct step step = {e, len};
+        struct step step = {end_state, len};
         double      s = get_score(&dp->dp_matrix, dp->seq_len - len, &step);
         if (s > score) {
             score = s;
@@ -242,11 +242,11 @@ double final_score(struct dp const* dp, struct step* end_step)
 
 int viterbi_path(struct dp* dp, struct imm_path* path, struct step const* end_step)
 {
-    int row = dp->seq_len;
+    return 0;
+    int                row = dp->seq_len;
     struct step const* step = end_step;
 
-    while (step->seq_len >= 0)
-    {
+    while (step->seq_len >= 0) {
         path_add_head(path, step->state->state, step->seq_len);
         row -= step->seq_len;
         step = gmatrix_step_get(dp->dp_matrix.step, row, column(&dp->dp_matrix, step));
