@@ -2,6 +2,7 @@
 #include "imm.h"
 #include "src/list.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 struct imm_step
 {
@@ -47,6 +48,21 @@ void imm_path_destroy(struct imm_path *path)
     free(path);
 }
 
+void imm_path_print(struct imm_path const* path)
+{
+    if (!path)
+        return;
+
+    printf("Path: ");
+    struct imm_step const *step = path_first_step(path);
+    while (step) {
+
+        printf("<%s:%d>", imm_state_get_name(step->state),  step->seq_len);
+        step = path_next_step(path, step);
+    }
+    printf("\n");
+}
+
 const struct imm_step *path_first_step(const struct imm_path *path)
 {
     return list_first_entry_or_null(&path->steps, struct imm_step, list);
@@ -77,3 +93,12 @@ int path_seq_len(const struct imm_path *path)
 
     return seq_len;
 }
+
+void path_add_head(struct imm_path* path, struct imm_state const* state, int seq_len)
+{
+    struct imm_step *step = malloc(sizeof(struct imm_step));
+    step->state = state;
+    step->seq_len = seq_len;
+    list_add(&step->list, &path->steps);
+}
+

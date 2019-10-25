@@ -1,5 +1,6 @@
 #include "src/imm/dp.h"
 #include "imm.h"
+#include "src/imm/path.h"
 #include "src/imm/gmatrix.h"
 #include "src/imm/hide.h"
 #include "src/imm/matrix.h"
@@ -121,15 +122,14 @@ double dp_viterbi(struct dp* dp, struct imm_path* path)
         struct state_info const* cur = dp->states;
         for (int i = 0; i < dp->nstates; ++i, ++cur) {
 
-            for (int len = imm_state_min_seq(cur->state);
-                 len <= MIN(imm_state_max_seq(cur->state), seq_len); ++len) {
+            for (int len = min_seq(cur); len <= MIN(max_seq(cur), seq_len); ++len) {
 
-                struct step  cur_step = {cur, len};
-                int          col = column(&dp->dp_matrix, &cur_step);
+                struct step  step = {cur, len};
+                int          col = column(&dp->dp_matrix, &step);
                 struct step* prev_step = gmatrix_step_get(dp->dp_matrix.step, r, col);
                 double       score = best_trans_score(dp, cur, r, prev_step);
                 double       emiss = imm_state_lprob(cur->state, seq, len);
-                set_score(&dp->dp_matrix, r, &cur_step, score + emiss);
+                set_score(&dp->dp_matrix, r, &step, score + emiss);
             }
         }
     }
@@ -242,6 +242,16 @@ double final_score(struct dp const* dp, struct step* end_step)
 
 int viterbi_path(struct dp* dp, struct imm_path* path, struct step const* end_step)
 {
+    int row = dp->seq_len;
+    struct step const* step = end_step;
+
+    while (step->seq_len >= 0)
+    {
+        path_add_head(path, step->state->state, step->seq_len);
+        row -= step->seq_len;
+        step = gmatrix_step_get(dp->dp_matrix.step, row, column(&dp->dp_matrix, step));
+    }
+
     return 0;
 }
 
