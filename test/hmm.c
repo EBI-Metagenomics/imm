@@ -124,41 +124,41 @@ void test_hmm_likelihood_single_state(void)
     imm_path_destroy(path);
 
     path = imm_path_create();
-    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, "", path)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_likelihood(hmm, "", path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
-    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, "A", path)));
-    imm_path_destroy(path);
-
-    path = imm_path_create();
-    imm_path_add(path, imm_state_cast_c(state), 1);
-    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, "AG", path)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_likelihood(hmm, "A", path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
     imm_path_add(path, imm_state_cast_c(state), 1);
-    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, "H", path)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_likelihood(hmm, "AG", path)));
+    imm_path_destroy(path);
+
+    path = imm_path_create();
+    imm_path_add(path, imm_state_cast_c(state), 1);
+    cass_cond(!imm_lprob_is_valid(imm_hmm_likelihood(hmm, "H", path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
     imm_path_add(path, NULL, 1);
-    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, "A", path)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_likelihood(hmm, "A", path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
     imm_path_add(path, imm_state_cast_c(state), 1);
     imm_path_add(path, imm_state_cast_c(state), 1);
-    cass_cond(imm_isninf(imm_hmm_likelihood(hmm, "AA", path)));
+    cass_cond(!imm_lprob_is_possible(imm_hmm_likelihood(hmm, "AA", path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
     imm_path_add(path, imm_state_cast_c(state), 1);
-    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, NULL, path)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_likelihood(hmm, NULL, path)));
     imm_path_destroy(path);
 
-    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, "A", NULL)));
-    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, NULL, NULL)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_likelihood(hmm, "A", NULL)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_likelihood(hmm, NULL, NULL)));
 
     cass_cond(imm_hmm_normalize(hmm) == 1);
     imm_hmm_set_trans(hmm, imm_state_cast_c(state), imm_state_cast_c(state), LOG0);
@@ -208,12 +208,12 @@ void test_hmm_likelihood_two_states(void)
 
     path = imm_path_create();
     imm_path_add(path, imm_state_cast_c(state0), 1);
-    cass_cond(imm_isninf(imm_hmm_likelihood(hmm, "T", path)));
+    cass_cond(!imm_lprob_is_possible(imm_hmm_likelihood(hmm, "T", path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
     imm_path_add(path, imm_state_cast_c(state1), 1);
-    cass_cond(imm_isninf(imm_hmm_likelihood(hmm, "G", path)));
+    cass_cond(!imm_lprob_is_possible(imm_hmm_likelihood(hmm, "G", path)));
     imm_path_destroy(path);
 
     cass_cond(imm_hmm_normalize(hmm) == 0);
@@ -255,17 +255,17 @@ void test_hmm_likelihood_mute_state(void)
 
     struct imm_path* path = imm_path_create();
     imm_path_add(path, imm_state_cast_c(state), 1);
-    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, "A", path)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_likelihood(hmm, "A", path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
     imm_path_add(path, imm_state_cast_c(state), 1);
-    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, "T", path)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_likelihood(hmm, "T", path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
     imm_path_add(path, imm_state_cast_c(state), 1);
-    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, "G", path)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_likelihood(hmm, "G", path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
@@ -276,13 +276,13 @@ void test_hmm_likelihood_mute_state(void)
     path = imm_path_create();
     imm_path_add(path, imm_state_cast_c(state), 1);
     imm_path_add(path, imm_state_cast_c(state), 1);
-    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, "GT", path)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_likelihood(hmm, "GT", path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
     imm_path_add(path, imm_state_cast_c(state), 1);
     imm_path_add(path, imm_state_cast_c(state), 1);
-    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, "GT", path)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_likelihood(hmm, "GT", path)));
     imm_path_destroy(path);
 
     imm_hmm_destroy(hmm);
@@ -320,7 +320,7 @@ void test_hmm_viterbi_no_state(void)
     struct imm_abc* abc = imm_abc_create("ACGT");
     struct imm_hmm* hmm = imm_hmm_create(abc);
 
-    cass_cond(imm_isnan(imm_hmm_viterbi(hmm, "", NULL, NULL)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_viterbi(hmm, "", NULL, NULL)));
 
     imm_hmm_destroy(hmm);
     imm_abc_destroy(abc);
@@ -335,8 +335,8 @@ void test_hmm_viterbi_mute_cycle(void)
 
     imm_hmm_add_state(hmm, imm_state_cast_c(state0), log(0.5));
     cass_close(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state0), NULL), -0.693147180560);
-    cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "C", imm_state_cast_c(state0), NULL)));
-    cass_cond(imm_isnan(imm_hmm_viterbi(hmm, "X", imm_state_cast_c(state0), NULL)));
+    cass_cond(!imm_lprob_is_possible(imm_hmm_viterbi(hmm, "C", imm_state_cast_c(state0), NULL)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_viterbi(hmm, "X", imm_state_cast_c(state0), NULL)));
 
     struct imm_mute_state* state1 = imm_mute_state_create("State1", abc);
     imm_hmm_add_state(hmm, imm_state_cast_c(state1), log(0.2));
@@ -348,7 +348,7 @@ void test_hmm_viterbi_mute_cycle(void)
     cass_close(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state1), NULL), -1.6094379124);
 
     imm_hmm_set_trans(hmm, imm_state_cast_c(state1), imm_state_cast_c(state0), log(0.2));
-    cass_cond(imm_isnan(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state1), NULL)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state1), NULL)));
 
     imm_hmm_set_trans(hmm, imm_state_cast_c(state1), imm_state_cast_c(state0), LOG0);
     cass_close(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state1), NULL), -1.6094379124);
@@ -383,13 +383,13 @@ void test_hmm_viterbi_normal_states(void)
     imm_hmm_normalize(hmm);
 
     struct imm_path* path = imm_path_create();
-    cass_cond(imm_isnan(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state0), path)));
-    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, "", path)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state0), path)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_likelihood(hmm, "", path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
-    cass_cond(imm_isnan(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state1), path)));
-    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, "", path)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state1), path)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_likelihood(hmm, "", path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
@@ -397,7 +397,7 @@ void test_hmm_viterbi_normal_states(void)
     /* cass_close(imm_hmm_likelihood(hmm, "A", path), -1.386294361120); */
     imm_path_destroy(path);
 
-    cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(state1), NULL)));
+    cass_cond(!imm_lprob_is_possible(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(state1), NULL)));
 
     cass_close(imm_hmm_viterbi(hmm, "AG", imm_state_cast_c(state0), NULL), -3.178053830348);
 
@@ -406,14 +406,14 @@ void test_hmm_viterbi_normal_states(void)
     /* cass_close(imm_hmm_likelihood(hmm, "AG", path), -3.295836866004); */
     imm_path_destroy(path);
 
-    cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "AGT", imm_state_cast_c(state0), NULL)));
+    cass_cond(!imm_lprob_is_possible(imm_hmm_viterbi(hmm, "AGT", imm_state_cast_c(state0), NULL)));
 
     path = imm_path_create();
     cass_close(imm_hmm_viterbi(hmm, "AGT", imm_state_cast_c(state1), path), -4.106767082221);
     /* cass_close(imm_hmm_likelihood(hmm, "AGT", path), -4.106767082221); */
     imm_path_destroy(path);
 
-    cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "AGTC", imm_state_cast_c(state0), NULL)));
+    cass_cond(!imm_lprob_is_possible(imm_hmm_viterbi(hmm, "AGTC", imm_state_cast_c(state0), NULL)));
     cass_close(imm_hmm_viterbi(hmm, "AGTC", imm_state_cast_c(state1), NULL), -6.303991659557);
 
     imm_hmm_set_trans(hmm, imm_state_cast_c(state0), imm_state_cast_c(state0), LOG0);
@@ -424,38 +424,38 @@ void test_hmm_viterbi_normal_states(void)
     imm_hmm_set_start_lprob(hmm, imm_state_cast_c(state0), LOG0);
     imm_hmm_set_start_lprob(hmm, imm_state_cast_c(state1), LOG0);
 
-    cass_cond(imm_isnan(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state0), NULL)));
-    cass_cond(imm_isnan(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state1), NULL)));
-    cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(state0), NULL)));
-    cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(state1), NULL)));
-    cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "AA", imm_state_cast_c(state0), NULL)));
-    cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "AA", imm_state_cast_c(state1), NULL)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state0), NULL)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state1), NULL)));
+    cass_cond(!imm_lprob_is_possible(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(state0), NULL)));
+    cass_cond(!imm_lprob_is_possible(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(state1), NULL)));
+    cass_cond(!imm_lprob_is_possible(imm_hmm_viterbi(hmm, "AA", imm_state_cast_c(state0), NULL)));
+    cass_cond(!imm_lprob_is_possible(imm_hmm_viterbi(hmm, "AA", imm_state_cast_c(state1), NULL)));
 
     imm_hmm_set_start_lprob(hmm, imm_state_cast_c(state0), 0.0);
 
-    cass_cond(imm_isnan(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state0), NULL)));
-    cass_cond(imm_isnan(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state1), NULL)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state0), NULL)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state1), NULL)));
     cass_close(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(state0), NULL), log(0.25));
-    cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(state1), NULL)));
-    cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "AA", imm_state_cast_c(state0), NULL)));
-    cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "AA", imm_state_cast_c(state1), NULL)));
+    cass_cond(!imm_lprob_is_possible(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(state1), NULL)));
+    cass_cond(!imm_lprob_is_possible(imm_hmm_viterbi(hmm, "AA", imm_state_cast_c(state0), NULL)));
+    cass_cond(!imm_lprob_is_possible(imm_hmm_viterbi(hmm, "AA", imm_state_cast_c(state1), NULL)));
 
     imm_hmm_set_trans(hmm, imm_state_cast_c(state0), imm_state_cast_c(state0), log(0.9));
 
-    cass_cond(imm_isnan(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state0), NULL)));
-    cass_cond(imm_isnan(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state1), NULL)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state0), NULL)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state1), NULL)));
     cass_close(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(state0), NULL), log(0.25));
-    cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(state1), NULL)));
+    cass_cond(!imm_lprob_is_possible(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(state1), NULL)));
     cass_close(imm_hmm_viterbi(hmm, "AA", imm_state_cast_c(state0), NULL),
                2 * log(0.25) + log(0.9));
-    cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "AA", imm_state_cast_c(state1), NULL)));
+    cass_cond(!imm_lprob_is_possible(imm_hmm_viterbi(hmm, "AA", imm_state_cast_c(state1), NULL)));
 
     imm_hmm_set_trans(hmm, imm_state_cast_c(state0), imm_state_cast_c(state1), log(0.2));
 
-    cass_cond(imm_isnan(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state0), NULL)));
-    cass_cond(imm_isnan(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state1), NULL)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state0), NULL)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_viterbi(hmm, "", imm_state_cast_c(state1), NULL)));
     cass_close(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(state0), NULL), log(0.25));
-    cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(state1), NULL)));
+    cass_cond(!imm_lprob_is_possible(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(state1), NULL)));
     cass_close(imm_hmm_viterbi(hmm, "AA", imm_state_cast_c(state0), NULL),
                2 * log(0.25) + log(0.9));
     cass_close(imm_hmm_viterbi(hmm, "AA", imm_state_cast_c(state1), NULL),
@@ -501,10 +501,10 @@ void test_hmm_viterbi_profile1(void)
     cass_close(imm_hmm_viterbi(hmm, "", imm_state_cast_c(D0), NULL), log(0.1));
     cass_close(imm_hmm_viterbi(hmm, "", imm_state_cast_c(start), NULL), log(1.0));
 
-    cass_cond(imm_isnan(imm_hmm_viterbi(hmm, "", imm_state_cast_c(M0), NULL)));
-    cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(start), NULL)));
-    cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(D0), NULL)));
-    cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(I0), NULL)));
+    cass_cond(!imm_lprob_is_valid(imm_hmm_viterbi(hmm, "", imm_state_cast_c(M0), NULL)));
+    cass_cond(!imm_lprob_is_possible(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(start), NULL)));
+    cass_cond(!imm_lprob_is_possible(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(D0), NULL)));
+    cass_cond(!imm_lprob_is_possible(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(I0), NULL)));
     cass_close(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(M0), NULL), log(0.5) + log(0.4));
     cass_close(imm_hmm_viterbi(hmm, "A", imm_state_cast_c(end), NULL),
                log(0.5) + log(0.4) + log(0.8));
@@ -512,7 +512,7 @@ void test_hmm_viterbi_profile1(void)
     cass_close(imm_hmm_viterbi(hmm, "B", imm_state_cast_c(end), NULL),
                log(0.5) + log(0.2) + log(0.8));
 
-    cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "AA", imm_state_cast_c(M0), NULL)));
+    cass_cond(!imm_lprob_is_possible(imm_hmm_viterbi(hmm, "AA", imm_state_cast_c(M0), NULL)));
     cass_close(imm_hmm_viterbi(hmm, "AA", imm_state_cast_c(end), NULL),
                log(0.5) + log(0.4) + log(0.1) + log(0.5));
     cass_close(imm_hmm_viterbi(hmm, "AA", imm_state_cast_c(end), NULL),
@@ -831,7 +831,7 @@ void test_hmm_viterbi_table_states(void)
     imm_hmm_set_trans(hmm, imm_state_cast_c(Z), imm_state_cast_c(Z), log(2.0));
     imm_hmm_set_trans(hmm, imm_state_cast_c(Z), imm_state_cast_c(T), log(0.6));
 
-    cass_cond(imm_isninf(imm_hmm_viterbi(hmm, "TATX", imm_state_cast_c(E), NULL)));
+    cass_cond(!imm_lprob_is_possible(imm_hmm_viterbi(hmm, "TATX", imm_state_cast_c(E), NULL)));
     cass_close(imm_hmm_viterbi(hmm, "TATA", imm_state_cast_c(N1), NULL), -6.502290170873972);
     cass_close(imm_hmm_viterbi(hmm, "TATA", imm_state_cast_c(E), NULL), -6.502290170873972);
     cass_close(imm_hmm_viterbi(hmm, "TATTX", imm_state_cast_c(Z), NULL), -7.195437351433918);

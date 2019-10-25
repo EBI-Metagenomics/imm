@@ -4,7 +4,7 @@
 
 double imm_lprob_impossible(void) { return -INFINITY; }
 
-int imm_lprob_is_probable(double a) { return isinf(a) && a <= 0.0; }
+int imm_lprob_is_possible(double a) { return !isinf(a) && a <= 0.0; }
 
 int imm_lprob_is_valid(double a) { return !isnan(a) && a <= 0.0; }
 

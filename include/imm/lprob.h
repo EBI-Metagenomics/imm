@@ -4,7 +4,7 @@
 #include "imm/api.h"
 
 IMM_API double imm_lprob_impossible(void);
-IMM_API int    imm_lprob_is_probable(double a);
+IMM_API int    imm_lprob_is_possible(double a);
 IMM_API int    imm_lprob_is_valid(double a);
 IMM_API double imm_lprob_invalid(void);
 IMM_API double imm_lprob_add(double a, double b);

@@ -88,7 +88,7 @@ void create_nodes(const struct mm_state *head, struct list_head *nodes,
         node->mm_state = mm_state;
         node->mark = INITIAL_MARK;
         INIT_LIST_HEAD(&node->edges);
-        if (imm_isninf(mm_state_get_start_lprob(node->mm_state)))
+        if (!imm_lprob_is_possible(mm_state_get_start_lprob(node->mm_state)))
             list_add_tail(&node->list_entry, nodes);
         else
             list_add(&node->list_entry, nodes);
