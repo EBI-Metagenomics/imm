@@ -23,12 +23,25 @@ struct imm_path *imm_path_create(void)
     return path;
 }
 
-void imm_path_add(struct imm_path *path, const struct imm_state *state, int seq_len)
+int imm_path_add(struct imm_path *path, const struct imm_state *state, int seq_len)
 {
+    if (!path || !state) {
+        imm_error("neither path nor state can be NULL");
+        return 1;
+    }
+    if (seq_len < 0) {
+        imm_error("seq_len cannot be negative");
+        return 1;
+    }
+    if (seq_len < imm_state_min_seq(state) || imm_state_max_seq(state) < seq_len) {
+        imm_error("seq_len outside the state's range");
+        return 1;
+    }
     struct imm_step *step = malloc(sizeof(struct imm_step));
     step->state = state;
     step->seq_len = seq_len;
     list_add_tail(&step->list, &path->steps);
+    return 0;
 }
 
 void imm_path_destroy(struct imm_path *path)

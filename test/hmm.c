@@ -154,11 +154,11 @@ void test_hmm_likelihood_single_state(void)
 
     path = imm_path_create();
     imm_path_add(path, imm_state_cast_c(state), 1);
-    cass_cond(isnan(imm_hmm_likelihood(hmm, NULL, path)));
+    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, NULL, path)));
     imm_path_destroy(path);
 
-    cass_cond(isnan(imm_hmm_likelihood(hmm, "A", NULL)));
-    cass_cond(isnan(imm_hmm_likelihood(hmm, NULL, NULL)));
+    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, "A", NULL)));
+    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, NULL, NULL)));
 
     cass_cond(imm_hmm_normalize(hmm) == 1);
     imm_hmm_set_trans(hmm, imm_state_cast_c(state), imm_state_cast_c(state), LOG0);
@@ -255,34 +255,34 @@ void test_hmm_likelihood_mute_state(void)
 
     struct imm_path *path = imm_path_create();
     imm_path_add(path, imm_state_cast_c(state), 1);
-    cass_cond(imm_isninf(imm_hmm_likelihood(hmm, "A", path)));
+    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, "A", path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
     imm_path_add(path, imm_state_cast_c(state), 1);
-    cass_cond(imm_isninf(imm_hmm_likelihood(hmm, "T", path)));
+    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, "T", path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
     imm_path_add(path, imm_state_cast_c(state), 1);
-    cass_cond(imm_isninf(imm_hmm_likelihood(hmm, "G", path)));
+    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, "G", path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
-    imm_path_add(path, imm_state_cast_c(state), 1);
-    cass_cond(imm_isninf(imm_hmm_likelihood(hmm, "G", path)));
-    imm_path_destroy(path);
-
-    path = imm_path_create();
-    imm_path_add(path, imm_state_cast_c(state), 1);
-    imm_path_add(path, imm_state_cast_c(state), 1);
-    cass_cond(imm_isninf(imm_hmm_likelihood(hmm, "GT", path)));
+    imm_path_add(path, imm_state_cast_c(state), 0);
+    cass_close(imm_hmm_likelihood(hmm, "", path), 0.0);
     imm_path_destroy(path);
 
     path = imm_path_create();
     imm_path_add(path, imm_state_cast_c(state), 1);
     imm_path_add(path, imm_state_cast_c(state), 1);
-    cass_cond(imm_isninf(imm_hmm_likelihood(hmm, "GT", path)));
+    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, "GT", path)));
+    imm_path_destroy(path);
+
+    path = imm_path_create();
+    imm_path_add(path, imm_state_cast_c(state), 1);
+    imm_path_add(path, imm_state_cast_c(state), 1);
+    cass_cond(imm_isnan(imm_hmm_likelihood(hmm, "GT", path)));
     imm_path_destroy(path);
 
     imm_hmm_destroy(hmm);
