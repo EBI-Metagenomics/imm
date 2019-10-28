@@ -67,7 +67,7 @@ HIDE void   set_score(struct dp_matrix const* dp_matrix, int row, struct step co
 HIDE double best_trans_score(const struct dp* dp, struct state_info const* dst_state, int row,
                              struct step* prev_step);
 HIDE double final_score(struct dp const* dp, struct step* end_step);
-HIDE void    viterbi_path(struct dp* dp, struct imm_path* path, struct step const* end_step);
+HIDE void   viterbi_path(struct dp* dp, struct imm_path* path, struct step const* end_step);
 
 HIDE struct matrix* create_trans(const struct mm_state* const* mm_states, int nstates,
                                  const struct state_idx* state_idx);
@@ -266,15 +266,15 @@ struct matrix* create_trans(const struct mm_state* const* mm_states, int nstates
 
     for (int i = 0; i < nstates; ++i) {
 
-        struct imm_state const *src_state = mm_state_get_state(mm_states[i]);
-        int src = state_idx_find(state_idx, src_state);
+        struct imm_state const* src_state = mm_state_get_state(mm_states[i]);
+        int                     src = state_idx_find(state_idx, src_state);
 
         const struct mm_trans* t = NULL;
         for (t = mm_state_get_trans_c(mm_states[i]); t; t = mm_trans_next_c(t)) {
 
-            struct imm_state const *dst_state = mm_trans_get_state(t);
-            int dst = state_idx_find(state_idx, dst_state);
-            
+            struct imm_state const* dst_state = mm_trans_get_state(t);
+            int                     dst = state_idx_find(state_idx, dst_state);
+
             matrix_set(trans, src, dst, mm_trans_get_lprob(t));
         }
     }
