@@ -6,7 +6,6 @@
 #include "src/imm/min.h"
 #include "src/imm/mm_state.h"
 #include "src/imm/mm_trans.h"
-#include "src/imm/path.h"
 #include "src/imm/state_idx.h"
 #include "src/uthash/uthash.h"
 #include <limits.h>
@@ -252,7 +251,7 @@ void viterbi_path(struct dp* dp, struct imm_path* path, struct step const* end_s
     struct step const* step = end_step;
 
     while (step->seq_len >= 0) {
-        path_add_head(path, step->state->state, step->seq_len);
+        imm_path_prepend(path, step->state->state, step->seq_len);
         row -= step->seq_len;
         step = gmatrix_step_get(dp->dp_matrix.step, row, column(&dp->dp_matrix, step));
     }

@@ -7,7 +7,6 @@
 #include "src/imm/mm_state.h"
 #include "src/imm/mm_state_sort.h"
 #include "src/imm/mm_trans.h"
-#include "src/imm/path.h"
 #include "src/logaddexp/logaddexp.h"
 #include <math.h>
 #include <stdlib.h>

@@ -68,6 +68,7 @@ set(IMM_SOURCES
     src/imm/report.c
     src/imm/state.c
     src/imm/state_idx.c
+    src/imm/step.c
     src/imm/table_state.c
 )
 
