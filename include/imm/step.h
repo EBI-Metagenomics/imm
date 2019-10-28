@@ -1,0 +1,12 @@
+#ifndef IMM_STEP_H_API
+#define IMM_STEP_H_API
+
+#include "imm/api.h"
+
+struct imm_state;
+struct imm_step;
+
+IMM_API const struct imm_state* imm_step_state(struct imm_step const* step);
+IMM_API int                     imm_step_seq_len(struct imm_step const* step);
+
+#endif

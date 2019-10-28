@@ -20,6 +20,7 @@ extern "C"
 #include "imm/path.h"
 #include "imm/report.h"
 #include "imm/state.h"
+#include "imm/step.h"
 #include "imm/table_state.h"
 
 #ifdef __cplusplus

@@ -133,12 +133,12 @@ double imm_hmm_likelihood(const struct imm_hmm* hmm, const char* seq,
     }
     int seq_len = (int)strlen(seq);
 
-    const struct imm_step* step = path_first_step(path);
+    const struct imm_step* step = imm_path_first(path);
     if (!step)
         return imm_lprob_invalid();
 
-    int                     len = path_step_seq_len(step);
-    const struct imm_state* state = path_step_state(step);
+    int                     len = imm_step_seq_len(step);
+    const struct imm_state* state = imm_step_state(step);
 
     if (len > seq_len)
         goto len_mismatch;
@@ -156,8 +156,8 @@ double imm_hmm_likelihood(const struct imm_hmm* hmm, const char* seq,
 
     goto enter;
     while (step) {
-        len = path_step_seq_len(step);
-        state = path_step_state(step);
+        len = imm_step_seq_len(step);
+        state = imm_step_state(step);
 
         if (len > seq_len)
             goto len_mismatch;
@@ -172,7 +172,7 @@ double imm_hmm_likelihood(const struct imm_hmm* hmm, const char* seq,
         prev_state = state;
         seq += len;
         seq_len -= len;
-        step = path_next_step(path, step);
+        step = imm_path_next(path, step);
     }
     if (seq_len > 0) {
         imm_error("sequence is longer than symbols emitted by path");
@@ -220,7 +220,7 @@ double imm_hmm_viterbi(const struct imm_hmm* hmm, const char* seq,
         return imm_lprob_invalid();
 
     struct dp* dp = dp_create(mm_states, mm_state_nitems(hmm->mm_states), seq, end_state);
-    double           score = dp_viterbi(dp, path);
+    double     score = dp_viterbi(dp, path);
     dp_destroy(dp);
 
     free((struct mm_state**)mm_states);

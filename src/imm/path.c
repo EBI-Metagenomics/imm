@@ -61,28 +61,12 @@ void imm_path_destroy(struct imm_path* path)
     free(path);
 }
 
-void imm_path_print(struct imm_path const* path)
-{
-    if (!path)
-        return;
-
-    printf("Path: ");
-    struct imm_step const* step = path_first_step(path);
-    while (step) {
-
-        printf("<%s:%d>", imm_state_get_name(step->state), step->seq_len);
-        step = path_next_step(path, step);
-    }
-    printf("\n");
-}
-
-const struct imm_step* path_first_step(const struct imm_path* path)
+struct imm_step const* imm_path_first(struct imm_path const* path)
 {
     return list_first_entry_or_null(&path->steps, struct imm_step, list);
 }
 
-const struct imm_step* path_next_step(const struct imm_path* path,
-                                      const struct imm_step* step)
+struct imm_step const* imm_path_next(struct imm_path const* path, struct imm_step const* step)
 {
     const struct imm_step* next = list_next_entry(step, list);
     if (&path->steps != &next->list)
@@ -90,18 +74,18 @@ const struct imm_step* path_next_step(const struct imm_path* path,
     return NULL;
 }
 
-const struct imm_state* path_step_state(const struct imm_step* step) { return step->state; }
+const struct imm_state* imm_step_state(const struct imm_step* step) { return step->state; }
 
-int path_step_seq_len(const struct imm_step* step) { return step->seq_len; }
+int imm_step_seq_len(const struct imm_step* step) { return step->seq_len; }
 
 int path_seq_len(const struct imm_path* path)
 {
-    const struct imm_step* step = path_first_step(path);
+    const struct imm_step* step = imm_path_first(path);
 
     int seq_len = 0;
     while (step) {
-        seq_len += path_step_seq_len(step);
-        step = path_next_step(path, step);
+        seq_len += imm_step_seq_len(step);
+        step = imm_path_next(path, step);
     }
 
     return seq_len;
