@@ -174,8 +174,10 @@ double imm_hmm_likelihood(const struct imm_hmm* hmm, const char* seq,
         seq_len -= len;
         step = path_next_step(path, step);
     }
-    if (seq_len > 0)
-        goto len_mismatch;
+    if (seq_len > 0) {
+        imm_error("sequence is longer than symbols emitted by path");
+        return imm_lprob_invalid();
+    }
 
     return lprob;
 
