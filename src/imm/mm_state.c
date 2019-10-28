@@ -24,7 +24,7 @@ void mm_state_destroy(struct mm_state** head_ptr)
             mm_trans_destroy(&mm_state->mm_transitions);
             mm_state->mm_transitions = NULL;
             mm_state->state = NULL;
-            mm_state->start_lprob = NAN;
+            mm_state->start_lprob = imm_lprob_invalid();
             HASH_DEL(*head_ptr, mm_state);
             free(mm_state);
         }

@@ -139,7 +139,7 @@ double dp_viterbi(struct dp* dp, struct imm_path* path)
 
     if (path) {
         if (viterbi_path(dp, path, &end_step))
-            return NAN;
+            return imm_lprob_invalid();
     }
 
     return score;

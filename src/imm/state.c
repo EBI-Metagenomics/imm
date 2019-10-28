@@ -51,7 +51,7 @@ double imm_state_lprob(const struct imm_state* state, const char* seq, int seq_l
     for (int i = 0; i < seq_len; ++i) {
         if (!imm_abc_has_symbol(imm_state_get_abc(state), seq[i])) {
             imm_error("alphabet does not have symbol %c", seq[i]);
-            return NAN;
+            return imm_lprob_invalid();
         }
     }
     return state->lprob(state, seq, seq_len);

@@ -109,12 +109,12 @@ double imm_hmm_get_trans(const struct imm_hmm* hmm, const struct imm_state* src_
     const struct mm_state* src = mm_state_find_c(hmm->mm_states, src_state);
     if (!src) {
         imm_error("source state not found");
-        return NAN;
+        return imm_lprob_invalid();
     }
 
     if (!mm_state_find_c(hmm->mm_states, dst_state)) {
         imm_error("destination state not found");
-        return NAN;
+        return imm_lprob_invalid();
     }
 
     const struct mm_trans* mm_trans = mm_trans_find_c(mm_state_get_trans_c(src), dst_state);
@@ -129,13 +129,13 @@ double imm_hmm_likelihood(const struct imm_hmm* hmm, const char* seq,
 {
     if (!path || !seq) {
         imm_error("path or seq is NULL");
-        return NAN;
+        return imm_lprob_invalid();
     }
     int seq_len = (int)strlen(seq);
 
     const struct imm_step* step = path_first_step(path);
     if (!step)
-        return NAN;
+        return imm_lprob_invalid();
 
     int                     len = path_step_seq_len(step);
     const struct imm_state* state = path_step_state(step);
@@ -147,7 +147,7 @@ double imm_hmm_likelihood(const struct imm_hmm* hmm, const char* seq,
 
     if (!abc_has_symbols(hmm->abc, seq, seq_len)) {
         imm_error("symbols must belong to alphabet");
-        return NAN;
+        return imm_lprob_invalid();
     }
 
     double lprob = hmm_start_lprob(hmm, state) + imm_state_lprob(state, seq, len);
@@ -165,8 +165,8 @@ double imm_hmm_likelihood(const struct imm_hmm* hmm, const char* seq,
             goto not_found_state;
 
         lprob += imm_hmm_get_trans(hmm, prev_state, state) + imm_state_lprob(state, seq, len);
-        if (isnan(lprob))
-            return NAN;
+        if (!imm_lprob_is_valid(lprob))
+            return imm_lprob_invalid();
 
     enter:
         prev_state = state;
@@ -181,11 +181,11 @@ double imm_hmm_likelihood(const struct imm_hmm* hmm, const char* seq,
 
 len_mismatch:
     imm_error("path emitted more symbols than sequence");
-    return NAN;
+    return imm_lprob_invalid();
 
 not_found_state:
     imm_error("state was not found");
-    return NAN;
+    return imm_lprob_invalid();
 }
 
 double imm_hmm_viterbi(const struct imm_hmm* hmm, const char* seq,
@@ -194,28 +194,28 @@ double imm_hmm_viterbi(const struct imm_hmm* hmm, const char* seq,
 {
     if (!hmm || !seq || !end_state) {
         imm_error("viterbi input cannot be NULL");
-        return NAN;
+        return imm_lprob_invalid();
     }
 
     if (!mm_state_find_c(hmm->mm_states, end_state)) {
         imm_error("end_state not found");
-        return NAN;
+        return imm_lprob_invalid();
     }
 
     int seq_len = (int)strlen(seq);
     if (!abc_has_symbols(hmm->abc, seq, seq_len)) {
         imm_error("symbols must belong to alphabet");
-        return NAN;
+        return imm_lprob_invalid();
     }
 
     if (seq_len < imm_state_min_seq(end_state)) {
         imm_error("sequence is shorter than end_state's lower bound");
-        return NAN;
+        return imm_lprob_invalid();
     }
 
     const struct mm_state* const* mm_states = mm_state_sort(hmm->mm_states);
     if (!mm_states)
-        return NAN;
+        return imm_lprob_invalid();
 
     struct dp* dp = dp_create(mm_states, mm_state_nitems(hmm->mm_states), seq, end_state);
     double     score = dp_viterbi(dp, path);
@@ -294,7 +294,7 @@ double hmm_start_lprob(const struct imm_hmm* hmm, const struct imm_state* state)
     const struct mm_state* mm_state = mm_state_find(hmm->mm_states, state);
     if (!mm_state) {
         imm_error("state not found");
-        return NAN;
+        return imm_lprob_invalid();
     }
     return mm_state_get_start_lprob(mm_state);
 }

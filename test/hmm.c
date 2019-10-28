@@ -822,7 +822,7 @@ void test_hmm_viterbi_table_states(void)
     imm_hmm_add_state(hmm, cast_c(E), zero());
     imm_hmm_add_state(hmm, cast_c(Z), zero());
 
-    cass_cond(imm_hmm_set_trans(hmm, cast_c(S), cast_c(T), NAN) == 1);
+    cass_cond(imm_hmm_set_trans(hmm, cast_c(S), cast_c(T), imm_lprob_invalid()) == 1);
     cass_cond(imm_hmm_set_trans(hmm, cast_c(S), cast_c(T), imm_lprob_invalid()) == 1);
 
     imm_hmm_set_trans(hmm, cast_c(S), cast_c(T), log(1.0));
