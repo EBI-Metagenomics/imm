@@ -38,11 +38,11 @@ int main(void)
     test_hmm_viterbi_one_normal_state();
     test_hmm_viterbi_two_normal_states();
     test_hmm_viterbi_normal_states();
-    /* test_hmm_viterbi_profile1(); */
-    /* test_hmm_viterbi_profile2(); */
-    /* test_hmm_viterbi_profile_delete(); */
-    /* test_hmm_viterbi_global_profile(); */
-    /* test_hmm_viterbi_table_states(); */
+    test_hmm_viterbi_profile1();
+    test_hmm_viterbi_profile2();
+    test_hmm_viterbi_profile_delete();
+    test_hmm_viterbi_global_profile();
+    test_hmm_viterbi_table_states();
     return cass_status();
 }
 
@@ -608,15 +608,15 @@ void test_hmm_viterbi_profile1(void)
     cass_close(imm_hmm_viterbi(hmm, "", cast_c(start), NULL), log(1.0));
 
     cass_cond(!is_valid(imm_hmm_viterbi(hmm, "", cast_c(M0), NULL)));
-    cass_cond(is_zero(imm_hmm_viterbi(hmm, "A", cast_c(start), NULL)));
-    cass_cond(is_zero(imm_hmm_viterbi(hmm, "A", cast_c(D0), NULL)));
-    cass_cond(is_zero(imm_hmm_viterbi(hmm, "A", cast_c(I0), NULL)));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "A", cast_c(start), NULL)));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "A", cast_c(D0), NULL)));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "A", cast_c(I0), NULL)));
     cass_close(imm_hmm_viterbi(hmm, "A", cast_c(M0), NULL), log(0.5) + log(0.4));
     cass_close(imm_hmm_viterbi(hmm, "A", cast_c(end), NULL), log(0.5) + log(0.4) + log(0.8));
     cass_close(imm_hmm_viterbi(hmm, "B", cast_c(M0), NULL), log(0.5) + log(0.2));
     cass_close(imm_hmm_viterbi(hmm, "B", cast_c(end), NULL), log(0.5) + log(0.2) + log(0.8));
 
-    cass_cond(is_zero(imm_hmm_viterbi(hmm, "AA", cast_c(M0), NULL)));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "AA", cast_c(M0), NULL)));
 
     double desired = log(0.5) + log(0.4) + log(0.1) + log(0.5);
     cass_close(imm_hmm_viterbi(hmm, "AA", cast_c(end), NULL), desired);
@@ -858,7 +858,7 @@ void test_hmm_viterbi_global_profile(void)
     imm_hmm_set_trans(hmm, cast_c(I1), cast_c(I1), log(0.5));
     imm_hmm_set_trans(hmm, cast_c(I1), cast_c(M2), log(0.5));
 
-    cass_close(imm_hmm_viterbi(hmm, "C", cast_c(start), NULL), zero());
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "C", cast_c(start), NULL)));
     cass_close(imm_hmm_viterbi(hmm, "C", cast_c(B), NULL), 0);
     cass_close(imm_hmm_viterbi(hmm, "CC", cast_c(B), NULL), 0);
     cass_close(imm_hmm_viterbi(hmm, "CCC", cast_c(B), NULL), 0);
@@ -938,7 +938,7 @@ void test_hmm_viterbi_table_states(void)
     imm_hmm_set_trans(hmm, cast_c(Z), cast_c(Z), log(2.0));
     imm_hmm_set_trans(hmm, cast_c(Z), cast_c(T), log(0.6));
 
-    cass_cond(is_zero(imm_hmm_viterbi(hmm, "TATX", cast_c(E), NULL)));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "TATX", cast_c(E), NULL)));
     cass_close(imm_hmm_viterbi(hmm, "TATA", cast_c(N1), NULL), -6.502290170873972);
     cass_close(imm_hmm_viterbi(hmm, "TATA", cast_c(E), NULL), -6.502290170873972);
     cass_close(imm_hmm_viterbi(hmm, "TATTX", cast_c(Z), NULL), -7.195437351433918);
