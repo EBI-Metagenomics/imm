@@ -10,9 +10,11 @@ void test_hmm_likelihood_two_states(void);
 void test_hmm_likelihood_mute_state(void);
 void test_hmm_likelihood_two_mute_states(void);
 void test_hmm_viterbi_no_state(void);
-void test_hmm_viterbi_mute_cycle(void);
 void test_hmm_viterbi_one_mute_state(void);
 void test_hmm_viterbi_two_mute_states(void);
+void test_hmm_viterbi_mute_cycle(void);
+void test_hmm_viterbi_one_normal_state(void);
+void test_hmm_viterbi_two_normal_states(void);
 void test_hmm_viterbi_normal_states(void);
 void test_hmm_viterbi_profile1(void);
 void test_hmm_viterbi_profile2(void);
@@ -30,10 +32,12 @@ int main(void)
     test_hmm_likelihood_mute_state();
     test_hmm_likelihood_two_mute_states();
     test_hmm_viterbi_no_state();
-    test_hmm_viterbi_mute_cycle();
     test_hmm_viterbi_one_mute_state();
     test_hmm_viterbi_two_mute_states();
-    /* test_hmm_viterbi_normal_states(); */
+    test_hmm_viterbi_mute_cycle();
+    test_hmm_viterbi_one_normal_state();
+    test_hmm_viterbi_two_normal_states();
+    test_hmm_viterbi_normal_states();
     /* test_hmm_viterbi_profile1(); */
     /* test_hmm_viterbi_profile2(); */
     /* test_hmm_viterbi_profile_delete(); */
@@ -418,6 +422,73 @@ void test_hmm_viterbi_mute_cycle(void)
     imm_abc_destroy(abc);
 }
 
+void test_hmm_viterbi_one_normal_state(void)
+{
+    struct imm_abc* abc = imm_abc_create("ACGT");
+    struct imm_hmm* hmm = imm_hmm_create(abc);
+
+    double                   lprobs0[] = {log(0.25), log(0.25), log(0.5), zero()};
+    struct imm_normal_state* state = imm_normal_state_create("State0", abc, lprobs0);
+
+    imm_hmm_add_state(hmm, cast_c(state), log(0.1));
+
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "", cast_c(state), NULL)));
+    cass_close(imm_hmm_viterbi(hmm, "A", cast_c(state), NULL), log(0.1) + log(0.25));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "T", cast_c(state), NULL)));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "AC", cast_c(state), NULL)));
+
+    imm_hmm_set_trans(hmm, cast_c(state), cast_c(state), log(0.1));
+    cass_close(imm_hmm_viterbi(hmm, "A", cast_c(state), NULL), log(0.1) + log(0.25));
+    cass_close(imm_hmm_viterbi(hmm, "AA", cast_c(state), NULL), 2 * log(0.1) + 2 * log(0.25));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "ACT", cast_c(state), NULL)));
+
+    imm_hmm_normalize(hmm);
+    cass_close(imm_hmm_viterbi(hmm, "A", cast_c(state), NULL), log(0.25));
+    cass_close(imm_hmm_viterbi(hmm, "AA", cast_c(state), NULL), 2 * log(0.25));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "ACT", cast_c(state), NULL)));
+
+    imm_hmm_destroy(hmm);
+    imm_normal_state_destroy(state);
+    imm_abc_destroy(abc);
+}
+
+void test_hmm_viterbi_two_normal_states(void)
+{
+    struct imm_abc* abc = imm_abc_create("ACGT");
+    struct imm_hmm* hmm = imm_hmm_create(abc);
+
+    double                   lprobs0[] = {log(0.25), log(0.25), log(0.5), zero()};
+    struct imm_normal_state* state0 = imm_normal_state_create("State0", abc, lprobs0);
+
+    double                   lprobs1[] = {log(0.25), log(0.25), log(0.5), log(0.5)};
+    struct imm_normal_state* state1 = imm_normal_state_create("State1", abc, lprobs1);
+
+    imm_hmm_add_state(hmm, cast_c(state0), log(0.1));
+    imm_hmm_add_state(hmm, cast_c(state1), log(0.2));
+    imm_hmm_set_trans(hmm, cast_c(state0), cast_c(state1), log(0.3));
+
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "", cast_c(state0), NULL)));
+    cass_close(imm_hmm_viterbi(hmm, "A", cast_c(state0), NULL), log(0.1) + log(0.25));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "T", cast_c(state0), NULL)));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "AC", cast_c(state0), NULL)));
+    double desired = log(0.1) + log(0.25) + log(0.3) + log(0.5);
+    cass_close(imm_hmm_viterbi(hmm, "AT", cast_c(state1), NULL), desired);
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "ATT", cast_c(state1), NULL)));
+
+    imm_hmm_set_trans(hmm, cast_c(state1), cast_c(state1), log(0.5));
+    desired = log(0.2) + log(0.25) + 4 * log(0.5);
+    cass_close(imm_hmm_viterbi(hmm, "ATT", cast_c(state1), NULL), desired);
+
+    imm_hmm_set_start_lprob(hmm, cast_c(state1), imm_lprob_zero());
+    desired = log(0.1) + log(0.25) + log(0.3) + 3 * log(0.5);
+    cass_close(imm_hmm_viterbi(hmm, "ATT", cast_c(state1), NULL), desired);
+
+    imm_hmm_destroy(hmm);
+    imm_normal_state_destroy(state0);
+    imm_normal_state_destroy(state1);
+    imm_abc_destroy(abc);
+}
+
 void test_hmm_viterbi_normal_states(void)
 {
     struct imm_abc* abc = imm_abc_create("ACGT");
@@ -442,22 +513,14 @@ void test_hmm_viterbi_normal_states(void)
     imm_hmm_normalize(hmm);
 
     cass_cond(!is_valid(imm_hmm_viterbi(hmm, "", cast_c(state0), NULL)));
-
     cass_cond(!is_valid(imm_hmm_viterbi(hmm, "", cast_c(state1), NULL)));
-
     cass_close(imm_hmm_viterbi(hmm, "A", cast_c(state0), NULL), -1.386294361120);
-
-    cass_cond(is_zero(imm_hmm_viterbi(hmm, "A", cast_c(state1), NULL)));
-
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "A", cast_c(state1), NULL)));
     cass_close(imm_hmm_viterbi(hmm, "AG", cast_c(state0), NULL), -3.178053830348);
-
     cass_close(imm_hmm_viterbi(hmm, "AG", cast_c(state1), NULL), -3.295836866004);
-
-    cass_cond(is_zero(imm_hmm_viterbi(hmm, "AGT", cast_c(state0), NULL)));
-
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "AGT", cast_c(state0), NULL)));
     cass_close(imm_hmm_viterbi(hmm, "AGT", cast_c(state1), NULL), -4.106767082221);
-
-    cass_cond(is_zero(imm_hmm_viterbi(hmm, "AGTC", cast_c(state0), NULL)));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "AGTC", cast_c(state0), NULL)));
     cass_close(imm_hmm_viterbi(hmm, "AGTC", cast_c(state1), NULL), -6.303991659557);
 
     imm_hmm_set_trans(hmm, cast_c(state0), cast_c(state0), zero());
@@ -470,35 +533,35 @@ void test_hmm_viterbi_normal_states(void)
 
     cass_cond(!is_valid(imm_hmm_viterbi(hmm, "", cast_c(state0), NULL)));
     cass_cond(!is_valid(imm_hmm_viterbi(hmm, "", cast_c(state1), NULL)));
-    cass_cond(is_zero(imm_hmm_viterbi(hmm, "A", cast_c(state0), NULL)));
-    cass_cond(is_zero(imm_hmm_viterbi(hmm, "A", cast_c(state1), NULL)));
-    cass_cond(is_zero(imm_hmm_viterbi(hmm, "AA", cast_c(state0), NULL)));
-    cass_cond(is_zero(imm_hmm_viterbi(hmm, "AA", cast_c(state1), NULL)));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "A", cast_c(state0), NULL)));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "A", cast_c(state1), NULL)));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "AA", cast_c(state0), NULL)));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "AA", cast_c(state1), NULL)));
 
     imm_hmm_set_start_lprob(hmm, cast_c(state0), 0.0);
 
     cass_cond(!is_valid(imm_hmm_viterbi(hmm, "", cast_c(state0), NULL)));
     cass_cond(!is_valid(imm_hmm_viterbi(hmm, "", cast_c(state1), NULL)));
     cass_close(imm_hmm_viterbi(hmm, "A", cast_c(state0), NULL), log(0.25));
-    cass_cond(is_zero(imm_hmm_viterbi(hmm, "A", cast_c(state1), NULL)));
-    cass_cond(is_zero(imm_hmm_viterbi(hmm, "AA", cast_c(state0), NULL)));
-    cass_cond(is_zero(imm_hmm_viterbi(hmm, "AA", cast_c(state1), NULL)));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "A", cast_c(state1), NULL)));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "AA", cast_c(state0), NULL)));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "AA", cast_c(state1), NULL)));
 
     imm_hmm_set_trans(hmm, cast_c(state0), cast_c(state0), log(0.9));
 
     cass_cond(!is_valid(imm_hmm_viterbi(hmm, "", cast_c(state0), NULL)));
     cass_cond(!is_valid(imm_hmm_viterbi(hmm, "", cast_c(state1), NULL)));
     cass_close(imm_hmm_viterbi(hmm, "A", cast_c(state0), NULL), log(0.25));
-    cass_cond(is_zero(imm_hmm_viterbi(hmm, "A", cast_c(state1), NULL)));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "A", cast_c(state1), NULL)));
     cass_close(imm_hmm_viterbi(hmm, "AA", cast_c(state0), NULL), 2 * log(0.25) + log(0.9));
-    cass_cond(is_zero(imm_hmm_viterbi(hmm, "AA", cast_c(state1), NULL)));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "AA", cast_c(state1), NULL)));
 
     imm_hmm_set_trans(hmm, cast_c(state0), cast_c(state1), log(0.2));
 
     cass_cond(!is_valid(imm_hmm_viterbi(hmm, "", cast_c(state0), NULL)));
     cass_cond(!is_valid(imm_hmm_viterbi(hmm, "", cast_c(state1), NULL)));
     cass_close(imm_hmm_viterbi(hmm, "A", cast_c(state0), NULL), log(0.25));
-    cass_cond(is_zero(imm_hmm_viterbi(hmm, "A", cast_c(state1), NULL)));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "A", cast_c(state1), NULL)));
     cass_close(imm_hmm_viterbi(hmm, "AA", cast_c(state0), NULL), 2 * log(0.25) + log(0.9));
 
     double desired = log(0.25) + log(0.5 / 2.25) + log(0.2);
