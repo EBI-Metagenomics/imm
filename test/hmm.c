@@ -11,6 +11,7 @@ void test_hmm_likelihood_mute_state(void);
 void test_hmm_likelihood_two_mute_states(void);
 void test_hmm_viterbi_no_state(void);
 void test_hmm_viterbi_mute_cycle(void);
+void test_hmm_viterbi_one_mute_state(void);
 void test_hmm_viterbi_normal_states(void);
 void test_hmm_viterbi_profile1(void);
 void test_hmm_viterbi_profile2(void);
@@ -28,13 +29,14 @@ int main(void)
     test_hmm_likelihood_mute_state();
     test_hmm_likelihood_two_mute_states();
     test_hmm_viterbi_no_state();
-    test_hmm_viterbi_mute_cycle();
-    test_hmm_viterbi_normal_states();
-    test_hmm_viterbi_profile1();
-    test_hmm_viterbi_profile2();
-    test_hmm_viterbi_profile_delete();
-    test_hmm_viterbi_global_profile();
-    test_hmm_viterbi_table_states();
+    /* test_hmm_viterbi_mute_cycle(); */
+    test_hmm_viterbi_one_mute_state();
+    /* test_hmm_viterbi_normal_states(); */
+    /* test_hmm_viterbi_profile1(); */
+    /* test_hmm_viterbi_profile2(); */
+    /* test_hmm_viterbi_profile_delete(); */
+    /* test_hmm_viterbi_global_profile(); */
+    /* test_hmm_viterbi_table_states(); */
     return cass_status();
 }
 
@@ -327,6 +329,30 @@ void test_hmm_viterbi_no_state(void)
     cass_cond(!is_valid(imm_hmm_viterbi(hmm, "", NULL, NULL)));
 
     imm_hmm_destroy(hmm);
+    imm_abc_destroy(abc);
+}
+
+void test_hmm_viterbi_one_mute_state(void)
+{
+    struct imm_abc* abc = imm_abc_create("ACGT");
+    struct imm_hmm* hmm = imm_hmm_create(abc);
+
+    struct imm_mute_state* state = imm_mute_state_create("state", abc);
+
+    imm_hmm_add_state(hmm, cast_c(state), log(0.5));
+    cass_close(imm_hmm_viterbi(hmm, "", cast_c(state), NULL), log(0.5));
+
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "X", cast_c(state), NULL)));
+    cass_cond(!is_valid(imm_hmm_viterbi(hmm, "C", cast_c(state), NULL)));
+
+    imm_hmm_set_start_lprob(hmm, cast_c(state), imm_lprob_zero());
+    cass_cond(is_zero(imm_hmm_viterbi(hmm, "", cast_c(state), NULL)));
+
+    /* cass_cond(is_zero(imm_hmm_viterbi(hmm, "C", cast_c(state), NULL))); */
+    /* cass_cond(!is_valid(imm_hmm_viterbi(hmm, "X", cast_c(state), NULL))); */
+
+    imm_hmm_destroy(hmm);
+    imm_mute_state_destroy(state);
     imm_abc_destroy(abc);
 }
 

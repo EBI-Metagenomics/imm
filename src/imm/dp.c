@@ -137,10 +137,10 @@ double dp_viterbi(struct dp* dp, struct imm_path* path)
     struct step end_step = {NULL, -1};
     double      score = final_score(dp, &end_step);
 
-    if (path) {
-        if (viterbi_path(dp, path, &end_step))
-            return imm_lprob_invalid();
-    }
+    /* if (path) { */
+    /*     if (viterbi_path(dp, path, &end_step)) */
+    /*         return imm_lprob_invalid(); */
+    /* } */
 
     return score;
 }
@@ -206,18 +206,22 @@ double best_trans_score(const struct dp* dp, struct state_info const* dst_state,
             continue;
 
         double trans = matrix_get(dp->trans, i, dst_state->idx);
+        if (imm_lprob_is_zero(trans))
+            continue;
 
         for (int len = min_seq(prev); len <= MIN(max_seq(prev), row); ++len) {
             struct step tmp_step = {prev, len};
             int         prev_row = row - len;
             double      v = get_score(&dp->dp_matrix, prev_row, &tmp_step) + trans;
-            if (v > score) {
+            if (v >= score) {
                 score = v;
                 prev_step->state = prev;
                 prev_step->seq_len = len;
             }
         }
     }
+    if (row > 0 && !prev_step->state)
+        return imm_lprob_invalid();
     return score;
 }
 
@@ -225,18 +229,22 @@ double final_score(struct dp const* dp, struct step* end_step)
 {
     double                   score = imm_lprob_zero();
     struct state_info const* end_state = dp->end_state;
-    end_step->state = dp->end_state;
-    end_step->seq_len = min_seq(end_state);
+
+    end_step->state = NULL;
+    end_step->seq_len = -1;
 
     for (int len = MIN(max_seq(end_state), dp->seq_len); min_seq(end_state) <= len; --len) {
 
         struct step step = {end_state, len};
         double      s = get_score(&dp->dp_matrix, dp->seq_len - len, &step);
-        if (s > score) {
+        if (s >= score) {
             score = s;
+            end_step->state = dp->end_state;
             end_step->seq_len = len;
         }
     }
+    if (!end_step->state)
+        return imm_lprob_invalid();
     return score;
 }
 
@@ -263,13 +271,18 @@ struct matrix* create_trans(const struct mm_state* const* mm_states, int nstates
 
     for (int i = 0; i < nstates; ++i) {
 
-        int src = state_idx_find(state_idx, mm_state_get_state(mm_states[i]));
+        struct imm_state const *src_state = mm_state_get_state(mm_states[i]);
+        int src = state_idx_find(state_idx, src_state);
+
         const struct mm_trans* t = NULL;
         for (t = mm_state_get_trans_c(mm_states[i]); t; t = mm_trans_next_c(t)) {
 
-            int dst = state_idx_find(state_idx, mm_trans_get_state(t));
+            struct imm_state const *dst_state = mm_trans_get_state(t);
+            int dst = state_idx_find(state_idx, dst_state);
+            
             matrix_set(trans, src, dst, mm_trans_get_lprob(t));
         }
     }
+
     return trans;
 }
