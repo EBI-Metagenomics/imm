@@ -5,7 +5,7 @@
 
 struct imm_step
 {
-    const struct imm_state* state;
+    struct imm_state const* state;
     int                     seq_len;
     struct list_head        list;
 };

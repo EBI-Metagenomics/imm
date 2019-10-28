@@ -20,11 +20,11 @@ struct emission
     UT_hash_handle hh;
 };
 
-HIDE double table_state_lprob(const struct imm_state* state, const char* seq, int seq_len);
-HIDE int    table_state_min_seq(const struct imm_state* state);
-HIDE int    table_state_max_seq(const struct imm_state* state);
+HIDE double table_state_lprob(struct imm_state const* state, char const* seq, int seq_len);
+HIDE int    table_state_min_seq(struct imm_state const* state);
+HIDE int    table_state_max_seq(struct imm_state const* state);
 
-struct imm_table_state* imm_table_state_create(const char* name, const struct imm_abc* abc)
+struct imm_table_state* imm_table_state_create(char const* name, struct imm_abc const* abc)
 {
     struct imm_table_state* state = malloc(sizeof(struct imm_table_state));
     state->emissions = NULL;
@@ -59,7 +59,7 @@ void imm_table_state_destroy(struct imm_table_state* state)
     free(state);
 }
 
-void imm_table_state_add(struct imm_table_state* state, const char* seq, double lprob)
+void imm_table_state_add(struct imm_table_state* state, char const* seq, double lprob)
 {
     struct emission* emiss = malloc(sizeof(struct emission));
     emiss->seq = strdup(seq);
@@ -98,9 +98,9 @@ int imm_table_state_normalize(struct imm_table_state* state)
     return 0;
 }
 
-double table_state_lprob(const struct imm_state* state, const char* seq, int seq_len)
+double table_state_lprob(struct imm_state const* state, char const* seq, int seq_len)
 {
-    const struct imm_table_state* s = imm_state_get_impl_c(state);
+    struct imm_table_state const* s = imm_state_get_impl_c(state);
 
     struct emission* emiss = NULL;
     HASH_FIND(hh, s->emissions, seq, (size_t)seq_len, emiss);
@@ -111,14 +111,14 @@ double table_state_lprob(const struct imm_state* state, const char* seq, int seq
     return imm_lprob_zero();
 }
 
-int table_state_min_seq(const struct imm_state* state)
+int table_state_min_seq(struct imm_state const* state)
 {
-    const struct imm_table_state* s = imm_state_get_impl_c(state);
+    struct imm_table_state const* s = imm_state_get_impl_c(state);
     return s->min_seq;
 }
 
-int table_state_max_seq(const struct imm_state* state)
+int table_state_max_seq(struct imm_state const* state)
 {
-    const struct imm_table_state* s = imm_state_get_impl_c(state);
+    struct imm_table_state const* s = imm_state_get_impl_c(state);
     return s->max_seq;
 }

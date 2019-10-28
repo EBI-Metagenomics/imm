@@ -4,6 +4,6 @@
 #include "imm/api.h"
 #include <stdarg.h>
 
-IMM_API void imm_error(const char *err, ...) __attribute__((format(printf, 1, 2)));
+IMM_API void imm_error(char const* err, ...) __attribute__((format(printf, 1, 2)));
 
 #endif

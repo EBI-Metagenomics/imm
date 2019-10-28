@@ -1,4 +1,5 @@
 #include "src/imm/matrix.h"
+#include "imm.h"
 #include <stdlib.h>
 
 struct matrix* matrix_create(int nrows, int ncols)
@@ -18,8 +19,10 @@ void matrix_set_all(struct matrix* matrix, double v)
 
 void matrix_destroy(struct matrix* matrix)
 {
-    if (!matrix)
+    if (!matrix) {
+        imm_error("matrix should not be null");
         return;
+    }
 
     free(matrix->data);
     matrix->data = NULL;
@@ -27,15 +30,3 @@ void matrix_destroy(struct matrix* matrix)
     matrix->ncols = 0;
     free(matrix);
 }
-
-/* void matrix_print(const struct matrix *matrix) */
-/* { */
-/*     return; */
-/*     for (int r = 0; r < matrix->nrows; ++r) { */
-/*         printf("|"); */
-/*         for (int c = 0; c < matrix->ncols - 1; ++c) { */
-/*             printf("%0.9f, ", exp(matrix_get(matrix, r, c))); */
-/*         } */
-/*         printf("%0.9f|\n", exp(matrix_get(matrix, r, matrix->ncols - 1))); */
-/*     } */
-/* } */

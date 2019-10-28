@@ -6,8 +6,8 @@
 
 struct imm_state
 {
-    const char*           name;
-    const struct imm_abc* abc;
+    char const*           name;
+    struct imm_abc const* abc;
 
     imm_state_lprob_t   lprob;
     imm_state_min_seq_t min_seq;
@@ -15,7 +15,7 @@ struct imm_state
     void*               impl;
 };
 
-struct imm_state* imm_state_create(const char* name, const struct imm_abc* abc,
+struct imm_state* imm_state_create(char const* name, struct imm_abc const* abc,
                                    struct imm_state_funcs funcs, void* impl)
 {
     if (imm_abc_length(abc) == 0) {
@@ -40,13 +40,13 @@ struct imm_state* imm_state_create(const char* name, const struct imm_abc* abc,
 
 void* imm_state_get_impl(struct imm_state* state) { return state->impl; }
 
-const void* imm_state_get_impl_c(const struct imm_state* state) { return state->impl; }
+void const* imm_state_get_impl_c(struct imm_state const* state) { return state->impl; }
 
-const char* imm_state_get_name(const struct imm_state* s) { return s->name; }
+char const* imm_state_get_name(struct imm_state const* s) { return s->name; }
 
-const struct imm_abc* imm_state_get_abc(const struct imm_state* s) { return s->abc; }
+struct imm_abc const* imm_state_get_abc(struct imm_state const* s) { return s->abc; }
 
-double imm_state_lprob(const struct imm_state* state, const char* seq, int seq_len)
+double imm_state_lprob(struct imm_state const* state, char const* seq, int seq_len)
 {
     for (int i = 0; i < seq_len; ++i) {
         if (!imm_abc_has_symbol(imm_state_get_abc(state), seq[i])) {
@@ -70,9 +70,9 @@ void imm_state_destroy(struct imm_state* state)
     free(state);
 }
 
-int imm_state_min_seq(const struct imm_state* state) { return state->min_seq(state); }
+int imm_state_min_seq(struct imm_state const* state) { return state->min_seq(state); }
 
-int imm_state_max_seq(const struct imm_state* state) { return state->max_seq(state); }
+int imm_state_max_seq(struct imm_state const* state) { return state->max_seq(state); }
 
 struct imm_state* imm_state_cast(void* state)
 {
@@ -83,11 +83,11 @@ struct imm_state* imm_state_cast(void* state)
     return t->state;
 }
 
-const struct imm_state* imm_state_cast_c(const void* state)
+struct imm_state const* imm_state_cast_c(void const* state)
 {
-    const struct type_c
+    struct type_c
     {
-        const struct imm_state* state;
-    }* t = state;
+        struct imm_state const* state;
+    } const* t = state;
     return t->state;
 }

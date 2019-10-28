@@ -8,11 +8,11 @@ struct imm_mute_state
     struct imm_state* interface;
 };
 
-HIDE double mute_state_lprob(const struct imm_state* state, const char* seq, int seq_len);
-HIDE int    mute_state_min_seq(const struct imm_state* state);
-HIDE int    mute_state_max_seq(const struct imm_state* state);
+HIDE double mute_state_lprob(struct imm_state const* state, char const* seq, int seq_len);
+HIDE int    mute_state_min_seq(struct imm_state const* state);
+HIDE int    mute_state_max_seq(struct imm_state const* state);
 
-struct imm_mute_state* imm_mute_state_create(const char* name, const struct imm_abc* abc)
+struct imm_mute_state* imm_mute_state_create(char const* name, struct imm_abc const* abc)
 {
     struct imm_mute_state* state = malloc(sizeof(struct imm_mute_state));
 
@@ -32,13 +32,13 @@ void imm_mute_state_destroy(struct imm_mute_state* state)
     free(state);
 }
 
-double mute_state_lprob(const struct imm_state* state, const char* seq, int seq_len)
+double mute_state_lprob(struct imm_state const* state, char const* seq, int seq_len)
 {
     if (seq_len == 0)
         return 0.0;
     return imm_lprob_zero();
 }
 
-int mute_state_min_seq(const struct imm_state* state) { return 0; }
+int mute_state_min_seq(struct imm_state const* state) { return 0; }
 
-int mute_state_max_seq(const struct imm_state* state) { return 0; }
+int mute_state_max_seq(struct imm_state const* state) { return 0; }

@@ -19,12 +19,12 @@ void test_path(void)
 
     struct imm_path* path = imm_path_create();
 
-    cass_cond(imm_path_add(path, imm_state_cast_c(state0), 1) == 0);
-    cass_cond(imm_path_add(path, imm_state_cast_c(state1), 1) == 0);
+    cass_cond(imm_path_append(path, imm_state_cast_c(state0), 1) == 0);
+    cass_cond(imm_path_append(path, imm_state_cast_c(state1), 1) == 0);
 
-    cass_cond(imm_path_add(path, imm_state_cast_c(state1), 2) == 1);
-    cass_cond(imm_path_add(path, imm_state_cast_c(state1), 0) == 1);
-    cass_cond(imm_path_add(path, imm_state_cast_c(state1), -1) == 1);
+    cass_cond(imm_path_append(path, imm_state_cast_c(state1), 2) == 1);
+    cass_cond(imm_path_append(path, imm_state_cast_c(state1), 0) == 1);
+    cass_cond(imm_path_append(path, imm_state_cast_c(state1), -1) == 1);
 
     imm_path_destroy(path);
 

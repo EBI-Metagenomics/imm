@@ -25,6 +25,8 @@ int counter_next(struct counter* counter)
 
 void counter_destroy(struct counter* counter)
 {
-    if (counter)
+    if (counter) {
+        imm_error("counter should not be NULL");
         free(counter);
+    }
 }

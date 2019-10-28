@@ -58,7 +58,6 @@ set(IMM_SOURCES
     src/imm/hmm.c
     src/imm/lprob.c
     src/imm/matrix.c
-    src/imm/matrix_ptr.c
     src/imm/mm_state.c
     src/imm/mm_state_sort.c
     src/imm/mm_trans.c

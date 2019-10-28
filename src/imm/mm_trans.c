@@ -4,7 +4,7 @@
 
 struct mm_trans
 {
-    const struct imm_state* state;
+    struct imm_state const* state;
     double                  lprob;
     UT_hash_handle          hh;
 };
@@ -24,7 +24,7 @@ void mm_trans_destroy(struct mm_trans** head_ptr)
     *head_ptr = NULL;
 }
 
-struct mm_trans* mm_trans_add(struct mm_trans** head_ptr, const struct imm_state* state,
+struct mm_trans* mm_trans_add(struct mm_trans** head_ptr, struct imm_state const* state,
                               double lprob)
 {
     struct mm_trans* mm_trans = malloc(sizeof(struct mm_trans));
@@ -40,33 +40,33 @@ void mm_trans_del(struct mm_trans** head_ptr, struct mm_trans* trans)
     free(trans);
 }
 
-struct mm_trans* mm_trans_find(struct mm_trans* head, const struct imm_state* state)
+struct mm_trans* mm_trans_find(struct mm_trans* head, struct imm_state const* state)
 {
     struct mm_trans* mm_trans = NULL;
     HASH_FIND_PTR(head, &state, mm_trans);
     return mm_trans;
 }
 
-const struct mm_trans* mm_trans_find_c(const struct mm_trans*  head,
-                                       const struct imm_state* state)
+struct mm_trans const* mm_trans_find_c(struct mm_trans const*  head,
+                                       struct imm_state const* state)
 {
-    const struct mm_trans* mm_trans = NULL;
+    struct mm_trans const* mm_trans = NULL;
     HASH_FIND_PTR(head, &state, mm_trans);
     return mm_trans;
 }
 
 void mm_trans_set_lprob(struct mm_trans* mm_trans, double lprob) { mm_trans->lprob = lprob; }
 
-double mm_trans_get_lprob(const struct mm_trans* mm_trans) { return mm_trans->lprob; }
+double mm_trans_get_lprob(struct mm_trans const* mm_trans) { return mm_trans->lprob; }
 
 struct mm_trans* mm_trans_next(struct mm_trans* mm_trans) { return mm_trans->hh.next; }
 
-const struct mm_trans* mm_trans_next_c(const struct mm_trans* mm_trans)
+struct mm_trans const* mm_trans_next_c(struct mm_trans const* mm_trans)
 {
     return mm_trans->hh.next;
 }
 
-const struct imm_state* mm_trans_get_state(const struct mm_trans* mm_trans)
+struct imm_state const* mm_trans_get_state(struct mm_trans const* mm_trans)
 {
     return mm_trans->state;
 }

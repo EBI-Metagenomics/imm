@@ -1,6 +1,5 @@
 #include "imm.h"
 #include "src/imm/step.h"
-#include "src/list.h"
 #include <stdlib.h>
 
 struct imm_path
@@ -17,8 +16,10 @@ struct imm_path* imm_path_create(void)
 
 void imm_path_destroy(struct imm_path* path)
 {
-    if (!path)
+    if (!path) {
+        imm_error("path should not be NULL");
         return;
+    }
 
     struct list_head *entry = NULL, *tmp = NULL;
     list_for_each_safe(entry, tmp, &path->steps)
@@ -32,7 +33,7 @@ void imm_path_destroy(struct imm_path* path)
     free(path);
 }
 
-int imm_path_add(struct imm_path* path, const struct imm_state* state, int seq_len)
+int imm_path_append(struct imm_path* path, struct imm_state const* state, int seq_len)
 {
     if (!path || !state) {
         imm_error("neither path nor state can be NULL");
@@ -68,7 +69,7 @@ struct imm_step const* imm_path_first(struct imm_path const* path)
 
 struct imm_step const* imm_path_next(struct imm_path const* path, struct imm_step const* step)
 {
-    const struct imm_step* next = list_next_entry(step, list);
+    struct imm_step const* next = list_next_entry(step, list);
     if (&path->steps != &next->list)
         return next;
     return NULL;

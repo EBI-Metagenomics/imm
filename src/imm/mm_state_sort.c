@@ -16,8 +16,8 @@ struct edge;
 
 struct node
 {
-    const struct imm_state* state;
-    const struct mm_state*  mm_state;
+    struct imm_state const* state;
+    struct mm_state const*  mm_state;
     int                     idx;
     int                     mark;
     struct list_head        edges;
@@ -32,24 +32,24 @@ struct edge
 
 struct state_node
 {
-    const struct imm_state* state;
+    struct imm_state const* state;
     struct node*            node;
     UT_hash_handle          hh;
 };
 
-HIDE void create_nodes(const struct mm_state* head, struct list_head* nodes,
+HIDE void create_nodes(struct mm_state const* head, struct list_head* nodes,
                        struct state_node** state_nodes);
 HIDE void destroy_nodes(struct list_head* nodes);
 HIDE void destroy_node(struct node* node);
 HIDE void destroy_state_nodes(struct state_node** state_nodes);
 HIDE void create_edges(struct list_head* nodes, struct state_node* state_nodes);
 HIDE void destroy_edges(struct list_head* edges);
-HIDE void visit(struct node* node, const struct mm_state*** mm_state);
+HIDE void visit(struct node* node, struct mm_state const*** mm_state);
 HIDE int  check_mute_cycles(struct list_head* nodes);
 HIDE int  check_mute_visit(struct node* node);
 HIDE void unmark_nodes(struct list_head* nodes);
 
-const struct mm_state* const* mm_state_sort(const struct mm_state* mm_state_head)
+struct mm_state const* const* mm_state_sort(struct mm_state const* mm_state_head)
 {
     struct state_node* state_node_head = NULL;
     struct list_head   nodes = LIST_HEAD_INIT(nodes);
@@ -64,8 +64,8 @@ const struct mm_state* const* mm_state_sort(const struct mm_state* mm_state_head
     unmark_nodes(&nodes);
 
     size_t                  nstates = (size_t)mm_state_nitems(mm_state_head);
-    const struct mm_state** mm_state = malloc(sizeof(struct mm_state*) * nstates);
-    const struct mm_state** cur = mm_state + nstates;
+    struct mm_state const** mm_state = malloc(sizeof(struct mm_state*) * nstates);
+    struct mm_state const** cur = mm_state + nstates;
     struct node*            node = NULL;
     list_for_each_entry(node, &nodes, list_entry) { visit(node, &cur); }
 
@@ -75,12 +75,12 @@ const struct mm_state* const* mm_state_sort(const struct mm_state* mm_state_head
     return mm_state;
 }
 
-void create_nodes(const struct mm_state* head, struct list_head* nodes,
+void create_nodes(struct mm_state const* head, struct list_head* nodes,
                   struct state_node** state_nodes)
 {
     *state_nodes = NULL;
 
-    const struct mm_state* mm_state = head;
+    struct mm_state const* mm_state = head;
     while (mm_state) {
 
         struct node* node = malloc(sizeof(struct node));
@@ -149,12 +149,12 @@ void create_edges(struct list_head* nodes, struct state_node* state_nodes)
     struct node* node = NULL;
     list_for_each_entry(node, nodes, list_entry)
     {
-        const struct mm_trans* trans = mm_state_get_trans_c(node->mm_state);
+        struct mm_trans const* trans = mm_state_get_trans_c(node->mm_state);
         while (trans) {
             if (!imm_lprob_is_zero(mm_trans_get_lprob(trans))) {
                 struct edge*             edge = malloc(sizeof(struct edge));
-                const struct state_node* sn = NULL;
-                const struct imm_state*  state = mm_trans_get_state(trans);
+                struct state_node const* sn = NULL;
+                struct imm_state const*  state = mm_trans_get_state(trans);
                 HASH_FIND_PTR(state_nodes, &state, sn);
                 edge->node = sn->node;
                 list_add(&edge->list_entry, &node->edges);
@@ -176,7 +176,7 @@ void destroy_edges(struct list_head* edges)
     }
 }
 
-void visit(struct node* node, const struct mm_state*** mm_state)
+void visit(struct node* node, struct mm_state const*** mm_state)
 {
     if (node->mark == PERMANENT_MARK)
         return;
@@ -184,7 +184,7 @@ void visit(struct node* node, const struct mm_state*** mm_state)
         return;
 
     node->mark = TEMPORARY_MARK;
-    const struct edge* edge = NULL;
+    struct edge const* edge = NULL;
     list_for_each_entry(edge, &node->edges, list_entry) { visit(edge->node, mm_state); }
     node->mark = PERMANENT_MARK;
     *mm_state -= 1;
@@ -216,7 +216,7 @@ int check_mute_visit(struct node* node)
     }
 
     node->mark = TEMPORARY_MARK;
-    const struct edge* edge = NULL;
+    struct edge const* edge = NULL;
     list_for_each_entry(edge, &node->edges, list_entry)
     {
         if (check_mute_visit(edge->node))
