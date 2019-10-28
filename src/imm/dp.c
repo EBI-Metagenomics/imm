@@ -67,7 +67,7 @@ HIDE void   set_score(struct dp_matrix const* dp_matrix, int row, struct step co
 HIDE double best_trans_score(const struct dp* dp, struct state_info const* dst_state, int row,
                              struct step* prev_step);
 HIDE double final_score(struct dp const* dp, struct step* end_step);
-HIDE int    viterbi_path(struct dp* dp, struct imm_path* path, struct step const* end_step);
+HIDE void    viterbi_path(struct dp* dp, struct imm_path* path, struct step const* end_step);
 
 HIDE struct matrix* create_trans(const struct mm_state* const* mm_states, int nstates,
                                  const struct state_idx* state_idx);
@@ -137,10 +137,8 @@ double dp_viterbi(struct dp* dp, struct imm_path* path)
     struct step end_step = {NULL, -1};
     double      score = final_score(dp, &end_step);
 
-    /* if (path) { */
-    /*     if (viterbi_path(dp, path, &end_step)) */
-    /*         return imm_lprob_invalid(); */
-    /* } */
+    if (path)
+        viterbi_path(dp, path, &end_step);
 
     return score;
 }
@@ -213,7 +211,7 @@ double best_trans_score(const struct dp* dp, struct state_info const* dst_state,
             struct step tmp_step = {prev, len};
             int         prev_row = row - len;
             double      v = get_score(&dp->dp_matrix, prev_row, &tmp_step) + trans;
-            if (v >= score) {
+            if (v > score) {
                 score = v;
                 prev_step->state = prev;
                 prev_step->seq_len = len;
@@ -237,7 +235,7 @@ double final_score(struct dp const* dp, struct step* end_step)
 
         struct step step = {end_state, len};
         double      s = get_score(&dp->dp_matrix, dp->seq_len - len, &step);
-        if (s >= score) {
+        if (s > score) {
             score = s;
             end_step->state = dp->end_state;
             end_step->seq_len = len;
@@ -248,9 +246,8 @@ double final_score(struct dp const* dp, struct step* end_step)
     return score;
 }
 
-int viterbi_path(struct dp* dp, struct imm_path* path, struct step const* end_step)
+void viterbi_path(struct dp* dp, struct imm_path* path, struct step const* end_step)
 {
-    return 0;
     int                row = dp->seq_len;
     struct step const* step = end_step;
 
@@ -259,8 +256,6 @@ int viterbi_path(struct dp* dp, struct imm_path* path, struct step const* end_st
         row -= step->seq_len;
         step = gmatrix_step_get(dp->dp_matrix.step, row, column(&dp->dp_matrix, step));
     }
-
-    return 0;
 }
 
 struct matrix* create_trans(const struct mm_state* const* mm_states, int nstates,

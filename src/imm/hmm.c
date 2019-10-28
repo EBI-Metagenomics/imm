@@ -220,7 +220,14 @@ double imm_hmm_viterbi(const struct imm_hmm* hmm, const char* seq,
         return imm_lprob_invalid();
 
     struct dp* dp = dp_create(mm_states, mm_state_nitems(hmm->mm_states), seq, end_state);
-    double     score = dp_viterbi(dp, path);
+    struct imm_path *p = imm_path_create();
+    double     score = dp_viterbi(dp, p);
+    double path_score = imm_hmm_likelihood(hmm, seq, path);
+    if (fabs(score - path_score) > 1e-7) {
+        imm_error("fatal error");
+        exit(1);
+    }
+    imm_path_destroy(p);
     dp_destroy(dp);
 
     free((struct mm_state**)mm_states);
