@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 project(imm VERSION 0.0.1 LANGUAGES C)
 
-list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake)
-
 # Generate compile_commands.json file
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
