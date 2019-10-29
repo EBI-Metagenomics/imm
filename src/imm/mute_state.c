@@ -23,8 +23,10 @@ struct imm_mute_state* imm_mute_state_create(char const* name, struct imm_abc co
 
 void imm_mute_state_destroy(struct imm_mute_state* state)
 {
-    if (!state)
+    if (!state) {
+        imm_error("state should not be NULL");
         return;
+    }
 
     imm_state_destroy(state->interface);
     state->interface = NULL;

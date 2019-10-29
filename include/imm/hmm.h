@@ -15,8 +15,8 @@ IMM_API int imm_hmm_add_state(struct imm_hmm* hmm, struct imm_state const* state
                               double start_lprob);
 IMM_API int imm_hmm_del_state(struct imm_hmm* hmm, struct imm_state const* state);
 
-IMM_API int imm_hmm_set_start_lprob(struct imm_hmm* hmm, struct imm_state const* state,
-                                    double start_lprob);
+IMM_API int imm_hmm_set_start(struct imm_hmm* hmm, struct imm_state const* state,
+                              double lprob);
 
 IMM_API int    imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state,
                                  struct imm_state const* dst_state, double lprob);

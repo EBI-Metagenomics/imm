@@ -365,7 +365,7 @@ void test_hmm_viterbi_one_mute_state(void)
     cass_cond(!is_valid(imm_hmm_likelihood(hmm, "C", path)));
     imm_path_destroy(path);
 
-    imm_hmm_set_start_lprob(hmm, cast_c(state), imm_lprob_zero());
+    imm_hmm_set_start(hmm, cast_c(state), imm_lprob_zero());
 
     path = imm_path_create();
     cass_cond(!is_valid(imm_hmm_viterbi(hmm, "", cast_c(state), path)));
@@ -428,7 +428,7 @@ void test_hmm_viterbi_two_mute_states(void)
     cass_cond(!is_valid(imm_hmm_likelihood(hmm, "C", path)));
     imm_path_destroy(path);
 
-    imm_hmm_set_start_lprob(hmm, cast_c(state1), imm_lprob_zero());
+    imm_hmm_set_start(hmm, cast_c(state1), imm_lprob_zero());
 
     path = imm_path_create();
     cass_close(imm_hmm_viterbi(hmm, "", cast_c(state0), path), log(0.5));
@@ -611,7 +611,7 @@ void test_hmm_viterbi_two_normal_states(void)
     cass_close(imm_hmm_likelihood(hmm, "ATT", path), desired);
     imm_path_destroy(path);
 
-    imm_hmm_set_start_lprob(hmm, cast_c(state1), imm_lprob_zero());
+    imm_hmm_set_start(hmm, cast_c(state1), imm_lprob_zero());
 
     path = imm_path_create();
     desired = log(0.1) + log(0.25) + log(0.3) + 3 * log(0.5);
@@ -703,8 +703,8 @@ void test_hmm_viterbi_normal_states(void)
     imm_hmm_set_trans(hmm, cast_c(state1), cast_c(state0), zero());
     imm_hmm_set_trans(hmm, cast_c(state1), cast_c(state1), zero());
 
-    imm_hmm_set_start_lprob(hmm, cast_c(state0), zero());
-    imm_hmm_set_start_lprob(hmm, cast_c(state1), zero());
+    imm_hmm_set_start(hmm, cast_c(state0), zero());
+    imm_hmm_set_start(hmm, cast_c(state1), zero());
 
     path = imm_path_create();
     cass_cond(!is_valid(imm_hmm_viterbi(hmm, "", cast_c(state0), path)));
@@ -736,7 +736,7 @@ void test_hmm_viterbi_normal_states(void)
     cass_cond(!is_valid(imm_hmm_likelihood(hmm, "AA", path)));
     imm_path_destroy(path);
 
-    imm_hmm_set_start_lprob(hmm, cast_c(state0), 0.0);
+    imm_hmm_set_start(hmm, cast_c(state0), 0.0);
 
     path = imm_path_create();
     cass_cond(!is_valid(imm_hmm_viterbi(hmm, "", cast_c(state0), path)));

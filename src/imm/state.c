@@ -1,6 +1,5 @@
 #include "imm.h"
 #include "src/imm/ascii.h"
-#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -23,7 +22,7 @@ struct imm_state* imm_state_create(char const* name, struct imm_abc const* abc,
         return NULL;
     }
 
-    if (!is_std_ascii(name, strlen(name))) {
+    if (!ascii_is_std(name, strlen(name))) {
         imm_error("name must be a string of non-extended ASCII characters");
         return NULL;
     }
@@ -38,9 +37,20 @@ struct imm_state* imm_state_create(char const* name, struct imm_abc const* abc,
     return s;
 }
 
-void* imm_state_get_impl(struct imm_state* state) { return state->impl; }
+void imm_state_destroy(struct imm_state* state)
+{
+    if (!state) {
+        imm_error("state should not be NULL");
+        return;
+    }
 
-void const* imm_state_get_impl_c(struct imm_state const* state) { return state->impl; }
+    free((char*)state->name);
+    state->abc = NULL;
+    state->lprob = NULL;
+    state->min_seq = NULL;
+    state->max_seq = NULL;
+    free(state);
+}
 
 char const* imm_state_get_name(struct imm_state const* s) { return s->name; }
 
@@ -55,19 +65,6 @@ double imm_state_lprob(struct imm_state const* state, char const* seq, int seq_l
         }
     }
     return state->lprob(state, seq, seq_len);
-}
-
-void imm_state_destroy(struct imm_state* state)
-{
-    if (!state)
-        return;
-
-    free((char*)state->name);
-    state->abc = NULL;
-    state->lprob = NULL;
-    state->min_seq = NULL;
-    state->max_seq = NULL;
-    free(state);
 }
 
 int imm_state_min_seq(struct imm_state const* state) { return state->min_seq(state); }
@@ -91,3 +88,7 @@ struct imm_state const* imm_state_cast_c(void const* state)
     } const* t = state;
     return t->state;
 }
+
+void* imm_state_get_impl(struct imm_state* state) { return state->impl; }
+
+void const* imm_state_get_impl_c(struct imm_state const* state) { return state->impl; }

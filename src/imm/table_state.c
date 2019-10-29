@@ -39,8 +39,10 @@ struct imm_table_state* imm_table_state_create(char const* name, struct imm_abc 
 
 void imm_table_state_destroy(struct imm_table_state* state)
 {
-    if (!state)
+    if (!state) {
+        imm_error("state should not be NULL");
         return;
+    }
 
     imm_state_destroy(state->interface);
     state->interface = NULL;

@@ -9,7 +9,7 @@
 struct imm_abc
 {
     char const* symbols;
-    int         symbol_idx[LAST_STD_ASCII + 1];
+    int         symbol_idx[ASCII_LAST_STD + 1];
 };
 
 HIDE int check_symbols_length(char const* symbols);
@@ -24,7 +24,7 @@ struct imm_abc* imm_abc_create(char const* symbols)
 
     abc->symbols = strdup(symbols);
 
-    for (int i = 0; i <= LAST_STD_ASCII; ++i)
+    for (int i = 0; i <= ASCII_LAST_STD; ++i)
         abc->symbol_idx[i] = -1;
 
     char const* ids = abc->symbols;
@@ -85,7 +85,7 @@ int check_symbols_length(char const* symbols)
 
 int check_symbol_id(char symbol_id)
 {
-    if (!is_std_ascii(&symbol_id, 1)) {
+    if (!ascii_is_std(&symbol_id, 1)) {
         imm_error("symbols must be non-extended ASCII characters");
         return 1;
     }

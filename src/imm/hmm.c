@@ -1,14 +1,10 @@
 #include "imm.h"
 #include "src/imm/abc.h"
-#include "src/imm/counter.h"
 #include "src/imm/dp.h"
 #include "src/imm/hide.h"
-#include "src/imm/matrix.h"
 #include "src/imm/mm_state.h"
 #include "src/imm/mm_state_sort.h"
 #include "src/imm/mm_trans.h"
-#include "src/logaddexp/logaddexp.h"
-#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -28,6 +24,19 @@ struct imm_hmm* imm_hmm_create(struct imm_abc const* abc)
     hmm->abc = abc;
     mm_state_create(&hmm->mm_states);
     return hmm;
+}
+
+void imm_hmm_destroy(struct imm_hmm* hmm)
+{
+    if (!hmm) {
+        imm_error("hmm should not be NULL");
+        return;
+    }
+
+    mm_state_destroy(&hmm->mm_states);
+
+    hmm->abc = NULL;
+    free(hmm);
 }
 
 int imm_hmm_add_state(struct imm_hmm* hmm, struct imm_state const* state, double start_lprob)
@@ -62,14 +71,13 @@ int imm_hmm_del_state(struct imm_hmm* hmm, struct imm_state const* state)
     return 0;
 }
 
-int imm_hmm_set_start_lprob(struct imm_hmm* hmm, struct imm_state const* state,
-                            double start_lprob)
+int imm_hmm_set_start(struct imm_hmm* hmm, struct imm_state const* state, double lprob)
 {
     struct mm_state* mm_state = mm_state_find(hmm->mm_states, state);
     if (!mm_state)
         return 1;
 
-    mm_state_set_start_lprob(mm_state, start_lprob);
+    mm_state_set_start_lprob(mm_state, lprob);
     return 0;
 }
 
@@ -240,19 +248,6 @@ int imm_hmm_normalize(struct imm_hmm* hmm)
     return 0;
 }
 
-void imm_hmm_destroy(struct imm_hmm* hmm)
-{
-    if (!hmm) {
-        imm_error("hmm should not be NULL");
-        return;
-    }
-
-    mm_state_destroy(&hmm->mm_states);
-
-    hmm->abc = NULL;
-    free(hmm);
-}
-
 int imm_hmm_normalize_start(struct imm_hmm* hmm)
 {
     struct mm_state const* mm_state = hmm->mm_states;
@@ -263,12 +258,12 @@ int imm_hmm_normalize_start(struct imm_hmm* hmm)
 
     goto enter;
     while (mm_state) {
-        lnorm = logaddexp(lnorm, mm_state_get_start_lprob(mm_state));
+        lnorm = imm_lprob_add(lnorm, mm_state_get_start_lprob(mm_state));
     enter:
         mm_state = mm_state_next_c(mm_state);
     }
 
-    if (!isfinite(lnorm)) {
+    if (imm_lprob_is_zero(lnorm)) {
         imm_error("no starting state is possible");
         return 1;
     }
@@ -308,11 +303,11 @@ int hmm_normalize_trans(struct mm_state* mm_state)
     double                 lnorm = imm_lprob_zero();
 
     while (mm_trans) {
-        lnorm = logaddexp(lnorm, mm_trans_get_lprob(mm_trans));
+        lnorm = imm_lprob_add(lnorm, mm_trans_get_lprob(mm_trans));
         mm_trans = mm_trans_next_c(mm_trans);
     }
 
-    if (!isfinite(lnorm)) {
+    if (imm_lprob_is_zero(lnorm)) {
         imm_error("state has no transition");
         return 1;
     }
