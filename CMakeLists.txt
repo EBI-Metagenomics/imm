@@ -26,8 +26,6 @@ add_library(imm
     src/table_state.c
 )
 
-add_library(IMM::imm ALIAS imm)
-
 target_include_directories(imm
     PUBLIC
         $<INSTALL_INTERFACE:include>
@@ -47,7 +45,7 @@ target_compile_options(imm PRIVATE $<$<C_COMPILER_ID:AppleClang>:-Wall -Wextra
 # Installation instructions
 
 include(GNUInstallDirs)
-set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/IMM)
+set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
 
 install(TARGETS imm
     EXPORT imm-targets
@@ -60,32 +58,32 @@ install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # Export the targets to a script
 install(EXPORT imm-targets
-    FILE IMMTargets.cmake
+    FILE imm-targets.cmake
     NAMESPACE IMM::
     DESTINATION ${INSTALL_CONFIGDIR}
 )
 
 include(CMakePackageConfigHelpers)
-configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/IMMConfig.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/IMMConfig.cmake
+write_basic_package_version_file(imm-config-version.cmake
+                                 VERSION ${PROJECT_VERSION}
+                                 COMPATIBILITY AnyNewerVersion)
+
+configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/imm-config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/imm-config.cmake
     INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
 )
 
 install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/IMMConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/imm-config-version.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/imm-config.cmake
     DESTINATION ${INSTALL_CONFIGDIR}
 )
 
 ##############################################################################
-# Exporting from the build tree
-export(EXPORT imm-targets FILE ${CMAKE_CURRENT_BINARY_DIR}/IMMTargets.cmake NAMESPACE IMM::)
+export(EXPORT imm-targets FILE ${CMAKE_CURRENT_BINARY_DIR}/imm-targets.cmake NAMESPACE IMM::)
 
-# Register package in user's package registry
-export(PACKAGE IMM)
+# Export the package for use from the build-tree
+export(PACKAGE ${PROJECT_NAME})
 
 enable_testing()
 add_subdirectory(test)
-
-# if(NOT WIN32)
-#     target_link_libraries(imm m)
-# endif()

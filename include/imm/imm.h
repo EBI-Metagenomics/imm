@@ -1,12 +1,6 @@
 #ifndef IMM_IMM_H
 #define IMM_IMM_H
 
-#define IMM_VERSION_MAJOR 0
-#define IMM_VERSION_MINOR 0
-#define IMM_VERSION_PATCH 1
-
-#define IMM_VERSION "0.0.1"
-
 #ifdef __cplusplus
 extern "C"
 {
