@@ -1,5 +1,5 @@
-#ifndef IMM_MUTE_STATE_H_API
-#define IMM_MUTE_STATE_H_API
+#ifndef IMM_MUTE_STATE_H
+#define IMM_MUTE_STATE_H
 
 #include "imm/api.h"
 

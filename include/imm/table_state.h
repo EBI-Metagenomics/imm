@@ -1,5 +1,5 @@
-#ifndef IMM_TABLE_STATE_H_API
-#define IMM_TABLE_STATE_H_API
+#ifndef IMM_TABLE_STATE_H
+#define IMM_TABLE_STATE_H
 
 #include "imm/api.h"
 

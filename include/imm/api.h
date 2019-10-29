@@ -1,5 +1,5 @@
-#ifndef IMM_API_H_API
-#define IMM_API_H_API
+#ifndef IMM_API_H
+#define IMM_API_H
 
 #ifdef _WIN32
 #ifdef IMM_API_EXPORTS

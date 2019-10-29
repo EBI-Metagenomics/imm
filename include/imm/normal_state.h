@@ -1,5 +1,5 @@
-#ifndef IMM_NORMAL_STATE_H_API
-#define IMM_NORMAL_STATE_H_API
+#ifndef IMM_NORMAL_STATE_H
+#define IMM_NORMAL_STATE_H
 
 #include "imm/api.h"
 

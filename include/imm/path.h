@@ -1,5 +1,5 @@
-#ifndef IMM_PATH_H_API
-#define IMM_PATH_H_API
+#ifndef IMM_PATH_H
+#define IMM_PATH_H
 
 #include "imm/api.h"
 

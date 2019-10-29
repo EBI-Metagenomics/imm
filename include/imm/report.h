@@ -1,5 +1,5 @@
-#ifndef IMM_REPORT_H_API
-#define IMM_REPORT_H_API
+#ifndef IMM_REPORT_H
+#define IMM_REPORT_H
 
 #include "imm/api.h"
 #include <stdarg.h>

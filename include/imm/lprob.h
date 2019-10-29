@@ -1,5 +1,5 @@
-#ifndef IMM_LPROB_H_API
-#define IMM_LPROB_H_API
+#ifndef IMM_LPROB_H
+#define IMM_LPROB_H
 
 #include "imm/api.h"
 

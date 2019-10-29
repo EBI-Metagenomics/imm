@@ -1,93 +1,91 @@
-cmake_minimum_required(VERSION 3.4 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+project(imm VERSION 0.0.1 LANGUAGES C)
 
-include(imm.cmake)
-
-imm_get_version(${CMAKE_CURRENT_SOURCE_DIR}/include/imm.h IMM_VERSION_MAJOR IMM_VERSION_MINOR IMM_VERSION_PATCH)
-set(IMM_VERSION ${IMM_VERSION_MAJOR}.${IMM_VERSION_MINOR}.${IMM_VERSION_PATCH})
-
-project(imm VERSION ${IMM_VERSION} LANGUAGES C)
-
-set(CMAKE_C_STANDARD 11)
-
-# Use FOLDER target property to organize targets into folders
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake)
 
 # Generate compile_commands.json file
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-message(STATUS "IMM_VERSION=${IMM_VERSION}")
-message(STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
-
-imm_enable_default_build_type()
-imm_enable_sanitizer_option()
-imm_enable_coverage_option()
-
-if(CMAKE_C_COMPILER_ID MATCHES "Clang")
-    add_compile_options(-Wall -Wextra -pedantic -Wstrict-prototypes -Wshadow -Wconversion
-        -Wmissing-prototypes -Wno-unused-parameter -Wno-empty-translation-unit)
-endif()
-
-include_directories(include)
-include_directories(.)
-
-# Interface header that that the user is used to include.
-set(IMM_PUBLIC_HEADER
-    include/imm.h
+add_library(imm
+    src/abc.c
+    src/ascii.c
+    src/dp.c
+    src/hmm.c
+    src/lprob.c
+    src/matrix.c
+    src/mm_state.c
+    src/mm_state_sort.c
+    src/mm_trans.c
+    src/mute_state.c
+    src/normal_state.c
+    src/path.c
+    src/report.c
+    src/state.c
+    src/state_idx.c
+    src/step.c
+    src/table_state.c
 )
 
-# Headers that are included by the interface header and
-# installed alongside it.
-set(IMM_PRIVATE_HEADERS
-    include/imm/abc.h
-    include/imm/api.h
-    include/imm/hmm.h
-    include/imm/lprob.h
-    include/imm/mute_state.h
-    include/imm/normal_state.h
-    include/imm/path.h
-    include/imm/report.h
-    include/imm/state.h
-    include/imm/table_state.h
+add_library(IMM::imm ALIAS imm)
+
+target_include_directories(imm
+    PUBLIC
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+set_target_properties(imm PROPERTIES VERSION ${PROJECT_VERSION})
+set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
+target_compile_features(imm PRIVATE c_std_11)
+target_compile_definitions(imm PRIVATE IMM_API_EXPORTS)
+target_compile_options(imm PRIVATE $<$<C_COMPILER_ID:AppleClang>:-Wall -Wextra
+    -pedantic -Wstrict-prototypes -Wshadow -Wconversion -Wmissing-prototypes
+    -Wno-unused-parameter -Wno-empty-translation-unit>)
+
+##############################################################################
+# Installation instructions
+
+include(GNUInstallDirs)
+set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/IMM)
+
+install(TARGETS imm
+    EXPORT imm-targets
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-set(IMM_SOURCES
-    src/imm/abc.c
-    src/imm/ascii.c
-    src/imm/dp.c
-    src/imm/hmm.c
-    src/imm/lprob.c
-    src/imm/matrix.c
-    src/imm/mm_state.c
-    src/imm/mm_state_sort.c
-    src/imm/mm_trans.c
-    src/imm/mute_state.c
-    src/imm/normal_state.c
-    src/imm/path.c
-    src/imm/report.c
-    src/imm/state.c
-    src/imm/state_idx.c
-    src/imm/step.c
-    src/imm/table_state.c
+install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+# Export the targets to a script
+install(EXPORT imm-targets
+    FILE IMMTargets.cmake
+    NAMESPACE IMM::
+    DESTINATION ${INSTALL_CONFIGDIR}
 )
 
-add_library(immobj OBJECT ${IMM_SOURCES})
-set_property(TARGET immobj PROPERTY POSITION_INDEPENDENT_CODE 1)
+include(CMakePackageConfigHelpers)
+configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/IMMConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/IMMConfig.cmake
+    INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
+)
 
-add_library(imm SHARED $<TARGET_OBJECTS:immobj>)
-set_target_properties(imm PROPERTIES VERSION ${IMM_VERSION})
-set_target_properties(imm PROPERTIES SOVERSION ${IMM_VERSION_MAJOR})
-set_target_properties(imm PROPERTIES PUBLIC_HEADER ${IMM_PUBLIC_HEADER})
-if(NOT WIN32)
-    target_link_libraries(imm m)
-endif()
-target_compile_definitions(imm PUBLIC IMM_API_EXPORTS)
-imm_sanitizer_add_target(imm)
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/IMMConfig.cmake
+    DESTINATION ${INSTALL_CONFIGDIR}
+)
+
+##############################################################################
+# Exporting from the build tree
+export(EXPORT imm-targets FILE ${CMAKE_CURRENT_BINARY_DIR}/IMMTargets.cmake NAMESPACE IMM::)
+
+# Register package in user's package registry
+export(PACKAGE IMM)
 
 enable_testing()
+add_subdirectory(test)
 
-imm_add_test(abc imm)
-imm_add_test(state imm)
-imm_add_test(hmm imm)
-imm_add_test(path imm)
-
-imm_enable_coverage("${IMM_SOURCES}")
+# if(NOT WIN32)
+#     target_link_libraries(imm m)
+# endif()

@@ -1,5 +1,5 @@
-#ifndef IMM_STEP_H_API
-#define IMM_STEP_H_API
+#ifndef IMM_STEP_H
+#define IMM_STEP_H
 
 #include "imm/api.h"
 
