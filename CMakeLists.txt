@@ -23,6 +23,9 @@ add_library(imm
     src/step.c
     src/table_state.c
 )
+add_library(IMM::imm ALIAS imm)
+
+find_package(logaddexp REQUIRED)
 
 target_include_directories(imm
     PUBLIC
@@ -31,57 +34,28 @@ target_include_directories(imm
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
+target_link_libraries(imm PRIVATE LOGADDEXP::logaddexp)
 set_target_properties(imm PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
 target_compile_features(imm PRIVATE c_std_11)
 target_compile_definitions(imm PRIVATE IMM_API_EXPORTS)
-target_compile_options(imm PRIVATE $<$<C_COMPILER_ID:AppleClang>:-Wall -Wextra
-    -pedantic -Wstrict-prototypes -Wshadow -Wconversion -Wmissing-prototypes
-    -Wno-unused-parameter -Wno-empty-translation-unit>)
-
-##############################################################################
-# Installation instructions
-
-include(GNUInstallDirs)
-set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
-
-install(TARGETS imm
-    EXPORT imm-targets
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
+target_compile_options(imm PRIVATE
+    $<$<BOOL:${WIN32}>:/W4 /WX>
+    $<$<NOT:$<BOOL:${WIN32}>>:-Wall -Wextra -pedantic -Wstrict-prototypes 
+        -Wshadow -Wconversion -Wmissing-prototypes -Wno-unused-parameter
+        -Wno-empty-translation-unit>
 )
 
-install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(TARGETS imm EXPORT imm-targets)
+install(DIRECTORY include/ DESTINATION include)
 
 # Export the targets to a script
 install(EXPORT imm-targets
-    FILE imm-targets.cmake
+    FILE imm-config.cmake
     NAMESPACE IMM::
-    DESTINATION ${INSTALL_CONFIGDIR}
+    DESTINATION lib/cmake/imm
 )
-
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(imm-config-version.cmake
-                                 VERSION ${PROJECT_VERSION}
-                                 COMPATIBILITY AnyNewerVersion)
-
-configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/imm-config.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/imm-config.cmake
-    INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
-)
-
-install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/imm-config-version.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/imm-config.cmake
-    DESTINATION ${INSTALL_CONFIGDIR}
-)
-
-##############################################################################
-export(EXPORT imm-targets FILE ${CMAKE_CURRENT_BINARY_DIR}/imm-targets.cmake NAMESPACE IMM::)
-
-# Export the package for use from the build-tree
-export(PACKAGE ${PROJECT_NAME})
 
 enable_testing()
 add_subdirectory(test)
