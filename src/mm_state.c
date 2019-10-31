@@ -5,7 +5,7 @@
 #include <limits.h>
 #include <math.h>
 
-struct mm_state
+struct mstate
 {
     struct imm_state const* state;
     double                  start_lprob;
@@ -13,11 +13,11 @@ struct mm_state
     UT_hash_handle          hh;
 };
 
-void mm_state_create(struct mm_state** head_ptr) { *head_ptr = NULL; }
+void imm_mstate_create(struct mstate** head_ptr) { *head_ptr = NULL; }
 
-void mm_state_destroy(struct mm_state** head_ptr)
+void imm_mstate_destroy(struct mstate** head_ptr)
 {
-    struct mm_state *mm_state, *tmp;
+    struct mstate *mm_state, *tmp;
     if (*head_ptr) {
         HASH_ITER(hh, *head_ptr, mm_state, tmp)
         {
@@ -32,19 +32,19 @@ void mm_state_destroy(struct mm_state** head_ptr)
     *head_ptr = NULL;
 }
 
-void mm_state_add_state(struct mm_state** head_ptr, struct imm_state const* state,
-                        double start_lprob)
+void imm_mstate_add_state(struct mstate** head_ptr, struct imm_state const* state,
+                          double start_lprob)
 {
-    struct mm_state* mm_state = malloc(sizeof(struct mm_state));
+    struct mstate* mm_state = malloc(sizeof(struct mstate));
     mm_trans_create(&mm_state->mm_transitions);
     mm_state->start_lprob = start_lprob;
     mm_state->state = state;
     HASH_ADD_PTR(*head_ptr, state, mm_state);
 }
 
-int mm_state_del_state(struct mm_state** head_ptr, struct imm_state const* state)
+int imm_mstate_del_state(struct mstate** head_ptr, struct imm_state const* state)
 {
-    struct mm_state* mm_state = NULL;
+    struct mstate* mm_state = NULL;
     HASH_FIND_PTR(*head_ptr, &state, mm_state);
     if (mm_state) {
         HASH_DEL(*head_ptr, mm_state);
@@ -54,14 +54,14 @@ int mm_state_del_state(struct mm_state** head_ptr, struct imm_state const* state
     return 1;
 }
 
-void mm_state_del_trans(struct mm_state* head, struct imm_state const* state)
+void imm_mstate_del_trans(struct mstate* head, struct imm_state const* state)
 {
     struct mm_trans* trans = mm_trans_find(head->mm_transitions, state);
     if (trans)
         mm_trans_del(&head->mm_transitions, trans);
 }
 
-int mm_state_nitems(struct mm_state const* head)
+int imm_mstate_nitems(struct mstate const* head)
 {
     size_t n = HASH_COUNT(head);
     if (n > INT_MAX) {
@@ -72,59 +72,59 @@ int mm_state_nitems(struct mm_state const* head)
     return (int)n;
 }
 
-struct mm_state* mm_state_find(struct mm_state* head, struct imm_state const* state)
+struct mstate* imm_mstate_find(struct mstate* head, struct imm_state const* state)
 {
-    struct mm_state* mm_state = NULL;
+    struct mstate* mm_state = NULL;
     HASH_FIND_PTR(head, &state, mm_state);
     return mm_state;
 }
 
-struct mm_state const* mm_state_find_c(struct mm_state const*  head,
+struct mstate const* imm_mstate_find_c(struct mstate const*    head,
                                        struct imm_state const* state)
 {
-    struct mm_state* mm_state = NULL;
+    struct mstate* mm_state = NULL;
     HASH_FIND_PTR(head, &state, mm_state);
     return mm_state;
 }
 
-struct imm_state const* mm_state_get_state(struct mm_state const* mm_state)
+struct imm_state const* imm_mstate_get_state(struct mstate const* mm_state)
 {
     return mm_state->state;
 }
 
-double mm_state_get_start_lprob(struct mm_state const* mm_state)
+double imm_mstate_get_start(struct mstate const* mm_state)
 {
     return mm_state->start_lprob;
 }
 
-void mm_state_set_start_lprob(struct mm_state* mm_state, double lprob)
+void imm_mstate_set_start(struct mstate* mm_state, double lprob)
 {
     mm_state->start_lprob = lprob;
 }
 
-struct mm_state* mm_state_next(struct mm_state* mm_state) { return mm_state->hh.next; }
+struct mstate* imm_mstate_next(struct mstate* mm_state) { return mm_state->hh.next; }
 
-struct mm_state const* mm_state_next_c(struct mm_state const* mm_state)
+struct mstate const* imm_mstate_next_c(struct mstate const* mm_state)
 {
     return mm_state->hh.next;
 }
 
-struct mm_trans* mm_state_get_trans(struct mm_state* mm_state)
+struct mm_trans* imm_mstate_get_trans(struct mstate* mm_state)
 {
-    return *mm_state_get_trans_ptr(mm_state);
+    return *imm_mstate_get_trans_ptr(mm_state);
 }
 
-struct mm_trans const* mm_state_get_trans_c(struct mm_state const* mm_state)
+struct mm_trans const* imm_mstate_get_trans_c(struct mstate const* mm_state)
 {
-    return *mm_state_get_trans_ptr_c(mm_state);
+    return *imm_mstate_get_trans_ptr_c(mm_state);
 }
 
-struct mm_trans** mm_state_get_trans_ptr(struct mm_state* mm_state)
+struct mm_trans** imm_mstate_get_trans_ptr(struct mstate* mm_state)
 {
     return &mm_state->mm_transitions;
 }
 
-struct mm_trans* const* mm_state_get_trans_ptr_c(struct mm_state const* mm_state)
+struct mm_trans* const* imm_mstate_get_trans_ptr_c(struct mstate const* mm_state)
 {
     return &mm_state->mm_transitions;
 }

@@ -11,8 +11,8 @@ struct imm_abc
     int         symbol_idx[ASCII_LAST_STD + 1];
 };
 
-HIDE int check_symbols_length(char const* symbols);
-HIDE int check_symbol_id(char symbol_id);
+static int check_symbols_length(char const* symbols);
+static int check_symbol_id(char symbol_id);
 
 struct imm_abc* imm_abc_create(char const* symbols)
 {
@@ -73,7 +73,7 @@ char imm_abc_symbol_id(struct imm_abc const* abc, int symbol_idx)
     return abc->symbols[symbol_idx];
 }
 
-int check_symbols_length(char const* symbols)
+static int check_symbols_length(char const* symbols)
 {
     if (strlen(symbols) > INT_MAX) {
         imm_error("symbols length is greater than %d", INT_MAX);
@@ -82,7 +82,7 @@ int check_symbols_length(char const* symbols)
     return 0;
 }
 
-int check_symbol_id(char symbol_id)
+static int check_symbol_id(char symbol_id)
 {
     if (!ascii_is_std(&symbol_id, 1)) {
         imm_error("symbols must be non-extended ASCII characters");

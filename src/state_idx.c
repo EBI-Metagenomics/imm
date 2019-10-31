@@ -8,9 +8,9 @@ struct state_idx
     UT_hash_handle          hh;
 };
 
-void state_idx_create(struct state_idx** head_ptr) { *head_ptr = NULL; }
+void imm_state_idx_create(struct state_idx** head_ptr) { *head_ptr = NULL; }
 
-void state_idx_destroy(struct state_idx** head_ptr)
+void imm_state_idx_destroy(struct state_idx** head_ptr)
 {
     struct state_idx *state_idx, *tmp;
     if (*head_ptr) {
@@ -25,7 +25,7 @@ void state_idx_destroy(struct state_idx** head_ptr)
     *head_ptr = NULL;
 }
 
-void state_idx_add(struct state_idx** head_ptr, struct imm_state const* state, int idx)
+void imm_state_idx_add(struct state_idx** head_ptr, struct imm_state const* state, int idx)
 {
     struct state_idx* state_idx = malloc(sizeof(struct state_idx));
     state_idx->state = state;
@@ -33,7 +33,7 @@ void state_idx_add(struct state_idx** head_ptr, struct imm_state const* state, i
     HASH_ADD_PTR(*head_ptr, state, state_idx);
 }
 
-int state_idx_find(struct state_idx const* head, struct imm_state const* state)
+int imm_state_idx_find(struct state_idx const* head, struct imm_state const* state)
 {
     struct state_idx* state_idx = NULL;
     HASH_FIND_PTR(head, &state, state_idx);

@@ -3,34 +3,34 @@
 
 #include "hide.h"
 
-struct mm_state;
+struct mstate;
 struct imm_state;
 
-HIDE void mm_state_create(struct mm_state** head_ptr);
-HIDE void mm_state_destroy(struct mm_state** head_ptr);
+HIDE void imm_mstate_create(struct mstate** head_ptr);
+HIDE void imm_mstate_destroy(struct mstate** head_ptr);
 
-HIDE void mm_state_add_state(struct mm_state** head_ptr, struct imm_state const* state,
-                             double start_lprob);
-HIDE int  mm_state_del_state(struct mm_state** head_ptr, struct imm_state const* state);
-HIDE void mm_state_del_trans(struct mm_state* head, struct imm_state const* state);
+HIDE void imm_mstate_add_state(struct mstate** head_ptr, struct imm_state const* state,
+                               double start_lprob);
+HIDE int  imm_mstate_del_state(struct mstate** head_ptr, struct imm_state const* state);
+HIDE void imm_mstate_del_trans(struct mstate* head, struct imm_state const* state);
 
-HIDE int mm_state_nitems(struct mm_state const* head);
+HIDE int imm_mstate_nitems(struct mstate const* head);
 
-HIDE struct mm_state* mm_state_find(struct mm_state* head, struct imm_state const* state);
-HIDE struct mm_state const* mm_state_find_c(struct mm_state const*  head,
+HIDE struct mstate*       imm_mstate_find(struct mstate* head, struct imm_state const* state);
+HIDE struct mstate const* imm_mstate_find_c(struct mstate const*    head,
                                             struct imm_state const* state);
 
-HIDE struct imm_state const* mm_state_get_state(struct mm_state const* mm_state);
-HIDE double                  mm_state_get_start_lprob(struct mm_state const* mm_state);
-HIDE void mm_state_set_start_lprob(struct mm_state* mm_state, double lprob);
+HIDE struct imm_state const* imm_mstate_get_state(struct mstate const* mm_state);
+HIDE double                  imm_mstate_get_start(struct mstate const* mm_state);
+HIDE void                    imm_mstate_set_start(struct mstate* mm_state, double lprob);
 
-HIDE struct mm_state*       mm_state_next(struct mm_state* mm_state);
-HIDE struct mm_state const* mm_state_next_c(struct mm_state const* mm_state);
+HIDE struct mstate*       imm_mstate_next(struct mstate* mm_state);
+HIDE struct mstate const* imm_mstate_next_c(struct mstate const* mm_state);
 
-HIDE struct mm_trans*       mm_state_get_trans(struct mm_state* mm_state);
-HIDE struct mm_trans const* mm_state_get_trans_c(struct mm_state const* mm_state);
+HIDE struct mm_trans*       imm_mstate_get_trans(struct mstate* mm_state);
+HIDE struct mm_trans const* imm_mstate_get_trans_c(struct mstate const* mm_state);
 
-HIDE struct mm_trans**       mm_state_get_trans_ptr(struct mm_state* mm_state);
-HIDE struct mm_trans* const* mm_state_get_trans_ptr_c(struct mm_state const* mm_state);
+HIDE struct mm_trans**       imm_mstate_get_trans_ptr(struct mstate* mm_state);
+HIDE struct mm_trans* const* imm_mstate_get_trans_ptr_c(struct mstate const* mm_state);
 
 #endif

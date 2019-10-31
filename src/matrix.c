@@ -2,7 +2,7 @@
 #include "imm/imm.h"
 #include <stdlib.h>
 
-struct matrix* matrix_create(int nrows, int ncols)
+struct matrix* imm_matrix_create(int nrows, int ncols)
 {
     struct matrix* matrix = malloc(sizeof(struct matrix));
     matrix->data = malloc(sizeof(double) * ((size_t)(nrows * ncols)));
@@ -11,13 +11,13 @@ struct matrix* matrix_create(int nrows, int ncols)
     return matrix;
 }
 
-void matrix_set_all(struct matrix* matrix, double v)
+void imm_matrix_fill(struct matrix* matrix, double v)
 {
     for (int i = 0; i < matrix->nrows * matrix->ncols; ++i)
         matrix->data[i] = v;
 }
 
-void matrix_destroy(struct matrix* matrix)
+void imm_matrix_destroy(struct matrix* matrix)
 {
     if (!matrix) {
         imm_error("matrix should not be null");

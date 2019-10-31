@@ -1,4 +1,3 @@
-#include "hide.h"
 #include "imm/imm.h"
 #include <math.h>
 #include <stdlib.h>
@@ -10,9 +9,9 @@ struct imm_normal_state
     double*           lprobs;
 };
 
-HIDE double normal_state_lprob(struct imm_state const* state, char const* seq, int seq_len);
-HIDE int    normal_state_min_seq(struct imm_state const* state);
-HIDE int    normal_state_max_seq(struct imm_state const* state);
+static double normal_state_lprob(struct imm_state const* state, char const* seq, int seq_len);
+static int    normal_state_min_seq(struct imm_state const* state);
+static int    normal_state_max_seq(struct imm_state const* state);
 
 struct imm_normal_state* imm_normal_state_create(char const* name, struct imm_abc const* abc,
                                                  double const* lprobs)
@@ -51,7 +50,7 @@ int imm_normal_state_normalize(struct imm_normal_state* state)
     return imm_lprob_normalize(state->lprobs, len);
 }
 
-double normal_state_lprob(struct imm_state const* state, char const* seq, int seq_len)
+static double normal_state_lprob(struct imm_state const* state, char const* seq, int seq_len)
 {
     struct imm_normal_state const* s = imm_state_get_impl_c(state);
     if (seq_len == 1) {
@@ -62,6 +61,6 @@ double normal_state_lprob(struct imm_state const* state, char const* seq, int se
     return imm_lprob_zero();
 }
 
-int normal_state_min_seq(struct imm_state const* state) { return 1; }
+static int normal_state_min_seq(struct imm_state const* state) { return 1; }
 
-int normal_state_max_seq(struct imm_state const* state) { return 1; }
+static int normal_state_max_seq(struct imm_state const* state) { return 1; }

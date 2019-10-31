@@ -1,4 +1,3 @@
-#include "hide.h"
 #include "imm/imm.h"
 #include "min.h"
 #include "uthash.h"
@@ -20,9 +19,9 @@ struct emission
     UT_hash_handle hh;
 };
 
-HIDE double table_state_lprob(struct imm_state const* state, char const* seq, int seq_len);
-HIDE int    table_state_min_seq(struct imm_state const* state);
-HIDE int    table_state_max_seq(struct imm_state const* state);
+static double table_state_lprob(struct imm_state const* state, char const* seq, int seq_len);
+static int    table_state_min_seq(struct imm_state const* state);
+static int    table_state_max_seq(struct imm_state const* state);
 
 struct imm_table_state* imm_table_state_create(char const* name, struct imm_abc const* abc)
 {
@@ -100,7 +99,7 @@ int imm_table_state_normalize(struct imm_table_state* state)
     return 0;
 }
 
-double table_state_lprob(struct imm_state const* state, char const* seq, int seq_len)
+static double table_state_lprob(struct imm_state const* state, char const* seq, int seq_len)
 {
     struct imm_table_state const* s = imm_state_get_impl_c(state);
 
@@ -113,13 +112,13 @@ double table_state_lprob(struct imm_state const* state, char const* seq, int seq
     return imm_lprob_zero();
 }
 
-int table_state_min_seq(struct imm_state const* state)
+static int table_state_min_seq(struct imm_state const* state)
 {
     struct imm_table_state const* s = imm_state_get_impl_c(state);
     return s->min_seq;
 }
 
-int table_state_max_seq(struct imm_state const* state)
+static int table_state_max_seq(struct imm_state const* state)
 {
     struct imm_table_state const* s = imm_state_get_impl_c(state);
     return s->max_seq;

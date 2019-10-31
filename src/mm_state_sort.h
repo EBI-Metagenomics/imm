@@ -3,8 +3,8 @@
 
 #include "hide.h"
 
-struct mm_state;
+struct mstate;
 
-HIDE struct mm_state const* const* mm_state_sort(struct mm_state const* mm_state_head);
+HIDE struct mstate const* const* imm_mstate_sort(struct mstate const* mm_state_head);
 
 #endif

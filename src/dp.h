@@ -5,11 +5,11 @@
 
 struct imm_path;
 struct imm_state;
-struct mm_state;
+struct mstate;
 
-HIDE struct dp* dp_create(struct mm_state const* const* mm_states, int nstates,
-                          char const* seq, struct imm_state const* end_state);
-HIDE double     dp_viterbi(struct dp* dp, struct imm_path* path);
-HIDE void       dp_destroy(struct dp* dp);
+HIDE struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates,
+                              char const* seq, struct imm_state const* end_state);
+HIDE double     imm_dp_viterbi(struct dp* dp, struct imm_path* path);
+HIDE void       imm_dp_destroy(struct dp* dp);
 
 #endif

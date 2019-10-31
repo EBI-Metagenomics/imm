@@ -6,7 +6,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_library(imm
     src/abc.c
-    src/ascii.c
     src/dp.c
     src/hmm.c
     src/lprob.c
@@ -49,11 +48,18 @@ target_compile_options(imm PRIVATE
 
 install(TARGETS imm EXPORT imm-targets)
 install(DIRECTORY include/ DESTINATION include)
-
-# Export the targets to a script
 install(EXPORT imm-targets
-    FILE imm-config.cmake
+    FILE imm-targets.cmake
     NAMESPACE IMM::
+    DESTINATION lib/cmake/imm
+)
+include(CMakePackageConfigHelpers)
+configure_package_config_file(imm-config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/imm-config.cmake
+    INSTALL_DESTINATION lib/cmake/imm
+    NO_SET_AND_CHECK_MACRO
+)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/imm-config.cmake
     DESTINATION lib/cmake/imm
 )
 
