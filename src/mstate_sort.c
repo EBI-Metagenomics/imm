@@ -1,8 +1,8 @@
-#include "mm_state_sort.h"
+#include "mstate_sort.h"
 #include "imm/imm.h"
 #include "list.h"
-#include "mm_state.h"
-#include "mm_trans.h"
+#include "mstate.h"
+#include "mtrans.h"
 #include "state_idx.h"
 #include "uthash.h"
 #include <stddef.h>
@@ -151,16 +151,16 @@ static void create_edges(struct list_head* nodes, struct state_node* state_nodes
     {
         struct mm_trans const* trans = imm_mstate_get_trans_c(node->mm_state);
         while (trans) {
-            if (!imm_lprob_is_zero(mm_trans_get_lprob(trans))) {
+            if (!imm_lprob_is_zero(imm_mtrans_get_lprob(trans))) {
                 struct edge*             edge = malloc(sizeof(struct edge));
                 struct state_node const* sn = NULL;
-                struct imm_state const*  state = mm_trans_get_state(trans);
+                struct imm_state const*  state = imm_mtrans_get_state(trans);
                 HASH_FIND_PTR(state_nodes, &state, sn);
                 edge->node = sn->node;
                 list_add(&edge->list_entry, &node->edges);
             }
 
-            trans = mm_trans_next_c(trans);
+            trans = imm_mtrans_next_c(trans);
         }
     }
 }

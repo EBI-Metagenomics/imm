@@ -4,8 +4,8 @@
 #include "imm/imm.h"
 #include "matrix.h"
 #include "min.h"
-#include "mm_state.h"
-#include "mm_trans.h"
+#include "mstate.h"
+#include "mtrans.h"
 #include "state_idx.h"
 #include "uthash.h"
 #include <limits.h>
@@ -269,12 +269,12 @@ static struct matrix* create_trans(struct mstate const* const* mm_states, int ns
         int                     src = imm_state_idx_find(state_idx, src_state);
 
         struct mm_trans const* t = NULL;
-        for (t = imm_mstate_get_trans_c(mm_states[i]); t; t = mm_trans_next_c(t)) {
+        for (t = imm_mstate_get_trans_c(mm_states[i]); t; t = imm_mtrans_next_c(t)) {
 
-            struct imm_state const* dst_state = mm_trans_get_state(t);
+            struct imm_state const* dst_state = imm_mtrans_get_state(t);
             int                     dst = imm_state_idx_find(state_idx, dst_state);
 
-            imm_matrix_set(trans, src, dst, mm_trans_get_lprob(t));
+            imm_matrix_set(trans, src, dst, imm_mtrans_get_lprob(t));
         }
     }
 

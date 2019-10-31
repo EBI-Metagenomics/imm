@@ -10,9 +10,9 @@ add_library(imm
     src/hmm.c
     src/lprob.c
     src/matrix.c
-    src/mm_state.c
-    src/mm_state_sort.c
-    src/mm_trans.c
+    src/mstate.c
+    src/mstate_sort.c
+    src/mtrans.c
     src/mute_state.c
     src/normal_state.c
     src/path.c

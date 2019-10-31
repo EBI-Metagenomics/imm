@@ -1,9 +1,9 @@
 #include "dp.h"
 #include "hide.h"
 #include "imm/imm.h"
-#include "mm_state.h"
-#include "mm_state_sort.h"
-#include "mm_trans.h"
+#include "mstate.h"
+#include "mstate_sort.h"
+#include "mtrans.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -101,11 +101,11 @@ int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state,
     }
 
     struct mm_trans** head_ptr = imm_mstate_get_trans_ptr(src);
-    struct mm_trans*  mm_trans = mm_trans_find(*head_ptr, dst_state);
+    struct mm_trans*  mm_trans = imm_mtrans_find(*head_ptr, dst_state);
     if (mm_trans)
-        mm_trans_set_lprob(mm_trans, lprob);
+        imm_mtrans_set_lprob(mm_trans, lprob);
     else
-        mm_trans_add(head_ptr, dst_state, lprob);
+        imm_mtrans_add(head_ptr, dst_state, lprob);
 
     return 0;
 }
@@ -124,11 +124,11 @@ double imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* src_
         return imm_lprob_invalid();
     }
 
-    struct mm_trans const* mm_trans = mm_trans_find_c(imm_mstate_get_trans_c(src), dst_state);
+    struct mm_trans const* mm_trans = imm_mtrans_find_c(imm_mstate_get_trans_c(src), dst_state);
     if (!mm_trans)
         return imm_lprob_zero();
 
-    return mm_trans_get_lprob(mm_trans);
+    return imm_mtrans_get_lprob(mm_trans);
 }
 
 double imm_hmm_likelihood(struct imm_hmm const* hmm, char const* seq,
@@ -206,11 +206,10 @@ double imm_hmm_viterbi(struct imm_hmm const* hmm, char const* seq,
         return imm_lprob_invalid();
     }
 
-    if (!imm_mstate_find_c(hmm->mm_states, end_state))
-        {
-            imm_error("end_state not found");
-            return imm_lprob_invalid();
-        }
+    if (!imm_mstate_find_c(hmm->mm_states, end_state)) {
+        imm_error("end_state not found");
+        return imm_lprob_invalid();
+    }
 
     int seq_len = (int)strlen(seq);
     if (!abc_has_symbols(hmm->abc, seq, seq_len)) {
@@ -305,8 +304,8 @@ static int hmm_normalize_trans(struct mstate* mm_state)
     double                 lnorm = imm_lprob_zero();
 
     while (mm_trans) {
-        lnorm = imm_lprob_add(lnorm, mm_trans_get_lprob(mm_trans));
-        mm_trans = mm_trans_next_c(mm_trans);
+        lnorm = imm_lprob_add(lnorm, imm_mtrans_get_lprob(mm_trans));
+        mm_trans = imm_mtrans_next_c(mm_trans);
     }
 
     if (imm_lprob_is_zero(lnorm)) {
@@ -316,8 +315,8 @@ static int hmm_normalize_trans(struct mstate* mm_state)
 
     struct mm_trans* t = imm_mstate_get_trans(mm_state);
     while (t) {
-        mm_trans_set_lprob(t, mm_trans_get_lprob(t) - lnorm);
-        t = mm_trans_next(t);
+        imm_mtrans_set_lprob(t, imm_mtrans_get_lprob(t) - lnorm);
+        t = imm_mtrans_next(t);
     }
 
     return 0;

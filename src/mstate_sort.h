@@ -1,5 +1,5 @@
-#ifndef IMM_MM_STATE_SORT_H
-#define IMM_MM_STATE_SORT_H
+#ifndef IMM_MSTATE_SORT_H
+#define IMM_MSTATE_SORT_H
 
 #include "hide.h"
 
