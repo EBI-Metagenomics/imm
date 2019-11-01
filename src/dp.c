@@ -107,6 +107,7 @@ struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, cha
     imm_state_idx_destroy(&state_idx);
 
     dp->dp_matrix.score = imm_matrix_create(dp->seq_len + 1, next_col);
+    imm_matrix_fill(dp->dp_matrix.score, imm_lprob_zero());
     dp->dp_matrix.step = gmatrix_step_create(dp->seq_len + 1, next_col);
 
     return dp;
