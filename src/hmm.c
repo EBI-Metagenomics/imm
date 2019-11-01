@@ -124,7 +124,8 @@ double imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* src_
         return imm_lprob_invalid();
     }
 
-    struct mm_trans const* mm_trans = imm_mtrans_find_c(imm_mstate_get_trans_c(src), dst_state);
+    struct mm_trans const* mm_trans =
+        imm_mtrans_find_c(imm_mstate_get_trans_c(src), dst_state);
     if (!mm_trans)
         return imm_lprob_zero();
 
@@ -141,8 +142,10 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, char const* seq,
     int seq_len = (int)strlen(seq);
 
     struct imm_step const* step = imm_path_first(path);
-    if (!step)
+    if (!step) {
+        imm_error("path must have steps");
         return imm_lprob_invalid();
+    }
 
     int                     len = imm_step_seq_len(step);
     struct imm_state const* state = imm_step_state(step);

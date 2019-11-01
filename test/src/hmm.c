@@ -9,6 +9,7 @@ void test_hmm_likelihood_single_state(void);
 void test_hmm_likelihood_two_states(void);
 void test_hmm_likelihood_mute_state(void);
 void test_hmm_likelihood_two_mute_states(void);
+void test_hmm_likelihood_invalid(void);
 void test_hmm_viterbi_no_state(void);
 void test_hmm_viterbi_one_mute_state(void);
 void test_hmm_viterbi_two_mute_states(void);
@@ -31,6 +32,7 @@ int main(void)
     test_hmm_likelihood_two_states();
     test_hmm_likelihood_mute_state();
     test_hmm_likelihood_two_mute_states();
+    test_hmm_likelihood_invalid();
     test_hmm_viterbi_no_state();
     test_hmm_viterbi_one_mute_state();
     test_hmm_viterbi_two_mute_states();
@@ -324,6 +326,47 @@ void test_hmm_likelihood_two_mute_states(void)
     imm_hmm_destroy(hmm);
     imm_mute_state_destroy(S0);
     imm_mute_state_destroy(S1);
+    imm_abc_destroy(abc);
+}
+
+void test_hmm_likelihood_invalid(void)
+{
+    struct imm_abc* abc = imm_abc_create("AC");
+    struct imm_hmm* hmm = imm_hmm_create(abc);
+
+    struct imm_mute_state* S = imm_mute_state_create("S", abc);
+    imm_hmm_add_state(hmm, cast_c(S), 0.0);
+
+    struct imm_mute_state* M1 = imm_mute_state_create("M1", abc);
+    imm_hmm_add_state(hmm, cast_c(M1), zero());
+
+    double const             lprobs[] = {log(0.8), log(0.2)};
+    struct imm_normal_state* M2 = imm_normal_state_create("M2", abc, lprobs);
+    imm_hmm_add_state(hmm, cast_c(M2), zero());
+
+    struct imm_mute_state* E = imm_mute_state_create("E", abc);
+    imm_hmm_add_state(hmm, cast_c(E), zero());
+
+    imm_hmm_set_trans(hmm, cast_c(S), cast_c(M1), 0.0);
+    imm_hmm_set_trans(hmm, cast_c(M1), cast_c(M2), 0.0);
+    imm_hmm_set_trans(hmm, cast_c(M2), cast_c(E), 0.0);
+    imm_hmm_set_trans(hmm, cast_c(E), cast_c(E), 0.0);
+
+    imm_hmm_normalize(hmm);
+
+    struct imm_path* path = imm_path_create();
+    cass_cond(imm_path_append(path, cast_c(S), 0) == 0);
+    cass_cond(imm_path_append(path, cast_c(M1), 1) == 1);
+    cass_cond(imm_path_append(path, cast_c(M2), 1) == 0);
+    cass_cond(imm_path_append(path, cast_c(E), 0) == 0);
+    cass_cond(imm_lprob_is_zero(imm_hmm_likelihood(hmm, "C", path)));
+    imm_path_destroy(path);
+
+    imm_hmm_destroy(hmm);
+    imm_mute_state_destroy(S);
+    imm_mute_state_destroy(M1);
+    imm_normal_state_destroy(M2);
+    imm_mute_state_destroy(E);
     imm_abc_destroy(abc);
 }
 
