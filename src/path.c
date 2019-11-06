@@ -66,6 +66,13 @@ struct imm_step const* imm_path_first(struct imm_path const* path)
     return list_first_entry_or_null(&path->steps, struct imm_step, list);
 }
 
+struct imm_step const* imm_path_last(struct imm_path const* path)
+{
+    if (list_empty(&path->steps))
+        return NULL;
+    return list_last_entry(&path->steps, struct imm_step, list);
+}
+
 struct imm_step const* imm_path_next(struct imm_path const* path, struct imm_step const* step)
 {
     struct imm_step const* next = list_next_entry(step, list);
