@@ -46,7 +46,11 @@ target_compile_options(imm PRIVATE
         -Wno-empty-translation-unit>
 )
 
-install(TARGETS imm EXPORT imm-targets)
+install(TARGETS imm EXPORT imm-targets
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+)
 install(DIRECTORY include/ DESTINATION include)
 install(EXPORT imm-targets
     FILE imm-targets.cmake
