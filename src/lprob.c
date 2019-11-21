@@ -12,7 +12,7 @@ double imm_lprob_invalid(void) { return NAN; }
 
 double imm_lprob_add(double a, double b) { return logaddexp(a, b); }
 
-double imm_lprob_sum(double* arr, int len)
+double imm_lprob_sum(double const* arr, int len)
 {
 
     double r = imm_lprob_zero();
