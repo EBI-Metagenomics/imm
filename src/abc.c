@@ -54,6 +54,8 @@ void imm_abc_destroy(struct imm_abc* abc)
 
 int imm_abc_length(struct imm_abc const* abc) { return (int)strlen(abc->symbols); }
 
+char const* imm_abc_symbols(struct imm_abc const* abc) { return abc->symbols; }
+
 int imm_abc_has_symbol(struct imm_abc const* abc, char symbol_id)
 {
     if (check_symbol_id(symbol_id))
