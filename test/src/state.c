@@ -15,7 +15,7 @@ int main(void)
 
 void test_normal_state(void)
 {
-    struct imm_abc* abc = imm_abc_create("ACGT");
+    struct imm_abc* abc = imm_abc_create("ACGT", '*');
 
     double                   lprobs[] = {log(0.25), log(0.25), log(0.5), imm_lprob_zero()};
     struct imm_normal_state* state = imm_normal_state_create("State0", abc, lprobs);
@@ -33,7 +33,7 @@ void test_normal_state(void)
 
 void test_mute_state(void)
 {
-    struct imm_abc* abc = imm_abc_create("ACGT");
+    struct imm_abc* abc = imm_abc_create("ACGT", '*');
 
     struct imm_mute_state* state = imm_mute_state_create("State0", abc);
 
@@ -47,7 +47,7 @@ void test_mute_state(void)
 
 void test_table_state(void)
 {
-    struct imm_abc* abc = imm_abc_create("ACGT");
+    struct imm_abc* abc = imm_abc_create("ACGT", '*');
 
     struct imm_table_state* state = imm_table_state_create("S0", abc);
 
