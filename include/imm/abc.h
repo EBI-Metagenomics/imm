@@ -8,6 +8,7 @@
 struct imm_abc;
 
 IMM_API struct imm_abc* imm_abc_create(char const* symbols, char any_symbol);
+IMM_API struct imm_abc* imm_abc_clone(struct imm_abc const* abc);
 IMM_API void            imm_abc_destroy(struct imm_abc* abc);
 IMM_API int             imm_abc_length(struct imm_abc const* abc);
 IMM_API char const*     imm_abc_symbols(struct imm_abc const* abc);

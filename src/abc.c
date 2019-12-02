@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define ARRAY_LENGTH(arr) (sizeof(arr) / sizeof((arr)[0]))
+
 struct imm_abc
 {
     char const* symbols;
@@ -41,6 +43,17 @@ struct imm_abc* imm_abc_create(char const* symbols, char any_symbol)
     }
 
     return abc;
+}
+
+struct imm_abc* imm_abc_clone(struct imm_abc const* abc)
+{
+    struct imm_abc* nabc = malloc(sizeof(struct imm_abc));
+
+    nabc->symbols = strdup(abc->symbols);
+    memcpy(nabc->symbol_idx, abc->symbol_idx, sizeof(int) * ARRAY_LENGTH(abc->symbol_idx));
+    nabc->any_symbol = abc->any_symbol;
+
+    return nabc;
 }
 
 void imm_abc_destroy(struct imm_abc* abc)
