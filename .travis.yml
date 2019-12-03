@@ -27,6 +27,10 @@ jobs:
     # - os: windows
     #   name: Install
     #   script: curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=imm bash
+addons:
+  apt:
+    packages:
+    - cmake
 script:
   - mkdir prefix
   - mkdir build
