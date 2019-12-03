@@ -42,7 +42,7 @@ target_compile_definitions(imm PRIVATE IMM_API_EXPORTS)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRECATE>)
 target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
 target_compile_options(imm PRIVATE
-    $<$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>:/W4 /WX>
+    $<$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>:/W4 /WX /Ze>
     $<$<NOT:$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>>:-Wall -Wextra -pedantic -Wstrict-prototypes
         -Wshadow -Wconversion -Wmissing-prototypes -Wno-unused-parameter
         -Wno-empty-translation-unit>
