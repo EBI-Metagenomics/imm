@@ -39,6 +39,7 @@ set_target_properties(imm PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
 target_compile_features(imm PRIVATE c_std_11)
 target_compile_definitions(imm PRIVATE IMM_API_EXPORTS)
+target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRECATE>)
 target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
 target_compile_options(imm PRIVATE
     $<$<BOOL:${WIN32}>:/W4 /WX>
