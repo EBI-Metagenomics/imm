@@ -3,12 +3,17 @@ jobs:
   include:
     - os: linux
       env: GENERATOR="Unix Makefiles"
+      sudo: required
+      before_script: curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=logaddexp DO_CMD=sudo bash
     - os: osx
       env: GENERATOR="Unix Makefiles"
+      before_script: curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=logaddexp DO_CMD=sudo bash
     - os: windows
       env: GENERATOR="Visual Studio 15 2017 Win64"
+      before_script: curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=logaddexp bash
     - os: windows
       env: GENERATOR=Ninja
+      before_script: curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=logaddexp bash
       before_install:
         - choco install ninja --no-progress -y
     # - os: linux
