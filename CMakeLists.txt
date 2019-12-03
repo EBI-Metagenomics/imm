@@ -56,7 +56,7 @@ check_c_source_compiles(
     "
     HAVE_ATTR_FORMAT
 )
-target_compile_definitions(athr PRIVATE $<$<BOOL:${HAVE_ATTR_FORMAT}>:HAVE_ATTR_FORMAT>)
+target_compile_definitions(imm PRIVATE $<$<BOOL:${HAVE_ATTR_FORMAT}>:HAVE_ATTR_FORMAT>)
 
 
 install(TARGETS imm EXPORT imm-targets
