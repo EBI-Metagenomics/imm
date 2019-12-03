@@ -59,7 +59,6 @@ check_c_source_compiles(
 )
 target_compile_definitions(imm PRIVATE $<$<BOOL:${HAVE_ATTR_FORMAT}>:HAVE_ATTR_FORMAT>)
 
-
 install(TARGETS imm EXPORT imm-targets
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
