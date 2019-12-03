@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
-project(imm VERSION 0.0.1 LANGUAGES C)
+project(imm VERSION 0.0.1 LANGUAGES C
+    DESCRIPTION "Invisible Markov model library.")
 
 # Generate compile_commands.json file
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
