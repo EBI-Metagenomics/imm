@@ -40,6 +40,7 @@ set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
 target_compile_features(imm PRIVATE c_std_11)
 target_compile_definitions(imm PRIVATE IMM_API_EXPORTS)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRECATE>)
+target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:__extension__>)
 target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
 target_compile_options(imm PRIVATE
     $<$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>:/W4 /WX /Ze>
