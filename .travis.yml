@@ -1,51 +1,46 @@
 language: c
 jobs:
   include:
-    - os: linux
-      env: GENERATOR="Unix Makefiles"
-      sudo: required
-      before_script:
-        - test -e /usr/bin/cmake || sudo ln -s $(which cmake) /usr/bin/cmake
-        - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=logaddexp DO_CMD=sudo bash
-    - os: osx
-      env: GENERATOR="Unix Makefiles"
-      before_script: curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=logaddexp DO_CMD=sudo bash
-    # - os: linux
-    #   name: Install
-    #   sudo: required
-    #   before_script: test -e /usr/bin/cmake || sudo ln -s $(which cmake) /usr/bin/cmake
-    #   script: curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=imm DO_CMD=sudo bash
-    # - os: osx
-    #   name: Install
-    #   script: curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=imm DO_CMD=sudo bash
+  - os: linux
+    env: GENERATOR="Unix Makefiles"
+    sudo: required
+    before_script:
+    - test -e /usr/bin/cmake || sudo ln -s $(which cmake) /usr/bin/cmake
+    - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=logaddexp
+      DO_CMD=sudo bash
+  - os: osx
+    env: GENERATOR="Unix Makefiles"
+    before_script: curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=logaddexp
+      DO_CMD=sudo bash
 addons:
   apt:
     packages:
     - cmake
 script:
-  - mkdir prefix
-  - mkdir build
-  - cd build
-  - cmake -G"$GENERATOR" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/prefix ..
-  - cmake --build . --config Release
-  - ctest --output-on-failure -C Release
-  - cmake --build . --config Release --target install
-  - test -e $TRAVIS_BUILD_DIR/prefix/include/imm/imm.h
-  - test -e $TRAVIS_BUILD_DIR/prefix/lib/cmake/imm/imm-config.cmake
-  - test -e $TRAVIS_BUILD_DIR/prefix/lib/cmake/imm/imm-targets-release.cmake
-  - test -e $TRAVIS_BUILD_DIR/prefix/lib/cmake/imm/imm-targets.cmake
-  - cd $TRAVIS_BUILD_DIR
-  - git clean -xdf
+- mkdir prefix
+- mkdir build
+- cd build
+- cmake -G"$GENERATOR" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/prefix
+  ..
+- cmake --build . --config Release
+- ctest --output-on-failure -C Release
+- cmake --build . --config Release --target install
+- test -e $TRAVIS_BUILD_DIR/prefix/include/imm/imm.h
+- test -e $TRAVIS_BUILD_DIR/prefix/lib/cmake/imm/imm-config.cmake
+- test -e $TRAVIS_BUILD_DIR/prefix/lib/cmake/imm/imm-targets-release.cmake
+- test -e $TRAVIS_BUILD_DIR/prefix/lib/cmake/imm/imm-targets.cmake
+- cd $TRAVIS_BUILD_DIR
+- git clean -xdf
 notifications:
   email:
     recipients:
-      - danilo.horta@pm.me
+    - danilo.horta@pm.me
     on_success: never
     on_failure: always
 deploy:
   provider: releases
   api_key:
-    secure: OSy0q7JXsJrjvwJS/8MVCf3oxDq5Wz8ZH4YKmQedzAhjO4pcV4frE1LWxy/xO4mmuMThdHBgsrDYlE8+QQqh57LpPV0M+GB+hrwxNdv0guo2ewumBUbUWvcojlnX9PWrZhAodzcHp2QADjg3NMFtk31ERr7dS5ed0my7CPJbQqTvhd4XPvLH2d34ZXe09sJ1AqwIMKrAQdFR949kGPhVOp3KLzG1a/Wnwgp4GPusaJ5pf3CbpQ6n3ykGBA4KZ+KCrAhamONW39mPhMvD+9cit8RkrBcVL1UkdR2IJkXHjqzNRJAjQSOc7QP/UCc4zq7tznrQzAX8+grJIfxDI8ic9HjuQh/2/z1jB6030o5buOBI+NLL/y2twxo37nSlpMGci4DR+L+4H241xx4hHvNpG790dViTao0+jFCXe+hNt0w7AkQo96QGHApV8RNn+DAEwHNVLqGswmZFdC/sUdQkNs180G41kxgJG9lx9FQxygn6KCGoxHevU2ud2y4rGkYQ+y2zdhNlV5kZlwAw7rDfnsXJO9Vcp8CMgAV2NEGabWMgu/zp7gnNLVMm7GigZHFUruw6z+CP2WX1QZ2v68lx01mpUce9mnF86rLu/YgWapZhSKRHSPiC/5iZ4c54GlAe8ljzbOJXBr8XOG5ChRBOF2RNrx8bahPyHJhYEdFQHak=
+    secure: vcpdveCT5sdsUowgJ6HMPQ0yQM/+KDan7Z0D6KRrOBP4Xw5IgbyAfC5xgscSgrkT5NQ3vaG+I1Bfj7eKEOJkUaUjcobTNtNKMobJBSCDyr/tz/2AHahdxMK2Fo6cLxRUyQt4k0TcaA0yH4NP2EQqbH29njoWrAAvJsAaTJXLXOUjHdRk2dyuI24czgDyB+Yi8h1oh+FPfJOj+BTxx1q2y/GRo+4ickZcYjnmEeCNevtecHTRdk7fPYRbwCLsVKqn4d0pdkSqJ+nELRQ7tguyx32SfiqHF+ngBCq/sbcXW8zynUUxTUibM0vl3wm2G88Nte5kuBM7D65tIQ8N7UGhI9c2Y0U083410R/2QhgYzyvmL2rL0Z0WlMsEBWzgHh+9ZfqCELeaD261maSeQ9mMOFx0k/bbWFsXziW8WsPrElUXOf4f5Er+lZyYVzXFjZhACIv0U8STZ42BwfrWjM6JkQhSnyQP8E6a1apT1ABs18aKb+sAP260bUQm+7Qkp2/A0YTA2mZ49c8sTpGzZsJhUESzXzEpqZF8xHlzJZ/BMydAVLcpALrkGUddk1miYU2/2mmUPQW1qtKYPOhB9ile+CheGvWou052yG+YiKdW3cEX0FELiG8kQS0TWixtYo5fdvbbM9pYTM+IAkTosKoJ/6l7S4llJ4bKkvGZeUT4oWc=
   on:
     tags: true
     repo: EBI-Metagenomics/imm
