@@ -4,6 +4,13 @@
 #include "imm/api.h"
 #include <stdarg.h>
 
-IMM_API void imm_error(char const* err, ...) __attribute__((format(printf, 1, 2)));
+#if defined(HAVE_ATTR_FORMAT)
+#define ATTR_FORMAT __attribute__((format(printf, 1, 2)))
+#else
+#define ATTR_FORMAT
+#endif
+
+
+IMM_API void imm_error(char const* err, ...) ATTR_FORMAT;
 
 #endif
