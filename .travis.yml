@@ -1,40 +1,53 @@
 language: c
 jobs:
   include:
-  - os: linux
-    env: GENERATOR="Unix Makefiles"
-    sudo: required
-    before_script:
-    - test -e /usr/bin/cmake || sudo ln -s $(which cmake) /usr/bin/cmake
-    - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=logaddexp
-      DO_CMD=sudo bash
-  - os: osx
-    env: GENERATOR="Unix Makefiles"
-    before_script: curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=logaddexp
-      DO_CMD=sudo bash
+    - os: linux
+      env: GENERATOR="Unix Makefiles"
+      sudo: required
+      before_script:
+        - test -e /usr/bin/cmake || sudo ln -s $(which cmake) /usr/bin/cmake
+        - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=logaddexp
+          DO_CMD=sudo bash
+    - os: osx
+      env: GENERATOR="Unix Makefiles"
+      before_script:
+        curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=logaddexp
+        DO_CMD=sudo bash
+    - os: linux
+      name: Install
+      sudo: required
+      before_script: test -e /usr/bin/cmake || sudo ln -s $(which cmake) /usr/bin/cmake
+      script:
+        - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=logaddexp
+        - curl -fsSL https://git.io/JerYI | GITHUB_USER=EBI-Metagenomics GITHUB_PROJECT=imm DO_CMD=sudo bash
+    - os: osx
+      name: Install
+      script:
+        - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=logaddexp
+        - curl -fsSL https://git.io/JerYI | GITHUB_USER=EBI-Metagenomics GITHUB_PROJECT=imm DO_CMD=sudo bash
 addons:
   apt:
     packages:
-    - cmake
+      - cmake
 script:
-- mkdir prefix
-- mkdir build
-- cd build
-- cmake -G"$GENERATOR" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/prefix
-  ..
-- cmake --build . --config Release
-- ctest --output-on-failure -C Release
-- cmake --build . --config Release --target install
-- test -e $TRAVIS_BUILD_DIR/prefix/include/imm/imm.h
-- test -e $TRAVIS_BUILD_DIR/prefix/lib/cmake/imm/imm-config.cmake
-- test -e $TRAVIS_BUILD_DIR/prefix/lib/cmake/imm/imm-targets-release.cmake
-- test -e $TRAVIS_BUILD_DIR/prefix/lib/cmake/imm/imm-targets.cmake
-- cd $TRAVIS_BUILD_DIR
-- git clean -xdf
+  - mkdir prefix
+  - mkdir build
+  - cd build
+  - cmake -G"$GENERATOR" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/prefix
+    ..
+  - cmake --build . --config Release
+  - ctest --output-on-failure -C Release
+  - cmake --build . --config Release --target install
+  - test -e $TRAVIS_BUILD_DIR/prefix/include/imm/imm.h
+  - test -e $TRAVIS_BUILD_DIR/prefix/lib/cmake/imm/imm-config.cmake
+  - test -e $TRAVIS_BUILD_DIR/prefix/lib/cmake/imm/imm-targets-release.cmake
+  - test -e $TRAVIS_BUILD_DIR/prefix/lib/cmake/imm/imm-targets.cmake
+  - cd $TRAVIS_BUILD_DIR
+  - git clean -xdf
 notifications:
   email:
     recipients:
-    - danilo.horta@pm.me
+      - danilo.horta@pm.me
     on_success: never
     on_failure: always
 deploy:
