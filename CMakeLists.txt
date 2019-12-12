@@ -1,9 +1,15 @@
-cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
-project(imm VERSION 0.0.1 LANGUAGES C
-    DESCRIPTION "Invisible Markov model library.")
+cmake_minimum_required(VERSION 3.5.1 FATAL_ERROR)
+project(imm VERSION 0.0.2 LANGUAGES C)
 
 # Generate compile_commands.json file
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+# Set RPATH only if it's not a system directory
+list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
+if("${isSystemDir}" STREQUAL "-1")
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+endif()
 
 add_library(imm
     src/abc.c
