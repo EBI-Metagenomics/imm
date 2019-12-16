@@ -43,7 +43,7 @@ script:
   - test -e $TRAVIS_BUILD_DIR/prefix/lib/cmake/imm/imm-targets-release.cmake
   - test -e $TRAVIS_BUILD_DIR/prefix/lib/cmake/imm/imm-targets.cmake
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then otool -l $TRAVIS_BUILD_DIR/prefix/lib/libimm.dylib | grep -q LC_RPATH; fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then test -e $TRAVIS_BUILD_DIR/prefix/lib/imm.so; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then test -e $TRAVIS_BUILD_DIR/prefix/lib/libimm.so; fi
   - cd $TRAVIS_BUILD_DIR
   - git clean -xdf
 notifications:
