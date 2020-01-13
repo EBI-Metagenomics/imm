@@ -22,6 +22,7 @@ void test_hmm_viterbi_profile2(void);
 void test_hmm_viterbi_profile_delete(void);
 void test_hmm_viterbi_global_profile(void);
 void test_hmm_viterbi_table_states(void);
+void test_hmm_viterbi_cycle_mute_ending(void);
 
 int main(void)
 {
@@ -45,6 +46,7 @@ int main(void)
     test_hmm_viterbi_profile_delete();
     test_hmm_viterbi_global_profile();
     test_hmm_viterbi_table_states();
+    test_hmm_viterbi_cycle_mute_ending();
     return cass_status();
 }
 
@@ -1465,5 +1467,51 @@ void test_hmm_viterbi_table_states(void)
     imm_normal_state_destroy(N1);
     imm_mute_state_destroy(E);
     imm_normal_state_destroy(Z);
+    imm_abc_destroy(abc);
+}
+
+void test_hmm_viterbi_cycle_mute_ending(void)
+{
+
+    struct imm_abc* abc = imm_abc_create("AB", '*');
+    struct imm_hmm* hmm = imm_hmm_create(abc);
+
+    struct imm_mute_state* start = imm_mute_state_create("START", abc);
+    imm_hmm_add_state(hmm, cast_c(start), log(1.0));
+
+    struct imm_mute_state* B = imm_mute_state_create("B", abc);
+    imm_hmm_add_state(hmm, cast_c(B), zero());
+
+    double                   lprobs[] = {log(0.01), log(0.01)};
+    struct imm_normal_state* M = imm_normal_state_create("M", abc, lprobs);
+    imm_hmm_add_state(hmm, cast_c(M), zero());
+
+    struct imm_mute_state* E = imm_mute_state_create("E", abc);
+    imm_hmm_add_state(hmm, cast_c(E), zero());
+
+    struct imm_mute_state* J = imm_mute_state_create("J", abc);
+    imm_hmm_add_state(hmm, cast_c(J), zero());
+
+    struct imm_mute_state* end = imm_mute_state_create("END", abc);
+    imm_hmm_add_state(hmm, cast_c(end), zero());
+
+    imm_hmm_set_trans(hmm, cast_c(start), cast_c(B), log(0.1));
+    imm_hmm_set_trans(hmm, cast_c(B), cast_c(M), log(0.1));
+    imm_hmm_set_trans(hmm, cast_c(M), cast_c(E), log(0.1));
+    imm_hmm_set_trans(hmm, cast_c(E), cast_c(end), log(0.1));
+    imm_hmm_set_trans(hmm, cast_c(E), cast_c(J), log(0.1));
+    imm_hmm_set_trans(hmm, cast_c(J), cast_c(B), log(0.1));
+
+    struct imm_path* path = imm_path_create();
+    cass_close(imm_hmm_viterbi(hmm, "A", cast_c(end), path), -13.815510557964272);
+    imm_path_destroy(path);
+
+    imm_hmm_destroy(hmm);
+    imm_mute_state_destroy(start);
+    imm_mute_state_destroy(B);
+    imm_normal_state_destroy(M);
+    imm_mute_state_destroy(E);
+    imm_mute_state_destroy(J);
+    imm_mute_state_destroy(end);
     imm_abc_destroy(abc);
 }

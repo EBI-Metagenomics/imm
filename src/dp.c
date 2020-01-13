@@ -135,7 +135,6 @@ struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, cha
     dp->dp_matrix.score = imm_matrix_create(dp->seq_len + 1, next_col);
     printf("imm_dp_create imm_matrix_create: %.10f seconds\n", elapsed_end(elapsed));
     elapsed_start(elapsed);
-    imm_matrix_fill(dp->dp_matrix.score, -1.4949201);
     /* imm_matrix_fill(dp->dp_matrix.score, imm_lprob_zero()); */
     printf("imm_dp_create imm_matrix_fill: %.10f seconds\n", elapsed_end(elapsed));
     elapsed_start(elapsed);
@@ -255,20 +254,13 @@ static double best_trans_score(struct dp const* dp, struct state_info const* dst
             continue;
 
         for (int len = min_seq(prev); len <= MIN(max_seq(prev), row); ++len) {
+
             if (len == 0 && prev->idx > dst_state->idx)
                 continue;
+
             struct step tmp_step = {prev, len};
             int         prev_row = row - len;
-            double tmp = get_score(&dp->dp_matrix, prev_row, &tmp_step);
-            if (tmp == -1.4949201)
-            {
-                imm_error("Queried invalid score: (row: %d, prev_row: %d)", row, prev_row);
-                imm_error("Prv_state %s: idx: %d", imm_state_get_name(prev->state), prev->idx);
-                imm_error("Dst_state %s: idx: %d", imm_state_get_name(dst_state->state), dst_state->idx);
-                fflush(stderr);
-                /* exit(1); */
-            }
-            double      v = tmp + trans->lprob;
+            double      v = get_score(&dp->dp_matrix, prev_row, &tmp_step) + trans->lprob;
             if (v > score) {
                 score = v;
                 prev_step->state = prev;
@@ -276,26 +268,7 @@ static double best_trans_score(struct dp const* dp, struct state_info const* dst
             }
         }
     }
-    /* struct state_info const* prev = dp->states; */
-    /* for (int i = 0; i < dp->nstates; ++i, ++prev) { */
-    /*     if (row - min_seq(prev) < 0) */
-    /*         continue; */
 
-    /*     double trans = imm_matrix_get(dp->trans, i, dst_state->idx); */
-    /*     if (imm_lprob_is_zero(trans)) */
-    /*         continue; */
-
-    /*     for (int len = min_seq(prev); len <= MIN(max_seq(prev), row); ++len) { */
-    /*         struct step tmp_step = {prev, len}; */
-    /*         int         prev_row = row - len; */
-    /*         double      v = get_score(&dp->dp_matrix, prev_row, &tmp_step) + trans; */
-    /*         if (v > score) { */
-    /*             score = v; */
-    /*             prev_step->state = prev; */
-    /*             prev_step->seq_len = len; */
-    /*         } */
-    /*     } */
-    /* } */
     if (row > 0 && !prev_step->state)
         return imm_lprob_invalid();
     return score;
