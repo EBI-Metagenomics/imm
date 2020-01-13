@@ -9,6 +9,8 @@
 #include "mtrans.h"
 #include "state_idx.h"
 #include "uthash.h"
+#include "elapsed.h"
+#include <stdio.h>
 #include <limits.h>
 #include <math.h>
 
@@ -87,6 +89,9 @@ static void create_trans(struct state_info* states, struct mstate const* const* 
 struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, char const* seq,
                          struct imm_state const* end_state)
 {
+    struct elapsed* elapsed = elapsed_create();
+
+    elapsed_start(elapsed);
     struct dp* dp = malloc(sizeof(struct dp));
 
     dp->nstates = nstates;
@@ -103,6 +108,8 @@ struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, cha
     dp->dp_matrix.step = NULL;
     int next_col = 0;
 
+    printf("imm_dp_create mallocs: %.10f seconds\n", elapsed_end(elapsed));
+    elapsed_start(elapsed);
     for (int i = 0; i < nstates; ++i) {
         dp->states[i].state = imm_mstate_get_state(mm_states[i]);
         dp->states[i].start_lprob = imm_mstate_get_start(mm_states[i]);
@@ -116,20 +123,32 @@ struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, cha
                     imm_state_min_seq(dp->states[i].state) + 1;
     }
     dp->end_state = dp->states + imm_state_idx_find(state_idx, end_state);
+    printf("imm_dp_create loop: %.10f seconds\n", elapsed_end(elapsed));
 
     /* dp->trans = create_trans(mm_states, nstates, state_idx); */
+    elapsed_start(elapsed);
     create_trans(dp->states, mm_states, nstates, state_idx);
+    printf("imm_dp_create create_trans: %.10f seconds\n", elapsed_end(elapsed));
     imm_state_idx_destroy(&state_idx);
 
+    elapsed_start(elapsed);
     dp->dp_matrix.score = imm_matrix_create(dp->seq_len + 1, next_col);
-    imm_matrix_fill(dp->dp_matrix.score, imm_lprob_zero());
+    printf("imm_dp_create imm_matrix_create: %.10f seconds\n", elapsed_end(elapsed));
+    elapsed_start(elapsed);
+    imm_matrix_fill(dp->dp_matrix.score, -1.4949201);
+    /* imm_matrix_fill(dp->dp_matrix.score, imm_lprob_zero()); */
+    printf("imm_dp_create imm_matrix_fill: %.10f seconds\n", elapsed_end(elapsed));
+    elapsed_start(elapsed);
     dp->dp_matrix.step = gmatrix_step_create(dp->seq_len + 1, next_col);
+    printf("imm_dp_create gmatrix_step_create: %.10f seconds\n", elapsed_end(elapsed));
 
+    elapsed_destroy(elapsed);
     return dp;
 }
 
 double imm_dp_viterbi(struct dp* dp, struct imm_path* path)
 {
+    int prev_col = -1;
     for (int r = 0; r <= dp->seq_len; ++r) {
         char const* seq = dp->seq + r;
         int         seq_len = dp->seq_len - r;
@@ -141,6 +160,9 @@ double imm_dp_viterbi(struct dp* dp, struct imm_path* path)
 
                 struct step  step = {cur, len};
                 int          col = column(&dp->dp_matrix, &step);
+                /* TODO: remove it */
+                if (prev_col >= col)
+                    exit(1);
                 struct step* prev_step = gmatrix_step_get(dp->dp_matrix.step, r, col);
                 double       score = best_trans_score(dp, cur, r, prev_step);
                 double       emiss = imm_state_lprob(cur->state, seq, len);
@@ -233,9 +255,20 @@ static double best_trans_score(struct dp const* dp, struct state_info const* dst
             continue;
 
         for (int len = min_seq(prev); len <= MIN(max_seq(prev), row); ++len) {
+            if (len == 0 && prev->idx > dst_state->idx)
+                continue;
             struct step tmp_step = {prev, len};
             int         prev_row = row - len;
-            double      v = get_score(&dp->dp_matrix, prev_row, &tmp_step) + trans->lprob;
+            double tmp = get_score(&dp->dp_matrix, prev_row, &tmp_step);
+            if (tmp == -1.4949201)
+            {
+                imm_error("Queried invalid score: (row: %d, prev_row: %d)", row, prev_row);
+                imm_error("Prv_state %s: idx: %d", imm_state_get_name(prev->state), prev->idx);
+                imm_error("Dst_state %s: idx: %d", imm_state_get_name(dst_state->state), dst_state->idx);
+                fflush(stderr);
+                /* exit(1); */
+            }
+            double      v = tmp + trans->lprob;
             if (v > score) {
                 score = v;
                 prev_step->state = prev;
