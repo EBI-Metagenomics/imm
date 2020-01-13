@@ -1,4 +1,5 @@
 #include "dp.h"
+#include "elapsed.h"
 #include "gmatrix.h"
 #include "hide.h"
 #include "imm/imm.h"
@@ -9,10 +10,9 @@
 #include "mtrans.h"
 #include "state_idx.h"
 #include "uthash.h"
-#include "elapsed.h"
-#include <stdio.h>
 #include <limits.h>
 #include <math.h>
+#include <stdio.h>
 
 struct trans;
 
@@ -66,8 +66,6 @@ struct dp
     char const* seq;
     int         seq_len;
 
-    /* struct matrix* trans; */
-
     struct dp_matrix dp_matrix;
 };
 
@@ -81,8 +79,6 @@ static double best_trans_score(struct dp const* dp, struct state_info const* dst
 static double final_score(struct dp const* dp, struct step* end_step);
 static void   viterbi_path(struct dp* dp, struct imm_path* path, struct step const* end_step);
 
-/* static struct matrix* create_trans(struct mstate const* const* mm_states, int nstates, */
-/*                                    struct state_idx const* state_idx); */
 static void create_trans(struct state_info* states, struct mstate const* const* mm_states,
                          int nstates, struct state_idx const* state_idx);
 
@@ -125,7 +121,6 @@ struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, cha
     dp->end_state = dp->states + imm_state_idx_find(state_idx, end_state);
     printf("imm_dp_create loop: %.10f seconds\n", elapsed_end(elapsed));
 
-    /* dp->trans = create_trans(mm_states, nstates, state_idx); */
     elapsed_start(elapsed);
     create_trans(dp->states, mm_states, nstates, state_idx);
     printf("imm_dp_create create_trans: %.10f seconds\n", elapsed_end(elapsed));
@@ -134,9 +129,6 @@ struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, cha
     elapsed_start(elapsed);
     dp->dp_matrix.score = imm_matrix_create(dp->seq_len + 1, next_col);
     printf("imm_dp_create imm_matrix_create: %.10f seconds\n", elapsed_end(elapsed));
-    elapsed_start(elapsed);
-    /* imm_matrix_fill(dp->dp_matrix.score, imm_lprob_zero()); */
-    printf("imm_dp_create imm_matrix_fill: %.10f seconds\n", elapsed_end(elapsed));
     elapsed_start(elapsed);
     dp->dp_matrix.step = gmatrix_step_create(dp->seq_len + 1, next_col);
     printf("imm_dp_create gmatrix_step_create: %.10f seconds\n", elapsed_end(elapsed));
@@ -147,10 +139,9 @@ struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, cha
 
 double imm_dp_viterbi(struct dp* dp, struct imm_path* path)
 {
-    int prev_col = -1;
     for (int r = 0; r <= dp->seq_len; ++r) {
         char const* seq = dp->seq + r;
-        int         seq_len = dp->seq_len - r;
+        int const   seq_len = dp->seq_len - r;
 
         struct state_info const* cur = dp->states;
         for (int i = 0; i < dp->nstates; ++i, ++cur) {
@@ -159,9 +150,6 @@ double imm_dp_viterbi(struct dp* dp, struct imm_path* path)
 
                 struct step  step = {cur, len};
                 int          col = column(&dp->dp_matrix, &step);
-                /* TODO: remove it */
-                if (prev_col >= col)
-                    exit(1);
                 struct step* prev_step = gmatrix_step_get(dp->dp_matrix.step, r, col);
                 double       score = best_trans_score(dp, cur, r, prev_step);
                 double       emiss = imm_state_lprob(cur->state, seq, len);
@@ -181,8 +169,7 @@ double imm_dp_viterbi(struct dp* dp, struct imm_path* path)
 
 void imm_dp_destroy(struct dp* dp)
 {
-    for (int i = 0; i < dp->nstates; ++i)
-    {
+    for (int i = 0; i < dp->nstates; ++i) {
         struct trans* trans = NULL;
         list_for_each_entry(trans, &dp->states[i].incoming_transitions, list_entry)
         {
