@@ -2,6 +2,7 @@
 #include "gmatrix.h"
 #include "hide.h"
 #include "imm/imm.h"
+#include "list.h"
 #include "matrix.h"
 #include "min.h"
 #include "mstate.h"
@@ -11,11 +12,21 @@
 #include <limits.h>
 #include <math.h>
 
+struct trans;
+
 struct state_info
 {
     struct imm_state const* state;
     double                  start_lprob;
     int                     idx;
+    struct list_head        incoming_transitions;
+};
+
+struct trans
+{
+    struct state_info const* src_state;
+    double                   lprob;
+    struct list_head         list_entry;
 };
 
 static inline int min_seq(struct state_info const* state_info)
@@ -53,7 +64,7 @@ struct dp
     char const* seq;
     int         seq_len;
 
-    struct matrix* trans;
+    /* struct matrix* trans; */
 
     struct dp_matrix dp_matrix;
 };
@@ -68,8 +79,10 @@ static double best_trans_score(struct dp const* dp, struct state_info const* dst
 static double final_score(struct dp const* dp, struct step* end_step);
 static void   viterbi_path(struct dp* dp, struct imm_path* path, struct step const* end_step);
 
-static struct matrix* create_trans(struct mstate const* const* mm_states, int nstates,
-                                   struct state_idx const* state_idx);
+/* static struct matrix* create_trans(struct mstate const* const* mm_states, int nstates, */
+/*                                    struct state_idx const* state_idx); */
+static void create_trans(struct state_info* states, struct mstate const* const* mm_states,
+                         int nstates, struct state_idx const* state_idx);
 
 struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, char const* seq,
                          struct imm_state const* end_state)
@@ -94,6 +107,7 @@ struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, cha
         dp->states[i].state = imm_mstate_get_state(mm_states[i]);
         dp->states[i].start_lprob = imm_mstate_get_start(mm_states[i]);
         dp->states[i].idx = i;
+        INIT_LIST_HEAD(&dp->states[i].incoming_transitions);
 
         dp->dp_matrix.state_col[i] = next_col;
 
@@ -103,7 +117,8 @@ struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, cha
     }
     dp->end_state = dp->states + imm_state_idx_find(state_idx, end_state);
 
-    dp->trans = create_trans(mm_states, nstates, state_idx);
+    /* dp->trans = create_trans(mm_states, nstates, state_idx); */
+    create_trans(dp->states, mm_states, nstates, state_idx);
     imm_state_idx_destroy(&state_idx);
 
     dp->dp_matrix.score = imm_matrix_create(dp->seq_len + 1, next_col);
@@ -145,6 +160,15 @@ double imm_dp_viterbi(struct dp* dp, struct imm_path* path)
 
 void imm_dp_destroy(struct dp* dp)
 {
+    for (int i = 0; i < dp->nstates; ++i)
+    {
+        struct trans* trans = NULL;
+        list_for_each_entry(trans, &dp->states[i].incoming_transitions, list_entry)
+        {
+            free(trans);
+        }
+    }
+
     dp->nstates = -1;
 
     free(dp->states);
@@ -155,8 +179,8 @@ void imm_dp_destroy(struct dp* dp)
     dp->seq = NULL;
     dp->seq_len = -1;
 
-    imm_matrix_destroy(dp->trans);
-    dp->trans = NULL;
+    /* imm_matrix_destroy(dp->trans); */
+    /* dp->trans = NULL; */
 
     imm_matrix_destroy(dp->dp_matrix.score);
     dp->dp_matrix.score = NULL;
@@ -198,19 +222,20 @@ static double best_trans_score(struct dp const* dp, struct state_info const* dst
     if (row == 0)
         score = dst_state->start_lprob;
 
-    struct state_info const* prev = dp->states;
-    for (int i = 0; i < dp->nstates; ++i, ++prev) {
+    struct trans* trans = NULL;
+    list_for_each_entry(trans, &dst_state->incoming_transitions, list_entry)
+    {
+        struct state_info const* prev = trans->src_state;
         if (row - min_seq(prev) < 0)
             continue;
 
-        double trans = imm_matrix_get(dp->trans, i, dst_state->idx);
-        if (imm_lprob_is_zero(trans))
+        if (imm_lprob_is_zero(trans->lprob))
             continue;
 
         for (int len = min_seq(prev); len <= MIN(max_seq(prev), row); ++len) {
             struct step tmp_step = {prev, len};
             int         prev_row = row - len;
-            double      v = get_score(&dp->dp_matrix, prev_row, &tmp_step) + trans;
+            double      v = get_score(&dp->dp_matrix, prev_row, &tmp_step) + trans->lprob;
             if (v > score) {
                 score = v;
                 prev_step->state = prev;
@@ -218,6 +243,26 @@ static double best_trans_score(struct dp const* dp, struct state_info const* dst
             }
         }
     }
+    /* struct state_info const* prev = dp->states; */
+    /* for (int i = 0; i < dp->nstates; ++i, ++prev) { */
+    /*     if (row - min_seq(prev) < 0) */
+    /*         continue; */
+
+    /*     double trans = imm_matrix_get(dp->trans, i, dst_state->idx); */
+    /*     if (imm_lprob_is_zero(trans)) */
+    /*         continue; */
+
+    /*     for (int len = min_seq(prev); len <= MIN(max_seq(prev), row); ++len) { */
+    /*         struct step tmp_step = {prev, len}; */
+    /*         int         prev_row = row - len; */
+    /*         double      v = get_score(&dp->dp_matrix, prev_row, &tmp_step) + trans; */
+    /*         if (v > score) { */
+    /*             score = v; */
+    /*             prev_step->state = prev; */
+    /*             prev_step->seq_len = len; */
+    /*         } */
+    /*     } */
+    /* } */
     if (row > 0 && !prev_step->state)
         return imm_lprob_invalid();
     return score;
@@ -258,11 +303,11 @@ static void viterbi_path(struct dp* dp, struct imm_path* path, struct step const
     }
 }
 
-static struct matrix* create_trans(struct mstate const* const* mm_states, int nstates,
-                                   struct state_idx const* state_idx)
+static void create_trans(struct state_info* states, struct mstate const* const* mm_states,
+                         int nstates, struct state_idx const* state_idx)
 {
-    struct matrix* trans = imm_matrix_create(nstates, nstates);
-    imm_matrix_fill(trans, imm_lprob_zero());
+    /* struct matrix* trans = imm_matrix_create(nstates, nstates); */
+    /* imm_matrix_fill(trans, imm_lprob_zero()); */
 
     for (int i = 0; i < nstates; ++i) {
 
@@ -275,9 +320,15 @@ static struct matrix* create_trans(struct mstate const* const* mm_states, int ns
             struct imm_state const* dst_state = imm_mtrans_get_state(t);
             int                     dst = imm_state_idx_find(state_idx, dst_state);
 
-            imm_matrix_set(trans, src, dst, imm_mtrans_get_lprob(t));
+            /* append(states[dst].incoming_edges, states + src, imm_mtrans_get_lprob(t)); */
+            struct trans* trans = malloc(sizeof(struct trans));
+            trans->lprob = imm_mtrans_get_lprob(t);
+            trans->src_state = states + src;
+            list_add(&trans->list_entry, &states[dst].incoming_transitions);
+
+            /* imm_matrix_set(trans, src, dst, imm_mtrans_get_lprob(t)); */
         }
     }
 
-    return trans;
+    /* return trans; */
 }

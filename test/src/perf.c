@@ -101,6 +101,13 @@ void test_perf_viterbi(void)
     /* imm_dp_viterbi: 3.6272990000 seconds */
     /* Score: -3247.8457072921 */
     /* Elapsed: 3.6685810000 seconds */
+
+    /* It has now improved to: */
+    /* imm_mstate_sort: 0.0029980000 seconds */
+    /* imm_dp_create: 0.0016950000 seconds */
+    /* imm_dp_viterbi: 0.0097860000 seconds */
+    /* Score: -3247.8457072921 */
+    /* Elapsed: 0.0150760000 seconds */
     double score = imm_hmm_viterbi(hmm, "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMIME", cast_c(end), path);
     printf("Score: %.10f\n", score);
     cass_cond(is_valid(score) && !is_zero(score));
