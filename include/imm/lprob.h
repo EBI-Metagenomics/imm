@@ -2,6 +2,7 @@
 #define IMM_LPROB_H
 
 #include "imm/api.h"
+#include <math.h>
 
 IMM_API double imm_lprob_zero(void);
 IMM_API int    imm_lprob_is_zero(double a);

@@ -2,13 +2,13 @@
 #include "logaddexp.h"
 #include <math.h>
 
-double imm_lprob_zero(void) { return -INFINITY; }
+IMM_API double imm_lprob_zero(void) { return -INFINITY; }
 
-int imm_lprob_is_zero(double a) { return isinf(a) && a < 0.0; }
+IMM_API int imm_lprob_is_zero(double a) { return isinf(a) && a < 0.0; }
 
-int imm_lprob_is_valid(double a) { return !isnan(a); }
+IMM_API int imm_lprob_is_valid(double a) { return !isnan(a); }
 
-double imm_lprob_invalid(void) { return NAN; }
+IMM_API double imm_lprob_invalid(void) { return NAN; }
 
 double imm_lprob_add(double a, double b) { return logaddexp(a, b); }
 
