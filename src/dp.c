@@ -147,6 +147,8 @@ struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, cha
 
 double imm_dp_viterbi(struct dp* dp, struct imm_path* path)
 {
+    struct elapsed* elapsed = elapsed_create();
+    elapsed_start(elapsed);
     for (int r = 0; r <= dp->seq_len; ++r) {
         char const* seq = dp->seq + r;
         int const   seq_len = dp->seq_len - r;
@@ -165,12 +167,17 @@ double imm_dp_viterbi(struct dp* dp, struct imm_path* path)
             }
         }
     }
+    printf("imm_dp_viterbi main loop: %.10f seconds\n", elapsed_end(elapsed));
 
+    elapsed_start(elapsed);
     struct step end_step = {.state = NULL, .seq_len = -1};
     double      score = final_score(dp, &end_step);
+    printf("imm_dp_viterbi final_score: %.10f seconds\n", elapsed_end(elapsed));
 
+    elapsed_start(elapsed);
     if (path)
         viterbi_path(dp, path, &end_step);
+    printf("imm_dp_viterbi viterbi_path: %.10f seconds\n", elapsed_end(elapsed));
 
     return score;
 }
