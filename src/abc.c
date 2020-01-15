@@ -90,6 +90,8 @@ char imm_abc_symbol_id(struct imm_abc const* abc, int symbol_idx)
     return abc->symbols[symbol_idx];
 }
 
+char imm_abc_any_symbol(struct imm_abc const* abc) { return abc->any_symbol; }
+
 static int check_symbols_length(char const* symbols)
 {
     if (strlen(symbols) > INT_MAX) {
