@@ -162,7 +162,7 @@ double imm_dp_viterbi(struct dp* dp, struct imm_path* path)
                 step.seq_len = len;
                 int const    col = column(&dp->dp_matrix, &step);
                 struct cell* cell = gmatrix_cell_get(dp->dp_matrix.cell, r, col);
-                double       score = best_trans_score(dp, cur, r, &cell->prev_step);
+                double const score = best_trans_score(dp, cur, r, &cell->prev_step);
                 cell->score = score + imm_state_lprob(cur->state, seq, len);
             }
         }
