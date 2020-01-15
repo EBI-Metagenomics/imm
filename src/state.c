@@ -58,12 +58,14 @@ struct imm_abc const* imm_state_get_abc(struct imm_state const* s) { return s->a
 
 double imm_state_lprob(struct imm_state const* state, char const* seq, int seq_len)
 {
+#ifdef DEBUG
     for (int i = 0; i < seq_len; ++i) {
         if (!imm_abc_has_symbol(imm_state_get_abc(state), seq[i])) {
             imm_error("alphabet does not have symbol %c", seq[i]);
             return imm_lprob_invalid();
         }
     }
+#endif
     return state->lprob(state, seq, seq_len);
 }
 

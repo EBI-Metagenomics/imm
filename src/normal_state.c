@@ -55,8 +55,9 @@ static double normal_state_lprob(struct imm_state const* state, char const* seq,
     struct imm_normal_state const* s = imm_state_get_impl_c(state);
     if (seq_len == 1) {
         struct imm_abc const* abc = imm_state_get_abc(state);
-        if (imm_abc_has_symbol(abc, seq[0]))
-            return s->lprobs[imm_abc_symbol_idx(abc, seq[0])];
+        int const             idx = imm_abc_symbol_idx(abc, seq[0]);
+        if (idx >= 0)
+            return s->lprobs[idx];
     }
     return imm_lprob_zero();
 }
