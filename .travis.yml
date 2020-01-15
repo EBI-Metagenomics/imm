@@ -31,8 +31,8 @@ addons:
       - cmake
 script:
   - mkdir prefix
-  - mkdir build
-  - cd build
+  - mkdir build.release
+  - cd build.release
   - cmake -G"$GENERATOR" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/prefix
     ..
   - cmake --build . --config Release
@@ -45,7 +45,14 @@ script:
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then otool -l $TRAVIS_BUILD_DIR/prefix/lib/libimm.dylib | grep -q LC_RPATH; fi
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then test -e $TRAVIS_BUILD_DIR/prefix/lib/libimm.so; fi
   - cd $TRAVIS_BUILD_DIR
-  - git clean -xdf
+  - git clean -xdfq
+  - mkdir build.debug
+  - cd build.debug
+  - cmake -G"$GENERATOR" -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON ..
+  - cmake --build . --config Debug
+  - ctest --output-on-failure -C Debug
+  - cd $TRAVIS_BUILD_DIR
+  - git clean -xdfq
 notifications:
   email:
     recipients:

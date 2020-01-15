@@ -138,20 +138,14 @@ void test_perf_viterbi(void)
                        "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMME";
     cass_cond(strlen(seq) == 2000);
 
-    /* imm_mstate_sort: 0.0024530000 seconds */
-    /* imm_dp_create: 0.0167040000 seconds */
-    /* imm_dp_viterbi: 0.4592080000 seconds */
-    /* Score: -65826.0106185297 */
-    /* Elapsed: 0.4849430000 seconds */
     elapsed_start(elapsed);
     double score = imm_hmm_viterbi(hmm, seq, cast_c(end), path);
-
-    printf("Score: %.10f\n", score);
     cass_cond(is_valid(score) && !is_zero(score));
     cass_close(score, -65826.0106185297);
     elapsed_end(elapsed);
     imm_path_destroy(path);
 
+    cass_cond(elapsed_seconds(elapsed) < 1.0);
     printf("Elapsed: %.10f seconds\n", elapsed_seconds(elapsed));
 
     elapsed_destroy(elapsed);
