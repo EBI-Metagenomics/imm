@@ -145,7 +145,9 @@ void test_perf_viterbi(void)
     elapsed_end(elapsed);
     imm_path_destroy(path);
 
+#ifdef NDEBUG
     cass_cond(elapsed_seconds(elapsed) < 1.0);
+#endif
 
     elapsed_destroy(elapsed);
     imm_hmm_destroy(hmm);
