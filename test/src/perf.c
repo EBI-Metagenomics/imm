@@ -146,7 +146,6 @@ void test_perf_viterbi(void)
     imm_path_destroy(path);
 
     cass_cond(elapsed_seconds(elapsed) < 1.0);
-    printf("Elapsed: %.10f seconds\n", elapsed_seconds(elapsed));
 
     elapsed_destroy(elapsed);
     imm_hmm_destroy(hmm);

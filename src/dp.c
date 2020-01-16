@@ -1,6 +1,5 @@
 #include "dp.h"
 #include "array.h"
-#include "elapsed.h"
 #include "gmatrix.h"
 #include "hide.h"
 #include "imm/imm.h"
@@ -13,7 +12,6 @@
 #include "uthash.h"
 #include <limits.h>
 #include <math.h>
-#include <stdio.h>
 
 struct trans
 {
@@ -95,9 +93,6 @@ static void create_trans(struct state_info* states, struct mstate const* const* 
 struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, char const* seq,
                          struct imm_state const* end_state)
 {
-    struct elapsed* elapsed = elapsed_create();
-
-    elapsed_start(elapsed);
     struct dp* dp = malloc(sizeof(struct dp));
 
     dp->lprob_zero = imm_lprob_zero();
@@ -114,8 +109,6 @@ struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, cha
     dp->dp_matrix.cell = NULL;
     int next_col = 0;
 
-    printf("imm_dp_create mallocs: %.10f seconds\n", elapsed_end(elapsed));
-    elapsed_start(elapsed);
     for (int i = 0; i < nstates; ++i) {
         dp->states[i].state = imm_mstate_get_state(mm_states[i]);
         dp->states[i].min_seq = imm_state_min_seq(dp->states[i].state);
@@ -130,25 +123,17 @@ struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, cha
         next_col += dp->states[i].max_seq - dp->states[i].min_seq + 1;
     }
     dp->end_state = dp->states + imm_state_idx_find(state_idx, end_state);
-    printf("imm_dp_create loop: %.10f seconds\n", elapsed_end(elapsed));
 
-    elapsed_start(elapsed);
     create_trans(dp->states, mm_states, nstates, state_idx);
-    printf("imm_dp_create create_trans: %.10f seconds\n", elapsed_end(elapsed));
     imm_state_idx_destroy(&state_idx);
 
-    elapsed_start(elapsed);
     dp->dp_matrix.cell = gmatrix_cell_create(dp->seq_len + 1, next_col);
-    printf("imm_dp_create gmatrix_step_create: %.10f seconds\n", elapsed_end(elapsed));
 
-    elapsed_destroy(elapsed);
     return dp;
 }
 
 double imm_dp_viterbi(struct dp* dp, struct imm_path* path)
 {
-    struct elapsed* elapsed = elapsed_create();
-    elapsed_start(elapsed);
     for (int r = 0; r <= dp->seq_len; ++r) {
         char const* seq = dp->seq + r;
         int const   seq_len = dp->seq_len - r;
@@ -167,17 +152,12 @@ double imm_dp_viterbi(struct dp* dp, struct imm_path* path)
             }
         }
     }
-    printf("imm_dp_viterbi main loop: %.10f seconds\n", elapsed_end(elapsed));
 
-    elapsed_start(elapsed);
     struct step end_step = {.state = NULL, .seq_len = -1};
     double      score = final_score(dp, &end_step);
-    printf("imm_dp_viterbi final_score: %.10f seconds\n", elapsed_end(elapsed));
 
-    elapsed_start(elapsed);
     if (path)
         viterbi_path(dp, path, &end_step);
-    printf("imm_dp_viterbi viterbi_path: %.10f seconds\n", elapsed_end(elapsed));
 
     return score;
 }

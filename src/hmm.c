@@ -4,8 +4,6 @@
 #include "mstate.h"
 #include "mstate_sort.h"
 #include "mtrans.h"
-#include "elapsed.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -227,24 +225,14 @@ double imm_hmm_viterbi(struct imm_hmm const* hmm, char const* seq,
         return imm_lprob_invalid();
     }
 
-    struct elapsed* elapsed = elapsed_create();
-
-    elapsed_start(elapsed);
     struct mstate const* const* mm_states = imm_mstate_sort(hmm->mm_states);
     if (!mm_states)
         return imm_lprob_invalid();
-    printf("imm_mstate_sort: %.10f seconds\n", elapsed_end(elapsed));
 
-    elapsed_start(elapsed);
     struct dp* dp =
         imm_dp_create(mm_states, imm_mstate_nitems(hmm->mm_states), seq, end_state);
-    printf("imm_dp_create: %.10f seconds\n", elapsed_end(elapsed));
-    elapsed_start(elapsed);
     double score = imm_dp_viterbi(dp, path);
-    printf("imm_dp_viterbi: %.10f seconds\n", elapsed_end(elapsed));
     imm_dp_destroy(dp);
-
-    elapsed_destroy(elapsed);
 
     free((struct mstate**)mm_states);
     return score;

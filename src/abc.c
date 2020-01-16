@@ -17,10 +17,15 @@ struct imm_abc
 static int check_symbols_length(char const* symbols);
 static int check_symbol_id(struct imm_abc const* abc, char symbol_id);
 
-struct imm_abc* imm_abc_create(char const* symbols, char any_symbol)
+struct imm_abc* imm_abc_create(char const* symbols, char const any_symbol)
 {
     if (check_symbols_length(symbols))
         return NULL;
+
+    if (!ascii_is_std(&any_symbol, 1)) {
+        imm_error("any_symbol must be non-extended ASCII characters");
+        return NULL;
+    }
 
     struct imm_abc* abc = malloc(sizeof(struct imm_abc));
 
@@ -39,7 +44,7 @@ struct imm_abc* imm_abc_create(char const* symbols, char any_symbol)
             return NULL;
         }
 
-        abc->symbol_idx[(int)ids[idx]] = idx;
+        abc->symbol_idx[(size_t)ids[idx]] = idx;
     }
 
     return abc;
@@ -91,6 +96,17 @@ char imm_abc_symbol_id(struct imm_abc const* abc, int symbol_idx)
 }
 
 char imm_abc_any_symbol(struct imm_abc const* abc) { return abc->any_symbol; }
+
+enum imm_symbol_type imm_abc_symbol_type(struct imm_abc const* abc, char symbol_id)
+{
+    if (symbol_id == abc->any_symbol)
+        return IMM_SYMBOL_ANY;
+
+    if (imm_abc_has_symbol(abc, symbol_id))
+        return IMM_SYMBOL_NORMAL;
+
+    return IMM_SYMBOL_UNKNOWN;
+}
 
 static int check_symbols_length(char const* symbols)
 {
