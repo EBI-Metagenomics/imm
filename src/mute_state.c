@@ -20,7 +20,7 @@ struct imm_mute_state* imm_mute_state_create(char const* name, struct imm_abc co
     return state;
 }
 
-void imm_mute_state_destroy(struct imm_mute_state* state)
+void imm_mute_state_destroy(struct imm_mute_state const* state)
 {
     if (!state) {
         imm_error("state should not be NULL");
@@ -28,9 +28,7 @@ void imm_mute_state_destroy(struct imm_mute_state* state)
     }
 
     imm_state_destroy(state->interface);
-    state->interface = NULL;
-
-    free(state);
+    free((struct imm_mute_state*)state);
 }
 
 static double mute_state_lprob(struct imm_state const* state, char const* seq, int seq_len)

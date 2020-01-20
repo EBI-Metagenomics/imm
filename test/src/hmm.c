@@ -245,13 +245,6 @@ void test_hmm_likelihood_two_states(void)
     cass_close(imm_hmm_likelihood(hmm, "GT", path), -1.0986122887);
     imm_path_destroy(path);
 
-    cass_cond(imm_normal_state_normalize(state1) == 0);
-    path = imm_path_create();
-    imm_path_append(path, cast_c(state0), 1);
-    imm_path_append(path, cast_c(state1), 1);
-    cass_close(imm_hmm_likelihood(hmm, "GT", path), -1.9095425049);
-    imm_path_destroy(path);
-
     imm_hmm_destroy(hmm);
     imm_normal_state_destroy(state0);
     imm_normal_state_destroy(state1);
@@ -675,10 +668,11 @@ void test_hmm_viterbi_normal_states(void)
     struct imm_abc* abc = imm_abc_create("ACGT", '*');
     struct imm_hmm* hmm = imm_hmm_create(abc);
 
-    double                   lprobs0[] = {log(0.25), log(0.25), log(0.5), zero()};
+    double const             lprobs0[] = {log(0.25), log(0.25), log(0.5), zero()};
     struct imm_normal_state* state0 = imm_normal_state_create("State0", abc, lprobs0);
 
-    double                   lprobs1[] = {log(0.5), log(0.25), log(0.5), log(1.0)};
+    double const             lprobs1[] = {log(0.5) - log(2.25), log(0.25) - log(2.25),
+                              log(0.5) - log(2.25), log(1.0) - log(2.25)};
     struct imm_normal_state* state1 = imm_normal_state_create("State1", abc, lprobs1);
 
     imm_hmm_add_state(hmm, cast_c(state0), log(1.0));
@@ -687,9 +681,6 @@ void test_hmm_viterbi_normal_states(void)
     imm_hmm_set_trans(hmm, cast_c(state0), cast_c(state0), log(0.1));
     imm_hmm_set_trans(hmm, cast_c(state0), cast_c(state1), log(0.2));
     imm_hmm_set_trans(hmm, cast_c(state1), cast_c(state1), log(1.0));
-
-    cass_cond(imm_normal_state_normalize(state0) == 0);
-    cass_cond(imm_normal_state_normalize(state1) == 0);
 
     imm_hmm_normalize(hmm);
 

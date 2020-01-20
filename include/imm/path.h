@@ -8,7 +8,7 @@ struct imm_state;
 struct imm_step;
 
 IMM_API struct imm_path* imm_path_create(void);
-IMM_API void             imm_path_destroy(struct imm_path* path);
+IMM_API void             imm_path_destroy(struct imm_path const* path);
 IMM_API int imm_path_append(struct imm_path* path, struct imm_state const* state, int seq_len);
 IMM_API int imm_path_prepend(struct imm_path* path, struct imm_state const* state,
                              int seq_len);

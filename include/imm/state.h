@@ -20,7 +20,7 @@ struct imm_state_funcs
 
 IMM_API struct imm_state* imm_state_create(char const* name, struct imm_abc const* abc,
                                            struct imm_state_funcs funcs, void* impl);
-IMM_API void              imm_state_destroy(struct imm_state* state);
+IMM_API void              imm_state_destroy(struct imm_state const* state);
 
 IMM_API char const* imm_state_get_name(struct imm_state const* state);
 

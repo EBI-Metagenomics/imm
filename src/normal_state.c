@@ -28,7 +28,7 @@ struct imm_normal_state* imm_normal_state_create(char const* name, struct imm_ab
     return state;
 }
 
-void imm_normal_state_destroy(struct imm_normal_state* state)
+void imm_normal_state_destroy(struct imm_normal_state const* state)
 {
     if (!state) {
         imm_error("state should not be NULL");
@@ -36,18 +36,8 @@ void imm_normal_state_destroy(struct imm_normal_state* state)
     }
 
     imm_state_destroy(state->interface);
-    state->interface = NULL;
-
     free(state->lprobs);
-    state->lprobs = NULL;
-
-    free(state);
-}
-
-int imm_normal_state_normalize(struct imm_normal_state* state)
-{
-    int len = imm_abc_length(imm_state_get_abc(imm_state_cast_c(state)));
-    return imm_lprob_normalize(state->lprobs, len);
+    free((struct imm_normal_state*)state);
 }
 
 static double normal_state_lprob(struct imm_state const* state, char const* seq, int seq_len)

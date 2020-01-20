@@ -16,7 +16,7 @@ struct imm_path* imm_path_create(void)
     return path;
 }
 
-void imm_path_destroy(struct imm_path* path)
+void imm_path_destroy(struct imm_path const* path)
 {
     if (!path) {
         imm_error("path should not be NULL");
@@ -32,7 +32,7 @@ void imm_path_destroy(struct imm_path* path)
         list_del(entry);
         free(step);
     }
-    free(path);
+    free((struct imm_path*)path);
 }
 
 int imm_path_append(struct imm_path* path, struct imm_state const* state, int seq_len)

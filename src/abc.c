@@ -7,6 +7,12 @@
 
 #define ARRAY_LENGTH(arr) (sizeof(arr) / sizeof((arr)[0]))
 
+/**
+ * Immutable alphabet.
+ *
+ * It represents a finite set of symbols and a special any-symbol
+ * symbol.
+ */
 struct imm_abc
 {
     char const* symbols;
@@ -61,7 +67,7 @@ struct imm_abc* imm_abc_clone(struct imm_abc const* abc)
     return nabc;
 }
 
-void imm_abc_destroy(struct imm_abc* abc)
+void imm_abc_destroy(struct imm_abc const* abc)
 {
     if (!abc) {
         imm_error("abc should not be NULL");
@@ -69,7 +75,7 @@ void imm_abc_destroy(struct imm_abc* abc)
     }
 
     free((char*)abc->symbols);
-    free(abc);
+    free((struct imm_abc*)abc);
 }
 
 int imm_abc_length(struct imm_abc const* abc) { return (int)strlen(abc->symbols); }

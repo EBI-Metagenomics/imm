@@ -37,7 +37,7 @@ struct imm_state* imm_state_create(char const* name, struct imm_abc const* abc,
     return s;
 }
 
-void imm_state_destroy(struct imm_state* state)
+void imm_state_destroy(struct imm_state const* state)
 {
     if (!state) {
         imm_error("state should not be NULL");
@@ -45,11 +45,7 @@ void imm_state_destroy(struct imm_state* state)
     }
 
     free((char*)state->name);
-    state->abc = NULL;
-    state->lprob = NULL;
-    state->min_seq = NULL;
-    state->max_seq = NULL;
-    free(state);
+    free((struct imm_state*)state);
 }
 
 char const* imm_state_get_name(struct imm_state const* s) { return s->name; }
