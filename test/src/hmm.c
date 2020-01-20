@@ -1381,10 +1381,11 @@ void test_hmm_viterbi_table_states(void)
     struct imm_hmm* hmm = imm_hmm_create(abc);
 
     struct imm_mute_state*  S = imm_mute_state_create("S", abc);
-    struct imm_table_state* T = imm_table_state_create("T", abc);
-    imm_table_state_add(T, "", log(0.5));
-    imm_table_state_add(T, "A", log(0.1));
-    imm_table_state_add(T, "TAT", log(0.2));
+    struct imm_sequence_table* table = imm_sequence_table_create(abc);
+    imm_sequence_table_add(table, "", log(0.5));
+    imm_sequence_table_add(table, "A", log(0.1));
+    imm_sequence_table_add(table, "TAT", log(0.2));
+    struct imm_table_state* T = imm_table_state_create("T", table);
 
     struct imm_mute_state* D = imm_mute_state_create("D", abc);
 

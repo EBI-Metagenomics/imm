@@ -101,3 +101,30 @@ int imm_sequence_table_normalize(struct imm_sequence_table* table)
     free_c(lprobs);
     return 0;
 }
+
+double imm_sequence_table_lprob(struct imm_sequence_table const* table, char const* seq,
+                                int seq_len)
+{
+    struct emission* emiss = NULL;
+    HASH_FIND(hh, table->emissions, seq, (size_t)seq_len, emiss);
+
+    if (emiss)
+        return emiss->lprob;
+
+    return imm_lprob_zero();
+}
+
+struct imm_abc const* imm_sequence_table_get_abc(struct imm_sequence_table const* table)
+{
+    return table->abc;
+}
+
+int imm_sequence_table_min_seq(struct imm_sequence_table const* table)
+{
+    return table->min_seq;
+}
+
+int imm_sequence_table_max_seq(struct imm_sequence_table const* table)
+{
+    return table->max_seq;
+}

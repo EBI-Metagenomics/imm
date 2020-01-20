@@ -51,24 +51,32 @@ void test_table_state(void)
 {
     struct imm_abc* abc = imm_abc_create("ACGT", '*');
 
-    struct imm_table_state* state = imm_table_state_create("S0", abc);
-
+    struct imm_sequence_table* table = imm_sequence_table_create(abc);
+    struct imm_table_state*    state = imm_table_state_create("S0", table);
     cass_cond(strcmp(imm_state_get_name(imm_state_cast_c(state)), "S0") == 0);
     cass_cond(imm_lprob_is_zero(imm_state_lprob(imm_state_cast_c(state), "", 0)));
     cass_cond(imm_lprob_is_zero(imm_state_lprob(imm_state_cast_c(state), "AGT", 3)));
-
-    imm_table_state_add(state, "GG", log(0.5));
-    cass_close(log(0.5), imm_state_lprob(imm_state_cast_c(state), "GG", 2));
-    cass_cond(imm_lprob_is_zero(imm_state_lprob(imm_state_cast_c(state), "GGT", 3)));
-
-    imm_table_state_add(state, "", log(0.1));
-    cass_close(log(0.1), imm_state_lprob(imm_state_cast_c(state), "", 0));
-
-    cass_cond(imm_table_state_normalize(state) == 0);
-
-    cass_close(log(0.5 / 0.6), imm_state_lprob(imm_state_cast_c(state), "GG", 2));
-    cass_close(log(0.1 / 0.6), imm_state_lprob(imm_state_cast_c(state), "", 0));
-
     imm_table_state_destroy(state);
+
+    table = imm_sequence_table_create(abc);
+    cass_cond(imm_sequence_table_add(table, "GG", log(0.5)) == 0);
+    cass_cond(imm_sequence_table_add(table, "", log(0.1)) == 0);
+    cass_cond(imm_sequence_table_add(table, "H", log(0.1)) == 1);
+    state = imm_table_state_create("S0", table);
+    cass_close(imm_state_lprob(imm_state_cast_c(state), "GG", 2), log(0.5));
+    cass_cond(imm_lprob_is_zero(imm_state_lprob(imm_state_cast_c(state), "GGT", 3)));
+    cass_close(imm_state_lprob(imm_state_cast_c(state), "", 0), log(0.1));
+    imm_table_state_destroy(state);
+
+    table = imm_sequence_table_create(abc);
+    cass_cond(imm_sequence_table_add(table, "GG", log(0.5)) == 0);
+    cass_cond(imm_sequence_table_add(table, "", log(0.1)) == 0);
+    cass_cond(imm_sequence_table_add(table, "H", log(0.1)) == 1);
+    cass_cond(imm_sequence_table_normalize(table) == 0);
+    state = imm_table_state_create("S0", table);
+    cass_close(imm_state_lprob(imm_state_cast_c(state), "GG", 2), log(0.5 / 0.6));
+    cass_close(imm_state_lprob(imm_state_cast_c(state), "", 0), log(0.1 / 0.6));
+    imm_table_state_destroy(state);
+
     imm_abc_destroy(abc);
 }
