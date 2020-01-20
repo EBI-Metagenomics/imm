@@ -1,4 +1,5 @@
 #include "ascii.h"
+#include "free.h"
 #include "imm/imm.h"
 #include <stdlib.h>
 #include <string.h>
@@ -44,8 +45,8 @@ void imm_state_destroy(struct imm_state const* state)
         return;
     }
 
-    free((char*)state->name);
-    free((struct imm_state*)state);
+    free_c(state->name);
+    free_c(state);
 }
 
 char const* imm_state_get_name(struct imm_state const* s) { return s->name; }

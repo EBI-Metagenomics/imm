@@ -1,3 +1,4 @@
+#include "free.h"
 #include "imm/imm.h"
 #include "step_p.h"
 #include <stdlib.h>
@@ -30,9 +31,9 @@ void imm_path_destroy(struct imm_path const* path)
         step->state = NULL;
         step->seq_len = -1;
         list_del(entry);
-        free(step);
+        free_c(step);
     }
-    free((struct imm_path*)path);
+    free_c(path);
 }
 
 int imm_path_append(struct imm_path* path, struct imm_state const* state, int seq_len)

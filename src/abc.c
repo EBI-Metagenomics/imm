@@ -1,4 +1,5 @@
 #include "ascii.h"
+#include "free.h"
 #include "hide.h"
 #include "imm/imm.h"
 #include <limits.h>
@@ -45,8 +46,8 @@ struct imm_abc* imm_abc_create(char const* symbols, char const any_symbol)
     int         len = (int)strlen(abc->symbols);
     for (int idx = 0; idx < len; ++idx) {
         if (check_symbol_id(abc, ids[idx])) {
-            free((char*)abc->symbols);
-            free(abc);
+            free_c(abc->symbols);
+            free_c(abc);
             return NULL;
         }
 
@@ -74,8 +75,8 @@ void imm_abc_destroy(struct imm_abc const* abc)
         return;
     }
 
-    free((char*)abc->symbols);
-    free((struct imm_abc*)abc);
+    free_c(abc->symbols);
+    free_c(abc);
 }
 
 int imm_abc_length(struct imm_abc const* abc) { return (int)strlen(abc->symbols); }

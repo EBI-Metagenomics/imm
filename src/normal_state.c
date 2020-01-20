@@ -1,3 +1,4 @@
+#include "free.h"
 #include "imm/imm.h"
 #include <math.h>
 #include <stdlib.h>
@@ -36,8 +37,8 @@ void imm_normal_state_destroy(struct imm_normal_state const* state)
     }
 
     imm_state_destroy(state->interface);
-    free(state->lprobs);
-    free((struct imm_normal_state*)state);
+    free_c(state->lprobs);
+    free_c(state);
 }
 
 static double normal_state_lprob(struct imm_state const* state, char const* seq, int seq_len)

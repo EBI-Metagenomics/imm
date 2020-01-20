@@ -1,3 +1,4 @@
+#include "free.h"
 #include "imm/imm.h"
 #include <math.h>
 #include <stdlib.h>
@@ -28,7 +29,7 @@ void imm_mute_state_destroy(struct imm_mute_state const* state)
     }
 
     imm_state_destroy(state->interface);
-    free((struct imm_mute_state*)state);
+    free_c(state);
 }
 
 static double mute_state_lprob(struct imm_state const* state, char const* seq, int seq_len)

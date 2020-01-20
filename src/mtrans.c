@@ -1,5 +1,6 @@
 #include "mtrans.h"
 #include "uthash.h"
+#include "free.h"
 #include <math.h>
 
 struct mm_trans
@@ -18,7 +19,7 @@ void imm_mtrans_destroy(struct mm_trans** head_ptr)
         HASH_ITER(hh, *head_ptr, mm_trans, tmp)
         {
             HASH_DEL(*head_ptr, mm_trans);
-            free(mm_trans);
+            free_c(mm_trans);
         }
     }
     *head_ptr = NULL;
@@ -37,7 +38,7 @@ struct mm_trans* imm_mtrans_add(struct mm_trans** head_ptr, struct imm_state con
 void imm_mtrans_del(struct mm_trans** head_ptr, struct mm_trans* trans)
 {
     HASH_DEL(*head_ptr, trans);
-    free(trans);
+    free_c(trans);
 }
 
 struct mm_trans* imm_mtrans_find(struct mm_trans* head, struct imm_state const* state)

@@ -1,4 +1,5 @@
 #include "dp.h"
+#include "free.h"
 #include "hide.h"
 #include "imm/imm.h"
 #include "mstate.h"
@@ -36,7 +37,7 @@ void imm_hmm_destroy(struct imm_hmm* hmm)
     imm_mstate_destroy(&hmm->mm_states);
 
     hmm->abc = NULL;
-    free(hmm);
+    free_c(hmm);
 }
 
 int imm_hmm_add_state(struct imm_hmm* hmm, struct imm_state const* state, double start_lprob)
@@ -234,7 +235,7 @@ double imm_hmm_viterbi(struct imm_hmm const* hmm, char const* seq,
     double score = imm_dp_viterbi(dp, path);
     imm_dp_destroy(dp);
 
-    free((struct mstate**)mm_states);
+    free_c(mm_states);
     return score;
 }
 

@@ -1,4 +1,5 @@
 #include "state_idx.h"
+#include "free.h"
 #include "uthash.h"
 
 struct state_idx
@@ -19,7 +20,7 @@ void imm_state_idx_destroy(struct state_idx** head_ptr)
             state_idx->state = NULL;
             state_idx->idx = -1;
             HASH_DEL(*head_ptr, state_idx);
-            free(state_idx);
+            free_c(state_idx);
         }
     }
     *head_ptr = NULL;

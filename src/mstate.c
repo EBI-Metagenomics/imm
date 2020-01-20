@@ -1,4 +1,5 @@
 #include "mstate.h"
+#include "free.h"
 #include "imm/imm.h"
 #include "mtrans.h"
 #include "uthash.h"
@@ -26,7 +27,7 @@ void imm_mstate_destroy(struct mstate** head_ptr)
             mm_state->state = NULL;
             mm_state->start_lprob = imm_lprob_invalid();
             HASH_DEL(*head_ptr, mm_state);
-            free(mm_state);
+            free_c(mm_state);
         }
     }
     *head_ptr = NULL;
@@ -48,7 +49,7 @@ int imm_mstate_del_state(struct mstate** head_ptr, struct imm_state const* state
     HASH_FIND_PTR(*head_ptr, &state, mm_state);
     if (mm_state) {
         HASH_DEL(*head_ptr, mm_state);
-        free(mm_state);
+        free_c(mm_state);
         return 0;
     }
     return 1;

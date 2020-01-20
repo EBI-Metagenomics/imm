@@ -1,6 +1,7 @@
 #ifndef IMM_ARRAY_H
 #define IMM_ARRAY_H
 
+#include "free.h"
 #include <stdlib.h>
 
 #define MAKE_ARRAY_STRUCT(S, T)                                                               \
@@ -45,7 +46,7 @@
 #define MAKE_ARRAY_EMPTY(S)                                                                   \
     static inline void array_##S##_empty(struct array_##S* array)                             \
     {                                                                                         \
-        free(array->elements);                                                                \
+        free_c(array->elements);                                                              \
         array->elements = NULL;                                                               \
         array->length = 0;                                                                    \
     }

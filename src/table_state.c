@@ -1,3 +1,4 @@
+#include "free.h"
 #include "imm/imm.h"
 #include "min.h"
 #include "uthash.h"
@@ -49,15 +50,15 @@ void imm_table_state_destroy(struct imm_table_state* state)
     struct emission *emiss, *tmp;
     HASH_ITER(hh, state->emissions, emiss, tmp)
     {
-        free(emiss->seq);
+        free_c(emiss->seq);
         HASH_DEL(state->emissions, emiss);
-        free(emiss);
+        free_c(emiss);
     }
     state->emissions = NULL;
     state->min_seq = 0;
     state->max_seq = 0;
 
-    free(state);
+    free_c(state);
 }
 
 void imm_table_state_add(struct imm_table_state* state, char const* seq, double lprob)
@@ -84,7 +85,7 @@ int imm_table_state_normalize(struct imm_table_state* state)
         ++i;
     }
     if (imm_lprob_normalize(lprobs, len)) {
-        free(lprobs);
+        free_c(lprobs);
         return -1;
     }
 
@@ -95,7 +96,7 @@ int imm_table_state_normalize(struct imm_table_state* state)
         ++i;
     }
 
-    free(lprobs);
+    free_c(lprobs);
     return 0;
 }
 

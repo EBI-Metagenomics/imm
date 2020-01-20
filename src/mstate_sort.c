@@ -1,4 +1,5 @@
 #include "mstate_sort.h"
+#include "free.h"
 #include "imm/imm.h"
 #include "list.h"
 #include "mstate.h"
@@ -122,7 +123,7 @@ static void destroy_node(struct node* node)
     node->mm_state = NULL;
     node->idx = -1;
     node->mark = INITIAL_MARK;
-    free(node);
+    free_c(node);
 }
 
 static void destroy_state_nodes(struct state_node** state_nodes)
@@ -138,7 +139,7 @@ static void destroy_state_nodes(struct state_node** state_nodes)
             state_node->node = NULL;
             state_node->state = NULL;
             HASH_DEL(*state_nodes, state_node);
-            free(state_node);
+            free_c(state_node);
         }
     }
     *state_nodes = NULL;
@@ -172,7 +173,7 @@ static void destroy_edges(struct list_head* edges)
     {
         edge->node = NULL;
         list_del(&edge->list_entry);
-        free(edge);
+        free_c(edge);
     }
 }
 

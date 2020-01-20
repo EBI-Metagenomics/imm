@@ -16,6 +16,7 @@ extern "C"
 #include "imm/state.h"
 #include "imm/step.h"
 #include "imm/table_state.h"
+#include "imm/sequence_table.h"
 
 #ifdef __cplusplus
 }

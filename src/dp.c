@@ -1,5 +1,6 @@
 #include "dp.h"
 #include "array.h"
+#include "free.h"
 #include "gmatrix.h"
 #include "hide.h"
 #include "imm/imm.h"
@@ -169,7 +170,7 @@ void imm_dp_destroy(struct dp* dp)
 
     dp->nstates = -1;
 
-    free(dp->states);
+    free_c(dp->states);
     dp->states = NULL;
 
     dp->end_state = NULL;
@@ -180,9 +181,9 @@ void imm_dp_destroy(struct dp* dp)
     gmatrix_cell_destroy(dp->dp_matrix.cell);
     dp->dp_matrix.cell = NULL;
 
-    free(dp->dp_matrix.state_col);
+    free_c(dp->dp_matrix.state_col);
 
-    free(dp);
+    free_c(dp);
 }
 
 static double best_trans_score(struct dp const* dp, struct state_info const* dst_state,

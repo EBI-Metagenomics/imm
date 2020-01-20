@@ -1,6 +1,7 @@
 #ifndef IMM_GMATRIX_H
 #define IMM_GMATRIX_H
 
+#include "free.h"
 #include "hide.h"
 #include <stdlib.h>
 
@@ -54,11 +55,11 @@
         if (!matrix)                                                                          \
             return;                                                                           \
                                                                                               \
-        free(matrix->data);                                                                   \
+        free_c(matrix->data);                                                                 \
         matrix->data = NULL;                                                                  \
         matrix->nrows = 0;                                                                    \
         matrix->ncols = 0;                                                                    \
-        free(matrix);                                                                         \
+        free_c(matrix);                                                                       \
     }
 
 #endif

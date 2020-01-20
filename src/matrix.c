@@ -1,4 +1,5 @@
 #include "matrix.h"
+#include "free.h"
 #include "imm/imm.h"
 #include <stdlib.h>
 
@@ -24,9 +25,9 @@ void imm_matrix_destroy(struct matrix* matrix)
         return;
     }
 
-    free(matrix->data);
+    free_c(matrix->data);
     matrix->data = NULL;
     matrix->nrows = 0;
     matrix->ncols = 0;
-    free(matrix);
+    free_c(matrix);
 }
