@@ -1,7 +1,6 @@
 #include "free.h"
 #include "imm/imm.h"
 #include "min.h"
-#include "uthash.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -9,13 +8,6 @@ struct imm_table_state
 {
     struct imm_state*                interface;
     struct imm_sequence_table const* table;
-};
-
-struct emission
-{
-    char*          seq;
-    double         lprob;
-    UT_hash_handle hh;
 };
 
 static double table_state_lprob(struct imm_state const* state, char const* seq, int seq_len);

@@ -121,8 +121,8 @@ int imm_sequence_table_normalize(struct imm_sequence_table* table)
 double imm_sequence_table_lprob(struct imm_sequence_table const* table, char const* seq,
                                 int seq_len)
 {
-    char const *key = strndup(seq, (size_t)seq_len);
-    khint_t i = kh_get(emission, table->emission_table, key);
+    char const* key = strndup(seq, (size_t)seq_len);
+    khint_t     i = kh_get(emission, table->emission_table, key);
     free_c(key);
 
     if (i == kh_end(table->emission_table))
