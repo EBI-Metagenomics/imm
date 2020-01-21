@@ -1,48 +1,61 @@
 #include "state_idx.h"
 #include "free.h"
 #include "imm/imm.h"
+#include "khash_ptr.h"
 
-struct state_idx
+struct item
 {
     struct imm_state const* state;
     int                     idx;
 };
 
-khash_t(state_idx) * imm_state_idx_create(void) { return kh_init(state_idx); }
+KHASH_MAP_INIT_PTR(item, struct item*)
 
-void imm_state_idx_destroy(khash_t(state_idx) * table)
+struct state_idx
 {
-    for (khint_t i = kh_begin(table); i < kh_end(table); ++i) {
-        if (kh_exist(table, i))
-            free_c(kh_val(table, i));
-    }
+    khash_t(item) * table;
+};
 
-    kh_destroy(state_idx, table);
+struct state_idx* imm_state_idx_create(void)
+{
+    struct state_idx* state_idx = malloc(sizeof(struct state_idx));
+    state_idx->table = kh_init(item);
+    return state_idx;
 }
 
-void imm_state_idx_add(khash_t(state_idx) * table, struct imm_state const* state, int idx)
+void imm_state_idx_destroy(struct state_idx* state_idx)
+{
+    for (khint_t i = kh_begin(state_idx->table); i < kh_end(state_idx->table); ++i) {
+        if (kh_exist(state_idx->table, i))
+            free_c(kh_val(state_idx->table, i));
+    }
+
+    kh_destroy(item, state_idx->table);
+}
+
+void imm_state_idx_add(struct state_idx* state_idx, struct imm_state const* state, int idx)
 {
     int     ret = 0;
-    khint_t iter = kh_put(state_idx, table, state, &ret);
+    khint_t iter = kh_put(item, state_idx->table, state, &ret);
     if (ret == -1)
         imm_die("hash table failed");
     if (ret == 0)
         imm_die("state already exist");
 
-    struct state_idx* state_idx = malloc(sizeof(struct state_idx));
-    state_idx->state = state;
-    state_idx->idx = idx;
+    struct item* item = malloc(sizeof(struct item));
+    item->state = state;
+    item->idx = idx;
 
-    kh_key(table, iter) = state_idx->state;
-    kh_val(table, iter) = state_idx;
+    kh_key(state_idx->table, iter) = item->state;
+    kh_val(state_idx->table, iter) = item;
 }
 
-int imm_state_idx_find(khash_t(state_idx) * table, struct imm_state const* state)
+int imm_state_idx_find(struct state_idx const* state_idx, struct imm_state const* state)
 {
-    khint_t i = kh_get(state_idx, table, state);
+    khint_t i = kh_get(item, state_idx->table, state);
 
-    if (i == kh_end(table))
-        imm_die("could not find state");
+    if (i == kh_end(state_idx->table))
+        imm_die("state not found");
 
-    return kh_val(table, i)->idx;
+    return kh_val(state_idx->table, i)->idx;
 }

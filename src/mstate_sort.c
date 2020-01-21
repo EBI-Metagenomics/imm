@@ -5,7 +5,6 @@
 #include "list.h"
 #include "mstate.h"
 #include "mtrans.h"
-#include "state_idx.h"
 #include <stddef.h>
 #include <stdlib.h>
 

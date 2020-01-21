@@ -10,6 +10,7 @@
 #include "mstate.h"
 #include "mtrans.h"
 #include "state_idx.h"
+#include "string.h"
 #include <limits.h>
 #include <math.h>
 
@@ -88,7 +89,7 @@ static double final_score(struct dp const* dp, struct step* end_step);
 static void   viterbi_path(struct dp* dp, struct imm_path* path, struct step const* end_step);
 
 static void create_trans(struct state_info* states, struct mstate const* const* mm_states,
-                         int nstates, khash_t(state_idx)* state_idx);
+                         int nstates, struct state_idx* state_idx);
 
 struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, char const* seq,
                          struct imm_state const* end_state)
@@ -99,7 +100,7 @@ struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, cha
     dp->nstates = nstates;
     dp->states = malloc(sizeof(struct state_info) * ((size_t)nstates));
 
-    khash_t(state_idx)* state_idx = imm_state_idx_create();
+    struct state_idx* state_idx = imm_state_idx_create();
 
     dp->seq = seq;
     dp->seq_len = (int)strlen(seq);
@@ -263,7 +264,7 @@ static void viterbi_path(struct dp* dp, struct imm_path* path, struct step const
 }
 
 static void create_trans(struct state_info* states, struct mstate const* const* mm_states,
-                         int nstates, khash_t(state_idx)* state_idx)
+                         int nstates, struct state_idx* state_idx)
 {
     for (int i = 0; i < nstates; ++i) {
 
