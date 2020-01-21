@@ -1,7 +1,7 @@
 #include "mstate_sort.h"
 #include "free.h"
-#include "hash_ptr.h"
 #include "imm/imm.h"
+#include "khash_ptr.h"
 #include "list.h"
 #include "mstate.h"
 #include "mtrans.h"
@@ -96,18 +96,14 @@ static void create_nodes(struct mstate const* head, struct list_head* nodes,
         struct state_node* state_node = malloc(sizeof(struct state_node));
         state_node->state = node->state;
         state_node->node = node;
-        /* HASH_ADD_PTR(*state_nodes, state, state_node); */
 
         int     ret = 0;
         khint_t iter = kh_put(state_node, table, state_node->state, &ret);
-        if (ret == -1) {
-            imm_error("hash table failed");
-            exit(1);
-        }
-        if (ret == 0) {
-            imm_error("state already exist");
-            exit(1);
-        }
+        if (ret == -1)
+            imm_die("hash table failed");
+        if (ret == 0)
+            imm_die("state already exist");
+
         kh_key(table, iter) = state_node->state;
         kh_val(table, iter) = state_node;
 
@@ -177,10 +173,9 @@ static void create_edges(struct list_head* nodes, khash_t(state_node) * table)
                 struct imm_state const* state = imm_mtrans_get_state(trans);
 
                 khint_t i = kh_get(state_node, table, state);
-                if (i == kh_end(table)) {
-                    imm_error("state not found");
-                    exit(1);
-                }
+                if (i == kh_end(table))
+                    imm_die("state not found");
+
                 edge->node = kh_val(table, i)->node;
                 list_add(&edge->list_entry, &node->edges);
             }

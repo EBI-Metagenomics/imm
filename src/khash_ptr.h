@@ -1,11 +1,11 @@
-#ifndef IMM_HASH_PTR_H
-#define IMM_HASH_PTR_H
+#ifndef IMM_KHASH_PTR_H
+#define IMM_KHASH_PTR_H
 
 #include "khash.h"
 #include <assert.h>
 #include <stdint.h>
 
-static_assert( sizeof(long) == 8, "Long type has to be 64 bits long" );
+static_assert(sizeof(long) == 8, "Long type has to be 64 bits long");
 
 /*
  * Source: Linux kernel.
@@ -51,7 +51,7 @@ static kh_inline khint_t ptr_hash_func(void const* ptr)
 
 #define ptr_hash_equal(a, b) ((a) == (b))
 
-#define KHASH_MAP_INIT_PTR(name, khval_t)								\
-	KHASH_INIT(name, void const*, khval_t, 1, ptr_hash_func, ptr_hash_equal)
+#define KHASH_MAP_INIT_PTR(name, khval_t)                                                     \
+    KHASH_INIT(name, void const*, khval_t, 1, ptr_hash_func, ptr_hash_equal)
 
 #endif
