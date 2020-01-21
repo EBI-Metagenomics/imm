@@ -110,7 +110,6 @@ static void create_nodes(struct mstate const* head, struct list_head* nodes,
         mm_state = imm_mstate_next_c(mm_state);
     }
 
-    /* create_edges(nodes, *state_nodes); */
     create_edges(nodes, table);
 }
 
@@ -137,28 +136,12 @@ static void destroy_node(struct node* node)
 
 static void destroy_state_nodes(khash_t(state_node) * table)
 {
-    /* if (!*state_nodes) */
-    /*     return; */
-
     for (khint_t i = kh_begin(table); i < kh_end(table); ++i) {
         if (kh_exist(table, i))
             free_c(kh_val(table, i));
     }
 
     kh_destroy(state_node, table);
-
-    /* struct state_node *state_node = NULL, *tmp = NULL; */
-
-    /* if (*state_nodes) { */
-    /*     HASH_ITER(hh, *state_nodes, state_node, tmp) */
-    /*     { */
-    /*         state_node->node = NULL; */
-    /*         state_node->state = NULL; */
-    /*         HASH_DEL(*state_nodes, state_node); */
-    /*         free_c(state_node); */
-    /*     } */
-    /* } */
-    /* *state_nodes = NULL; */
 }
 
 static void create_edges(struct list_head* nodes, khash_t(state_node) * table)

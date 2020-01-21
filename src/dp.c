@@ -10,7 +10,6 @@
 #include "mstate.h"
 #include "mtrans.h"
 #include "state_idx.h"
-#include "uthash.h"
 #include <limits.h>
 #include <math.h>
 
@@ -89,7 +88,7 @@ static double final_score(struct dp const* dp, struct step* end_step);
 static void   viterbi_path(struct dp* dp, struct imm_path* path, struct step const* end_step);
 
 static void create_trans(struct state_info* states, struct mstate const* const* mm_states,
-                         int nstates, struct state_idx const* state_idx);
+                         int nstates, khash_t(state_idx)* state_idx);
 
 struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, char const* seq,
                          struct imm_state const* end_state)
@@ -100,8 +99,7 @@ struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, cha
     dp->nstates = nstates;
     dp->states = malloc(sizeof(struct state_info) * ((size_t)nstates));
 
-    struct state_idx* state_idx = NULL;
-    imm_state_idx_create(&state_idx);
+    khash_t(state_idx)* state_idx = imm_state_idx_create();
 
     dp->seq = seq;
     dp->seq_len = (int)strlen(seq);
@@ -120,13 +118,13 @@ struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, cha
 
         dp->dp_matrix.state_col[i] = next_col;
 
-        imm_state_idx_add(&state_idx, dp->states[i].state, i);
+        imm_state_idx_add(state_idx, dp->states[i].state, i);
         next_col += dp->states[i].max_seq - dp->states[i].min_seq + 1;
     }
     dp->end_state = dp->states + imm_state_idx_find(state_idx, end_state);
 
     create_trans(dp->states, mm_states, nstates, state_idx);
-    imm_state_idx_destroy(&state_idx);
+    imm_state_idx_destroy(state_idx);
 
     dp->dp_matrix.cell = gmatrix_cell_create(dp->seq_len + 1, next_col);
 
@@ -265,7 +263,7 @@ static void viterbi_path(struct dp* dp, struct imm_path* path, struct step const
 }
 
 static void create_trans(struct state_info* states, struct mstate const* const* mm_states,
-                         int nstates, struct state_idx const* state_idx)
+                         int nstates, khash_t(state_idx)* state_idx)
 {
     for (int i = 0; i < nstates; ++i) {
 

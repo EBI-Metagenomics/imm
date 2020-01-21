@@ -1,42 +1,48 @@
 #include "state_idx.h"
 #include "free.h"
-#include "uthash.h"
+#include "imm/imm.h"
 
 struct state_idx
 {
     struct imm_state const* state;
     int                     idx;
-    UT_hash_handle          hh;
 };
 
-void imm_state_idx_create(struct state_idx** head_ptr) { *head_ptr = NULL; }
+khash_t(state_idx) * imm_state_idx_create(void) { return kh_init(state_idx); }
 
-void imm_state_idx_destroy(struct state_idx** head_ptr)
+void imm_state_idx_destroy(khash_t(state_idx) * table)
 {
-    struct state_idx *state_idx, *tmp;
-    if (*head_ptr) {
-        HASH_ITER(hh, *head_ptr, state_idx, tmp)
-        {
-            state_idx->state = NULL;
-            state_idx->idx = -1;
-            HASH_DEL(*head_ptr, state_idx);
-            free_c(state_idx);
-        }
+    for (khint_t i = kh_begin(table); i < kh_end(table); ++i) {
+        if (kh_exist(table, i))
+            free_c(kh_val(table, i));
     }
-    *head_ptr = NULL;
+
+    kh_destroy(state_idx, table);
 }
 
-void imm_state_idx_add(struct state_idx** head_ptr, struct imm_state const* state, int idx)
+void imm_state_idx_add(khash_t(state_idx) * table, struct imm_state const* state, int idx)
 {
+    int     ret = 0;
+    khint_t iter = kh_put(state_idx, table, state, &ret);
+    if (ret == -1)
+        imm_die("hash table failed");
+    if (ret == 0)
+        imm_die("state already exist");
+
     struct state_idx* state_idx = malloc(sizeof(struct state_idx));
     state_idx->state = state;
     state_idx->idx = idx;
-    HASH_ADD_PTR(*head_ptr, state, state_idx);
+
+    kh_key(table, iter) = state_idx->state;
+    kh_val(table, iter) = state_idx;
 }
 
-int imm_state_idx_find(struct state_idx const* head, struct imm_state const* state)
+int imm_state_idx_find(khash_t(state_idx) * table, struct imm_state const* state)
 {
-    struct state_idx* state_idx = NULL;
-    HASH_FIND_PTR(head, &state, state_idx);
-    return state_idx->idx;
+    khint_t i = kh_get(state_idx, table, state);
+
+    if (i == kh_end(table))
+        imm_die("could not find state");
+
+    return kh_val(table, i)->idx;
 }
