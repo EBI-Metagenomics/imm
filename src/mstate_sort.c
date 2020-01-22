@@ -1,4 +1,5 @@
 #include "mstate_sort.h"
+#include "bug.h"
 #include "free.h"
 #include "imm/imm.h"
 #include "khash_ptr.h"
@@ -30,20 +31,13 @@ struct edge
     struct list_head list_entry;
 };
 
-struct state_node
-{
-    struct imm_state const* state;
-    struct node*            node;
-};
-
-KHASH_MAP_INIT_PTR(state_node, struct state_node*)
+KHASH_MAP_INIT_PTR(node, struct node*)
 
 static void create_nodes(struct mstate const** mstates, int nstates, struct list_head* nodes,
-                         khash_t(state_node) * table);
+                         khash_t(node) * table);
 static void destroy_nodes(struct list_head* nodes);
 static void destroy_node(struct node* node);
-static void destroy_state_nodes(khash_t(state_node) * table);
-static void create_edges(struct list_head* nodes, khash_t(state_node) * table);
+static void create_edges(struct list_head* nodes, khash_t(node) * table);
 static void destroy_edges(struct list_head* edges);
 static void visit(struct node* node, struct mstate const*** mm_state);
 static int  check_mute_cycles(struct list_head* nodes);
@@ -56,12 +50,12 @@ int mstate_sort(struct mstate const** mstates, int nstates)
 
     /* TODO: i dont think i need a hash table for that if we start
      * receiving an array of mstates.*/
-    khash_t(state_node)* tbl = kh_init(state_node);
+    khash_t(node)* tbl = kh_init(node);
     create_nodes(mstates, nstates, &nodes, tbl);
 
     if (check_mute_cycles(&nodes)) {
         destroy_nodes(&nodes);
-        destroy_state_nodes(tbl);
+        kh_destroy(node, tbl);
         return 1;
     }
     unmark_nodes(&nodes);
@@ -72,7 +66,7 @@ int mstate_sort(struct mstate const** mstates, int nstates)
     list_for_each_entry(node, &nodes, list_entry) { visit(node, &cur); }
 
     destroy_nodes(&nodes);
-    destroy_state_nodes(tbl);
+    kh_destroy(node, tbl);
 
     for (int i = 0; i < nstates; ++i)
         mstates[i] = mm_state[i];
@@ -82,7 +76,7 @@ int mstate_sort(struct mstate const** mstates, int nstates)
 }
 
 static void create_nodes(struct mstate const** mstates, int nstates, struct list_head* nodes,
-                         khash_t(state_node) * table)
+                         khash_t(node) * table)
 {
     for (int i = 0; i < nstates; ++i) {
         struct mstate const* mstate = mstates[i];
@@ -97,19 +91,11 @@ static void create_nodes(struct mstate const** mstates, int nstates, struct list
         else
             list_add(&node->list_entry, nodes);
 
-        struct state_node* state_node = malloc(sizeof(struct state_node));
-        state_node->state = node->state;
-        state_node->node = node;
-
         int      ret = 0;
-        khiter_t iter = kh_put(state_node, table, state_node->state, &ret);
-        if (ret == -1)
-            imm_die("hash table failed");
-        if (ret == 0)
-            imm_die("state already exist");
-
-        kh_key(table, iter) = state_node->state;
-        kh_val(table, iter) = state_node;
+        khiter_t iter = kh_put(node, table, node->state, &ret);
+        BUG(ret == -1 || ret == 0);
+        kh_key(table, iter) = node->state;
+        kh_val(table, iter) = node;
     }
 
     create_edges(nodes, table);
@@ -132,17 +118,7 @@ static void destroy_node(struct node* node)
     free_c(node);
 }
 
-static void destroy_state_nodes(khash_t(state_node) * table)
-{
-    for (khiter_t i = kh_begin(table); i < kh_end(table); ++i) {
-        if (kh_exist(table, i))
-            free_c(kh_val(table, i));
-    }
-
-    kh_destroy(state_node, table);
-}
-
-static void create_edges(struct list_head* nodes, khash_t(state_node) * table)
+static void create_edges(struct list_head* nodes, khash_t(node) * table)
 {
     struct node* node = NULL;
     list_for_each_entry(node, nodes, list_entry)
@@ -153,11 +129,10 @@ static void create_edges(struct list_head* nodes, khash_t(state_node) * table)
                 struct edge*            edge = malloc(sizeof(struct edge));
                 struct imm_state const* state = mtrans_get_state(trans);
 
-                khiter_t i = kh_get(state_node, table, state);
-                if (i == kh_end(table))
-                    imm_die("state not found");
+                khiter_t i = kh_get(node, table, state);
+                BUG(i == kh_end(table));
 
-                edge->node = kh_val(table, i)->node;
+                edge->node = kh_val(table, i);
                 list_add(&edge->list_entry, &node->edges);
             }
 
