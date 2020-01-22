@@ -4,9 +4,9 @@
 struct imm_state;
 struct state_idx;
 
-struct state_idx* imm_state_idx_create(void);
-void              imm_state_idx_destroy(struct state_idx* state_idx);
-void imm_state_idx_add(struct state_idx* state_idx, struct imm_state const* state, int idx);
-int  imm_state_idx_find(struct state_idx const* state_idx, struct imm_state const* state);
+struct state_idx* state_idx_create(void);
+void              state_idx_destroy(struct state_idx* state_idx);
+void state_idx_add(struct state_idx* state_idx, struct imm_state const* state, int idx);
+int  state_idx_find(struct state_idx const* state_idx, struct imm_state const* state);
 
 #endif

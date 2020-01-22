@@ -28,7 +28,6 @@ add_library(imm
     src/sequence_table.c
     src/state.c
     src/state_idx.c
-    src/step.c
     src/table_state.c
 )
 add_library(IMM::imm ALIAS imm)

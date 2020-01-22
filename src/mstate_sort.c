@@ -50,7 +50,7 @@ static int  check_mute_cycles(struct list_head* nodes);
 static int  check_mute_visit(struct node* node);
 static void unmark_nodes(struct list_head* nodes);
 
-int imm_mstate_sort(struct mstate const** mstates, int nstates)
+int mstate_sort(struct mstate const** mstates, int nstates)
 {
     struct list_head nodes = LIST_HEAD_INIT(nodes);
 
@@ -66,7 +66,6 @@ int imm_mstate_sort(struct mstate const** mstates, int nstates)
     }
     unmark_nodes(&nodes);
 
-    /* size_t                nstates = (size_t)imm_mstate_nitems(mm_state_head); */
     struct mstate const** mm_state = malloc(sizeof(struct mstate*) * (size_t)nstates);
     struct mstate const** cur = mm_state + nstates;
     struct node*          node = NULL;
@@ -89,11 +88,11 @@ static void create_nodes(struct mstate const** mstates, int nstates, struct list
         struct mstate const* mstate = mstates[i];
 
         struct node* node = malloc(sizeof(struct node));
-        node->state = imm_mstate_get_state(mstate);
+        node->state = mstate_get_state(mstate);
         node->mm_state = mstate;
         node->mark = INITIAL_MARK;
         INIT_LIST_HEAD(&node->edges);
-        if (imm_lprob_is_zero(imm_mstate_get_start(node->mm_state)))
+        if (imm_lprob_is_zero(mstate_get_start(node->mm_state)))
             list_add_tail(&node->list_entry, nodes);
         else
             list_add(&node->list_entry, nodes);
@@ -152,11 +151,11 @@ static void create_edges(struct list_head* nodes, khash_t(state_node) * table)
     struct node* node = NULL;
     list_for_each_entry(node, nodes, list_entry)
     {
-        struct mm_trans const* trans = imm_mstate_get_trans_c(node->mm_state);
+        struct mm_trans const* trans = mstate_get_trans_c(node->mm_state);
         while (trans) {
-            if (!imm_lprob_is_zero(imm_mtrans_get_lprob(trans))) {
+            if (!imm_lprob_is_zero(mtrans_get_lprob(trans))) {
                 struct edge*            edge = malloc(sizeof(struct edge));
-                struct imm_state const* state = imm_mtrans_get_state(trans);
+                struct imm_state const* state = mtrans_get_state(trans);
 
                 khiter_t i = kh_get(state_node, table, state);
                 if (i == kh_end(table))
@@ -166,7 +165,7 @@ static void create_edges(struct list_head* nodes, khash_t(state_node) * table)
                 list_add(&edge->list_entry, &node->edges);
             }
 
-            trans = imm_mtrans_next_c(trans);
+            trans = mtrans_next_c(trans);
         }
     }
 }

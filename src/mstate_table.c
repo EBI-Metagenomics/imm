@@ -14,74 +14,74 @@ struct mstate_table
 
 static khiter_t put_or_die(khash_t(mstate) * table, struct imm_state const* state);
 
-struct mstate_table* imm_mstate_table_create(void)
+struct mstate_table* mstate_table_create(void)
 {
     struct mstate_table* mstate_table = malloc(sizeof(struct mstate_table));
     mstate_table->table = kh_init(mstate);
     return mstate_table;
 }
 
-void imm_mstate_table_destroy(struct mstate_table* table)
+void mstate_table_destroy(struct mstate_table* table)
 {
     for (khiter_t i = kh_begin(table->table); i < kh_end(table->table); ++i) {
         if (kh_exist(table->table, i))
-            imm_mstate_destroy(kh_val(table->table, i));
+            mstate_destroy(kh_val(table->table, i));
     }
     kh_destroy(mstate, table->table);
     free_c(table);
 }
 
-void imm_mstate_table_add(struct mstate_table* table, struct mstate* mstate)
+void mstate_table_add(struct mstate_table* table, struct mstate* mstate)
 {
-    khiter_t i = put_or_die(table->table, imm_mstate_get_state(mstate));
-    kh_key(table->table, i) = imm_mstate_get_state(mstate);
+    khiter_t i = put_or_die(table->table, mstate_get_state(mstate));
+    kh_key(table->table, i) = mstate_get_state(mstate);
     kh_val(table->table, i) = mstate;
 }
 
-unsigned long imm_mstate_table_find(struct mstate_table const* table,
+unsigned long mstate_table_find(struct mstate_table const* table,
                                     struct imm_state const*    state)
 {
     return kh_get(mstate, table->table, state);
 }
 
-struct mstate* imm_mstate_table_get(struct mstate_table const* table, unsigned long iter)
+struct mstate* mstate_table_get(struct mstate_table const* table, unsigned long iter)
 {
     return kh_val(table->table, (khiter_t)iter);
 }
 
-int imm_mstate_table_exist(struct mstate_table const* table, unsigned long iter)
+int mstate_table_exist(struct mstate_table const* table, unsigned long iter)
 {
     return kh_exist(table->table, (khiter_t)iter);
 }
 
-void imm_mstate_table_del(struct mstate_table* table, unsigned long iter)
+void mstate_table_del(struct mstate_table* table, unsigned long iter)
 {
-    struct mstate*          mstate = imm_mstate_table_get(table, iter);
-    struct imm_state const* state = imm_mstate_get_state(mstate);
+    struct mstate*          mstate = mstate_table_get(table, iter);
+    struct imm_state const* state = mstate_get_state(mstate);
 
-    imm_mstate_destroy(mstate);
+    mstate_destroy(mstate);
     kh_del(mstate, table->table, (khiter_t)iter);
 
     unsigned long i = 0;
     mstate_table_for_each(i, table)
     {
-        if (imm_mstate_table_exist(table, i)) {
-            imm_mstate_del_trans(kh_val(table->table, i), state);
+        if (mstate_table_exist(table, i)) {
+            mstate_del_trans(kh_val(table->table, i), state);
         }
     }
 }
 
-unsigned long imm_mstate_table_begin(struct mstate_table const* table)
+unsigned long mstate_table_begin(struct mstate_table const* table)
 {
     return kh_begin(table->table);
 }
 
-unsigned long imm_mstate_table_end(struct mstate_table const* table)
+unsigned long mstate_table_end(struct mstate_table const* table)
 {
     return kh_end(table->table);
 }
 
-int imm_mstate_table_nitems(struct mstate_table const* table)
+int mstate_table_nitems(struct mstate_table const* table)
 {
     size_t n = kh_size(table->table);
     if (n > INT_MAX) {
@@ -92,17 +92,17 @@ int imm_mstate_table_nitems(struct mstate_table const* table)
     return (int)n;
 }
 
-struct mstate const** imm_mstate_table_array(struct mstate_table const* table)
+struct mstate const** mstate_table_array(struct mstate_table const* table)
 {
-    int                   size = imm_mstate_table_nitems(table);
+    int                   size = mstate_table_nitems(table);
     struct mstate const** mstates = malloc(sizeof(struct mstate*) * (size_t)size);
 
     struct mstate const** mstate = mstates;
     unsigned long         i = 0;
     mstate_table_for_each(i, table)
     {
-        if (imm_mstate_table_exist(table, i)) {
-            *mstate = imm_mstate_table_get(table, i);
+        if (mstate_table_exist(table, i)) {
+            *mstate = mstate_table_get(table, i);
             ++mstate;
         }
     }

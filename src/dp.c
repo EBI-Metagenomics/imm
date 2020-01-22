@@ -90,8 +90,8 @@ static void   viterbi_path(struct dp* dp, struct imm_path* path, struct step con
 static void create_trans(struct state_info* states, struct mstate const* const* mm_states,
                          int nstates, struct state_idx* state_idx);
 
-struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, char const* seq,
-                         struct imm_state const* end_state)
+struct dp* dp_create(struct mstate const* const* mm_states, int nstates, char const* seq,
+                     struct imm_state const* end_state)
 {
     struct dp* dp = malloc(sizeof(struct dp));
 
@@ -99,7 +99,7 @@ struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, cha
     dp->nstates = nstates;
     dp->states = malloc(sizeof(struct state_info) * ((size_t)nstates));
 
-    struct state_idx* state_idx = imm_state_idx_create();
+    struct state_idx* state_idx = state_idx_create();
 
     dp->seq = seq;
     dp->seq_len = (int)strlen(seq);
@@ -109,29 +109,29 @@ struct dp* imm_dp_create(struct mstate const* const* mm_states, int nstates, cha
     int next_col = 0;
 
     for (int i = 0; i < nstates; ++i) {
-        dp->states[i].state = imm_mstate_get_state(mm_states[i]);
+        dp->states[i].state = mstate_get_state(mm_states[i]);
         dp->states[i].min_seq = imm_state_min_seq(dp->states[i].state);
         dp->states[i].max_seq = imm_state_max_seq(dp->states[i].state);
-        dp->states[i].start_lprob = imm_mstate_get_start(mm_states[i]);
+        dp->states[i].start_lprob = mstate_get_start(mm_states[i]);
         dp->states[i].idx = i;
         array_trans_init(&dp->states[i].incoming_transitions);
 
         dp->dp_matrix.state_col[i] = next_col;
 
-        imm_state_idx_add(state_idx, dp->states[i].state, i);
+        state_idx_add(state_idx, dp->states[i].state, i);
         next_col += dp->states[i].max_seq - dp->states[i].min_seq + 1;
     }
-    dp->end_state = dp->states + imm_state_idx_find(state_idx, end_state);
+    dp->end_state = dp->states + state_idx_find(state_idx, end_state);
 
     create_trans(dp->states, mm_states, nstates, state_idx);
-    imm_state_idx_destroy(state_idx);
+    state_idx_destroy(state_idx);
 
     dp->dp_matrix.cell = gmatrix_cell_create(dp->seq_len + 1, next_col);
 
     return dp;
 }
 
-double imm_dp_viterbi(struct dp* dp, struct imm_path* path)
+double dp_viterbi(struct dp* dp, struct imm_path* path)
 {
     for (int r = 0; r <= dp->seq_len; ++r) {
         char const* seq = dp->seq + r;
@@ -161,7 +161,7 @@ double imm_dp_viterbi(struct dp* dp, struct imm_path* path)
     return score;
 }
 
-void imm_dp_destroy(struct dp* dp)
+void dp_destroy(struct dp* dp)
 {
     for (int i = 0; i < dp->nstates; ++i)
         array_trans_empty(&dp->states[i].incoming_transitions);
@@ -267,18 +267,18 @@ static void create_trans(struct state_info* states, struct mstate const* const* 
 {
     for (int i = 0; i < nstates; ++i) {
 
-        struct imm_state const* src_state = imm_mstate_get_state(mm_states[i]);
-        int                     src = imm_state_idx_find(state_idx, src_state);
+        struct imm_state const* src_state = mstate_get_state(mm_states[i]);
+        int                     src = state_idx_find(state_idx, src_state);
 
         struct mm_trans const* t = NULL;
-        for (t = imm_mstate_get_trans_c(mm_states[i]); t; t = imm_mtrans_next_c(t)) {
+        for (t = mstate_get_trans_c(mm_states[i]); t; t = mtrans_next_c(t)) {
 
-            double lprob = imm_mtrans_get_lprob(t);
+            double lprob = mtrans_get_lprob(t);
             if (imm_lprob_is_zero(lprob))
                 continue;
 
-            struct imm_state const* dst_state = imm_mtrans_get_state(t);
-            int                     dst = imm_state_idx_find(state_idx, dst_state);
+            struct imm_state const* dst_state = mtrans_get_state(t);
+            int                     dst = state_idx_find(state_idx, dst_state);
 
             struct trans* trans = array_trans_append(&states[dst].incoming_transitions);
             trans->lprob = lprob;

@@ -1,14 +1,22 @@
 #include "free.h"
 #include "imm/imm.h"
-#include "step_p.h"
-#include <stdlib.h>
+#include "list.h"
+
+struct imm_step
+{
+    struct imm_state const* state;
+    int                     seq_len;
+    struct list_head        list;
+};
+
+struct imm_state const* imm_step_state(struct imm_step const* step) { return step->state; }
+
+int imm_step_seq_len(struct imm_step const* step) { return step->seq_len; }
 
 struct imm_path
 {
     struct list_head steps;
 };
-
-static struct imm_step* create_step(struct imm_state const* state, int seq_len);
 
 struct imm_path* imm_path_create(void)
 {
@@ -35,6 +43,8 @@ void imm_path_destroy(struct imm_path const* path)
     }
     free_c(path);
 }
+
+static struct imm_step* create_step(struct imm_state const* state, int seq_len);
 
 int imm_path_append(struct imm_path* path, struct imm_state const* state, int seq_len)
 {
