@@ -228,12 +228,12 @@ double imm_hmm_viterbi(struct imm_hmm const* hmm, char const* seq,
     }
 
     struct mstate const** mstates = mstate_table_array(hmm->table);
-    if (mstate_sort(mstates, mstate_table_nitems(hmm->table))) {
+    if (mstate_sort(mstates, mstate_table_size(hmm->table))) {
         free_c(mstates);
         return imm_lprob_invalid();
     }
 
-    struct dp* dp = dp_create(mstates, mstate_table_nitems(hmm->table), seq, end_state);
+    struct dp* dp = dp_create(mstates, mstate_table_size(hmm->table), seq, end_state);
     double     score = dp_viterbi(dp, path);
     dp_destroy(dp);
 
@@ -260,7 +260,7 @@ int imm_hmm_normalize(struct imm_hmm* hmm)
 
 int imm_hmm_normalize_start(struct imm_hmm* hmm)
 {
-    int size = mstate_table_nitems(hmm->table);
+    int size = mstate_table_size(hmm->table);
     if (size == 0)
         return 0;
 

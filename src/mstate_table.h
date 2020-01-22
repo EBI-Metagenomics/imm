@@ -16,9 +16,8 @@ int                   mstate_table_exist(struct mstate_table const* table, unsig
 void                  mstate_table_del(struct mstate_table* table, unsigned long iter);
 unsigned long         mstate_table_begin(struct mstate_table const* table);
 unsigned long         mstate_table_end(struct mstate_table const* table);
-int                   mstate_table_nitems(struct mstate_table const* table);
+int                   mstate_table_size(struct mstate_table const* table);
 struct mstate const** mstate_table_array(struct mstate_table const* table);
-/* TODO: rename nitems to size everywhere? */
 
 /** iterate over buckets */
 #define mstate_table_for_each(iter, tbl)                                                      \
