@@ -1,27 +1,24 @@
 #include "mstate_sort.h"
 #include "bug.h"
 #include "free.h"
-#include "imm/imm.h"
+#include "imm/lprob.h"
+#include "imm/report.h"
+#include "imm/state.h"
 #include "khash_ptr.h"
 #include "list.h"
 #include "mstate.h"
 #include "mtrans.h"
-#include "state_idx.h"
-#include <stddef.h>
-#include <stdlib.h>
 
 #define INITIAL_MARK 0
 #define TEMPORARY_MARK 1
 #define PERMANENT_MARK 2
-
-struct edge;
 
 struct node
 {
     struct imm_state const* state;
     struct mstate const*    mm_state;
     int                     mark;
-    struct list_head        edges;
+    struct list_head        edge_list;
     struct list_head        list_entry;
 };
 
@@ -33,50 +30,48 @@ struct edge
 
 KHASH_MAP_INIT_PTR(node, struct node*)
 
-static void create_nodes(struct mstate const** mstates, int nstates, struct list_head* nodes,
-                         khash_t(node) * table);
-static void destroy_nodes(struct list_head* nodes);
+static void create_nodes(struct mstate const** mstates, int nstates,
+                         struct list_head* node_list, khash_t(node) * node_table);
+static void destroy_node_list(struct list_head* node_list);
 static void destroy_node(struct node* node);
-static void create_edges(struct list_head* nodes, khash_t(node) * table);
+static void create_edges(struct list_head* node_list, khash_t(node) * table);
 static void destroy_edges(struct list_head* edges);
 static void visit(struct node* node, struct mstate const*** mm_state);
-static int  check_mute_cycles(struct list_head* nodes);
+static int  check_mute_cycles(struct list_head* node_list);
 static int  check_mute_visit(struct node* node);
-static void unmark_nodes(struct list_head* nodes);
+static void unmark_nodes(struct list_head* node_list);
 
 int mstate_sort(struct mstate const** mstates, int nstates)
 {
-    struct list_head nodes = LIST_HEAD_INIT(nodes);
+    struct list_head node_list = LIST_HEAD_INIT(node_list);
+    khash_t(node)* node_table = kh_init(node);
 
-    /* TODO: i dont think i need a hash table for that if we start
-     * receiving an array of mstates.*/
-    khash_t(node)* tbl = kh_init(node);
-    create_nodes(mstates, nstates, &nodes, tbl);
+    create_nodes(mstates, nstates, &node_list, node_table);
 
-    if (check_mute_cycles(&nodes)) {
-        destroy_nodes(&nodes);
-        kh_destroy(node, tbl);
+    if (check_mute_cycles(&node_list)) {
+        destroy_node_list(&node_list);
+        kh_destroy(node, node_table);
         return 1;
     }
-    unmark_nodes(&nodes);
+    unmark_nodes(&node_list);
 
-    struct mstate const** mm_state = malloc(sizeof(struct mstate*) * (size_t)nstates);
-    struct mstate const** cur = mm_state + nstates;
+    struct mstate const** mstate_arr = malloc(sizeof(struct mstate*) * (size_t)nstates);
+    struct mstate const** cur = mstate_arr + nstates;
     struct node*          node = NULL;
-    list_for_each_entry(node, &nodes, list_entry) { visit(node, &cur); }
+    list_for_each_entry(node, &node_list, list_entry) { visit(node, &cur); }
 
-    destroy_nodes(&nodes);
-    kh_destroy(node, tbl);
+    destroy_node_list(&node_list);
+    kh_destroy(node, node_table);
 
     for (int i = 0; i < nstates; ++i)
-        mstates[i] = mm_state[i];
+        mstates[i] = mstate_arr[i];
 
-    free_c(mm_state);
+    free_c(mstate_arr);
     return 0;
 }
 
-static void create_nodes(struct mstate const** mstates, int nstates, struct list_head* nodes,
-                         khash_t(node) * table)
+static void create_nodes(struct mstate const** mstates, int nstates,
+                         struct list_head* node_list, khash_t(node) * node_table)
 {
     for (int i = 0; i < nstates; ++i) {
         struct mstate const* mstate = mstates[i];
@@ -85,27 +80,28 @@ static void create_nodes(struct mstate const** mstates, int nstates, struct list
         node->state = mstate_get_state(mstate);
         node->mm_state = mstate;
         node->mark = INITIAL_MARK;
-        INIT_LIST_HEAD(&node->edges);
+
+        INIT_LIST_HEAD(&node->edge_list);
         if (imm_lprob_is_zero(mstate_get_start(node->mm_state)))
-            list_add_tail(&node->list_entry, nodes);
+            list_add_tail(&node->list_entry, node_list);
         else
-            list_add(&node->list_entry, nodes);
+            list_add(&node->list_entry, node_list);
 
         int      ret = 0;
-        khiter_t iter = kh_put(node, table, node->state, &ret);
+        khiter_t iter = kh_put(node, node_table, node->state, &ret);
         BUG(ret == -1 || ret == 0);
-        kh_key(table, iter) = node->state;
-        kh_val(table, iter) = node;
+        kh_key(node_table, iter) = node->state;
+        kh_val(node_table, iter) = node;
     }
 
-    create_edges(nodes, table);
+    create_edges(node_list, node_table);
 }
 
-static void destroy_nodes(struct list_head* nodes)
+static void destroy_node_list(struct list_head* node_list)
 {
     struct node *node = NULL, *tmp = NULL;
 
-    list_for_each_entry_safe(node, tmp, nodes, list_entry)
+    list_for_each_entry_safe(node, tmp, node_list, list_entry)
     {
         list_del(&node->list_entry);
         destroy_node(node);
@@ -114,14 +110,14 @@ static void destroy_nodes(struct list_head* nodes)
 
 static void destroy_node(struct node* node)
 {
-    destroy_edges(&node->edges);
+    destroy_edges(&node->edge_list);
     free_c(node);
 }
 
-static void create_edges(struct list_head* nodes, khash_t(node) * table)
+static void create_edges(struct list_head* node_list, khash_t(node) * table)
 {
     struct node* node = NULL;
-    list_for_each_entry(node, nodes, list_entry)
+    list_for_each_entry(node, node_list, list_entry)
     {
         struct mm_trans const* trans = mstate_get_trans_c(node->mm_state);
         while (trans) {
@@ -133,7 +129,7 @@ static void create_edges(struct list_head* nodes, khash_t(node) * table)
                 BUG(i == kh_end(table));
 
                 edge->node = kh_val(table, i);
-                list_add(&edge->list_entry, &node->edges);
+                list_add(&edge->list_entry, &node->edge_list);
             }
 
             trans = mtrans_next_c(trans);
@@ -160,16 +156,16 @@ static void visit(struct node* node, struct mstate const*** mm_state)
 
     node->mark = TEMPORARY_MARK;
     struct edge const* edge = NULL;
-    list_for_each_entry(edge, &node->edges, list_entry) { visit(edge->node, mm_state); }
+    list_for_each_entry(edge, &node->edge_list, list_entry) { visit(edge->node, mm_state); }
     node->mark = PERMANENT_MARK;
     *mm_state -= 1;
     **mm_state = node->mm_state;
 }
 
-static int check_mute_cycles(struct list_head* nodes)
+static int check_mute_cycles(struct list_head* node_list)
 {
     struct node* node = NULL;
-    list_for_each_entry(node, nodes, list_entry)
+    list_for_each_entry(node, node_list, list_entry)
     {
         if (check_mute_visit(node))
             return 1;
@@ -192,7 +188,7 @@ static int check_mute_visit(struct node* node)
 
     node->mark = TEMPORARY_MARK;
     struct edge const* edge = NULL;
-    list_for_each_entry(edge, &node->edges, list_entry)
+    list_for_each_entry(edge, &node->edge_list, list_entry)
     {
         if (check_mute_visit(edge->node))
             return 1;
@@ -202,8 +198,8 @@ static int check_mute_visit(struct node* node)
     return 0;
 }
 
-static void unmark_nodes(struct list_head* nodes)
+static void unmark_nodes(struct list_head* node_list)
 {
     struct node* node = NULL;
-    list_for_each_entry(node, nodes, list_entry) { node->mark = INITIAL_MARK; }
+    list_for_each_entry(node, node_list, list_entry) { node->mark = INITIAL_MARK; }
 }
