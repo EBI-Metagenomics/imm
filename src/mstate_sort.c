@@ -5,6 +5,7 @@
 #include "list.h"
 #include "mstate.h"
 #include "mtrans.h"
+#include "state_idx.h"
 #include <stddef.h>
 #include <stdlib.h>
 
@@ -18,7 +19,6 @@ struct node
 {
     struct imm_state const* state;
     struct mstate const*    mm_state;
-    int                     idx;
     int                     mark;
     struct list_head        edges;
     struct list_head        list_entry;
@@ -129,10 +129,6 @@ static void destroy_nodes(struct list_head* nodes)
 static void destroy_node(struct node* node)
 {
     destroy_edges(&node->edges);
-    node->state = NULL;
-    node->mm_state = NULL;
-    node->idx = -1;
-    node->mark = INITIAL_MARK;
     free_c(node);
 }
 
@@ -175,7 +171,6 @@ static void destroy_edges(struct list_head* edges)
     struct edge *edge = NULL, *tmp = NULL;
     list_for_each_entry_safe(edge, tmp, edges, list_entry)
     {
-        edge->node = NULL;
         list_del(&edge->list_entry);
         free_c(edge);
     }
