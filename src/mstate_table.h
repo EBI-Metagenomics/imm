@@ -3,7 +3,6 @@
 
 struct imm_state;
 struct mstate;
-/* TODO: check whether I can just rename khash_t(mstate) to struct mstate_table. */
 struct mstate_table;
 
 struct mstate_table*  mstate_table_create(void);
