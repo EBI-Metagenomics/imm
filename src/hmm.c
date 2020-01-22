@@ -1,6 +1,5 @@
 #include "dp.h"
 #include "free.h"
-#include "hide.h"
 #include "imm/imm.h"
 #include "mstate.h"
 #include "mstate_sort.h"

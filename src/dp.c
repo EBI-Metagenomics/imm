@@ -2,7 +2,6 @@
 #include "array.h"
 #include "free.h"
 #include "gmatrix.h"
-#include "hide.h"
 #include "imm/imm.h"
 #include "list.h"
 #include "matrix.h"

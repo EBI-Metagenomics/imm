@@ -1,6 +1,5 @@
 #include "ascii.h"
 #include "free.h"
-#include "hide.h"
 #include "imm/imm.h"
 #include <limits.h>
 #include <stdlib.h>

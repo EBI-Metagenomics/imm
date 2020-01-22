@@ -8,7 +8,7 @@
 #define IMM_API __declspec(dllimport)
 #endif
 #else
-#define IMM_API
+#define IMM_API __attribute__((visibility("default")))
 #endif
 
 #endif

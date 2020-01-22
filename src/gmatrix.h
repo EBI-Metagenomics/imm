@@ -2,7 +2,6 @@
 #define IMM_GMATRIX_H
 
 #include "free.h"
-#include "hide.h"
 #include <stdlib.h>
 
 #define MAKE_GMATRIX_STRUCT(S, T)                                                             \
