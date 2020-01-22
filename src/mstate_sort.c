@@ -38,7 +38,7 @@ struct state_node
 
 KHASH_MAP_INIT_PTR(state_node, struct state_node*)
 
-static void create_nodes(struct mstate const* head, struct list_head* nodes,
+static void create_nodes(struct mstate const** mstates, int nstates, struct list_head* nodes,
                          khash_t(state_node) * table);
 static void destroy_nodes(struct list_head* nodes);
 static void destroy_node(struct node* node);
@@ -50,22 +50,24 @@ static int  check_mute_cycles(struct list_head* nodes);
 static int  check_mute_visit(struct node* node);
 static void unmark_nodes(struct list_head* nodes);
 
-struct mstate const* const* imm_mstate_sort(struct mstate const* mm_state_head)
+int imm_mstate_sort(struct mstate const** mstates, int nstates)
 {
     struct list_head nodes = LIST_HEAD_INIT(nodes);
 
+    /* TODO: i dont think i need a hash table for that if we start
+     * receiving an array of mstates.*/
     khash_t(state_node)* tbl = kh_init(state_node);
-    create_nodes(mm_state_head, &nodes, tbl);
+    create_nodes(mstates, nstates, &nodes, tbl);
 
     if (check_mute_cycles(&nodes)) {
         destroy_nodes(&nodes);
         destroy_state_nodes(tbl);
-        return NULL;
+        return 1;
     }
     unmark_nodes(&nodes);
 
-    size_t                nstates = (size_t)imm_mstate_nitems(mm_state_head);
-    struct mstate const** mm_state = malloc(sizeof(struct mstate*) * nstates);
+    /* size_t                nstates = (size_t)imm_mstate_nitems(mm_state_head); */
+    struct mstate const** mm_state = malloc(sizeof(struct mstate*) * (size_t)nstates);
     struct mstate const** cur = mm_state + nstates;
     struct node*          node = NULL;
     list_for_each_entry(node, &nodes, list_entry) { visit(node, &cur); }
@@ -73,18 +75,22 @@ struct mstate const* const* imm_mstate_sort(struct mstate const* mm_state_head)
     destroy_nodes(&nodes);
     destroy_state_nodes(tbl);
 
-    return mm_state;
+    for (int i = 0; i < nstates; ++i)
+        mstates[i] = mm_state[i];
+
+    free_c(mm_state);
+    return 0;
 }
 
-static void create_nodes(struct mstate const* head, struct list_head* nodes,
+static void create_nodes(struct mstate const** mstates, int nstates, struct list_head* nodes,
                          khash_t(state_node) * table)
 {
-    struct mstate const* mm_state = head;
-    while (mm_state) {
+    for (int i = 0; i < nstates; ++i) {
+        struct mstate const* mstate = mstates[i];
 
         struct node* node = malloc(sizeof(struct node));
-        node->state = imm_mstate_get_state(mm_state);
-        node->mm_state = mm_state;
+        node->state = imm_mstate_get_state(mstate);
+        node->mm_state = mstate;
         node->mark = INITIAL_MARK;
         INIT_LIST_HEAD(&node->edges);
         if (imm_lprob_is_zero(imm_mstate_get_start(node->mm_state)))
@@ -96,8 +102,8 @@ static void create_nodes(struct mstate const* head, struct list_head* nodes,
         state_node->state = node->state;
         state_node->node = node;
 
-        int     ret = 0;
-        khint_t iter = kh_put(state_node, table, state_node->state, &ret);
+        int      ret = 0;
+        khiter_t iter = kh_put(state_node, table, state_node->state, &ret);
         if (ret == -1)
             imm_die("hash table failed");
         if (ret == 0)
@@ -105,8 +111,6 @@ static void create_nodes(struct mstate const* head, struct list_head* nodes,
 
         kh_key(table, iter) = state_node->state;
         kh_val(table, iter) = state_node;
-
-        mm_state = imm_mstate_next_c(mm_state);
     }
 
     create_edges(nodes, table);
@@ -135,7 +139,7 @@ static void destroy_node(struct node* node)
 
 static void destroy_state_nodes(khash_t(state_node) * table)
 {
-    for (khint_t i = kh_begin(table); i < kh_end(table); ++i) {
+    for (khiter_t i = kh_begin(table); i < kh_end(table); ++i) {
         if (kh_exist(table, i))
             free_c(kh_val(table, i));
     }
@@ -154,7 +158,7 @@ static void create_edges(struct list_head* nodes, khash_t(state_node) * table)
                 struct edge*            edge = malloc(sizeof(struct edge));
                 struct imm_state const* state = imm_mtrans_get_state(trans);
 
-                khint_t i = kh_get(state_node, table, state);
+                khiter_t i = kh_get(state_node, table, state);
                 if (i == kh_end(table))
                     imm_die("state not found");
 

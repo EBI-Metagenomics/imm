@@ -38,7 +38,7 @@ void imm_sequence_table_destroy(struct imm_sequence_table const* table)
 
     khash_t(emission)* emiss_tbl = table->emission_table;
 
-    for (khint_t i = kh_begin(emiss_tbl); i < kh_end(emiss_tbl); ++i) {
+    for (khiter_t i = kh_begin(emiss_tbl); i < kh_end(emiss_tbl); ++i) {
         if (kh_exist(emiss_tbl, i)) {
             struct emission const* e = kh_val(emiss_tbl, i);
             free_c(e->seq);
@@ -62,8 +62,8 @@ int imm_sequence_table_add(struct imm_sequence_table* table, char const* seq,
         }
     }
 
-    int     ret = 0;
-    khint_t iter = kh_put(emission, table->emission_table, seq, &ret);
+    int      ret = 0;
+    khiter_t iter = kh_put(emission, table->emission_table, seq, &ret);
     if (ret == -1) {
         imm_error("hash table failed");
         return 1;
@@ -88,13 +88,13 @@ int imm_sequence_table_add(struct imm_sequence_table* table, char const* seq,
 
 int imm_sequence_table_normalize(struct imm_sequence_table* table)
 {
-    khint_t const len = kh_size(table->emission_table);
-    double*       lprobs = malloc(sizeof(double) * (size_t)len);
-    double*       lprob = lprobs;
+    khiter_t const len = kh_size(table->emission_table);
+    double*        lprobs = malloc(sizeof(double) * (size_t)len);
+    double*        lprob = lprobs;
 
     khash_t(emission)* emiss_tbl = table->emission_table;
 
-    for (khint_t i = kh_begin(emiss_tbl); i < kh_end(emiss_tbl); ++i) {
+    for (khiter_t i = kh_begin(emiss_tbl); i < kh_end(emiss_tbl); ++i) {
         if (kh_exist(emiss_tbl, i)) {
             *lprob = kh_val(emiss_tbl, i)->lprob;
             ++lprob;
@@ -107,7 +107,7 @@ int imm_sequence_table_normalize(struct imm_sequence_table* table)
     }
 
     lprob = lprobs;
-    for (khint_t i = kh_begin(emiss_tbl); i < kh_end(emiss_tbl); ++i) {
+    for (khiter_t i = kh_begin(emiss_tbl); i < kh_end(emiss_tbl); ++i) {
         if (kh_exist(emiss_tbl, i)) {
             kh_val(emiss_tbl, i)->lprob = *lprob;
             ++lprob;
@@ -122,7 +122,7 @@ double imm_sequence_table_lprob(struct imm_sequence_table const* table, char con
                                 int seq_len)
 {
     char const* key = strndup(seq, (size_t)seq_len);
-    khint_t     i = kh_get(emission, table->emission_table, key);
+    khiter_t    i = kh_get(emission, table->emission_table, key);
     free_c(key);
 
     if (i == kh_end(table->emission_table))

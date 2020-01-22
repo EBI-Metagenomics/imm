@@ -5,6 +5,6 @@
 
 struct mstate;
 
-HIDE struct mstate const* const* imm_mstate_sort(struct mstate const* mm_state_head);
+HIDE int imm_mstate_sort(struct mstate const** mstates, int nstates);
 
 #endif

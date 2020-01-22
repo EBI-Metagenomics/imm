@@ -4,6 +4,7 @@
 #include "imm/imm.h"
 #include "mstate.h"
 #include "mstate_sort.h"
+#include "mstate_table.h"
 #include "mtrans.h"
 #include <stdlib.h>
 #include <string.h>
@@ -11,19 +12,18 @@
 struct imm_hmm
 {
     struct imm_abc const* abc;
-
-    struct mstate* mm_states;
+    struct mstate_table*  table;
 };
 
 static double hmm_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state);
-static int    hmm_normalize_trans(struct mstate* mm_state);
+static int    hmm_normalize_trans(struct mstate* mstate);
 static int    abc_has_symbols(struct imm_abc const* abc, char const* seq, int seq_len);
 
 struct imm_hmm* imm_hmm_create(struct imm_abc const* abc)
 {
     struct imm_hmm* hmm = malloc(sizeof(struct imm_hmm));
     hmm->abc = abc;
-    imm_mstate_create(&hmm->mm_states);
+    hmm->table = imm_mstate_table_create();
     return hmm;
 }
 
@@ -34,9 +34,7 @@ void imm_hmm_destroy(struct imm_hmm* hmm)
         return;
     }
 
-    imm_mstate_destroy(&hmm->mm_states);
-
-    hmm->abc = NULL;
+    imm_mstate_table_destroy(hmm->table);
     free_c(hmm);
 }
 
@@ -47,51 +45,52 @@ int imm_hmm_add_state(struct imm_hmm* hmm, struct imm_state const* state, double
         return 1;
     }
 
-    if (imm_mstate_find(hmm->mm_states, state) != NULL) {
+    unsigned long i = imm_mstate_table_find(hmm->table, state);
+    if (i != imm_mstate_table_end(hmm->table)) {
         imm_error("state already exists");
         return 1;
     }
 
-    imm_mstate_add_state(&hmm->mm_states, state, start_lprob);
+    struct mstate* mstate = imm_mstate_create(state, start_lprob);
+    imm_mstate_table_add(hmm->table, mstate);
     return 0;
 }
 
 int imm_hmm_del_state(struct imm_hmm* hmm, struct imm_state const* state)
 {
-    if (imm_mstate_del_state(&hmm->mm_states, state)) {
+    unsigned long i = imm_mstate_table_find(hmm->table, state);
+    if (i == imm_mstate_table_end(hmm->table)) {
         imm_error("state not found");
         return 1;
     }
 
-    struct mstate* curr = hmm->mm_states;
-    while (curr) {
-        imm_mstate_del_trans(curr, state);
-        curr = imm_mstate_next(curr);
-    }
-
+    imm_mstate_table_del(hmm->table, i);
     return 0;
 }
 
 int imm_hmm_set_start(struct imm_hmm* hmm, struct imm_state const* state, double lprob)
 {
-    struct mstate* mm_state = imm_mstate_find(hmm->mm_states, state);
-    if (!mm_state)
+    unsigned long i = imm_mstate_table_find(hmm->table, state);
+    if (i == imm_mstate_table_end(hmm->table)) {
+        imm_error("state not found");
         return 1;
+    }
 
-    imm_mstate_set_start(mm_state, lprob);
+    imm_mstate_set_start(imm_mstate_table_get(hmm->table, i), lprob);
     return 0;
 }
 
 int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state,
                       struct imm_state const* dst_state, double lprob)
 {
-    struct mstate* src = imm_mstate_find(hmm->mm_states, src_state);
-    if (!src) {
+    unsigned long src = imm_mstate_table_find(hmm->table, src_state);
+    if (src == imm_mstate_table_end(hmm->table)) {
         imm_error("source state not found");
         return 1;
     }
 
-    if (!imm_mstate_find_c(hmm->mm_states, dst_state)) {
+    unsigned long dst = imm_mstate_table_find(hmm->table, dst_state);
+    if (dst == imm_mstate_table_end(hmm->table)) {
         imm_error("destination state not found");
         return 1;
     }
@@ -101,8 +100,10 @@ int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state,
         return 1;
     }
 
-    struct mm_trans** head_ptr = imm_mstate_get_trans_ptr(src);
-    struct mm_trans*  mm_trans = imm_mtrans_find(*head_ptr, dst_state);
+    struct mm_trans** head_ptr =
+        imm_mstate_get_trans_ptr(imm_mstate_table_get(hmm->table, src));
+
+    struct mm_trans* mm_trans = imm_mtrans_find(*head_ptr, dst_state);
     if (mm_trans)
         imm_mtrans_set_lprob(mm_trans, lprob);
     else
@@ -114,19 +115,20 @@ int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state,
 double imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* src_state,
                          struct imm_state const* dst_state)
 {
-    struct mstate const* src = imm_mstate_find_c(hmm->mm_states, src_state);
-    if (!src) {
+    unsigned long src = imm_mstate_table_find(hmm->table, src_state);
+    if (src == imm_mstate_table_end(hmm->table)) {
         imm_error("source state not found");
         return imm_lprob_invalid();
     }
 
-    if (!imm_mstate_find_c(hmm->mm_states, dst_state)) {
+    unsigned long dst = imm_mstate_table_find(hmm->table, dst_state);
+    if (dst == imm_mstate_table_end(hmm->table)) {
         imm_error("destination state not found");
         return imm_lprob_invalid();
     }
 
-    struct mm_trans const* mm_trans =
-        imm_mtrans_find_c(imm_mstate_get_trans_c(src), dst_state);
+    struct mm_trans const* mm_trans = imm_mtrans_find_c(
+        imm_mstate_get_trans_c(imm_mstate_table_get(hmm->table, src)), dst_state);
     if (!mm_trans)
         return imm_lprob_zero();
 
@@ -210,7 +212,8 @@ double imm_hmm_viterbi(struct imm_hmm const* hmm, char const* seq,
         return imm_lprob_invalid();
     }
 
-    if (!imm_mstate_find_c(hmm->mm_states, end_state)) {
+    unsigned long end = imm_mstate_table_find(hmm->table, end_state);
+    if (end == imm_mstate_table_end(hmm->table)) {
         imm_error("end_state not found");
         return imm_lprob_invalid();
     }
@@ -226,16 +229,18 @@ double imm_hmm_viterbi(struct imm_hmm const* hmm, char const* seq,
         return imm_lprob_invalid();
     }
 
-    struct mstate const* const* mm_states = imm_mstate_sort(hmm->mm_states);
-    if (!mm_states)
+    struct mstate const** mstates = imm_mstate_table_array(hmm->table);
+    if (imm_mstate_sort(mstates, imm_mstate_table_nitems(hmm->table))) {
+        free_c(mstates);
         return imm_lprob_invalid();
+    }
 
     struct dp* dp =
-        imm_dp_create(mm_states, imm_mstate_nitems(hmm->mm_states), seq, end_state);
+        imm_dp_create(mstates, imm_mstate_table_nitems(hmm->table), seq, end_state);
     double score = imm_dp_viterbi(dp, path);
     imm_dp_destroy(dp);
 
-    free_c(mm_states);
+    free_c(mstates);
     return score;
 }
 
@@ -244,67 +249,77 @@ int imm_hmm_normalize(struct imm_hmm* hmm)
     if (imm_hmm_normalize_start(hmm))
         return 1;
 
-    struct mstate* mm_state = hmm->mm_states;
-    while (mm_state) {
-        if (hmm_normalize_trans(mm_state))
-            return 1;
-        mm_state = imm_mstate_next(mm_state);
+    unsigned long i = 0;
+    mstate_table_for_each(i, hmm->table)
+    {
+        if (imm_mstate_table_exist(hmm->table, i)) {
+
+            if (hmm_normalize_trans(imm_mstate_table_get(hmm->table, i)))
+                return 1;
+        }
     }
     return 0;
 }
 
 int imm_hmm_normalize_start(struct imm_hmm* hmm)
 {
-    struct mstate const* mm_state = hmm->mm_states;
-    if (!mm_state)
+    int size = imm_mstate_table_nitems(hmm->table);
+    if (size == 0)
         return 0;
 
-    double lnorm = imm_mstate_get_start(mm_state);
+    double* lprobs = malloc(sizeof(double) * (size_t)size);
+    double* lprob = lprobs;
 
-    goto enter;
-    while (mm_state) {
-        lnorm = imm_lprob_add(lnorm, imm_mstate_get_start(mm_state));
-    enter:
-        mm_state = imm_mstate_next_c(mm_state);
+    unsigned long i = 0;
+    mstate_table_for_each(i, hmm->table)
+    {
+        if (imm_mstate_table_exist(hmm->table, i)) {
+            *lprob = imm_mstate_get_start(imm_mstate_table_get(hmm->table, i));
+            ++lprob;
+        }
     }
 
-    if (imm_lprob_is_zero(lnorm)) {
+    if (imm_lprob_normalize(lprobs, size)) {
         imm_error("no starting state is possible");
         return 1;
     }
 
-    struct mstate* t = hmm->mm_states;
-    while (t) {
-        imm_mstate_set_start(t, imm_mstate_get_start(t) - lnorm);
-        t = imm_mstate_next(t);
+    lprob = lprobs;
+    mstate_table_for_each(i, hmm->table)
+    {
+        if (imm_mstate_table_exist(hmm->table, i)) {
+            imm_mstate_set_start(imm_mstate_table_get(hmm->table, i), *lprob);
+            ++lprob;
+        }
     }
+    free_c(lprobs);
 
     return 0;
 }
 
 int imm_hmm_normalize_trans(struct imm_hmm* hmm, struct imm_state const* src)
 {
-    struct mstate* state = imm_mstate_find(hmm->mm_states, src);
-    if (!state) {
+    unsigned long i = imm_mstate_table_find(hmm->table, src);
+    if (i == imm_mstate_table_end(hmm->table)) {
         imm_error("source state not found");
         return 1;
     }
-    return hmm_normalize_trans(state);
+    return hmm_normalize_trans(imm_mstate_table_get(hmm->table, i));
 }
 
 static double hmm_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state)
 {
-    struct mstate const* mm_state = imm_mstate_find(hmm->mm_states, state);
-    if (!mm_state) {
+    unsigned long i = imm_mstate_table_find(hmm->table, state);
+    if (i == imm_mstate_table_end(hmm->table)) {
         imm_error("state not found");
         return imm_lprob_invalid();
     }
-    return imm_mstate_get_start(mm_state);
+    return imm_mstate_get_start(imm_mstate_table_get(hmm->table, i));
 }
 
-static int hmm_normalize_trans(struct mstate* mm_state)
+static int hmm_normalize_trans(struct mstate* mstate)
 {
-    struct mm_trans const* mm_trans = imm_mstate_get_trans_c(mm_state);
+    struct mm_trans const* mm_trans = imm_mstate_get_trans_c(mstate);
     double                 lnorm = imm_lprob_zero();
 
     while (mm_trans) {
@@ -317,7 +332,7 @@ static int hmm_normalize_trans(struct mstate* mm_state)
         return 1;
     }
 
-    struct mm_trans* t = imm_mstate_get_trans(mm_state);
+    struct mm_trans* t = imm_mstate_get_trans(mstate);
     while (t) {
         imm_mtrans_set_lprob(t, imm_mtrans_get_lprob(t) - lnorm);
         t = imm_mtrans_next(t);

@@ -19,6 +19,7 @@ add_library(imm
     src/matrix.c
     src/mstate.c
     src/mstate_sort.c
+    src/mstate_table.c
     src/mtrans.c
     src/mute_state.c
     src/normal_state.c

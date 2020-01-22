@@ -25,18 +25,19 @@ struct state_idx* imm_state_idx_create(void)
 
 void imm_state_idx_destroy(struct state_idx* state_idx)
 {
-    for (khint_t i = kh_begin(state_idx->table); i < kh_end(state_idx->table); ++i) {
+    for (khiter_t i = kh_begin(state_idx->table); i < kh_end(state_idx->table); ++i) {
         if (kh_exist(state_idx->table, i))
             free_c(kh_val(state_idx->table, i));
     }
 
     kh_destroy(item, state_idx->table);
+    free_c(state_idx);
 }
 
 void imm_state_idx_add(struct state_idx* state_idx, struct imm_state const* state, int idx)
 {
-    int     ret = 0;
-    khint_t iter = kh_put(item, state_idx->table, state, &ret);
+    int      ret = 0;
+    khiter_t iter = kh_put(item, state_idx->table, state, &ret);
     if (ret == -1)
         imm_die("hash table failed");
     if (ret == 0)
@@ -52,7 +53,7 @@ void imm_state_idx_add(struct state_idx* state_idx, struct imm_state const* stat
 
 int imm_state_idx_find(struct state_idx const* state_idx, struct imm_state const* state)
 {
-    khint_t i = kh_get(item, state_idx->table, state);
+    khiter_t i = kh_get(item, state_idx->table, state);
 
     if (i == kh_end(state_idx->table))
         imm_die("state not found");
