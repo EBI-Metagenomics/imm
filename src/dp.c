@@ -270,7 +270,7 @@ static void create_trans(struct state_info* states, struct mstate const* const* 
         struct imm_state const* src_state = mstate_get_state(mm_states[i]);
         int                     src = state_idx_find(state_idx, src_state);
 
-        struct mm_trans const* t = NULL;
+        struct mtrans const* t = NULL;
         for (t = mstate_get_trans_c(mm_states[i]); t; t = mtrans_next_c(t)) {
 
             double lprob = mtrans_get_lprob(t);

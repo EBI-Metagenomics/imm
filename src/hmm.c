@@ -99,9 +99,9 @@ int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state,
         return 1;
     }
 
-    struct mm_trans** head_ptr = mstate_get_trans_ptr(mstate_table_get(hmm->table, src));
+    struct mtrans** head_ptr = mstate_get_trans_ptr(mstate_table_get(hmm->table, src));
 
-    struct mm_trans* mm_trans = mtrans_find(*head_ptr, dst_state);
+    struct mtrans* mm_trans = mtrans_find(*head_ptr, dst_state);
     if (mm_trans)
         mtrans_set_lprob(mm_trans, lprob);
     else
@@ -125,7 +125,7 @@ double imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* src_
         return imm_lprob_invalid();
     }
 
-    struct mm_trans const* mm_trans =
+    struct mtrans const* mm_trans =
         mtrans_find_c(mstate_get_trans_c(mstate_table_get(hmm->table, src)), dst_state);
     if (!mm_trans)
         return imm_lprob_zero();
@@ -316,7 +316,7 @@ static double hmm_start_lprob(struct imm_hmm const* hmm, struct imm_state const*
 
 static int hmm_normalize_trans(struct mstate* mstate)
 {
-    struct mm_trans const* mm_trans = mstate_get_trans_c(mstate);
+    struct mtrans const* mm_trans = mstate_get_trans_c(mstate);
     double                 lnorm = imm_lprob_zero();
 
     while (mm_trans) {
@@ -329,7 +329,7 @@ static int hmm_normalize_trans(struct mstate* mstate)
         return 1;
     }
 
-    struct mm_trans* t = mstate_get_trans(mstate);
+    struct mtrans* t = mstate_get_trans(mstate);
     while (t) {
         mtrans_set_lprob(t, mtrans_get_lprob(t) - lnorm);
         t = mtrans_next(t);

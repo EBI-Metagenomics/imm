@@ -119,7 +119,7 @@ static void create_edges(struct list_head* node_list, khash_t(node) * table)
     struct node* node = NULL;
     list_for_each_entry(node, node_list, list_entry)
     {
-        struct mm_trans const* trans = mstate_get_trans_c(node->mm_state);
+        struct mtrans const* trans = mstate_get_trans_c(node->mm_state);
         while (trans) {
             if (!imm_lprob_is_zero(mtrans_get_lprob(trans))) {
                 struct edge*            edge = malloc(sizeof(struct edge));
