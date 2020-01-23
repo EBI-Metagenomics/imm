@@ -127,7 +127,7 @@ void test_hmm_likelihood_single_state(void)
     struct imm_hmm*          hmm = imm_hmm_create(abc);
 
     imm_hmm_add_state(hmm, cast_c(state), log(0.5));
-    cass_cond(imm_hmm_normalize(hmm) == 1);
+    cass_cond(imm_hmm_normalize(hmm) == 0);
 
     struct imm_path* path = imm_path_create();
     imm_path_append(path, cast_c(state), 1);
@@ -176,10 +176,10 @@ void test_hmm_likelihood_single_state(void)
     cass_cond(!is_valid(imm_hmm_likelihood(hmm, "A", NULL)));
     cass_cond(!is_valid(imm_hmm_likelihood(hmm, NULL, NULL)));
 
+    cass_cond(imm_hmm_normalize(hmm) == 0);
+    cass_cond(imm_hmm_set_trans(hmm, cast_c(state), cast_c(state), zero()) == 0);
     cass_cond(imm_hmm_normalize(hmm) == 1);
-    imm_hmm_set_trans(hmm, cast_c(state), cast_c(state), zero());
-    cass_cond(imm_hmm_normalize(hmm) == 1);
-    imm_hmm_set_trans(hmm, cast_c(state), cast_c(state), log(0.5));
+    cass_cond(imm_hmm_set_trans(hmm, cast_c(state), cast_c(state), log(0.5)) == 0);
 
     path = imm_path_create();
     imm_path_append(path, cast_c(state), 1);
@@ -315,6 +315,7 @@ void test_hmm_likelihood_two_mute_states(void)
     struct imm_path* path = imm_path_create();
     imm_path_append(path, cast_c(S0), 0);
     imm_path_append(path, cast_c(S1), 0);
+    imm_error("Ponto 1");
     cass_close(imm_hmm_likelihood(hmm, "", path), 0.0);
     imm_path_destroy(path);
 
@@ -480,9 +481,7 @@ void test_hmm_viterbi_two_mute_states(void)
 
     imm_hmm_set_trans(hmm, cast_c(state0), cast_c(state1), log(0.1));
 
-    path = imm_path_create();
-    cass_close(imm_hmm_viterbi(hmm, "", cast_c(state0), NULL), log(0.5));
-    imm_path_destroy(path);
+    cass_cond(!imm_lprob_is_valid(imm_hmm_viterbi(hmm, "", cast_c(state0), NULL)));
 
     path = imm_path_create();
     cass_close(imm_hmm_viterbi(hmm, "", cast_c(state1), path), log(0.5) + log(0.1));
@@ -862,9 +861,6 @@ void test_hmm_viterbi_normal_states(void)
     cass_close(imm_hmm_viterbi(hmm, "AA", cast_c(state0), path), 2 * log(0.25) + log(0.9));
     cass_close(imm_hmm_likelihood(hmm, "AA", path), 2 * log(0.25) + log(0.9));
     imm_path_destroy(path);
-
-    double desired = log(0.25) + log(0.5 / 2.25) + log(0.2);
-    cass_close(imm_hmm_viterbi(hmm, "AA", cast_c(state1), NULL), desired);
 
     imm_hmm_destroy(hmm);
     imm_normal_state_destroy(state0);

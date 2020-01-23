@@ -5,6 +5,7 @@
 #include "khash_ptr.h"
 #include "mstate.h"
 #include "mtrans.h"
+#include "mtrans_table.h"
 
 KHASH_MAP_INIT_PTR(mstate, struct mstate*)
 
@@ -70,7 +71,10 @@ void mstate_table_del(struct mstate_table* table, unsigned long iter)
     mstate_table_for_each(i, table)
     {
         if (mstate_table_exist(table, i)) {
-            mstate_del_trans(kh_val(table->ktable, i), state);
+            struct mtrans_table* tbl = mstate_get_mtrans_table(mstate_table_get(table, i));
+            unsigned long        j = mtrans_table_find(tbl, state);
+            if (j != mtrans_table_end(tbl))
+                mtrans_table_del(tbl, j);
         }
     }
 }

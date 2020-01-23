@@ -8,6 +8,7 @@
 #include "list.h"
 #include "mstate.h"
 #include "mtrans.h"
+#include "mtrans_table.h"
 
 #define INITIAL_MARK 0
 #define TEMPORARY_MARK 1
@@ -119,20 +120,23 @@ static void create_edges(struct list_head* node_list, khash_t(node) * table)
     struct node* node = NULL;
     list_for_each_entry(node, node_list, list_entry)
     {
-        struct mtrans const* trans = mstate_get_trans_c(node->mm_state);
-        while (trans) {
-            if (!imm_lprob_is_zero(mtrans_get_lprob(trans))) {
+        struct mtrans_table const* mtrans_table = mstate_get_mtrans_table(node->mm_state);
+        unsigned long              i = 0;
+        mtrans_table_for_each(i, mtrans_table)
+        {
+            if (!mtrans_table_exist(mtrans_table, i))
+                continue;
+            struct mtrans const* mtrans = mtrans_table_get(mtrans_table, i);
+            if (!imm_lprob_is_zero(mtrans_get_lprob(mtrans))) {
                 struct edge*            edge = malloc(sizeof(struct edge));
-                struct imm_state const* state = mtrans_get_state(trans);
+                struct imm_state const* state = mtrans_get_state(mtrans);
 
-                khiter_t i = kh_get(node, table, state);
-                BUG(i == kh_end(table));
+                khiter_t iter = kh_get(node, table, state);
+                BUG(iter == kh_end(table));
 
-                edge->node = kh_val(table, i);
+                edge->node = kh_val(table, iter);
                 list_add(&edge->list_entry, &node->edge_list);
             }
-
-            trans = mtrans_next_c(trans);
         }
     }
 }

@@ -21,6 +21,7 @@ add_library(imm
     src/mstate_sort.c
     src/mstate_table.c
     src/mtrans.c
+    src/mtrans_table.c
     src/mute_state.c
     src/normal_state.c
     src/path.c

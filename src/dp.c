@@ -8,6 +8,7 @@
 #include "min.h"
 #include "mstate.h"
 #include "mtrans.h"
+#include "mtrans_table.h"
 #include "state_idx.h"
 #include "string.h"
 #include <limits.h>
@@ -262,22 +263,26 @@ static void viterbi_path(struct dp* dp, struct imm_path* path, struct step const
     }
 }
 
-static void create_trans(struct state_info* states, struct mstate const* const* mm_states,
+static void create_trans(struct state_info* states, struct mstate const* const* mstates,
                          int nstates, struct state_idx* state_idx)
 {
     for (int i = 0; i < nstates; ++i) {
 
-        struct imm_state const* src_state = mstate_get_state(mm_states[i]);
-        int                     src = state_idx_find(state_idx, src_state);
+        struct imm_state const*    src_state = mstate_get_state(mstates[i]);
+        int                        src = state_idx_find(state_idx, src_state);
+        struct mtrans_table const* table = mstate_get_mtrans_table(mstates[i]);
 
-        struct mtrans const* t = NULL;
-        for (t = mstate_get_trans_c(mm_states[i]); t; t = mtrans_next_c(t)) {
-
-            double lprob = mtrans_get_lprob(t);
+        unsigned long iter = 0;
+        mtrans_table_for_each(iter, table)
+        {
+            if (!mtrans_table_exist(table, iter))
+                continue;
+            struct mtrans const* mtrans = mtrans_table_get(table, iter);
+            double               lprob = mtrans_get_lprob(mtrans);
             if (imm_lprob_is_zero(lprob))
                 continue;
 
-            struct imm_state const* dst_state = mtrans_get_state(t);
+            struct imm_state const* dst_state = mtrans_get_state(mtrans);
             int                     dst = state_idx_find(state_idx, dst_state);
 
             struct trans* trans = array_trans_append(&states[dst].incoming_transitions);
