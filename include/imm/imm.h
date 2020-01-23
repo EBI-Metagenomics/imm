@@ -13,10 +13,9 @@ extern "C"
 #include "imm/normal_state.h"
 #include "imm/path.h"
 #include "imm/report.h"
-#include "imm/state.h"
-#include "imm/step.h"
-#include "imm/table_state.h"
 #include "imm/sequence_table.h"
+#include "imm/state.h"
+#include "imm/table_state.h"
 
 #ifdef __cplusplus
 }

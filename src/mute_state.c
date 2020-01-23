@@ -5,14 +5,14 @@
 
 struct imm_mute_state
 {
-    struct imm_state* interface;
+    struct imm_state const* interface;
 };
 
 static double mute_state_lprob(struct imm_state const* state, char const* seq, int seq_len);
 static int    mute_state_min_seq(struct imm_state const* state);
 static int    mute_state_max_seq(struct imm_state const* state);
 
-struct imm_mute_state* imm_mute_state_create(char const* name, struct imm_abc const* abc)
+struct imm_mute_state const* imm_mute_state_create(char const* name, struct imm_abc const* abc)
 {
     struct imm_mute_state* state = malloc(sizeof(struct imm_mute_state));
 

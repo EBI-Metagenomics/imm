@@ -15,8 +15,8 @@ struct imm_state
     void*               impl;
 };
 
-struct imm_state* imm_state_create(char const* name, struct imm_abc const* abc,
-                                   struct imm_state_funcs funcs, void* impl)
+struct imm_state const* imm_state_create(char const* name, struct imm_abc const* abc,
+                                         struct imm_state_funcs funcs, void* impl)
 {
     if (imm_abc_length(abc) == 0) {
         imm_error("empty alphabet");
@@ -70,15 +70,6 @@ int imm_state_min_seq(struct imm_state const* state) { return state->min_seq(sta
 
 int imm_state_max_seq(struct imm_state const* state) { return state->max_seq(state); }
 
-struct imm_state* imm_state_cast(void* state)
-{
-    struct type
-    {
-        struct imm_state* state;
-    }* t = state;
-    return t->state;
-}
-
 struct imm_state const* imm_state_cast_c(void const* state)
 {
     struct type_c
@@ -87,7 +78,5 @@ struct imm_state const* imm_state_cast_c(void const* state)
     } const* t = state;
     return t->state;
 }
-
-void* imm_state_get_impl(struct imm_state* state) { return state->impl; }
 
 void const* imm_state_get_impl_c(struct imm_state const* state) { return state->impl; }

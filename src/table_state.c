@@ -6,7 +6,7 @@
 
 struct imm_table_state
 {
-    struct imm_state*                interface;
+    struct imm_state const*          interface;
     struct imm_sequence_table const* table;
 };
 

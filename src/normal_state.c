@@ -6,16 +6,17 @@
 
 struct imm_normal_state
 {
-    struct imm_state* interface;
-    double*           lprobs;
+    struct imm_state const* interface;
+    double*                 lprobs;
 };
 
 static double normal_state_lprob(struct imm_state const* state, char const* seq, int seq_len);
 static int    normal_state_min_seq(struct imm_state const* state);
 static int    normal_state_max_seq(struct imm_state const* state);
 
-struct imm_normal_state* imm_normal_state_create(char const* name, struct imm_abc const* abc,
-                                                 double const* lprobs)
+struct imm_normal_state const* imm_normal_state_create(char const*           name,
+                                                       struct imm_abc const* abc,
+                                                       double const*         lprobs)
 {
     struct imm_normal_state* state = malloc(sizeof(struct imm_normal_state));
 

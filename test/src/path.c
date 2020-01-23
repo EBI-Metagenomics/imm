@@ -13,9 +13,9 @@ void test_path(void)
 {
     struct imm_abc const* abc = imm_abc_create("ACGT", '*');
 
-    double                   lprobs[] = {log(0.25), log(0.25), log(0.5), imm_lprob_zero()};
-    struct imm_normal_state* state0 = imm_normal_state_create("State0", abc, lprobs);
-    struct imm_normal_state* state1 = imm_normal_state_create("State1", abc, lprobs);
+    double lprobs[] = {log(0.25), log(0.25), log(0.5), imm_lprob_zero()};
+    struct imm_normal_state const* state0 = imm_normal_state_create("State0", abc, lprobs);
+    struct imm_normal_state const* state1 = imm_normal_state_create("State1", abc, lprobs);
 
     struct imm_path* path = imm_path_create();
 

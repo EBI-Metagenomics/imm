@@ -57,9 +57,9 @@ static inline int                     is_valid(double a) { return imm_lprob_is_v
 
 void test_hmm_state_id(void)
 {
-    struct imm_abc const*  abc = imm_abc_create("ACGT", '*');
-    struct imm_mute_state* state = imm_mute_state_create("State0", abc);
-    struct imm_hmm*        hmm = imm_hmm_create(abc);
+    struct imm_abc const*        abc = imm_abc_create("ACGT", '*');
+    struct imm_mute_state const* state = imm_mute_state_create("State0", abc);
+    struct imm_hmm*              hmm = imm_hmm_create(abc);
 
     cass_cond(imm_hmm_add_state(hmm, cast_c(state), log(1.0)) == 0);
     cass_cond(imm_hmm_add_state(hmm, cast_c(state), log(1.0)) == 1);
@@ -71,10 +71,10 @@ void test_hmm_state_id(void)
 
 void test_hmm_del_get_state(void)
 {
-    struct imm_abc const*  abc = imm_abc_create("ACGT", '*');
-    struct imm_mute_state* state0 = imm_mute_state_create("State0", abc);
-    struct imm_mute_state* state1 = imm_mute_state_create("State1", abc);
-    struct imm_hmm*        hmm = imm_hmm_create(abc);
+    struct imm_abc const*        abc = imm_abc_create("ACGT", '*');
+    struct imm_mute_state const* state0 = imm_mute_state_create("State0", abc);
+    struct imm_mute_state const* state1 = imm_mute_state_create("State1", abc);
+    struct imm_hmm*              hmm = imm_hmm_create(abc);
 
     cass_cond(imm_hmm_add_state(hmm, cast_c(state0), log(0.5)) == 0);
     cass_cond(imm_hmm_add_state(hmm, cast_c(state1), log(0.5)) == 0);
@@ -99,10 +99,10 @@ void test_hmm_del_get_state(void)
 void test_hmm_set_trans(void)
 {
 
-    struct imm_abc const*  abc = imm_abc_create("ACGT", '*');
-    struct imm_mute_state* state0 = imm_mute_state_create("State0", abc);
-    struct imm_mute_state* state1 = imm_mute_state_create("State1", abc);
-    struct imm_hmm*        hmm = imm_hmm_create(abc);
+    struct imm_abc const*        abc = imm_abc_create("ACGT", '*');
+    struct imm_mute_state const* state0 = imm_mute_state_create("State0", abc);
+    struct imm_mute_state const* state1 = imm_mute_state_create("State1", abc);
+    struct imm_hmm*              hmm = imm_hmm_create(abc);
 
     imm_hmm_add_state(hmm, cast_c(state0), log(0.5));
     imm_hmm_add_state(hmm, cast_c(state1), log(0.5));
@@ -123,8 +123,8 @@ void test_hmm_likelihood_single_state(void)
 
     double lprobs[] = {log(0.25), log(0.25), log(0.5), zero()};
 
-    struct imm_normal_state* state = imm_normal_state_create("State0", abc, lprobs);
-    struct imm_hmm*          hmm = imm_hmm_create(abc);
+    struct imm_normal_state const* state = imm_normal_state_create("State0", abc, lprobs);
+    struct imm_hmm*                hmm = imm_hmm_create(abc);
 
     imm_hmm_add_state(hmm, cast_c(state), log(0.5));
     cass_cond(imm_hmm_normalize(hmm) == 0);
@@ -204,11 +204,11 @@ void test_hmm_likelihood_two_states(void)
     struct imm_abc const* abc = imm_abc_create("ACGT", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
-    double                   lprobs0[] = {log(0.25), log(0.25), log(0.5), zero()};
-    struct imm_normal_state* state0 = imm_normal_state_create("State0", abc, lprobs0);
+    double                         lprobs0[] = {log(0.25), log(0.25), log(0.5), zero()};
+    struct imm_normal_state const* state0 = imm_normal_state_create("State0", abc, lprobs0);
 
-    double                   lprobs1[] = {log(0.5), log(0.25), log(0.5), log(1.0)};
-    struct imm_normal_state* state1 = imm_normal_state_create("State1", abc, lprobs1);
+    double                         lprobs1[] = {log(0.5), log(0.25), log(0.5), log(1.0)};
+    struct imm_normal_state const* state1 = imm_normal_state_create("State1", abc, lprobs1);
 
     imm_hmm_add_state(hmm, cast_c(state0), log(1.0));
     imm_hmm_add_state(hmm, cast_c(state1), zero());
@@ -256,7 +256,7 @@ void test_hmm_likelihood_mute_state(void)
     struct imm_abc const* abc = imm_abc_create("ACGT", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
-    struct imm_mute_state* state = imm_mute_state_create("State0", abc);
+    struct imm_mute_state const* state = imm_mute_state_create("State0", abc);
 
     imm_hmm_add_state(hmm, cast_c(state), log(1.0));
 
@@ -304,8 +304,8 @@ void test_hmm_likelihood_two_mute_states(void)
     struct imm_abc const* abc = imm_abc_create("ACGT", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
-    struct imm_mute_state* S0 = imm_mute_state_create("S0", abc);
-    struct imm_mute_state* S1 = imm_mute_state_create("S1", abc);
+    struct imm_mute_state const* S0 = imm_mute_state_create("S0", abc);
+    struct imm_mute_state const* S1 = imm_mute_state_create("S1", abc);
 
     imm_hmm_add_state(hmm, cast_c(S0), 0.0);
     imm_hmm_add_state(hmm, cast_c(S1), zero());
@@ -330,17 +330,17 @@ void test_hmm_likelihood_invalid(void)
     struct imm_abc const* abc = imm_abc_create("AC", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
-    struct imm_mute_state* S = imm_mute_state_create("S", abc);
+    struct imm_mute_state const* S = imm_mute_state_create("S", abc);
     imm_hmm_add_state(hmm, cast_c(S), 0.0);
 
-    struct imm_mute_state* M1 = imm_mute_state_create("M1", abc);
+    struct imm_mute_state const* M1 = imm_mute_state_create("M1", abc);
     imm_hmm_add_state(hmm, cast_c(M1), zero());
 
-    double const             lprobs[] = {log(0.8), log(0.2)};
-    struct imm_normal_state* M2 = imm_normal_state_create("M2", abc, lprobs);
+    double const                   lprobs[] = {log(0.8), log(0.2)};
+    struct imm_normal_state const* M2 = imm_normal_state_create("M2", abc, lprobs);
     imm_hmm_add_state(hmm, cast_c(M2), zero());
 
-    struct imm_mute_state* E = imm_mute_state_create("E", abc);
+    struct imm_mute_state const* E = imm_mute_state_create("E", abc);
     imm_hmm_add_state(hmm, cast_c(E), zero());
 
     imm_hmm_set_trans(hmm, cast_c(S), cast_c(M1), 0.0);
@@ -385,7 +385,7 @@ void test_hmm_viterbi_one_mute_state(void)
     struct imm_abc const* abc = imm_abc_create("ACGT", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
-    struct imm_mute_state* state = imm_mute_state_create("state", abc);
+    struct imm_mute_state const* state = imm_mute_state_create("state", abc);
 
     imm_hmm_add_state(hmm, cast_c(state), log(0.5));
 
@@ -431,8 +431,8 @@ void test_hmm_viterbi_two_mute_states(void)
     struct imm_abc const* abc = imm_abc_create("ACGT", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
-    struct imm_mute_state* state0 = imm_mute_state_create("state", abc);
-    struct imm_mute_state* state1 = imm_mute_state_create("state", abc);
+    struct imm_mute_state const* state0 = imm_mute_state_create("state", abc);
+    struct imm_mute_state const* state1 = imm_mute_state_create("state", abc);
 
     imm_hmm_add_state(hmm, cast_c(state0), log(0.5));
     imm_hmm_add_state(hmm, cast_c(state1), log(0.1));
@@ -499,11 +499,11 @@ void test_hmm_viterbi_mute_cycle(void)
     struct imm_abc const* abc = imm_abc_create("ACGT", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
-    struct imm_mute_state* state0 = imm_mute_state_create("State0", abc);
+    struct imm_mute_state const* state0 = imm_mute_state_create("State0", abc);
 
     imm_hmm_add_state(hmm, cast_c(state0), log(0.5));
 
-    struct imm_mute_state* state1 = imm_mute_state_create("State1", abc);
+    struct imm_mute_state const* state1 = imm_mute_state_create("State1", abc);
     imm_hmm_add_state(hmm, cast_c(state1), imm_lprob_zero());
 
     imm_hmm_set_trans(hmm, cast_c(state0), cast_c(state1), log(0.2));
@@ -530,8 +530,8 @@ void test_hmm_viterbi_one_normal_state(void)
     struct imm_abc const* abc = imm_abc_create("ACGT", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
-    double                   lprobs0[] = {log(0.25), log(0.25), log(0.5), zero()};
-    struct imm_normal_state* state = imm_normal_state_create("State0", abc, lprobs0);
+    double                         lprobs0[] = {log(0.25), log(0.25), log(0.5), zero()};
+    struct imm_normal_state const* state = imm_normal_state_create("State0", abc, lprobs0);
 
     imm_hmm_add_state(hmm, cast_c(state), log(0.1));
 
@@ -599,11 +599,11 @@ void test_hmm_viterbi_two_normal_states(void)
     struct imm_abc const* abc = imm_abc_create("ACGT", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
-    double                   lprobs0[] = {log(0.25), log(0.25), log(0.5), zero()};
-    struct imm_normal_state* state0 = imm_normal_state_create("State0", abc, lprobs0);
+    double                         lprobs0[] = {log(0.25), log(0.25), log(0.5), zero()};
+    struct imm_normal_state const* state0 = imm_normal_state_create("State0", abc, lprobs0);
 
-    double                   lprobs1[] = {log(0.25), log(0.25), log(0.5), log(0.5)};
-    struct imm_normal_state* state1 = imm_normal_state_create("State1", abc, lprobs1);
+    double                         lprobs1[] = {log(0.25), log(0.25), log(0.5), log(0.5)};
+    struct imm_normal_state const* state1 = imm_normal_state_create("State1", abc, lprobs1);
 
     imm_hmm_add_state(hmm, cast_c(state0), log(0.1));
     imm_hmm_add_state(hmm, cast_c(state1), log(0.2));
@@ -667,12 +667,12 @@ void test_hmm_viterbi_normal_states(void)
     struct imm_abc const* abc = imm_abc_create("ACGT", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
-    double const             lprobs0[] = {log(0.25), log(0.25), log(0.5), zero()};
-    struct imm_normal_state* state0 = imm_normal_state_create("State0", abc, lprobs0);
+    double const                   lprobs0[] = {log(0.25), log(0.25), log(0.5), zero()};
+    struct imm_normal_state const* state0 = imm_normal_state_create("State0", abc, lprobs0);
 
-    double const             lprobs1[] = {log(0.5) - log(2.25), log(0.25) - log(2.25),
+    double const                   lprobs1[] = {log(0.5) - log(2.25), log(0.25) - log(2.25),
                               log(0.5) - log(2.25), log(1.0) - log(2.25)};
-    struct imm_normal_state* state1 = imm_normal_state_create("State1", abc, lprobs1);
+    struct imm_normal_state const* state1 = imm_normal_state_create("State1", abc, lprobs1);
 
     imm_hmm_add_state(hmm, cast_c(state0), log(1.0));
     imm_hmm_add_state(hmm, cast_c(state1), zero());
@@ -873,15 +873,15 @@ void test_hmm_viterbi_profile1(void)
     struct imm_abc const* abc = imm_abc_create("AB", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
-    struct imm_mute_state* start = imm_mute_state_create("START", abc);
-    struct imm_mute_state* D0 = imm_mute_state_create("D0", abc);
-    struct imm_mute_state* end = imm_mute_state_create("END", abc);
+    struct imm_mute_state const* start = imm_mute_state_create("START", abc);
+    struct imm_mute_state const* D0 = imm_mute_state_create("D0", abc);
+    struct imm_mute_state const* end = imm_mute_state_create("END", abc);
 
-    double                   M0_lprobs[] = {log(0.4), log(0.2)};
-    struct imm_normal_state* M0 = imm_normal_state_create("M0", abc, M0_lprobs);
+    double                         M0_lprobs[] = {log(0.4), log(0.2)};
+    struct imm_normal_state const* M0 = imm_normal_state_create("M0", abc, M0_lprobs);
 
-    double                   I0_lprobs[] = {log(0.5), log(0.5)};
-    struct imm_normal_state* I0 = imm_normal_state_create("I0", abc, I0_lprobs);
+    double                         I0_lprobs[] = {log(0.5), log(0.5)};
+    struct imm_normal_state const* I0 = imm_normal_state_create("I0", abc, I0_lprobs);
 
     imm_hmm_add_state(hmm, cast_c(start), 0.0);
     imm_hmm_add_state(hmm, cast_c(D0), zero());
@@ -990,7 +990,7 @@ void test_hmm_viterbi_profile2(void)
     struct imm_abc const* abc = imm_abc_create("ABCD", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
-    struct imm_mute_state* start = imm_mute_state_create("START", abc);
+    struct imm_mute_state const* start = imm_mute_state_create("START", abc);
 
     double ins_lprobs[] = {log(0.1), log(0.1), log(0.1), log(0.7)};
 
@@ -998,17 +998,17 @@ void test_hmm_viterbi_profile2(void)
     double M1_lprobs[] = {log(0.6), zero(), log(0.4), zero()};
     double M2_lprobs[] = {log(0.05), log(0.05), log(0.05), log(0.05)};
 
-    struct imm_normal_state* M0 = imm_normal_state_create("M0", abc, M0_lprobs);
-    struct imm_normal_state* I0 = imm_normal_state_create("I0", abc, ins_lprobs);
+    struct imm_normal_state const* M0 = imm_normal_state_create("M0", abc, M0_lprobs);
+    struct imm_normal_state const* I0 = imm_normal_state_create("I0", abc, ins_lprobs);
 
-    struct imm_mute_state*   D1 = imm_mute_state_create("D1", abc);
-    struct imm_normal_state* M1 = imm_normal_state_create("M1", abc, M1_lprobs);
-    struct imm_normal_state* I1 = imm_normal_state_create("I1", abc, ins_lprobs);
+    struct imm_mute_state const*   D1 = imm_mute_state_create("D1", abc);
+    struct imm_normal_state const* M1 = imm_normal_state_create("M1", abc, M1_lprobs);
+    struct imm_normal_state const* I1 = imm_normal_state_create("I1", abc, ins_lprobs);
 
-    struct imm_mute_state*   D2 = imm_mute_state_create("D2", abc);
-    struct imm_normal_state* M2 = imm_normal_state_create("M2", abc, M2_lprobs);
+    struct imm_mute_state const*   D2 = imm_mute_state_create("D2", abc);
+    struct imm_normal_state const* M2 = imm_normal_state_create("M2", abc, M2_lprobs);
 
-    struct imm_mute_state* end = imm_mute_state_create("END", abc);
+    struct imm_mute_state const* end = imm_mute_state_create("END", abc);
 
     imm_hmm_add_state(hmm, cast_c(start), 0.0);
 
@@ -1157,16 +1157,16 @@ void test_hmm_viterbi_profile_delete(void)
     struct imm_abc const* abc = imm_abc_create("AB", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
-    double                   N0_lprobs[] = {log(0.5), zero()};
-    struct imm_normal_state* N0 = imm_normal_state_create("N0", abc, N0_lprobs);
+    double                         N0_lprobs[] = {log(0.5), zero()};
+    struct imm_normal_state const* N0 = imm_normal_state_create("N0", abc, N0_lprobs);
 
-    struct imm_mute_state* M = imm_mute_state_create("M", abc);
+    struct imm_mute_state const* M = imm_mute_state_create("M", abc);
 
-    double                   N1_lprobs[] = {log(0.5), zero()};
-    struct imm_normal_state* N1 = imm_normal_state_create("N1", abc, N1_lprobs);
+    double                         N1_lprobs[] = {log(0.5), zero()};
+    struct imm_normal_state const* N1 = imm_normal_state_create("N1", abc, N1_lprobs);
 
-    double                   N2_lprobs[] = {zero(), log(0.5)};
-    struct imm_normal_state* N2 = imm_normal_state_create("N2", abc, N2_lprobs);
+    double                         N2_lprobs[] = {zero(), log(0.5)};
+    struct imm_normal_state const* N2 = imm_normal_state_create("N2", abc, N2_lprobs);
 
     imm_hmm_add_state(hmm, cast_c(N2), zero());
     imm_hmm_add_state(hmm, cast_c(N1), zero());
@@ -1213,32 +1213,32 @@ void test_hmm_viterbi_global_profile(void)
     struct imm_abc const* abc = imm_abc_create("ABCZ", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
-    struct imm_mute_state* start = imm_mute_state_create("START", abc);
+    struct imm_mute_state const* start = imm_mute_state_create("START", abc);
 
-    double                   B_lprobs[] = {log(0.01), log(0.01), log(1.0), zero()};
-    struct imm_normal_state* B = imm_normal_state_create("B", abc, B_lprobs);
+    double                         B_lprobs[] = {log(0.01), log(0.01), log(1.0), zero()};
+    struct imm_normal_state const* B = imm_normal_state_create("B", abc, B_lprobs);
 
-    double                   M0_lprobs[] = {log(0.9), log(0.01), log(0.01), zero()};
-    struct imm_normal_state* M0 = imm_normal_state_create("M0", abc, M0_lprobs);
+    double                         M0_lprobs[] = {log(0.9), log(0.01), log(0.01), zero()};
+    struct imm_normal_state const* M0 = imm_normal_state_create("M0", abc, M0_lprobs);
 
-    double                   M1_lprobs[] = {log(0.01), log(0.9), zero(), zero()};
-    struct imm_normal_state* M1 = imm_normal_state_create("M1", abc, M1_lprobs);
+    double                         M1_lprobs[] = {log(0.01), log(0.9), zero(), zero()};
+    struct imm_normal_state const* M1 = imm_normal_state_create("M1", abc, M1_lprobs);
 
-    double                   M2_lprobs[] = {log(0.5), log(0.5), zero(), zero()};
-    struct imm_normal_state* M2 = imm_normal_state_create("M2", abc, M2_lprobs);
+    double                         M2_lprobs[] = {log(0.5), log(0.5), zero(), zero()};
+    struct imm_normal_state const* M2 = imm_normal_state_create("M2", abc, M2_lprobs);
 
-    struct imm_mute_state* E = imm_mute_state_create("E", abc);
-    struct imm_mute_state* end = imm_mute_state_create("END", abc);
+    struct imm_mute_state const* E = imm_mute_state_create("E", abc);
+    struct imm_mute_state const* end = imm_mute_state_create("END", abc);
 
-    double                   Z_lprobs[] = {zero(), zero(), zero(), log(1.0)};
-    struct imm_normal_state* Z = imm_normal_state_create("Z", abc, Z_lprobs);
+    double                         Z_lprobs[] = {zero(), zero(), zero(), log(1.0)};
+    struct imm_normal_state const* Z = imm_normal_state_create("Z", abc, Z_lprobs);
 
-    double                   ins_lprobs[] = {log(0.1), log(0.1), log(0.1), zero()};
-    struct imm_normal_state* I0 = imm_normal_state_create("I0", abc, ins_lprobs);
-    struct imm_normal_state* I1 = imm_normal_state_create("I1", abc, ins_lprobs);
+    double                         ins_lprobs[] = {log(0.1), log(0.1), log(0.1), zero()};
+    struct imm_normal_state const* I0 = imm_normal_state_create("I0", abc, ins_lprobs);
+    struct imm_normal_state const* I1 = imm_normal_state_create("I1", abc, ins_lprobs);
 
-    struct imm_mute_state* D1 = imm_mute_state_create("D1", abc);
-    struct imm_mute_state* D2 = imm_mute_state_create("D2", abc);
+    struct imm_mute_state const* D1 = imm_mute_state_create("D1", abc);
+    struct imm_mute_state const* D2 = imm_mute_state_create("D2", abc);
 
     imm_hmm_add_state(hmm, cast_c(start), log(1.0));
     imm_hmm_add_state(hmm, cast_c(B), zero());
@@ -1376,8 +1376,8 @@ void test_hmm_viterbi_table_states(void)
     struct imm_abc const* abc = imm_abc_create("ACGTX", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
-    struct imm_mute_state*     S = imm_mute_state_create("S", abc);
-    struct imm_sequence_table* table = imm_sequence_table_create(abc);
+    struct imm_mute_state const* S = imm_mute_state_create("S", abc);
+    struct imm_sequence_table*   table = imm_sequence_table_create(abc);
     imm_sequence_table_add(table, "", log(0.5));
     imm_sequence_table_add(table, "A", log(0.1));
     imm_sequence_table_add(table, "TAT", log(0.2));
@@ -1387,18 +1387,18 @@ void test_hmm_viterbi_table_states(void)
     cass_cond(imm_lprob_is_zero(imm_sequence_table_lprob(table, "T", 1)));
     struct imm_table_state* T = imm_table_state_create("T", table);
 
-    struct imm_mute_state* D = imm_mute_state_create("D", abc);
+    struct imm_mute_state const* D = imm_mute_state_create("D", abc);
 
-    double                   N0_lprobs[] = {zero(), log(0.5), log(0.5), zero(), zero()};
-    struct imm_normal_state* N0 = imm_normal_state_create("N0", abc, N0_lprobs);
+    double                         N0_lprobs[] = {zero(), log(0.5), log(0.5), zero(), zero()};
+    struct imm_normal_state const* N0 = imm_normal_state_create("N0", abc, N0_lprobs);
 
     double N1_lprobs[] = {log(0.25), log(0.25), log(0.25), log(0.25), zero()};
-    struct imm_normal_state* N1 = imm_normal_state_create("N1", abc, N1_lprobs);
+    struct imm_normal_state const* N1 = imm_normal_state_create("N1", abc, N1_lprobs);
 
-    struct imm_mute_state* E = imm_mute_state_create("E", abc);
+    struct imm_mute_state const* E = imm_mute_state_create("E", abc);
 
-    double                   Z_lprobs[] = {zero(), zero(), zero(), zero(), log(1.0)};
-    struct imm_normal_state* Z = imm_normal_state_create("Z", abc, Z_lprobs);
+    double                         Z_lprobs[] = {zero(), zero(), zero(), zero(), log(1.0)};
+    struct imm_normal_state const* Z = imm_normal_state_create("Z", abc, Z_lprobs);
 
     imm_hmm_add_state(hmm, cast_c(S), log(1.0));
     imm_hmm_add_state(hmm, cast_c(T), zero());
@@ -1468,23 +1468,23 @@ void test_hmm_viterbi_cycle_mute_ending(void)
     struct imm_abc const* abc = imm_abc_create("AB", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
-    struct imm_mute_state* start = imm_mute_state_create("START", abc);
+    struct imm_mute_state const* start = imm_mute_state_create("START", abc);
     imm_hmm_add_state(hmm, cast_c(start), log(1.0));
 
-    struct imm_mute_state* B = imm_mute_state_create("B", abc);
+    struct imm_mute_state const* B = imm_mute_state_create("B", abc);
     imm_hmm_add_state(hmm, cast_c(B), zero());
 
-    double                   lprobs[] = {log(0.01), log(0.01)};
-    struct imm_normal_state* M = imm_normal_state_create("M", abc, lprobs);
+    double                         lprobs[] = {log(0.01), log(0.01)};
+    struct imm_normal_state const* M = imm_normal_state_create("M", abc, lprobs);
     imm_hmm_add_state(hmm, cast_c(M), zero());
 
-    struct imm_mute_state* E = imm_mute_state_create("E", abc);
+    struct imm_mute_state const* E = imm_mute_state_create("E", abc);
     imm_hmm_add_state(hmm, cast_c(E), zero());
 
-    struct imm_mute_state* J = imm_mute_state_create("J", abc);
+    struct imm_mute_state const* J = imm_mute_state_create("J", abc);
     imm_hmm_add_state(hmm, cast_c(J), zero());
 
-    struct imm_mute_state* end = imm_mute_state_create("END", abc);
+    struct imm_mute_state const* end = imm_mute_state_create("END", abc);
     imm_hmm_add_state(hmm, cast_c(end), zero());
 
     imm_hmm_set_trans(hmm, cast_c(start), cast_c(B), log(0.1));

@@ -17,8 +17,8 @@ void test_normal_state(void)
 {
     struct imm_abc const* abc = imm_abc_create("ACGT", '*');
 
-    double                   lprobs[] = {log(0.25), log(0.25), log(0.5), imm_lprob_zero()};
-    struct imm_normal_state* state = imm_normal_state_create("State0", abc, lprobs);
+    double lprobs[] = {log(0.25), log(0.25), log(0.5), imm_lprob_zero()};
+    struct imm_normal_state const* state = imm_normal_state_create("State0", abc, lprobs);
 
     cass_cond(strcmp(imm_state_get_name(imm_state_cast_c(state)), "State0") == 0);
     cass_close(log(0.25), imm_state_lprob(imm_state_cast_c(state), "A", 1));
@@ -37,7 +37,7 @@ void test_mute_state(void)
 {
     struct imm_abc const* abc = imm_abc_create("ACGT", '*');
 
-    struct imm_mute_state* state = imm_mute_state_create("State0", abc);
+    struct imm_mute_state const* state = imm_mute_state_create("State0", abc);
 
     cass_cond(strcmp(imm_state_get_name(imm_state_cast_c(state)), "State0") == 0);
     cass_close(0.0, imm_state_lprob(imm_state_cast_c(state), "", 0));

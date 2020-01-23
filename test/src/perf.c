@@ -29,10 +29,10 @@ void test_perf_viterbi(void)
     struct imm_abc const* abc = imm_abc_create("BMIEJ", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
-    struct imm_mute_state* start = imm_mute_state_create("START", abc);
+    struct imm_mute_state const* start = imm_mute_state_create("START", abc);
     imm_hmm_add_state(hmm, cast_c(start), log(1.0));
 
-    struct imm_mute_state* end = imm_mute_state_create("END", abc);
+    struct imm_mute_state const* end = imm_mute_state_create("END", abc);
     imm_hmm_add_state(hmm, cast_c(end), zero());
 
     double B_lprobs[] = {log(1.0), zero(), zero(), zero(), zero()};
@@ -41,11 +41,11 @@ void test_perf_viterbi(void)
     double M_lprobs[] = {zero(), log(1.0), zero(), zero(), zero()};
     double I_lprobs[] = {zero(), zero(), log(1.0), zero(), zero()};
 
-    struct imm_normal_state* B = imm_normal_state_create("B", abc, B_lprobs);
+    struct imm_normal_state const* B = imm_normal_state_create("B", abc, B_lprobs);
     imm_hmm_add_state(hmm, cast_c(B), zero());
-    struct imm_normal_state* E = imm_normal_state_create("E", abc, E_lprobs);
+    struct imm_normal_state const* E = imm_normal_state_create("E", abc, E_lprobs);
     imm_hmm_add_state(hmm, cast_c(E), zero());
-    struct imm_normal_state* J = imm_normal_state_create("J", abc, J_lprobs);
+    struct imm_normal_state const* J = imm_normal_state_create("J", abc, J_lprobs);
     imm_hmm_add_state(hmm, cast_c(J), zero());
 
     imm_hmm_set_trans(hmm, cast_c(start), cast_c(B), log(0.2));
@@ -56,9 +56,9 @@ void test_perf_viterbi(void)
     imm_hmm_set_trans(hmm, cast_c(J), cast_c(B), log(0.2));
     imm_hmm_set_trans(hmm, cast_c(E), cast_c(end), log(0.2));
 
-    struct imm_normal_state* M[ncore_nodes];
-    struct imm_normal_state* I[ncore_nodes];
-    struct imm_mute_state*   D[ncore_nodes];
+    struct imm_normal_state const* M[ncore_nodes];
+    struct imm_normal_state const* I[ncore_nodes];
+    struct imm_mute_state const*   D[ncore_nodes];
 
     char name[10] = "\0";
     for (int i = 0; i < ncore_nodes; ++i) {

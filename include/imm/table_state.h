@@ -3,6 +3,12 @@
 
 #include "imm/api.h"
 
+/** @file table_state.h
+ * Table state module.
+ *
+ * An object of type @ref imm_table_state is meant to be immutable.
+ */
+
 struct imm_sequence_table;
 struct imm_table_state;
 
