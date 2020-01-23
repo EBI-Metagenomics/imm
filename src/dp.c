@@ -2,17 +2,15 @@
 #include "array.h"
 #include "free.h"
 #include "gmatrix.h"
-#include "imm/imm.h"
-#include "list.h"
-#include "matrix.h"
+#include "imm/lprob.h"
+#include "imm/path.h"
+#include "imm/state.h"
 #include "min.h"
 #include "mstate.h"
 #include "mtrans.h"
 #include "mtrans_table.h"
 #include "state_idx.h"
-#include "string.h"
-#include <limits.h>
-#include <math.h>
+#include <string.h>
 
 struct trans
 {
@@ -162,26 +160,14 @@ double dp_viterbi(struct dp* dp, struct imm_path* path)
     return score;
 }
 
-void dp_destroy(struct dp* dp)
+void dp_destroy(struct dp const* dp)
 {
     for (int i = 0; i < dp->nstates; ++i)
         array_trans_empty(&dp->states[i].incoming_transitions);
 
-    dp->nstates = -1;
-
     free_c(dp->states);
-    dp->states = NULL;
-
-    dp->end_state = NULL;
-
-    dp->seq = NULL;
-    dp->seq_len = -1;
-
     gmatrix_cell_destroy(dp->dp_matrix.cell);
-    dp->dp_matrix.cell = NULL;
-
     free_c(dp->dp_matrix.state_col);
-
     free_c(dp);
 }
 

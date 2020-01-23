@@ -26,8 +26,8 @@ void test_perf_viterbi(void)
 {
     int ncore_nodes = 1000;
 
-    struct imm_abc* abc = imm_abc_create("BMIEJ", '*');
-    struct imm_hmm* hmm = imm_hmm_create(abc);
+    struct imm_abc const* abc = imm_abc_create("BMIEJ", '*');
+    struct imm_hmm*       hmm = imm_hmm_create(abc);
 
     struct imm_mute_state* start = imm_mute_state_create("START", abc);
     imm_hmm_add_state(hmm, cast_c(start), log(1.0));

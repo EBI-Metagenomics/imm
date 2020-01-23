@@ -11,7 +11,7 @@ int main(void)
 
 void test_sequence_table(void)
 {
-    struct imm_abc* abc = imm_abc_create("ACGT", '*');
+    struct imm_abc const* abc = imm_abc_create("ACGT", '*');
 
     struct imm_sequence_table* table = imm_sequence_table_create(abc);
 

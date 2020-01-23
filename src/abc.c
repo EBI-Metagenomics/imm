@@ -23,7 +23,7 @@ struct imm_abc
 static int check_symbols_length(char const* symbols);
 static int check_symbol_id(struct imm_abc const* abc, char symbol_id);
 
-struct imm_abc* imm_abc_create(char const* symbols, char const any_symbol)
+struct imm_abc const* imm_abc_create(char const* symbols, char const any_symbol)
 {
     if (check_symbols_length(symbols))
         return NULL;
@@ -56,7 +56,7 @@ struct imm_abc* imm_abc_create(char const* symbols, char const any_symbol)
     return abc;
 }
 
-struct imm_abc* imm_abc_clone(struct imm_abc const* abc)
+struct imm_abc const* imm_abc_clone(struct imm_abc const* abc)
 {
     struct imm_abc* nabc = malloc(sizeof(struct imm_abc));
 
