@@ -104,10 +104,8 @@ int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state,
 
     unsigned long i = mtrans_table_find(table, dst_state);
     if (i == mtrans_table_end(table)) {
-        imm_error("mtrans_table_add");
         mtrans_table_add(table, mtrans_create(dst_state, lprob));
     } else {
-        imm_error("mtrans_set_lprob");
         mtrans_set_lprob(mtrans_table_get(table, i), lprob);
     }
 
@@ -117,39 +115,24 @@ int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state,
 double imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* src_state,
                          struct imm_state const* dst_state)
 {
-    imm_error("imm_hmm_get_trans: 1");
     unsigned long src = mstate_table_find(hmm->table, src_state);
     if (src == mstate_table_end(hmm->table)) {
         imm_error("source state not found");
         return imm_lprob_invalid();
     }
-    imm_error("imm_hmm_get_trans: 2");
 
     unsigned long dst = mstate_table_find(hmm->table, dst_state);
     if (dst == mstate_table_end(hmm->table)) {
         imm_error("destination state not found");
         return imm_lprob_invalid();
     }
-    imm_error("imm_hmm_get_trans: 3 State %s", imm_state_get_name(dst_state));
 
     struct mtrans_table const* table =
         mstate_get_mtrans_table(mstate_table_get(hmm->table, src));
     unsigned long i = mtrans_table_find(table, dst_state);
-    imm_error("i: %ld end: %ld", i, mtrans_table_end(table));
 
-    unsigned long tmp = 0;
-    mtrans_table_for_each(tmp, table)
-    {
-        if (mtrans_table_exist(table, tmp)) {
-            imm_error("imm_hmm_get_trans: 3.1 State %s",
-                      imm_state_get_name(mtrans_get_state(mtrans_table_get(table, tmp))));
-        }
-    }
-
-    imm_error("imm_hmm_get_trans: 4 size: %d", mtrans_table_size(table));
     if (i == mtrans_table_end(table))
         return imm_lprob_zero();
-    imm_error("imm_hmm_get_trans: 5");
 
     return mtrans_get_lprob(mtrans_table_get(table, i));
 }
@@ -161,7 +144,6 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, char const* seq,
         imm_error("path or seq is NULL");
         return imm_lprob_invalid();
     }
-    imm_error("Ponto 2");
     int seq_len = (int)strlen(seq);
 
     struct imm_step const* step = imm_path_first(path);
@@ -169,7 +151,6 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, char const* seq,
         imm_error("path must have steps");
         return imm_lprob_invalid();
     }
-    imm_error("Ponto 3");
 
     int                     len = imm_step_seq_len(step);
     struct imm_state const* state = imm_step_state(step);
@@ -179,7 +160,6 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, char const* seq,
     if (!state)
         goto not_found_state;
 
-    imm_error("Ponto 4: State %s", imm_state_get_name(state));
     if (!abc_has_symbols(hmm->abc, seq, seq_len)) {
         imm_error("symbols must belong to alphabet");
         return imm_lprob_invalid();
@@ -188,22 +168,17 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, char const* seq,
     double lprob = hmm_start_lprob(hmm, state) + imm_state_lprob(state, seq, len);
 
     struct imm_state const* prev_state = NULL;
-    imm_error("Ponto 5: lprob %f", lprob);
 
     goto enter;
     while (step) {
         len = imm_step_seq_len(step);
         state = imm_step_state(step);
 
-        imm_error("Ponto 5.1: State %s", imm_state_get_name(state));
-
         if (len > seq_len)
             goto len_mismatch;
         if (!state)
             goto not_found_state;
 
-        imm_error("Ponto 5.2: trans %f emit %f", imm_hmm_get_trans(hmm, prev_state, state),
-                  imm_state_lprob(state, seq, len));
         lprob += imm_hmm_get_trans(hmm, prev_state, state) + imm_state_lprob(state, seq, len);
         if (!imm_lprob_is_valid(lprob))
             return imm_lprob_invalid();
@@ -214,12 +189,10 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, char const* seq,
         seq_len -= len;
         step = imm_path_next(path, step);
     }
-    imm_error("Ponto 6");
     if (seq_len > 0) {
         imm_error("sequence is longer than symbols emitted by path");
         return imm_lprob_invalid();
     }
-    imm_error("Ponto 7");
 
     return lprob;
 
@@ -236,12 +209,10 @@ double imm_hmm_viterbi(struct imm_hmm const* hmm, char const* seq,
                        struct imm_state const* end_state, struct imm_path* path)
 
 {
-    imm_error("imm_hmm_viterbi: 1");
     if (!hmm || !seq || !end_state || !path) {
         imm_error("viterbi input cannot be NULL");
         return imm_lprob_invalid();
     }
-    imm_error("imm_hmm_viterbi: 2");
 
     unsigned long end = mstate_table_find(hmm->table, end_state);
     if (end == mstate_table_end(hmm->table)) {
@@ -260,17 +231,13 @@ double imm_hmm_viterbi(struct imm_hmm const* hmm, char const* seq,
         return imm_lprob_invalid();
     }
 
-    imm_error("imm_hmm_viterbi: 3");
     struct mstate const** mstates = mstate_table_array(hmm->table);
     if (mstate_sort(mstates, mstate_table_size(hmm->table))) {
-        imm_error("imm_hmm_viterbi: 3.1");
         free_c(mstates);
         return imm_lprob_invalid();
     }
 
-    imm_error("imm_hmm_viterbi: 4");
     struct dp* dp = dp_create(mstates, mstate_table_size(hmm->table), seq, end_state);
-    imm_error("imm_hmm_viterbi: 5");
     double score = dp_viterbi(dp, path);
     dp_destroy(dp);
 
