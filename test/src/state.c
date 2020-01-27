@@ -59,9 +59,9 @@ void test_table_state(void)
     imm_table_state_destroy(state);
 
     table = imm_sequence_table_create(abc);
-    cass_cond(imm_sequence_table_add(table, "GG", log(0.5)) == 0);
-    cass_cond(imm_sequence_table_add(table, "", log(0.1)) == 0);
-    cass_cond(imm_sequence_table_add(table, "H", log(0.1)) == 1);
+    cass_cond(imm_sequence_table_add(table, IMM_SEQ("GG"), log(0.5)) == 0);
+    cass_cond(imm_sequence_table_add(table, IMM_SEQ(""), log(0.1)) == 0);
+    cass_cond(imm_sequence_table_add(table, IMM_SEQ("H"), log(0.1)) == 1);
     state = imm_table_state_create("S0", table);
     cass_close(imm_state_lprob(imm_state_cast_c(state), "GG", 2), log(0.5));
     cass_cond(imm_lprob_is_zero(imm_state_lprob(imm_state_cast_c(state), "GGT", 3)));
@@ -69,9 +69,9 @@ void test_table_state(void)
     imm_table_state_destroy(state);
 
     table = imm_sequence_table_create(abc);
-    cass_cond(imm_sequence_table_add(table, "GG", log(0.5)) == 0);
-    cass_cond(imm_sequence_table_add(table, "", log(0.1)) == 0);
-    cass_cond(imm_sequence_table_add(table, "H", log(0.1)) == 1);
+    cass_cond(imm_sequence_table_add(table, IMM_SEQ("GG"), log(0.5)) == 0);
+    cass_cond(imm_sequence_table_add(table, IMM_SEQ(""), log(0.1)) == 0);
+    cass_cond(imm_sequence_table_add(table, IMM_SEQ("H"), log(0.1)) == 1);
     cass_cond(imm_sequence_table_normalize(table) == 0);
     state = imm_table_state_create("S0", table);
     cass_close(imm_state_lprob(imm_state_cast_c(state), "GG", 2), log(0.5 / 0.6));

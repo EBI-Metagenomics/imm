@@ -1,15 +1,15 @@
 #include "free.h"
 #include "imm/imm.h"
-#include "khash.h"
+#include "khash_seq.h"
 #include "min.h"
 
 struct emission
 {
-    char const* seq;
-    double      lprob;
+    struct imm_seq seq;
+    double         lprob;
 };
 
-KHASH_MAP_INIT_STR(emission, struct emission*)
+KHASH_MAP_INIT_SEQ(emission, struct emission*)
 
 struct imm_sequence_table
 {
@@ -41,7 +41,7 @@ void imm_sequence_table_destroy(struct imm_sequence_table const* table)
     for (khiter_t i = kh_begin(emiss_tbl); i < kh_end(emiss_tbl); ++i) {
         if (kh_exist(emiss_tbl, i)) {
             struct emission const* e = kh_val(emiss_tbl, i);
-            free_c(e->seq);
+            imm_seq_destroy(e->seq);
             free_c(e);
         }
     }
@@ -50,13 +50,11 @@ void imm_sequence_table_destroy(struct imm_sequence_table const* table)
     free_c(table);
 }
 
-int imm_sequence_table_add(struct imm_sequence_table* table, char const* seq,
+int imm_sequence_table_add(struct imm_sequence_table* table, struct imm_seq const seq,
                            double const lprob)
 {
-    int const seq_len = (int const)strlen(seq);
-
-    for (int i = 0; i < seq_len; ++i) {
-        if (!imm_abc_has_symbol(table->abc, seq[i])) {
+    for (unsigned i = 0; i < seq.length; ++i) {
+        if (!imm_abc_has_symbol(table->abc, seq.string[i])) {
             imm_error("symbol not found in the alphabet");
             return 1;
         }
@@ -74,14 +72,14 @@ int imm_sequence_table_add(struct imm_sequence_table* table, char const* seq,
     }
 
     struct emission* emiss = malloc(sizeof(struct emission));
-    emiss->seq = strdup(seq);
+    emiss->seq = imm_seq_duplicate(seq);
     emiss->lprob = lprob;
 
     kh_key(table->emission_table, iter) = emiss->seq;
     kh_val(table->emission_table, iter) = emiss;
 
-    table->min_seq = MIN(table->min_seq, seq_len);
-    table->max_seq = MAX(table->max_seq, seq_len);
+    table->min_seq = MIN(table->min_seq, seq.length);
+    table->max_seq = MAX(table->max_seq, seq.length);
 
     return 0;
 }
@@ -118,12 +116,10 @@ int imm_sequence_table_normalize(struct imm_sequence_table* table)
     return 0;
 }
 
-double imm_sequence_table_lprob(struct imm_sequence_table const* table, char const* seq,
-                                unsigned seq_len)
+double imm_sequence_table_lprob(struct imm_sequence_table const* table,
+                                struct imm_seq const             seq)
 {
-    char const* key = strndup(seq, (size_t)seq_len);
-    khiter_t    i = kh_get(emission, table->emission_table, key);
-    free_c(key);
+    khiter_t i = kh_get(emission, table->emission_table, seq);
 
     if (i == kh_end(table->emission_table))
         return imm_lprob_zero();

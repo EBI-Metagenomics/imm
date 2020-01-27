@@ -96,7 +96,7 @@ void test_perf_viterbi(void)
 
     struct imm_path* path = imm_path_create();
 
-    char const seq[] = "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
+    char const str[] = "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
                        "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
                        "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
                        "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
@@ -136,10 +136,11 @@ void test_perf_viterbi(void)
                        "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
                        "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
                        "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMME";
-    cass_cond(strlen(seq) == 2000);
+    cass_cond(strlen(str) == 2000);
 
     elapsed_start(elapsed);
-    double score = imm_hmm_viterbi(hmm, seq, cast_c(end), path);
+    struct imm_seq const seq = {str, strlen(str)};
+    double               score = imm_hmm_viterbi(hmm, seq, cast_c(end), path);
     cass_cond(is_valid(score) && !is_zero(score));
     cass_close(score, -65826.0106185297);
     elapsed_end(elapsed);

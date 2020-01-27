@@ -26,6 +26,7 @@ add_library(imm
     src/normal_state.c
     src/path.c
     src/report.c
+    src/seq.c
     src/sequence_table.c
     src/state.c
     src/state_idx.c

@@ -43,7 +43,7 @@ static double table_state_lprob(struct imm_state const* state, char const* seq,
                                 unsigned seq_len)
 {
     struct imm_table_state const* s = imm_state_get_impl_c(state);
-    return imm_sequence_table_lprob(s->table, seq, seq_len);
+    return imm_sequence_table_lprob(s->table, (struct imm_seq){(char*)seq, seq_len});
 }
 
 static unsigned table_state_min_seq(struct imm_state const* state)
