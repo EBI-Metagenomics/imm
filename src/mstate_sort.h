@@ -3,6 +3,6 @@
 
 struct mstate;
 
-int mstate_sort(struct mstate const** mstates, int nstates);
+int mstate_sort(struct mstate const** mstates, unsigned nstates);
 
 #endif

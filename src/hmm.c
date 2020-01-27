@@ -168,7 +168,8 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const seq,
         return imm_lprob_invalid();
     }
 
-    double lprob = hmm_start_lprob(hmm, state) + imm_state_lprob(state, str, len);
+    double lprob =
+        hmm_start_lprob(hmm, state) + imm_state_lprob(state, (struct imm_seq){str, len});
 
     struct imm_state const* prev_state = NULL;
 
@@ -182,7 +183,8 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const seq,
         if (!state)
             goto not_found_state;
 
-        lprob += imm_hmm_get_trans(hmm, prev_state, state) + imm_state_lprob(state, str, len);
+        lprob += imm_hmm_get_trans(hmm, prev_state, state) +
+                 imm_state_lprob(state, (struct imm_seq){str, len});
         if (!imm_lprob_is_valid(lprob))
             return imm_lprob_invalid();
 
@@ -240,10 +242,8 @@ double imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_seq const seq,
         return imm_lprob_invalid();
     }
 
-    char const* tmp = strndup(seq.string, seq.length);
-    struct dp*  dp = dp_create(mstates, mstate_table_size(hmm->table), tmp, end_state);
-    free_c(tmp);
-    double score = dp_viterbi(dp, path);
+    struct dp* dp = dp_create(mstates, mstate_table_size(hmm->table), seq, end_state);
+    double     score = dp_viterbi(dp, path);
     dp_destroy(dp);
 
     free_c(mstates);
@@ -269,11 +269,11 @@ int imm_hmm_normalize(struct imm_hmm* hmm)
 
 int imm_hmm_normalize_start(struct imm_hmm* hmm)
 {
-    int size = mstate_table_size(hmm->table);
+    unsigned size = mstate_table_size(hmm->table);
     if (size == 0)
         return 0;
 
-    double* lprobs = malloc(sizeof(double) * (size_t)size);
+    double* lprobs = malloc(sizeof(double) * size);
     double* lprob = lprobs;
 
     unsigned long i = 0;
@@ -327,7 +327,7 @@ static double hmm_start_lprob(struct imm_hmm const* hmm, struct imm_state const*
 static int hmm_normalize_trans(struct mstate* mstate)
 {
     struct mtrans_table* table = mstate_get_mtrans_table(mstate);
-    int                  size = mtrans_table_size(table);
+    unsigned             size = mtrans_table_size(table);
     if (size == 0)
         return 0;
 

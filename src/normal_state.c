@@ -10,8 +10,7 @@ struct imm_normal_state
     double*                 lprobs;
 };
 
-static double   normal_state_lprob(struct imm_state const* state, char const* seq,
-                                   unsigned seq_len);
+static double   normal_state_lprob(struct imm_state const* state, struct imm_seq seq);
 static unsigned normal_state_min_seq(struct imm_state const* state);
 static unsigned normal_state_max_seq(struct imm_state const* state);
 
@@ -43,13 +42,12 @@ void imm_normal_state_destroy(struct imm_normal_state const* state)
     free_c(state);
 }
 
-static double normal_state_lprob(struct imm_state const* state, char const* seq,
-                                 unsigned seq_len)
+static double normal_state_lprob(struct imm_state const* state, struct imm_seq const seq)
 {
     struct imm_normal_state const* s = imm_state_get_impl_c(state);
-    if (seq_len == 1) {
+    if (seq.length == 1) {
         struct imm_abc const* abc = imm_state_get_abc(state);
-        int const             idx = imm_abc_symbol_idx(abc, seq[0]);
+        int const             idx = imm_abc_symbol_idx(abc, seq.string[0]);
         if (idx >= 0)
             return s->lprobs[idx];
     }

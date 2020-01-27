@@ -89,21 +89,17 @@ unsigned long mstate_table_end(struct mstate_table const* table)
     return kh_end(table->ktable);
 }
 
-int mstate_table_size(struct mstate_table const* table)
+unsigned mstate_table_size(struct mstate_table const* table)
 {
     size_t n = kh_size(table->ktable);
-    if (n > INT_MAX) {
-        imm_error("size greater than INT_MAX");
-        return -1;
-    }
-
-    return (int)n;
+    BUG(n > UINT_MAX);
+    return (unsigned)n;
 }
 
 struct mstate const** mstate_table_array(struct mstate_table const* table)
 {
-    int                   size = mstate_table_size(table);
-    struct mstate const** mstates = malloc(sizeof(struct mstate*) * (size_t)size);
+    unsigned              size = mstate_table_size(table);
+    struct mstate const** mstates = malloc(sizeof(struct mstate*) * size);
 
     struct mstate const** mstate = mstates;
     unsigned long         i = 0;

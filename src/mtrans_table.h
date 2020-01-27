@@ -16,7 +16,7 @@ struct mtrans* mtrans_table_get(struct mtrans_table const* table, unsigned long 
 int            mtrans_table_exist(struct mtrans_table const* table, unsigned long iter);
 unsigned long  mtrans_table_begin(struct mtrans_table const* table);
 unsigned long  mtrans_table_end(struct mtrans_table const* table);
-int            mtrans_table_size(struct mtrans_table const* table);
+unsigned       mtrans_table_size(struct mtrans_table const* table);
 
 /** iterate over buckets */
 #define mtrans_table_for_each(iter, tbl)                                                      \

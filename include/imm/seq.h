@@ -9,8 +9,8 @@
  */
 struct imm_seq
 {
-    char*    string;
-    unsigned length;
+    char const* string;
+    unsigned    length;
 };
 
 #define IMM_SEQ(string)                                                                       \

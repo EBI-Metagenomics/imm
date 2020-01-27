@@ -8,8 +8,7 @@ struct imm_mute_state
     struct imm_state const* interface;
 };
 
-static double   mute_state_lprob(struct imm_state const* state, char const* seq,
-                                 unsigned seq_len);
+static double   mute_state_lprob(struct imm_state const* state, struct imm_seq seq);
 static unsigned mute_state_min_seq(struct imm_state const* state);
 static unsigned mute_state_max_seq(struct imm_state const* state);
 
@@ -33,10 +32,9 @@ void imm_mute_state_destroy(struct imm_mute_state const* state)
     free_c(state);
 }
 
-static double mute_state_lprob(struct imm_state const* state, char const* seq,
-                               unsigned seq_len)
+static double mute_state_lprob(struct imm_state const* state, struct imm_seq const seq)
 {
-    if (seq_len == 0)
+    if (seq.length == 0)
         return 0.0;
     return imm_lprob_zero();
 }

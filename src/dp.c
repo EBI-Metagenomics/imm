@@ -33,7 +33,7 @@ struct state_info
     unsigned                min_seq;
     unsigned                max_seq;
     double                  start_lprob;
-    int                     idx;
+    unsigned                idx;
     struct array_trans      incoming_transitions;
 };
 
@@ -63,14 +63,11 @@ struct dp_matrix
 struct dp
 {
     double                   lprob_zero;
-    int                      nstates;
+    unsigned                 nstates;
     struct state_info*       states;
     struct state_info const* end_state;
-
-    char const* seq;
-    unsigned    seq_len;
-
-    struct dp_matrix dp_matrix;
+    struct imm_seq           seq;
+    struct dp_matrix         dp_matrix;
 };
 
 static inline unsigned column(struct dp_matrix const* dp_matrix, struct step const* step)
@@ -91,16 +88,11 @@ static double final_score(struct dp const* dp, struct step* end_step);
 static void   viterbi_path(struct dp* dp, struct imm_path* path, struct step const* end_step);
 
 static void create_trans(struct state_info* states, struct mstate const* const* mm_states,
-                         int nstates, struct state_idx* state_idx);
+                         unsigned nstates, struct state_idx* state_idx);
 
-struct dp* dp_create(struct mstate const* const* mm_states, int nstates, char const* seq,
-                     struct imm_state const* end_state)
+struct dp* dp_create(struct mstate const* const* mm_states, unsigned nstates,
+                     struct imm_seq seq, struct imm_state const* end_state)
 {
-    size_t seq_len = strlen(seq);
-    if (seq_len > UINT_MAX) {
-        imm_error("sequence length is too long, %zu", seq_len);
-        return NULL;
-    }
     struct dp* dp = malloc(sizeof(struct dp));
 
     dp->lprob_zero = imm_lprob_zero();
@@ -110,13 +102,12 @@ struct dp* dp_create(struct mstate const* const* mm_states, int nstates, char co
     struct state_idx* state_idx = state_idx_create();
 
     dp->seq = seq;
-    dp->seq_len = (unsigned)seq_len;
 
     dp->dp_matrix.state_col = malloc(sizeof(int) * ((size_t)nstates));
     dp->dp_matrix.cell = NULL;
     unsigned next_col = 0;
 
-    for (int i = 0; i < nstates; ++i) {
+    for (unsigned i = 0; i < nstates; ++i) {
         dp->states[i].state = mstate_get_state(mm_states[i]);
         dp->states[i].min_seq = imm_state_min_seq(dp->states[i].state);
         dp->states[i].max_seq = imm_state_max_seq(dp->states[i].state);
@@ -134,21 +125,21 @@ struct dp* dp_create(struct mstate const* const* mm_states, int nstates, char co
     create_trans(dp->states, mm_states, nstates, state_idx);
     state_idx_destroy(state_idx);
 
-    dp->dp_matrix.cell = gmatrix_cell_create(dp->seq_len + 1, next_col);
+    dp->dp_matrix.cell = gmatrix_cell_create(dp->seq.length + 1, next_col);
 
     return dp;
 }
 
 double dp_viterbi(struct dp* dp, struct imm_path* path)
 {
-    for (unsigned r = 0; r <= dp->seq_len; ++r) {
-        char const* seq = dp->seq + r;
-        BUG(dp->seq_len < r);
-        unsigned const seq_len = dp->seq_len - r;
+    for (unsigned r = 0; r <= dp->seq.length; ++r) {
+        char const* seq = dp->seq.string + r;
+        BUG(dp->seq.length < r);
+        unsigned const seq_len = dp->seq.length - r;
 
         struct state_info const* cur = dp->states;
 
-        for (int i = 0; i < dp->nstates; ++i, ++cur) {
+        for (unsigned i = 0; i < dp->nstates; ++i, ++cur) {
             struct step step = {.state = cur};
 
             for (unsigned len = cur->min_seq; len <= MIN(cur->max_seq, seq_len); ++len) {
@@ -156,7 +147,8 @@ double dp_viterbi(struct dp* dp, struct imm_path* path)
                 unsigned const col = column(&dp->dp_matrix, &step);
                 struct cell*   cell = gmatrix_cell_get(dp->dp_matrix.cell, r, col);
                 double const   score = best_trans_score(dp, cur, r, &cell->prev_step);
-                cell->score = score + imm_state_lprob(cur->state, seq, len);
+                cell->score =
+                    score + imm_state_lprob(cur->state, (struct imm_seq const){seq, len});
             }
         }
     }
@@ -172,7 +164,7 @@ double dp_viterbi(struct dp* dp, struct imm_path* path)
 
 void dp_destroy(struct dp const* dp)
 {
-    for (int i = 0; i < dp->nstates; ++i)
+    for (unsigned i = 0; i < dp->nstates; ++i)
         array_trans_empty(&dp->states[i].incoming_transitions);
 
     free_c(dp->states);
@@ -232,10 +224,10 @@ static double final_score(struct dp const* dp, struct step* end_step)
     end_step->seq_len = UINT_MAX;
     struct step step = {.state = end_state};
 
-    for (unsigned len = MIN(end_state->max_seq, dp->seq_len);; --len) {
+    for (unsigned len = MIN(end_state->max_seq, dp->seq.length);; --len) {
 
         step.seq_len = len;
-        double s = get_score(&dp->dp_matrix, dp->seq_len - len, &step);
+        double s = get_score(&dp->dp_matrix, dp->seq.length - len, &step);
         if (s > score) {
             score = s;
             end_step->state = dp->end_state;
@@ -252,7 +244,7 @@ static double final_score(struct dp const* dp, struct step* end_step)
 
 static void viterbi_path(struct dp* dp, struct imm_path* path, struct step const* end_step)
 {
-    unsigned           row = dp->seq_len;
+    unsigned           row = dp->seq.length;
     struct step const* step = end_step;
 
     while (step->seq_len != UINT_MAX) {
@@ -265,12 +257,12 @@ static void viterbi_path(struct dp* dp, struct imm_path* path, struct step const
 }
 
 static void create_trans(struct state_info* states, struct mstate const* const* mstates,
-                         int nstates, struct state_idx* state_idx)
+                         unsigned nstates, struct state_idx* state_idx)
 {
-    for (int i = 0; i < nstates; ++i) {
+    for (unsigned i = 0; i < nstates; ++i) {
 
         struct imm_state const*    src_state = mstate_get_state(mstates[i]);
-        int                        src = state_idx_find(state_idx, src_state);
+        unsigned                   src = state_idx_find(state_idx, src_state);
         struct mtrans_table const* table = mstate_get_mtrans_table(mstates[i]);
 
         unsigned long iter = 0;
@@ -284,7 +276,7 @@ static void create_trans(struct state_info* states, struct mstate const* const* 
                 continue;
 
             struct imm_state const* dst_state = mtrans_get_state(mtrans);
-            int                     dst = state_idx_find(state_idx, dst_state);
+            unsigned                dst = state_idx_find(state_idx, dst_state);
 
             struct trans* trans = array_trans_append(&states[dst].incoming_transitions);
             trans->lprob = lprob;

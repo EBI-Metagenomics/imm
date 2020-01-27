@@ -31,7 +31,7 @@ struct edge
 
 KHASH_MAP_INIT_PTR(node, struct node*)
 
-static void create_nodes(struct mstate const** mstates, int nstates,
+static void create_nodes(struct mstate const** mstates, unsigned nstates,
                          struct list_head* node_list, khash_t(node) * node_table);
 static void destroy_node_list(struct list_head* node_list);
 static void destroy_node(struct node* node);
@@ -42,7 +42,7 @@ static int  check_mute_cycles(struct list_head* node_list);
 static int  check_mute_visit(struct node* node);
 static void unmark_nodes(struct list_head* node_list);
 
-int mstate_sort(struct mstate const** mstates, int nstates)
+int mstate_sort(struct mstate const** mstates, unsigned nstates)
 {
     struct list_head node_list = LIST_HEAD_INIT(node_list);
     khash_t(node)* node_table = kh_init(node);
@@ -64,17 +64,17 @@ int mstate_sort(struct mstate const** mstates, int nstates)
     destroy_node_list(&node_list);
     kh_destroy(node, node_table);
 
-    for (int i = 0; i < nstates; ++i)
+    for (unsigned i = 0; i < nstates; ++i)
         mstates[i] = mstate_arr[i];
 
     free_c(mstate_arr);
     return 0;
 }
 
-static void create_nodes(struct mstate const** mstates, int nstates,
+static void create_nodes(struct mstate const** mstates, unsigned nstates,
                          struct list_head* node_list, khash_t(node) * node_table)
 {
-    for (int i = 0; i < nstates; ++i) {
+    for (unsigned i = 0; i < nstates; ++i) {
         struct mstate const* mstate = mstates[i];
 
         struct node* node = malloc(sizeof(struct node));
