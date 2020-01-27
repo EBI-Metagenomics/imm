@@ -15,8 +15,8 @@ struct imm_sequence_table
 {
     struct imm_abc const* abc;
     khash_t(emission) * emission_table;
-    int min_seq;
-    int max_seq;
+    unsigned min_seq;
+    unsigned max_seq;
 };
 
 struct imm_sequence_table* imm_sequence_table_create(struct imm_abc const* abc)
@@ -101,7 +101,7 @@ int imm_sequence_table_normalize(struct imm_sequence_table* table)
         }
     }
 
-    if (imm_lprob_normalize(lprobs, (int const)len)) {
+    if (imm_lprob_normalize(lprobs, len)) {
         free_c(lprobs);
         return 1;
     }
@@ -119,7 +119,7 @@ int imm_sequence_table_normalize(struct imm_sequence_table* table)
 }
 
 double imm_sequence_table_lprob(struct imm_sequence_table const* table, char const* seq,
-                                int seq_len)
+                                unsigned seq_len)
 {
     char const* key = strndup(seq, (size_t)seq_len);
     khiter_t    i = kh_get(emission, table->emission_table, key);
@@ -136,12 +136,12 @@ struct imm_abc const* imm_sequence_table_get_abc(struct imm_sequence_table const
     return table->abc;
 }
 
-int imm_sequence_table_min_seq(struct imm_sequence_table const* table)
+unsigned imm_sequence_table_min_seq(struct imm_sequence_table const* table)
 {
     return table->min_seq;
 }
 
-int imm_sequence_table_max_seq(struct imm_sequence_table const* table)
+unsigned imm_sequence_table_max_seq(struct imm_sequence_table const* table)
 {
     return table->max_seq;
 }

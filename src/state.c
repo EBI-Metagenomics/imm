@@ -53,10 +53,10 @@ char const* imm_state_get_name(struct imm_state const* s) { return s->name; }
 
 struct imm_abc const* imm_state_get_abc(struct imm_state const* s) { return s->abc; }
 
-double imm_state_lprob(struct imm_state const* state, char const* seq, int seq_len)
+double imm_state_lprob(struct imm_state const* state, char const* seq, unsigned seq_len)
 {
 #ifdef DEBUG
-    for (int i = 0; i < seq_len; ++i) {
+    for (unsigned i = 0; i < seq_len; ++i) {
         if (!imm_abc_has_symbol(imm_state_get_abc(state), seq[i])) {
             imm_error("alphabet does not have symbol %c", seq[i]);
             return imm_lprob_invalid();
@@ -66,9 +66,9 @@ double imm_state_lprob(struct imm_state const* state, char const* seq, int seq_l
     return state->lprob(state, seq, seq_len);
 }
 
-int imm_state_min_seq(struct imm_state const* state) { return state->min_seq(state); }
+unsigned imm_state_min_seq(struct imm_state const* state) { return state->min_seq(state); }
 
-int imm_state_max_seq(struct imm_state const* state) { return state->max_seq(state); }
+unsigned imm_state_max_seq(struct imm_state const* state) { return state->max_seq(state); }
 
 struct imm_state const* imm_state_cast_c(void const* state)
 {

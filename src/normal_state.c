@@ -10,9 +10,10 @@ struct imm_normal_state
     double*                 lprobs;
 };
 
-static double normal_state_lprob(struct imm_state const* state, char const* seq, int seq_len);
-static int    normal_state_min_seq(struct imm_state const* state);
-static int    normal_state_max_seq(struct imm_state const* state);
+static double   normal_state_lprob(struct imm_state const* state, char const* seq,
+                                   unsigned seq_len);
+static unsigned normal_state_min_seq(struct imm_state const* state);
+static unsigned normal_state_max_seq(struct imm_state const* state);
 
 struct imm_normal_state const* imm_normal_state_create(char const*           name,
                                                        struct imm_abc const* abc,
@@ -42,7 +43,8 @@ void imm_normal_state_destroy(struct imm_normal_state const* state)
     free_c(state);
 }
 
-static double normal_state_lprob(struct imm_state const* state, char const* seq, int seq_len)
+static double normal_state_lprob(struct imm_state const* state, char const* seq,
+                                 unsigned seq_len)
 {
     struct imm_normal_state const* s = imm_state_get_impl_c(state);
     if (seq_len == 1) {
@@ -54,6 +56,6 @@ static double normal_state_lprob(struct imm_state const* state, char const* seq,
     return imm_lprob_zero();
 }
 
-static int normal_state_min_seq(struct imm_state const* state) { return 1; }
+static unsigned normal_state_min_seq(struct imm_state const* state) { return 1; }
 
-static int normal_state_max_seq(struct imm_state const* state) { return 1; }
+static unsigned normal_state_max_seq(struct imm_state const* state) { return 1; }

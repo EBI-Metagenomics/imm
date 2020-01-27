@@ -12,10 +12,10 @@ IMM_API int    imm_sequence_table_add(struct imm_sequence_table* table, char con
                                       double lprob);
 IMM_API int    imm_sequence_table_normalize(struct imm_sequence_table* table);
 IMM_API double imm_sequence_table_lprob(struct imm_sequence_table const* table,
-                                        char const* seq, int seq_len);
+                                        char const* seq, unsigned seq_len);
 IMM_API struct imm_abc const* imm_sequence_table_get_abc(
     struct imm_sequence_table const* table);
-IMM_API int imm_sequence_table_min_seq(struct imm_sequence_table const* table);
-IMM_API int imm_sequence_table_max_seq(struct imm_sequence_table const* table);
+IMM_API unsigned imm_sequence_table_min_seq(struct imm_sequence_table const* table);
+IMM_API unsigned imm_sequence_table_max_seq(struct imm_sequence_table const* table);
 
 #endif

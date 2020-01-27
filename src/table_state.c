@@ -10,9 +10,10 @@ struct imm_table_state
     struct imm_sequence_table const* table;
 };
 
-static double table_state_lprob(struct imm_state const* state, char const* seq, int seq_len);
-static int    table_state_min_seq(struct imm_state const* state);
-static int    table_state_max_seq(struct imm_state const* state);
+static double   table_state_lprob(struct imm_state const* state, char const* seq,
+                                  unsigned seq_len);
+static unsigned table_state_min_seq(struct imm_state const* state);
+static unsigned table_state_max_seq(struct imm_state const* state);
 
 struct imm_table_state* imm_table_state_create(char const*                      name,
                                                struct imm_sequence_table const* table)
@@ -38,19 +39,20 @@ void imm_table_state_destroy(struct imm_table_state const* state)
     free_c(state);
 }
 
-static double table_state_lprob(struct imm_state const* state, char const* seq, int seq_len)
+static double table_state_lprob(struct imm_state const* state, char const* seq,
+                                unsigned seq_len)
 {
     struct imm_table_state const* s = imm_state_get_impl_c(state);
     return imm_sequence_table_lprob(s->table, seq, seq_len);
 }
 
-static int table_state_min_seq(struct imm_state const* state)
+static unsigned table_state_min_seq(struct imm_state const* state)
 {
     struct imm_table_state const* s = imm_state_get_impl_c(state);
     return imm_sequence_table_min_seq(s->table);
 }
 
-static int table_state_max_seq(struct imm_state const* state)
+static unsigned table_state_max_seq(struct imm_state const* state)
 {
     struct imm_table_state const* s = imm_state_get_impl_c(state);
     return imm_sequence_table_max_seq(s->table);

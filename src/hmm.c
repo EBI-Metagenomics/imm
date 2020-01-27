@@ -6,6 +6,7 @@
 #include "mstate_table.h"
 #include "mtrans.h"
 #include "mtrans_table.h"
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -17,7 +18,7 @@ struct imm_hmm
 
 static double hmm_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state);
 static int    hmm_normalize_trans(struct mstate* mstate);
-static int    abc_has_symbols(struct imm_abc const* abc, char const* seq, int seq_len);
+static int    abc_has_symbols(struct imm_abc const* abc, char const* seq, unsigned seq_len);
 
 struct imm_hmm* imm_hmm_create(struct imm_abc const* abc)
 {
@@ -144,7 +145,12 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, char const* seq,
         imm_error("path or seq is NULL");
         return imm_lprob_invalid();
     }
-    int seq_len = (int)strlen(seq);
+    size_t tmp = strlen(seq);
+    if (tmp > UINT_MAX) {
+        imm_error("sequence length is too long, %zu", tmp);
+        return imm_lprob_invalid();
+    }
+    unsigned seq_len = (unsigned)tmp;
 
     struct imm_step const* step = imm_path_first(path);
     if (!step) {
@@ -152,7 +158,7 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, char const* seq,
         return imm_lprob_invalid();
     }
 
-    int                     len = imm_step_seq_len(step);
+    unsigned                len = imm_step_seq_len(step);
     struct imm_state const* state = imm_step_state(step);
 
     if (len > seq_len)
@@ -238,7 +244,7 @@ double imm_hmm_viterbi(struct imm_hmm const* hmm, char const* seq,
     }
 
     struct dp* dp = dp_create(mstates, mstate_table_size(hmm->table), seq, end_state);
-    double score = dp_viterbi(dp, path);
+    double     score = dp_viterbi(dp, path);
     dp_destroy(dp);
 
     free_c(mstates);
@@ -357,9 +363,9 @@ static int hmm_normalize_trans(struct mstate* mstate)
     return 0;
 }
 
-static int abc_has_symbols(struct imm_abc const* abc, char const* seq, int seq_len)
+static int abc_has_symbols(struct imm_abc const* abc, char const* seq, unsigned seq_len)
 {
-    for (int i = 0; i < seq_len; ++i)
+    for (unsigned i = 0; i < seq_len; ++i)
         if (!imm_abc_has_symbol(abc, seq[i]))
             return 0;
     return 1;
