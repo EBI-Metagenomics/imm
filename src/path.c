@@ -5,13 +5,13 @@
 struct imm_step
 {
     struct imm_state const* state;
-    int                     seq_len;
-    struct list_head        list;
+    unsigned                seq_len;
+    struct list_head        list_entry;
 };
 
 struct imm_state const* imm_step_state(struct imm_step const* step) { return step->state; }
 
-int imm_step_seq_len(struct imm_step const* step) { return step->seq_len; }
+unsigned imm_step_seq_len(struct imm_step const* step) { return step->seq_len; }
 
 struct imm_path
 {
@@ -35,18 +35,16 @@ void imm_path_destroy(struct imm_path const* path)
     struct list_head *entry = NULL, *tmp = NULL;
     list_for_each_safe(entry, tmp, &path->steps)
     {
-        struct imm_step* step = list_entry(entry, struct imm_step, list);
-        step->state = NULL;
-        step->seq_len = -1;
+        struct imm_step const* step = list_entry(entry, struct imm_step, list_entry);
         list_del(entry);
         free_c(step);
     }
     free_c(path);
 }
 
-static struct imm_step* create_step(struct imm_state const* state, int seq_len);
+static struct imm_step* create_step(struct imm_state const* state, unsigned const seq_len);
 
-int imm_path_append(struct imm_path* path, struct imm_state const* state, int seq_len)
+int imm_path_append(struct imm_path* path, struct imm_state const* state, unsigned seq_len)
 {
     if (!path) {
         imm_error("path cannot be NULL");
@@ -55,11 +53,11 @@ int imm_path_append(struct imm_path* path, struct imm_state const* state, int se
     struct imm_step* step = create_step(state, seq_len);
     if (!step)
         return 1;
-    list_add_tail(&step->list, &path->steps);
+    list_add_tail(&step->list_entry, &path->steps);
     return 0;
 }
 
-int imm_path_prepend(struct imm_path* path, struct imm_state const* state, int seq_len)
+int imm_path_prepend(struct imm_path* path, struct imm_state const* state, unsigned seq_len)
 {
     if (!path) {
         imm_error("path cannot be NULL");
@@ -68,31 +66,31 @@ int imm_path_prepend(struct imm_path* path, struct imm_state const* state, int s
     struct imm_step* step = create_step(state, seq_len);
     if (!step)
         return 1;
-    list_add(&step->list, &path->steps);
+    list_add(&step->list_entry, &path->steps);
     return 0;
 }
 
 struct imm_step const* imm_path_first(struct imm_path const* path)
 {
-    return list_first_entry_or_null(&path->steps, struct imm_step, list);
+    return list_first_entry_or_null(&path->steps, struct imm_step, list_entry);
 }
 
 struct imm_step const* imm_path_last(struct imm_path const* path)
 {
     if (list_empty(&path->steps))
         return NULL;
-    return list_last_entry(&path->steps, struct imm_step, list);
+    return list_last_entry(&path->steps, struct imm_step, list_entry);
 }
 
 struct imm_step const* imm_path_next(struct imm_path const* path, struct imm_step const* step)
 {
-    struct imm_step const* next = list_next_entry(step, list);
-    if (&path->steps != &next->list)
+    struct imm_step const* next = list_next_entry(step, list_entry);
+    if (&path->steps != &next->list_entry)
         return next;
     return NULL;
 }
 
-static struct imm_step* create_step(struct imm_state const* state, int seq_len)
+static struct imm_step* create_step(struct imm_state const* state, unsigned seq_len)
 {
     if (!state) {
         imm_error("state cannot be NULL");
