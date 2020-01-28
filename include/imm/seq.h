@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 /**
- * Sequence of characters (not null-terminated string).
+ * Sequence of characters. No need for null-terminated string.
  */
 struct imm_seq
 {

@@ -1385,14 +1385,14 @@ void test_hmm_viterbi_table_states(void)
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
     struct imm_mute_state const* S = imm_mute_state_create("S", abc);
-    struct imm_sequence_table*   table = imm_sequence_table_create(abc);
-    imm_sequence_table_add(table, IMM_SEQ(""), log(0.5));
-    imm_sequence_table_add(table, IMM_SEQ("A"), log(0.1));
-    imm_sequence_table_add(table, IMM_SEQ("TAT"), log(0.2));
-    cass_cond(imm_sequence_table_lprob(table, IMM_SEQ("")) == log(0.5));
-    cass_cond(imm_sequence_table_lprob(table, IMM_SEQ("A")) == log(0.1));
-    cass_cond(imm_sequence_table_lprob(table, IMM_SEQ("TAT")) == log(0.2));
-    cass_cond(imm_lprob_is_zero(imm_sequence_table_lprob(table, IMM_SEQ("T"))));
+    struct imm_seq_table*        table = imm_seq_table_create(abc);
+    imm_seq_table_add(table, IMM_SEQ(""), log(0.5));
+    imm_seq_table_add(table, IMM_SEQ("A"), log(0.1));
+    imm_seq_table_add(table, IMM_SEQ("TAT"), log(0.2));
+    cass_cond(imm_seq_table_lprob(table, IMM_SEQ("")) == log(0.5));
+    cass_cond(imm_seq_table_lprob(table, IMM_SEQ("A")) == log(0.1));
+    cass_cond(imm_seq_table_lprob(table, IMM_SEQ("TAT")) == log(0.2));
+    cass_cond(imm_lprob_is_zero(imm_seq_table_lprob(table, IMM_SEQ("T"))));
     struct imm_table_state* T = imm_table_state_create("T", table);
 
     struct imm_mute_state const* D = imm_mute_state_create("D", abc);

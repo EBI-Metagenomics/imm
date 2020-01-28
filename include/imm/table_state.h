@@ -9,11 +9,11 @@
  * An object of type @ref imm_table_state is meant to be immutable.
  */
 
-struct imm_sequence_table;
+struct imm_seq_table;
 struct imm_table_state;
 
-IMM_API struct imm_table_state* imm_table_state_create(char const*                      name,
-                                                       struct imm_sequence_table const* table);
+IMM_API struct imm_table_state* imm_table_state_create(char const*                 name,
+                                                       struct imm_seq_table const* table);
 IMM_API void                    imm_table_state_destroy(struct imm_table_state const* state);
 
 #endif
