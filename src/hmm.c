@@ -1,7 +1,11 @@
+#include "imm/hmm.h"
 #include "bug.h"
 #include "dp.h"
 #include "free.h"
-#include "imm/imm.h"
+#include "imm/lprob.h"
+#include "imm/path.h"
+#include "imm/report.h"
+#include "imm/state.h"
 #include "mstate.h"
 #include "mstate_sort.h"
 #include "mstate_table.h"
@@ -31,22 +35,12 @@ struct imm_hmm* imm_hmm_create(struct imm_abc const* abc)
 
 void imm_hmm_destroy(struct imm_hmm* hmm)
 {
-    if (!hmm) {
-        imm_error("hmm should not be NULL");
-        return;
-    }
-
     mstate_table_destroy(hmm->table);
     free_c(hmm);
 }
 
 int imm_hmm_add_state(struct imm_hmm* hmm, struct imm_state const* state, double start_lprob)
 {
-    if (!state) {
-        imm_error("state cannot be NULL");
-        return 1;
-    }
-
     unsigned long i = mstate_table_find(hmm->table, state);
     if (i != mstate_table_end(hmm->table)) {
         imm_error("state already exists");
@@ -142,18 +136,11 @@ double imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* src_
 double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
                           struct imm_path const* path)
 {
-    if (!path || !seq) {
-        imm_error("path or seq is NULL");
-        return imm_lprob_invalid();
-    }
-
     if (hmm->abc != imm_seq_get_abc(seq)) {
         imm_error("hmm and seq must have the same alphabet");
         return imm_lprob_invalid();
     }
 
-    /* char const* str = seq.string; */
-    /* unsigned    str_len = seq.length; */
     unsigned str_len = imm_seq_length(seq);
 
     struct imm_step const* step = imm_path_first(path);
@@ -164,18 +151,17 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
 
     unsigned                len = imm_step_seq_len(step);
     struct imm_state const* state = imm_step_state(step);
-    struct subseq* subseq = subseq_create(seq);
+    struct subseq*          subseq = subseq_create(seq);
 
     if (len > str_len)
         goto len_mismatch;
     if (!state)
         goto not_found_state;
 
-    unsigned       start = 0;
+    unsigned start = 0;
     subseq_set(subseq, start, len);
 
     double lprob = hmm_start_lprob(hmm, state) + imm_state_lprob(state, subseq_cast(subseq));
-    /* hmm_start_lprob(hmm, state) + imm_state_lprob(state, (struct imm_seq){str, len}); */
 
     struct imm_state const* prev_state = NULL;
 
@@ -194,13 +180,11 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
 
         lprob += imm_hmm_get_trans(hmm, prev_state, state) +
                  imm_state_lprob(state, subseq_cast(subseq));
-        /* imm_state_lprob(state, (struct imm_seq){str, len}); */
         if (!imm_lprob_is_valid(lprob))
             return imm_lprob_invalid();
 
     enter:
         prev_state = state;
-        /* str += len; */
         start += len;
         BUG(str_len < len);
         str_len -= len;
@@ -229,11 +213,6 @@ double imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq,
                        struct imm_state const* end_state, struct imm_path* path)
 
 {
-    if (!hmm || !seq || !end_state || !path) {
-        imm_error("viterbi input cannot be NULL");
-        return imm_lprob_invalid();
-    }
-
     if (hmm->abc != imm_seq_get_abc(seq)) {
         imm_error("hmm and seq must have the same alphabet");
         return imm_lprob_invalid();
