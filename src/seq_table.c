@@ -31,11 +31,6 @@ struct imm_seq_table* imm_seq_table_create(struct imm_abc const* abc)
 
 void imm_seq_table_destroy(struct imm_seq_table const* table)
 {
-    if (!table) {
-        imm_error("table should not be NULL");
-        return;
-    }
-
     khash_t(emission)* emiss_tbl = table->emission_table;
 
     for (khiter_t i = kh_begin(emiss_tbl); i < kh_end(emiss_tbl); ++i) {
@@ -53,10 +48,6 @@ void imm_seq_table_destroy(struct imm_seq_table const* table)
 int imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const* seq,
                       double const lprob)
 {
-    if (!seq) {
-        imm_error("seq should not be NULL");
-        return 1;
-    }
     if (table->abc != imm_seq_get_abc(seq)) {
         imm_error("alphabets must be the same");
         return 1;

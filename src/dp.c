@@ -135,7 +135,6 @@ double dp_viterbi(struct dp* dp, struct imm_path* path)
 {
     struct subseq* subseq = subseq_create(dp->seq);
     for (unsigned r = 0; r <= imm_seq_length(dp->seq); ++r) {
-        /* char const* seq = imm_seq_string(dp->seq) + r; */
         BUG(imm_seq_length(dp->seq) < r);
         unsigned const seq_len = imm_seq_length(dp->seq) - r;
 
@@ -149,7 +148,6 @@ double dp_viterbi(struct dp* dp, struct imm_path* path)
                 unsigned const col = column(&dp->dp_matrix, &step);
                 struct cell*   cell = gmatrix_cell_get(dp->dp_matrix.cell, r, col);
                 double const   score = best_trans_score(dp, cur, r, &cell->prev_step);
-                /* struct imm_seq tmp = {seq, len}; */
                 subseq_set(subseq, r, len);
                 cell->score = score + imm_state_lprob(cur->state, subseq_cast(subseq));
             }

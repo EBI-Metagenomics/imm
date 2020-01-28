@@ -27,7 +27,10 @@ struct subseq
 struct imm_seq const* imm_seq_create(char const* seq, struct imm_abc const* abc)
 {
     size_t length = strlen(seq);
-    BUG(length > UINT_MAX);
+    if (length > UINT_MAX) {
+        imm_error("sequence is too long");
+        return NULL;
+    }
 
     for (unsigned i = 0; i < length; ++i) {
         if (!imm_abc_has_symbol(abc, seq[i]) && seq[i] != imm_abc_any_symbol(abc)) {
@@ -60,17 +63,12 @@ struct imm_seq const* imm_seq_duplicate(struct imm_seq const* seq)
 
 void imm_seq_destroy(struct imm_seq const* seq)
 {
-    if (!seq) {
-        imm_error("seq should not be NULL");
-        return;
-    }
     free_c(seq->string);
     free_c(seq);
 }
 
 struct subseq* subseq_create(struct imm_seq const* seq)
 {
-    BUG(seq == NULL);
     struct subseq* subseq = malloc(sizeof(struct subseq));
     subseq->seq = seq;
     subseq->subseq.abc = seq->abc;
@@ -86,12 +84,4 @@ void subseq_set(struct subseq* subseq, unsigned start, unsigned length)
 
 struct imm_seq const* subseq_cast(struct subseq const* subseq) { return &subseq->subseq; }
 
-void subseq_destroy(struct subseq const* subseq)
-{
-    if (!subseq) {
-        imm_error("subseq should not be NULL");
-        return;
-    }
-
-    free_c(subseq);
-}
+void subseq_destroy(struct subseq const* subseq) { free_c(subseq); }

@@ -150,11 +150,6 @@ void test_hmm_likelihood_single_state(void)
     imm_path_destroy(path);
 
     path = imm_path_create();
-    imm_path_append(path, NULL, 1);
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, A, path)));
-    imm_path_destroy(path);
-
-    path = imm_path_create();
     imm_path_append(path, cast_c(state), 1);
     imm_path_append(path, cast_c(state), 1);
     cass_cond(is_zero(imm_hmm_likelihood(hmm, AA, path)));

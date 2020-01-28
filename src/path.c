@@ -27,11 +27,6 @@ struct imm_path* imm_path_create(void)
 
 void imm_path_destroy(struct imm_path const* path)
 {
-    if (!path) {
-        imm_error("path should not be NULL");
-        return;
-    }
-
     struct list_head *entry = NULL, *tmp = NULL;
     list_for_each_safe(entry, tmp, &path->steps)
     {
@@ -46,10 +41,6 @@ static struct imm_step* create_step(struct imm_state const* state, unsigned cons
 
 int imm_path_append(struct imm_path* path, struct imm_state const* state, unsigned seq_len)
 {
-    if (!path) {
-        imm_error("path cannot be NULL");
-        return 1;
-    }
     struct imm_step* step = create_step(state, seq_len);
     if (!step)
         return 1;
@@ -59,10 +50,6 @@ int imm_path_append(struct imm_path* path, struct imm_state const* state, unsign
 
 int imm_path_prepend(struct imm_path* path, struct imm_state const* state, unsigned seq_len)
 {
-    if (!path) {
-        imm_error("path cannot be NULL");
-        return 1;
-    }
     struct imm_step* step = create_step(state, seq_len);
     if (!step)
         return 1;
@@ -92,14 +79,6 @@ struct imm_step const* imm_path_next(struct imm_path const* path, struct imm_ste
 
 static struct imm_step* create_step(struct imm_state const* state, unsigned seq_len)
 {
-    if (!state) {
-        imm_error("state cannot be NULL");
-        return NULL;
-    }
-    if (seq_len < 0) {
-        imm_error("seq_len cannot be negative");
-        return NULL;
-    }
     if (seq_len < imm_state_min_seq(state) || imm_state_max_seq(state) < seq_len) {
         imm_error("seq_len outside the state's range");
         return NULL;

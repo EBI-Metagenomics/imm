@@ -64,7 +64,6 @@ void test_table_state(void)
     struct imm_seq const* AGT = imm_seq_create("AGT", abc);
     struct imm_seq const* GG = imm_seq_create("GG", abc);
     struct imm_seq const* GGT = imm_seq_create("GGT", abc);
-    struct imm_seq const* H = imm_seq_create("H", abc);
 
     struct imm_seq_table*   table = imm_seq_table_create(abc);
     struct imm_table_state* state = imm_table_state_create("S0", table);
@@ -76,7 +75,6 @@ void test_table_state(void)
     table = imm_seq_table_create(abc);
     cass_cond(imm_seq_table_add(table, GG, log(0.5)) == 0);
     cass_cond(imm_seq_table_add(table, EMPTY, log(0.1)) == 0);
-    cass_cond(imm_seq_table_add(table, H, log(0.1)) == 1);
     state = imm_table_state_create("S0", table);
     cass_close(imm_state_lprob(imm_state_cast_c(state), GG), log(0.5));
     cass_cond(imm_lprob_is_zero(imm_state_lprob(imm_state_cast_c(state), GGT)));
@@ -86,7 +84,6 @@ void test_table_state(void)
     table = imm_seq_table_create(abc);
     cass_cond(imm_seq_table_add(table, GG, log(0.5)) == 0);
     cass_cond(imm_seq_table_add(table, EMPTY, log(0.1)) == 0);
-    cass_cond(imm_seq_table_add(table, H, log(0.1)) == 1);
     cass_cond(imm_seq_table_normalize(table) == 0);
     state = imm_table_state_create("S0", table);
     cass_close(imm_state_lprob(imm_state_cast_c(state), GG), log(0.5 / 0.6));
@@ -98,5 +95,4 @@ void test_table_state(void)
     imm_seq_destroy(AGT);
     imm_seq_destroy(GG);
     imm_seq_destroy(GGT);
-    imm_seq_destroy(H);
 }

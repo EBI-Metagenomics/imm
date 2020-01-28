@@ -32,11 +32,6 @@ struct imm_normal_state const* imm_normal_state_create(char const*           nam
 
 void imm_normal_state_destroy(struct imm_normal_state const* state)
 {
-    if (!state) {
-        imm_error("state should not be NULL");
-        return;
-    }
-
     imm_state_destroy(state->interface);
     free_c(state->lprobs);
     free_c(state);

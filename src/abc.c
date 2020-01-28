@@ -84,11 +84,6 @@ struct imm_abc const* imm_abc_clone(struct imm_abc const* abc)
 
 void imm_abc_destroy(struct imm_abc const* abc)
 {
-    if (!abc) {
-        imm_error("abc should not be NULL");
-        return;
-    }
-
     free_c(abc->symbols);
     free_c(abc);
 }

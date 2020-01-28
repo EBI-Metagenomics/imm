@@ -1,4 +1,5 @@
 #include "ascii.h"
+#include "bug.h"
 #include "free.h"
 #include "imm/imm.h"
 #include <stdlib.h>
@@ -40,11 +41,6 @@ struct imm_state const* imm_state_create(char const* name, struct imm_abc const*
 
 void imm_state_destroy(struct imm_state const* state)
 {
-    if (!state) {
-        imm_error("state should not be NULL");
-        return;
-    }
-
     free_c(state->name);
     free_c(state);
 }
@@ -53,16 +49,9 @@ char const* imm_state_get_name(struct imm_state const* s) { return s->name; }
 
 struct imm_abc const* imm_state_get_abc(struct imm_state const* s) { return s->abc; }
 
-double imm_state_lprob(struct imm_state const* state, struct imm_seq const *seq)
+double imm_state_lprob(struct imm_state const* state, struct imm_seq const* seq)
 {
-#ifdef DEBUG
-    for (unsigned i = 0; i < seq.length; ++i) {
-        if (!imm_abc_has_symbol(imm_state_get_abc(state), seq.string[i])) {
-            imm_error("alphabet does not have symbol %c", seq.string[i]);
-            return imm_lprob_invalid();
-        }
-    }
-#endif
+    BUG(state->abc != imm_seq_get_abc(seq));
     return state->lprob(state, seq);
 }
 
