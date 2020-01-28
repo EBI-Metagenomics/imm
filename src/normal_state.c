@@ -1,6 +1,8 @@
+#include "imm/normal_state.h"
 #include "free.h"
-#include "imm/imm.h"
-#include <math.h>
+#include "imm/abc.h"
+#include "imm/lprob.h"
+#include "imm/state.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -20,7 +22,7 @@ struct imm_normal_state const* imm_normal_state_create(char const*           nam
 {
     struct imm_normal_state* state = malloc(sizeof(struct imm_normal_state));
 
-    size_t len = (size_t)imm_abc_length(abc);
+    size_t len = imm_abc_length(abc);
     state->lprobs = malloc(sizeof(double) * len);
     memcpy(state->lprobs, lprobs, sizeof(double) * len);
 

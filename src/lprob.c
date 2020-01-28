@@ -1,4 +1,5 @@
-#include "imm/imm.h"
+#include "imm/lprob.h"
+#include "imm/report.h"
 #include "logaddexp.h"
 
 IMM_API double imm_lprob_zero(void) { return -INFINITY; }

@@ -141,25 +141,22 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
         return imm_lprob_invalid();
     }
 
-    unsigned str_len = imm_seq_length(seq);
-
     struct imm_step const* step = imm_path_first(path);
     if (!step) {
         imm_error("path must have steps");
         return imm_lprob_invalid();
     }
 
-    unsigned                len = imm_step_seq_len(step);
+    unsigned                step_len = imm_step_seq_len(step);
     struct imm_state const* state = imm_step_state(step);
     struct subseq*          subseq = subseq_create(seq);
 
-    if (len > str_len)
+    unsigned remain_len = imm_seq_length(seq);
+    if (step_len > remain_len)
         goto len_mismatch;
-    if (!state)
-        goto not_found_state;
 
     unsigned start = 0;
-    subseq_set(subseq, start, len);
+    subseq_set(subseq, start, step_len);
 
     double lprob = hmm_start_lprob(hmm, state) + imm_state_lprob(state, subseq_cast(subseq));
 
@@ -167,35 +164,30 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
 
     goto enter;
     while (step) {
-        len = imm_step_seq_len(step);
+        step_len = imm_step_seq_len(step);
         state = imm_step_state(step);
 
-        if (len > str_len)
+        if (step_len > remain_len)
             goto len_mismatch;
 
-        subseq_set(subseq, start, len);
+        subseq_set(subseq, start, step_len);
 
-        if (!state)
-            goto not_found_state;
+        lprob += imm_hmm_get_trans(hmm, prev_state, state);
+        lprob += imm_state_lprob(state, subseq_cast(subseq));
 
-        lprob += imm_hmm_get_trans(hmm, prev_state, state) +
-                 imm_state_lprob(state, subseq_cast(subseq));
-        if (!imm_lprob_is_valid(lprob)) {
-            subseq_destroy(subseq);
-            return imm_lprob_invalid();
-        }
+        if (!imm_lprob_is_valid(lprob))
+            goto invalid;
 
     enter:
         prev_state = state;
-        start += len;
-        BUG(str_len < len);
-        str_len -= len;
+        start += step_len;
+        BUG(remain_len < step_len);
+        remain_len -= step_len;
         step = imm_path_next(path, step);
     }
-    if (str_len > 0) {
+    if (remain_len > 0) {
         imm_error("sequence is longer than symbols emitted by path");
-        subseq_destroy(subseq);
-        return imm_lprob_invalid();
+        goto invalid;
     }
 
     subseq_destroy(subseq);
@@ -203,18 +195,14 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
 
 len_mismatch:
     imm_error("path emitted more symbols than sequence");
-    subseq_destroy(subseq);
-    return imm_lprob_invalid();
 
-not_found_state:
-    imm_error("state was not found");
+invalid:
     subseq_destroy(subseq);
     return imm_lprob_invalid();
 }
 
 double imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq,
                        struct imm_state const* end_state, struct imm_path* path)
-
 {
     if (hmm->abc != imm_seq_get_abc(seq)) {
         imm_error("hmm and seq must have the same alphabet");

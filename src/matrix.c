@@ -1,6 +1,6 @@
 #include "matrix.h"
 #include "free.h"
-#include "imm/imm.h"
+#include "imm/report.h"
 #include <stdlib.h>
 
 struct matrix* matrix_create(int nrows, int ncols)

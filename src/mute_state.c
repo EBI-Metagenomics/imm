@@ -1,6 +1,7 @@
+#include "imm/mute_state.h"
 #include "free.h"
-#include "imm/imm.h"
-#include <math.h>
+#include "imm/lprob.h"
+#include "imm/state.h"
 #include <stdlib.h>
 
 struct imm_mute_state

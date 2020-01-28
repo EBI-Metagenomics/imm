@@ -1,5 +1,7 @@
+#include "imm/seq_table.h"
 #include "free.h"
-#include "imm/imm.h"
+#include "imm/lprob.h"
+#include "imm/report.h"
 #include "khash_seq.h"
 #include "min.h"
 

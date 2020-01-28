@@ -1,7 +1,8 @@
+#include "imm/table_state.h"
 #include "free.h"
-#include "imm/imm.h"
+#include "imm/seq_table.h"
+#include "imm/state.h"
 #include "min.h"
-#include <math.h>
 #include <stdlib.h>
 
 struct imm_table_state
