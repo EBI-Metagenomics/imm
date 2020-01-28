@@ -139,12 +139,13 @@ void test_perf_viterbi(void)
     cass_cond(strlen(str) == 2000);
 
     elapsed_start(elapsed);
-    struct imm_seq const seq = {str, strlen(str)};
-    double               score = imm_hmm_viterbi(hmm, seq, cast_c(end), path);
+    struct imm_seq const* seq = imm_seq_create(str, abc);
+    double                score = imm_hmm_viterbi(hmm, seq, cast_c(end), path);
     cass_cond(is_valid(score) && !is_zero(score));
     cass_close(score, -65826.0106185297);
     elapsed_end(elapsed);
     imm_path_destroy(path);
+    imm_seq_destroy(seq);
 
 #ifdef NDEBUG
     cass_cond(elapsed_seconds(elapsed) < 1.0);

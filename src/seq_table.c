@@ -5,8 +5,8 @@
 
 struct emission
 {
-    struct imm_seq seq;
-    double         lprob;
+    struct imm_seq const* seq;
+    double                lprob;
 };
 
 KHASH_MAP_INIT_SEQ(emission, struct emission*)
@@ -50,14 +50,16 @@ void imm_seq_table_destroy(struct imm_seq_table const* table)
     free_c(table);
 }
 
-int imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const seq,
+int imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const* seq,
                       double const lprob)
 {
-    for (unsigned i = 0; i < seq.length; ++i) {
-        if (!imm_abc_has_symbol(table->abc, seq.string[i])) {
-            imm_error("symbol not found in the alphabet");
-            return 1;
-        }
+    if (!seq) {
+        imm_error("seq should not be NULL");
+        return 1;
+    }
+    if (table->abc != imm_seq_get_abc(seq)) {
+        imm_error("alphabets must be the same");
+        return 1;
     }
 
     int      ret = 0;
@@ -78,8 +80,8 @@ int imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const seq,
     kh_key(table->emission_table, iter) = emiss->seq;
     kh_val(table->emission_table, iter) = emiss;
 
-    table->min_seq = MIN(table->min_seq, seq.length);
-    table->max_seq = MAX(table->max_seq, seq.length);
+    table->min_seq = MIN(table->min_seq, imm_seq_length(seq));
+    table->max_seq = MAX(table->max_seq, imm_seq_length(seq));
 
     return 0;
 }
@@ -116,8 +118,13 @@ int imm_seq_table_normalize(struct imm_seq_table* table)
     return 0;
 }
 
-double imm_seq_table_lprob(struct imm_seq_table const* table, struct imm_seq const seq)
+double imm_seq_table_lprob(struct imm_seq_table const* table, struct imm_seq const* seq)
 {
+    if (table->abc != imm_seq_get_abc(seq)) {
+        imm_error("alphabets must be the same");
+        return 1;
+    }
+
     khiter_t i = kh_get(emission, table->emission_table, seq);
 
     if (i == kh_end(table->emission_table))

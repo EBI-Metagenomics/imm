@@ -53,7 +53,7 @@ char const* imm_state_get_name(struct imm_state const* s) { return s->name; }
 
 struct imm_abc const* imm_state_get_abc(struct imm_state const* s) { return s->abc; }
 
-double imm_state_lprob(struct imm_state const* state, struct imm_seq const seq)
+double imm_state_lprob(struct imm_state const* state, struct imm_seq const *seq)
 {
 #ifdef DEBUG
     for (unsigned i = 0; i < seq.length; ++i) {

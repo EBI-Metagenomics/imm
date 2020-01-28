@@ -2,21 +2,15 @@
 #define IMM_SEQ_H
 
 #include "imm/api.h"
-#include <stdbool.h>
 
-/**
- * Sequence of characters. No need for null-terminated string.
- */
-struct imm_seq
-{
-    char const* string;
-    unsigned    length;
-};
+struct imm_abc;
+struct imm_seq;
 
-#define IMM_SEQ(string)                                                                       \
-    (struct imm_seq) { string, (sizeof(string) - 1) }
-
-struct imm_seq imm_seq_duplicate(struct imm_seq seq);
-void           imm_seq_destroy(struct imm_seq seq);
+IMM_API struct imm_seq const* imm_seq_create(char const* seq, struct imm_abc const* abc);
+IMM_API struct imm_abc const* imm_seq_get_abc(struct imm_seq const* seq);
+IMM_API unsigned              imm_seq_length(struct imm_seq const* seq);
+IMM_API char const*           imm_seq_string(struct imm_seq const* seq);
+IMM_API struct imm_seq const* imm_seq_duplicate(struct imm_seq const* seq);
+IMM_API void                  imm_seq_destroy(struct imm_seq const* seq);
 
 #endif

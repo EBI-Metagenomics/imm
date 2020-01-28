@@ -5,25 +5,26 @@
 #include "khash.h"
 #include "min.h"
 
-static kh_inline khint_t seq_hash_func(struct imm_seq const seq)
+static kh_inline khint_t seq_hash_func(struct imm_seq const* seq)
 {
-    const char* s = seq.string;
+    const char* s = imm_seq_string(seq);
     khint_t     h = (khint_t)'\0';
-    for (unsigned i = 0; i < seq.length; ++i) {
+    for (unsigned i = 0; i < imm_seq_length(seq); ++i) {
         h = (h << 5) - h + (khint_t)*s;
         ++s;
     }
     return h;
 }
 
-static kh_inline int seq_hash_equal(struct imm_seq const a, struct imm_seq const b)
+static kh_inline int seq_hash_equal(struct imm_seq const* a, struct imm_seq const* b)
 {
-    if (a.length != b.length)
+    if (imm_seq_length(a) != imm_seq_length(b))
         return 0;
-    return strncmp(a.string, b.string, MIN(a.length, b.length)) == 0;
+    size_t n = MIN(imm_seq_length(a), imm_seq_length(b));
+    return strncmp(imm_seq_string(a), imm_seq_string(b), n) == 0;
 }
 
 #define KHASH_MAP_INIT_SEQ(name, khval_t)                                                     \
-    KHASH_INIT(name, struct imm_seq, khval_t, 1, seq_hash_func, seq_hash_equal)
+    KHASH_INIT(name, struct imm_seq const*, khval_t, 1, seq_hash_func, seq_hash_equal)
 
 #endif

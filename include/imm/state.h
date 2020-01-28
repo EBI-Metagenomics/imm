@@ -13,7 +13,7 @@
 struct imm_abc;
 struct imm_state;
 
-typedef double (*imm_state_lprob_t)(struct imm_state const* state, struct imm_seq seq);
+typedef double (*imm_state_lprob_t)(struct imm_state const* state, struct imm_seq const* seq);
 typedef unsigned (*imm_state_min_seq_t)(struct imm_state const* state);
 typedef unsigned (*imm_state_max_seq_t)(struct imm_state const* state);
 
@@ -32,7 +32,7 @@ IMM_API char const* imm_state_get_name(struct imm_state const* state);
 
 IMM_API struct imm_abc const* imm_state_get_abc(struct imm_state const* state);
 
-IMM_API double   imm_state_lprob(struct imm_state const* state, struct imm_seq seq);
+IMM_API double   imm_state_lprob(struct imm_state const* state, struct imm_seq const* seq);
 IMM_API unsigned imm_state_min_seq(struct imm_state const* state);
 IMM_API unsigned imm_state_max_seq(struct imm_state const* state);
 

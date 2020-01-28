@@ -14,7 +14,7 @@ extern "C"
 #include "imm/path.h"
 #include "imm/report.h"
 #include "imm/seq.h"
-#include "imm/sequence_table.h"
+#include "imm/seq_table.h"
 #include "imm/state.h"
 #include "imm/table_state.h"
 

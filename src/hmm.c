@@ -7,6 +7,7 @@
 #include "mstate_table.h"
 #include "mtrans.h"
 #include "mtrans_table.h"
+#include "subseq.h"
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,7 +20,6 @@ struct imm_hmm
 
 static double hmm_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state);
 static int    hmm_normalize_trans(struct mstate* mstate);
-static int    abc_has_symbols(struct imm_abc const* abc, struct imm_seq seq);
 
 struct imm_hmm* imm_hmm_create(struct imm_abc const* abc)
 {
@@ -139,15 +139,22 @@ double imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* src_
     return mtrans_get_lprob(mtrans_table_get(table, i));
 }
 
-double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const seq,
+double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
                           struct imm_path const* path)
 {
-    if (!path || !seq.string) {
-        imm_error("path or seq.string is NULL");
+    if (!path || !seq) {
+        imm_error("path or seq is NULL");
         return imm_lprob_invalid();
     }
-    char const* str = seq.string;
-    unsigned    str_len = seq.length;
+
+    if (hmm->abc != imm_seq_get_abc(seq)) {
+        imm_error("hmm and seq must have the same alphabet");
+        return imm_lprob_invalid();
+    }
+
+    /* char const* str = seq.string; */
+    /* unsigned    str_len = seq.length; */
+    unsigned str_len = imm_seq_length(seq);
 
     struct imm_step const* step = imm_path_first(path);
     if (!step) {
@@ -157,19 +164,18 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const seq,
 
     unsigned                len = imm_step_seq_len(step);
     struct imm_state const* state = imm_step_state(step);
+    struct subseq* subseq = subseq_create(seq);
 
     if (len > str_len)
         goto len_mismatch;
     if (!state)
         goto not_found_state;
 
-    if (!abc_has_symbols(hmm->abc, seq)) {
-        imm_error("symbols must belong to alphabet");
-        return imm_lprob_invalid();
-    }
+    unsigned       start = 0;
+    subseq_set(subseq, start, len);
 
-    double lprob =
-        hmm_start_lprob(hmm, state) + imm_state_lprob(state, (struct imm_seq){str, len});
+    double lprob = hmm_start_lprob(hmm, state) + imm_state_lprob(state, subseq_cast(subseq));
+    /* hmm_start_lprob(hmm, state) + imm_state_lprob(state, (struct imm_seq){str, len}); */
 
     struct imm_state const* prev_state = NULL;
 
@@ -180,17 +186,22 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const seq,
 
         if (len > str_len)
             goto len_mismatch;
+
+        subseq_set(subseq, start, len);
+
         if (!state)
             goto not_found_state;
 
         lprob += imm_hmm_get_trans(hmm, prev_state, state) +
-                 imm_state_lprob(state, (struct imm_seq){str, len});
+                 imm_state_lprob(state, subseq_cast(subseq));
+        /* imm_state_lprob(state, (struct imm_seq){str, len}); */
         if (!imm_lprob_is_valid(lprob))
             return imm_lprob_invalid();
 
     enter:
         prev_state = state;
-        str += len;
+        /* str += len; */
+        start += len;
         BUG(str_len < len);
         str_len -= len;
         step = imm_path_next(path, step);
@@ -200,23 +211,31 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const seq,
         return imm_lprob_invalid();
     }
 
+    subseq_destroy(subseq);
     return lprob;
 
 len_mismatch:
     imm_error("path emitted more symbols than sequence");
+    subseq_destroy(subseq);
     return imm_lprob_invalid();
 
 not_found_state:
     imm_error("state was not found");
+    subseq_destroy(subseq);
     return imm_lprob_invalid();
 }
 
-double imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_seq const seq,
+double imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq,
                        struct imm_state const* end_state, struct imm_path* path)
 
 {
-    if (!hmm || !seq.string || !end_state || !path) {
+    if (!hmm || !seq || !end_state || !path) {
         imm_error("viterbi input cannot be NULL");
+        return imm_lprob_invalid();
+    }
+
+    if (hmm->abc != imm_seq_get_abc(seq)) {
+        imm_error("hmm and seq must have the same alphabet");
         return imm_lprob_invalid();
     }
 
@@ -226,12 +245,7 @@ double imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_seq const seq,
         return imm_lprob_invalid();
     }
 
-    if (!abc_has_symbols(hmm->abc, seq)) {
-        imm_error("symbols must belong to alphabet");
-        return imm_lprob_invalid();
-    }
-
-    if (seq.length < imm_state_min_seq(end_state)) {
+    if (imm_seq_length(seq) < imm_state_min_seq(end_state)) {
         imm_error("sequence is shorter than end_state's lower bound");
         return imm_lprob_invalid();
     }
@@ -360,12 +374,4 @@ static int hmm_normalize_trans(struct mstate* mstate)
     free_c(lprobs);
 
     return 0;
-}
-
-static int abc_has_symbols(struct imm_abc const* abc, struct imm_seq const seq)
-{
-    for (unsigned i = 0; i < seq.length; ++i)
-        if (!imm_abc_has_symbol(abc, seq.string[i]))
-            return 0;
-    return 1;
 }

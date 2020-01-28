@@ -10,7 +10,7 @@ struct imm_table_state
     struct imm_seq_table const* table;
 };
 
-static double   table_state_lprob(struct imm_state const* state, struct imm_seq seq);
+static double   table_state_lprob(struct imm_state const* state, struct imm_seq const* seq);
 static unsigned table_state_min_seq(struct imm_state const* state);
 static unsigned table_state_max_seq(struct imm_state const* state);
 
@@ -38,7 +38,7 @@ void imm_table_state_destroy(struct imm_table_state const* state)
     free_c(state);
 }
 
-static double table_state_lprob(struct imm_state const* state, struct imm_seq const seq)
+static double table_state_lprob(struct imm_state const* state, struct imm_seq const* seq)
 {
     struct imm_table_state const* s = imm_state_get_impl_c(state);
     return imm_seq_table_lprob(s->table, seq);

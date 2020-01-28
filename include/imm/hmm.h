@@ -24,10 +24,10 @@ IMM_API int    imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* sr
 IMM_API double imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* src_state,
                                  struct imm_state const* dst_state);
 
-IMM_API double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const seq,
+IMM_API double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
                                   struct imm_path const* path);
 
-IMM_API double imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_seq const seq,
+IMM_API double imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_seq const *seq,
                                struct imm_state const* end_state, struct imm_path* path);
 
 IMM_API int imm_hmm_normalize(struct imm_hmm* hmm);

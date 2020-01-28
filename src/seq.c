@@ -1,18 +1,97 @@
 #include "imm/seq.h"
+#include "bug.h"
 #include "free.h"
+#include "imm/abc.h"
 #include "imm/report.h"
+#include "subseq.h"
+#include <limits.h>
 #include <string.h>
 
-struct imm_seq imm_seq_duplicate(struct imm_seq const seq)
+/**
+ *
+ * Sequence of characters. No need for null-terminated string.
+ */
+struct imm_seq
 {
-    return (struct imm_seq){strndup(seq.string, seq.length), seq.length};
+    struct imm_abc const* abc;
+    char const*           string;
+    unsigned              length;
+};
+
+struct subseq
+{
+    struct imm_seq const* seq;
+    struct imm_seq        subseq;
+};
+
+struct imm_seq const* imm_seq_create(char const* seq, struct imm_abc const* abc)
+{
+    size_t length = strlen(seq);
+    BUG(length > UINT_MAX);
+
+    for (unsigned i = 0; i < length; ++i) {
+        if (!imm_abc_has_symbol(abc, seq[i]) && seq[i] != imm_abc_any_symbol(abc)) {
+            imm_error("symbol not found in the alphabet");
+            return NULL;
+        }
+    }
+
+    struct imm_seq* ret = malloc(sizeof(struct imm_seq));
+    ret->abc = abc;
+    ret->string = strdup(seq);
+    ret->length = (unsigned)length;
+    return ret;
 }
 
-void imm_seq_destroy(struct imm_seq const seq)
+struct imm_abc const* imm_seq_get_abc(struct imm_seq const* seq) { return seq->abc; }
+
+unsigned imm_seq_length(struct imm_seq const* seq) { return seq->length; }
+
+char const* imm_seq_string(struct imm_seq const* seq) { return seq->string; }
+
+struct imm_seq const* imm_seq_duplicate(struct imm_seq const* seq)
 {
-    if (!seq.string) {
-        imm_error("seq.string should not be NULL");
+    struct imm_seq* ret = malloc(sizeof(struct imm_seq));
+    ret->abc = seq->abc;
+    ret->string = strndup(seq->string, seq->length);
+    ret->length = seq->length;
+    return ret;
+}
+
+void imm_seq_destroy(struct imm_seq const* seq)
+{
+    if (!seq) {
+        imm_error("seq should not be NULL");
         return;
     }
-    free_c(seq.string);
+    free_c(seq->string);
+    free_c(seq);
+}
+
+struct subseq* subseq_create(struct imm_seq const* seq)
+{
+    BUG(seq == NULL);
+    struct subseq* subseq = malloc(sizeof(struct subseq));
+    subseq->seq = seq;
+    subseq->subseq.abc = seq->abc;
+    return subseq;
+}
+
+void subseq_set(struct subseq* subseq, unsigned start, unsigned length)
+{
+    BUG(start + length > subseq->seq->length);
+    subseq->subseq.string = subseq->seq->string + start;
+    subseq->subseq.length = length;
+}
+
+struct imm_seq const* subseq_cast(struct subseq const* subseq) { return &subseq->subseq; }
+
+void subseq_destroy(struct subseq const* subseq)
+{
+    if (!subseq) {
+        imm_error("subseq should not be NULL");
+        return;
+    }
+
+    free_c(subseq);
 }

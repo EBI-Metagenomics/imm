@@ -12,6 +12,7 @@
 #include "mtrans.h"
 #include "mtrans_table.h"
 #include "state_idx.h"
+#include "subseq.h"
 #include <limits.h>
 #include <string.h>
 
@@ -66,7 +67,7 @@ struct dp
     unsigned                 nstates;
     struct state_info*       states;
     struct state_info const* end_state;
-    struct imm_seq           seq;
+    struct imm_seq const*    seq;
     struct dp_matrix         dp_matrix;
 };
 
@@ -91,7 +92,7 @@ static void create_trans(struct state_info* states, struct mstate const* const* 
                          unsigned nstates, struct state_idx* state_idx);
 
 struct dp* dp_create(struct mstate const* const* mm_states, unsigned nstates,
-                     struct imm_seq seq, struct imm_state const* end_state)
+                     struct imm_seq const* seq, struct imm_state const* end_state)
 {
     struct dp* dp = malloc(sizeof(struct dp));
 
@@ -125,17 +126,18 @@ struct dp* dp_create(struct mstate const* const* mm_states, unsigned nstates,
     create_trans(dp->states, mm_states, nstates, state_idx);
     state_idx_destroy(state_idx);
 
-    dp->dp_matrix.cell = gmatrix_cell_create(dp->seq.length + 1, next_col);
+    dp->dp_matrix.cell = gmatrix_cell_create(imm_seq_length(dp->seq) + 1, next_col);
 
     return dp;
 }
 
 double dp_viterbi(struct dp* dp, struct imm_path* path)
 {
-    for (unsigned r = 0; r <= dp->seq.length; ++r) {
-        char const* seq = dp->seq.string + r;
-        BUG(dp->seq.length < r);
-        unsigned const seq_len = dp->seq.length - r;
+    struct subseq* subseq = subseq_create(dp->seq);
+    for (unsigned r = 0; r <= imm_seq_length(dp->seq); ++r) {
+        /* char const* seq = imm_seq_string(dp->seq) + r; */
+        BUG(imm_seq_length(dp->seq) < r);
+        unsigned const seq_len = imm_seq_length(dp->seq) - r;
 
         struct state_info const* cur = dp->states;
 
@@ -147,11 +149,13 @@ double dp_viterbi(struct dp* dp, struct imm_path* path)
                 unsigned const col = column(&dp->dp_matrix, &step);
                 struct cell*   cell = gmatrix_cell_get(dp->dp_matrix.cell, r, col);
                 double const   score = best_trans_score(dp, cur, r, &cell->prev_step);
-                cell->score =
-                    score + imm_state_lprob(cur->state, (struct imm_seq const){seq, len});
+                /* struct imm_seq tmp = {seq, len}; */
+                subseq_set(subseq, r, len);
+                cell->score = score + imm_state_lprob(cur->state, subseq_cast(subseq));
             }
         }
     }
+    subseq_destroy(subseq);
 
     struct step end_step = {.state = NULL, .seq_len = UINT_MAX};
     double      score = final_score(dp, &end_step);
@@ -224,10 +228,10 @@ static double final_score(struct dp const* dp, struct step* end_step)
     end_step->seq_len = UINT_MAX;
     struct step step = {.state = end_state};
 
-    for (unsigned len = MIN(end_state->max_seq, dp->seq.length);; --len) {
+    for (unsigned len = MIN(end_state->max_seq, imm_seq_length(dp->seq));; --len) {
 
         step.seq_len = len;
-        double s = get_score(&dp->dp_matrix, dp->seq.length - len, &step);
+        double s = get_score(&dp->dp_matrix, imm_seq_length(dp->seq) - len, &step);
         if (s > score) {
             score = s;
             end_step->state = dp->end_state;
@@ -244,7 +248,7 @@ static double final_score(struct dp const* dp, struct step* end_step)
 
 static void viterbi_path(struct dp* dp, struct imm_path* path, struct step const* end_step)
 {
-    unsigned           row = dp->seq.length;
+    unsigned           row = imm_seq_length(dp->seq);
     struct step const* step = end_step;
 
     while (step->seq_len != UINT_MAX) {
