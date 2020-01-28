@@ -16,7 +16,6 @@ add_library(imm
     src/dp.c
     src/hmm.c
     src/lprob.c
-    src/matrix.c
     src/mstate.c
     src/mstate_sort.c
     src/mstate_table.c

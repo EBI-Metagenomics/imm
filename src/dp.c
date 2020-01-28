@@ -2,11 +2,11 @@
 #include "array.h"
 #include "bug.h"
 #include "free.h"
-#include "gmatrix.h"
 #include "imm/lprob.h"
 #include "imm/path.h"
 #include "imm/report.h"
 #include "imm/state.h"
+#include "matrix.h"
 #include "min.h"
 #include "mstate.h"
 #include "mtrans.h"
@@ -49,16 +49,16 @@ struct cell
     double      score;
     struct step prev_step;
 };
-MAKE_GMATRIX_STRUCT(cell, struct cell)
-MAKE_GMATRIX_CREATE(cell, struct cell)
-MAKE_GMATRIX_GET(cell, struct cell)
-MAKE_GMATRIX_GET_C(cell, struct cell)
-MAKE_GMATRIX_DESTROY(cell, struct cell)
+MAKE_MATRIX_STRUCT(cell, struct cell)
+MAKE_MATRIX_CREATE(cell, struct cell)
+MAKE_MATRIX_GET(cell, struct cell)
+MAKE_MATRIX_GET_C(cell, struct cell)
+MAKE_MATRIX_DESTROY(cell, struct cell)
 
 struct dp_matrix
 {
-    struct gmatrix_cell* cell;
-    unsigned*            state_col;
+    struct matrix_cell* cell;
+    unsigned*           state_col;
 };
 
 struct dp
@@ -80,7 +80,7 @@ static inline unsigned column(struct dp_matrix const* dp_matrix, struct step con
 static inline double get_score(struct dp_matrix const* dp_matrix, unsigned row,
                                struct step const* step)
 {
-    return gmatrix_cell_get_c(dp_matrix->cell, row, column(dp_matrix, step))->score;
+    return matrix_cell_get_c(dp_matrix->cell, row, column(dp_matrix, step))->score;
 }
 
 static double best_trans_score(struct dp const* dp, struct state_info const* dst_state,
@@ -126,7 +126,7 @@ struct dp* dp_create(struct mstate const* const* mm_states, unsigned nstates,
     create_trans(dp->states, mm_states, nstates, state_idx);
     state_idx_destroy(state_idx);
 
-    dp->dp_matrix.cell = gmatrix_cell_create(imm_seq_length(dp->seq) + 1, next_col);
+    dp->dp_matrix.cell = matrix_cell_create(imm_seq_length(dp->seq) + 1, next_col);
 
     return dp;
 }
@@ -146,7 +146,7 @@ double dp_viterbi(struct dp* dp, struct imm_path* path)
             for (unsigned len = cur->min_seq; len <= MIN(cur->max_seq, seq_len); ++len) {
                 step.seq_len = len;
                 unsigned const col = column(&dp->dp_matrix, &step);
-                struct cell*   cell = gmatrix_cell_get(dp->dp_matrix.cell, r, col);
+                struct cell*   cell = matrix_cell_get(dp->dp_matrix.cell, r, col);
                 double const   score = best_trans_score(dp, cur, r, &cell->prev_step);
                 subseq_set(subseq, r, len);
                 cell->score = score + imm_state_lprob(cur->state, subseq_cast(subseq));
@@ -170,7 +170,7 @@ void dp_destroy(struct dp const* dp)
         array_trans_empty(&dp->states[i].incoming_transitions);
 
     free_c(dp->states);
-    gmatrix_cell_destroy(dp->dp_matrix.cell);
+    matrix_cell_destroy(dp->dp_matrix.cell);
     free_c(dp->dp_matrix.state_col);
     free_c(dp);
 }
@@ -253,7 +253,7 @@ static void viterbi_path(struct dp* dp, struct imm_path* path, struct step const
         imm_path_prepend(path, step->state->state, step->seq_len);
         BUG(step->seq_len > row);
         row -= step->seq_len;
-        step = &gmatrix_cell_get_c(dp->dp_matrix.cell, row, column(&dp->dp_matrix, step))
+        step = &matrix_cell_get_c(dp->dp_matrix.cell, row, column(&dp->dp_matrix, step))
                     ->prev_step;
     }
 }
