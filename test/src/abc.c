@@ -65,13 +65,13 @@ void test_abc_duplicated_any_symbol(void)
 
 void test_abc_symbol_outside_range(void)
 {
-    char                  symbols[] = {(char)128, '\0'};
+    char                  symbols[] = {3, '\0'};
     struct imm_abc const* abc = imm_abc_create(symbols, '*');
     cass_cond(abc == NULL);
 }
 
 void test_abc_any_symbol_outside_range(void)
 {
-    struct imm_abc const* abc = imm_abc_create("ACGT", ' ');
+    struct imm_abc const* abc = imm_abc_create("ACGT", 3);
     cass_cond(abc == NULL);
 }

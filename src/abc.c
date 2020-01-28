@@ -54,6 +54,7 @@ struct imm_abc const* imm_abc_create(char const* symbols, char const any_symbol)
         if (symbols[i] < FIRST_VISUAL_CHAR || symbols[i] > LAST_VISUAL_CHAR) {
             imm_error("alphabet symbol is outside the range [%c, %c] ", FIRST_VISUAL_CHAR,
                       LAST_VISUAL_CHAR);
+            free_c(abc);
             return NULL;
         }
 

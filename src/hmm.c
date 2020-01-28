@@ -180,8 +180,10 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
 
         lprob += imm_hmm_get_trans(hmm, prev_state, state) +
                  imm_state_lprob(state, subseq_cast(subseq));
-        if (!imm_lprob_is_valid(lprob))
+        if (!imm_lprob_is_valid(lprob)) {
+            subseq_destroy(subseq);
             return imm_lprob_invalid();
+        }
 
     enter:
         prev_state = state;
@@ -192,6 +194,7 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
     }
     if (str_len > 0) {
         imm_error("sequence is longer than symbols emitted by path");
+        subseq_destroy(subseq);
         return imm_lprob_invalid();
     }
 
