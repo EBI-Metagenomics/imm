@@ -17,6 +17,7 @@ extern "C"
 #include "imm/seq_table.h"
 #include "imm/state.h"
 #include "imm/table_state.h"
+#include "imm/window.h"
 
 #ifdef __cplusplus
 }

@@ -3,26 +3,8 @@
 #include "free.h"
 #include "imm/abc.h"
 #include "imm/report.h"
-#include "subseq.h"
 #include <limits.h>
 #include <string.h>
-
-/**
- *
- * Sequence of characters. No need for null-terminated string.
- */
-struct imm_seq
-{
-    struct imm_abc const* abc;
-    char const*           string;
-    unsigned              length;
-};
-
-struct subseq
-{
-    struct imm_seq const* seq;
-    struct imm_seq        subseq;
-};
 
 struct imm_seq const* imm_seq_create(char const* seq, struct imm_abc const* abc)
 {
@@ -66,22 +48,3 @@ void imm_seq_destroy(struct imm_seq const* seq)
     free_c(seq->string);
     free_c(seq);
 }
-
-struct subseq* subseq_create(struct imm_seq const* seq)
-{
-    struct subseq* subseq = malloc(sizeof(struct subseq));
-    subseq->seq = seq;
-    subseq->subseq.abc = seq->abc;
-    return subseq;
-}
-
-void subseq_set(struct subseq* subseq, unsigned start, unsigned length)
-{
-    BUG(start + length > subseq->seq->length);
-    subseq->subseq.string = subseq->seq->string + start;
-    subseq->subseq.length = length;
-}
-
-struct imm_seq const* subseq_cast(struct subseq const* subseq) { return &subseq->subseq; }
-
-void subseq_destroy(struct subseq const* subseq) { free_c(subseq); }

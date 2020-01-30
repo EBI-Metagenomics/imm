@@ -30,6 +30,7 @@ add_library(imm
     src/state.c
     src/state_idx.c
     src/table_state.c
+    src/window.c
 )
 add_library(IMM::imm ALIAS imm)
 

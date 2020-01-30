@@ -149,16 +149,15 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
 
     unsigned                step_len = imm_step_seq_len(step);
     struct imm_state const* state = imm_step_state(step);
-    struct subseq*          subseq = subseq_create(seq);
 
     unsigned remain_len = imm_seq_length(seq);
     if (step_len > remain_len)
         goto len_mismatch;
 
     unsigned start = 0;
-    subseq_set(subseq, start, step_len);
+    SUBSEQ(subseq, seq, start, step_len);
 
-    double lprob = hmm_start_lprob(hmm, state) + imm_state_lprob(state, subseq_cast(subseq));
+    double lprob = hmm_start_lprob(hmm, state) + imm_state_lprob(state, subseq_cast(&subseq));
 
     struct imm_state const* prev_state = NULL;
 
@@ -170,10 +169,10 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
         if (step_len > remain_len)
             goto len_mismatch;
 
-        subseq_set(subseq, start, step_len);
+        subseq_set(&subseq, start, step_len);
 
         lprob += imm_hmm_get_trans(hmm, prev_state, state);
-        lprob += imm_state_lprob(state, subseq_cast(subseq));
+        lprob += imm_state_lprob(state, subseq_cast(&subseq));
 
         if (!imm_lprob_is_valid(lprob))
             goto invalid;
@@ -190,14 +189,12 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
         goto invalid;
     }
 
-    subseq_destroy(subseq);
     return lprob;
 
 len_mismatch:
     imm_error("path emitted more symbols than sequence");
 
 invalid:
-    subseq_destroy(subseq);
     return imm_lprob_invalid();
 }
 

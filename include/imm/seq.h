@@ -4,7 +4,17 @@
 #include "imm/api.h"
 
 struct imm_abc;
-struct imm_seq;
+
+/**
+ *
+ * Sequence of characters. No need for null-terminated string.
+ */
+struct imm_seq
+{
+    struct imm_abc const* abc;
+    char const*           string;
+    unsigned              length;
+};
 
 IMM_API struct imm_seq const* imm_seq_create(char const* seq, struct imm_abc const* abc);
 IMM_API struct imm_abc const* imm_seq_get_abc(struct imm_seq const* seq);

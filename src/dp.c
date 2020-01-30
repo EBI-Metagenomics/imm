@@ -133,7 +133,6 @@ struct dp* dp_create(struct mstate const* const* mm_states, unsigned nstates,
 
 double dp_viterbi(struct dp* dp, struct imm_path* path)
 {
-    struct subseq* subseq = subseq_create(dp->seq);
     for (unsigned r = 0; r <= imm_seq_length(dp->seq); ++r) {
         BUG(imm_seq_length(dp->seq) < r);
         unsigned const seq_len = imm_seq_length(dp->seq) - r;
@@ -148,12 +147,11 @@ double dp_viterbi(struct dp* dp, struct imm_path* path)
                 unsigned const col = column(&dp->dp_matrix, &step);
                 struct cell*   cell = matrix_cell_get(dp->dp_matrix.cell, r, col);
                 double const   score = best_trans_score(dp, cur, r, &cell->prev_step);
-                subseq_set(subseq, r, len);
-                cell->score = score + imm_state_lprob(cur->state, subseq_cast(subseq));
+                SUBSEQ(subseq, dp->seq, r, len);
+                cell->score = score + imm_state_lprob(cur->state, subseq_cast(&subseq));
             }
         }
     }
-    subseq_destroy(subseq);
 
     struct step end_step = {.state = NULL, .seq_len = UINT_MAX};
     double      score = final_score(dp, &end_step);
