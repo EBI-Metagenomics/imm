@@ -5,6 +5,9 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#define IMM_LPROB_ZERO -INFINITY
+#define IMM_LPROB_INVALID NAN
+
 IMM_API double imm_lprob_zero(void);
 IMM_API bool   imm_lprob_is_zero(double a);
 IMM_API bool   imm_lprob_is_valid(double a);
