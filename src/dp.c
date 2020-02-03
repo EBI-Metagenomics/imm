@@ -6,13 +6,13 @@
 #include "imm/path.h"
 #include "imm/report.h"
 #include "imm/state.h"
+#include "imm/subseq.h"
 #include "matrix.h"
 #include "min.h"
 #include "mstate.h"
 #include "mtrans.h"
 #include "mtrans_table.h"
 #include "state_idx.h"
-#include "subseq.h"
 #include <limits.h>
 #include <string.h>
 
@@ -147,8 +147,8 @@ double dp_viterbi(struct dp* dp, struct imm_path* path)
                 unsigned const col = column(&dp->dp_matrix, &step);
                 struct cell*   cell = matrix_cell_get(dp->dp_matrix.cell, r, col);
                 double const   score = best_trans_score(dp, cur, r, &cell->prev_step);
-                SUBSEQ(subseq, dp->seq, r, len);
-                cell->score = score + imm_state_lprob(cur->state, subseq_cast(&subseq));
+                IMM_SUBSEQ(subseq, dp->seq, r, len);
+                cell->score = score + imm_state_lprob(cur->state, imm_subseq_cast(&subseq));
             }
         }
     }

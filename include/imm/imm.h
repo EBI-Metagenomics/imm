@@ -16,6 +16,7 @@ extern "C"
 #include "imm/seq.h"
 #include "imm/seq_table.h"
 #include "imm/state.h"
+#include "imm/subseq.h"
 #include "imm/table_state.h"
 #include "imm/window.h"
 

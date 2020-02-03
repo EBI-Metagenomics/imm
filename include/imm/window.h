@@ -2,6 +2,7 @@
 #define IMM_WINDOW_H
 
 #include "imm/api.h"
+#include "imm/subseq.h"
 
 struct imm_seq;
 struct imm_window;

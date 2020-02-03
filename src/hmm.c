@@ -6,12 +6,12 @@
 #include "imm/path.h"
 #include "imm/report.h"
 #include "imm/state.h"
+#include "imm/subseq.h"
 #include "mstate.h"
 #include "mstate_sort.h"
 #include "mstate_table.h"
 #include "mtrans.h"
 #include "mtrans_table.h"
-#include "subseq.h"
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
@@ -155,9 +155,10 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
         goto len_mismatch;
 
     unsigned start = 0;
-    SUBSEQ(subseq, seq, start, step_len);
+    IMM_SUBSEQ(subseq, seq, start, step_len);
 
-    double lprob = hmm_start_lprob(hmm, state) + imm_state_lprob(state, subseq_cast(&subseq));
+    double lprob =
+        hmm_start_lprob(hmm, state) + imm_state_lprob(state, imm_subseq_cast(&subseq));
 
     struct imm_state const* prev_state = NULL;
 
@@ -169,10 +170,10 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
         if (step_len > remain_len)
             goto len_mismatch;
 
-        subseq_set(&subseq, start, step_len);
+        imm_subseq_set(&subseq, start, step_len);
 
         lprob += imm_hmm_get_trans(hmm, prev_state, state);
-        lprob += imm_state_lprob(state, subseq_cast(&subseq));
+        lprob += imm_state_lprob(state, imm_subseq_cast(&subseq));
 
         if (!imm_lprob_is_valid(lprob))
             goto invalid;
