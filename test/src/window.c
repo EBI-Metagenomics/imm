@@ -74,6 +74,7 @@ void test_window_2(void)
 
     cass_cond(imm_window_end(window));
 
+    cass_cond(imm_window_size(window) == 1);
     imm_window_destroy(window);
 
     imm_seq_destroy(seq);
@@ -97,6 +98,7 @@ void test_window_3(void)
 
     cass_cond(imm_window_end(window));
 
+    cass_cond(imm_window_size(window) == 2);
     imm_window_destroy(window);
 
     imm_seq_destroy(seq);
@@ -124,6 +126,7 @@ void test_window_4(void)
 
     cass_cond(imm_window_end(window));
 
+    cass_cond(imm_window_size(window) == 3);
     imm_window_destroy(window);
 
     imm_seq_destroy(seq);
@@ -147,6 +150,7 @@ void test_window_5(void)
 
     cass_cond(imm_window_end(window));
 
+    cass_cond(imm_window_size(window) == 2);
     imm_window_destroy(window);
 
     imm_seq_destroy(seq);
@@ -166,6 +170,7 @@ void test_window_6(void)
 
     cass_cond(imm_window_end(window));
 
+    cass_cond(imm_window_size(window) == 1);
     imm_window_destroy(window);
 
     imm_seq_destroy(seq);
@@ -185,6 +190,7 @@ void test_window_7(void)
 
     cass_cond(imm_window_end(window));
 
+    cass_cond(imm_window_size(window) == 1);
     imm_window_destroy(window);
 
     imm_seq_destroy(seq);
@@ -212,6 +218,7 @@ void test_window_8(void)
 
     cass_cond(imm_window_end(window));
 
+    cass_cond(imm_window_size(window) == 3);
     imm_window_destroy(window);
 
     imm_seq_destroy(seq);
@@ -254,6 +261,7 @@ void test_window_10(void)
 
     cass_cond(imm_window_end(window));
 
+    cass_cond(imm_window_size(window) == 1);
     imm_window_destroy(window);
 
     imm_seq_destroy(seq);
@@ -285,6 +293,7 @@ void test_window_11(void)
 
     cass_cond(imm_window_end(window));
 
+    cass_cond(imm_window_size(window) == 4);
     imm_window_destroy(window);
 
     imm_seq_destroy(seq);
@@ -312,6 +321,7 @@ void test_window_12(void)
 
     cass_cond(imm_window_end(window));
 
+    cass_cond(imm_window_size(window) == 3);
     imm_window_destroy(window);
 
     imm_seq_destroy(seq);
@@ -335,6 +345,7 @@ void test_window_13(void)
 
     cass_cond(imm_window_end(window));
 
+    cass_cond(imm_window_size(window) == 2);
     imm_window_destroy(window);
 
     imm_seq_destroy(seq);
@@ -354,6 +365,7 @@ void test_window_14(void)
 
     cass_cond(imm_window_end(window));
 
+    cass_cond(imm_window_size(window) == 1);
     imm_window_destroy(window);
 
     imm_seq_destroy(seq);
@@ -373,6 +385,7 @@ void test_window_15(void)
 
     cass_cond(imm_window_end(window));
 
+    cass_cond(imm_window_size(window) == 1);
     imm_window_destroy(window);
 
     imm_seq_destroy(seq);

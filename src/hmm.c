@@ -237,6 +237,12 @@ double imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq,
     return score;
 }
 
+/* double imm_hmm_viterbi2(struct imm_hmm const* hmm, struct imm_seq const* seq, */
+/*                        struct imm_state const* end_state, struct imm_path* path) */
+/* { */
+
+/* } */
+
 int imm_hmm_normalize(struct imm_hmm* hmm)
 {
     if (imm_hmm_normalize_start(hmm))

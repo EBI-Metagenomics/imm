@@ -55,4 +55,23 @@ bool imm_window_end(struct imm_window const* window)
     return window->offset >= imm_seq_length(window->seq);
 }
 
+unsigned imm_window_size(struct imm_window const* window)
+{
+    unsigned size = 0;
+    unsigned offset = 0;
+
+    while (offset < imm_seq_length(window->seq)) {
+        unsigned const poffset = offset;
+        offset += MAX(window->length / 2, 1);
+
+        unsigned const length = MIN(window->length, imm_seq_length(window->seq) - poffset);
+        if (imm_seq_length(window->seq) == poffset + length)
+            offset = UINT_MAX;
+
+        ++size;
+    }
+
+    return size;
+}
+
 void imm_window_destroy(struct imm_window const* window) { free_c(window); }
