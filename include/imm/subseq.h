@@ -9,14 +9,14 @@ struct imm_subseq
     struct imm_seq        subseq;
 };
 
-struct imm_subseq imm_subseq_init(struct imm_subseq* subseq, struct imm_seq const* seq,
-                                  unsigned start, unsigned length);
+IMM_API struct imm_subseq imm_subseq_init(struct imm_subseq* subseq, struct imm_seq const* seq,
+                                          unsigned start, unsigned length);
 
 #define IMM_SUBSEQ(name, seq, start, length)                                                  \
     struct imm_subseq name = imm_subseq_init(&(name), seq, start, length)
 
-struct imm_seq const* imm_subseq_cast(struct imm_subseq const* subseq);
+IMM_API struct imm_seq const* imm_subseq_cast(struct imm_subseq const* subseq);
 
-void imm_subseq_set(struct imm_subseq* subseq, unsigned start, unsigned length);
+IMM_API void imm_subseq_set(struct imm_subseq* subseq, unsigned start, unsigned length);
 
 #endif

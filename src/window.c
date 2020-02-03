@@ -9,8 +9,8 @@ struct imm_window
 {
     struct imm_seq const* seq;
     unsigned              length;
-    struct imm_subseq     subseq;
-    unsigned              offset;
+    /* struct imm_subseq     subseq; */
+    unsigned offset;
 };
 
 struct imm_window* imm_window_create(struct imm_seq const* seq, unsigned const length)
@@ -32,21 +32,28 @@ struct imm_window* imm_window_create(struct imm_seq const* seq, unsigned const l
     return window;
 }
 
-struct imm_seq const* imm_window_next(struct imm_window* window)
+struct imm_subseq imm_window_next(struct imm_window* window)
 {
     unsigned const offset = window->offset;
-    if (offset >= imm_seq_length(window->seq))
-        return NULL;
-
     unsigned const length = MIN(window->length, imm_seq_length(window->seq) - offset);
 
-    imm_subseq_init(&window->subseq, window->seq, offset, length);
+    IMM_SUBSEQ(subseq, window->seq, offset, length);
+
+    if (offset >= imm_seq_length(window->seq)) {
+        imm_error("there is no next windows");
+        return subseq;
+    }
 
     window->offset += MAX(window->length / 2, 1);
     if (imm_seq_length(window->seq) == offset + length)
         window->offset = UINT_MAX;
 
-    return imm_subseq_cast(&window->subseq);
+    return subseq;
+}
+
+bool imm_window_end(struct imm_window const* window)
+{
+    return window->offset >= imm_seq_length(window->seq);
 }
 
 void imm_window_destroy(struct imm_window const* window) { free_c(window); }
