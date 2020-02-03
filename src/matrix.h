@@ -13,7 +13,8 @@
     };
 
 #define MAKE_MATRIX_CREATE(S, T)                                                              \
-    static inline struct matrix_##S* matrix_##S##_create(unsigned nrows, unsigned ncols)      \
+    static inline struct matrix_##S* matrix_##S##_create(unsigned const nrows,                \
+                                                         unsigned const ncols)                \
     {                                                                                         \
         struct matrix_##S* matrix = malloc(sizeof(struct matrix_##S));                        \
         matrix->data = malloc(sizeof(T) * (nrows * ncols));                                   \
@@ -70,6 +71,13 @@
     static inline unsigned matrix_##S##_ncols(struct matrix_##S const* matrix)                \
     {                                                                                         \
         return matrix->ncols;                                                                 \
+    }
+
+#define MAKE_MATRIX_RESIZE(S, T)                                                              \
+    static inline void matrix_##S##_resize(struct matrix_##S* matrix, unsigned const nrows,   \
+                                           unsigned const ncols)                              \
+    {                                                                                         \
+        matrix->data = realloc(matrix->data, sizeof(T) * (nrows * ncols));                    \
     }
 
 #endif

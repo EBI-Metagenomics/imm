@@ -10,6 +10,7 @@
 #include "imm/state.h"
 #include "imm/subseq.h"
 #include "imm/window.h"
+#include "min.h"
 #include "mstate.h"
 #include "mstate_sort.h"
 #include "mstate_table.h"
@@ -231,21 +232,33 @@ struct imm_results const* imm_hmm_viterbi2(struct imm_hmm const*   hmm,
     struct imm_results* results = imm_results_create(seq, window_length);
 
     unsigned const nresults = imm_results_size(results);
+    unsigned const nworkers = MIN(nresults, 4);
+
+    struct dp_matrix** const matrices = malloc(sizeof(struct dp_matrix*) * nworkers);
+    for (unsigned i = 0; i < nworkers; ++i) {
+        struct imm_seq const* tmp = imm_seq_create("", hmm->abc);
+        matrices[i] = dp_matrix_create(dp, tmp);
+        imm_seq_destroy(tmp);
+    }
 
     struct imm_window* window = imm_window_create(seq, window_length);
     for (unsigned i = 0; i < nresults; ++i) {
 
+        unsigned worker_idx = i % nworkers;
+
         struct imm_subseq subseq = imm_window_next(window);
-        struct dp_matrix* matrix = dp_matrix_create(dp, imm_subseq_cast(&subseq));
+        dp_matrix_reset(matrices[worker_idx], imm_subseq_cast(&subseq));
 
         struct imm_path* path = imm_path_create();
-        double           score = dp_viterbi(dp, matrix, path);
+        double           score = dp_viterbi(dp, matrices[worker_idx], path);
 
         imm_results_set(results, i, subseq, path, score);
-
-        dp_matrix_destroy(matrix);
     }
 
+    for (unsigned i = 0; i < nworkers; ++i)
+        dp_matrix_destroy(matrices[i]);
+
+    free_c(matrices);
     imm_window_destroy(window);
     dp_destroy(dp);
     return results;

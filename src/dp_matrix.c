@@ -21,6 +21,12 @@ struct dp_matrix* dp_matrix_create(struct dp const* dp, struct imm_seq const* se
     return matrix;
 }
 
+void dp_matrix_reset(struct dp_matrix* matrix, struct imm_seq const* seq)
+{
+    matrix_cell_resize(matrix->cell, imm_seq_length(seq) + 1, matrix_cell_ncols(matrix->cell));
+    matrix->seq = seq;
+}
+
 void dp_matrix_destroy(struct dp_matrix const* matrix)
 {
     matrix_cell_destroy(matrix->cell);

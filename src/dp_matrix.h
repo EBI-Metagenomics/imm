@@ -49,6 +49,7 @@ MAKE_MATRIX_GET_C(cell, struct cell)
 MAKE_MATRIX_DESTROY(cell)
 MAKE_MATRIX_NROWS(cell)
 MAKE_MATRIX_NCOLS(cell)
+MAKE_MATRIX_RESIZE(cell, struct cell)
 
 struct dp_matrix
 {
@@ -71,6 +72,8 @@ static inline double get_score(struct dp_matrix const* dp_matrix, unsigned row,
 }
 
 struct dp_matrix* dp_matrix_create(struct dp const* dp, struct imm_seq const* seq);
+
+void dp_matrix_reset(struct dp_matrix* dp_matrix, struct imm_seq const* seq);
 
 void dp_matrix_destroy(struct dp_matrix const* matrix);
 
