@@ -1,6 +1,7 @@
 #include "imm/hmm.h"
 #include "bug.h"
 #include "dp.h"
+#include "dp_matrix.h"
 #include "free.h"
 #include "imm/lprob.h"
 #include "imm/path.h"

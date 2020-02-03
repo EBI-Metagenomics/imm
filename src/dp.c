@@ -1,86 +1,17 @@
 #include "dp.h"
-#include "array.h"
-#include "bug.h"
-#include "free.h"
 #include "imm/lprob.h"
 #include "imm/path.h"
 #include "imm/report.h"
 #include "imm/state.h"
 #include "imm/subseq.h"
-#include "matrix.h"
 #include "min.h"
 #include "mstate.h"
 #include "mtrans.h"
 #include "mtrans_table.h"
+#include "dp_matrix.h"
 #include "state_idx.h"
 #include <limits.h>
 #include <string.h>
-
-struct trans
-{
-    struct state_info const* src_state;
-    double                   lprob;
-};
-MAKE_ARRAY_STRUCT(trans, struct trans)
-MAKE_ARRAY_INIT(trans)
-MAKE_ARRAY_APPEND(trans, struct trans)
-MAKE_ARRAY_GET_C(trans, struct trans)
-MAKE_ARRAY_LENGTH(trans)
-MAKE_ARRAY_EMPTY(trans)
-
-struct state_info
-{
-    struct imm_state const* state;
-    unsigned                min_seq;
-    unsigned                max_seq;
-    double                  start_lprob;
-    unsigned                idx;
-    struct array_trans      incoming_transitions;
-};
-
-struct step
-{
-    struct state_info const* state;
-    unsigned                 seq_len;
-};
-
-struct cell
-{
-    double      score;
-    struct step prev_step;
-};
-MAKE_MATRIX_STRUCT(cell, struct cell)
-MAKE_MATRIX_CREATE(cell, struct cell)
-MAKE_MATRIX_GET(cell, struct cell)
-MAKE_MATRIX_GET_C(cell, struct cell)
-MAKE_MATRIX_DESTROY(cell, struct cell)
-
-struct dp_matrix
-{
-    struct imm_seq const* seq;
-    struct matrix_cell*   cell;
-    unsigned*             state_col;
-};
-
-struct dp
-{
-    double                   lprob_zero;
-    unsigned                 nstates;
-    struct state_info*       states;
-    struct state_info const* end_state;
-};
-
-static inline unsigned column(struct dp_matrix const* dp_matrix, struct step const* step)
-{
-    BUG(step->seq_len < step->state->min_seq);
-    return dp_matrix->state_col[step->state->idx] + step->seq_len - step->state->min_seq;
-}
-
-static inline double get_score(struct dp_matrix const* dp_matrix, unsigned row,
-                               struct step const* step)
-{
-    return matrix_cell_get_c(dp_matrix->cell, row, column(dp_matrix, step))->score;
-}
 
 static double best_trans_score(struct dp const* dp, struct dp_matrix const* matrix,
                                struct state_info const* dst_state, unsigned const row,
@@ -123,32 +54,6 @@ struct dp* dp_create(struct mstate const* const* mm_states, unsigned const nstat
     state_idx_destroy(state_idx);
 
     return dp;
-}
-
-struct dp_matrix* dp_matrix_create(struct dp const* dp, struct imm_seq const* seq)
-{
-    struct dp_matrix* matrix = malloc(sizeof(struct dp));
-
-    matrix->seq = seq;
-    matrix->state_col = malloc(sizeof(int) * (dp->nstates));
-    matrix->cell = NULL;
-
-    unsigned next_col = 0;
-    for (unsigned i = 0; i < dp->nstates; ++i) {
-        matrix->state_col[i] = next_col;
-        next_col += dp->states[i].max_seq - dp->states[i].min_seq + 1;
-    }
-
-    matrix->cell = matrix_cell_create(imm_seq_length(matrix->seq) + 1, next_col);
-
-    return matrix;
-}
-
-void dp_matrix_destroy(struct dp_matrix const* matrix)
-{
-    matrix_cell_destroy(matrix->cell);
-    free_c(matrix->state_col);
-    free_c(matrix);
 }
 
 double dp_viterbi(struct dp const* dp, struct dp_matrix* matrix, struct imm_path* path)
