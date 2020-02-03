@@ -3,18 +3,24 @@
 
 #include "imm/api.h"
 #include "imm/subseq.h"
-#include <stdbool.h>
 
 struct imm_seq;
 struct imm_results;
 struct imm_path;
-
+struct imm_result;
 
 IMM_API struct imm_results*      imm_results_create(struct imm_seq const* seq,
                                                     unsigned              window_length);
 IMM_API void                     imm_results_set(struct imm_results* results, unsigned idx,
-                                                 struct imm_viterbi_item item);
-IMM_API struct imm_viterbi_item* imm_results_get(struct imm_results* results, unsigned idx);
+                                                 struct imm_subseq subseq, struct imm_path const* path,
+                                                 double loglik);
+IMM_API struct imm_result const* imm_results_get(struct imm_results const* results,
+                                                 unsigned                  idx);
+IMM_API unsigned                 imm_results_size(struct imm_results const* results);
 IMM_API void                     imm_results_destroy(struct imm_results const* results);
+
+IMM_API double                 imm_result_loglik(struct imm_result const* result);
+IMM_API struct imm_path const* imm_result_path(struct imm_result const* result);
+IMM_API struct imm_seq const*  imm_result_sequence(struct imm_result const* result);
 
 #endif

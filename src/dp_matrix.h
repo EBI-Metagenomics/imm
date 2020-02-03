@@ -72,8 +72,6 @@ static inline double get_score(struct dp_matrix const* dp_matrix, unsigned row,
 
 struct dp_matrix* dp_matrix_create(struct dp const* dp, struct imm_seq const* seq);
 
-struct dp_matrix* dp_matrix_clone(struct dp_matrix const* matrix);
-
 void dp_matrix_destroy(struct dp_matrix const* matrix);
 
 #endif

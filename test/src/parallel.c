@@ -32,7 +32,8 @@ void test_parallel(void)
     struct imm_mute_state const* start = imm_mute_state_create("START", abc);
     imm_hmm_add_state(hmm, cast_c(start), log(1.0));
 
-    struct imm_mute_state const* end = imm_mute_state_create("END", abc);
+    double end_lprobs[] = {log(0.05), log(0.05), log(0.05), log(0.05), log(0.05)};
+    struct imm_normal_state const* end = imm_normal_state_create("END", abc, end_lprobs);
     imm_hmm_add_state(hmm, cast_c(end), zero());
 
     double B_lprobs[] = {log(1.0), zero(), zero(), zero(), zero()};
@@ -55,6 +56,7 @@ void test_parallel(void)
     imm_hmm_set_trans(hmm, cast_c(E), cast_c(J), log(0.2));
     imm_hmm_set_trans(hmm, cast_c(J), cast_c(B), log(0.2));
     imm_hmm_set_trans(hmm, cast_c(E), cast_c(end), log(0.2));
+    imm_hmm_set_trans(hmm, cast_c(end), cast_c(end), log(0.2));
 
     struct imm_normal_state const* M[ncore_nodes];
     struct imm_normal_state const* I[ncore_nodes];
@@ -99,7 +101,7 @@ void test_parallel(void)
     char const str[] = "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
                        "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
                        "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
-                       "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
+                       "BIIIMIMIMIMMMMMMIMMIMMMMMIIMIMMIMIMIMIMIMMMIMMIMME"
                        "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
                        "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
                        "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
@@ -139,10 +141,47 @@ void test_parallel(void)
     cass_cond(strlen(str) == 2000);
 
     elapsed_start(elapsed);
-    struct imm_seq const* seq = imm_seq_create(str, abc);
-    double                score = imm_hmm_viterbi(hmm, seq, cast_c(end), path);
-    cass_cond(is_valid(score) && !is_zero(score));
-    cass_close(score, -65826.0106185297);
+    struct imm_seq const*     seq = imm_seq_create(str, abc);
+    struct imm_results const* results = imm_hmm_viterbi2(hmm, seq, cast_c(end), 50);
+
+    cass_cond(imm_results_size(results) == 79);
+
+    struct imm_result const* result = imm_results_get(results, 0);
+    struct imm_seq const*    s = imm_result_sequence(result);
+    cass_close(imm_result_loglik(result), -1778.8892020572);
+    cass_cond(strncmp(imm_seq_string(s), "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM",
+                      imm_seq_length(s)) == 0);
+
+    result = imm_results_get(results, 1);
+    s = imm_result_sequence(result);
+    cass_cond(!imm_lprob_is_valid(imm_result_loglik(result)));
+    cass_cond(strncmp(imm_seq_string(s), "MIMMMMMMMMMIIMIMIMIMIMIIMIIIMIMIMIMMMMMMIMMIMIMIMI",
+                      imm_seq_length(s)) == 0);
+
+    result = imm_results_get(results, 2);
+    s = imm_result_sequence(result);
+    cass_cond(!imm_lprob_is_valid(imm_result_loglik(result)));
+    cass_cond(strncmp(imm_seq_string(s), "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ",
+                      imm_seq_length(s)) == 0);
+
+    result = imm_results_get(results, 3);
+    s = imm_result_sequence(result);
+    cass_cond(!imm_lprob_is_valid(imm_result_loglik(result)));
+    cass_cond(strncmp(imm_seq_string(s), "IMIMMIMIMIMIMIMMMMIMMIMEJBMIIMIIMMIMMMIMEJBMIIMIIM",
+                      imm_seq_length(s)) == 0);
+
+    result = imm_results_get(results, 4);
+    s = imm_result_sequence(result);
+    cass_close(imm_result_loglik(result), -1778.8892020572);
+    cass_cond(strncmp(imm_seq_string(s), "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM",
+                      imm_seq_length(s)) == 0);
+
+    result = imm_results_get(results, 8);
+    s = imm_result_sequence(result);
+    cass_close(imm_result_loglik(result), -1778.8892020572);
+    cass_cond(strncmp(imm_seq_string(s), "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM",
+                      imm_seq_length(s)) == 0);
+
     elapsed_end(elapsed);
     imm_path_destroy(path);
     imm_seq_destroy(seq);
@@ -152,6 +191,7 @@ void test_parallel(void)
 #endif
 
     elapsed_destroy(elapsed);
+    imm_results_destroy(results);
     imm_hmm_destroy(hmm);
     imm_mute_state_destroy(start);
     imm_normal_state_destroy(B);
@@ -162,6 +202,6 @@ void test_parallel(void)
     }
     imm_normal_state_destroy(J);
     imm_normal_state_destroy(E);
-    imm_mute_state_destroy(end);
+    imm_normal_state_destroy(end);
     imm_abc_destroy(abc);
 }

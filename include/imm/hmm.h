@@ -27,8 +27,13 @@ IMM_API double imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state con
 IMM_API double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
                                   struct imm_path const* path);
 
-IMM_API double imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_seq const *seq,
+IMM_API double imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq,
                                struct imm_state const* end_state, struct imm_path* path);
+
+IMM_API struct imm_results const* imm_hmm_viterbi2(struct imm_hmm const*   hmm,
+                                                   struct imm_seq const*   seq,
+                                                   struct imm_state const* end_state,
+                                                   unsigned                window_length);
 
 IMM_API int imm_hmm_normalize(struct imm_hmm* hmm);
 

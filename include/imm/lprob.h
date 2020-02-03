@@ -2,6 +2,7 @@
 #define IMM_LPROB_H
 
 #include "imm/api.h"
+#include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
 

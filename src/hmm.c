@@ -6,8 +6,10 @@
 #include "imm/lprob.h"
 #include "imm/path.h"
 #include "imm/report.h"
+#include "imm/results.h"
 #include "imm/state.h"
 #include "imm/subseq.h"
+#include "imm/window.h"
 #include "mstate.h"
 #include "mstate_sort.h"
 #include "mstate_table.h"
@@ -25,6 +27,8 @@ struct imm_hmm
 
 static double hmm_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state);
 static int    hmm_normalize_trans(struct mstate* mstate);
+static struct dp const* hmm_create_dp(struct imm_hmm const* hmm, struct imm_seq const* seq,
+                                      struct imm_state const* end_state);
 
 struct imm_hmm* imm_hmm_create(struct imm_abc const* abc)
 {
@@ -203,45 +207,49 @@ invalid:
 double imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq,
                        struct imm_state const* end_state, struct imm_path* path)
 {
-    if (hmm->abc != imm_seq_get_abc(seq)) {
-        imm_error("hmm and seq must have the same alphabet");
-        return imm_lprob_invalid();
-    }
+    struct dp const* dp = hmm_create_dp(hmm, seq, end_state);
+    if (!dp)
+        return IMM_LPROB_INVALID;
 
-    unsigned long end = mstate_table_find(hmm->table, end_state);
-    if (end == mstate_table_end(hmm->table)) {
-        imm_error("end_state not found");
-        return imm_lprob_invalid();
-    }
-
-    if (imm_seq_length(seq) < imm_state_min_seq(end_state)) {
-        imm_error("sequence is shorter than end_state's lower bound");
-        return imm_lprob_invalid();
-    }
-
-    struct mstate const** mstates = mstate_table_array(hmm->table);
-    if (mstate_sort(mstates, mstate_table_size(hmm->table))) {
-        free_c(mstates);
-        return imm_lprob_invalid();
-    }
-
-    struct dp const*  dp = dp_create(mstates, mstate_table_size(hmm->table), seq, end_state);
-    struct dp_matrix* tmp = dp_matrix_create(dp, seq);
-    struct dp_matrix* matrix = dp_matrix_clone(tmp);
+    struct dp_matrix* matrix = dp_matrix_create(dp, seq);
     double            score = dp_viterbi(dp, matrix, path);
     dp_matrix_destroy(matrix);
-    dp_matrix_destroy(tmp);
-    dp_destroy(dp);
 
-    free_c(mstates);
+    dp_destroy(dp);
     return score;
 }
 
-/* double imm_hmm_viterbi2(struct imm_hmm const* hmm, struct imm_seq const* seq, */
-/*                        struct imm_state const* end_state, struct imm_path* path) */
-/* { */
+struct imm_results const* imm_hmm_viterbi2(struct imm_hmm const*   hmm,
+                                           struct imm_seq const*   seq,
+                                           struct imm_state const* end_state,
+                                           unsigned                window_length)
+{
+    struct dp const* dp = hmm_create_dp(hmm, seq, end_state);
+    if (!dp)
+        return NULL;
 
-/* } */
+    struct imm_results* results = imm_results_create(seq, window_length);
+
+    unsigned const nresults = imm_results_size(results);
+
+    struct imm_window* window = imm_window_create(seq, window_length);
+    for (unsigned i = 0; i < nresults; ++i) {
+
+        struct imm_subseq subseq = imm_window_next(window);
+        struct dp_matrix* matrix = dp_matrix_create(dp, imm_subseq_cast(&subseq));
+
+        struct imm_path* path = imm_path_create();
+        double           score = dp_viterbi(dp, matrix, path);
+
+        imm_results_set(results, i, subseq, path, score);
+
+        dp_matrix_destroy(matrix);
+    }
+
+    imm_window_destroy(window);
+    dp_destroy(dp);
+    return results;
+}
 
 int imm_hmm_normalize(struct imm_hmm* hmm)
 {
@@ -353,4 +361,32 @@ static int hmm_normalize_trans(struct mstate* mstate)
     free_c(lprobs);
 
     return 0;
+}
+
+static struct dp const* hmm_create_dp(struct imm_hmm const* hmm, struct imm_seq const* seq,
+                                      struct imm_state const* end_state)
+{
+    if (hmm->abc != imm_seq_get_abc(seq)) {
+        imm_error("hmm and seq must have the same alphabet");
+        return NULL;
+    }
+
+    unsigned long end = mstate_table_find(hmm->table, end_state);
+    if (end == mstate_table_end(hmm->table)) {
+        imm_error("end_state not found");
+        return NULL;
+    }
+
+    if (imm_seq_length(seq) < imm_state_min_seq(end_state)) {
+        imm_error("sequence is shorter than end_state's lower bound");
+        return NULL;
+    }
+
+    struct mstate const** mstates = mstate_table_array(hmm->table);
+    if (mstate_sort(mstates, mstate_table_size(hmm->table))) {
+        free_c(mstates);
+        return NULL;
+    }
+
+    return dp_create(mstates, mstate_table_size(hmm->table), seq, end_state);
 }
