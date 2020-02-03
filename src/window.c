@@ -9,8 +9,7 @@ struct imm_window
 {
     struct imm_seq const* seq;
     unsigned              length;
-    /* struct imm_subseq     subseq; */
-    unsigned offset;
+    unsigned              offset;
 };
 
 struct imm_window* imm_window_create(struct imm_seq const* seq, unsigned const length)
