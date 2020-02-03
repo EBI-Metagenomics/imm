@@ -226,9 +226,11 @@ double imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq,
     }
 
     struct dp const*  dp = dp_create(mstates, mstate_table_size(hmm->table), seq, end_state);
-    struct dp_matrix* matrix = dp_matrix_create(dp, seq);
+    struct dp_matrix* tmp = dp_matrix_create(dp, seq);
+    struct dp_matrix* matrix = dp_matrix_clone(tmp);
     double            score = dp_viterbi(dp, matrix, path);
     dp_matrix_destroy(matrix);
+    dp_matrix_destroy(tmp);
     dp_destroy(dp);
 
     free_c(mstates);

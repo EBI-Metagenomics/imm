@@ -50,7 +50,7 @@
             matrix->data[i] = v;                                                              \
     }
 
-#define MAKE_MATRIX_DESTROY(S, T)                                                             \
+#define MAKE_MATRIX_DESTROY(S)                                                                \
     static inline void matrix_##S##_destroy(struct matrix_##S const* matrix)                  \
     {                                                                                         \
         if (!matrix)                                                                          \
@@ -58,6 +58,18 @@
                                                                                               \
         free_c(matrix->data);                                                                 \
         free_c(matrix);                                                                       \
+    }
+
+#define MAKE_MATRIX_NROWS(S)                                                                  \
+    static inline unsigned matrix_##S##_nrows(struct matrix_##S const* matrix)                \
+    {                                                                                         \
+        return matrix->nrows;                                                                 \
+    }
+
+#define MAKE_MATRIX_NCOLS(S)                                                                  \
+    static inline unsigned matrix_##S##_ncols(struct matrix_##S const* matrix)                \
+    {                                                                                         \
+        return matrix->ncols;                                                                 \
     }
 
 #endif

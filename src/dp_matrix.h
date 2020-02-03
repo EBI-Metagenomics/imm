@@ -46,13 +46,16 @@ MAKE_MATRIX_STRUCT(cell, struct cell)
 MAKE_MATRIX_CREATE(cell, struct cell)
 MAKE_MATRIX_GET(cell, struct cell)
 MAKE_MATRIX_GET_C(cell, struct cell)
-MAKE_MATRIX_DESTROY(cell, struct cell)
+MAKE_MATRIX_DESTROY(cell)
+MAKE_MATRIX_NROWS(cell)
+MAKE_MATRIX_NCOLS(cell)
 
 struct dp_matrix
 {
     struct imm_seq const* seq;
     struct matrix_cell*   cell;
     unsigned*             state_col;
+    unsigned              nstates;
 };
 
 static inline unsigned column(struct dp_matrix const* dp_matrix, struct step const* step)
@@ -68,6 +71,8 @@ static inline double get_score(struct dp_matrix const* dp_matrix, unsigned row,
 }
 
 struct dp_matrix* dp_matrix_create(struct dp const* dp, struct imm_seq const* seq);
+
+struct dp_matrix* dp_matrix_clone(struct dp_matrix const* matrix);
 
 void dp_matrix_destroy(struct dp_matrix const* matrix);
 
