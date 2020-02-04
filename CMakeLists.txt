@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 project(imm VERSION 0.0.4 LANGUAGES C)
 
 # Generate compile_commands.json file
@@ -40,6 +40,8 @@ add_library(IMM::imm ALIAS imm)
 
 find_package(logaddexp REQUIRED)
 
+find_package(OpenMP)
+
 target_include_directories(imm
     PUBLIC
         $<INSTALL_INTERFACE:include>
@@ -47,7 +49,8 @@ target_include_directories(imm
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
-target_link_libraries(imm PRIVATE LOGADDEXP::logaddexp)
+target_link_libraries(imm PRIVATE LOGADDEXP::logaddexp
+    $<$<BOOL:${OpenMP_C_FOUND}>:OpenMP::OpenMP_C>)
 set_target_properties(imm PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
 target_compile_features(imm PRIVATE c_std_11)
@@ -55,6 +58,7 @@ set_target_properties(imm PROPERTIES C_VISIBILITY_PRESET hidden)
 set_target_properties(imm PROPERTIES DEFINE_SYMBOL "IMM_EXPORTS")
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRECATE>)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:__extension__>)
+target_compile_definitions(imm PRIVATE $<$<BOOL:${OpenMP_C_FOUND}>:OPENMP>)
 target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
 target_compile_options(imm PRIVATE
     $<$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>:/W3 /WX>
