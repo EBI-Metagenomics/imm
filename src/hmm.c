@@ -235,21 +235,20 @@ struct imm_results const* imm_hmm_viterbi2(struct imm_hmm const*   hmm,
     struct imm_seq const* empty_seq = imm_seq_create("", hmm->abc);
     struct dp_matrix**    matrices = NULL;
 
-#pragma omp parallel
+    _Pragma("omp parallel")
     {
-#pragma omp single
-        matrices = malloc(sizeof(struct dp_matrix*) * get_num_threads());
+        _Pragma("omp single") matrices = malloc(sizeof(struct dp_matrix*) * thread_size());
 
-        matrices[get_thread_num()] = dp_matrix_create(dp, empty_seq);
-#pragma omp single
+        matrices[thread_id()] = dp_matrix_create(dp, empty_seq);
+        _Pragma("omp single")
         {
             unsigned           i = 0;
             struct imm_window* window = imm_window_create(seq, window_length);
             while (!imm_window_end(window)) {
                 struct imm_subseq subseq = imm_window_next(window);
-#pragma omp task firstprivate(subseq, i)
+                _Pragma("omp task firstprivate(subseq, i)")
                 {
-                    struct dp_matrix* matrix = matrices[get_thread_num()];
+                    struct dp_matrix* matrix = matrices[thread_id()];
                     dp_matrix_reset(matrix, imm_subseq_cast(&subseq));
                     struct imm_path* path = imm_path_create();
                     double           score = dp_viterbi(dp, matrix, path);
@@ -259,9 +258,9 @@ struct imm_results const* imm_hmm_viterbi2(struct imm_hmm const*   hmm,
             }
             imm_window_destroy(window);
         }
-#pragma omp      single
+        _Pragma("omp single")
         {
-            for (unsigned i = 0; i < get_num_threads(); ++i)
+            for (unsigned i = 0; i < thread_size(); ++i)
                 dp_matrix_destroy(matrices[i]);
             free_c(matrices);
         }
@@ -278,8 +277,7 @@ int imm_hmm_normalize(struct imm_hmm* hmm)
         return 1;
 
     unsigned long i = 0;
-    mstate_table_for_each(i, hmm->table)
-    {
+    mstate_table_for_each (i, hmm->table) {
         if (mstate_table_exist(hmm->table, i)) {
 
             if (hmm_normalize_trans(mstate_table_get(hmm->table, i)))
@@ -299,8 +297,7 @@ int imm_hmm_normalize_start(struct imm_hmm* hmm)
     double* lprob = lprobs;
 
     unsigned long i = 0;
-    mstate_table_for_each(i, hmm->table)
-    {
+    mstate_table_for_each (i, hmm->table) {
         if (mstate_table_exist(hmm->table, i)) {
             *lprob = mstate_get_start(mstate_table_get(hmm->table, i));
             ++lprob;
@@ -314,8 +311,7 @@ int imm_hmm_normalize_start(struct imm_hmm* hmm)
     }
 
     lprob = lprobs;
-    mstate_table_for_each(i, hmm->table)
-    {
+    mstate_table_for_each (i, hmm->table) {
         if (mstate_table_exist(hmm->table, i)) {
             mstate_set_start(mstate_table_get(hmm->table, i), *lprob);
             ++lprob;
@@ -357,8 +353,7 @@ static int hmm_normalize_trans(struct mstate* mstate)
     double* lprob = lprobs;
 
     unsigned long i = 0;
-    mtrans_table_for_each(i, table)
-    {
+    mtrans_table_for_each (i, table) {
         if (mtrans_table_exist(table, i)) {
             *lprob = mtrans_get_lprob(mtrans_table_get(table, i));
             ++lprob;
@@ -372,8 +367,7 @@ static int hmm_normalize_trans(struct mstate* mstate)
     }
 
     lprob = lprobs;
-    mtrans_table_for_each(i, table)
-    {
+    mtrans_table_for_each (i, table) {
         if (mtrans_table_exist(table, i)) {
             mtrans_set_lprob(mtrans_table_get(table, i), *lprob);
             ++lprob;

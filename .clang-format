@@ -58,6 +58,10 @@ ForEachMacros:
   - foreach
   - Q_FOREACH
   - BOOST_FOREACH
+  - list_for_each_entry
+  - mtrans_table_for_each
+  - list_for_each_entry_safe
+  - mstate_table_for_each
 IncludeCategories:
   - Regex:           '^"(llvm|llvm-c|clang|clang-c)/'
     Priority:        2
