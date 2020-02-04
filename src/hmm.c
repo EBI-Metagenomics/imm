@@ -243,11 +243,11 @@ struct imm_results const* imm_hmm_viterbi2(struct imm_hmm const*   hmm,
 
 #pragma omp parallel
     {
-#pragma omp master
+#pragma omp single
         matrices = malloc(sizeof(struct dp_matrix*) * (unsigned)omp_get_num_threads());
 
         matrices[(unsigned)omp_get_thread_num()] = dp_matrix_create(dp, empty_seq);
-#pragma omp single
+#pragma omp master
         {
             unsigned           i = 0;
             struct imm_window* window = imm_window_create(seq, window_length);
@@ -266,7 +266,7 @@ struct imm_results const* imm_hmm_viterbi2(struct imm_hmm const*   hmm,
             imm_window_destroy(window);
         }
 #pragma omp      barrier
-#pragma omp      master
+#pragma omp      single
         {
             for (unsigned i = 0; i < (unsigned)omp_get_num_threads(); ++i)
                 dp_matrix_destroy(matrices[i]);
