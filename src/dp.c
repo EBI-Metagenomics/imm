@@ -114,8 +114,8 @@ static double best_trans_score(struct dp const* dp, struct dp_matrix const* matr
 
         struct trans const*      trans = array_trans_get_c(incoming, i);
         struct state_info const* prev = trans->src_state;
-        /* if (row - prev->min_seq < 0) */
-        /*     continue; */
+        if (row < prev->min_seq)
+            continue;
 
         struct step tmp_step = {.state = prev};
         for (unsigned len = prev->min_seq; len <= MIN(prev->max_seq, row); ++len) {

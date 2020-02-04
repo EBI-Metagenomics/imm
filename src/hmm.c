@@ -16,16 +16,10 @@
 #include "mstate_table.h"
 #include "mtrans.h"
 #include "mtrans_table.h"
+#include "thread.h"
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef OPENMP
-#include <omp.h>
-#else
-static inline int omp_get_num_threads(void) { return 1; }
-static inline int omp_get_thread_num(void) { return 0; }
-#endif
 
 struct imm_hmm
 {
@@ -244,10 +238,10 @@ struct imm_results const* imm_hmm_viterbi2(struct imm_hmm const*   hmm,
 #pragma omp parallel
     {
 #pragma omp single
-        matrices = malloc(sizeof(struct dp_matrix*) * (unsigned)omp_get_num_threads());
+        matrices = malloc(sizeof(struct dp_matrix*) * get_num_threads());
 
-        matrices[(unsigned)omp_get_thread_num()] = dp_matrix_create(dp, empty_seq);
-#pragma omp master
+        matrices[get_thread_num()] = dp_matrix_create(dp, empty_seq);
+#pragma omp single
         {
             unsigned           i = 0;
             struct imm_window* window = imm_window_create(seq, window_length);
@@ -255,7 +249,7 @@ struct imm_results const* imm_hmm_viterbi2(struct imm_hmm const*   hmm,
                 struct imm_subseq subseq = imm_window_next(window);
 #pragma omp task firstprivate(subseq, i)
                 {
-                    struct dp_matrix* matrix = matrices[(unsigned)omp_get_thread_num()];
+                    struct dp_matrix* matrix = matrices[get_thread_num()];
                     dp_matrix_reset(matrix, imm_subseq_cast(&subseq));
                     struct imm_path* path = imm_path_create();
                     double           score = dp_viterbi(dp, matrix, path);
@@ -265,10 +259,9 @@ struct imm_results const* imm_hmm_viterbi2(struct imm_hmm const*   hmm,
             }
             imm_window_destroy(window);
         }
-#pragma omp      barrier
 #pragma omp      single
         {
-            for (unsigned i = 0; i < (unsigned)omp_get_num_threads(); ++i)
+            for (unsigned i = 0; i < get_num_threads(); ++i)
                 dp_matrix_destroy(matrices[i]);
             free_c(matrices);
         }
