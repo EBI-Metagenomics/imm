@@ -230,6 +230,9 @@ struct imm_results const* imm_hmm_viterbi2(struct imm_hmm const*   hmm,
     if (!dp)
         return NULL;
 
+    if (window_length == 0)
+        window_length = imm_seq_length(seq);
+
     struct imm_results* results = imm_results_create(seq, window_length);
 
     struct imm_seq const* empty_seq = imm_seq_create("", hmm->abc);

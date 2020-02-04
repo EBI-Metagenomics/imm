@@ -44,8 +44,17 @@ void test_window_0(void)
     struct imm_abc const* abc = imm_abc_create("ACGT", 'X');
     struct imm_seq const* seq = imm_seq_create("", abc);
 
-    cass_cond(imm_window_create(seq, 0) == NULL);
+    struct imm_window* window = imm_window_create(seq, 0);
+    cass_cond(window != NULL);
+    cass_cond(imm_window_size(window) == 1);
 
+    struct imm_subseq subseq = imm_window_next(window);
+    cass_cond(imm_seq_length(imm_subseq_cast(&subseq)) == 0);
+    cass_cond(strncmp(imm_seq_string(imm_subseq_cast(&subseq)), "", 0) == 0);
+
+    cass_cond(imm_window_end(window));
+
+    imm_window_destroy(window);
     imm_seq_destroy(seq);
     imm_abc_destroy(abc);
 }
@@ -55,7 +64,14 @@ void test_window_1(void)
     struct imm_abc const* abc = imm_abc_create("ACGT", 'X');
     struct imm_seq const* seq = imm_seq_create("", abc);
 
-    cass_cond(imm_window_create(seq, 1) == NULL);
+    struct imm_window* window = imm_window_create(seq, 1);
+    cass_cond(window != NULL);
+    cass_cond(imm_window_size(window) == 1);
+
+    struct imm_subseq subseq = imm_window_next(window);
+    cass_cond(imm_seq_length(imm_subseq_cast(&subseq)) == 0);
+
+    cass_cond(imm_window_end(window));
 
     imm_seq_destroy(seq);
     imm_abc_destroy(abc);
