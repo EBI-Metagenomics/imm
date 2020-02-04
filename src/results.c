@@ -15,18 +15,16 @@ struct imm_result
 struct imm_results
 {
     struct imm_seq const* seq;
-    struct imm_window*    window;
     struct imm_result*    result;
     unsigned              nresults;
 };
 
-struct imm_results* imm_results_create(struct imm_seq const* seq, unsigned window_length)
+struct imm_results* imm_results_create(struct imm_seq const* seq, unsigned const nresults)
 {
     struct imm_results* results = malloc(sizeof(struct imm_results));
 
     results->seq = seq;
-    results->window = imm_window_create(seq, window_length);
-    results->nresults = imm_window_size(results->window);
+    results->nresults = nresults;
     results->result = malloc(sizeof(struct imm_result) * results->nresults);
 
     return results;
@@ -52,7 +50,6 @@ void imm_results_destroy(struct imm_results const* results)
     for (unsigned i = 0; i < results->nresults; ++i)
         imm_path_destroy(results->result[i].path);
     free_c(results->result);
-    imm_window_destroy(results->window);
     free_c(results);
 }
 

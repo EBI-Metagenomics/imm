@@ -213,8 +213,9 @@ double imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq,
     if (!dp)
         return IMM_LPROB_INVALID;
 
-    struct dp_matrix* matrix = dp_matrix_create(dp, seq);
-    double            score = dp_viterbi(dp, matrix, path);
+    struct dp_matrix* matrix = dp_matrix_new(dp);
+    dp_matrix_set(matrix, seq);
+    double score = dp_viterbi(dp, matrix, path);
     dp_matrix_destroy(matrix);
 
     dp_destroy(dp);
@@ -233,31 +234,28 @@ struct imm_results const* imm_hmm_viterbi2(struct imm_hmm const*   hmm,
     if (window_length == 0)
         window_length = imm_seq_length(seq);
 
-    struct imm_results* results = imm_results_create(seq, window_length);
-
-    struct imm_seq const* empty_seq = imm_seq_create("", hmm->abc);
-    struct dp_matrix**    matrices = NULL;
+    struct imm_window*  window = imm_window_create(seq, window_length);
+    unsigned const      nwindows = imm_window_size(window);
+    struct imm_results* results = imm_results_create(seq, nwindows);
+    struct dp_matrix**  matrices = NULL;
 
     _Pragma("omp parallel")
     {
         _Pragma("omp single") matrices = malloc(sizeof(struct dp_matrix*) * thread_size());
 
-        matrices[thread_id()] = dp_matrix_create(dp, empty_seq);
+        matrices[thread_id()] = dp_matrix_new(dp);
         _Pragma("omp single")
         {
-            unsigned           i = 0;
-            struct imm_window* window = imm_window_create(seq, window_length);
-            while (!imm_window_end(window)) {
+            for (unsigned i = 0; i < nwindows; ++i) {
                 struct imm_subseq subseq = imm_window_next(window);
                 _Pragma("omp task firstprivate(subseq, i)")
                 {
                     struct dp_matrix* matrix = matrices[thread_id()];
-                    dp_matrix_reset(matrix, imm_subseq_cast(&subseq));
+                    dp_matrix_set(matrix, imm_subseq_cast(&subseq));
                     struct imm_path* path = imm_path_create();
                     double           score = dp_viterbi(dp, matrix, path);
                     imm_results_set(results, i, subseq, path, score);
                 }
-                ++i;
             }
             imm_window_destroy(window);
         }
@@ -268,7 +266,6 @@ struct imm_results const* imm_hmm_viterbi2(struct imm_hmm const*   hmm,
             free_c(matrices);
         }
     }
-    imm_seq_destroy(empty_seq);
     dp_destroy(dp);
 
     return results;

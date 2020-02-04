@@ -71,9 +71,9 @@ static inline double get_score(struct dp_matrix const* dp_matrix, unsigned row,
     return matrix_cell_get_c(dp_matrix->cell, row, column(dp_matrix, step))->score;
 }
 
-struct dp_matrix* dp_matrix_create(struct dp const* dp, struct imm_seq const* seq);
+struct dp_matrix* dp_matrix_new(struct dp const* dp);
 
-void dp_matrix_reset(struct dp_matrix* dp_matrix, struct imm_seq const* seq);
+void dp_matrix_set(struct dp_matrix* dp_matrix, struct imm_seq const* seq);
 
 void dp_matrix_destroy(struct dp_matrix const* matrix);
 

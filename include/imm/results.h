@@ -9,11 +9,10 @@ struct imm_results;
 struct imm_path;
 struct imm_result;
 
-IMM_API struct imm_results*      imm_results_create(struct imm_seq const* seq,
-                                                    unsigned              window_length);
-IMM_API void                     imm_results_set(struct imm_results* results, unsigned idx,
-                                                 struct imm_subseq subseq, struct imm_path const* path,
-                                                 double loglik);
+IMM_API struct imm_results* imm_results_create(struct imm_seq const* seq, unsigned nresults);
+IMM_API void                imm_results_set(struct imm_results* results, unsigned idx,
+                                            struct imm_subseq subseq, struct imm_path const* path,
+                                            double loglik);
 IMM_API struct imm_result const* imm_results_get(struct imm_results const* results,
                                                  unsigned                  idx);
 IMM_API unsigned                 imm_results_size(struct imm_results const* results);
