@@ -39,7 +39,6 @@ add_library(imm
 add_library(IMM::imm ALIAS imm)
 
 find_package(logaddexp REQUIRED)
-
 find_package(OpenMP)
 
 target_include_directories(imm

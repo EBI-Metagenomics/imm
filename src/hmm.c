@@ -222,7 +222,7 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
     struct imm_results* results = imm_results_create(seq, nwindows);
     struct dp_matrix**  matrices = NULL;
 
-    _Pragma("omp parallel if (nwindows > 1)")
+    _Pragma("omp parallel if(nwindows > 1)")
     {
         _Pragma("omp single") matrices = malloc(sizeof(struct dp_matrix*) * thread_size());
 

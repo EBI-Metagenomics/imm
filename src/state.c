@@ -1,20 +1,10 @@
 #include "ascii.h"
-#include "bug.h"
 #include "free.h"
-#include "imm/imm.h"
+#include "imm/abc.h"
+#include "imm/report.h"
+#include "state_static.h"
 #include <stdlib.h>
 #include <string.h>
-
-struct imm_state
-{
-    char const*           name;
-    struct imm_abc const* abc;
-
-    imm_state_lprob_t   lprob;
-    imm_state_min_seq_t min_seq;
-    imm_state_max_seq_t max_seq;
-    void*               impl;
-};
 
 struct imm_state const* imm_state_create(char const* name, struct imm_abc const* abc,
                                          struct imm_state_funcs funcs, void* impl)
@@ -51,8 +41,7 @@ struct imm_abc const* imm_state_get_abc(struct imm_state const* s) { return s->a
 
 double imm_state_lprob(struct imm_state const* state, struct imm_seq const* seq)
 {
-    BUG(state->abc != imm_seq_get_abc(seq));
-    return state->lprob(state, seq);
+    return state_lprob(state, seq);
 }
 
 unsigned imm_state_min_seq(struct imm_state const* state) { return state->min_seq(state); }

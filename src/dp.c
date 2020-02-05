@@ -10,6 +10,8 @@
 #include "mtrans.h"
 #include "mtrans_table.h"
 #include "state_idx.h"
+#include "state_static.h"
+#include "subseq_static.h"
 #include <limits.h>
 #include <string.h>
 
@@ -65,15 +67,17 @@ double dp_viterbi(struct dp const* dp, struct dp_matrix* matrix, struct imm_path
         struct state_info const* cur = dp->states;
 
         for (unsigned i = 0; i < dp->nstates; ++i, ++cur) {
-            struct step step = {.state = cur};
 
-            for (unsigned len = cur->min_seq; len <= MIN(cur->max_seq, seq_len); ++len) {
-                step.seq_len = len;
-                unsigned const col = column(matrix, &step);
-                struct cell*   cell = matrix_cell_get(matrix->cell, r, col);
-                double const   score = best_trans_score(dp, matrix, cur, r, &cell->prev_step);
+            unsigned const begin = cur->min_seq;
+            unsigned const end = MIN(cur->max_seq, seq_len);
+
+            for (unsigned len = begin; len <= end; ++len) {
+                struct step const step = {cur, len};
+                unsigned const    col = column(matrix, &step);
+                struct cell*      cell = matrix_cell_get(matrix->cell, r, col);
+                double const score = best_trans_score(dp, matrix, cur, r, &cell->prev_step);
                 IMM_SUBSEQ(subseq, matrix->seq, r, len);
-                cell->score = score + imm_state_lprob(cur->state, imm_subseq_cast(&subseq));
+                cell->score = score + state_lprob(cur->state, subseq_cast(&subseq));
             }
         }
     }

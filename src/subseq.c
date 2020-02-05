@@ -1,5 +1,5 @@
 #include "bug.h"
-#include "imm/subseq.h"
+#include "subseq_static.h"
 
 struct imm_subseq imm_subseq_init(struct imm_subseq* subseq, struct imm_seq const* seq,
                                   unsigned start, unsigned length)
@@ -14,7 +14,7 @@ struct imm_subseq imm_subseq_init(struct imm_subseq* subseq, struct imm_seq cons
 
 struct imm_seq const* imm_subseq_cast(struct imm_subseq const* subseq)
 {
-    return &subseq->subseq;
+    return subseq_cast(subseq);
 }
 
 void imm_subseq_set(struct imm_subseq* subseq, unsigned start, unsigned length)
