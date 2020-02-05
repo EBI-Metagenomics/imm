@@ -142,7 +142,7 @@ void test_parallel(void)
 
     elapsed_start(elapsed);
     struct imm_seq const*     seq = imm_seq_create(str, abc);
-    struct imm_results const* results = imm_hmm_viterbi2(hmm, seq, cast_c(end), 50);
+    struct imm_results const* results = imm_hmm_viterbi(hmm, seq, cast_c(end), 50);
 
     cass_cond(imm_results_size(results) == 79);
 

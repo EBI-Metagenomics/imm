@@ -138,7 +138,7 @@ void test_perf_viterbi(void)
 
     struct imm_seq const*     seq = imm_seq_create(str, abc);
     elapsed_start(elapsed);
-    struct imm_results const* results = imm_hmm_viterbi2(hmm, seq, cast_c(end), 0);
+    struct imm_results const* results = imm_hmm_viterbi(hmm, seq, cast_c(end), 0);
     elapsed_end(elapsed);
     cass_cond(imm_results_size(results) == 1);
     struct imm_result const* r = imm_results_get(results, 0);

@@ -206,26 +206,9 @@ invalid:
     return imm_lprob_invalid();
 }
 
-double imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq,
-                       struct imm_state const* end_state, struct imm_path* path)
-{
-    struct dp const* dp = hmm_create_dp(hmm, seq, end_state);
-    if (!dp)
-        return IMM_LPROB_INVALID;
-
-    struct dp_matrix* matrix = dp_matrix_new(dp);
-    dp_matrix_set(matrix, seq);
-    double score = dp_viterbi(dp, matrix, path);
-    dp_matrix_destroy(matrix);
-
-    dp_destroy(dp);
-    return score;
-}
-
-struct imm_results const* imm_hmm_viterbi2(struct imm_hmm const*   hmm,
-                                           struct imm_seq const*   seq,
-                                           struct imm_state const* end_state,
-                                           unsigned                window_length)
+struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq,
+                                          struct imm_state const* end_state,
+                                          unsigned                window_length)
 {
     struct dp const* dp = hmm_create_dp(hmm, seq, end_state);
     if (!dp)

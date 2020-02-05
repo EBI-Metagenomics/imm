@@ -1625,7 +1625,7 @@ void test_hmm_viterbi_cycle_mute_ending(void)
 double single_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq,
                       struct imm_state const* end_state, struct imm_path* path)
 {
-    struct imm_results const* results = imm_hmm_viterbi2(hmm, seq, end_state, 0);
+    struct imm_results const* results = imm_hmm_viterbi(hmm, seq, end_state, 0);
     if (results == NULL)
         return IMM_LPROB_INVALID;
     struct imm_result const* r = imm_results_get(results, 0);
