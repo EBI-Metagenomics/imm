@@ -94,8 +94,6 @@ void test_perf_viterbi(void)
 
     struct elapsed* elapsed = elapsed_create();
 
-    struct imm_path* path = imm_path_create();
-
     char const str[] = "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
                        "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
                        "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
@@ -138,13 +136,18 @@ void test_perf_viterbi(void)
                        "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMME";
     cass_cond(strlen(str) == 2000);
 
+    struct imm_seq const*     seq = imm_seq_create(str, abc);
     elapsed_start(elapsed);
-    struct imm_seq const* seq = imm_seq_create(str, abc);
-    double                score = imm_hmm_viterbi(hmm, seq, cast_c(end), path);
+    struct imm_results const* results = imm_hmm_viterbi2(hmm, seq, cast_c(end), 0);
+    elapsed_end(elapsed);
+    cass_cond(imm_results_size(results) == 1);
+    struct imm_result const* r = imm_results_get(results, 0);
+    struct imm_path const*   path = imm_result_path(r);
+    double                   score = imm_result_loglik(r);
+    imm_results_destroy(results);
+
     cass_cond(is_valid(score) && !is_zero(score));
     cass_close(score, -65826.0106185297);
-    elapsed_end(elapsed);
-    imm_path_destroy(path);
     imm_seq_destroy(seq);
 
 #ifdef NDEBUG
