@@ -110,7 +110,7 @@ static double best_trans_score(struct dp const* dp, struct dp_matrix const* matr
 
     struct array_trans const* incoming = &dst_state->incoming_transitions;
 
-    for (int i = 0; i < array_trans_length(incoming); ++i) {
+    for (unsigned i = 0; i < array_trans_length(incoming); ++i) {
 
         struct trans const*      trans = array_trans_get_c(incoming, i);
         struct state_info const* prev = trans->src_state;
@@ -192,8 +192,7 @@ static void create_trans(struct state_info* states, struct mstate const* const* 
         struct mtrans_table const* table = mstate_get_mtrans_table(mstates[i]);
 
         unsigned long iter = 0;
-        mtrans_table_for_each(iter, table)
-        {
+        mtrans_table_for_each (iter, table) {
             if (!mtrans_table_exist(table, iter))
                 continue;
             struct mtrans const* mtrans = mtrans_table_get(table, iter);

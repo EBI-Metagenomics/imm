@@ -7,8 +7,8 @@
 #define MAKE_ARRAY_STRUCT(S, T)                                                               \
     struct array_##S                                                                          \
     {                                                                                         \
-        T*  elements;                                                                         \
-        int length;                                                                           \
+        T*       elements;                                                                    \
+        unsigned length;                                                                      \
     };
 
 #define MAKE_ARRAY_INIT(S)                                                                    \
@@ -26,19 +26,20 @@
     }
 
 #define MAKE_ARRAY_GET(S, T)                                                                  \
-    static inline T* array_##S##_get(struct array_##S* array, int idx)                        \
+    static inline T* array_##S##_get(struct array_##S* array, unsigned const idx)             \
     {                                                                                         \
         return array->elements + idx;                                                         \
     }
 
 #define MAKE_ARRAY_GET_C(S, T)                                                                \
-    static inline T const* array_##S##_get_c(struct array_##S const* array, int idx)          \
+    static inline T const* array_##S##_get_c(struct array_##S const* array,                   \
+                                             unsigned const          idx)                     \
     {                                                                                         \
         return array->elements + idx;                                                         \
     }
 
 #define MAKE_ARRAY_LENGTH(S)                                                                  \
-    static inline int array_##S##_length(struct array_##S const* array)                       \
+    static inline unsigned array_##S##_length(struct array_##S const* array)                  \
     {                                                                                         \
         return array->length;                                                                 \
     }
