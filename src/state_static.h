@@ -2,6 +2,8 @@
 #define IMM_STATE_STATIC_H
 
 #include "bug.h"
+#include "imm/lprob.h"
+#include "imm/report.h"
 #include "imm/seq.h"
 #include "imm/state.h"
 
@@ -18,7 +20,10 @@ struct imm_state
 
 static inline double state_lprob(struct imm_state const* state, struct imm_seq const* seq)
 {
-    BUG(state->abc != imm_seq_get_abc(seq));
+    if (state->abc != imm_seq_get_abc(seq)) {
+        imm_error("alphabets must be the same");
+        return IMM_LPROB_INVALID;
+    }
     return state->lprob(state, seq);
 }
 
