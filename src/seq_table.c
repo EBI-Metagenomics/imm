@@ -115,7 +115,7 @@ double imm_seq_table_lprob(struct imm_seq_table const* table, struct imm_seq con
 {
     if (table->abc != imm_seq_get_abc(seq)) {
         imm_error("alphabets must be the same");
-        return 1;
+        return imm_lprob_invalid();
     }
 
     khiter_t i = kh_get(emission, table->emission_table, seq);
