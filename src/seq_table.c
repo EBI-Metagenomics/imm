@@ -87,7 +87,7 @@ int imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const* seq,
     }
 
     struct emission* emiss = malloc(sizeof(struct emission));
-    emiss->seq = imm_seq_duplicate(seq);
+    emiss->seq = imm_seq_clone(seq);
     emiss->lprob = lprob;
 
     kh_key(table->emission_table, iter) = emiss->seq;

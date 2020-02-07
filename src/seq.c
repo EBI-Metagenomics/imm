@@ -34,7 +34,7 @@ unsigned imm_seq_length(struct imm_seq const* seq) { return seq->length; }
 
 char const* imm_seq_string(struct imm_seq const* seq) { return seq->string; }
 
-struct imm_seq const* imm_seq_duplicate(struct imm_seq const* seq)
+struct imm_seq const* imm_seq_clone(struct imm_seq const* seq)
 {
     struct imm_seq* ret = malloc(sizeof(struct imm_seq));
     ret->abc = seq->abc;
