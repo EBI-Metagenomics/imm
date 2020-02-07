@@ -73,6 +73,7 @@ void test_window_1(void)
 
     cass_cond(imm_window_end(window));
 
+    imm_window_destroy(window);
     imm_seq_destroy(seq);
     imm_abc_destroy(abc);
 }

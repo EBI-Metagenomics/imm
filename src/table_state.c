@@ -19,7 +19,7 @@ struct imm_table_state* imm_table_state_create(char const*                 name,
                                                struct imm_seq_table const* table)
 {
     struct imm_table_state* state = malloc(sizeof(struct imm_table_state));
-    state->table = table;
+    state->table = imm_seq_table_clone(table);
 
     struct imm_state_funcs funcs = {table_state_lprob, table_state_min_seq,
                                     table_state_max_seq};

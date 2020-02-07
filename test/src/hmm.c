@@ -1485,6 +1485,7 @@ void test_hmm_viterbi_table_states(void)
     cass_cond(imm_seq_table_lprob(table, TAT) == log(0.2));
     cass_cond(imm_lprob_is_zero(imm_seq_table_lprob(table, seqT)));
     struct imm_table_state* T = imm_table_state_create("T", table);
+    imm_seq_table_destroy(table);
 
     struct imm_mute_state const* D = imm_mute_state_create("D", abc);
 

@@ -8,6 +8,7 @@ struct imm_abc;
 struct imm_seq_table;
 
 IMM_API struct imm_seq_table* imm_seq_table_create(struct imm_abc const* abc);
+IMM_API struct imm_seq_table* imm_seq_table_clone(struct imm_seq_table const* table);
 IMM_API void                  imm_seq_table_destroy(struct imm_seq_table const* table);
 IMM_API int    imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const* seq,
                                  double lprob);

@@ -1,4 +1,5 @@
 #include "imm/seq_table.h"
+#include "bug.h"
 #include "free.h"
 #include "imm/lprob.h"
 #include "imm/report.h"
@@ -29,6 +30,25 @@ struct imm_seq_table* imm_seq_table_create(struct imm_abc const* abc)
     table->max_seq = 0;
     table->emission_table = kh_init(emission);
     return table;
+}
+
+struct imm_seq_table* imm_seq_table_clone(struct imm_seq_table const* table)
+{
+    struct imm_seq_table* new_table = malloc(sizeof(struct imm_seq_table));
+    new_table->abc = table->abc;
+    new_table->min_seq = table->min_seq;
+    new_table->max_seq = table->max_seq;
+    new_table->emission_table = kh_init(emission);
+
+    khash_t(emission)* emiss_tbl = table->emission_table;
+
+    for (khiter_t i = kh_begin(emiss_tbl); i < kh_end(emiss_tbl); ++i) {
+        if (kh_exist(emiss_tbl, i)) {
+            struct emission const* e = kh_val(emiss_tbl, i);
+            BUG(imm_seq_table_add(new_table, e->seq, e->lprob) != 0);
+        }
+    }
+    return new_table;
 }
 
 void imm_seq_table_destroy(struct imm_seq_table const* table)
