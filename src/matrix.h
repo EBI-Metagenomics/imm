@@ -78,6 +78,8 @@
                                            unsigned const ncols)                              \
     {                                                                                         \
         matrix->data = realloc(matrix->data, sizeof(T) * (nrows * ncols));                    \
+        matrix->nrows = nrows;                                                                \
+        matrix->ncols = ncols;                                                                \
     }
 
 #endif
