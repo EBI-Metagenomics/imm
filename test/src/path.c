@@ -26,7 +26,20 @@ void test_path(void)
     cass_cond(imm_path_append(path, imm_state_cast_c(state1), 0) == 1);
     cass_cond(imm_path_append(path, imm_state_cast_c(state1), -1) == 1);
 
+    struct imm_path* new_path = imm_path_clone(path);
+
+    struct imm_step const* s0 = imm_path_first(path);
+    struct imm_step const* s1 = imm_path_first(new_path);
+    while (s0) {
+        cass_cond(s1 != NULL);
+        cass_cond(imm_step_state(s0) == imm_step_state(s1));
+        cass_cond(imm_step_seq_len(s0) == imm_step_seq_len(s1));
+        s0 = imm_path_next(path, s0);
+        s1 = imm_path_next(path, s1);
+    }
+
     imm_path_destroy(path);
+    imm_path_destroy(new_path);
 
     imm_normal_state_destroy(state0);
     imm_normal_state_destroy(state1);

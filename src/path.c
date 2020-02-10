@@ -1,3 +1,4 @@
+#include "bug.h"
 #include "free.h"
 #include "imm/imm.h"
 #include "list.h"
@@ -23,6 +24,21 @@ struct imm_path* imm_path_create(void)
     struct imm_path* path = malloc(sizeof(struct imm_path));
     INIT_LIST_HEAD(&path->steps);
     return path;
+}
+
+struct imm_path* imm_path_clone(struct imm_path const* path)
+{
+    struct imm_path* new_path = malloc(sizeof(struct imm_path));
+    INIT_LIST_HEAD(&new_path->steps);
+
+    struct list_head* entry = NULL;
+    list_for_each(entry, &path->steps)
+    {
+        struct imm_step const* step = list_entry(entry, struct imm_step, list_entry);
+        BUG(imm_path_append(new_path, imm_step_state(step), imm_step_seq_len(step)) != 0);
+    }
+
+    return new_path;
 }
 
 void imm_path_destroy(struct imm_path const* path)
