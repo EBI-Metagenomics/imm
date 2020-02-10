@@ -15,17 +15,19 @@ struct imm_result
 struct imm_results
 {
     struct imm_seq const* seq;
-    struct imm_result*    result;
     unsigned              nresults;
+    struct imm_result*    result[];
 };
 
 struct imm_results* imm_results_create(struct imm_seq const* seq, unsigned const nresults)
 {
-    struct imm_results* results = malloc(sizeof(struct imm_results));
+    struct imm_results* results =
+        malloc(sizeof(struct imm_results) + sizeof(struct imm_result* [nresults]));
 
     results->seq = seq;
     results->nresults = nresults;
-    results->result = malloc(sizeof(struct imm_result) * results->nresults);
+    for (unsigned i = 0; i < results->nresults; ++i)
+        results->result[i] = malloc(sizeof(struct imm_result));
 
     return results;
 }
@@ -33,14 +35,14 @@ struct imm_results* imm_results_create(struct imm_seq const* seq, unsigned const
 void imm_results_set(struct imm_results* results, unsigned idx, struct imm_subseq subseq,
                      struct imm_path const* path, double loglik)
 {
-    results->result[idx].path = path;
-    results->result[idx].subseq = subseq;
-    results->result[idx].loglik = loglik;
+    results->result[idx]->path = path;
+    results->result[idx]->subseq = subseq;
+    results->result[idx]->loglik = loglik;
 }
 
 struct imm_result const* imm_results_get(struct imm_results const* results, unsigned idx)
 {
-    return results->result + idx;
+    return results->result[idx];
 }
 
 unsigned imm_results_size(struct imm_results const* results) { return results->nresults; }
@@ -48,10 +50,12 @@ unsigned imm_results_size(struct imm_results const* results) { return results->n
 void imm_results_destroy(struct imm_results const* results)
 {
     for (unsigned i = 0; i < results->nresults; ++i)
-        imm_path_destroy(results->result[i].path);
-    free_c(results->result);
-    free_c(results);
+        imm_result_destroy(results->result[i]);
+
+    imm_results_free(results);
 }
+
+void imm_results_free(struct imm_results const* results) { free_c(results); }
 
 double imm_result_loglik(struct imm_result const* result) { return result->loglik; }
 
@@ -64,3 +68,11 @@ struct imm_seq const* imm_result_sequence(struct imm_result const* result)
 {
     return imm_subseq_cast(&result->subseq);
 }
+
+void imm_result_destroy(struct imm_result const* result)
+{
+    imm_path_destroy(result->path);
+    imm_result_free(result);
+}
+
+void imm_result_free(struct imm_result const* result) { free_c(result); }

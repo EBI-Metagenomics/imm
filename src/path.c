@@ -14,6 +14,8 @@ struct imm_state const* imm_step_state(struct imm_step const* step) { return ste
 
 unsigned imm_step_seq_len(struct imm_step const* step) { return step->seq_len; }
 
+void imm_step_destroy(struct imm_step const* step) { free_c(step); }
+
 struct imm_path
 {
     struct list_head steps;
@@ -41,6 +43,8 @@ struct imm_path* imm_path_clone(struct imm_path const* path)
     return new_path;
 }
 
+void imm_path_free(struct imm_path const* path) { free_c(path); }
+
 void imm_path_destroy(struct imm_path const* path)
 {
     struct list_head *entry = NULL, *tmp = NULL;
@@ -48,9 +52,9 @@ void imm_path_destroy(struct imm_path const* path)
     {
         struct imm_step const* step = list_entry(entry, struct imm_step, list_entry);
         list_del(entry);
-        free_c(step);
+        imm_step_destroy(step);
     }
-    free_c(path);
+    imm_path_free(path);
 }
 
 static struct imm_step* create_step(struct imm_state const* state, unsigned const seq_len);
