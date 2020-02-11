@@ -23,3 +23,11 @@ void imm_subseq_set(struct imm_subseq* subseq, unsigned start, unsigned length)
     subseq->subseq.string = subseq->seq->string + start;
     subseq->subseq.length = length;
 }
+
+unsigned imm_subseq_start(struct imm_subseq const* subseq)
+{
+    BUG(subseq->subseq.string < subseq->seq->string);
+    return (unsigned)(subseq->subseq.string - subseq->seq->string);
+}
+
+unsigned imm_subseq_length(struct imm_subseq const* subseq) { return subseq->subseq.length; }
