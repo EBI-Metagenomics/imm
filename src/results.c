@@ -64,10 +64,7 @@ struct imm_path const* imm_result_path(struct imm_result const* result)
     return result->path;
 }
 
-struct imm_seq const* imm_result_sequence(struct imm_result const* result)
-{
-    return imm_subseq_cast(&result->subseq);
-}
+struct imm_subseq imm_result_subseq(struct imm_result const* result) { return result->subseq; }
 
 void imm_result_destroy(struct imm_result const* result)
 {

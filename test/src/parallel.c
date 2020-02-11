@@ -147,37 +147,43 @@ void test_parallel(void)
     cass_cond(imm_results_size(results) == 79);
 
     struct imm_result const* result = imm_results_get(results, 0);
-    struct imm_seq const*    s = imm_result_sequence(result);
+    struct imm_subseq        subseq = imm_result_subseq(result);
+    struct imm_seq const*    s = imm_subseq_cast(&subseq);
     cass_close(imm_result_loglik(result), -1778.8892020572);
     cass_cond(strncmp(imm_seq_string(s), "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM",
                       imm_seq_length(s)) == 0);
 
     result = imm_results_get(results, 1);
-    s = imm_result_sequence(result);
+    subseq = imm_result_subseq(result);
+    s = imm_subseq_cast(&subseq);
     cass_cond(!imm_lprob_is_valid(imm_result_loglik(result)));
     cass_cond(strncmp(imm_seq_string(s), "MIMMMMMMMMMIIMIMIMIMIMIIMIIIMIMIMIMMMMMMIMMIMIMIMI",
                       imm_seq_length(s)) == 0);
 
     result = imm_results_get(results, 2);
-    s = imm_result_sequence(result);
+    subseq = imm_result_subseq(result);
+    s = imm_subseq_cast(&subseq);
     cass_cond(!imm_lprob_is_valid(imm_result_loglik(result)));
     cass_cond(strncmp(imm_seq_string(s), "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ",
                       imm_seq_length(s)) == 0);
 
     result = imm_results_get(results, 3);
-    s = imm_result_sequence(result);
+    subseq = imm_result_subseq(result);
+    s = imm_subseq_cast(&subseq);
     cass_cond(!imm_lprob_is_valid(imm_result_loglik(result)));
     cass_cond(strncmp(imm_seq_string(s), "IMIMMIMIMIMIMIMMMMIMMIMEJBMIIMIIMMIMMMIMEJBMIIMIIM",
                       imm_seq_length(s)) == 0);
 
     result = imm_results_get(results, 4);
-    s = imm_result_sequence(result);
+    subseq = imm_result_subseq(result);
+    s = imm_subseq_cast(&subseq);
     cass_close(imm_result_loglik(result), -1778.8892020572);
     cass_cond(strncmp(imm_seq_string(s), "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM",
                       imm_seq_length(s)) == 0);
 
     result = imm_results_get(results, 8);
-    s = imm_result_sequence(result);
+    subseq = imm_result_subseq(result);
+    s = imm_subseq_cast(&subseq);
     cass_close(imm_result_loglik(result), -1778.8892020572);
     cass_cond(strncmp(imm_seq_string(s), "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM",
                       imm_seq_length(s)) == 0);
