@@ -4,6 +4,7 @@
 #include "imm/path.h"
 #include "imm/report.h"
 #include "imm/state.h"
+#include "imm/step.h"
 #include "imm/subseq.h"
 #include "min.h"
 #include "mstate.h"
@@ -179,7 +180,9 @@ static void viterbi_path(struct dp const* dp, struct dp_matrix const* matrix,
     struct step const* step = end_step;
 
     while (step->seq_len != UINT_MAX) {
-        imm_path_prepend(path, step->state->state, step->seq_len);
+        struct imm_step* new_step = imm_step_create(step->state->state, step->seq_len);
+        BUG(new_step == NULL);
+        imm_path_prepend(path, new_step);
         BUG(step->seq_len > row);
         row -= step->seq_len;
         step = &matrix_cell_get_c(matrix->cell, row, column(matrix, step))->prev_step;

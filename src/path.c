@@ -1,20 +1,9 @@
+#include "imm/path.h"
 #include "bug.h"
 #include "free.h"
-#include "imm/imm.h"
+#include "imm/step.h"
 #include "list.h"
-
-struct imm_step
-{
-    struct imm_state const* state;
-    unsigned                seq_len;
-    struct list_head        list_entry;
-};
-
-struct imm_state const* imm_step_state(struct imm_step const* step) { return step->state; }
-
-unsigned imm_step_seq_len(struct imm_step const* step) { return step->seq_len; }
-
-void imm_step_destroy(struct imm_step const* step) { free_c(step); }
+#include "step_struct.h"
 
 struct imm_path
 {
@@ -37,7 +26,8 @@ struct imm_path* imm_path_clone(struct imm_path const* path)
     list_for_each(entry, &path->steps)
     {
         struct imm_step const* step = list_entry(entry, struct imm_step, list_entry);
-        BUG(imm_path_append(new_path, imm_step_state(step), imm_step_seq_len(step)) != 0);
+        struct imm_step*       new_step = imm_step_clone(step);
+        imm_path_append(new_path, new_step);
     }
 
     return new_path;
@@ -57,36 +47,19 @@ void imm_path_destroy(struct imm_path const* path)
     imm_path_free(path);
 }
 
-static struct imm_step* create_step(struct imm_state const* state, unsigned const seq_len);
-
-int imm_path_append(struct imm_path* path, struct imm_state const* state, unsigned seq_len)
+void imm_path_append(struct imm_path* path, struct imm_step* step)
 {
-    struct imm_step* step = create_step(state, seq_len);
-    if (!step)
-        return 1;
     list_add_tail(&step->list_entry, &path->steps);
-    return 0;
 }
 
-int imm_path_prepend(struct imm_path* path, struct imm_state const* state, unsigned seq_len)
+void imm_path_prepend(struct imm_path* path, struct imm_step* step)
 {
-    struct imm_step* step = create_step(state, seq_len);
-    if (!step)
-        return 1;
     list_add(&step->list_entry, &path->steps);
-    return 0;
 }
 
 struct imm_step const* imm_path_first(struct imm_path const* path)
 {
     return list_first_entry_or_null(&path->steps, struct imm_step, list_entry);
-}
-
-struct imm_step const* imm_path_last(struct imm_path const* path)
-{
-    if (list_empty(&path->steps))
-        return NULL;
-    return list_last_entry(&path->steps, struct imm_step, list_entry);
 }
 
 struct imm_step const* imm_path_next(struct imm_path const* path, struct imm_step const* step)
@@ -95,16 +68,4 @@ struct imm_step const* imm_path_next(struct imm_path const* path, struct imm_ste
     if (&path->steps != &next->list_entry)
         return next;
     return NULL;
-}
-
-static struct imm_step* create_step(struct imm_state const* state, unsigned seq_len)
-{
-    if (seq_len < imm_state_min_seq(state) || imm_state_max_seq(state) < seq_len) {
-        imm_error("seq_len outside the state's range");
-        return NULL;
-    }
-    struct imm_step* step = malloc(sizeof(struct imm_step));
-    step->state = state;
-    step->seq_len = seq_len;
-    return step;
 }

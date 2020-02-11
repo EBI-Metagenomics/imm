@@ -8,6 +8,7 @@
 #include "imm/report.h"
 #include "imm/results.h"
 #include "imm/state.h"
+#include "imm/step.h"
 #include "imm/subseq.h"
 #include "imm/window.h"
 #include "min.h"

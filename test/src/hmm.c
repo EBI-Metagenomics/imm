@@ -130,12 +130,11 @@ void test_hmm_likelihood_single_state(void)
     cass_cond(imm_hmm_normalize(hmm) == 0);
 
     struct imm_path* path = imm_path_create();
-    imm_path_append(path, cast_c(state), 1);
+    imm_path_append(path, imm_step_create(cast_c(state), 1));
     cass_close(imm_hmm_likelihood(hmm, A, path), -1.386294361120);
     imm_path_destroy(path);
 
     path = imm_path_create();
-    imm_path_append(path, cast_c(state), 2);
     cass_cond(!is_valid(imm_hmm_likelihood(hmm, A, path)));
     imm_path_destroy(path);
 
@@ -148,13 +147,13 @@ void test_hmm_likelihood_single_state(void)
     imm_path_destroy(path);
 
     path = imm_path_create();
-    imm_path_append(path, cast_c(state), 1);
+    imm_path_append(path, imm_step_create(cast_c(state), 1));
     cass_cond(!is_valid(imm_hmm_likelihood(hmm, AG, path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
-    imm_path_append(path, cast_c(state), 1);
-    imm_path_append(path, cast_c(state), 1);
+    imm_path_append(path, imm_step_create(cast_c(state), 1));
+    imm_path_append(path, imm_step_create(cast_c(state), 1));
     cass_cond(is_zero(imm_hmm_likelihood(hmm, AA, path)));
     imm_path_destroy(path);
 
@@ -164,15 +163,15 @@ void test_hmm_likelihood_single_state(void)
     cass_cond(imm_hmm_set_trans(hmm, cast_c(state), cast_c(state), log(0.5)) == 0);
 
     path = imm_path_create();
-    imm_path_append(path, cast_c(state), 1);
-    imm_path_append(path, cast_c(state), 1);
+    imm_path_append(path, imm_step_create(cast_c(state), 1));
+    imm_path_append(path, imm_step_create(cast_c(state), 1));
     cass_close(imm_hmm_likelihood(hmm, AA, path), -3.465735902800);
     imm_path_destroy(path);
 
     cass_cond(imm_hmm_normalize(hmm) == 0);
     path = imm_path_create();
-    imm_path_append(path, cast_c(state), 1);
-    imm_path_append(path, cast_c(state), 1);
+    imm_path_append(path, imm_step_create(cast_c(state), 1));
+    imm_path_append(path, imm_step_create(cast_c(state), 1));
     cass_close(imm_hmm_likelihood(hmm, AA, path), -2.772588722240);
     imm_path_destroy(path);
 
@@ -208,30 +207,30 @@ void test_hmm_likelihood_two_states(void)
     imm_hmm_set_trans(hmm, cast_c(state1), cast_c(state1), log(1.0));
 
     struct imm_path* path = imm_path_create();
-    imm_path_append(path, cast_c(state0), 1);
+    imm_path_append(path, imm_step_create(cast_c(state0), 1));
     cass_close(imm_hmm_likelihood(hmm, A, path), -1.3862943611);
     imm_path_destroy(path);
 
     path = imm_path_create();
-    imm_path_append(path, cast_c(state0), 1);
+    imm_path_append(path, imm_step_create(cast_c(state0), 1));
     cass_cond(is_zero(imm_hmm_likelihood(hmm, T, path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
-    imm_path_append(path, cast_c(state1), 1);
+    imm_path_append(path, imm_step_create(cast_c(state1), 1));
     cass_cond(is_zero(imm_hmm_likelihood(hmm, G, path)));
     imm_path_destroy(path);
 
     cass_cond(imm_hmm_normalize(hmm) == 0);
 
     path = imm_path_create();
-    imm_path_append(path, cast_c(state0), 1);
+    imm_path_append(path, imm_step_create(cast_c(state0), 1));
     cass_close(imm_hmm_likelihood(hmm, G, path), -0.6931471806);
     imm_path_destroy(path);
 
     path = imm_path_create();
-    imm_path_append(path, cast_c(state0), 1);
-    imm_path_append(path, cast_c(state1), 1);
+    imm_path_append(path, imm_step_create(cast_c(state0), 1));
+    imm_path_append(path, imm_step_create(cast_c(state1), 1));
     cass_close(imm_hmm_likelihood(hmm, GT, path), -1.0986122887);
     imm_path_destroy(path);
 
@@ -262,34 +261,27 @@ void test_hmm_likelihood_mute_state(void)
     imm_hmm_set_trans(hmm, cast_c(state), cast_c(state), log(0.1));
 
     struct imm_path* path = imm_path_create();
-    imm_path_append(path, cast_c(state), 1);
     cass_cond(!is_valid(imm_hmm_likelihood(hmm, A, path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
-    imm_path_append(path, cast_c(state), 1);
     cass_cond(!is_valid(imm_hmm_likelihood(hmm, T, path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
-    imm_path_append(path, cast_c(state), 1);
     cass_cond(!is_valid(imm_hmm_likelihood(hmm, G, path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
-    imm_path_append(path, cast_c(state), 0);
+    imm_path_append(path, imm_step_create(cast_c(state), 0));
     cass_close(imm_hmm_likelihood(hmm, EMPTY, path), 0.0);
     imm_path_destroy(path);
 
     path = imm_path_create();
-    imm_path_append(path, cast_c(state), 1);
-    imm_path_append(path, cast_c(state), 1);
     cass_cond(!is_valid(imm_hmm_likelihood(hmm, GT, path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
-    imm_path_append(path, cast_c(state), 1);
-    imm_path_append(path, cast_c(state), 1);
     cass_cond(!is_valid(imm_hmm_likelihood(hmm, GT, path)));
     imm_path_destroy(path);
 
@@ -318,8 +310,8 @@ void test_hmm_likelihood_two_mute_states(void)
     imm_hmm_set_trans(hmm, cast_c(S0), cast_c(S1), 0.0);
 
     struct imm_path* path = imm_path_create();
-    imm_path_append(path, cast_c(S0), 0);
-    imm_path_append(path, cast_c(S1), 0);
+    imm_path_append(path, imm_step_create(cast_c(S0), 0));
+    imm_path_append(path, imm_step_create(cast_c(S1), 0));
     cass_close(imm_hmm_likelihood(hmm, EMPTY, path), 0.0);
     imm_path_destroy(path);
 
@@ -357,10 +349,10 @@ void test_hmm_likelihood_invalid(void)
     imm_hmm_normalize(hmm);
 
     struct imm_path* path = imm_path_create();
-    cass_cond(imm_path_append(path, cast_c(S), 0) == 0);
-    cass_cond(imm_path_append(path, cast_c(M1), 1) == 1);
-    cass_cond(imm_path_append(path, cast_c(M2), 1) == 0);
-    cass_cond(imm_path_append(path, cast_c(E), 0) == 0);
+    imm_path_append(path, imm_step_create(cast_c(S), 0));
+    cass_cond(imm_step_create(cast_c(M1), 1) == NULL);
+    imm_path_append(path, imm_step_create(cast_c(M2), 1));
+    imm_path_append(path, imm_step_create(cast_c(E), 0));
     cass_cond(imm_lprob_is_zero(imm_hmm_likelihood(hmm, C, path)));
     imm_path_destroy(path);
 
@@ -1634,7 +1626,7 @@ double single_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq,
     struct imm_path const* src = imm_result_path(r);
     for (struct imm_step const* step = imm_path_first(src); step;
          step = imm_path_next(src, step))
-        imm_path_append(path, imm_step_state(step), imm_step_seq_len(step));
+        imm_path_append(path, imm_step_create(imm_step_state(step), imm_step_seq_len(step)));
 
     double score = imm_result_loglik(r);
     imm_results_destroy(results);
