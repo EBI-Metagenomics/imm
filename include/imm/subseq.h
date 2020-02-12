@@ -14,6 +14,8 @@ struct imm_subseq
 
 IMM_API struct imm_subseq imm_subseq_init(struct imm_subseq* subseq, struct imm_seq const* seq,
                                           unsigned start, unsigned length);
+IMM_API struct imm_subseq imm_subseq_slice(struct imm_seq const* seq, unsigned start,
+                                           unsigned length);
 IMM_API struct imm_seq const* imm_subseq_cast(struct imm_subseq const* subseq);
 IMM_API void     imm_subseq_set(struct imm_subseq* subseq, unsigned start, unsigned length);
 IMM_API unsigned imm_subseq_start(struct imm_subseq const* subseq);

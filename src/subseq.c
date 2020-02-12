@@ -12,6 +12,12 @@ struct imm_subseq imm_subseq_init(struct imm_subseq* subseq, struct imm_seq cons
     return *subseq;
 }
 
+struct imm_subseq imm_subseq_slice(struct imm_seq const* seq, unsigned start, unsigned length)
+{
+    IMM_SUBSEQ(subseq, seq, start, length);
+    return subseq;
+}
+
 struct imm_seq const* imm_subseq_cast(struct imm_subseq const* subseq)
 {
     return subseq_cast(subseq);
