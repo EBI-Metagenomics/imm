@@ -13,6 +13,7 @@ endif()
 
 add_library(imm
     src/abc.c
+    src/abct.c
     src/dp.c
     src/dp_matrix.c
     src/hmm.c
