@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
-project(imm VERSION 0.0.4 LANGUAGES C)
+project(imm VERSION 0.0.5 LANGUAGES C)
 
 # Generate compile_commands.json file
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -13,7 +13,7 @@ endif()
 
 add_library(imm
     src/abc.c
-    src/abct.c
+    src/abc_table.c
     src/dp.c
     src/dp_matrix.c
     src/hmm.c

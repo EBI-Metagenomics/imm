@@ -7,7 +7,7 @@ extern "C"
 #endif
 
 #include "imm/abc.h"
-#include "imm/abct.h"
+#include "imm/abc_table.h"
 #include "imm/hmm.h"
 #include "imm/lprob.h"
 #include "imm/mute_state.h"

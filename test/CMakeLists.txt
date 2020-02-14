@@ -5,6 +5,7 @@ function(imm_add_test name)
 endfunction()
 
 imm_add_test(abc)
+imm_add_test(abc_table)
 imm_add_test(hmm)
 imm_add_test(path)
 imm_add_test(perf)
