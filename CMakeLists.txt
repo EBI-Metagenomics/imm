@@ -50,8 +50,8 @@ target_include_directories(imm
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
-target_link_libraries(imm PUBLIC LOGADDEXP::logaddexp
-    $<$<BOOL:${OpenMP_C_FOUND}>:OpenMP::OpenMP_C>)
+target_link_libraries(imm PUBLIC LOGADDEXP::logaddexp)
+target_link_libraries(imm PRIVATE $<$<BOOL:${OpenMP_C_FOUND}>:OpenMP::OpenMP_C>)
 set_target_properties(imm PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
 target_compile_features(imm PRIVATE c_std_11)
