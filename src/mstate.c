@@ -1,5 +1,4 @@
 #include "mstate.h"
-#include "bug.h"
 #include "free.h"
 #include "mtrans.h"
 #include "mtrans_table.h"

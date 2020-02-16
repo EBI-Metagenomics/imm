@@ -1,8 +1,8 @@
+#include "imm/state.h"
 #include "ascii.h"
 #include "free.h"
 #include "imm/abc.h"
 #include "imm/report.h"
-#include "state_static.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -34,27 +34,3 @@ void imm_state_destroy(struct imm_state const* state)
     free_c(state->name);
     free_c(state);
 }
-
-char const* imm_state_get_name(struct imm_state const* s) { return s->name; }
-
-struct imm_abc const* imm_state_get_abc(struct imm_state const* s) { return s->abc; }
-
-double imm_state_lprob(struct imm_state const* state, struct imm_seq const* seq)
-{
-    return state_lprob(state, seq);
-}
-
-unsigned imm_state_min_seq(struct imm_state const* state) { return state->min_seq(state); }
-
-unsigned imm_state_max_seq(struct imm_state const* state) { return state->max_seq(state); }
-
-struct imm_state const* imm_state_cast_c(void const* state)
-{
-    struct type_c
-    {
-        struct imm_state const* state;
-    } const* t = state;
-    return t->state;
-}
-
-void const* imm_state_get_impl_c(struct imm_state const* state) { return state->impl; }

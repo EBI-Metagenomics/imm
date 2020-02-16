@@ -1,6 +1,6 @@
 #include "imm/seq_table.h"
-#include "bug.h"
 #include "free.h"
+#include "imm//bug.h"
 #include "imm/lprob.h"
 #include "imm/report.h"
 #include "khash_seq.h"
@@ -45,7 +45,7 @@ struct imm_seq_table* imm_seq_table_clone(struct imm_seq_table const* table)
     for (khiter_t i = kh_begin(emiss_tbl); i < kh_end(emiss_tbl); ++i) {
         if (kh_exist(emiss_tbl, i)) {
             struct emission const* e = kh_val(emiss_tbl, i);
-            BUG(imm_seq_table_add(new_table, e->seq, e->lprob) != 0);
+            IMM_BUG(imm_seq_table_add(new_table, e->seq, e->lprob) != 0);
         }
     }
     return new_table;

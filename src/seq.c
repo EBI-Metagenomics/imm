@@ -1,5 +1,4 @@
 #include "imm/seq.h"
-#include "bug.h"
 #include "free.h"
 #include "imm/abc.h"
 #include "imm/report.h"
@@ -27,12 +26,6 @@ struct imm_seq const* imm_seq_create(char const* seq, struct imm_abc const* abc)
     ret->length = (unsigned)length;
     return ret;
 }
-
-struct imm_abc const* imm_seq_get_abc(struct imm_seq const* seq) { return seq->abc; }
-
-unsigned imm_seq_length(struct imm_seq const* seq) { return seq->length; }
-
-char const* imm_seq_string(struct imm_seq const* seq) { return seq->string; }
 
 struct imm_seq const* imm_seq_clone(struct imm_seq const* seq)
 {

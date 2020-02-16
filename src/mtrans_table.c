@@ -1,6 +1,6 @@
 #include "mtrans_table.h"
-#include "bug.h"
 #include "free.h"
+#include "imm/bug.h"
 #include "imm/report.h"
 #include "khash_ptr.h"
 #include "mtrans.h"
@@ -22,8 +22,7 @@ struct mtrans_table* mtrans_table_create(void)
 void mtrans_table_destroy(struct mtrans_table* table)
 {
     unsigned long i = 0;
-    mtrans_table_for_each(i, table)
-    {
+    mtrans_table_for_each (i, table) {
         if (kh_exist(table->ktable, i))
             mtrans_destroy(kh_val(table->ktable, i));
     }
@@ -36,7 +35,7 @@ void mtrans_table_add(struct mtrans_table* table, struct mtrans* mtrans)
 {
     int      ret = 0;
     khiter_t i = kh_put(mtrans, table->ktable, mtrans_get_state(mtrans), &ret);
-    BUG(ret == -1 || ret == 0);
+    IMM_BUG(ret == -1 || ret == 0);
     kh_key(table->ktable, i) = mtrans_get_state(mtrans);
     kh_val(table->ktable, i) = mtrans;
 }
@@ -77,6 +76,6 @@ unsigned long mtrans_table_end(struct mtrans_table const* table)
 unsigned mtrans_table_size(struct mtrans_table const* table)
 {
     size_t n = kh_size(table->ktable);
-    BUG(n > UINT_MAX);
+    IMM_BUG(n > UINT_MAX);
     return (unsigned)n;
 }

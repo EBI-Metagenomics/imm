@@ -11,8 +11,6 @@
 #include "mtrans.h"
 #include "mtrans_table.h"
 #include "state_idx.h"
-#include "state_static.h"
-#include "subseq_static.h"
 #include <limits.h>
 #include <string.h>
 
@@ -62,7 +60,7 @@ struct dp const* dp_create(struct mstate const* const* mstates, unsigned const n
 double dp_viterbi(struct dp const* dp, struct dp_matrix* matrix, struct imm_path* path)
 {
     for (unsigned r = 0; r <= imm_seq_length(matrix->seq); ++r) {
-        BUG(imm_seq_length(matrix->seq) < r);
+        IMM_BUG(imm_seq_length(matrix->seq) < r);
         unsigned const seq_len = imm_seq_length(matrix->seq) - r;
 
         struct state_info const* cur = dp->states;
@@ -78,7 +76,7 @@ double dp_viterbi(struct dp const* dp, struct dp_matrix* matrix, struct imm_path
                 struct cell*      cell = matrix_cell_get(matrix->cell, r, col);
                 double const score = best_trans_score(dp, matrix, cur, r, &cell->prev_step);
                 IMM_SUBSEQ(subseq, matrix->seq, r, len);
-                cell->score = score + state_lprob(cur->state, subseq_cast(&subseq));
+                cell->score = score + imm_state_lprob(cur->state, imm_subseq_cast(&subseq));
             }
         }
     }
@@ -106,7 +104,7 @@ static double best_trans_score(struct dp const* dp, struct dp_matrix const* matr
                                struct state_info const* dst_state, unsigned const row,
                                struct step* prev_step)
 {
-    double score = IMM_LPROB_ZERO;
+    double score = imm_lprob_zero();
     prev_step->state = NULL;
     prev_step->seq_len = UINT_MAX;
 
@@ -129,7 +127,7 @@ static double best_trans_score(struct dp const* dp, struct dp_matrix const* matr
                 continue;
 
             tmp_step.seq_len = len;
-            BUG(row < len);
+            IMM_BUG(row < len);
             unsigned const prev_row = row - len;
             double const   v = get_score(matrix, prev_row, &tmp_step) + trans->lprob;
             if (v > score) {
@@ -148,7 +146,7 @@ static double best_trans_score(struct dp const* dp, struct dp_matrix const* matr
 static double final_score(struct dp const* dp, struct dp_matrix const* matrix,
                           struct step* end_step)
 {
-    double                   score = IMM_LPROB_ZERO;
+    double                   score = imm_lprob_zero();
     struct state_info const* end_state = dp->end_state;
 
     end_step->state = NULL;
@@ -181,9 +179,9 @@ static void viterbi_path(struct dp const* dp, struct dp_matrix const* matrix,
 
     while (step->seq_len != UINT_MAX) {
         struct imm_step* new_step = imm_step_create(step->state->state, step->seq_len);
-        BUG(new_step == NULL);
+        IMM_BUG(new_step == NULL);
         imm_path_prepend(path, new_step);
-        BUG(step->seq_len > row);
+        IMM_BUG(step->seq_len > row);
         row -= step->seq_len;
         step = &matrix_cell_get_c(matrix->cell, row, column(matrix, step))->prev_step;
     }

@@ -1,6 +1,7 @@
 #ifndef IMM_SUBSEQ_H
 #define IMM_SUBSEQ_H
 
+#include "imm/bug.h"
 #include "imm/seq.h"
 
 struct imm_subseq
@@ -14,11 +15,31 @@ struct imm_subseq
 
 IMM_API struct imm_subseq imm_subseq_init(struct imm_subseq* subseq, struct imm_seq const* seq,
                                           unsigned start, unsigned length);
-IMM_API struct imm_subseq imm_subseq_slice(struct imm_seq const* seq, unsigned start,
-                                           unsigned length);
-IMM_API struct imm_seq const* imm_subseq_cast(struct imm_subseq const* subseq);
-IMM_API void     imm_subseq_set(struct imm_subseq* subseq, unsigned start, unsigned length);
-IMM_API unsigned imm_subseq_start(struct imm_subseq const* subseq);
-IMM_API unsigned imm_subseq_length(struct imm_subseq const* subseq);
+IMM_API static inline struct imm_subseq imm_subseq_slice(struct imm_seq const* seq,
+                                                         unsigned start, unsigned length)
+{
+    IMM_SUBSEQ(subseq, seq, start, length);
+    return subseq;
+}
+IMM_API static inline struct imm_seq const* imm_subseq_cast(struct imm_subseq const* subseq)
+{
+    return &subseq->subseq;
+}
+IMM_API static inline void imm_subseq_set(struct imm_subseq* subseq, unsigned start,
+                                          unsigned length)
+{
+    IMM_BUG(start + length > subseq->seq->length);
+    subseq->subseq.string = subseq->seq->string + start;
+    subseq->subseq.length = length;
+}
+IMM_API static inline unsigned imm_subseq_start(struct imm_subseq const* subseq)
+{
+    IMM_BUG(subseq->subseq.string < subseq->seq->string);
+    return (unsigned)(subseq->subseq.string - subseq->seq->string);
+}
+IMM_API static inline unsigned imm_subseq_length(struct imm_subseq const* subseq)
+{
+    return subseq->subseq.length;
+}
 
 #endif

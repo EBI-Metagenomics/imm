@@ -1,6 +1,6 @@
 #include "mstate_sort.h"
-#include "bug.h"
 #include "free.h"
+#include "imm/bug.h"
 #include "imm/lprob.h"
 #include "imm/report.h"
 #include "imm/state.h"
@@ -92,7 +92,7 @@ static void create_nodes(struct mstate const** mstates, unsigned nstates,
 
         int      ret = 0;
         khiter_t iter = kh_put(node, node_table, node->state, &ret);
-        BUG(ret == -1 || ret == 0);
+        IMM_BUG(ret == -1 || ret == 0);
         kh_key(node_table, iter) = node->state;
         kh_val(node_table, iter) = node;
     }
@@ -131,7 +131,7 @@ static void create_edges(struct list_head* node_list, khash_t(node) * table)
                 struct imm_state const* state = mtrans_get_state(mtrans);
 
                 khiter_t iter = kh_get(node, table, state);
-                BUG(iter == kh_end(table));
+                IMM_BUG(iter == kh_end(table));
 
                 edge->node = kh_val(table, iter);
                 list_add(&edge->list_entry, &node->edge_list);

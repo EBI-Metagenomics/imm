@@ -1,16 +1,5 @@
 #include "imm/lprob.h"
 #include "imm/report.h"
-#include "logaddexp.h"
-
-double imm_lprob_zero(void) { return IMM_LPROB_ZERO; }
-
-bool imm_lprob_is_zero(double a) { return isinf(a) && a < 0.0; }
-
-bool imm_lprob_is_valid(double a) { return !isnan(a); }
-
-double imm_lprob_invalid(void) { return IMM_LPROB_INVALID; }
-
-double imm_lprob_add(double a, double b) { return logaddexp(a, b); }
 
 double imm_lprob_sum(double const* arr, size_t len)
 {

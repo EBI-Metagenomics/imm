@@ -1,6 +1,6 @@
 #include "mstate_table.h"
-#include "bug.h"
 #include "free.h"
+#include "imm/bug.h"
 #include "imm/report.h"
 #include "khash_ptr.h"
 #include "mstate.h"
@@ -24,8 +24,7 @@ struct mstate_table* mstate_table_create(void)
 void mstate_table_destroy(struct mstate_table* table)
 {
     unsigned long i = 0;
-    mstate_table_for_each(i, table)
-    {
+    mstate_table_for_each (i, table) {
         if (kh_exist(table->ktable, i))
             mstate_destroy(kh_val(table->ktable, i));
     }
@@ -38,7 +37,7 @@ void mstate_table_add(struct mstate_table* table, struct mstate* mstate)
 {
     int      ret = 0;
     khiter_t i = kh_put(mstate, table->ktable, mstate_get_state(mstate), &ret);
-    BUG(ret == -1 || ret == 0);
+    IMM_BUG(ret == -1 || ret == 0);
     kh_key(table->ktable, i) = mstate_get_state(mstate);
     kh_val(table->ktable, i) = mstate;
 }
@@ -68,8 +67,7 @@ void mstate_table_del(struct mstate_table* table, unsigned long iter)
     kh_del(mstate, table->ktable, (khiter_t)iter);
 
     unsigned long i = 0;
-    mstate_table_for_each(i, table)
-    {
+    mstate_table_for_each (i, table) {
         if (mstate_table_exist(table, i)) {
             struct mtrans_table* tbl = mstate_get_mtrans_table(mstate_table_get(table, i));
             unsigned long        j = mtrans_table_find(tbl, state);
@@ -92,7 +90,7 @@ unsigned long mstate_table_end(struct mstate_table const* table)
 unsigned mstate_table_size(struct mstate_table const* table)
 {
     size_t n = kh_size(table->ktable);
-    BUG(n > UINT_MAX);
+    IMM_BUG(n > UINT_MAX);
     return (unsigned)n;
 }
 
@@ -103,8 +101,7 @@ struct mstate const** mstate_table_array(struct mstate_table const* table)
 
     struct mstate const** mstate = mstates;
     unsigned long         i = 0;
-    mstate_table_for_each(i, table)
-    {
+    mstate_table_for_each (i, table) {
         if (mstate_table_exist(table, i)) {
             *mstate = mstate_table_get(table, i);
             ++mstate;

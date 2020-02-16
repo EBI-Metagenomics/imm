@@ -2,8 +2,8 @@
 #define IMM_DP_MATRIX_H
 
 #include "array.h"
-#include "bug.h"
 #include "free.h"
+#include "imm/bug.h"
 #include "imm/seq.h"
 #include "matrix.h"
 
@@ -61,7 +61,7 @@ struct dp_matrix
 
 static inline unsigned column(struct dp_matrix const* dp_matrix, struct step const* step)
 {
-    BUG(step->seq_len < step->state->min_seq);
+    IMM_BUG(step->seq_len < step->state->min_seq);
     return dp_matrix->state_col[step->state->idx] + step->seq_len - step->state->min_seq;
 }
 

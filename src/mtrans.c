@@ -1,6 +1,6 @@
 #include "mtrans.h"
-#include "bug.h"
 #include "free.h"
+#include "imm/bug.h"
 
 struct mtrans
 {
@@ -18,7 +18,7 @@ struct mtrans* mtrans_create(struct imm_state const* state, double const lprob)
 
 void mtrans_destroy(struct mtrans const* mtrans)
 {
-    BUG(mtrans == NULL);
+    IMM_BUG(mtrans == NULL);
     free_c(mtrans);
 }
 

@@ -1,8 +1,8 @@
 #include "imm/hmm.h"
-#include "bug.h"
 #include "dp.h"
 #include "dp_matrix.h"
 #include "free.h"
+#include "imm/bug.h"
 #include "imm/lprob.h"
 #include "imm/path.h"
 #include "imm/report.h"
@@ -189,7 +189,7 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
     enter:
         prev_state = state;
         start += step_len;
-        BUG(remain_len < step_len);
+        IMM_BUG(remain_len < step_len);
         remain_len -= step_len;
         step = imm_path_next(path, step);
     }

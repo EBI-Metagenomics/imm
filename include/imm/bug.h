@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define BUG(cond)                                                                             \
+#define IMM_BUG(cond)                                                                             \
     do {                                                                                      \
         if (!(cond))                                                                          \
             break;                                                                            \
