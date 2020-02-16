@@ -2,6 +2,7 @@
 #define IMM_LPROB_H
 
 #include "imm/api.h"
+#include "imm/report.h"
 #include "logaddexp.h"
 #include <math.h>
 #include <stdbool.h>
@@ -12,7 +13,26 @@ IMM_API static inline bool   imm_lprob_is_zero(double a) { return isinf(a) && a 
 IMM_API static inline bool   imm_lprob_is_valid(double a) { return !isnan(a); }
 IMM_API static inline double imm_lprob_invalid(void) { return NAN; }
 IMM_API static inline double imm_lprob_add(double a, double b) { return logaddexp(a, b); }
-IMM_API double               imm_lprob_sum(double const* arr, size_t len);
-IMM_API int                  imm_lprob_normalize(double* arr, size_t len);
+IMM_API static inline double imm_lprob_sum(double const* arr, size_t len)
+{
+
+    double r = imm_lprob_zero();
+    for (size_t i = 0; i < len; ++i)
+        r = logaddexp(r, arr[i]);
+    return r;
+}
+IMM_API static inline int imm_lprob_normalize(double* arr, size_t len)
+{
+    double lnorm = imm_lprob_sum(arr, len);
+    if (!isfinite(lnorm)) {
+        imm_error("non-finite normalization denominator");
+        return 1;
+    }
+
+    for (size_t i = 0; i < len; ++i)
+        arr[i] -= lnorm;
+
+    return 0;
+}
 
 #endif
