@@ -22,6 +22,8 @@ IMM_API void                     imm_results_free(struct imm_results const* resu
 IMM_API double                 imm_result_loglik(struct imm_result const* result);
 IMM_API struct imm_path const* imm_result_path(struct imm_result const* result);
 IMM_API struct imm_subseq      imm_result_subseq(struct imm_result const* result);
+IMM_API unsigned               imm_result_start(struct imm_result const* result);
+IMM_API unsigned               imm_result_stop(struct imm_result const* result);
 IMM_API void                   imm_result_destroy(struct imm_result const* result);
 IMM_API void                   imm_result_free(struct imm_result const* result);
 
