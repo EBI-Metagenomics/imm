@@ -1,7 +1,7 @@
 #ifndef IMM_STATE_H
 #define IMM_STATE_H
 
-#include "imm/api.h"
+#include "imm/export.h"
 #include "imm/lprob.h"
 #include "imm/report.h"
 #include "imm/seq.h"
@@ -37,9 +37,10 @@ struct imm_state
     void*               impl;
 };
 
-IMM_API struct imm_state const* imm_state_create(char const* name, struct imm_abc const* abc,
-                                                 struct imm_state_funcs funcs, void* impl);
-IMM_API void                    imm_state_destroy(struct imm_state const* state);
+IMM_EXPORT struct imm_state const* imm_state_create(char const*            name,
+                                                    struct imm_abc const*  abc,
+                                                    struct imm_state_funcs funcs, void* impl);
+IMM_EXPORT void                    imm_state_destroy(struct imm_state const* state);
 
 static inline char const* imm_state_get_name(struct imm_state const* state)
 {

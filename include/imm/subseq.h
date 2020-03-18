@@ -2,6 +2,7 @@
 #define IMM_SUBSEQ_H
 
 #include "imm/bug.h"
+#include "imm/export.h"
 #include "imm/seq.h"
 
 struct imm_subseq
@@ -13,8 +14,9 @@ struct imm_subseq
 #define IMM_SUBSEQ(name, seq, start, length)                                                  \
     struct imm_subseq name = imm_subseq_init(&(name), seq, start, length)
 
-IMM_API struct imm_subseq imm_subseq_init(struct imm_subseq* subseq, struct imm_seq const* seq,
-                                          unsigned start, unsigned length);
+IMM_EXPORT struct imm_subseq    imm_subseq_init(struct imm_subseq*    subseq,
+                                                struct imm_seq const* seq, unsigned start,
+                                                unsigned length);
 static inline struct imm_subseq imm_subseq_slice(struct imm_seq const* seq, unsigned start,
                                                  unsigned length)
 {

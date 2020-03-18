@@ -1,7 +1,7 @@
 #ifndef IMM_ABC_H
 #define IMM_ABC_H
 
-#include "imm/api.h"
+#include "imm/export.h"
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -39,10 +39,10 @@ struct imm_abc
 
 static inline size_t __imm_abc_index(char const c) { return (size_t)(c - IMM_FIRST_CHAR); }
 
-IMM_API struct imm_abc const* imm_abc_create(char const* symbols, char any_symbol);
-IMM_API struct imm_abc const* imm_abc_clone(struct imm_abc const* abc);
-IMM_API void                  imm_abc_destroy(struct imm_abc const* abc);
-static inline unsigned        imm_abc_length(struct imm_abc const* abc) { return abc->length; }
+IMM_EXPORT struct imm_abc const* imm_abc_create(char const* symbols, char any_symbol);
+IMM_EXPORT struct imm_abc const* imm_abc_clone(struct imm_abc const* abc);
+IMM_EXPORT void                  imm_abc_destroy(struct imm_abc const* abc);
+static inline unsigned    imm_abc_length(struct imm_abc const* abc) { return abc->length; }
 static inline char const* imm_abc_symbols(struct imm_abc const* abc) { return abc->symbols; }
 static inline bool        imm_abc_has_symbol(struct imm_abc const* abc, char symbol_id)
 {
@@ -64,6 +64,6 @@ static inline char imm_abc_symbol_id(struct imm_abc const* abc, unsigned symbol_
     return abc->symbols[symbol_idx];
 }
 static inline char imm_abc_any_symbol(struct imm_abc const* abc) { return abc->any_symbol; }
-IMM_API enum imm_symbol_type imm_abc_symbol_type(struct imm_abc const* abc, char symbol_id);
+IMM_EXPORT enum imm_symbol_type imm_abc_symbol_type(struct imm_abc const* abc, char symbol_id);
 
 #endif

@@ -1,7 +1,6 @@
 #ifndef IMM_LPROB_H
 #define IMM_LPROB_H
 
-#include "imm/api.h"
 #include "imm/report.h"
 #include "logaddexp.h"
 #include <math.h>

@@ -49,6 +49,14 @@ add_library(imm
 )
 add_library(IMM::imm ALIAS imm)
 
+# Write out mytools_export.h to the current binary directory
+# Must include ${CMAKE_CURRENT_BINARY_DIR} in the target's
+# search path.
+include(GenerateExportHeader)
+generate_export_header(imm BASE_NAME IMM
+    INCLUDE_GUARD_NAME IMM_EXPORT_H
+    EXPORT_FILE_NAME ${CMAKE_CURRENT_BINARY_DIR}/imm/export.h)
+
 add_library(warning INTERFACE)
 add_library(IMM::warning ALIAS warning)
 target_compile_options(warning INTERFACE
@@ -62,6 +70,7 @@ target_include_directories(imm
     PUBLIC
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
@@ -70,8 +79,6 @@ target_link_libraries(imm PRIVATE $<$<BOOL:${OpenMP_C_FOUND}>:OpenMP::OpenMP_C>)
 set_target_properties(imm PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
 target_compile_features(imm PRIVATE c_std_11)
-set_target_properties(imm PROPERTIES C_VISIBILITY_PRESET hidden)
-set_target_properties(imm PROPERTIES DEFINE_SYMBOL "IMM_EXPORTS")
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRECATE>)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:__extension__>)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${OpenMP_C_FOUND}>:OPENMP>)
@@ -92,8 +99,12 @@ install(TARGETS imm EXPORT imm-targets
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
+    PUBLIC_HEADER DESTINATION include
 )
 install(DIRECTORY include/ DESTINATION include)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/imm/export.h
+    DESTINATION include/imm
+)
 install(EXPORT imm-targets
     FILE imm-targets.cmake
     NAMESPACE IMM::
