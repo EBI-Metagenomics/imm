@@ -11,6 +11,16 @@ if("${isSystemDir}" STREQUAL "-1")
     set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 endif()
 
+# merge request fix: https://gitlab.kitware.com/cmake/cmake/-/merge_requests/1799
+if(CMAKE_VERSION VERSION_GREATER 3.12.0)
+    # Hide things by default
+    set(CMAKE_C_VISIBILITY_PRESET hidden)
+    set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
+endif()
+
+find_package(logaddexp REQUIRED)
+find_package(OpenMP)
+
 add_library(imm
     src/abc.c
     src/abc_table.c
@@ -39,8 +49,14 @@ add_library(imm
 )
 add_library(IMM::imm ALIAS imm)
 
-find_package(logaddexp REQUIRED)
-find_package(OpenMP)
+add_library(warning INTERFACE)
+add_library(IMM::warning ALIAS warning)
+target_compile_options(warning INTERFACE
+    $<$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>:/W3>
+    $<$<NOT:$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>>:-Wall -Wextra -pedantic
+    -Wstrict-prototypes -Wshadow -Wconversion -Wmissing-prototypes
+    -Wno-unused-parameter -Wsign-conversion>
+)
 
 target_include_directories(imm
     PUBLIC
@@ -60,12 +76,7 @@ target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPREC
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:__extension__>)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${OpenMP_C_FOUND}>:OPENMP>)
 target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
-target_compile_options(imm PRIVATE
-    $<$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>:/W3 /WX>
-    $<$<NOT:$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>>:-Wall -Wextra -pedantic -Wstrict-prototypes
-        -Wshadow -Wconversion -Wmissing-prototypes -Wno-unused-parameter
-        -Wno-empty-translation-unit>
-)
+target_link_libraries(imm PRIVATE IMM::warning)
 
 include(CheckCSourceCompiles)
 check_c_source_compiles(

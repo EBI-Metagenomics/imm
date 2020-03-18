@@ -142,7 +142,6 @@ void test_perf_viterbi(void)
     elapsed_end(elapsed);
     cass_cond(imm_results_size(results) == 1);
     struct imm_result const* r = imm_results_get(results, 0);
-    struct imm_path const*   path = imm_result_path(r);
     double                   score = imm_result_loglik(r);
     imm_results_destroy(results);
 

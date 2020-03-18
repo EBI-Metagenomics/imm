@@ -24,7 +24,6 @@ void test_path(void)
 
     cass_cond(imm_step_create(imm_state_cast_c(state1), 2) == NULL);
     cass_cond(imm_step_create(imm_state_cast_c(state1), 0) == NULL);
-    cass_cond(imm_step_create(imm_state_cast_c(state1), -1) == NULL);
 
     struct imm_path* new_path = imm_path_clone(path);
 
