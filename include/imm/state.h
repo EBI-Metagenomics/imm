@@ -41,18 +41,17 @@ IMM_API struct imm_state const* imm_state_create(char const* name, struct imm_ab
                                                  struct imm_state_funcs funcs, void* impl);
 IMM_API void                    imm_state_destroy(struct imm_state const* state);
 
-IMM_API static inline char const* imm_state_get_name(struct imm_state const* state)
+static inline char const* imm_state_get_name(struct imm_state const* state)
 {
     return state->name;
 }
 
-IMM_API static inline struct imm_abc const* imm_state_get_abc(struct imm_state const* state)
+static inline struct imm_abc const* imm_state_get_abc(struct imm_state const* state)
 {
     return state->abc;
 }
 
-IMM_API static inline double imm_state_lprob(struct imm_state const* state,
-                                             struct imm_seq const*   seq)
+static inline double imm_state_lprob(struct imm_state const* state, struct imm_seq const* seq)
 {
     if (state->abc != imm_seq_get_abc(seq)) {
         imm_error("alphabets must be the same");
@@ -60,16 +59,16 @@ IMM_API static inline double imm_state_lprob(struct imm_state const* state,
     }
     return state->lprob(state, seq);
 }
-IMM_API static inline unsigned imm_state_min_seq(struct imm_state const* state)
+static inline unsigned imm_state_min_seq(struct imm_state const* state)
 {
     return state->min_seq(state);
 }
-IMM_API static inline unsigned imm_state_max_seq(struct imm_state const* state)
+static inline unsigned imm_state_max_seq(struct imm_state const* state)
 {
     return state->max_seq(state);
 }
 
-IMM_API static inline struct imm_state const* imm_state_cast_c(void const* state)
+static inline struct imm_state const* imm_state_cast_c(void const* state)
 {
     struct type_c
     {
@@ -78,7 +77,7 @@ IMM_API static inline struct imm_state const* imm_state_cast_c(void const* state
     return t->state;
 }
 
-IMM_API static inline void const* imm_state_get_impl_c(struct imm_state const* state)
+static inline void const* imm_state_get_impl_c(struct imm_state const* state)
 {
     return state->impl;
 }

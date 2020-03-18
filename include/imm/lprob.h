@@ -8,12 +8,12 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-IMM_API static inline double imm_lprob_zero(void) { return -INFINITY; }
-IMM_API static inline bool   imm_lprob_is_zero(double a) { return isinf(a) && a < 0.0; }
-IMM_API static inline bool   imm_lprob_is_valid(double a) { return !isnan(a); }
-IMM_API static inline double imm_lprob_invalid(void) { return NAN; }
-IMM_API static inline double imm_lprob_add(double a, double b) { return logaddexp(a, b); }
-IMM_API static inline double imm_lprob_sum(double const* arr, size_t len)
+static inline double imm_lprob_zero(void) { return -INFINITY; }
+static inline bool   imm_lprob_is_zero(double a) { return isinf(a) && a < 0.0; }
+static inline bool   imm_lprob_is_valid(double a) { return !isnan(a); }
+static inline double imm_lprob_invalid(void) { return NAN; }
+static inline double imm_lprob_add(double a, double b) { return logaddexp(a, b); }
+static inline double imm_lprob_sum(double const* arr, size_t len)
 {
 
     double r = imm_lprob_zero();
@@ -21,7 +21,7 @@ IMM_API static inline double imm_lprob_sum(double const* arr, size_t len)
         r = logaddexp(r, arr[i]);
     return r;
 }
-IMM_API static inline int imm_lprob_normalize(double* arr, size_t len)
+static inline int imm_lprob_normalize(double* arr, size_t len)
 {
     double lnorm = imm_lprob_sum(arr, len);
     if (!isfinite(lnorm)) {
