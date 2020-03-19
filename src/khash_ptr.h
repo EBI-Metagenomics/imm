@@ -5,8 +5,6 @@
 #include <assert.h>
 #include <stdint.h>
 
-static_assert(sizeof(long) == 8, "Long type has to be 64 bits long");
-
 /*
  * Source: Linux kernel.
  *
@@ -29,7 +27,7 @@ static_assert(sizeof(long) == 8, "Long type has to be 64 bits long");
 #define GOLDEN_RATIO_64 0x61C8864680B583EBull
 
 /* Source: http://graphics.stanford.edu/~seander/bithacks.html#BitReverseObvious */
-static kh_inline unsigned long reverse_bits(unsigned long v)
+static kh_inline uint64_t reverse_bits(uint64_t v)
 {
     unsigned long r = v; // r will be reversed bits of v; first get LSB of v
     int           s = sizeof(v) * CHAR_BIT - 1; // extra shift needed at end
@@ -45,7 +43,7 @@ static kh_inline unsigned long reverse_bits(unsigned long v)
 
 static kh_inline khint_t ptr_hash_func(void const* ptr)
 {
-    unsigned long val = (unsigned long)ptr;
+    uint64_t val = (uint64_t)ptr;
     return (khint_t)reverse_bits(val * GOLDEN_RATIO_64);
 }
 
