@@ -4,55 +4,51 @@
 #include "free.h"
 #include <stdlib.h>
 
-#define MAKE_MATRIX_STRUCT(S, T)                                                              \
-    struct matrix_##S                                                                         \
+#define MAKE_MATRIX_STRUCT(NAME, T)                                                           \
+    struct NAME                                                                               \
     {                                                                                         \
         T*       data;                                                                        \
         unsigned nrows;                                                                       \
         unsigned ncols;                                                                       \
     };
 
-#define MAKE_MATRIX_CREATE(S, T)                                                              \
-    static inline struct matrix_##S* matrix_##S##_create(unsigned const nrows,                \
-                                                         unsigned const ncols)                \
+#define MAKE_MATRIX_CREATE(NAME, T)                                                           \
+    static inline struct NAME* NAME##_create(unsigned const nrows, unsigned const ncols)      \
     {                                                                                         \
-        struct matrix_##S* matrix = malloc(sizeof(struct matrix_##S));                        \
+        struct NAME* matrix = malloc(sizeof(struct NAME*));                                   \
         matrix->data = malloc(sizeof(T) * (nrows * ncols));                                   \
         matrix->nrows = nrows;                                                                \
         matrix->ncols = ncols;                                                                \
         return matrix;                                                                        \
     }
 
-#define MAKE_MATRIX_GET(S, T)                                                                 \
-    static inline T* matrix_##S##_get(struct matrix_##S const* matrix, unsigned r,            \
-                                      unsigned c)                                             \
+#define MAKE_MATRIX_GET(NAME, T)                                                              \
+    static inline T* NAME##_get(struct NAME const* matrix, unsigned r, unsigned c)            \
     {                                                                                         \
         return matrix->data + (r * matrix->ncols + c);                                        \
     }
 
-#define MAKE_MATRIX_GET_C(S, T)                                                               \
-    static inline T const* matrix_##S##_get_c(struct matrix_##S const* matrix, unsigned r,    \
-                                              unsigned c)                                     \
+#define MAKE_MATRIX_GET_C(NAME, T)                                                            \
+    static inline T const* NAME##_get_c(struct NAME const* matrix, unsigned r, unsigned c)    \
     {                                                                                         \
         return matrix->data + (r * matrix->ncols + c);                                        \
     }
 
-#define MAKE_MATRIX_SET(S, T)                                                                 \
-    static inline void matrix_##S##_set(struct matrix_##S* matrix, unsigned r, unsigned c,    \
-                                        T v)                                                  \
+#define MAKE_MATRIX_SET(NAME, T)                                                              \
+    static inline void NAME##_set(struct NAME* matrix, unsigned r, unsigned c, T v)           \
     {                                                                                         \
         matrix->data[r * matrix->ncols + c] = v;                                              \
     }
 
-#define MAKE_MATRIX_SET_ALL(S, T)                                                             \
-    static inline void matrix_##S##_set_all(struct matrix_##S* matrix, T v)                   \
+#define MAKE_MATRIX_SET_ALL(NAME, T)                                                          \
+    static inline void NAME##_set_all(struct NAME* matrix, T v)                               \
     {                                                                                         \
         for (unsigned i = 0; i < matrix->nrows * matrix->ncols; ++i)                          \
             matrix->data[i] = v;                                                              \
     }
 
-#define MAKE_MATRIX_DESTROY(S)                                                                \
-    static inline void matrix_##S##_destroy(struct matrix_##S const* matrix)                  \
+#define MAKE_MATRIX_DESTROY(NAME)                                                             \
+    static inline void NAME##_destroy(struct NAME const* matrix)                              \
     {                                                                                         \
         if (!matrix)                                                                          \
             return;                                                                           \
@@ -61,21 +57,15 @@
         free_c(matrix);                                                                       \
     }
 
-#define MAKE_MATRIX_NROWS(S)                                                                  \
-    static inline unsigned matrix_##S##_nrows(struct matrix_##S const* matrix)                \
-    {                                                                                         \
-        return matrix->nrows;                                                                 \
-    }
+#define MAKE_MATRIX_NROWS(NAME)                                                               \
+    static inline unsigned NAME##_nrows(struct NAME const* matrix) { return matrix->nrows; }
 
-#define MAKE_MATRIX_NCOLS(S)                                                                  \
-    static inline unsigned matrix_##S##_ncols(struct matrix_##S const* matrix)                \
-    {                                                                                         \
-        return matrix->ncols;                                                                 \
-    }
+#define MAKE_MATRIX_NCOLS(NAME)                                                               \
+    static inline unsigned NAME##_ncols(struct NAME const* matrix) { return matrix->ncols; }
 
-#define MAKE_MATRIX_RESIZE(S, T)                                                              \
-    static inline void matrix_##S##_resize(struct matrix_##S* matrix, unsigned const nrows,   \
-                                           unsigned const ncols)                              \
+#define MAKE_MATRIX_RESIZE(NAME, T)                                                           \
+    static inline void NAME##_resize(struct NAME* matrix, unsigned const nrows,               \
+                                     unsigned const ncols)                                    \
     {                                                                                         \
         matrix->data = realloc(matrix->data, sizeof(T) * (nrows * ncols));                    \
         matrix->nrows = nrows;                                                                \
