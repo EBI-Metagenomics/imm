@@ -1,5 +1,5 @@
-#ifndef ELAPSED_H
-#define ELAPSED_H
+#ifndef ELAPSED_ELAPSED_H
+#define ELAPSED_ELAPSED_H
 
 #include <stdlib.h>
 #include <time.h>
