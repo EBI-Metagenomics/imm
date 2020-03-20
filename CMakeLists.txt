@@ -24,6 +24,7 @@ find_package(OpenMP)
 add_library(imm
     src/abc.c
     src/abc_table.c
+    src/cartes.c
     src/dp.c
     src/dp_matrix.c
     src/hmm.c
@@ -38,6 +39,7 @@ add_library(imm
     src/report.c
     src/results.c
     src/seq.c
+    src/seq_code.c
     src/seq_table.c
     src/state.c
     src/state_idx.c
