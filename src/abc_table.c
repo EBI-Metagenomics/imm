@@ -12,4 +12,4 @@ struct imm_abc_table const* imm_abc_table_create(struct imm_abc const* abc, doub
     return abc_table;
 }
 
-void imm_abc_table_destroy(struct imm_abc_table const* abc_table) { free_c(abc_table); }
+void imm_abc_table_destroy(struct imm_abc_table const* abc_table) { imm_free(abc_table); }

@@ -30,7 +30,7 @@ void mstate_table_destroy(struct mstate_table* table)
     }
 
     kh_destroy(mstate, table->ktable);
-    free_c(table);
+    imm_free(table);
 }
 
 void mstate_table_add(struct mstate_table* table, struct mstate* mstate)

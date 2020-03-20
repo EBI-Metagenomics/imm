@@ -30,6 +30,6 @@ void dp_matrix_set(struct dp_matrix* matrix, struct imm_seq const* seq)
 void dp_matrix_destroy(struct dp_matrix const* matrix)
 {
     matrix_cell_destroy(matrix->cell);
-    free_c(matrix->state_col);
-    free_c(matrix);
+    imm_free(matrix->state_col);
+    imm_free(matrix);
 }

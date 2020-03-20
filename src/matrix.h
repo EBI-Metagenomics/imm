@@ -53,8 +53,8 @@
         if (!matrix)                                                                          \
             return;                                                                           \
                                                                                               \
-        free_c(matrix->data);                                                                 \
-        free_c(matrix);                                                                       \
+        imm_free(matrix->data);                                                                 \
+        imm_free(matrix);                                                                       \
     }
 
 #define MAKE_MATRIX_NROWS(NAME)                                                               \

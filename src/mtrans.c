@@ -19,7 +19,7 @@ struct mtrans* mtrans_create(struct imm_state const* state, double const lprob)
 void mtrans_destroy(struct mtrans const* mtrans)
 {
     IMM_BUG(mtrans == NULL);
-    free_c(mtrans);
+    imm_free(mtrans);
 }
 
 struct imm_state const* mtrans_get_state(struct mtrans const* mtrans) { return mtrans->state; }

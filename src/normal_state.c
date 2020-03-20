@@ -35,8 +35,8 @@ struct imm_normal_state const* imm_normal_state_create(char const*           nam
 void imm_normal_state_destroy(struct imm_normal_state const* state)
 {
     imm_state_destroy(state->interface);
-    free_c(state->lprobs);
-    free_c(state);
+    imm_free(state->lprobs);
+    imm_free(state);
 }
 
 static double normal_state_lprob(struct imm_state const* state, struct imm_seq const* seq)

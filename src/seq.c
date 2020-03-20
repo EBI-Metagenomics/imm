@@ -38,6 +38,6 @@ struct imm_seq const* imm_seq_clone(struct imm_seq const* seq)
 
 void imm_seq_destroy(struct imm_seq const* seq)
 {
-    free_c(seq->string);
-    free_c(seq);
+    imm_free(seq->string);
+    imm_free(seq);
 }

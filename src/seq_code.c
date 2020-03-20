@@ -7,9 +7,9 @@
 
 struct seq_code
 {
-    unsigned  min_seq;
-    unsigned* offset;
-    unsigned* stride;
+    unsigned        min_seq;
+    unsigned*       offset;
+    unsigned*       stride;
     struct imm_abc* abc;
 };
 
@@ -49,7 +49,7 @@ unsigned seq_code_get(struct seq_code const* seq_code, struct imm_seq const* seq
 
 void seq_code_destroy(struct seq_code const* seq_code)
 {
-    free_c(seq_code->offset);
-    free_c(seq_code->stride);
-    free_c(seq_code);
+    imm_free(seq_code->offset);
+    imm_free(seq_code->stride);
+    imm_free(seq_code);
 }

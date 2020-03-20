@@ -25,7 +25,7 @@ struct imm_mute_state const* imm_mute_state_create(char const* name, struct imm_
 void imm_mute_state_destroy(struct imm_mute_state const* state)
 {
     imm_state_destroy(state->interface);
-    free_c(state);
+    imm_free(state);
 }
 
 static double mute_state_lprob(struct imm_state const* state, struct imm_seq const* seq)

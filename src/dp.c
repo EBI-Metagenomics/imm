@@ -95,9 +95,9 @@ void dp_destroy(struct dp const* dp)
     for (unsigned i = 0; i < dp->nstates; ++i)
         array_trans_empty(&dp->states[i].incoming_transitions);
 
-    free_c(dp->states);
-    free_c(dp->mstates);
-    free_c(dp);
+    imm_free(dp->states);
+    imm_free(dp->mstates);
+    imm_free(dp);
 }
 
 static double best_trans_score(struct dp const* dp, struct dp_matrix const* matrix,

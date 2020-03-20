@@ -32,7 +32,7 @@ struct imm_path* imm_path_clone(struct imm_path const* path)
     return new_path;
 }
 
-void imm_path_free(struct imm_path const* path) { free_c(path); }
+void imm_path_free(struct imm_path const* path) { imm_free(path); }
 
 void imm_path_destroy(struct imm_path const* path)
 {

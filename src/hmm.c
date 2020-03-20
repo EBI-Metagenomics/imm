@@ -45,7 +45,7 @@ struct imm_hmm* imm_hmm_create(struct imm_abc const* abc)
 void imm_hmm_destroy(struct imm_hmm* hmm)
 {
     mstate_table_destroy(hmm->table);
-    free_c(hmm);
+    imm_free(hmm);
 }
 
 int imm_hmm_add_state(struct imm_hmm* hmm, struct imm_state const* state, double start_lprob)
@@ -259,7 +259,7 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
         {
             for (unsigned i = 0; i < thread_size(); ++i)
                 dp_matrix_destroy(matrices[i]);
-            free_c(matrices);
+            imm_free(matrices);
         }
         fprintf(stderr, "main loop    : %f seconds\n", elapsed_end(elapsed));
     }
@@ -307,7 +307,7 @@ int imm_hmm_normalize_start(struct imm_hmm* hmm)
 
     if (imm_lprob_normalize(lprobs, size)) {
         imm_error("no starting state is possible");
-        free_c(lprobs);
+        imm_free(lprobs);
         return 1;
     }
 
@@ -318,7 +318,7 @@ int imm_hmm_normalize_start(struct imm_hmm* hmm)
             ++lprob;
         }
     }
-    free_c(lprobs);
+    imm_free(lprobs);
 
     return 0;
 }
@@ -363,7 +363,7 @@ static int hmm_normalize_trans(struct mstate* mstate)
 
     if (imm_lprob_normalize(lprobs, size)) {
         imm_error("could not normalize transitions");
-        free_c(lprobs);
+        imm_free(lprobs);
         return 1;
     }
 
@@ -374,7 +374,7 @@ static int hmm_normalize_trans(struct mstate* mstate)
             ++lprob;
         }
     }
-    free_c(lprobs);
+    imm_free(lprobs);
 
     return 0;
 }
@@ -400,7 +400,7 @@ static struct dp const* hmm_create_dp(struct imm_hmm const* hmm, struct imm_seq 
 
     struct mstate const** mstates = mstate_table_array(hmm->table);
     if (mstate_sort(mstates, mstate_table_size(hmm->table))) {
-        free_c(mstates);
+        imm_free(mstates);
         return NULL;
     }
 

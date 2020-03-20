@@ -47,7 +47,7 @@
 #define MAKE_ARRAY_EMPTY(S)                                                                   \
     static inline void array_##S##_empty(struct array_##S* array)                             \
     {                                                                                         \
-        free_c(array->elements);                                                              \
+        imm_free(array->elements);                                                              \
         array->elements = NULL;                                                               \
         array->length = 0;                                                                    \
     }

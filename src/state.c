@@ -31,6 +31,6 @@ struct imm_state const* imm_state_create(char const* name, struct imm_abc const*
 
 void imm_state_destroy(struct imm_state const* state)
 {
-    free_c(state->name);
-    free_c(state);
+    imm_free(state->name);
+    imm_free(state);
 }

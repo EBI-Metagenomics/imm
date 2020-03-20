@@ -17,7 +17,7 @@ struct imm_abc const* imm_abc_create(char const* symbols, char const any_symbol)
 
     if (strlen(symbols) > IMM_SYMBOL_IDX_SIZE) {
         imm_error("alphabet size cannot be larger than %zu", IMM_SYMBOL_IDX_SIZE);
-        free_c(abc);
+        imm_free(abc);
         return NULL;
     }
 
@@ -25,21 +25,21 @@ struct imm_abc const* imm_abc_create(char const* symbols, char const any_symbol)
     for (unsigned i = 0; i < abc->length; ++i) {
         if (symbols[i] == any_symbol) {
             imm_error("any_symbol cannot be in the alphabet");
-            free_c(abc);
+            imm_free(abc);
             return NULL;
         }
 
         if (symbols[i] < IMM_FIRST_CHAR || symbols[i] > IMM_LAST_CHAR) {
             imm_error("alphabet symbol is outside the range [%c, %c] ", IMM_FIRST_CHAR,
                       IMM_LAST_CHAR);
-            free_c(abc);
+            imm_free(abc);
             return NULL;
         }
 
         size_t j = __imm_abc_index(symbols[i]);
         if (abc->symbol_idx[j] != -1) {
             imm_error("alphabet cannot have duplicated symbols");
-            free_c(abc);
+            imm_free(abc);
             return NULL;
         }
         abc->symbol_idx[j] = (int)i;
@@ -63,8 +63,8 @@ struct imm_abc const* imm_abc_clone(struct imm_abc const* abc)
 
 void imm_abc_destroy(struct imm_abc const* abc)
 {
-    free_c(abc->symbols);
-    free_c(abc);
+    imm_free(abc->symbols);
+    imm_free(abc);
 }
 
 enum imm_symbol_type imm_abc_symbol_type(struct imm_abc const* abc, char symbol_id)

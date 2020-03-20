@@ -55,7 +55,7 @@ void imm_results_destroy(struct imm_results const* results)
     imm_results_free(results);
 }
 
-void imm_results_free(struct imm_results const* results) { free_c(results); }
+void imm_results_free(struct imm_results const* results) { imm_free(results); }
 
 double imm_result_loglik(struct imm_result const* result) { return result->loglik; }
 
@@ -72,4 +72,4 @@ void imm_result_destroy(struct imm_result const* result)
     imm_result_free(result);
 }
 
-void imm_result_free(struct imm_result const* result) { free_c(result); }
+void imm_result_free(struct imm_result const* result) { imm_free(result); }
