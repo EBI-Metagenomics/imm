@@ -42,14 +42,14 @@ struct cell
     double      score;
     struct step prev_step;
 };
-MAKE_MATRIX_STRUCT(cell, struct cell)
-MAKE_MATRIX_CREATE(cell, struct cell)
-MAKE_MATRIX_GET(cell, struct cell)
-MAKE_MATRIX_GET_C(cell, struct cell)
-MAKE_MATRIX_DESTROY(cell)
-MAKE_MATRIX_NROWS(cell)
-MAKE_MATRIX_NCOLS(cell)
-MAKE_MATRIX_RESIZE(cell, struct cell)
+MAKE_MATRIX_STRUCT(matrix_cell, struct cell)
+MAKE_MATRIX_CREATE(matrix_cell, struct cell)
+MAKE_MATRIX_GET(matrix_cell, struct cell)
+MAKE_MATRIX_GET_C(matrix_cell, struct cell)
+MAKE_MATRIX_DESTROY(matrix_cell)
+MAKE_MATRIX_NROWS(matrix_cell)
+MAKE_MATRIX_NCOLS(matrix_cell)
+MAKE_MATRIX_RESIZE(matrix_cell, struct cell)
 
 struct dp_matrix
 {
