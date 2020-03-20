@@ -15,7 +15,7 @@
 #define MAKE_MATRIX_CREATE(NAME, T)                                                           \
     static inline struct NAME* NAME##_create(unsigned const nrows, unsigned const ncols)      \
     {                                                                                         \
-        struct NAME* matrix = malloc(sizeof(struct NAME*));                                   \
+        struct NAME* matrix = malloc(sizeof(struct NAME));                                    \
         matrix->data = malloc(sizeof(T) * (nrows * ncols));                                   \
         matrix->nrows = nrows;                                                                \
         matrix->ncols = ncols;                                                                \
@@ -53,8 +53,8 @@
         if (!matrix)                                                                          \
             return;                                                                           \
                                                                                               \
-        imm_free(matrix->data);                                                                 \
-        imm_free(matrix);                                                                       \
+        imm_free(matrix->data);                                                               \
+        imm_free(matrix);                                                                     \
     }
 
 #define MAKE_MATRIX_NROWS(NAME)                                                               \
