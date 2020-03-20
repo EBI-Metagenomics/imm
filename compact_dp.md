@@ -53,7 +53,7 @@ of a given state `i`. We will lay out the transition array as follows:
 ```c
 struct transition
 {
-  double cost = {
+  double cost[] = {
     T(0, q0(0)), T(0, q0(1)), ..., T(0, q0(NT(0)-1)), /* transitions from state 0 */
     T(1, q1(0)), T(1, q1(1)), ..., T(1, q1(NT(1)-1)), /* transitions from state 1 */
     ...,
@@ -80,6 +80,18 @@ emission length `emission_lenghts[j]`.
 ```c
 struct dp_matrix
 {
-  double [i][]
+  double   *cost;
+  unsigned *prev_state;
+  unsigned *offset;
+};
+```
+
+```c
+struct state_info
+{
+  struct imm_state const* state;
+  unsigned                min_seq;
+  unsigned                max_seq;
+  double                  start_lprob;
 };
 ```
