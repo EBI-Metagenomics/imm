@@ -17,6 +17,7 @@ struct seq_code
 struct seq_code const* imm_seq_code_create(struct imm_abc const* abc, unsigned min_seq,
                                            unsigned max_seq)
 {
+    IMM_BUG(min_seq > max_seq);
     struct seq_code* seq_code = malloc(sizeof(struct seq_code));
 
     seq_code->min_seq = min_seq;
@@ -32,12 +33,10 @@ struct seq_code const* imm_seq_code_create(struct imm_abc const* abc, unsigned m
 
     seq_code->offset = malloc(sizeof(unsigned) * (max_seq - min_seq + 1));
     seq_code->offset[0] = 0;
-    printf("Offset[0]: %u\n", seq_code->offset[0]);
     for (unsigned len = min_seq + 1; len <= max_seq; ++len) {
 
         unsigned i = len - min_seq;
         seq_code->offset[i] = seq_code->offset[i - 1] + seq_code->stride[len - 1];
-        printf("Offset[%u]: %u\n", i, seq_code->offset[i]);
     }
 
     return seq_code;
