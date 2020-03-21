@@ -19,27 +19,35 @@ void test_seq_code(void)
     printf("\n");
 
     struct imm_seq const* seq = imm_seq_create("AA", abc);
-    cass_equal_uint64(imm_seq_code_encode(seq_code, seq), 0)
+    cass_equal_uint64(imm_seq_code_encode(seq_code, min_seq, seq), 0);
     imm_seq_destroy(seq);
 
     seq = imm_seq_create("AC", abc);
-    cass_equal_uint64(imm_seq_code_encode(seq_code, seq), 4)
+    cass_equal_uint64(imm_seq_code_encode(seq_code, min_seq, seq), 4);
     imm_seq_destroy(seq);
 
     seq = imm_seq_create("TT", abc);
-    cass_equal_uint64(imm_seq_code_encode(seq_code, seq), 15)
+    cass_equal_uint64(imm_seq_code_encode(seq_code, min_seq, seq), 15);
     imm_seq_destroy(seq);
 
     seq = imm_seq_create("AAA", abc);
-    cass_equal_uint64(imm_seq_code_encode(seq_code, seq), 16)
+    cass_equal_uint64(imm_seq_code_encode(seq_code, min_seq, seq), 16);
+    imm_seq_destroy(seq);
+
+    seq = imm_seq_create("AAA", abc);
+    cass_equal_uint64(imm_seq_code_encode(seq_code, 3, seq), 0);
     imm_seq_destroy(seq);
 
     seq = imm_seq_create("TTT", abc);
-    cass_equal_uint64(imm_seq_code_encode(seq_code, seq), 79)
+    cass_equal_uint64(imm_seq_code_encode(seq_code, min_seq, seq), 79);
+    imm_seq_destroy(seq);
+
+    seq = imm_seq_create("TTT", abc);
+    cass_equal_uint64(imm_seq_code_encode(seq_code, 3, seq), 63);
     imm_seq_destroy(seq);
 
     seq = imm_seq_create("TTTT", abc);
-    cass_equal_uint64(imm_seq_code_encode(seq_code, seq), 335)
+    cass_equal_uint64(imm_seq_code_encode(seq_code, min_seq, seq), 335);
     imm_seq_destroy(seq);
 
     imm_seq_code_destroy(seq_code);

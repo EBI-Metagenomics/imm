@@ -8,6 +8,7 @@
 struct seq_code
 {
     unsigned              min_seq;
+    unsigned              max_seq;
     unsigned*             offset;
     unsigned*             stride;
     struct imm_abc const* abc;
@@ -19,6 +20,7 @@ struct seq_code const* imm_seq_code_create(struct imm_abc const* abc, unsigned m
     struct seq_code* seq_code = malloc(sizeof(struct seq_code));
 
     seq_code->min_seq = min_seq;
+    seq_code->max_seq = max_seq;
     seq_code->abc = abc;
 
     seq_code->stride = malloc(sizeof(unsigned) * max_seq);
@@ -41,9 +43,12 @@ struct seq_code const* imm_seq_code_create(struct imm_abc const* abc, unsigned m
     return seq_code;
 }
 
-unsigned imm_seq_code_encode(struct seq_code const* seq_code, struct imm_seq const* seq)
+unsigned imm_seq_code_encode(struct seq_code const* seq_code, unsigned min_seq,
+                             struct imm_seq const* seq)
 {
     IMM_BUG(seq_code->abc != imm_seq_get_abc(seq));
+    IMM_BUG(seq_code->min_seq > min_seq);
+    IMM_BUG(seq_code->max_seq < min_seq);
 
     unsigned code = seq_code->offset[imm_seq_length(seq) - seq_code->min_seq];
     for (unsigned i = 0; i < imm_seq_length(seq); ++i) {
@@ -52,7 +57,7 @@ unsigned imm_seq_code_encode(struct seq_code const* seq_code, struct imm_seq con
         code += seq_code->stride[i] * j;
     }
 
-    return code;
+    return code - seq_code->offset[min_seq - seq_code->min_seq];
 }
 
 void imm_seq_code_destroy(struct seq_code const* seq_code)
