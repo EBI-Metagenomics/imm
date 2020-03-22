@@ -1,0 +1,56 @@
+#include "cartes.h"
+#include "free.h"
+#include "imm/bug.h"
+#include "ipow.h"
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+struct imm_cartes
+{
+    char const* set;
+    unsigned    set_size;
+    unsigned    times;
+    unsigned    iter_idx;
+    char*       item;
+    unsigned    nitems;
+};
+
+struct imm_cartes* imm_cartes_create(char const* set, unsigned set_size, unsigned times)
+{
+    struct imm_cartes* cartes = malloc(sizeof(struct imm_cartes));
+
+    cartes->set = set;
+    cartes->set_size = set_size;
+    cartes->times = times;
+    cartes->item = malloc(sizeof(char) * (times + 1));
+    cartes->item[times] = '\0';
+    cartes->iter_idx = 0;
+    unsigned long nitems = imm_ipow(set_size, times);
+    IMM_BUG(nitems > UINT_MAX);
+    cartes->nitems = (unsigned)nitems;
+
+    return cartes;
+}
+
+void imm_cartes_destroy(struct imm_cartes const* cartes)
+{
+    imm_free(cartes->item);
+    imm_free(cartes);
+}
+
+char const* imm_cartes_next(struct imm_cartes* cartes)
+{
+    if (cartes->iter_idx == cartes->nitems)
+        return NULL;
+
+    char*    item = cartes->item;
+    unsigned idx = cartes->iter_idx++;
+    unsigned set_size = cartes->set_size;
+
+    for (unsigned i = 0; i < cartes->times; ++i) {
+        item[i] = cartes->set[(idx % imm_ipow(set_size, i + 1)) / imm_ipow(set_size, i)];
+    }
+
+    return item;
+}

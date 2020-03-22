@@ -24,6 +24,7 @@ find_package(OpenMP)
 add_library(imm
     src/abc.c
     src/abc_table.c
+    src/cartes.c
     src/dp.c
     src/dp_matrix.c
     src/hmm.c

@@ -71,6 +71,11 @@ unsigned imm_seq_code_size(struct seq_code const* seq_code, unsigned min_seq)
     return seq_code->size - seq_code->offset[min_seq - seq_code->min_seq];
 }
 
+struct imm_abc const* imm_seq_code_abc(struct seq_code const* seq_code)
+{
+    return seq_code->abc;
+}
+
 void imm_seq_code_destroy(struct seq_code const* seq_code)
 {
     imm_free(seq_code->offset);
