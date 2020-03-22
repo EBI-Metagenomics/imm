@@ -39,6 +39,10 @@ void test_seq_code1(void)
     cass_equal_uint64(imm_seq_code_encode(seq_code, 2, seq), 2);
     imm_seq_destroy(seq);
 
+    cass_equal_uint64(imm_seq_code_size(seq_code, min_seq), 13);
+    cass_equal_uint64(imm_seq_code_size(seq_code, 1), 12);
+    cass_equal_uint64(imm_seq_code_size(seq_code, 2), 9);
+
     imm_seq_code_destroy(seq_code);
 
     imm_abc_destroy(abc);

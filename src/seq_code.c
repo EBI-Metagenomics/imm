@@ -3,6 +3,8 @@
 #include "imm/abc.h"
 #include "imm/bug.h"
 #include "imm/seq.h"
+#include "ipow.h"
+#include <limits.h>
 #include <stdlib.h>
 
 struct seq_code
@@ -11,6 +13,7 @@ struct seq_code
     unsigned              max_seq;
     unsigned*             offset;
     unsigned*             stride;
+    unsigned              size;
     struct imm_abc const* abc;
 };
 
@@ -39,6 +42,10 @@ struct seq_code const* imm_seq_code_create(struct imm_abc const* abc, unsigned m
         seq_code->offset[i] = seq_code->offset[i - 1] + seq_code->stride[len - 1];
     }
 
+    unsigned long ncombs = imm_ipow(imm_abc_length(abc), max_seq);
+    IMM_BUG(ncombs > UINT_MAX);
+    seq_code->size = seq_code->offset[max_seq] + (unsigned)ncombs;
+
     return seq_code;
 }
 
@@ -57,6 +64,11 @@ unsigned imm_seq_code_encode(struct seq_code const* seq_code, unsigned min_seq,
     }
 
     return code - seq_code->offset[min_seq - seq_code->min_seq];
+}
+
+unsigned imm_seq_code_size(struct seq_code const* seq_code, unsigned min_seq)
+{
+    return seq_code->size - seq_code->offset[min_seq - seq_code->min_seq];
 }
 
 void imm_seq_code_destroy(struct seq_code const* seq_code)
