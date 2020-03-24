@@ -1,4 +1,4 @@
-#include "dp_draft/trans_table.h"
+#include "dp2_trans.h"
 #include "free.h"
 #include "mstate.h"
 #include "mtrans.h"
@@ -6,11 +6,11 @@
 #include "state_idx.h"
 #include <stdlib.h>
 
-struct dp_trans_table const* dp_trans_table_create(struct mstate const* const* mstates,
+struct dp2_trans const* dp2_trans_create(struct mstate const* const* mstates,
                                                    unsigned                    nstates,
                                                    struct state_idx*           state_idx)
 {
-    struct dp_trans_table* trans_tbl = malloc(sizeof(struct dp_trans_table));
+    struct dp2_trans* trans_tbl = malloc(sizeof(struct dp2_trans));
     trans_tbl->offset = malloc(sizeof(unsigned) * (nstates + 1));
     trans_tbl->offset[0] = 0;
 
@@ -43,7 +43,7 @@ struct dp_trans_table const* dp_trans_table_create(struct mstate const* const* m
     return trans_tbl;
 }
 
-void dp_trans_table_destroy(struct dp_trans_table const* trans_tbl)
+void dp2_trans_destroy(struct dp2_trans const* trans_tbl)
 {
     imm_free(trans_tbl->cost);
     imm_free(trans_tbl->target_state);
