@@ -16,21 +16,28 @@ struct imm_cartes
     unsigned    nitems;
 };
 
-struct imm_cartes* imm_cartes_create(char const* set, unsigned set_size, unsigned times)
+struct imm_cartes* imm_cartes_create(char const* set, unsigned set_size, unsigned max_times)
 {
     struct imm_cartes* cartes = malloc(sizeof(struct imm_cartes));
 
     cartes->set = set;
     cartes->set_size = set_size;
-    cartes->times = times;
-    cartes->item = malloc(sizeof(char) * (times + 1));
-    cartes->item[times] = '\0';
+    cartes->times = 0;
     cartes->iter_idx = 0;
-    unsigned long nitems = imm_ipow(set_size, times);
-    IMM_BUG(nitems > UINT_MAX);
-    cartes->nitems = (unsigned)nitems;
+    cartes->item = malloc(sizeof(char) * (max_times + 1));
+    cartes->nitems = 0;
 
     return cartes;
+}
+
+void imm_cartes_setup(struct imm_cartes* cartes, unsigned times)
+{
+    cartes->times = times;
+    cartes->item[times] = '\0';
+    cartes->iter_idx = 0;
+    unsigned long nitems = imm_ipow(cartes->set_size, times);
+    IMM_BUG(nitems > UINT_MAX);
+    cartes->nitems = (unsigned)nitems;
 }
 
 void imm_cartes_destroy(struct imm_cartes const* cartes)
