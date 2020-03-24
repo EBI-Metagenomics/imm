@@ -5,6 +5,7 @@
 #include "imm/lprob.h"
 #include "imm/path.h"
 #include "imm/report.h"
+#include "imm/seq_code.h"
 #include "imm/state.h"
 #include "imm/step.h"
 #include "imm/subseq.h"
@@ -31,42 +32,28 @@ static void create_trans(struct state_info* states, struct mstate const* const* 
 
 struct dp2
 {
+    struct seq_code const*     seq_code;
     struct dp2_emission const* emission;
     struct dp2_trans const*    transition;
-    struct seq_code const*     seq_code;
 };
 
-struct dp2 const* dp2_create(struct mstate const* const* mstates, unsigned const nstates,
-                             struct seq_code const* seq_code)
+static unsigned min_seq(struct mstate const* const* mstates, unsigned nstates);
+static unsigned max_seq(struct mstate const* const* mstates, unsigned nstates);
+
+struct dp2 const* dp2_create(struct imm_abc const* abc, struct mstate const* const* mstates,
+                             unsigned const nstates)
 {
     struct dp2* dp = malloc(sizeof(struct dp2));
+    dp->seq_code =
+        imm_seq_code_create(abc, min_seq(mstates, nstates), max_seq(mstates, nstates));
 
     struct state_idx* state_idx = state_idx_create();
 
     for (unsigned i = 0; i < nstates; ++i)
         state_idx_add(state_idx, mstate_get_state(mstates[i]), i);
 
-#if 0
-    for (unsigned i = 0; i < nstates; ++i) {
-        dp->states[i].state = mstate_get_state(mstates[i]);
-        dp->states[i].min_seq = imm_state_min_seq(dp->states[i].state);
-        dp->states[i].max_seq = imm_state_max_seq(dp->states[i].state);
-        dp->states[i].start_lprob = mstate_get_start(mstates[i]);
-        dp->states[i].idx = i;
-        array_trans_init(&dp->states[i].incoming_transitions);
-
-        state_idx_add(state_idx, dp->states[i].state, i);
-        next_col += dp->states[i].max_seq - dp->states[i].min_seq + 1;
-    }
-    dp->end_state = dp->states + state_idx_find(state_idx, end_state);
-
-    create_trans(dp->states, mstates, nstates, state_idx);
-    dp->mstates = mstates;
-#endif
-
-    dp->emission = dp2_emission_create(seq_code, mstates, nstates);
+    dp->emission = dp2_emission_create(dp->seq_code, mstates, nstates);
     dp->transition = dp2_trans_create(mstates, nstates, state_idx);
-    dp->seq_code = seq_code;
 
     state_idx_destroy(state_idx);
 
@@ -110,6 +97,7 @@ double dp_viterbi(struct dp const* dp, struct dp_matrix* matrix, struct imm_path
 
 void dp2_destroy(struct dp2 const* dp)
 {
+    imm_seq_code_destroy(dp->seq_code);
     dp2_emission_destroy(dp->emission);
     dp2_trans_destroy(dp->transition);
     imm_free(dp);
@@ -231,3 +219,25 @@ static void create_trans(struct state_info* states, struct mstate const* const* 
     }
 }
 #endif
+
+static unsigned min_seq(struct mstate const* const* mstates, unsigned nstates)
+{
+    IMM_BUG(nstates == 0);
+
+    unsigned min = imm_state_min_seq(mstate_get_state(mstates[0]));
+    for (unsigned i = 1; i < nstates; ++i)
+        min = MIN(min, imm_state_min_seq(mstate_get_state(mstates[i])));
+
+    return min;
+}
+
+static unsigned max_seq(struct mstate const* const* mstates, unsigned nstates)
+{
+    IMM_BUG(nstates == 0);
+
+    unsigned max = imm_state_max_seq(mstate_get_state(mstates[0]));
+    for (unsigned i = 1; i < nstates; ++i)
+        max = MAX(max, imm_state_max_seq(mstate_get_state(mstates[i])));
+
+    return max;
+}

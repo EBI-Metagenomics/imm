@@ -35,8 +35,6 @@ static double hmm_start_lprob(struct imm_hmm const* hmm, struct imm_state const*
 static int    hmm_normalize_trans(struct mstate* mstate);
 static struct dp const* hmm_create_dp(struct imm_hmm const* hmm, struct imm_seq const* seq,
                                       struct imm_state const* end_state);
-static unsigned         min_seq(struct mstate const* const* mstates, unsigned nstates);
-static unsigned         max_seq(struct mstate const* const* mstates, unsigned nstates);
 
 struct imm_hmm* imm_hmm_create(struct imm_abc const* abc)
 {
@@ -411,33 +409,9 @@ static struct dp const* hmm_create_dp(struct imm_hmm const* hmm, struct imm_seq 
         return NULL;
     }
     unsigned nstates = mstate_table_size(hmm->table);
-    struct seq_code const* seq_code = imm_seq_code_create(hmm->abc, min_seq(mstates, nstates), max_seq(mstates, nstates));
 
-    struct dp2 const* dp2 = dp2_create(mstates, nstates, seq_code);
+    struct dp2 const* dp2 = dp2_create(hmm->abc, mstates, nstates);
     dp2_destroy(dp2);
-    imm_seq_code_destroy(seq_code);
 
     return dp_create(mstates, mstate_table_size(hmm->table), seq, end_state);
-}
-
-static unsigned min_seq(struct mstate const* const* mstates, unsigned nstates)
-{
-    IMM_BUG(nstates == 0);
-
-    unsigned min = imm_state_min_seq(mstate_get_state(mstates[0]));
-    for (unsigned i = 1; i < nstates; ++i)
-        min = MIN(min, imm_state_min_seq(mstate_get_state(mstates[i])));
-
-    return min;
-}
-
-static unsigned max_seq(struct mstate const* const* mstates, unsigned nstates)
-{
-    IMM_BUG(nstates == 0);
-
-    unsigned max = imm_state_max_seq(mstate_get_state(mstates[0]));
-    for (unsigned i = 1; i < nstates; ++i)
-        max = MAX(max, imm_state_max_seq(mstate_get_state(mstates[i])));
-
-    return max;
 }
