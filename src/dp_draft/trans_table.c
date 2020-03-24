@@ -19,7 +19,7 @@ struct dp_trans_table const* dp_trans_table_create(struct mstate const* const* m
         trans_tbl->offset[i] = ntrans;
         ntrans += mtrans_table_size(mstate_get_mtrans_table(mstates[i]));
     }
-    /* used for (offset[i+1] - offset[i+1]) calculation */
+    /* Used for (offset[i+1] - offset[i+1]) calculation. */
     trans_tbl->offset[nstates] = ntrans;
 
     trans_tbl->target_state = malloc(sizeof(unsigned) * ntrans);
