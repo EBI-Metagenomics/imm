@@ -36,7 +36,7 @@ void test_seq_code1(void)
     imm_seq_destroy(seq);
 
     seq = imm_seq_create("TA", abc);
-    cass_equal_uint64(imm_seq_code_encode(seq_code, 2, seq), 2);
+    cass_equal_uint64(imm_seq_code_encode(seq_code, 2, seq), 6);
     imm_seq_destroy(seq);
 
     cass_equal_uint64(imm_seq_code_size(seq_code, min_seq), 13);
@@ -61,7 +61,7 @@ void test_seq_code2(void)
     imm_seq_destroy(seq);
 
     seq = imm_seq_create("AC", abc);
-    cass_equal_uint64(imm_seq_code_encode(seq_code, min_seq, seq), 4);
+    cass_equal_uint64(imm_seq_code_encode(seq_code, min_seq, seq), 1);
     imm_seq_destroy(seq);
 
     seq = imm_seq_create("TT", abc);
