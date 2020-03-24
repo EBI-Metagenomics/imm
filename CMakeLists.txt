@@ -26,6 +26,7 @@ add_library(imm
     src/abc_table.c
     src/cartes.c
     src/dp.c
+    src/dp2_emission.c
     src/dp_matrix.c
     src/hmm.c
     src/ipow.c

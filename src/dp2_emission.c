@@ -1,4 +1,4 @@
-#include "dp_draft/emission.h"
+#include "dp2_emission.h"
 #include "cartes.h"
 #include "free.h"
 #include "imm/abc.h"
@@ -18,17 +18,17 @@
  * sequence seq.
  *
  */
-struct dp_emission
+struct dp2_emission
 {
     double*   cost;   /**< Sequence emission cost of a state. */
     unsigned* offset; /**< Maps state to cost array offset. */
 };
 
-struct dp_emission const* dp_emission_create(struct seq_code const*      seq_code,
-                                             struct mstate const* const* mstates,
-                                             unsigned                    nstates)
+struct dp2_emission const* dp2_emission_create(struct seq_code const*      seq_code,
+                                               struct mstate const* const* mstates,
+                                               unsigned                    nstates)
 {
-    struct dp_emission* emiss_tbl = malloc(sizeof(struct dp_emission));
+    struct dp2_emission* emiss_tbl = malloc(sizeof(struct dp2_emission));
 
     emiss_tbl->offset = malloc(sizeof(unsigned) * (nstates + 1));
     emiss_tbl->offset[0] = 0;
@@ -71,12 +71,13 @@ struct dp_emission const* dp_emission_create(struct seq_code const*      seq_cod
     return emiss_tbl;
 }
 
-double dp_emission_cost(struct dp_emission const* emission, unsigned state, unsigned seq_code)
+double dp2_emission_cost(struct dp2_emission const* emission, unsigned state,
+                         unsigned seq_code)
 {
     return emission->cost[emission->offset[state] + seq_code];
 }
 
-void dp_emission_destroy(struct dp_emission const* emission)
+void dp2_emission_destroy(struct dp2_emission const* emission)
 {
     imm_free(emission->cost);
     imm_free(emission->offset);
