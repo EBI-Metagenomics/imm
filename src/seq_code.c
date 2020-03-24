@@ -27,12 +27,16 @@ struct seq_code const* imm_seq_code_create(struct imm_abc const* abc, unsigned m
     seq_code->max_seq = max_seq;
     seq_code->abc = abc;
 
-    seq_code->stride = malloc(sizeof(unsigned) * max_seq);
+    if (max_seq == 0)
+        seq_code->stride = NULL;
+    else {
+        seq_code->stride = malloc(sizeof(unsigned) * max_seq);
+        seq_code->stride[max_seq - 1] = 1;
+    }
 
-    seq_code->stride[max_seq - 1] = 1;
-    for (unsigned len = max_seq - 2; 1 <= len + 1; --len) {
-
-        seq_code->stride[len] = seq_code->stride[len + 1] * imm_abc_length(abc);
+    if (max_seq > 1) {
+        for (unsigned len = max_seq - 2; 1 <= len + 1; --len)
+            seq_code->stride[len] = seq_code->stride[len + 1] * imm_abc_length(abc);
     }
 
     seq_code->offset = malloc(sizeof(unsigned) * (max_seq - min_seq + 1));
@@ -45,8 +49,9 @@ struct seq_code const* imm_seq_code_create(struct imm_abc const* abc, unsigned m
     }
 
     unsigned long ncombs = imm_ipow(imm_abc_length(abc), max_seq);
+
     IMM_BUG(ncombs > UINT_MAX);
-    seq_code->size = seq_code->offset[max_seq] + (unsigned)ncombs;
+    seq_code->size = seq_code->offset[max_seq - min_seq] + (unsigned)ncombs;
 
     return seq_code;
 }

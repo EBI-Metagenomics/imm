@@ -6,9 +6,8 @@
 #include "state_idx.h"
 #include <stdlib.h>
 
-struct dp2_trans const* dp2_trans_create(struct mstate const* const* mstates,
-                                                   unsigned                    nstates,
-                                                   struct state_idx*           state_idx)
+struct dp2_trans const* dp2_trans_create(struct mstate const* const* mstates, unsigned nstates,
+                                         struct state_idx* state_idx)
 {
     struct dp2_trans* trans_tbl = malloc(sizeof(struct dp2_trans));
     trans_tbl->offset = malloc(sizeof(unsigned) * (nstates + 1));
@@ -22,7 +21,13 @@ struct dp2_trans const* dp2_trans_create(struct mstate const* const* mstates,
     /* Used for (offset[i+1] - offset[i+1]) calculation. */
     trans_tbl->offset[nstates] = ntrans;
 
-    trans_tbl->target_state = malloc(sizeof(unsigned) * ntrans);
+    if (ntrans > 0) {
+        trans_tbl->cost = malloc(sizeof(double) * ntrans);
+        trans_tbl->target_state = malloc(sizeof(unsigned) * ntrans);
+    } else {
+        trans_tbl->cost = NULL;
+        trans_tbl->target_state = NULL;
+    }
 
     for (unsigned i = 0; i < nstates; ++i) {
         struct mtrans_table const* tbl = mstate_get_mtrans_table(mstates[i]);
@@ -47,5 +52,6 @@ void dp2_trans_destroy(struct dp2_trans const* trans_tbl)
 {
     imm_free(trans_tbl->cost);
     imm_free(trans_tbl->target_state);
+    imm_free(trans_tbl->offset);
     imm_free(trans_tbl);
 }

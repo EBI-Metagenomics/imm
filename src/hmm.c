@@ -1,6 +1,7 @@
 /* #include "elapsed/elapsed.h" */
 #include "imm/hmm.h"
 #include "dp.h"
+#include "dp2.h"
 #include "dp_matrix.h"
 #include "free.h"
 #include "imm/bug.h"
@@ -8,6 +9,7 @@
 #include "imm/path.h"
 #include "imm/report.h"
 #include "imm/results.h"
+#include "imm/seq_code.h"
 #include "imm/state.h"
 #include "imm/step.h"
 #include "imm/subseq.h"
@@ -33,6 +35,8 @@ static double hmm_start_lprob(struct imm_hmm const* hmm, struct imm_state const*
 static int    hmm_normalize_trans(struct mstate* mstate);
 static struct dp const* hmm_create_dp(struct imm_hmm const* hmm, struct imm_seq const* seq,
                                       struct imm_state const* end_state);
+static unsigned         min_seq(struct mstate const* const* mstates, unsigned nstates);
+static unsigned         max_seq(struct mstate const* const* mstates, unsigned nstates);
 
 struct imm_hmm* imm_hmm_create(struct imm_abc const* abc)
 {
@@ -250,8 +254,9 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
                     dp_matrix_set(matrix, imm_subseq_cast(&subseq));
                     struct imm_path* path = imm_path_create();
                     /* elapsed_start(elapsed1); */
-                    double           score = dp_viterbi(dp, matrix, path);
-                    /* fprintf(stderr, "dp_viterbi   : %f seconds\n", elapsed_end(elapsed1)); */
+                    double score = dp_viterbi(dp, matrix, path);
+                    /* fprintf(stderr, "dp_viterbi   : %f seconds\n", elapsed_end(elapsed1));
+                     */
                     imm_results_set(results, i, subseq, path, score);
                 }
             }
@@ -405,6 +410,34 @@ static struct dp const* hmm_create_dp(struct imm_hmm const* hmm, struct imm_seq 
         imm_free(mstates);
         return NULL;
     }
+    unsigned nstates = mstate_table_size(hmm->table);
+    struct seq_code const* seq_code = imm_seq_code_create(hmm->abc, min_seq(mstates, nstates), max_seq(mstates, nstates));
+
+    struct dp2 const* dp2 = dp2_create(mstates, nstates, seq_code);
+    dp2_destroy(dp2);
+    imm_seq_code_destroy(seq_code);
 
     return dp_create(mstates, mstate_table_size(hmm->table), seq, end_state);
+}
+
+static unsigned min_seq(struct mstate const* const* mstates, unsigned nstates)
+{
+    IMM_BUG(nstates == 0);
+
+    unsigned min = imm_state_min_seq(mstate_get_state(mstates[0]));
+    for (unsigned i = 1; i < nstates; ++i)
+        min = MIN(min, imm_state_min_seq(mstate_get_state(mstates[i])));
+
+    return min;
+}
+
+static unsigned max_seq(struct mstate const* const* mstates, unsigned nstates)
+{
+    IMM_BUG(nstates == 0);
+
+    unsigned max = imm_state_max_seq(mstate_get_state(mstates[0]));
+    for (unsigned i = 1; i < nstates; ++i)
+        max = MAX(max, imm_state_max_seq(mstate_get_state(mstates[i])));
+
+    return max;
 }

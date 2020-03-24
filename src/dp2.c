@@ -1,4 +1,7 @@
-#include "dp.h"
+#include "dp2.h"
+#include "dp2_emission.h"
+#include "dp2_trans.h"
+#include "free.h"
 #include "imm/lprob.h"
 #include "imm/path.h"
 #include "imm/report.h"
@@ -10,7 +13,6 @@
 #include "mtrans.h"
 #include "mtrans_table.h"
 #include "state_idx.h"
-#include "dp2_emission.h"
 #include <limits.h>
 #include <string.h>
 
@@ -29,22 +31,22 @@ static void create_trans(struct state_info* states, struct mstate const* const* 
 
 struct dp2
 {
-    struct dp2_emission *emission;
+    struct dp2_emission const* emission;
+    struct dp2_trans const*    transition;
+    struct seq_code const*     seq_code;
 };
 
 struct dp2 const* dp2_create(struct mstate const* const* mstates, unsigned const nstates,
-        struct imm_state const* end_state)
+                             struct seq_code const* seq_code)
 {
     struct dp2* dp = malloc(sizeof(struct dp2));
 
-#if 0
-    dp->nstates = nstates;
-    dp->states = malloc(sizeof(struct state_info) * ((size_t)nstates));
-
     struct state_idx* state_idx = state_idx_create();
 
-    unsigned next_col = 0;
+    for (unsigned i = 0; i < nstates; ++i)
+        state_idx_add(state_idx, mstate_get_state(mstates[i]), i);
 
+#if 0
     for (unsigned i = 0; i < nstates; ++i) {
         dp->states[i].state = mstate_get_state(mstates[i]);
         dp->states[i].min_seq = imm_state_min_seq(dp->states[i].state);
@@ -59,9 +61,14 @@ struct dp2 const* dp2_create(struct mstate const* const* mstates, unsigned const
     dp->end_state = dp->states + state_idx_find(state_idx, end_state);
 
     create_trans(dp->states, mstates, nstates, state_idx);
-    state_idx_destroy(state_idx);
     dp->mstates = mstates;
 #endif
+
+    dp->emission = dp2_emission_create(seq_code, mstates, nstates);
+    dp->transition = dp2_trans_create(mstates, nstates, state_idx);
+    dp->seq_code = seq_code;
+
+    state_idx_destroy(state_idx);
 
     return dp;
 }
@@ -99,17 +106,16 @@ double dp_viterbi(struct dp const* dp, struct dp_matrix* matrix, struct imm_path
 
     return score;
 }
+#endif
 
-void dp_destroy(struct dp const* dp)
+void dp2_destroy(struct dp2 const* dp)
 {
-    for (unsigned i = 0; i < dp->nstates; ++i)
-        array_trans_empty(&dp->states[i].incoming_transitions);
-
-    imm_free(dp->states);
-    imm_free(dp->mstates);
+    dp2_emission_destroy(dp->emission);
+    dp2_trans_destroy(dp->transition);
     imm_free(dp);
 }
 
+#if 0
 static double best_trans_score(struct dp const* dp, struct dp_matrix const* matrix,
                                struct state_info const* dst_state, unsigned const row,
                                struct step* prev_step)
