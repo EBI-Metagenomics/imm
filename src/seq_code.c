@@ -28,13 +28,6 @@ struct seq_code const* imm_seq_code_create(struct imm_abc const* abc, unsigned m
     seq_code->abc = abc;
 
     seq_code->stride = malloc(sizeof(unsigned) * max_seq);
-#if 0
-    seq_code->stride[0] = 1;
-    for (unsigned len = 1; len < max_seq; ++len) {
-
-        seq_code->stride[len] = seq_code->stride[len - 1] * imm_abc_length(abc);
-    }
-#endif
 
     seq_code->stride[max_seq - 1] = 1;
     for (unsigned len = max_seq - 2; 1 <= len + 1; --len) {
@@ -47,7 +40,6 @@ struct seq_code const* imm_seq_code_create(struct imm_abc const* abc, unsigned m
     for (unsigned len = min_seq + 1; len <= max_seq; ++len) {
 
         unsigned i = len - min_seq;
-        /* seq_code->offset[i] = seq_code->offset[i - 1] + seq_code->stride[len - 1]; */
         seq_code->offset[i] =
             seq_code->offset[i - 1] + seq_code->stride[max_seq - (len - 1) - 1];
     }
@@ -70,7 +62,8 @@ unsigned imm_seq_code_encode(struct seq_code const* seq_code, unsigned min_seq,
     for (unsigned i = 0; i < imm_seq_length(seq); ++i) {
 
         unsigned j = (unsigned)imm_abc_symbol_idx(seq_code->abc, imm_seq_string(seq)[i]);
-        code += seq_code->stride[i + (seq_code->max_seq - imm_seq_length(seq))] * j;
+        unsigned offset = seq_code->max_seq - imm_seq_length(seq);
+        code += seq_code->stride[i + offset] * j;
     }
 
     return code - seq_code->offset[min_seq - seq_code->min_seq];
@@ -80,6 +73,10 @@ unsigned imm_seq_code_size(struct seq_code const* seq_code, unsigned min_seq)
 {
     return seq_code->size - seq_code->offset[min_seq - seq_code->min_seq];
 }
+
+unsigned imm_seq_code_min_seq(struct seq_code const* seq_code) { return seq_code->min_seq; }
+
+unsigned imm_seq_code_max_seq(struct seq_code const* seq_code) { return seq_code->max_seq; }
 
 struct imm_abc const* imm_seq_code_abc(struct seq_code const* seq_code)
 {

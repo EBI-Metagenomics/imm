@@ -20,7 +20,7 @@
  */
 struct dp_emission
 {
-    double*   cost; /**< Sequence emission cost of a state. */
+    double*   cost;   /**< Sequence emission cost of a state. */
     unsigned* offset; /**< Maps state to cost array offset. */
 };
 
@@ -43,18 +43,20 @@ struct dp_emission const* dp_emission_create(struct seq_code const*      seq_cod
 
     emiss_tbl->cost = malloc(sizeof(double) * size);
 
+    struct imm_abc const* abc = imm_seq_code_abc(seq_code);
+    char const*           set = imm_abc_symbols(abc);
+    unsigned              set_size = imm_abc_length(abc);
+    struct imm_cartes*    cartes =
+        imm_cartes_create(set, set_size, imm_seq_code_max_seq(seq_code));
+
     for (unsigned i = 0; i < nstates; ++i) {
 
-        struct imm_abc const* abc = imm_seq_code_abc(seq_code);
-        unsigned              min_seq = imm_state_min_seq(mstate_get_state(mstates[i]));
+        unsigned min_seq = imm_state_min_seq(mstate_get_state(mstates[i]));
         for (unsigned len = min_seq; len <= imm_state_max_seq(mstate_get_state(mstates[i]));
              ++len) {
 
-            char const* set = imm_abc_symbols(abc);
-            unsigned    set_size = imm_abc_length(abc);
-
-            struct imm_cartes* cartes = imm_cartes_create(set, set_size, len);
-            char const*        item = NULL;
+            imm_cartes_setup(cartes, len);
+            char const* item = NULL;
             while ((item = imm_cartes_next(cartes)) != NULL) {
 
                 struct imm_seq seq = IMM_SEQ(abc, item, len);
@@ -62,10 +64,10 @@ struct dp_emission const* dp_emission_create(struct seq_code const*      seq_cod
                 emiss_tbl->cost[emiss_tbl->offset[i] + j] =
                     imm_state_lprob(mstate_get_state(mstates[i]), &seq);
             }
-            imm_cartes_destroy(cartes);
         }
     }
 
+    imm_cartes_destroy(cartes);
     return emiss_tbl;
 }
 
