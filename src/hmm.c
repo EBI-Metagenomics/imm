@@ -88,6 +88,8 @@ int imm_hmm_set_start(struct imm_hmm* hmm, struct imm_state const* state, double
 int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state,
                       struct imm_state const* dst_state, double lprob)
 {
+    /* TODO: do not create transition for lprob=-INF or
+     * remove it if it already exists */
     unsigned long src = mstate_table_find(hmm->table, src_state);
     if (src == mstate_table_end(hmm->table)) {
         imm_error("source state not found");
