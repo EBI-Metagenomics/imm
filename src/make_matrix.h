@@ -1,5 +1,5 @@
-#ifndef IMM_MATRIX_H
-#define IMM_MATRIX_H
+#ifndef IMM_MAKE_MATRIX_H
+#define IMM_MAKE_MATRIX_H
 
 #include "free.h"
 #include <stdlib.h>

@@ -24,7 +24,6 @@ struct dp2_emission
     unsigned* offset; /**< Maps state to cost array offset. */
 };
 
-#include <stdio.h>
 struct dp2_emission const* dp2_emission_create(struct seq_code const*      seq_code,
                                                struct mstate const* const* mstates,
                                                unsigned                    nstates)

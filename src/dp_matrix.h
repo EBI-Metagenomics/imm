@@ -5,7 +5,7 @@
 #include "free.h"
 #include "imm/bug.h"
 #include "imm/seq.h"
-#include "matrix.h"
+#include "make_matrix.h"
 
 struct dp;
 
@@ -31,7 +31,7 @@ struct state_info
     struct array_trans      incoming_transitions;
 };
 
-struct step
+struct dp_step
 {
     struct state_info const* state;
     unsigned                 seq_len;
@@ -40,7 +40,7 @@ struct step
 struct cell
 {
     double      score;
-    struct step prev_step;
+    struct dp_step prev_step;
 };
 MAKE_MATRIX_STRUCT(matrix_cell, struct cell)
 MAKE_MATRIX_CREATE(matrix_cell, struct cell)
@@ -59,14 +59,14 @@ struct dp_matrix
     unsigned              nstates;
 };
 
-static inline unsigned column(struct dp_matrix const* dp_matrix, struct step const* step)
+static inline unsigned column(struct dp_matrix const* dp_matrix, struct dp_step const* step)
 {
     IMM_BUG(step->seq_len < step->state->min_seq);
     return dp_matrix->state_col[step->state->idx] + step->seq_len - step->state->min_seq;
 }
 
 static inline double get_score(struct dp_matrix const* dp_matrix, unsigned row,
-                               struct step const* step)
+                               struct dp_step const* step)
 {
     return matrix_cell_get_c(dp_matrix->cell, row, column(dp_matrix, step))->score;
 }

@@ -3,6 +3,7 @@
 #include "dp.h"
 #include "dp2.h"
 #include "dp_matrix.h"
+#include "dp2_matrix.h"
 #include "free.h"
 #include "imm/bug.h"
 #include "imm/lprob.h"
@@ -33,8 +34,10 @@ struct imm_hmm
 
 static double hmm_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state);
 static int    hmm_normalize_trans(struct mstate* mstate);
-static struct dp const* hmm_create_dp(struct imm_hmm const* hmm, struct imm_seq const* seq,
-                                      struct imm_state const* end_state);
+static struct dp const*  hmm_create_dp(struct imm_hmm const* hmm, struct imm_seq const* seq,
+                                       struct imm_state const* end_state);
+static struct dp2 const* hmm_create_dp2(struct imm_hmm const* hmm, struct imm_seq const* seq,
+                                        struct imm_state const* end_state);
 
 struct imm_hmm* imm_hmm_create(struct imm_abc const* abc)
 {
@@ -219,10 +222,11 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
     /* struct elapsed* elapsed = elapsed_create(); */
 
     /* elapsed_start(elapsed); */
-    struct dp const* dp = hmm_create_dp(hmm, seq, end_state);
+    struct dp const*  dp = hmm_create_dp(hmm, seq, end_state);
     /* fprintf(stderr, "hmm_create_dp: %f seconds\n", elapsed_end(elapsed)); */
     if (!dp)
         return NULL;
+    struct dp2 const* dp2 = hmm_create_dp2(hmm, seq, end_state);
 
     if (window_length == 0)
         window_length = imm_seq_length(seq);
@@ -232,6 +236,7 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
     unsigned const      nwindows = imm_window_size(window);
     struct imm_results* results = imm_results_create(seq, nwindows);
     struct dp_matrix**  matrices = NULL;
+    struct dp2_matrix**  matrices2 = NULL;
     /* fprintf(stderr, "window init  : %f seconds\n", elapsed_end(elapsed)); */
 
     /* struct elapsed* elapsed1 = elapsed_create(); */
@@ -240,8 +245,10 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
     {
         /* elapsed_start(elapsed); */
         _Pragma("omp single") matrices = malloc(sizeof(struct dp_matrix*) * thread_size());
+        _Pragma("omp single") matrices2 = malloc(sizeof(struct dp2_matrix*) * thread_size());
 
         matrices[thread_id()] = dp_matrix_new(dp);
+        matrices2[thread_id()] = dp2_matrix_new(dp2);
         _Pragma("omp single")
         {
             for (unsigned i = 0; i < nwindows; ++i) {
@@ -249,10 +256,13 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
                 _Pragma("omp task firstprivate(subseq, i)")
                 {
                     struct dp_matrix* matrix = matrices[thread_id()];
+                    struct dp2_matrix* matrix2 = matrices2[thread_id()];
                     dp_matrix_set(matrix, imm_subseq_cast(&subseq));
+                    dp2_matrix_setup(matrix2, imm_subseq_cast(&subseq));
                     struct imm_path* path = imm_path_create();
                     /* elapsed_start(elapsed1); */
                     double score = dp_viterbi(dp, matrix, path);
+                    double score2 = dp2_viterbi(dp2, matrix2);
                     /* fprintf(stderr, "dp_viterbi   : %f seconds\n", elapsed_end(elapsed1));
                      */
                     imm_results_set(results, i, subseq, path, score);
@@ -262,14 +272,18 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
         }
         _Pragma("omp single")
         {
-            for (unsigned i = 0; i < thread_size(); ++i)
+            for (unsigned i = 0; i < thread_size(); ++i) {
                 dp_matrix_destroy(matrices[i]);
+                dp2_matrix_destroy(matrices2[i]);
+            }
             imm_free(matrices);
+            imm_free(matrices2);
         }
         /* fprintf(stderr, "main loop    : %f seconds\n", elapsed_end(elapsed)); */
     }
     /* elapsed_start(elapsed); */
     dp_destroy(dp);
+    dp2_destroy(dp2);
     /* fprintf(stderr, "dp destroy   : %f seconds\n", elapsed_end(elapsed)); */
 
     /* elapsed_destroy(elapsed); */
@@ -408,10 +422,37 @@ static struct dp const* hmm_create_dp(struct imm_hmm const* hmm, struct imm_seq 
         imm_free(mstates);
         return NULL;
     }
-    unsigned nstates = mstate_table_size(hmm->table);
-
-    struct dp2 const* dp2 = dp2_create(hmm->abc, mstates, nstates);
-    dp2_destroy(dp2);
 
     return dp_create(mstates, mstate_table_size(hmm->table), seq, end_state);
+}
+
+static struct dp2 const* hmm_create_dp2(struct imm_hmm const* hmm, struct imm_seq const* seq,
+                                        struct imm_state const* end_state)
+{
+    if (hmm->abc != imm_seq_get_abc(seq)) {
+        imm_error("hmm and seq must have the same alphabet");
+        return NULL;
+    }
+
+    unsigned long end = mstate_table_find(hmm->table, end_state);
+    if (end == mstate_table_end(hmm->table)) {
+        imm_error("end_state not found");
+        return NULL;
+    }
+
+    if (imm_seq_length(seq) < imm_state_min_seq(end_state)) {
+        imm_error("sequence is shorter than end_state's lower bound");
+        return NULL;
+    }
+
+    struct mstate const** mstates = mstate_table_array(hmm->table);
+    if (mstate_sort(mstates, mstate_table_size(hmm->table))) {
+        imm_free(mstates);
+        return NULL;
+    }
+    unsigned nstates = mstate_table_size(hmm->table);
+
+    struct dp2 const* dp = dp2_create(hmm->abc, mstates, nstates);
+    imm_free(mstates);
+    return dp;
 }
