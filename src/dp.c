@@ -129,7 +129,9 @@ static double best_trans_score(struct dp const* dp, struct dp_matrix const* matr
             tmp_step.seq_len = len;
             IMM_BUG(row < len);
             unsigned const prev_row = row - len;
-            double const   v = get_score(matrix, prev_row, &tmp_step) + trans->lprob;
+            double v0 = get_score(matrix, prev_row, &tmp_step);
+            double v1 = trans->lprob;
+            double const   v = v0 + v1;
             if (v > score) {
                 score = v;
                 prev_step->state = prev;

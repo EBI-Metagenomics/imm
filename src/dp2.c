@@ -19,15 +19,16 @@
 #include <limits.h>
 #include <string.h>
 
-static double best_trans_score(struct dp2 const* dp, struct dp2_matrix const* matrix,
-                               unsigned dst_state, unsigned row, struct dp2_step* prev_step);
+static double best_trans_cost(struct dp2 const* dp, struct dp2_matrix const* matrix,
+                               unsigned target_state, unsigned row,
+                               struct dp2_step* prev_step);
 #if 0
 static double final_score(struct dp const* dp, struct dp_matrix const* matrix,
                           struct step* end_step);
 static void   viterbi_path(struct dp const* dp, struct dp_matrix const* matrix,
                            struct imm_path* path, struct step const* end_step);
 
-static void create_trans(struct state_info* states, struct mstate const* const* mstates,
+static void create_reversed_trans(struct state_info* states, struct mstate const* const* mstates,
                          unsigned nstates, struct state_idx* state_idx);
 #endif
 
@@ -98,7 +99,7 @@ double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
                 /* unsigned const    col = column(matrix, &step); */
                 /* struct cell*      cell = matrix_cell_get(matrix->cell, r, col); */
                 struct dp2_step* prev_step = dp2_matrix_get_prev_step(matrix, r, &step);
-                double const     score = best_trans_score(dp, matrix, i, r, prev_step);
+                double const     score = best_trans_cost(dp, matrix, i, r, prev_step);
                 /* IMM_SUBSEQ(subseq, matrix->seq, r, len); */
                 /* cell->score = score + imm_state_lprob(cur->state, imm_subseq_cast(&subseq));
                  */
@@ -124,15 +125,45 @@ void dp2_destroy(struct dp2 const* dp)
     imm_free(dp);
 }
 
-static double best_trans_score(struct dp2 const* dp, struct dp2_matrix const* matrix,
-                               unsigned dst_state, unsigned row, struct dp2_step* prev_step)
+static double best_trans_cost(struct dp2 const* dp, struct dp2_matrix const* matrix,
+                               unsigned target_state, unsigned row, struct dp2_step* prev_step)
 {
     double score = imm_lprob_zero();
     prev_step->state = UINT_MAX;
     prev_step->seq_len = UINT_MAX;
 
     if (row == 0)
-        score = dp->start_lprob[dst_state];
+        score = dp->start_lprob[target_state];
+
+    for (unsigned i = 0; i < dp2_trans_ntrans(dp->transition, target_state); ++i) {
+
+
+        unsigned source_state = dp2_trans_source_state(dp->transition, target_state, i);
+        if (row < dp->min_seq[source_state])
+            continue;
+
+        for (unsigned len = dp->min_seq[source_state];
+             len <= MIN(dp->max_seq[source_state], row); ++len) {
+
+            if (len == 0 && source_state > target_state)
+                continue;
+
+            struct dp2_step step = {.state=source_state, .seq_len=len};
+
+            IMM_BUG(row < len);
+            unsigned const prev_row = row - len;
+
+            double v0 = dp2_matrix_get_cost(matrix, prev_row, &step);
+            double v1 = dp2_trans_cost(dp->transition, target_state, i);
+            double v = v0 + v1;
+
+            if (v > score) {
+                score = v;
+                prev_step->state = source_state;
+                prev_step->seq_len = len;
+            }
+        }
+    }
 
 #if 0
     struct array_trans const* incoming = &dst_state->incoming_transitions;
@@ -162,9 +193,10 @@ static double best_trans_score(struct dp2 const* dp, struct dp2_matrix const* ma
         }
     }
 
-    if (row > 0 && !prev_step->state)
-        return imm_lprob_invalid();
 #endif
+    if (row > 0 && prev_step->state == UINT_MAX)
+        return imm_lprob_invalid();
+
     return score;
 }
 
@@ -210,34 +242,6 @@ static void viterbi_path(struct dp const* dp, struct dp_matrix const* matrix,
         IMM_BUG(step->seq_len > row);
         row -= step->seq_len;
         step = &matrix_cell_get_c(matrix->cell, row, column(matrix, step))->prev_step;
-    }
-}
-
-static void create_trans(struct state_info* states, struct mstate const* const* mstates,
-                         unsigned nstates, struct state_idx* state_idx)
-{
-    for (unsigned i = 0; i < nstates; ++i) {
-
-        struct imm_state const*    src_state = mstate_get_state(mstates[i]);
-        unsigned                   src = state_idx_find(state_idx, src_state);
-        struct mtrans_table const* table = mstate_get_mtrans_table(mstates[i]);
-
-        unsigned long iter = 0;
-        mtrans_table_for_each (iter, table) {
-            if (!mtrans_table_exist(table, iter))
-                continue;
-            struct mtrans const* mtrans = mtrans_table_get(table, iter);
-            double               lprob = mtrans_get_lprob(mtrans);
-            if (imm_lprob_is_zero(lprob))
-                continue;
-
-            struct imm_state const* dst_state = mtrans_get_state(mtrans);
-            unsigned                dst = state_idx_find(state_idx, dst_state);
-
-            struct trans* trans = array_trans_append(&states[dst].incoming_transitions);
-            trans->lprob = lprob;
-            trans->src_state = states + src;
-        }
     }
 }
 #endif
