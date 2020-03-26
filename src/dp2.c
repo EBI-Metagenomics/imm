@@ -84,7 +84,7 @@ double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
                     imm_seq_code_encode(dp->seq_code, min_len, imm_subseq_cast(&subseq));
                 double v = dp2_emission_cost(dp->emission, i, seq_code);
                 double cost = score + v;
-                dp2_matrix_set_cost(matrix, r, &step, cost);
+                dp2_matrix_set_cost(matrix, r, step, cost);
             }
         }
     }
@@ -122,14 +122,14 @@ static double best_trans_cost(struct dp2 const* dp, struct dp2_matrix const* mat
         unsigned max_seq = MIN(dp2_states_max_seq(dp->states, source_state), row);
         for (unsigned len = min_seq; len <= max_seq; ++len) {
 
-            /* if (len == 0 && source_state > target_state) */
-            /*     continue; */
+            if (len == 0 && source_state > target_state)
+                continue;
 
             struct dp2_step step = {.state = source_state, .seq_len = len};
 
             unsigned const prev_row = row - len;
 
-            double v0 = dp2_matrix_get_cost(matrix, prev_row, &step);
+            double v0 = dp2_matrix_get_cost(matrix, prev_row, step);
             double v1 = dp2_trans_cost(dp->transition, target_state, i);
             double v = v0 + v1;
 
@@ -163,7 +163,7 @@ static double final_score2(struct dp2 const* dp, struct dp2_matrix const* matrix
          --len) {
 
         step.seq_len = len;
-        double s = dp2_matrix_get_cost(matrix, imm_seq_length(seq) - len, &step);
+        double s = dp2_matrix_get_cost(matrix, imm_seq_length(seq) - len, step);
         if (s > score) {
             score = s;
             end_step->state = end_state;

@@ -73,7 +73,7 @@ double dp_viterbi(struct dp const* dp, struct dp_matrix* matrix, struct imm_path
             for (unsigned len = begin; len <= end; ++len) {
                 struct dp_step const step = {cur, len};
                 unsigned const    col = column(matrix, &step);
-                struct cell*      cell = matrix_cell_get(matrix->cell, r, col);
+                struct cell*      cell = matrix_cell_get_ptr(matrix->cell, r, col);
                 double const score = best_trans_score(dp, matrix, cur, r, &cell->prev_step);
                 IMM_SUBSEQ(subseq, matrix->seq, r, len);
                 double v = imm_state_lprob(cur->state, imm_subseq_cast(&subseq));
@@ -187,7 +187,7 @@ static void viterbi_path(struct dp const* dp, struct dp_matrix const* matrix,
         imm_path_prepend(path, new_step);
         IMM_BUG(step->seq_len > row);
         row -= step->seq_len;
-        step = &matrix_cell_get_c(matrix->cell, row, column(matrix, step))->prev_step;
+        step = &matrix_cell_get_ptr_c(matrix->cell, row, column(matrix, step))->prev_step;
     }
 }
 

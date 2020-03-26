@@ -23,13 +23,20 @@
     }
 
 #define MAKE_MATRIX_GET(NAME, T)                                                              \
-    static inline T* NAME##_get(struct NAME const* matrix, unsigned r, unsigned c)            \
+    static inline T NAME##_get(struct NAME const* matrix, unsigned r, unsigned c)             \
+    {                                                                                         \
+        return matrix->data[r * matrix->ncols + c];                                           \
+    }
+
+#define MAKE_MATRIX_GET_PTR(NAME, T)                                                          \
+    static inline T* NAME##_get_ptr(struct NAME const* matrix, unsigned r, unsigned c)        \
     {                                                                                         \
         return matrix->data + (r * matrix->ncols + c);                                        \
     }
 
-#define MAKE_MATRIX_GET_C(NAME, T)                                                            \
-    static inline T const* NAME##_get_c(struct NAME const* matrix, unsigned r, unsigned c)    \
+#define MAKE_MATRIX_GET_PTR_C(NAME, T)                                                        \
+    static inline T const* NAME##_get_ptr_c(struct NAME const* matrix, unsigned r,            \
+                                            unsigned c)                                       \
     {                                                                                         \
         return matrix->data + (r * matrix->ncols + c);                                        \
     }

@@ -44,8 +44,8 @@ struct cell
 };
 MAKE_MATRIX_STRUCT(matrix_cell, struct cell)
 MAKE_MATRIX_CREATE(matrix_cell, struct cell)
-MAKE_MATRIX_GET(matrix_cell, struct cell)
-MAKE_MATRIX_GET_C(matrix_cell, struct cell)
+MAKE_MATRIX_GET_PTR(matrix_cell, struct cell)
+MAKE_MATRIX_GET_PTR_C(matrix_cell, struct cell)
 MAKE_MATRIX_DESTROY(matrix_cell)
 MAKE_MATRIX_NROWS(matrix_cell)
 MAKE_MATRIX_NCOLS(matrix_cell)
@@ -68,7 +68,7 @@ static inline unsigned column(struct dp_matrix const* dp_matrix, struct dp_step 
 static inline double get_score(struct dp_matrix const* dp_matrix, unsigned row,
                                struct dp_step const* step)
 {
-    return matrix_cell_get_c(dp_matrix->cell, row, column(dp_matrix, step))->score;
+    return matrix_cell_get_ptr_c(dp_matrix->cell, row, column(dp_matrix, step))->score;
 }
 
 struct dp_matrix* dp_matrix_new(struct dp const* dp);

@@ -25,23 +25,23 @@ struct dp2_matrix* dp2_matrix_new(struct dp2_states const* states);
 void               dp2_matrix_setup(struct dp2_matrix* dp_matrix, struct imm_seq const* seq);
 
 static inline double dp2_matrix_get_cost(struct dp2_matrix const* dp_matrix, unsigned row,
-                                         struct dp2_step const* step)
+                                         struct dp2_step step)
 {
-    unsigned col = (unsigned)(dp_matrix->state_col[step->state] + (int)step->seq_len);
-    return *matrixd_get_c(dp_matrix->cost, row, col);
+    unsigned col = (unsigned)(dp_matrix->state_col[step.state] + (int)step.seq_len);
+    return matrixd_get(dp_matrix->cost, row, col);
 }
 
 static inline void dp2_matrix_set_cost(struct dp2_matrix const* dp_matrix, unsigned row,
-                                       struct dp2_step const* step, double cost)
+                                       struct dp2_step step, double cost)
 {
-    unsigned col = (unsigned)(dp_matrix->state_col[step->state] + (int)step->seq_len);
-    *matrixd_get(dp_matrix->cost, row, col) = cost;
+    unsigned col = (unsigned)(dp_matrix->state_col[step.state] + (int)step.seq_len);
+    matrixd_set(dp_matrix->cost, row, col, cost);
 }
 
 static inline struct dp2_step* dp2_matrix_get_prev_step(struct dp2_matrix const* dp_matrix,
                                                         unsigned row, unsigned state)
 {
-    return step_matrix_get(dp_matrix->prev_step, row, state);
+    return step_matrix_get_ptr(dp_matrix->prev_step, row, state);
 }
 
 static inline struct imm_seq const* dp2_matrix_get_seq(struct dp2_matrix const* dp_matrix)

@@ -6,8 +6,8 @@
 
 MAKE_MATRIX_STRUCT(step_matrix, struct dp2_step)
 MAKE_MATRIX_CREATE(step_matrix, struct dp2_step)
-MAKE_MATRIX_GET(step_matrix, struct dp2_step)
-MAKE_MATRIX_GET_C(step_matrix, struct dp2_step)
+MAKE_MATRIX_GET_PTR(step_matrix, struct dp2_step)
+MAKE_MATRIX_GET_PTR_C(step_matrix, struct dp2_step)
 MAKE_MATRIX_DESTROY(step_matrix)
 MAKE_MATRIX_NROWS(step_matrix)
 MAKE_MATRIX_NCOLS(step_matrix)
