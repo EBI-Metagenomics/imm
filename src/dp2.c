@@ -74,12 +74,13 @@ double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
             unsigned const min_len = dp2_states_min_seq(dp->states, i);
             unsigned const max_len = MIN(dp2_states_max_seq(dp->states, i), seq_len);
 
+            struct dp2_step* prev_step = dp2_matrix_get_prev_step(matrix, r, i);
+            double const     score = best_trans_cost(dp, matrix, i, r, prev_step);
+
             for (unsigned len = min_len; len <= max_len; ++len) {
                 struct dp2_step const step = {.state = i, .seq_len = len};
                 /* TODO: I think we dont need to have a prev_step
                  * for each cell of the cost matrix*/
-                struct dp2_step* prev_step = dp2_matrix_get_prev_step(matrix, r, &step);
-                double const     score = best_trans_cost(dp, matrix, i, r, prev_step);
                 IMM_SUBSEQ(subseq, dp2_matrix_get_seq(matrix), r, len);
                 unsigned seq_code =
                     imm_seq_code_encode(dp->seq_code, min_len, imm_subseq_cast(&subseq));

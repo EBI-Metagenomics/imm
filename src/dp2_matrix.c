@@ -16,16 +16,16 @@ struct dp2_matrix* dp2_matrix_new(struct dp2_states const* states)
     }
 
     matrix->cost = matrixd_create(1, next_col);
-    matrix->prev_step = step_matrix_create(1, next_col);
+    matrix->prev_step = step_matrix_create(1, dp2_states_nstates(states));
 
     return matrix;
 }
 
 void dp2_matrix_setup(struct dp2_matrix* matrix, struct imm_seq const* seq)
 {
-    matrixd_resize(matrix->cost, imm_seq_length(seq) + 1, matrixd_ncols(matrix->cost));
-    step_matrix_resize(matrix->prev_step, imm_seq_length(seq) + 1,
-                       matrixd_ncols(matrix->cost));
+    unsigned seq_len = imm_seq_length(seq);
+    matrixd_resize(matrix->cost, seq_len + 1, matrixd_ncols(matrix->cost));
+    step_matrix_resize(matrix->prev_step, seq_len + 1, step_matrix_ncols(matrix->prev_step));
     matrix->seq = seq;
 }
 

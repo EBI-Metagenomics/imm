@@ -41,12 +41,9 @@ static inline void dp2_matrix_set_cost(struct dp2_matrix const* dp_matrix, unsig
 }
 
 static inline struct dp2_step* dp2_matrix_get_prev_step(struct dp2_matrix const* dp_matrix,
-                                                        unsigned                 row,
-                                                        struct dp2_step const*   step)
+                                                        unsigned row, unsigned state)
 {
-    unsigned min_seq = dp2_states_min_seq(dp_matrix->states, step->state);
-    unsigned col = dp_matrix->state_col[step->state] + step->seq_len - min_seq;
-    return step_matrix_get(dp_matrix->prev_step, row, col);
+    return step_matrix_get(dp_matrix->prev_step, row, state);
 }
 
 static inline struct imm_seq const* dp2_matrix_get_seq(struct dp2_matrix const* dp_matrix)
