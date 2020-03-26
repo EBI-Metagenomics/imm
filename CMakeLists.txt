@@ -29,6 +29,7 @@ add_library(imm
     src/dp2.c
     src/dp2_emission.c
     src/dp2_matrix.c
+    src/dp2_states.c
     src/dp2_trans.c
     src/dp_matrix.c
     src/hmm.c

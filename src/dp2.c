@@ -1,6 +1,7 @@
 #include "dp2.h"
 #include "dp2_emission.h"
 #include "dp2_matrix.h"
+#include "dp2_states.h"
 #include "dp2_step.h"
 #include "dp2_trans.h"
 #include "free.h"
@@ -36,11 +37,7 @@ struct dp2
     struct seq_code const*     seq_code;
     struct dp2_emission const* emission;
     struct dp2_trans const*    transition;
-    unsigned*                  min_seq;
-    unsigned*                  max_seq;
-    double*                    start_lprob;
-    unsigned                   nstates;
-    unsigned                   end_state;
+    struct dp2_states const*   states;
 };
 
 static unsigned min_seq(struct mstate const* const* mstates, unsigned nstates);
@@ -52,34 +49,17 @@ struct dp2 const* dp2_create(struct imm_abc const* abc, struct mstate const* con
     struct dp2* dp = malloc(sizeof(struct dp2));
     dp->seq_code =
         imm_seq_code_create(abc, min_seq(mstates, nstates), max_seq(mstates, nstates));
-    dp->nstates = nstates;
-
-    dp->min_seq = malloc(sizeof(unsigned) * nstates);
-    dp->max_seq = malloc(sizeof(unsigned) * nstates);
-    dp->start_lprob = malloc(sizeof(double) * nstates);
 
     struct state_idx* state_idx = state_idx_create();
-
-    for (unsigned i = 0; i < nstates; ++i) {
-        state_idx_add(state_idx, mstate_get_state(mstates[i]), i);
-        dp->min_seq[i] = imm_state_min_seq(mstate_get_state(mstates[i]));
-        dp->max_seq[i] = imm_state_max_seq(mstate_get_state(mstates[i]));
-        dp->start_lprob[i] = mstate_get_start(mstates[i]);
-    }
-
+    dp->states = dp2_states_create(mstates, nstates, end_state, state_idx);
     dp->emission = dp2_emission_create(dp->seq_code, mstates, nstates);
     dp->transition = dp2_trans_create(mstates, nstates, state_idx);
-    dp->end_state = state_idx_find(state_idx, end_state);
     state_idx_destroy(state_idx);
 
     return dp;
 }
 
-unsigned dp2_nstates(struct dp2 const* dp) { return dp->nstates; }
-
-unsigned dp2_state_min_seq(struct dp2 const* dp, unsigned state) { return dp->min_seq[state]; }
-
-unsigned dp2_state_max_seq(struct dp2 const* dp, unsigned state) { return dp->max_seq[state]; }
+struct dp2_states const* dp2_states(struct dp2 const* dp) { return dp->states; }
 
 double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
 {
@@ -89,10 +69,10 @@ double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
         IMM_BUG(imm_seq_length(seq) < r);
         unsigned const seq_len = imm_seq_length(seq) - r;
 
-        for (unsigned i = 0; i < dp->nstates; ++i) {
+        for (unsigned i = 0; i < dp2_states_nstates(dp->states); ++i) {
 
-            unsigned const min_len = dp->min_seq[i];
-            unsigned const max_len = MIN(dp->max_seq[i], seq_len);
+            unsigned const min_len = dp2_states_min_seq(dp->states, i);
+            unsigned const max_len = MIN(dp2_states_max_seq(dp->states, i), seq_len);
 
             for (unsigned len = min_len; len <= max_len; ++len) {
                 struct dp2_step const step = {.state = i, .seq_len = len};
@@ -106,14 +86,12 @@ double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
                 double v = dp2_emission_cost(dp->emission, i, seq_code);
                 double cost = score + v;
                 dp2_matrix_set_cost(matrix, r, &step, cost);
-                /* cell->score = score + imm_state_lprob(cur->state, imm_subseq_cast(&subseq));
-                 */
             }
         }
     }
 
     struct dp2_step end_step = {.state = UINT_MAX, .seq_len = UINT_MAX};
-    double fs = final_score2(dp, matrix, &end_step);
+    double          fs = final_score2(dp, matrix, &end_step);
     return fs;
 }
 
@@ -122,10 +100,7 @@ void dp2_destroy(struct dp2 const* dp)
     imm_seq_code_destroy(dp->seq_code);
     dp2_emission_destroy(dp->emission);
     dp2_trans_destroy(dp->transition);
-    imm_free(dp->min_seq);
-    imm_free(dp->max_seq);
-    imm_free(dp->start_lprob);
-    imm_free(dp);
+    dp2_states_destroy(dp->states);
 }
 
 static double best_trans_cost(struct dp2 const* dp, struct dp2_matrix const* matrix,
@@ -136,16 +111,16 @@ static double best_trans_cost(struct dp2 const* dp, struct dp2_matrix const* mat
     prev_step->seq_len = UINT_MAX;
 
     if (row == 0)
-        score = dp->start_lprob[target_state];
+        score = dp2_states_start_lprob(dp->states, target_state);
 
     for (unsigned i = 0; i < dp2_trans_ntrans(dp->transition, target_state); ++i) {
 
         unsigned source_state = dp2_trans_source_state(dp->transition, target_state, i);
-        if (row < dp->min_seq[source_state])
+        if (row < dp2_states_min_seq(dp->states, source_state))
             continue;
 
-        for (unsigned len = dp->min_seq[source_state];
-             len <= MIN(dp->max_seq[source_state], row); ++len) {
+        for (unsigned len = dp2_states_min_seq(dp->states, source_state);
+             len <= MIN(dp2_states_max_seq(dp->states, source_state), row); ++len) {
 
             if (len == 0 && source_state > target_state)
                 continue;
@@ -206,7 +181,7 @@ static double final_score2(struct dp2 const* dp, struct dp2_matrix const* matrix
                            struct dp2_step* end_step)
 {
     double   score = imm_lprob_zero();
-    unsigned end_state = dp->end_state;
+    unsigned end_state = dp2_states_end_state(dp->states);
 
     end_step->state = UINT_MAX;
     end_step->seq_len = UINT_MAX;
@@ -214,17 +189,18 @@ static double final_score2(struct dp2 const* dp, struct dp2_matrix const* matrix
 
     struct imm_seq const* seq = dp2_matrix_get_seq(matrix);
 
-    for (unsigned len = MIN(dp->max_seq[end_state], imm_seq_length(seq));; --len) {
+    for (unsigned len = MIN(dp2_states_max_seq(dp->states, end_state), imm_seq_length(seq));;
+         --len) {
 
         step.seq_len = len;
         double s = dp2_matrix_get_cost(matrix, imm_seq_length(seq) - len, &step);
         if (s > score) {
             score = s;
-            end_step->state = dp->end_state;
+            end_step->state = end_state;
             end_step->seq_len = len;
         }
 
-        if (dp->min_seq[end_state] == len)
+        if (dp2_states_min_seq(dp->states, end_state) == len)
             break;
     }
     if (end_step->state == UINT_MAX)
