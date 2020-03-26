@@ -79,8 +79,6 @@ double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
 
             for (unsigned len = min_len; len <= max_len; ++len) {
                 struct dp2_step const step = {.state = i, .seq_len = len};
-                /* TODO: I think we dont need to have a prev_step
-                 * for each cell of the cost matrix*/
                 IMM_SUBSEQ(subseq, dp2_matrix_get_seq(matrix), r, len);
                 unsigned seq_code =
                     imm_seq_code_encode(dp->seq_code, min_len, imm_subseq_cast(&subseq));
@@ -120,15 +118,15 @@ static double best_trans_cost(struct dp2 const* dp, struct dp2_matrix const* mat
         if (row < dp2_states_min_seq(dp->states, source_state))
             continue;
 
-        for (unsigned len = dp2_states_min_seq(dp->states, source_state);
-             len <= MIN(dp2_states_max_seq(dp->states, source_state), row); ++len) {
+        unsigned min_seq = dp2_states_min_seq(dp->states, source_state);
+        unsigned max_seq = MIN(dp2_states_max_seq(dp->states, source_state), row);
+        for (unsigned len = min_seq; len <= max_seq; ++len) {
 
-            if (len == 0 && source_state > target_state)
-                continue;
+            /* if (len == 0 && source_state > target_state) */
+            /*     continue; */
 
             struct dp2_step step = {.state = source_state, .seq_len = len};
 
-            IMM_BUG(row < len);
             unsigned const prev_row = row - len;
 
             double v0 = dp2_matrix_get_cost(matrix, prev_row, &step);
@@ -143,35 +141,6 @@ static double best_trans_cost(struct dp2 const* dp, struct dp2_matrix const* mat
         }
     }
 
-#if 0
-    struct array_trans const* incoming = &dst_state->incoming_transitions;
-
-    for (unsigned i = 0; i < array_trans_length(incoming); ++i) {
-
-        struct trans const*      trans = array_trans_get_c(incoming, i);
-        struct state_info const* prev = trans->src_state;
-        if (row < prev->min_seq)
-            continue;
-
-        struct step tmp_step = {.state = prev};
-        for (unsigned len = prev->min_seq; len <= MIN(prev->max_seq, row); ++len) {
-
-            if (len == 0 && prev->idx > dst_state->idx)
-                continue;
-
-            tmp_step.seq_len = len;
-            IMM_BUG(row < len);
-            unsigned const prev_row = row - len;
-            double const   v = get_score(matrix, prev_row, &tmp_step) + trans->lprob;
-            if (v > score) {
-                score = v;
-                prev_step->state = prev;
-                prev_step->seq_len = len;
-            }
-        }
-    }
-
-#endif
     if (row > 0 && prev_step->state == UINT_MAX)
         return imm_lprob_invalid();
 

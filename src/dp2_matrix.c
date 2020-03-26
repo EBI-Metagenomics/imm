@@ -1,4 +1,5 @@
 #include "dp2_matrix.h"
+#include "imath.h"
 #include "imm/seq.h"
 
 struct dp2_matrix* dp2_matrix_new(struct dp2_states const* states)
@@ -7,11 +8,11 @@ struct dp2_matrix* dp2_matrix_new(struct dp2_states const* states)
 
     matrix->states = states;
     matrix->seq = NULL;
-    matrix->state_col = malloc(sizeof(unsigned) * dp2_states_nstates(states));
+    matrix->state_col = malloc(sizeof(int) * dp2_states_nstates(states));
 
     unsigned next_col = 0;
     for (unsigned i = 0; i < dp2_states_nstates(states); ++i) {
-        matrix->state_col[i] = next_col;
+        matrix->state_col[i] = panic_sub_ui(next_col, dp2_states_min_seq(states, i));
         next_col += dp2_states_max_seq(states, i) - dp2_states_min_seq(states, i) + 1;
     }
 

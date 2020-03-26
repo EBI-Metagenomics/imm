@@ -257,9 +257,9 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
                 {
                     struct imm_path* path = imm_path_create();
 
-                    /* struct dp_matrix*  matrix = matrices[thread_id()]; */
-                    /* dp_matrix_set(matrix, imm_subseq_cast(&subseq)); */
-                    /* dp_viterbi(dp, matrix, path); */
+                    struct dp_matrix*  matrix = matrices[thread_id()];
+                    dp_matrix_set(matrix, imm_subseq_cast(&subseq));
+                    dp_viterbi(dp, matrix, path);
 
                     struct dp2_matrix* matrix2 = matrices2[thread_id()];
                     dp2_matrix_setup(matrix2, imm_subseq_cast(&subseq));
