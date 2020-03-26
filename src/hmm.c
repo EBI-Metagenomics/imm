@@ -2,8 +2,8 @@
 #include "imm/hmm.h"
 #include "dp.h"
 #include "dp2.h"
-#include "dp_matrix.h"
 #include "dp2_matrix.h"
+#include "dp_matrix.h"
 #include "free.h"
 #include "imm/bug.h"
 #include "imm/lprob.h"
@@ -222,7 +222,7 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
     /* struct elapsed* elapsed = elapsed_create(); */
 
     /* elapsed_start(elapsed); */
-    struct dp const*  dp = hmm_create_dp(hmm, seq, end_state);
+    struct dp const* dp = hmm_create_dp(hmm, seq, end_state);
     /* fprintf(stderr, "hmm_create_dp: %f seconds\n", elapsed_end(elapsed)); */
     if (!dp)
         return NULL;
@@ -236,7 +236,7 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
     unsigned const      nwindows = imm_window_size(window);
     struct imm_results* results = imm_results_create(seq, nwindows);
     struct dp_matrix**  matrices = NULL;
-    struct dp2_matrix**  matrices2 = NULL;
+    struct dp2_matrix** matrices2 = NULL;
     /* fprintf(stderr, "window init  : %f seconds\n", elapsed_end(elapsed)); */
 
     /* struct elapsed* elapsed1 = elapsed_create(); */
@@ -255,14 +255,15 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
                 struct imm_subseq subseq = imm_window_next(window);
                 _Pragma("omp task firstprivate(subseq, i)")
                 {
-                    struct dp_matrix* matrix = matrices[thread_id()];
+                    struct dp_matrix*  matrix = matrices[thread_id()];
                     struct dp2_matrix* matrix2 = matrices2[thread_id()];
                     dp_matrix_set(matrix, imm_subseq_cast(&subseq));
                     dp2_matrix_setup(matrix2, imm_subseq_cast(&subseq));
                     struct imm_path* path = imm_path_create();
                     /* elapsed_start(elapsed1); */
-                    double score = dp_viterbi(dp, matrix, path);
-                    double score2 = dp2_viterbi(dp2, matrix2);
+                    dp_viterbi(dp, matrix, path);
+                    /* double score = dp_viterbi(dp, matrix, path); */
+                    double score = dp2_viterbi(dp2, matrix2);
                     /* fprintf(stderr, "dp_viterbi   : %f seconds\n", elapsed_end(elapsed1));
                      */
                     imm_results_set(results, i, subseq, path, score);
@@ -452,7 +453,7 @@ static struct dp2 const* hmm_create_dp2(struct imm_hmm const* hmm, struct imm_se
     }
     unsigned nstates = mstate_table_size(hmm->table);
 
-    struct dp2 const* dp = dp2_create(hmm->abc, mstates, nstates);
+    struct dp2 const* dp = dp2_create(hmm->abc, mstates, nstates, end_state);
     imm_free(mstates);
     return dp;
 }

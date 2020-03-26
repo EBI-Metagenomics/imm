@@ -21,9 +21,9 @@
 
 static double best_trans_cost(struct dp2 const* dp, struct dp2_matrix const* matrix,
                               unsigned target_state, unsigned row, struct dp2_step* prev_step);
+static double final_score2(struct dp2 const* dp, struct dp2_matrix const* matrix,
+                           struct dp2_step* end_step);
 #if 0
-static double final_score(struct dp const* dp, struct dp_matrix const* matrix,
-                          struct step* end_step);
 static void   viterbi_path(struct dp const* dp, struct dp_matrix const* matrix,
                            struct imm_path* path, struct step const* end_step);
 
@@ -40,13 +40,14 @@ struct dp2
     unsigned*                  max_seq;
     double*                    start_lprob;
     unsigned                   nstates;
+    unsigned                   end_state;
 };
 
 static unsigned min_seq(struct mstate const* const* mstates, unsigned nstates);
 static unsigned max_seq(struct mstate const* const* mstates, unsigned nstates);
 
 struct dp2 const* dp2_create(struct imm_abc const* abc, struct mstate const* const* mstates,
-                             unsigned const nstates)
+                             unsigned const nstates, struct imm_state const* end_state)
 {
     struct dp2* dp = malloc(sizeof(struct dp2));
     dp->seq_code =
@@ -68,7 +69,7 @@ struct dp2 const* dp2_create(struct imm_abc const* abc, struct mstate const* con
 
     dp->emission = dp2_emission_create(dp->seq_code, mstates, nstates);
     dp->transition = dp2_trans_create(mstates, nstates, state_idx);
-
+    dp->end_state = state_idx_find(state_idx, end_state);
     state_idx_destroy(state_idx);
 
     return dp;
@@ -97,8 +98,8 @@ double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
                 struct dp2_step const step = {.state = i, .seq_len = len};
                 /* TODO: I think we dont need to have a prev_step
                  * for each cell of the cost matrix*/
-                struct dp2_step*      prev_step = dp2_matrix_get_prev_step(matrix, r, &step);
-                double const          score = best_trans_cost(dp, matrix, i, r, prev_step);
+                struct dp2_step* prev_step = dp2_matrix_get_prev_step(matrix, r, &step);
+                double const     score = best_trans_cost(dp, matrix, i, r, prev_step);
                 IMM_SUBSEQ(subseq, dp2_matrix_get_seq(matrix), r, len);
                 unsigned seq_code =
                     imm_seq_code_encode(dp->seq_code, min_len, imm_subseq_cast(&subseq));
@@ -111,11 +112,9 @@ double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
         }
     }
 
-    /* struct step end_step = {.state = NULL, .seq_len = UINT_MAX}; */
-    /* double      score = final_score(dp, matrix, &end_step); */
-
-    /* return score; */
-    return 0.0;
+    struct dp2_step end_step = {.state = UINT_MAX, .seq_len = UINT_MAX};
+    double fs = final_score2(dp, matrix, &end_step);
+    return fs;
 }
 
 void dp2_destroy(struct dp2 const* dp)
@@ -203,35 +202,38 @@ static double best_trans_cost(struct dp2 const* dp, struct dp2_matrix const* mat
     return score;
 }
 
-#if 0
-static double final_score(struct dp const* dp, struct dp_matrix const* matrix,
-                          struct step* end_step)
+static double final_score2(struct dp2 const* dp, struct dp2_matrix const* matrix,
+                           struct dp2_step* end_step)
 {
-    double                   score = imm_lprob_zero();
-    struct state_info const* end_state = dp->end_state;
+    double   score = imm_lprob_zero();
+    unsigned end_state = dp->end_state;
 
-    end_step->state = NULL;
+    end_step->state = UINT_MAX;
     end_step->seq_len = UINT_MAX;
-    struct step step = {.state = end_state};
+    struct dp2_step step = {.state = end_state};
 
-    for (unsigned len = MIN(end_state->max_seq, imm_seq_length(matrix->seq));; --len) {
+    struct imm_seq const* seq = dp2_matrix_get_seq(matrix);
+
+    for (unsigned len = MIN(dp->max_seq[end_state], imm_seq_length(seq));; --len) {
 
         step.seq_len = len;
-        double s = get_score(matrix, imm_seq_length(matrix->seq) - len, &step);
+        double s = dp2_matrix_get_cost(matrix, imm_seq_length(seq) - len, &step);
         if (s > score) {
             score = s;
             end_step->state = dp->end_state;
             end_step->seq_len = len;
         }
 
-        if (end_state->min_seq == len)
+        if (dp->min_seq[end_state] == len)
             break;
     }
-    if (!end_step->state)
+    if (end_step->state == UINT_MAX)
         return imm_lprob_invalid();
+
     return score;
 }
 
+#if 0
 static void viterbi_path(struct dp const* dp, struct dp_matrix const* matrix,
                          struct imm_path* path, struct step const* end_step)
 {

@@ -65,7 +65,6 @@ generate_export_header(imm BASE_NAME IMM
     EXPORT_FILE_NAME ${CMAKE_CURRENT_BINARY_DIR}/imm/export.h)
 
 add_library(warning INTERFACE)
-add_library(IMM::warning ALIAS warning)
 target_compile_options(warning INTERFACE
     $<$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>:/W3>
     $<$<NOT:$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>>:-Wall -Wextra -pedantic
@@ -90,7 +89,7 @@ target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPREC
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:__extension__>)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${OpenMP_C_FOUND}>:OPENMP>)
 target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
-target_link_libraries(imm PRIVATE IMM::warning)
+target_link_libraries(imm PRIVATE warning)
 
 include(CheckCSourceCompiles)
 check_c_source_compiles(

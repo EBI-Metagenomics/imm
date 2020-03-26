@@ -143,6 +143,7 @@ static double best_trans_score(struct dp const* dp, struct dp_matrix const* matr
 
     if (row > 0 && !prev_step->state)
         return imm_lprob_invalid();
+
     return score;
 }
 
