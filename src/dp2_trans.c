@@ -7,7 +7,6 @@
 #include "mtrans_table.h"
 #include "state_idx.h"
 #include <stdlib.h>
-#include <string.h>
 
 struct incoming_trans
 {
@@ -83,6 +82,7 @@ static unsigned create_incoming_transitions(struct list_head*           incoming
                 continue;
             struct mtrans const* mtrans = mtrans_table_get(table, iter);
             double               lprob = mtrans_get_lprob(mtrans);
+            
             if (imm_lprob_is_zero(lprob))
                 continue;
 

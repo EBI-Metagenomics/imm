@@ -260,8 +260,8 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
                     dp_matrix_set(matrix, imm_subseq_cast(&subseq));
                     dp2_matrix_setup(matrix2, imm_subseq_cast(&subseq));
                     struct imm_path* path = imm_path_create();
-                    elapsed_start(elapsed1);
                     dp_viterbi(dp, matrix, path);
+                    elapsed_start(elapsed1);
                     /* double score = dp_viterbi(dp, matrix, path); */
                     double score = dp2_viterbi(dp2, matrix2);
                     fprintf(stderr, "dp_viterbi   : %f seconds\n", elapsed_end(elapsed1));

@@ -5,16 +5,6 @@ struct dp2_emission;
 struct seq_code;
 struct mstate;
 
-/**
- * States are unsigned integers: 0, 1, ..., nstates-1.
- * Sequence code is an unsigned integer assigned to a particular sequence.
- * This assignment differs from state to state according to the size of
- * smallest sequence it can emit. Let min_seq(j) be that size for state j,
- * and let SC() be the sequence code function.
- * cost[offset[i] + SC(seq, min_seq(j))] will give the emission cost for
- * sequence seq.
- *
- */
 struct dp2_emission
 {
     double*   cost;   /**< Sequence emission cost of a state. */
