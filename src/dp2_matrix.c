@@ -52,8 +52,16 @@ double dp2_matrix_get_cost(struct dp2_matrix const* dp_matrix, unsigned row,
     return *matrixd_get_c(dp_matrix->cost, row, col);
 }
 
+void dp2_matrix_set_cost(struct dp2_matrix const* dp_matrix, unsigned row,
+                         struct dp2_step const* step, double cost)
+{
+    unsigned min_seq = dp2_state_min_seq(dp_matrix->dp, step->state);
+    unsigned col = dp_matrix->state_col[step->state] + step->seq_len - min_seq;
+    *matrixd_get(dp_matrix->cost, row, col) = cost;
+}
+
 struct dp2_step* dp2_matrix_get_prev_step(struct dp2_matrix const* dp_matrix, unsigned row,
-                                      struct dp2_step const* step)
+                                          struct dp2_step const* step)
 {
     unsigned min_seq = dp2_state_min_seq(dp_matrix->dp, step->state);
     unsigned col = dp_matrix->state_col[step->state] + step->seq_len - min_seq;

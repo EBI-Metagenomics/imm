@@ -20,8 +20,7 @@
 #include <string.h>
 
 static double best_trans_cost(struct dp2 const* dp, struct dp2_matrix const* matrix,
-                               unsigned target_state, unsigned row,
-                               struct dp2_step* prev_step);
+                              unsigned target_state, unsigned row, struct dp2_step* prev_step);
 #if 0
 static double final_score(struct dp const* dp, struct dp_matrix const* matrix,
                           struct step* end_step);
@@ -91,16 +90,21 @@ double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
 
         for (unsigned i = 0; i < dp->nstates; ++i) {
 
-            unsigned const begin = dp->min_seq[i];
-            unsigned const end = MIN(dp->max_seq[i], seq_len);
+            unsigned const min_len = dp->min_seq[i];
+            unsigned const max_len = MIN(dp->max_seq[i], seq_len);
 
-            for (unsigned len = begin; len <= end; ++len) {
-                struct dp2_step const step = {i, len};
-                /* unsigned const    col = column(matrix, &step); */
-                /* struct cell*      cell = matrix_cell_get(matrix->cell, r, col); */
-                struct dp2_step* prev_step = dp2_matrix_get_prev_step(matrix, r, &step);
-                double const     score = best_trans_cost(dp, matrix, i, r, prev_step);
-                /* IMM_SUBSEQ(subseq, matrix->seq, r, len); */
+            for (unsigned len = min_len; len <= max_len; ++len) {
+                struct dp2_step const step = {.state = i, .seq_len = len};
+                /* TODO: I think we dont need to have a prev_step
+                 * for each cell of the cost matrix*/
+                struct dp2_step*      prev_step = dp2_matrix_get_prev_step(matrix, r, &step);
+                double const          score = best_trans_cost(dp, matrix, i, r, prev_step);
+                IMM_SUBSEQ(subseq, dp2_matrix_get_seq(matrix), r, len);
+                unsigned seq_code =
+                    imm_seq_code_encode(dp->seq_code, min_len, imm_subseq_cast(&subseq));
+                double v = dp2_emission_cost(dp->emission, i, seq_code);
+                double cost = score + v;
+                dp2_matrix_set_cost(matrix, r, &step, cost);
                 /* cell->score = score + imm_state_lprob(cur->state, imm_subseq_cast(&subseq));
                  */
             }
@@ -126,7 +130,7 @@ void dp2_destroy(struct dp2 const* dp)
 }
 
 static double best_trans_cost(struct dp2 const* dp, struct dp2_matrix const* matrix,
-                               unsigned target_state, unsigned row, struct dp2_step* prev_step)
+                              unsigned target_state, unsigned row, struct dp2_step* prev_step)
 {
     double score = imm_lprob_zero();
     prev_step->state = UINT_MAX;
@@ -136,7 +140,6 @@ static double best_trans_cost(struct dp2 const* dp, struct dp2_matrix const* mat
         score = dp->start_lprob[target_state];
 
     for (unsigned i = 0; i < dp2_trans_ntrans(dp->transition, target_state); ++i) {
-
 
         unsigned source_state = dp2_trans_source_state(dp->transition, target_state, i);
         if (row < dp->min_seq[source_state])
@@ -148,7 +151,7 @@ static double best_trans_cost(struct dp2 const* dp, struct dp2_matrix const* mat
             if (len == 0 && source_state > target_state)
                 continue;
 
-            struct dp2_step step = {.state=source_state, .seq_len=len};
+            struct dp2_step step = {.state = source_state, .seq_len = len};
 
             IMM_BUG(row < len);
             unsigned const prev_row = row - len;

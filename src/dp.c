@@ -76,7 +76,8 @@ double dp_viterbi(struct dp const* dp, struct dp_matrix* matrix, struct imm_path
                 struct cell*      cell = matrix_cell_get(matrix->cell, r, col);
                 double const score = best_trans_score(dp, matrix, cur, r, &cell->prev_step);
                 IMM_SUBSEQ(subseq, matrix->seq, r, len);
-                cell->score = score + imm_state_lprob(cur->state, imm_subseq_cast(&subseq));
+                double v = imm_state_lprob(cur->state, imm_subseq_cast(&subseq));
+                cell->score = score + v;
             }
         }
     }
