@@ -59,10 +59,6 @@ struct seq_code const* imm_seq_code_create(struct imm_abc const* abc, unsigned m
 unsigned imm_seq_code_encode(struct seq_code const* seq_code, unsigned min_seq,
                              struct imm_seq const* seq)
 {
-    IMM_BUG(seq_code->abc != imm_seq_get_abc(seq));
-    IMM_BUG(seq_code->min_seq > min_seq);
-    IMM_BUG(seq_code->max_seq < min_seq);
-
     unsigned code = seq_code->offset[imm_seq_length(seq) - seq_code->min_seq];
     for (unsigned i = 0; i < imm_seq_length(seq); ++i) {
 

@@ -66,19 +66,18 @@ double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
     struct imm_seq const* seq = dp2_matrix_get_seq(matrix);
 
     for (unsigned r = 0; r <= imm_seq_length(seq); ++r) {
-        IMM_BUG(imm_seq_length(seq) < r);
-        unsigned const seq_len = imm_seq_length(seq) - r;
+        unsigned seq_len = imm_seq_length(seq) - r;
 
         for (unsigned i = 0; i < dp2_states_nstates(dp->states); ++i) {
 
-            unsigned const min_len = dp2_states_min_seq(dp->states, i);
-            unsigned const max_len = MIN(dp2_states_max_seq(dp->states, i), seq_len);
+            unsigned min_len = dp2_states_min_seq(dp->states, i);
+            unsigned max_len = MIN(dp2_states_max_seq(dp->states, i), seq_len);
 
             struct dp2_step* prev_step = dp2_matrix_get_prev_step(matrix, r, i);
             double const     score = best_trans_cost(dp, matrix, i, r, prev_step);
 
             for (unsigned len = min_len; len <= max_len; ++len) {
-                struct dp2_step const step = {.state = i, .seq_len = len};
+                struct dp2_step step = {.state = i, .seq_len = len};
                 IMM_SUBSEQ(subseq, dp2_matrix_get_seq(matrix), r, len);
                 unsigned seq_code =
                     imm_seq_code_encode(dp->seq_code, min_len, imm_subseq_cast(&subseq));
