@@ -10,7 +10,7 @@
 #include "imm/path.h"
 #include "imm/report.h"
 #include "imm/results.h"
-#include "imm/seq_code.h"
+#include "seq_code.h"
 #include "imm/state.h"
 #include "imm/step.h"
 #include "imm/subseq.h"

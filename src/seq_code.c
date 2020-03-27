@@ -1,4 +1,4 @@
-#include "imm/seq_code.h"
+#include "seq_code.h"
 #include "eseq.h"
 #include "free.h"
 #include "imm/abc.h"
@@ -20,7 +20,7 @@ struct seq_code
     struct imm_abc const* abc;
 };
 
-struct seq_code const* imm_seq_code_create(struct imm_abc const* abc, unsigned min_seq,
+struct seq_code const* seq_code_create(struct imm_abc const* abc, unsigned min_seq,
                                            unsigned max_seq)
 {
     IMM_BUG(min_seq > max_seq);
@@ -59,7 +59,7 @@ struct seq_code const* imm_seq_code_create(struct imm_abc const* abc, unsigned m
     return seq_code;
 }
 
-unsigned imm_seq_code_encode(struct seq_code const* seq_code, unsigned min_seq,
+unsigned seq_code_encode(struct seq_code const* seq_code, unsigned min_seq,
                              struct imm_seq const* seq)
 {
     unsigned code = seq_code->offset[imm_seq_length(seq) - seq_code->min_seq];
@@ -73,7 +73,7 @@ unsigned imm_seq_code_encode(struct seq_code const* seq_code, unsigned min_seq,
     return code - seq_code->offset[min_seq - seq_code->min_seq];
 }
 
-struct eseq const* imm_seq_eseq(struct seq_code const* seq_code, struct imm_seq const* seq)
+struct eseq const* seq_eseq(struct seq_code const* seq_code, struct imm_seq const* seq)
 {
     struct eseq* eseq = malloc(sizeof(struct eseq));
     eseq->seq_code = seq_code;
@@ -90,7 +90,7 @@ struct eseq const* imm_seq_eseq(struct seq_code const* seq_code, struct imm_seq 
 
             IMM_SUBSEQ(subseq, seq, i, length);
             unsigned min_seq = seq_code->min_seq;
-            unsigned code = imm_seq_code_encode(seq_code, min_seq, imm_subseq_cast(&subseq));
+            unsigned code = seq_code_encode(seq_code, min_seq, imm_subseq_cast(&subseq));
 
             matrixu_set(eseq->code, i, j, code);
         }
@@ -98,21 +98,21 @@ struct eseq const* imm_seq_eseq(struct seq_code const* seq_code, struct imm_seq 
     return eseq;
 }
 
-unsigned imm_seq_code_size(struct seq_code const* seq_code, unsigned min_seq)
+unsigned seq_code_size(struct seq_code const* seq_code, unsigned min_seq)
 {
     return seq_code->size - seq_code->offset[min_seq - seq_code->min_seq];
 }
 
-unsigned imm_seq_code_min_seq(struct seq_code const* seq_code) { return seq_code->min_seq; }
+unsigned seq_code_min_seq(struct seq_code const* seq_code) { return seq_code->min_seq; }
 
-unsigned imm_seq_code_max_seq(struct seq_code const* seq_code) { return seq_code->max_seq; }
+unsigned seq_code_max_seq(struct seq_code const* seq_code) { return seq_code->max_seq; }
 
-struct imm_abc const* imm_seq_code_abc(struct seq_code const* seq_code)
+struct imm_abc const* seq_code_abc(struct seq_code const* seq_code)
 {
     return seq_code->abc;
 }
 
-void imm_seq_code_destroy(struct seq_code const* seq_code)
+void seq_code_destroy(struct seq_code const* seq_code)
 {
     imm_free(seq_code->offset);
     imm_free(seq_code->stride);

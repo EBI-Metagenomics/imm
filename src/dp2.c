@@ -8,7 +8,6 @@
 #include "imm/lprob.h"
 #include "imm/path.h"
 #include "imm/report.h"
-#include "imm/seq_code.h"
 #include "imm/state.h"
 #include "imm/step.h"
 #include "imm/subseq.h"
@@ -16,6 +15,7 @@
 #include "mstate.h"
 #include "mtrans.h"
 #include "mtrans_table.h"
+#include "seq_code.h"
 #include "state_idx.h"
 #include <limits.h>
 #include <string.h>
@@ -47,8 +47,7 @@ struct dp2 const* dp2_create(struct imm_abc const* abc, struct mstate const* con
                              unsigned const nstates, struct imm_state const* end_state)
 {
     struct dp2* dp = malloc(sizeof(struct dp2));
-    dp->seq_code =
-        imm_seq_code_create(abc, min_seq(mstates, nstates), max_seq(mstates, nstates));
+    dp->seq_code = seq_code_create(abc, min_seq(mstates, nstates), max_seq(mstates, nstates));
 
     struct state_idx* state_idx = state_idx_create();
     dp->states = dp2_states_create(mstates, nstates, end_state, state_idx);
@@ -85,7 +84,7 @@ double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
 
                 IMM_SUBSEQ(subseq, seq, r, len);
                 unsigned seq_code =
-                    imm_seq_code_encode(dp->seq_code, min_len, imm_subseq_cast(&subseq));
+                    seq_code_encode(dp->seq_code, min_len, imm_subseq_cast(&subseq));
 
                 /* unsigned seq_code2 = matrixu_get(eseq->code, r, len - smallest_min_seq); */
 
@@ -103,7 +102,7 @@ double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
 
 void dp2_destroy(struct dp2 const* dp)
 {
-    imm_seq_code_destroy(dp->seq_code);
+    seq_code_destroy(dp->seq_code);
     dp2_emission_destroy(dp->emission);
     dp2_trans_destroy(dp->transition);
     dp2_states_destroy(dp->states);

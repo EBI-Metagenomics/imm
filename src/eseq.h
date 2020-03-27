@@ -1,7 +1,7 @@
 #ifndef IMM_ESEQ_H
 #define IMM_ESEQ_H
 
-#include "imm/seq_code.h"
+#include "seq_code.h"
 #include "matrixu.h"
 
 struct eseq
