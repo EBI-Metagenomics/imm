@@ -77,7 +77,8 @@ unsigned seq_code_offset(struct seq_code const* seq_code, unsigned min_seq)
     return seq_code->offset[min_seq - seq_code->min_seq];
 }
 
-struct eseq const* seq_eseq(struct seq_code const* seq_code, struct imm_seq const* seq)
+struct eseq const* seq_code_create_eseq(struct seq_code const* seq_code,
+                                        struct imm_seq const*  seq)
 {
     struct eseq* eseq = malloc(sizeof(struct eseq));
     eseq->seq_code = seq_code;
@@ -89,7 +90,7 @@ struct eseq const* seq_eseq(struct seq_code const* seq_code, struct imm_seq cons
         for (unsigned j = 0; j < ncols; ++j) {
 
             unsigned length = seq_code->min_seq + j;
-            if (i + length >= imm_seq_length(seq))
+            if (i + length > imm_seq_length(seq))
                 continue;
 
             IMM_SUBSEQ(subseq, seq, i, length);
