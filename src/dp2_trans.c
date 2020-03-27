@@ -82,7 +82,7 @@ static unsigned create_incoming_transitions(struct list_head*           incoming
                 continue;
             struct mtrans const* mtrans = mtrans_table_get(table, iter);
             double               lprob = mtrans_get_lprob(mtrans);
-            
+
             if (imm_lprob_is_zero(lprob))
                 continue;
 

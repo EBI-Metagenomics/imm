@@ -5,13 +5,13 @@
 #include "dp2_step.h"
 #include "dp2_trans.h"
 #include "free.h"
+#include "imm/bug.h"
 #include "imm/lprob.h"
 #include "imm/path.h"
 #include "imm/report.h"
 #include "imm/state.h"
 #include "imm/step.h"
 #include "imm/subseq.h"
-#include "imm/bug.h"
 #include "min.h"
 #include "mstate.h"
 #include "mtrans.h"
@@ -25,13 +25,6 @@ static double best_trans_cost(struct dp2 const* dp, struct dp2_matrix const* mat
                               unsigned target_state, unsigned row, struct dp2_step* prev_step);
 static double final_score2(struct dp2 const* dp, struct dp2_matrix const* matrix,
                            struct dp2_step* end_step);
-#if 0
-static void   viterbi_path(struct dp const* dp, struct dp_matrix const* matrix,
-                           struct imm_path* path, struct step const* end_step);
-
-static void create_reversed_trans(struct state_info* states, struct mstate const* const* mstates,
-                         unsigned nstates, struct state_idx* state_idx);
-#endif
 
 struct dp2
 {
@@ -186,24 +179,6 @@ static double final_score2(struct dp2 const* dp, struct dp2_matrix const* matrix
 
     return score;
 }
-
-#if 0
-static void viterbi_path(struct dp const* dp, struct dp_matrix const* matrix,
-                         struct imm_path* path, struct step const* end_step)
-{
-    unsigned           row = imm_seq_length(matrix->seq);
-    struct step const* step = end_step;
-
-    while (step->seq_len != UINT_MAX) {
-        struct imm_step* new_step = imm_step_create(step->state->state, step->seq_len);
-        IMM_BUG(new_step == NULL);
-        imm_path_prepend(path, new_step);
-        IMM_BUG(step->seq_len > row);
-        row -= step->seq_len;
-        step = &matrix_cell_get_c(matrix->cell, row, column(matrix, step))->prev_step;
-    }
-}
-#endif
 
 static unsigned min_seq(struct mstate const* const* mstates, unsigned nstates)
 {

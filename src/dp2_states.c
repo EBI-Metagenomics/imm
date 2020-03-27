@@ -1,8 +1,8 @@
 #include "dp2_states.h"
+#include "free.h"
 #include "imm/state.h"
 #include "mstate.h"
 #include "state_idx.h"
-#include "free.h"
 #include <stdlib.h>
 
 struct dp2_states const* dp2_states_create(struct mstate const* const* mstates,
