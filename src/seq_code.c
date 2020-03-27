@@ -1,9 +1,12 @@
 #include "imm/seq_code.h"
+#include "eseq.h"
 #include "free.h"
 #include "imm/abc.h"
 #include "imm/bug.h"
 #include "imm/seq.h"
+#include "imm/subseq.h"
 #include "ipow.h"
+#include "matrixu.h"
 #include <limits.h>
 #include <stdlib.h>
 
@@ -68,6 +71,30 @@ unsigned imm_seq_code_encode(struct seq_code const* seq_code, unsigned min_seq,
     }
 
     return code - seq_code->offset[min_seq - seq_code->min_seq];
+}
+
+void imm_seq_eseq(struct seq_code const* seq_code, struct imm_seq const* seq)
+{
+    struct eseq* eseq = malloc(sizeof(struct eseq));
+    eseq->seq_code = seq_code;
+    unsigned     ncols = seq_code->max_seq - seq_code->min_seq + 1;
+    eseq->code = matrixu_create(imm_seq_length(seq), ncols);
+
+    for (unsigned i = 0; i < imm_seq_length(seq); ++i) {
+
+        for (unsigned j = 0; j < ncols; ++j) {
+
+            unsigned length = seq_code->min_seq + j;
+            if (i + length >= imm_seq_length(seq))
+                continue;
+
+            IMM_SUBSEQ(subseq, seq, i, length);
+            unsigned min_seq = seq_code->min_seq;
+            unsigned code = imm_seq_code_encode(seq_code, min_seq, imm_subseq_cast(&subseq));
+
+            matrixu_set(eseq->code, i, j, code);
+        }
+    }
 }
 
 unsigned imm_seq_code_size(struct seq_code const* seq_code, unsigned min_seq)

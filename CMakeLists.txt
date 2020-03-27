@@ -32,6 +32,7 @@ add_library(imm
     src/dp2_states.c
     src/dp2_trans.c
     src/dp_matrix.c
+    src/eseq.c
     src/hmm.c
     src/ipow.c
     src/mstate.c
