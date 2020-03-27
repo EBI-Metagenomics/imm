@@ -13,7 +13,7 @@ struct imm_abc const* imm_abc_create(char const* symbols, char const any_symbol)
     abc->any_symbol = any_symbol;
 
     for (size_t i = 0; i < IMM_SYMBOL_IDX_SIZE; ++i)
-        abc->symbol_idx[i] = -1;
+        abc->symbol_idx[i] = IMM_ABC_INVALID_IDX;
 
     if (strlen(symbols) > IMM_SYMBOL_IDX_SIZE) {
         imm_error("alphabet size cannot be larger than %zu", IMM_SYMBOL_IDX_SIZE);
@@ -37,12 +37,12 @@ struct imm_abc const* imm_abc_create(char const* symbols, char const any_symbol)
         }
 
         size_t j = __imm_abc_index(symbols[i]);
-        if (abc->symbol_idx[j] != -1) {
+        if (abc->symbol_idx[j] != IMM_ABC_INVALID_IDX) {
             imm_error("alphabet cannot have duplicated symbols");
             imm_free(abc);
             return NULL;
         }
-        abc->symbol_idx[j] = (int)i;
+        abc->symbol_idx[j] = i;
     }
     abc->symbols = strdup(symbols);
 
@@ -55,7 +55,7 @@ struct imm_abc const* imm_abc_clone(struct imm_abc const* abc)
 
     nabc->symbols = strdup(abc->symbols);
     nabc->length = abc->length;
-    memcpy(nabc->symbol_idx, abc->symbol_idx, sizeof(int) * IMM_SYMBOL_IDX_SIZE);
+    memcpy(nabc->symbol_idx, abc->symbol_idx, sizeof(unsigned) * IMM_SYMBOL_IDX_SIZE);
     nabc->any_symbol = abc->any_symbol;
 
     return nabc;

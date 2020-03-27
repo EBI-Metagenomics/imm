@@ -16,13 +16,12 @@ IMM_EXPORT struct imm_abc_table const* imm_abc_table_create(struct imm_abc const
                                                             double const*         lprobs);
 static inline double imm_abc_table_lprob(struct imm_abc_table const* abc_table, char symbol)
 {
-    int idx = imm_abc_symbol_idx(abc_table->abc, symbol);
-    if (idx < 0) {
+    unsigned idx = imm_abc_symbol_idx(abc_table->abc, symbol);
+    if (idx == IMM_ABC_INVALID_IDX) {
         imm_error("symbol not found");
         return imm_lprob_invalid();
     }
-    size_t i = (size_t)idx;
-    return abc_table->lprobs[i];
+    return abc_table->lprobs[idx];
 }
 IMM_EXPORT void imm_abc_table_destroy(struct imm_abc_table const* abc_table);
 static inline struct imm_abc const* imm_abc_table_get_abc(
