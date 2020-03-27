@@ -3,9 +3,9 @@
 #include "free.h"
 #include "imm/abc.h"
 #include "imm/seq.h"
-#include "seq_code.h"
 #include "imm/state.h"
 #include "mstate.h"
+#include "seq_code.h"
 #include <stdlib.h>
 
 struct dp2_emission const* dp2_emission_create(struct seq_code const*      seq_code,
@@ -17,8 +17,7 @@ struct dp2_emission const* dp2_emission_create(struct seq_code const*      seq_c
     emiss_tbl->offset = malloc(sizeof(unsigned) * (nstates + 1));
     emiss_tbl->offset[0] = 0;
 
-    unsigned size =
-        seq_code_size(seq_code, imm_state_min_seq(mstate_get_state(mstates[0])));
+    unsigned size = seq_code_size(seq_code, imm_state_min_seq(mstate_get_state(mstates[0])));
     for (unsigned i = 1; i < nstates; ++i) {
         emiss_tbl->offset[i] = size;
         size += seq_code_size(seq_code, imm_state_min_seq(mstate_get_state(mstates[i])));
@@ -30,8 +29,7 @@ struct dp2_emission const* dp2_emission_create(struct seq_code const*      seq_c
     struct imm_abc const* abc = seq_code_abc(seq_code);
     char const*           set = imm_abc_symbols(abc);
     unsigned              set_size = imm_abc_length(abc);
-    struct imm_cartes*    cartes =
-        imm_cartes_create(set, set_size, seq_code_max_seq(seq_code));
+    struct imm_cartes* cartes = imm_cartes_create(set, set_size, seq_code_max_seq(seq_code));
 
     for (unsigned i = 0; i < nstates; ++i) {
 
@@ -44,7 +42,8 @@ struct dp2_emission const* dp2_emission_create(struct seq_code const*      seq_c
             while ((item = imm_cartes_next(cartes)) != NULL) {
 
                 struct imm_seq seq = IMM_SEQ(abc, item, len);
-                unsigned       j = seq_code_encode(seq_code, min_seq, &seq);
+                unsigned       j = seq_code_encode(seq_code, &seq);
+                j -= seq_code_offset(seq_code, min_seq);
                 emiss_tbl->cost[emiss_tbl->offset[i] + j] =
                     imm_state_lprob(mstate_get_state(mstates[i]), &seq);
             }

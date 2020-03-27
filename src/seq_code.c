@@ -21,7 +21,7 @@ struct seq_code
 };
 
 struct seq_code const* seq_code_create(struct imm_abc const* abc, unsigned min_seq,
-                                           unsigned max_seq)
+                                       unsigned max_seq)
 {
     IMM_BUG(min_seq > max_seq);
     struct seq_code* seq_code = malloc(sizeof(struct seq_code));
@@ -59,8 +59,7 @@ struct seq_code const* seq_code_create(struct imm_abc const* abc, unsigned min_s
     return seq_code;
 }
 
-unsigned seq_code_encode(struct seq_code const* seq_code, unsigned min_seq,
-                             struct imm_seq const* seq)
+unsigned seq_code_encode(struct seq_code const* seq_code, struct imm_seq const* seq)
 {
     unsigned code = seq_code->offset[imm_seq_length(seq) - seq_code->min_seq];
     for (unsigned i = 0; i < imm_seq_length(seq); ++i) {
@@ -70,7 +69,12 @@ unsigned seq_code_encode(struct seq_code const* seq_code, unsigned min_seq,
         code += seq_code->stride[i + offset] * j;
     }
 
-    return code - seq_code->offset[min_seq - seq_code->min_seq];
+    return code;
+}
+
+unsigned seq_code_offset(struct seq_code const* seq_code, unsigned min_seq)
+{
+    return seq_code->offset[min_seq - seq_code->min_seq];
 }
 
 struct eseq const* seq_eseq(struct seq_code const* seq_code, struct imm_seq const* seq)
@@ -90,7 +94,8 @@ struct eseq const* seq_eseq(struct seq_code const* seq_code, struct imm_seq cons
 
             IMM_SUBSEQ(subseq, seq, i, length);
             unsigned min_seq = seq_code->min_seq;
-            unsigned code = seq_code_encode(seq_code, min_seq, imm_subseq_cast(&subseq));
+            unsigned code = seq_code_encode(seq_code, imm_subseq_cast(&subseq));
+            code -= seq_code_offset(seq_code, min_seq);
 
             matrixu_set(eseq->code, i, j, code);
         }
@@ -107,10 +112,7 @@ unsigned seq_code_min_seq(struct seq_code const* seq_code) { return seq_code->mi
 
 unsigned seq_code_max_seq(struct seq_code const* seq_code) { return seq_code->max_seq; }
 
-struct imm_abc const* seq_code_abc(struct seq_code const* seq_code)
-{
-    return seq_code->abc;
-}
+struct imm_abc const* seq_code_abc(struct seq_code const* seq_code) { return seq_code->abc; }
 
 void seq_code_destroy(struct seq_code const* seq_code)
 {

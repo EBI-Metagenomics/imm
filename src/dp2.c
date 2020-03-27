@@ -77,8 +77,8 @@ double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
                 struct dp2_step step = {.state = i, .seq_len = len};
 
                 IMM_SUBSEQ(subseq, seq, r, len);
-                unsigned seq_code =
-                    seq_code_encode(dp->seq_code, min_len, imm_subseq_cast(&subseq));
+                unsigned seq_code = seq_code_encode(dp->seq_code, imm_subseq_cast(&subseq));
+                seq_code -= seq_code_offset(dp->seq_code, min_len);
 
                 /* unsigned seq_code2 = matrixu_get(eseq->code, r, len - smallest_min_seq); */
 
