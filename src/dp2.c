@@ -11,6 +11,7 @@
 #include "imm/state.h"
 #include "imm/step.h"
 #include "imm/subseq.h"
+#include "imm/bug.h"
 #include "min.h"
 #include "mstate.h"
 #include "mtrans.h"

@@ -2,9 +2,9 @@
 #define IMM_SEQ_TABLE_H
 
 #include "imm/export.h"
-#include "imm/seq.h"
 
 struct imm_abc;
+struct imm_seq;
 struct imm_seq_table;
 
 IMM_EXPORT struct imm_seq_table* imm_seq_table_create(struct imm_abc const* abc);
