@@ -224,8 +224,10 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
     elapsed_start(elapsed);
     struct dp const* dp = hmm_create_dp(hmm, seq, end_state);
     fprintf(stderr, "hmm_create_dp: %f seconds\n", elapsed_end(elapsed));
-    if (!dp)
+    if (!dp) {
+        elapsed_destroy(elapsed);
         return NULL;
+    }
     struct dp2 const* dp2 = hmm_create_dp2(hmm, seq, end_state);
 
     if (window_length == 0)
@@ -262,13 +264,17 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
                     dp_viterbi(dp, matrix, path);
 
                     struct dp2_matrix* matrix2 = matrices2[thread_id()];
-                    dp2_matrix_setup(matrix2, imm_subseq_cast(&subseq));
+                    /* struct seq_code const* seq_code = dp2_seq_code(dp2); */
+                    /* struct eseq const *eseq = imm_seq_eseq(seq_code, imm_subseq_cast(&subseq)); */
+                    dp2_matrix_setup(matrix2, imm_subseq_cast(&subseq), NULL);
+                    /* dp2_matrix_setup(matrix2, imm_subseq_cast(&subseq), eseq); */
 
                     elapsed_start(elapsed1);
                     double score = dp2_viterbi(dp2, matrix2);
                     fprintf(stderr, "dp_viterbi   : %f seconds\n", elapsed_end(elapsed1));
 
                     imm_results_set(results, i, subseq, path, score);
+                    /* eseq_destroy(eseq); */
                 }
             }
             imm_window_destroy(window);

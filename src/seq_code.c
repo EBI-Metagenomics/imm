@@ -73,11 +73,11 @@ unsigned imm_seq_code_encode(struct seq_code const* seq_code, unsigned min_seq,
     return code - seq_code->offset[min_seq - seq_code->min_seq];
 }
 
-void imm_seq_eseq(struct seq_code const* seq_code, struct imm_seq const* seq)
+struct eseq const* imm_seq_eseq(struct seq_code const* seq_code, struct imm_seq const* seq)
 {
     struct eseq* eseq = malloc(sizeof(struct eseq));
     eseq->seq_code = seq_code;
-    unsigned     ncols = seq_code->max_seq - seq_code->min_seq + 1;
+    unsigned ncols = seq_code->max_seq - seq_code->min_seq + 1;
     eseq->code = matrixu_create(imm_seq_length(seq), ncols);
 
     for (unsigned i = 0; i < imm_seq_length(seq); ++i) {
@@ -95,6 +95,7 @@ void imm_seq_eseq(struct seq_code const* seq_code, struct imm_seq const* seq)
             matrixu_set(eseq->code, i, j, code);
         }
     }
+    return eseq;
 }
 
 unsigned imm_seq_code_size(struct seq_code const* seq_code, unsigned min_seq)

@@ -59,11 +59,15 @@ struct dp2 const* dp2_create(struct imm_abc const* abc, struct mstate const* con
     return dp;
 }
 
+struct seq_code const* dp2_seq_code(struct dp2 const* dp) { return dp->seq_code; }
+
 struct dp2_states const* dp2_states(struct dp2 const* dp) { return dp->states; }
 
 double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
 {
     struct imm_seq const* seq = dp2_matrix_get_seq(matrix);
+    /* struct eseq const*    eseq = dp2_matrix_get_eseq(matrix); */
+    /* unsigned smallest_min_seq = imm_seq_code_min_seq(dp->seq_code); */
 
     for (unsigned r = 0; r <= imm_seq_length(seq); ++r) {
         unsigned seq_len = imm_seq_length(seq) - r;
@@ -78,9 +82,13 @@ double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
 
             for (unsigned len = min_len; len <= max_len; ++len) {
                 struct dp2_step step = {.state = i, .seq_len = len};
-                IMM_SUBSEQ(subseq, dp2_matrix_get_seq(matrix), r, len);
+
+                IMM_SUBSEQ(subseq, seq, r, len);
                 unsigned seq_code =
                     imm_seq_code_encode(dp->seq_code, min_len, imm_subseq_cast(&subseq));
+
+                /* unsigned seq_code2 = matrixu_get(eseq->code, r, len - smallest_min_seq); */
+
                 double v = dp2_emission_cost(dp->emission, i, seq_code);
                 double cost = score + v;
                 dp2_matrix_set_cost(matrix, r, step, cost);
@@ -99,6 +107,7 @@ void dp2_destroy(struct dp2 const* dp)
     dp2_emission_destroy(dp->emission);
     dp2_trans_destroy(dp->transition);
     dp2_states_destroy(dp->states);
+    imm_free(dp);
 }
 
 static double best_trans_cost(struct dp2 const* dp, struct dp2_matrix const* matrix,
