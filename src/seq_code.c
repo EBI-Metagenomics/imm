@@ -83,9 +83,9 @@ struct eseq const* seq_code_create_eseq(struct seq_code const* seq_code,
     struct eseq* eseq = malloc(sizeof(struct eseq));
     eseq->seq_code = seq_code;
     unsigned ncols = seq_code->max_seq - seq_code->min_seq + 1;
-    eseq->code = matrixu_create(imm_seq_length(seq), ncols);
+    eseq->code = matrixu_create(imm_seq_length(seq) + 1, ncols);
 
-    for (unsigned i = 0; i < imm_seq_length(seq); ++i) {
+    for (unsigned i = 0; i <= imm_seq_length(seq); ++i) {
 
         for (unsigned j = 0; j < ncols; ++j) {
 

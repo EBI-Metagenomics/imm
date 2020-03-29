@@ -59,8 +59,7 @@ struct dp2_states const* dp2_states(struct dp2 const* dp) { return dp->states; }
 double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
 {
     struct imm_seq const* seq = dp2_matrix_get_seq(matrix);
-    /* struct eseq const*    eseq = dp2_matrix_get_eseq(matrix); */
-    /* unsigned smallest_min_seq = imm_seq_code_min_seq(dp->seq_code); */
+    struct eseq const *eseq = seq_code_create_eseq(dp->seq_code, seq);
 
     for (unsigned r = 0; r <= imm_seq_length(seq); ++r) {
         unsigned seq_len = imm_seq_length(seq) - r;
@@ -76,11 +75,8 @@ double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
             for (unsigned len = min_len; len <= max_len; ++len) {
                 struct dp2_step step = {.state = i, .seq_len = len};
 
-                IMM_SUBSEQ(subseq, seq, r, len);
-                unsigned seq_code = seq_code_encode(dp->seq_code, imm_subseq_cast(&subseq));
+                unsigned seq_code = eseq_get(eseq, r, len);
                 seq_code -= seq_code_offset(dp->seq_code, min_len);
-
-                /* unsigned seq_code2 = matrixu_get(eseq->code, r, len - smallest_min_seq); */
 
                 double v = dp2_emission_cost(dp->emission, i, seq_code);
                 double cost = score + v;
@@ -91,6 +87,7 @@ double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
 
     struct dp2_step end_step = {.state = UINT_MAX, .seq_len = UINT_MAX};
     double          fs = final_score2(dp, matrix, &end_step);
+    eseq_destroy(eseq);
     return fs;
 }
 
