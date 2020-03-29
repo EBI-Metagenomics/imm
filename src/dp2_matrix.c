@@ -7,7 +7,6 @@ struct dp2_matrix* dp2_matrix_new(struct dp2_states const* states)
     struct dp2_matrix* matrix = malloc(sizeof(struct dp2_matrix));
 
     matrix->states = states;
-    matrix->eseq = NULL;
     matrix->state_col = malloc(sizeof(int) * dp2_states_nstates(states));
 
     unsigned next_col = 0;
@@ -22,13 +21,11 @@ struct dp2_matrix* dp2_matrix_new(struct dp2_states const* states)
     return matrix;
 }
 
-void dp2_matrix_setup(struct dp2_matrix* matrix, struct imm_seq const* seq,
-                      struct eseq const* eseq)
+void dp2_matrix_setup(struct dp2_matrix* matrix, struct eseq const* eseq)
 {
-    unsigned seq_len = imm_seq_length(seq);
+    unsigned seq_len = eseq_length(eseq);
     matrixd_resize(matrix->cost, seq_len + 1, matrixd_ncols(matrix->cost));
     step_matrix_resize(matrix->prev_step, seq_len + 1, step_matrix_ncols(matrix->prev_step));
-    matrix->eseq = eseq;
 }
 
 void dp2_matrix_destroy(struct dp2_matrix const* matrix)

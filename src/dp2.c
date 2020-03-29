@@ -24,7 +24,7 @@
 static double best_trans_cost(struct dp2 const* dp, struct dp2_matrix const* matrix,
                               unsigned target_state, unsigned row, struct dp2_step* prev_step);
 static double final_score2(struct dp2 const* dp, struct dp2_matrix const* matrix,
-                           struct dp2_step* end_step);
+                           struct dp2_step* end_step, struct eseq const* eseq);
 
 struct dp2
 {
@@ -56,12 +56,10 @@ struct dp2_states const* dp2_states(struct dp2 const* dp) { return dp->states; }
 
 struct seq_code const* dp2_seq_code(struct dp2 const* dp) { return dp->seq_code; }
 
-double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
+double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix, struct eseq const* eseq)
 {
-    struct eseq const* eseq = dp2_matrix_get_eseq(matrix);
-
-    for (unsigned r = 0; r < eseq_npositions(eseq); ++r) {
-        unsigned seq_len = eseq_npositions(eseq) - 1 - r;
+    for (unsigned r = 0; r <= eseq_length(eseq); ++r) {
+        unsigned seq_len = eseq_length(eseq) - r;
 
         for (unsigned i = 0; i < dp2_states_nstates(dp->states); ++i) {
 
@@ -69,7 +67,7 @@ double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
             unsigned max_len = MIN(dp2_states_max_seq(dp->states, i), seq_len);
 
             struct dp2_step* prev_step = dp2_matrix_get_prev_step(matrix, r, i);
-            double const     score = best_trans_cost(dp, matrix, i, r, prev_step);
+            double score = best_trans_cost(dp, matrix, i, r, prev_step);
 
             for (unsigned len = min_len; len <= max_len; ++len) {
                 struct dp2_step step = {.state = i, .seq_len = len};
@@ -85,7 +83,7 @@ double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
     }
 
     struct dp2_step end_step = {.state = UINT_MAX, .seq_len = UINT_MAX};
-    double          fs = final_score2(dp, matrix, &end_step);
+    double          fs = final_score2(dp, matrix, &end_step, eseq);
     return fs;
 }
 
@@ -144,7 +142,7 @@ static double best_trans_cost(struct dp2 const* dp, struct dp2_matrix const* mat
 }
 
 static double final_score2(struct dp2 const* dp, struct dp2_matrix const* matrix,
-                           struct dp2_step* end_step)
+                           struct dp2_step* end_step, struct eseq const* eseq)
 {
     double   score = imm_lprob_zero();
     unsigned end_state = dp2_states_end_state(dp->states);
@@ -153,7 +151,7 @@ static double final_score2(struct dp2 const* dp, struct dp2_matrix const* matrix
     end_step->seq_len = UINT_MAX;
     struct dp2_step step = {.state = end_state};
 
-    unsigned length = eseq_npositions(dp2_matrix_get_eseq(matrix)) - 1;
+    unsigned length = eseq_length(eseq);
 
     for (unsigned len = MIN(dp2_states_max_seq(dp->states, end_state), length);; --len) {
 

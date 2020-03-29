@@ -15,7 +15,6 @@ struct dp2_step;
 struct dp2_matrix
 {
     struct dp2_states const* states;
-    struct eseq const*       eseq;
     struct matrixd*          cost;
     struct step_matrix*      prev_step;
     int*                     state_col;
@@ -23,8 +22,7 @@ struct dp2_matrix
 };
 
 struct dp2_matrix* dp2_matrix_new(struct dp2_states const* states);
-void               dp2_matrix_setup(struct dp2_matrix* dp_matrix, struct imm_seq const* seq,
-                                    struct eseq const* eseq);
+void               dp2_matrix_setup(struct dp2_matrix* matrix, struct eseq const* eseq);
 
 static inline double dp2_matrix_get_cost(struct dp2_matrix const* dp_matrix, unsigned row,
                                          struct dp2_step step)
@@ -44,11 +42,6 @@ static inline struct dp2_step* dp2_matrix_get_prev_step(struct dp2_matrix const*
                                                         unsigned row, unsigned state)
 {
     return step_matrix_get_ptr(dp_matrix->prev_step, row, state);
-}
-
-static inline struct eseq const* dp2_matrix_get_eseq(struct dp2_matrix const* dp_matrix)
-{
-    return dp_matrix->eseq;
 }
 
 void dp2_matrix_destroy(struct dp2_matrix const* matrix);
