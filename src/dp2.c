@@ -52,17 +52,16 @@ struct dp2 const* dp2_create(struct imm_abc const* abc, struct mstate const* con
     return dp;
 }
 
-struct seq_code const* dp2_seq_code(struct dp2 const* dp) { return dp->seq_code; }
-
 struct dp2_states const* dp2_states(struct dp2 const* dp) { return dp->states; }
+
+struct seq_code const* dp2_seq_code(struct dp2 const* dp) { return dp->seq_code; }
 
 double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
 {
-    struct imm_seq const* seq = dp2_matrix_get_seq(matrix);
-    struct eseq const *eseq = seq_code_create_eseq(dp->seq_code, seq);
+    struct eseq const* eseq = dp2_matrix_get_eseq(matrix);
 
-    for (unsigned r = 0; r <= imm_seq_length(seq); ++r) {
-        unsigned seq_len = imm_seq_length(seq) - r;
+    for (unsigned r = 0; r < eseq_npositions(eseq); ++r) {
+        unsigned seq_len = eseq_npositions(eseq) - 1 - r;
 
         for (unsigned i = 0; i < dp2_states_nstates(dp->states); ++i) {
 
@@ -87,7 +86,6 @@ double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix)
 
     struct dp2_step end_step = {.state = UINT_MAX, .seq_len = UINT_MAX};
     double          fs = final_score2(dp, matrix, &end_step);
-    eseq_destroy(eseq);
     return fs;
 }
 
@@ -155,13 +153,12 @@ static double final_score2(struct dp2 const* dp, struct dp2_matrix const* matrix
     end_step->seq_len = UINT_MAX;
     struct dp2_step step = {.state = end_state};
 
-    struct imm_seq const* seq = dp2_matrix_get_seq(matrix);
+    unsigned length = eseq_npositions(dp2_matrix_get_eseq(matrix)) - 1;
 
-    for (unsigned len = MIN(dp2_states_max_seq(dp->states, end_state), imm_seq_length(seq));;
-         --len) {
+    for (unsigned len = MIN(dp2_states_max_seq(dp->states, end_state), length);; --len) {
 
         step.seq_len = len;
-        double s = dp2_matrix_get_cost(matrix, imm_seq_length(seq) - len, step);
+        double s = dp2_matrix_get_cost(matrix, length - len, step);
         if (s > score) {
             score = s;
             end_step->state = end_state;

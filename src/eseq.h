@@ -14,6 +14,10 @@ static inline unsigned eseq_get(struct eseq const* eseq, unsigned position, unsi
 {
     return matrixu_get(eseq->code, position, length - seq_code_min_seq(eseq->seq_code));
 }
+static inline unsigned eseq_npositions(struct eseq const* eseq)
+{
+    return matrixu_nrows(eseq->code);
+}
 IMM_EXPORT void eseq_destroy(struct eseq const* eseq);
 
 #endif

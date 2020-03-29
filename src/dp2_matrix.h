@@ -15,7 +15,6 @@ struct dp2_step;
 struct dp2_matrix
 {
     struct dp2_states const* states;
-    struct imm_seq const*    seq;
     struct eseq const*       eseq;
     struct matrixd*          cost;
     struct step_matrix*      prev_step;
@@ -45,11 +44,6 @@ static inline struct dp2_step* dp2_matrix_get_prev_step(struct dp2_matrix const*
                                                         unsigned row, unsigned state)
 {
     return step_matrix_get_ptr(dp_matrix->prev_step, row, state);
-}
-
-static inline struct imm_seq const* dp2_matrix_get_seq(struct dp2_matrix const* dp_matrix)
-{
-    return dp_matrix->seq;
 }
 
 static inline struct eseq const* dp2_matrix_get_eseq(struct dp2_matrix const* dp_matrix)

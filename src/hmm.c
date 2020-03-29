@@ -264,9 +264,9 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
                     dp_viterbi(dp, matrix, path);
 
                     struct dp2_matrix* matrix2 = matrices2[thread_id()];
-                    /* struct seq_code const* seq_code = dp2_seq_code(dp2); */
-                    /* struct eseq const *eseq = imm_seq_eseq(seq_code, imm_subseq_cast(&subseq)); */
-                    dp2_matrix_setup(matrix2, imm_subseq_cast(&subseq), NULL);
+                    struct seq_code const* seq_code = dp2_seq_code(dp2);
+                    struct eseq const *eseq = seq_code_create_eseq(seq_code, imm_subseq_cast(&subseq));
+                    dp2_matrix_setup(matrix2, imm_subseq_cast(&subseq), eseq);
                     /* dp2_matrix_setup(matrix2, imm_subseq_cast(&subseq), eseq); */
 
                     elapsed_start(elapsed1);
@@ -274,7 +274,7 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
                     fprintf(stderr, "dp_viterbi   : %f seconds\n", elapsed_end(elapsed1));
 
                     imm_results_set(results, i, subseq, path, score);
-                    /* eseq_destroy(eseq); */
+                    eseq_destroy(eseq);
                 }
             }
             imm_window_destroy(window);
