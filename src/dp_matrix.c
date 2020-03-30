@@ -2,7 +2,7 @@
 #include "imath.h"
 #include "imm/seq.h"
 
-struct dp_matrix* dp_matrix_new(struct dp_states const* states)
+struct dp_matrix* dp_matrix_create(struct dp_states const* states)
 {
     struct dp_matrix* matrix = malloc(sizeof(struct dp_matrix));
 

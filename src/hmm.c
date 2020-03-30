@@ -1,17 +1,13 @@
 #include "imm/hmm.h"
 #include "dp.h"
-#include "dp_matrix.h"
-#include "elapsed/elapsed.h"
 #include "free.h"
 #include "imm/bug.h"
 #include "imm/lprob.h"
 #include "imm/path.h"
 #include "imm/report.h"
-#include "imm/results.h"
 #include "imm/state.h"
 #include "imm/step.h"
 #include "imm/subseq.h"
-#include "imm/window.h"
 #include "min.h"
 #include "mstate.h"
 #include "mstate_sort.h"
@@ -19,10 +15,7 @@
 #include "mtrans.h"
 #include "mtrans_table.h"
 #include "seq_code.h"
-#include "thread.h"
-#include <limits.h>
 #include <stdlib.h>
-#include <string.h>
 
 struct imm_hmm
 {
@@ -210,7 +203,7 @@ invalid:
 }
 
 struct imm_dp const* imm_hmm_create_dp(struct imm_hmm const*   hmm,
-                                   struct imm_state const* end_state)
+                                       struct imm_state const* end_state)
 {
     unsigned long end = mstate_table_find(hmm->table, end_state);
     if (end == mstate_table_end(hmm->table)) {

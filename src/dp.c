@@ -32,6 +32,8 @@ struct imm_dp
     struct dp_emission const*   emission;
     struct dp_trans const*      transition;
     struct dp_states const*     states;
+    struct dp_matrix**          matrices;
+    unsigned                    nmatrices;
 };
 
 static double   viterbi(struct imm_dp const* dp, struct dp_matrix* matrix,
@@ -58,6 +60,12 @@ struct imm_dp const* dp_create(struct imm_abc const* abc, struct mstate const* c
     dp->emission = dp_emission_create(dp->seq_code, mstates, nstates);
     dp->transition = dp_trans_create(mstates, nstates, state_idx);
     state_idx_destroy(state_idx);
+
+    dp->nmatrices = thread_max_size();
+    dp->matrices = malloc(sizeof(struct dp_matrix*) * dp->nmatrices);
+
+    for (unsigned i = 0; i < dp->nmatrices; ++i)
+        dp->matrices[i] = NULL;
 
     return dp;
 }
@@ -92,7 +100,6 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
     struct imm_window*  window = imm_window_create(seq, window_length);
     unsigned const      nwindows = imm_window_size(window);
     struct imm_results* results = imm_results_create(seq, nwindows);
-    struct dp_matrix**  matrices = NULL;
     fprintf(stderr, "window init  : %f seconds\n", elapsed_end(elapsed));
 
     struct elapsed* elapsed1 = elapsed_create();
@@ -100,9 +107,9 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
     _Pragma("omp parallel if(nwindows > 1)")
     {
         elapsed_start(elapsed);
-        _Pragma("omp single") matrices = malloc(sizeof(struct dp_matrix*) * thread_size());
+        if (!dp->matrices[thread_id()])
+            dp->matrices[thread_id()] = dp_matrix_create(dp->states);
 
-        matrices[thread_id()] = dp_matrix_new(dp->states);
         _Pragma("omp single")
         {
             for (unsigned i = 0; i < nwindows; ++i) {
@@ -111,7 +118,7 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
                 {
                     struct imm_path* path = imm_path_create();
 
-                    struct dp_matrix*  matrix = matrices[thread_id()];
+                    struct dp_matrix*  matrix = dp->matrices[thread_id()];
                     struct eseq const* eseq =
                         seq_code_create_eseq(dp->seq_code, imm_subseq_cast(&subseq));
                     dp_matrix_setup(matrix, eseq);
@@ -125,12 +132,6 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
                 }
             }
             imm_window_destroy(window);
-        }
-        _Pragma("omp single")
-        {
-            for (unsigned i = 0; i < thread_size(); ++i)
-                dp_matrix_destroy(matrices[i]);
-            free_c(matrices);
         }
         fprintf(stderr, "main loop    : %f seconds\n", elapsed_end(elapsed));
     }
@@ -182,6 +183,13 @@ void imm_dp_destroy(struct imm_dp const* dp)
     dp_emission_destroy(dp->emission);
     dp_trans_destroy(dp->transition);
     dp_states_destroy(dp->states);
+
+    for (unsigned i = 0; i < dp->nmatrices; ++i) {
+        if (dp->matrices[i])
+            dp_matrix_destroy(dp->matrices[i]);
+    }
+
+    free_c(dp->matrices);
     free_c(dp);
 }
 

@@ -20,7 +20,7 @@ struct dp_matrix
     unsigned                nstates;
 };
 
-struct dp_matrix* dp_matrix_new(struct dp_states const* states);
+struct dp_matrix* dp_matrix_create(struct dp_states const* states);
 void              dp_matrix_setup(struct dp_matrix* matrix, struct eseq const* eseq);
 
 static inline double dp_matrix_get_score(struct dp_matrix const* dp_matrix, unsigned row,
