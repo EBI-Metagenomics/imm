@@ -8,7 +8,7 @@ struct imm_abc;
 struct imm_hmm;
 struct imm_path;
 struct imm_state;
-struct dp;
+struct imm_dp;
 
 IMM_EXPORT struct imm_hmm* imm_hmm_create(struct imm_abc const* abc);
 IMM_EXPORT void            imm_hmm_destroy(struct imm_hmm* hmm);
@@ -34,7 +34,7 @@ IMM_EXPORT struct imm_results const* imm_hmm_viterbi(struct imm_hmm const*   hmm
                                                      struct imm_state const* end_state,
                                                      unsigned                window_length);
 
-IMM_EXPORT struct dp const* imm_hmm_create_dp(struct imm_hmm const*   hmm,
+IMM_EXPORT struct imm_dp const* imm_hmm_create_dp(struct imm_hmm const*   hmm,
                                               struct imm_state const* end_state);
 
 IMM_EXPORT int imm_hmm_normalize(struct imm_hmm* hmm);

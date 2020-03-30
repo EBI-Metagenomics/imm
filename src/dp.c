@@ -21,15 +21,15 @@
 #include <limits.h>
 #include <string.h>
 
-static double best_trans_score(struct dp const* dp, struct dp_matrix const* matrix,
+static double best_trans_score(struct imm_dp const* dp, struct dp_matrix const* matrix,
                                unsigned target_state, unsigned row, struct dp_step* prev_step);
-static double final_score2(struct dp const* dp, struct dp_matrix const* matrix,
+static double final_score2(struct imm_dp const* dp, struct dp_matrix const* matrix,
                            struct dp_step* end_step, struct eseq const* eseq);
-static void   viterbi_path2(struct dp const* dp, struct dp_matrix const* matrix,
+static void   viterbi_path2(struct imm_dp const* dp, struct dp_matrix const* matrix,
                             struct imm_path* path, struct dp_step const* end_step,
                             struct eseq const* eseq);
 
-struct dp
+struct imm_dp
 {
     struct mstate const* const* mstates;
     struct seq_code const*      seq_code;
@@ -41,10 +41,10 @@ struct dp
 static unsigned min_seq(struct mstate const* const* mstates, unsigned nstates);
 static unsigned max_seq(struct mstate const* const* mstates, unsigned nstates);
 
-struct dp const* dp_create(struct imm_abc const* abc, struct mstate const* const* mstates,
+struct imm_dp const* dp_create(struct imm_abc const* abc, struct mstate const* const* mstates,
                            unsigned const nstates, struct imm_state const* end_state)
 {
-    struct dp* dp = malloc(sizeof(struct dp));
+    struct imm_dp* dp = malloc(sizeof(struct imm_dp));
     dp->mstates = mstates;
     dp->seq_code = seq_code_create(abc, min_seq(mstates, nstates), max_seq(mstates, nstates));
 
@@ -57,11 +57,11 @@ struct dp const* dp_create(struct imm_abc const* abc, struct mstate const* const
     return dp;
 }
 
-struct dp_states const* dp_states(struct dp const* dp) { return dp->states; }
+struct dp_states const* dp_states(struct imm_dp const* dp) { return dp->states; }
 
-struct seq_code const* dp_seq_code(struct dp const* dp) { return dp->seq_code; }
+struct seq_code const* dp_seq_code(struct imm_dp const* dp) { return dp->seq_code; }
 
-double dp_viterbi(struct dp const* dp, struct dp_matrix* matrix, struct eseq const* eseq,
+double dp_viterbi(struct imm_dp const* dp, struct dp_matrix* matrix, struct eseq const* eseq,
                   struct imm_path* path)
 {
     for (unsigned r = 0; r <= eseq_length(eseq); ++r) {
@@ -96,7 +96,7 @@ double dp_viterbi(struct dp const* dp, struct dp_matrix* matrix, struct eseq con
     return fs;
 }
 
-void dp_destroy(struct dp const* dp)
+void imm_dp_destroy(struct imm_dp const* dp)
 {
     imm_free(dp->mstates);
     seq_code_destroy(dp->seq_code);
@@ -106,7 +106,7 @@ void dp_destroy(struct dp const* dp)
     imm_free(dp);
 }
 
-static void viterbi_path2(struct dp const* dp, struct dp_matrix const* matrix,
+static void viterbi_path2(struct imm_dp const* dp, struct dp_matrix const* matrix,
                           struct imm_path* path, struct dp_step const* end_step,
                           struct eseq const* eseq)
 {
@@ -122,7 +122,7 @@ static void viterbi_path2(struct dp const* dp, struct dp_matrix const* matrix,
     }
 }
 
-static double best_trans_score(struct dp const* dp, struct dp_matrix const* matrix,
+static double best_trans_score(struct imm_dp const* dp, struct dp_matrix const* matrix,
                                unsigned target_state, unsigned row, struct dp_step* prev_step)
 {
     double score = imm_lprob_zero();
@@ -167,7 +167,7 @@ static double best_trans_score(struct dp const* dp, struct dp_matrix const* matr
     return score;
 }
 
-static double final_score2(struct dp const* dp, struct dp_matrix const* matrix,
+static double final_score2(struct imm_dp const* dp, struct dp_matrix const* matrix,
                            struct dp_step* end_step, struct eseq const* eseq)
 {
     double   score = imm_lprob_zero();

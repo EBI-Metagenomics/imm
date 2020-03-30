@@ -226,7 +226,7 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
     struct elapsed* elapsed = elapsed_create();
 
     elapsed_start(elapsed);
-    struct dp const* dp = imm_hmm_create_dp(hmm, end_state);
+    struct imm_dp const* dp = imm_hmm_create_dp(hmm, end_state);
     fprintf(stderr, "imm_hmm_create_dp: %f seconds\n", elapsed_end(elapsed));
     if (!dp) {
         elapsed_destroy(elapsed);
@@ -284,7 +284,7 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
         fprintf(stderr, "main loop    : %f seconds\n", elapsed_end(elapsed));
     }
     elapsed_start(elapsed);
-    dp_destroy(dp);
+    imm_dp_destroy(dp);
     fprintf(stderr, "dp destroy   : %f seconds\n", elapsed_end(elapsed));
 
     elapsed_destroy(elapsed);
@@ -292,7 +292,7 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
     return results;
 }
 
-struct dp const* imm_hmm_create_dp(struct imm_hmm const*   hmm,
+struct imm_dp const* imm_hmm_create_dp(struct imm_hmm const*   hmm,
                                    struct imm_state const* end_state)
 {
     unsigned long end = mstate_table_find(hmm->table, end_state);

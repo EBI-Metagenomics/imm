@@ -8,7 +8,7 @@
 #include "matrixd.h"
 #include "step_matrix.h"
 
-struct dp;
+struct imm_dp;
 struct imm_seq;
 
 struct dp_matrix
