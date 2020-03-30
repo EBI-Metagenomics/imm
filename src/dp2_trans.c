@@ -11,7 +11,7 @@
 struct incoming_trans
 {
     unsigned         source_state;
-    double           cost;
+    double           score;
     struct list_head list_entry;
 };
 
@@ -34,10 +34,10 @@ struct dp2_trans const* dp2_trans_create(struct mstate const* const* mstates, un
     trans_tbl->offset[0] = 0;
 
     if (ntrans > 0) {
-        trans_tbl->cost = malloc(sizeof(double) * ntrans);
+        trans_tbl->score = malloc(sizeof(double) * ntrans);
         trans_tbl->source_state = malloc(sizeof(unsigned) * ntrans);
     } else {
-        trans_tbl->cost = NULL;
+        trans_tbl->score = NULL;
         trans_tbl->source_state = NULL;
     }
 
@@ -46,7 +46,7 @@ struct dp2_trans const* dp2_trans_create(struct mstate const* const* mstates, un
         struct incoming_trans* it = NULL;
         list_for_each_entry (it, incoming_trans + i, list_entry) {
 
-            trans_tbl->cost[trans_tbl->offset[i] + j] = it->cost;
+            trans_tbl->score[trans_tbl->offset[i] + j] = it->score;
             trans_tbl->source_state[trans_tbl->offset[i] + j] = it->source_state;
             ++j;
         }
@@ -90,7 +90,7 @@ static unsigned create_incoming_transitions(struct list_head*           incoming
             unsigned                dst = state_idx_find(state_idx, dst_state);
 
             struct incoming_trans* it = malloc(sizeof(struct incoming_trans));
-            it->cost = lprob;
+            it->score = lprob;
             it->source_state = src;
             list_add_tail(&it->list_entry, incoming_trans + dst);
             ++ntrans;
@@ -101,7 +101,7 @@ static unsigned create_incoming_transitions(struct list_head*           incoming
 
 void dp2_trans_destroy(struct dp2_trans const* trans_tbl)
 {
-    imm_free(trans_tbl->cost);
+    imm_free(trans_tbl->score);
     imm_free(trans_tbl->source_state);
     imm_free(trans_tbl->offset);
     imm_free(trans_tbl);

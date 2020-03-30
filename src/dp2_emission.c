@@ -24,7 +24,7 @@ struct dp2_emission const* dp2_emission_create(struct seq_code const*      seq_c
     }
     emiss_tbl->offset[nstates] = size;
 
-    emiss_tbl->cost = malloc(sizeof(double) * size);
+    emiss_tbl->score = malloc(sizeof(double) * size);
 
     struct imm_abc const* abc = seq_code_abc(seq_code);
     char const*           set = imm_abc_symbols(abc);
@@ -44,7 +44,7 @@ struct dp2_emission const* dp2_emission_create(struct seq_code const*      seq_c
                 struct imm_seq seq = IMM_SEQ(abc, item, len);
                 unsigned       j = seq_code_encode(seq_code, &seq);
                 j -= seq_code_offset(seq_code, min_seq);
-                emiss_tbl->cost[emiss_tbl->offset[i] + j] =
+                emiss_tbl->score[emiss_tbl->offset[i] + j] =
                     imm_state_lprob(mstate_get_state(mstates[i]), &seq);
             }
         }
@@ -56,7 +56,7 @@ struct dp2_emission const* dp2_emission_create(struct seq_code const*      seq_c
 
 void dp2_emission_destroy(struct dp2_emission const* emission)
 {
-    imm_free(emission->cost);
+    imm_free(emission->score);
     imm_free(emission->offset);
     imm_free(emission);
 }

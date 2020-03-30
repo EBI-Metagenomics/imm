@@ -6,7 +6,7 @@ struct state_idx;
 
 struct dp2_trans
 {
-    double*   cost;
+    double*   score;
     unsigned* source_state;
     unsigned* offset;
 };
@@ -19,10 +19,10 @@ static inline double dp2_trans_ntrans(struct dp2_trans const* trans_tbl, unsigne
     return trans_tbl->offset[target_state + 1] - trans_tbl->offset[target_state];
 }
 
-static inline double dp2_trans_cost(struct dp2_trans const* trans_tbl, unsigned target_source,
-                                    unsigned trans_idx)
+static inline double dp2_trans_score(struct dp2_trans const* trans_tbl, unsigned target_source,
+                                     unsigned trans_idx)
 {
-    return trans_tbl->cost[trans_tbl->offset[target_source] + trans_idx];
+    return trans_tbl->score[trans_tbl->offset[target_source] + trans_idx];
 }
 
 static inline unsigned dp2_trans_source_state(struct dp2_trans const* trans_tbl,

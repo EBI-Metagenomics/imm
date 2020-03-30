@@ -21,8 +21,9 @@
 #include <limits.h>
 #include <string.h>
 
-static double best_trans_cost(struct dp2 const* dp, struct dp2_matrix const* matrix,
-                              unsigned target_state, unsigned row, struct dp2_step* prev_step);
+static double best_trans_score(struct dp2 const* dp, struct dp2_matrix const* matrix,
+                               unsigned target_state, unsigned row,
+                               struct dp2_step* prev_step);
 static double final_score2(struct dp2 const* dp, struct dp2_matrix const* matrix,
                            struct dp2_step* end_step, struct eseq const* eseq);
 
@@ -67,7 +68,7 @@ double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix, struct eseq 
             unsigned max_len = MIN(dp2_states_max_seq(dp->states, i), seq_len);
 
             struct dp2_step* prev_step = dp2_matrix_get_prev_step(matrix, r, i);
-            double score = best_trans_cost(dp, matrix, i, r, prev_step);
+            double           trans_score = best_trans_score(dp, matrix, i, r, prev_step);
 
             for (unsigned len = min_len; len <= max_len; ++len) {
                 struct dp2_step step = {.state = i, .seq_len = len};
@@ -75,9 +76,8 @@ double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix, struct eseq 
                 unsigned seq_code = eseq_get(eseq, r, len);
                 seq_code -= seq_code_offset(dp->seq_code, min_len);
 
-                double v = dp2_emission_cost(dp->emission, i, seq_code);
-                double cost = score + v;
-                dp2_matrix_set_cost(matrix, r, step, cost);
+                double score = trans_score + dp2_emission_score(dp->emission, i, seq_code);
+                dp2_matrix_set_score(matrix, r, step, score);
             }
         }
     }
@@ -96,8 +96,8 @@ void dp2_destroy(struct dp2 const* dp)
     imm_free(dp);
 }
 
-static double best_trans_cost(struct dp2 const* dp, struct dp2_matrix const* matrix,
-                              unsigned target_state, unsigned row, struct dp2_step* prev_step)
+static double best_trans_score(struct dp2 const* dp, struct dp2_matrix const* matrix,
+                               unsigned target_state, unsigned row, struct dp2_step* prev_step)
 {
     double score = imm_lprob_zero();
     prev_step->state = UINT_MAX;
@@ -123,8 +123,8 @@ static double best_trans_cost(struct dp2 const* dp, struct dp2_matrix const* mat
 
             unsigned const prev_row = row - len;
 
-            double v0 = dp2_matrix_get_cost(matrix, prev_row, step);
-            double v1 = dp2_trans_cost(dp->transition, target_state, i);
+            double v0 = dp2_matrix_get_score(matrix, prev_row, step);
+            double v1 = dp2_trans_score(dp->transition, target_state, i);
             double v = v0 + v1;
 
             if (v > score) {
@@ -156,7 +156,7 @@ static double final_score2(struct dp2 const* dp, struct dp2_matrix const* matrix
     for (unsigned len = MIN(dp2_states_max_seq(dp->states, end_state), length);; --len) {
 
         step.seq_len = len;
-        double s = dp2_matrix_get_cost(matrix, length - len, step);
+        double s = dp2_matrix_get_score(matrix, length - len, step);
         if (s > score) {
             score = s;
             end_step->state = end_state;
