@@ -1,6 +1,6 @@
 #include "imm/hmm.h"
-#include "dp2.h"
-#include "dp2_matrix.h"
+#include "dp.h"
+#include "dp_matrix.h"
 #include "elapsed/elapsed.h"
 #include "free.h"
 #include "imm/bug.h"
@@ -32,8 +32,8 @@ struct imm_hmm
 
 static double hmm_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state);
 static int    hmm_normalize_trans(struct mstate* mstate);
-static struct dp2 const* hmm_create_dp2(struct imm_hmm const* hmm, struct imm_seq const* seq,
-                                        struct imm_state const* end_state);
+static struct dp const* hmm_create_dp(struct imm_hmm const* hmm, struct imm_seq const* seq,
+                                      struct imm_state const* end_state);
 
 struct imm_hmm* imm_hmm_create(struct imm_abc const* abc)
 {
@@ -218,9 +218,9 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
     struct elapsed* elapsed = elapsed_create();
 
     elapsed_start(elapsed);
-    struct dp2 const* dp2 = hmm_create_dp2(hmm, seq, end_state);
+    struct dp const* dp = hmm_create_dp(hmm, seq, end_state);
     fprintf(stderr, "hmm_create_dp: %f seconds\n", elapsed_end(elapsed));
-    if (!dp2) {
+    if (!dp) {
         elapsed_destroy(elapsed);
         return NULL;
     }
@@ -232,7 +232,7 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
     struct imm_window*  window = imm_window_create(seq, window_length);
     unsigned const      nwindows = imm_window_size(window);
     struct imm_results* results = imm_results_create(seq, nwindows);
-    struct dp2_matrix** matrices2 = NULL;
+    struct dp_matrix**  matrices = NULL;
     fprintf(stderr, "window init  : %f seconds\n", elapsed_end(elapsed));
 
     struct elapsed* elapsed1 = elapsed_create();
@@ -240,9 +240,9 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
     _Pragma("omp parallel if(nwindows > 1)")
     {
         elapsed_start(elapsed);
-        _Pragma("omp single") matrices2 = malloc(sizeof(struct dp2_matrix*) * thread_size());
+        _Pragma("omp single") matrices = malloc(sizeof(struct dp_matrix*) * thread_size());
 
-        matrices2[thread_id()] = dp2_matrix_new(dp2_states(dp2));
+        matrices[thread_id()] = dp_matrix_new(dp_states(dp));
         _Pragma("omp single")
         {
             for (unsigned i = 0; i < nwindows; ++i) {
@@ -251,14 +251,14 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
                 {
                     struct imm_path* path = imm_path_create();
 
-                    struct dp2_matrix*     matrix2 = matrices2[thread_id()];
-                    struct seq_code const* seq_code = dp2_seq_code(dp2);
+                    struct dp_matrix*      matrix = matrices[thread_id()];
+                    struct seq_code const* seq_code = dp_seq_code(dp);
                     struct eseq const*     eseq =
                         seq_code_create_eseq(seq_code, imm_subseq_cast(&subseq));
-                    dp2_matrix_setup(matrix2, eseq);
+                    dp_matrix_setup(matrix, eseq);
 
                     elapsed_start(elapsed1);
-                    double score = dp2_viterbi(dp2, matrix2, eseq, path);
+                    double score = dp_viterbi(dp, matrix, eseq, path);
                     fprintf(stderr, "dp_viterbi   : %f seconds\n", elapsed_end(elapsed1));
 
                     imm_results_set(results, i, subseq, path, score);
@@ -270,13 +270,13 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
         _Pragma("omp single")
         {
             for (unsigned i = 0; i < thread_size(); ++i)
-                dp2_matrix_destroy(matrices2[i]);
-            imm_free(matrices2);
+                dp_matrix_destroy(matrices[i]);
+            imm_free(matrices);
         }
         fprintf(stderr, "main loop    : %f seconds\n", elapsed_end(elapsed));
     }
     elapsed_start(elapsed);
-    dp2_destroy(dp2);
+    dp_destroy(dp);
     fprintf(stderr, "dp destroy   : %f seconds\n", elapsed_end(elapsed));
 
     elapsed_destroy(elapsed);
@@ -391,8 +391,8 @@ static int hmm_normalize_trans(struct mstate* mstate)
     return 0;
 }
 
-static struct dp2 const* hmm_create_dp2(struct imm_hmm const* hmm, struct imm_seq const* seq,
-                                        struct imm_state const* end_state)
+static struct dp const* hmm_create_dp(struct imm_hmm const* hmm, struct imm_seq const* seq,
+                                      struct imm_state const* end_state)
 {
     if (hmm->abc != imm_seq_get_abc(seq)) {
         imm_error("hmm and seq must have the same alphabet");
@@ -417,6 +417,6 @@ static struct dp2 const* hmm_create_dp2(struct imm_hmm const* hmm, struct imm_se
     }
     unsigned nstates = mstate_table_size(hmm->table);
 
-    struct dp2 const* dp = dp2_create(hmm->abc, mstates, nstates, end_state);
+    struct dp const* dp = dp_create(hmm->abc, mstates, nstates, end_state);
     return dp;
 }

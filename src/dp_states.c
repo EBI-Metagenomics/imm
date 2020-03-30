@@ -1,15 +1,15 @@
-#include "dp2_states.h"
+#include "dp_states.h"
 #include "free.h"
 #include "imm/state.h"
 #include "mstate.h"
 #include "state_idx.h"
 #include <stdlib.h>
 
-struct dp2_states const* dp2_states_create(struct mstate const* const* mstates,
-                                           unsigned nstates, struct imm_state const* end_state,
-                                           struct state_idx* state_idx)
+struct dp_states const* dp_states_create(struct mstate const* const* mstates, unsigned nstates,
+                                         struct imm_state const* end_state,
+                                         struct state_idx*       state_idx)
 {
-    struct dp2_states* states = malloc(sizeof(struct dp2_states));
+    struct dp_states* states = malloc(sizeof(struct dp_states));
 
     states->nstates = nstates;
 
@@ -29,7 +29,7 @@ struct dp2_states const* dp2_states_create(struct mstate const* const* mstates,
     return states;
 }
 
-void dp2_states_destroy(struct dp2_states const* states)
+void dp_states_destroy(struct dp_states const* states)
 {
     imm_free(states->min_seq);
     imm_free(states->max_seq);

@@ -1,4 +1,4 @@
-#include "dp2_trans.h"
+#include "dp_trans.h"
 #include "free.h"
 #include "imm/lprob.h"
 #include "list.h"
@@ -20,7 +20,7 @@ static unsigned create_incoming_transitions(struct list_head*           incoming
                                             unsigned                    nstates,
                                             struct state_idx const*     state_idx);
 
-struct dp2_trans const* dp2_trans_create(struct mstate const* const* mstates, unsigned nstates,
+struct dp_trans const* dp_trans_create(struct mstate const* const* mstates, unsigned nstates,
                                          struct state_idx* state_idx)
 {
     struct list_head incoming_trans[nstates];
@@ -29,7 +29,7 @@ struct dp2_trans const* dp2_trans_create(struct mstate const* const* mstates, un
 
     unsigned ntrans = create_incoming_transitions(incoming_trans, mstates, nstates, state_idx);
 
-    struct dp2_trans* trans_tbl = malloc(sizeof(struct dp2_trans));
+    struct dp_trans* trans_tbl = malloc(sizeof(struct dp_trans));
     trans_tbl->offset = malloc(sizeof(unsigned) * (nstates + 1));
     trans_tbl->offset[0] = 0;
 
@@ -99,7 +99,7 @@ static unsigned create_incoming_transitions(struct list_head*           incoming
     return ntrans;
 }
 
-void dp2_trans_destroy(struct dp2_trans const* trans_tbl)
+void dp_trans_destroy(struct dp_trans const* trans_tbl)
 {
     imm_free(trans_tbl->score);
     imm_free(trans_tbl->source_state);

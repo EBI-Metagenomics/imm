@@ -25,11 +25,11 @@ add_library(imm
     src/abc.c
     src/abc_table.c
     src/cartes.c
-    src/dp2.c
-    src/dp2_emission.c
-    src/dp2_matrix.c
-    src/dp2_states.c
-    src/dp2_trans.c
+    src/dp.c
+    src/dp_emission.c
+    src/dp_matrix.c
+    src/dp_states.c
+    src/dp_trans.c
     src/eseq.c
     src/hmm.c
     src/ipow.c
