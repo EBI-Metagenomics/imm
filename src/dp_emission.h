@@ -1,5 +1,5 @@
-#ifndef IMM_DP_EMISSION_H
-#define IMM_DP_EMISSION_H
+#ifndef DP_EMISSION_H
+#define DP_EMISSION_H
 
 struct dp_emission;
 struct seq_code;

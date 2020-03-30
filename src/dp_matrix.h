@@ -1,5 +1,5 @@
-#ifndef IMM_DP_MATRIX_H
-#define IMM_DP_MATRIX_H
+#ifndef DP_MATRIX_H
+#define DP_MATRIX_H
 
 #include "dp.h"
 #include "dp_states.h"

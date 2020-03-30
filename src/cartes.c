@@ -1,7 +1,7 @@
 #include "cartes.h"
 #include "free.h"
+#include "imath.h"
 #include "imm/bug.h"
-#include "ipow.h"
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,7 +35,7 @@ void imm_cartes_setup(struct imm_cartes* cartes, unsigned times)
     cartes->times = times;
     cartes->item[times] = '\0';
     cartes->iter_idx = 0;
-    unsigned long nitems = imm_ipow(cartes->set_size, times);
+    unsigned long nitems = ipow(cartes->set_size, times);
     IMM_BUG(nitems > UINT_MAX);
     cartes->nitems = (unsigned)nitems;
 }
@@ -56,7 +56,7 @@ char const* imm_cartes_next(struct imm_cartes* cartes)
     unsigned set_size = cartes->set_size;
 
     for (unsigned i = 0; i < cartes->times; ++i) {
-        item[i] = cartes->set[(idx % imm_ipow(set_size, i + 1)) / imm_ipow(set_size, i)];
+        item[i] = cartes->set[(idx % ipow(set_size, i + 1)) / ipow(set_size, i)];
     }
 
     return item;

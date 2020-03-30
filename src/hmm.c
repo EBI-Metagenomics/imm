@@ -30,8 +30,8 @@ struct imm_hmm
     struct mstate_table*  table;
 };
 
-static double    hmm_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state);
-static int       hmm_normalize_trans(struct mstate* mstate);
+static double hmm_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state);
+static int    hmm_normalize_trans(struct mstate* mstate);
 
 struct imm_hmm* imm_hmm_create(struct imm_abc const* abc)
 {

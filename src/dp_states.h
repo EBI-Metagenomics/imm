@@ -1,5 +1,5 @@
-#ifndef IMM_DP_STATES_H
-#define IMM_DP_STATES_H
+#ifndef DP_STATES_H
+#define DP_STATES_H
 
 struct mstate;
 struct imm_state;

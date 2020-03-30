@@ -1,5 +1,5 @@
-#ifndef IMM_DP_STEP_H
-#define IMM_DP_STEP_H
+#ifndef DP_STEP_H
+#define DP_STEP_H
 
 struct dp_step
 {

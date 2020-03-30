@@ -1,5 +1,5 @@
-#ifndef IMM_ESEQ_H
-#define IMM_ESEQ_H
+#ifndef ESEQ_H
+#define ESEQ_H
 
 #include "matrixu.h"
 #include "seq_code.h"

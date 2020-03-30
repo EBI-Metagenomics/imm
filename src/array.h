@@ -1,5 +1,5 @@
-#ifndef IMM_ARRAY_H
-#define IMM_ARRAY_H
+#ifndef ARRAY_H
+#define ARRAY_H
 
 #include "free.h"
 #include <stdlib.h>

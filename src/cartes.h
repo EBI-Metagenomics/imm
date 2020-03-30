@@ -1,5 +1,5 @@
-#ifndef IMM_CARTES_H
-#define IMM_CARTES_H
+#ifndef CARTES_H
+#define CARTES_H
 
 struct imm_cartes;
 

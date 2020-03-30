@@ -1,5 +1,5 @@
-#ifndef IMM_DP_TRANS_H
-#define IMM_DP_TRANS_H
+#ifndef DP_TRANS_H
+#define DP_TRANS_H
 
 struct mstate;
 struct state_idx;

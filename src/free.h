@@ -1,5 +1,5 @@
-#ifndef IMM_FREE_H
-#define IMM_FREE_H
+#ifndef FREE_H
+#define FREE_H
 
 #include <stdlib.h>
 

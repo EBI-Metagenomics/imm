@@ -1,11 +1,11 @@
 #include "seq_code.h"
 #include "eseq.h"
 #include "free.h"
+#include "imath.h"
 #include "imm/abc.h"
 #include "imm/bug.h"
 #include "imm/seq.h"
 #include "imm/subseq.h"
-#include "ipow.h"
 #include "matrixu.h"
 #include <limits.h>
 #include <stdlib.h>
@@ -41,7 +41,7 @@ struct seq_code const* seq_code_create(struct imm_abc const* abc, unsigned min_s
             seq_code->offset[i - 1] + seq_code->stride[max_seq - (len - 1) - 1];
     }
 
-    unsigned long ncombs = imm_ipow(imm_abc_length(abc), max_seq);
+    unsigned long ncombs = ipow(imm_abc_length(abc), max_seq);
 
     IMM_BUG(ncombs > UINT_MAX);
     seq_code->size = seq_code->offset[max_seq - min_seq] + (unsigned)ncombs;
