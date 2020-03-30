@@ -42,8 +42,8 @@ void imm_cartes_setup(struct imm_cartes* cartes, unsigned times)
 
 void imm_cartes_destroy(struct imm_cartes const* cartes)
 {
-    imm_free(cartes->item);
-    imm_free(cartes);
+    free_c(cartes->item);
+    free_c(cartes);
 }
 
 char const* imm_cartes_next(struct imm_cartes* cartes)

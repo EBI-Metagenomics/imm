@@ -6,7 +6,6 @@
 #include "dp_trans.h"
 #include "elapsed/elapsed.h"
 #include "free.h"
-#include "imm/bug.h"
 #include "imm/dp.h"
 #include "imm/lprob.h"
 #include "imm/path.h"
@@ -24,15 +23,7 @@
 #include "state_idx.h"
 #include "thread.h"
 #include <limits.h>
-#include <string.h>
-
-static double best_trans_score(struct imm_dp const* dp, struct dp_matrix const* matrix,
-                               unsigned target_state, unsigned row, struct dp_step* prev_step);
-static double final_score2(struct imm_dp const* dp, struct dp_matrix const* matrix,
-                           struct dp_step* end_step, struct eseq const* eseq);
-static void   viterbi_path2(struct imm_dp const* dp, struct dp_matrix const* matrix,
-                            struct imm_path* path, struct dp_step const* end_step,
-                            struct eseq const* eseq);
+#include <stdio.h>
 
 struct imm_dp
 {
@@ -43,6 +34,15 @@ struct imm_dp
     struct dp_states const*     states;
 };
 
+static double   viterbi(struct imm_dp const* dp, struct dp_matrix* matrix,
+                        struct eseq const* eseq, struct imm_path* path);
+static double   best_trans_score(struct imm_dp const* dp, struct dp_matrix const* matrix,
+                                 unsigned target_state, unsigned row, struct dp_step* prev_step);
+static double   final_score(struct imm_dp const* dp, struct dp_matrix const* matrix,
+                            struct dp_step* end_step, struct eseq const* eseq);
+static void     viterbi_path(struct imm_dp const* dp, struct dp_matrix const* matrix,
+                             struct imm_path* path, struct dp_step const* end_step,
+                             struct eseq const* eseq);
 static unsigned min_seq(struct mstate const* const* mstates, unsigned nstates);
 static unsigned max_seq(struct mstate const* const* mstates, unsigned nstates);
 
@@ -66,10 +66,10 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
                                          struct imm_state const* end_state,
                                          unsigned                window_length)
 {
-    /* if (hmm->abc != imm_seq_get_abc(seq)) { */
-    /*     imm_error("hmm and seq must have the same alphabet"); */
-    /*     return NULL; */
-    /* } */
+    if (seq_code_abc(dp->seq_code) != imm_seq_get_abc(seq)) {
+        imm_error("dp and seq must have the same alphabet");
+        return NULL;
+    }
 
     if (imm_seq_length(seq) < imm_state_min_seq(end_state)) {
         imm_error("sequence is shorter than end_state's lower bound");
@@ -79,7 +79,6 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
     struct elapsed* elapsed = elapsed_create();
 
     elapsed_start(elapsed);
-    /* struct imm_dp const* dp = imm_hmm_create_dp(hmm, end_state); */
     fprintf(stderr, "imm_hmm_create_dp: %f seconds\n", elapsed_end(elapsed));
     if (!dp) {
         elapsed_destroy(elapsed);
@@ -103,7 +102,7 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
         elapsed_start(elapsed);
         _Pragma("omp single") matrices = malloc(sizeof(struct dp_matrix*) * thread_size());
 
-        matrices[thread_id()] = dp_matrix_new(dp_states(dp));
+        matrices[thread_id()] = dp_matrix_new(dp->states);
         _Pragma("omp single")
         {
             for (unsigned i = 0; i < nwindows; ++i) {
@@ -112,14 +111,13 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
                 {
                     struct imm_path* path = imm_path_create();
 
-                    struct dp_matrix*      matrix = matrices[thread_id()];
-                    struct seq_code const* seq_code = dp_seq_code(dp);
-                    struct eseq const*     eseq =
-                        seq_code_create_eseq(seq_code, imm_subseq_cast(&subseq));
+                    struct dp_matrix*  matrix = matrices[thread_id()];
+                    struct eseq const* eseq =
+                        seq_code_create_eseq(dp->seq_code, imm_subseq_cast(&subseq));
                     dp_matrix_setup(matrix, eseq);
 
                     elapsed_start(elapsed1);
-                    double score = dp_viterbi(dp, matrix, eseq, path);
+                    double score = viterbi(dp, matrix, eseq, path);
                     fprintf(stderr, "dp_viterbi   : %f seconds\n", elapsed_end(elapsed1));
 
                     imm_results_set(results, i, subseq, path, score);
@@ -132,7 +130,7 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
         {
             for (unsigned i = 0; i < thread_size(); ++i)
                 dp_matrix_destroy(matrices[i]);
-            imm_free(matrices);
+            free_c(matrices);
         }
         fprintf(stderr, "main loop    : %f seconds\n", elapsed_end(elapsed));
     }
@@ -142,12 +140,8 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
     return results;
 }
 
-struct dp_states const* dp_states(struct imm_dp const* dp) { return dp->states; }
-
-struct seq_code const* dp_seq_code(struct imm_dp const* dp) { return dp->seq_code; }
-
-double dp_viterbi(struct imm_dp const* dp, struct dp_matrix* matrix, struct eseq const* eseq,
-                  struct imm_path* path)
+static double viterbi(struct imm_dp const* dp, struct dp_matrix* matrix,
+                      struct eseq const* eseq, struct imm_path* path)
 {
     for (unsigned r = 0; r <= eseq_length(eseq); ++r) {
         unsigned seq_len = eseq_length(eseq) - r;
@@ -173,27 +167,27 @@ double dp_viterbi(struct imm_dp const* dp, struct dp_matrix* matrix, struct eseq
     }
 
     struct dp_step end_step = {.state = UINT_MAX, .seq_len = UINT_MAX};
-    double         fs = final_score2(dp, matrix, &end_step, eseq);
+    double         fs = final_score(dp, matrix, &end_step, eseq);
 
     if (path)
-        viterbi_path2(dp, matrix, path, &end_step, eseq);
+        viterbi_path(dp, matrix, path, &end_step, eseq);
 
     return fs;
 }
 
 void imm_dp_destroy(struct imm_dp const* dp)
 {
-    imm_free(dp->mstates);
+    free_c(dp->mstates);
     seq_code_destroy(dp->seq_code);
     dp_emission_destroy(dp->emission);
     dp_trans_destroy(dp->transition);
     dp_states_destroy(dp->states);
-    imm_free(dp);
+    free_c(dp);
 }
 
-static void viterbi_path2(struct imm_dp const* dp, struct dp_matrix const* matrix,
-                          struct imm_path* path, struct dp_step const* end_step,
-                          struct eseq const* eseq)
+static void viterbi_path(struct imm_dp const* dp, struct dp_matrix const* matrix,
+                         struct imm_path* path, struct dp_step const* end_step,
+                         struct eseq const* eseq)
 {
     unsigned              row = eseq_length(eseq);
     struct dp_step const* step = end_step;
@@ -252,8 +246,8 @@ static double best_trans_score(struct imm_dp const* dp, struct dp_matrix const* 
     return score;
 }
 
-static double final_score2(struct imm_dp const* dp, struct dp_matrix const* matrix,
-                           struct dp_step* end_step, struct eseq const* eseq)
+static double final_score(struct imm_dp const* dp, struct dp_matrix const* matrix,
+                          struct dp_step* end_step, struct eseq const* eseq)
 {
     double   score = imm_lprob_zero();
     unsigned end_state = dp_states_end_state(dp->states);
@@ -285,8 +279,6 @@ static double final_score2(struct imm_dp const* dp, struct dp_matrix const* matr
 
 static unsigned min_seq(struct mstate const* const* mstates, unsigned nstates)
 {
-    IMM_BUG(nstates == 0);
-
     unsigned min = imm_state_min_seq(mstate_get_state(mstates[0]));
     for (unsigned i = 1; i < nstates; ++i)
         min = MIN(min, imm_state_min_seq(mstate_get_state(mstates[i])));
@@ -296,8 +288,6 @@ static unsigned min_seq(struct mstate const* const* mstates, unsigned nstates)
 
 static unsigned max_seq(struct mstate const* const* mstates, unsigned nstates)
 {
-    IMM_BUG(nstates == 0);
-
     unsigned max = imm_state_max_seq(mstate_get_state(mstates[0]));
     for (unsigned i = 1; i < nstates; ++i)
         max = MAX(max, imm_state_max_seq(mstate_get_state(mstates[i])));

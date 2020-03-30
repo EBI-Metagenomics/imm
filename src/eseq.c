@@ -4,5 +4,5 @@
 void eseq_destroy(struct eseq const* eseq)
 {
     matrixu_destroy(eseq->code);
-    imm_free(eseq);
+    free_c(eseq);
 }

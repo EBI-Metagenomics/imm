@@ -57,7 +57,7 @@ struct dp_trans const* dp_trans_create(struct mstate const* const* mstates, unsi
         struct incoming_trans* it = NULL;
         struct incoming_trans* tmp = NULL;
         list_for_each_entry_safe (it, tmp, incoming_trans + i, list_entry) {
-            imm_free(it);
+            free_c(it);
         }
     }
 
@@ -101,8 +101,8 @@ static unsigned create_incoming_transitions(struct list_head*           incoming
 
 void dp_trans_destroy(struct dp_trans const* trans_tbl)
 {
-    imm_free(trans_tbl->score);
-    imm_free(trans_tbl->source_state);
-    imm_free(trans_tbl->offset);
-    imm_free(trans_tbl);
+    free_c(trans_tbl->score);
+    free_c(trans_tbl->source_state);
+    free_c(trans_tbl->offset);
+    free_c(trans_tbl);
 }

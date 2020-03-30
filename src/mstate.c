@@ -17,7 +17,7 @@ struct mstate* mstate_create(struct imm_state const* state, double start_lprob)
 void mstate_destroy(struct mstate* mstate)
 {
     mtrans_table_destroy(mstate->mtrans_table);
-    imm_free(mstate);
+    free_c(mstate);
 }
 
 double mstate_get_start(struct mstate const* mstate) { return mstate->start_lprob; }

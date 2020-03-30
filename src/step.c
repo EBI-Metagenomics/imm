@@ -20,7 +20,7 @@ struct imm_state const* imm_step_state(struct imm_step const* step) { return ste
 
 unsigned imm_step_seq_len(struct imm_step const* step) { return step->seq_len; }
 
-void imm_step_destroy(struct imm_step const* step) { imm_free(step); }
+void imm_step_destroy(struct imm_step const* step) { free_c(step); }
 
 struct imm_step* imm_step_clone(struct imm_step const* step)
 {

@@ -32,6 +32,6 @@ void dp_matrix_destroy(struct dp_matrix const* matrix)
 {
     matrixd_destroy(matrix->score);
     step_matrix_destroy(matrix->prev_step);
-    imm_free(matrix->state_col);
-    imm_free(matrix);
+    free_c(matrix->state_col);
+    free_c(matrix);
 }

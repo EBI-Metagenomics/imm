@@ -59,12 +59,12 @@ void imm_seq_table_destroy(struct imm_seq_table const* table)
         if (kh_exist(emiss_tbl, i)) {
             struct emission const* e = kh_val(emiss_tbl, i);
             imm_seq_destroy(e->seq);
-            imm_free(e);
+            free_c(e);
         }
     }
 
     kh_destroy(emission, emiss_tbl);
-    imm_free(table);
+    free_c(table);
 }
 
 int imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const* seq,
@@ -115,7 +115,7 @@ int imm_seq_table_normalize(struct imm_seq_table* table)
     }
 
     if (imm_lprob_normalize(lprobs, len)) {
-        imm_free(lprobs);
+        free_c(lprobs);
         return 1;
     }
 
@@ -127,7 +127,7 @@ int imm_seq_table_normalize(struct imm_seq_table* table)
         }
     }
 
-    imm_free(lprobs);
+    free_c(lprobs);
     return 0;
 }
 

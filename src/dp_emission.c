@@ -56,7 +56,7 @@ struct dp_emission const* dp_emission_create(struct seq_code const*      seq_cod
 
 void dp_emission_destroy(struct dp_emission const* emission)
 {
-    imm_free(emission->score);
-    imm_free(emission->offset);
-    imm_free(emission);
+    free_c(emission->score);
+    free_c(emission->offset);
+    free_c(emission);
 }

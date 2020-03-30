@@ -28,7 +28,7 @@ void mtrans_table_destroy(struct mtrans_table* table)
     }
 
     kh_destroy(mtrans, table->ktable);
-    imm_free(table);
+    free_c(table);
 }
 
 void mtrans_table_add(struct mtrans_table* table, struct mtrans* mtrans)

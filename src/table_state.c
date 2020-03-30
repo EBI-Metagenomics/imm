@@ -31,7 +31,7 @@ void imm_table_state_destroy(struct imm_table_state const* state)
 {
     imm_state_destroy(state->interface);
     imm_seq_table_destroy(state->table);
-    imm_free(state);
+    free_c(state);
 }
 
 static double table_state_lprob(struct imm_state const* state, struct imm_seq const* seq)

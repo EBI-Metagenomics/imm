@@ -102,7 +102,7 @@ struct imm_abc const* seq_code_abc(struct seq_code const* seq_code) { return seq
 
 void seq_code_destroy(struct seq_code const* seq_code)
 {
-    imm_free(seq_code->offset);
-    imm_free(seq_code->stride);
-    imm_free(seq_code);
+    free_c(seq_code->offset);
+    free_c(seq_code->stride);
+    free_c(seq_code);
 }

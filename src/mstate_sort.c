@@ -69,7 +69,7 @@ int mstate_sort(struct mstate const** mstates, unsigned nstates)
     for (unsigned i = 0; i < nstates; ++i)
         mstates[i] = mstate_arr[i];
 
-    imm_free(mstate_arr);
+    free_c(mstate_arr);
     return 0;
 }
 
@@ -113,7 +113,7 @@ static void destroy_node_list(struct list_head* node_list)
 static void destroy_node(struct node* node)
 {
     destroy_edges(&node->edge_list);
-    imm_free(node);
+    free_c(node);
 }
 
 static void create_edges(struct list_head* node_list, khash_t(node) * table)
@@ -145,7 +145,7 @@ static void destroy_edges(struct list_head* edges)
     struct edge *edge = NULL, *tmp = NULL;
     list_for_each_entry_safe (edge, tmp, edges, list_entry) {
         list_del(&edge->list_entry);
-        imm_free(edge);
+        free_c(edge);
     }
 }
 

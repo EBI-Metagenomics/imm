@@ -31,8 +31,8 @@ struct dp_states const* dp_states_create(struct mstate const* const* mstates, un
 
 void dp_states_destroy(struct dp_states const* states)
 {
-    imm_free(states->min_seq);
-    imm_free(states->max_seq);
-    imm_free(states->start_lprob);
-    imm_free(states);
+    free_c(states->min_seq);
+    free_c(states->max_seq);
+    free_c(states->start_lprob);
+    free_c(states);
 }

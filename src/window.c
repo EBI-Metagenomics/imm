@@ -66,4 +66,4 @@ unsigned imm_window_size(struct imm_window const* window)
     return size;
 }
 
-void imm_window_destroy(struct imm_window const* window) { imm_free(window); }
+void imm_window_destroy(struct imm_window const* window) { free_c(window); }
