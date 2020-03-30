@@ -138,7 +138,8 @@ void test_perf_viterbi(void)
 
     struct imm_seq const*     seq = imm_seq_create(str, abc);
     elapsed_start(elapsed);
-    struct imm_results const* results = imm_hmm_viterbi(hmm, seq, cast_c(end), 0);
+    struct imm_dp const* dp = imm_hmm_create_dp(hmm, cast_c(end));
+    struct imm_results const* results = imm_dp_viterbi(dp, seq, cast_c(end), 0);
     elapsed_end(elapsed);
     cass_cond(imm_results_size(results) == 1);
     struct imm_result const* r = imm_results_get(results, 0);
@@ -166,4 +167,5 @@ void test_perf_viterbi(void)
     imm_normal_state_destroy(E);
     imm_mute_state_destroy(end);
     imm_abc_destroy(abc);
+    imm_dp_destroy(dp);
 }

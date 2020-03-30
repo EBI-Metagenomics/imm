@@ -29,11 +29,6 @@ IMM_EXPORT double imm_hmm_get_trans(struct imm_hmm const*   hmm,
 IMM_EXPORT double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
                                      struct imm_path const* path);
 
-IMM_EXPORT struct imm_results const* imm_hmm_viterbi(struct imm_hmm const*   hmm,
-                                                     struct imm_seq const*   seq,
-                                                     struct imm_state const* end_state,
-                                                     unsigned                window_length);
-
 IMM_EXPORT struct imm_dp const* imm_hmm_create_dp(struct imm_hmm const*   hmm,
                                               struct imm_state const* end_state);
 
