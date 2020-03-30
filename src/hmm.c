@@ -267,7 +267,6 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
                     struct seq_code const* seq_code = dp2_seq_code(dp2);
                     struct eseq const *eseq = seq_code_create_eseq(seq_code, imm_subseq_cast(&subseq));
                     dp2_matrix_setup(matrix2, eseq);
-                    /* dp2_matrix_setup(matrix2, imm_subseq_cast(&subseq), eseq); */
 
                     elapsed_start(elapsed1);
                     double score = dp2_viterbi(dp2, matrix2, eseq);
