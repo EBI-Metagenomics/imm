@@ -8,29 +8,34 @@ struct imm_abc;
 struct imm_hmm;
 struct imm_path;
 struct imm_state;
+struct dp;
 
 IMM_EXPORT struct imm_hmm* imm_hmm_create(struct imm_abc const* abc);
 IMM_EXPORT void            imm_hmm_destroy(struct imm_hmm* hmm);
 
 IMM_EXPORT int imm_hmm_add_state(struct imm_hmm* hmm, struct imm_state const* state,
-                              double start_lprob);
+                                 double start_lprob);
 IMM_EXPORT int imm_hmm_del_state(struct imm_hmm* hmm, struct imm_state const* state);
 
 IMM_EXPORT int imm_hmm_set_start(struct imm_hmm* hmm, struct imm_state const* state,
-                              double lprob);
+                                 double lprob);
 
 IMM_EXPORT int    imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state,
-                                 struct imm_state const* dst_state, double lprob);
-IMM_EXPORT double imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* src_state,
-                                 struct imm_state const* dst_state);
+                                    struct imm_state const* dst_state, double lprob);
+IMM_EXPORT double imm_hmm_get_trans(struct imm_hmm const*   hmm,
+                                    struct imm_state const* src_state,
+                                    struct imm_state const* dst_state);
 
 IMM_EXPORT double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
-                                  struct imm_path const* path);
+                                     struct imm_path const* path);
 
 IMM_EXPORT struct imm_results const* imm_hmm_viterbi(struct imm_hmm const*   hmm,
-                                                  struct imm_seq const*   seq,
-                                                  struct imm_state const* end_state,
-                                                  unsigned                window_length);
+                                                     struct imm_seq const*   seq,
+                                                     struct imm_state const* end_state,
+                                                     unsigned                window_length);
+
+IMM_EXPORT struct dp const* imm_hmm_create_dp(struct imm_hmm const*   hmm,
+                                              struct imm_state const* end_state);
 
 IMM_EXPORT int imm_hmm_normalize(struct imm_hmm* hmm);
 

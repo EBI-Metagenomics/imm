@@ -30,10 +30,8 @@ struct imm_hmm
     struct mstate_table*  table;
 };
 
-static double hmm_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state);
-static int    hmm_normalize_trans(struct mstate* mstate);
-static struct dp const* hmm_create_dp(struct imm_hmm const* hmm, struct imm_seq const* seq,
-                                      struct imm_state const* end_state);
+static double    hmm_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state);
+static int       hmm_normalize_trans(struct mstate* mstate);
 
 struct imm_hmm* imm_hmm_create(struct imm_abc const* abc)
 {
@@ -215,11 +213,21 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
                                           struct imm_state const* end_state,
                                           unsigned                window_length)
 {
+    if (hmm->abc != imm_seq_get_abc(seq)) {
+        imm_error("hmm and seq must have the same alphabet");
+        return NULL;
+    }
+
+    if (imm_seq_length(seq) < imm_state_min_seq(end_state)) {
+        imm_error("sequence is shorter than end_state's lower bound");
+        return NULL;
+    }
+
     struct elapsed* elapsed = elapsed_create();
 
     elapsed_start(elapsed);
-    struct dp const* dp = hmm_create_dp(hmm, seq, end_state);
-    fprintf(stderr, "hmm_create_dp: %f seconds\n", elapsed_end(elapsed));
+    struct dp const* dp = imm_hmm_create_dp(hmm, end_state);
+    fprintf(stderr, "imm_hmm_create_dp: %f seconds\n", elapsed_end(elapsed));
     if (!dp) {
         elapsed_destroy(elapsed);
         return NULL;
@@ -282,6 +290,25 @@ struct imm_results const* imm_hmm_viterbi(struct imm_hmm const* hmm, struct imm_
     elapsed_destroy(elapsed);
     elapsed_destroy(elapsed1);
     return results;
+}
+
+struct dp const* imm_hmm_create_dp(struct imm_hmm const*   hmm,
+                                   struct imm_state const* end_state)
+{
+    unsigned long end = mstate_table_find(hmm->table, end_state);
+    if (end == mstate_table_end(hmm->table)) {
+        imm_error("end_state not found");
+        return NULL;
+    }
+
+    struct mstate const** mstates = mstate_table_array(hmm->table);
+    if (mstate_sort(mstates, mstate_table_size(hmm->table))) {
+        imm_free(mstates);
+        return NULL;
+    }
+    unsigned nstates = mstate_table_size(hmm->table);
+
+    return dp_create(hmm->abc, mstates, nstates, end_state);
 }
 
 int imm_hmm_normalize(struct imm_hmm* hmm)
@@ -389,34 +416,4 @@ static int hmm_normalize_trans(struct mstate* mstate)
     imm_free(lprobs);
 
     return 0;
-}
-
-static struct dp const* hmm_create_dp(struct imm_hmm const* hmm, struct imm_seq const* seq,
-                                      struct imm_state const* end_state)
-{
-    if (hmm->abc != imm_seq_get_abc(seq)) {
-        imm_error("hmm and seq must have the same alphabet");
-        return NULL;
-    }
-
-    unsigned long end = mstate_table_find(hmm->table, end_state);
-    if (end == mstate_table_end(hmm->table)) {
-        imm_error("end_state not found");
-        return NULL;
-    }
-
-    if (imm_seq_length(seq) < imm_state_min_seq(end_state)) {
-        imm_error("sequence is shorter than end_state's lower bound");
-        return NULL;
-    }
-
-    struct mstate const** mstates = mstate_table_array(hmm->table);
-    if (mstate_sort(mstates, mstate_table_size(hmm->table))) {
-        imm_free(mstates);
-        return NULL;
-    }
-    unsigned nstates = mstate_table_size(hmm->table);
-
-    struct dp const* dp = dp_create(hmm->abc, mstates, nstates, end_state);
-    return dp;
 }
