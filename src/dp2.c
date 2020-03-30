@@ -26,13 +26,17 @@ static double best_trans_score(struct dp2 const* dp, struct dp2_matrix const* ma
                                struct dp2_step* prev_step);
 static double final_score2(struct dp2 const* dp, struct dp2_matrix const* matrix,
                            struct dp2_step* end_step, struct eseq const* eseq);
+static void   viterbi_path2(struct dp2 const* dp, struct dp2_matrix const* matrix,
+                            struct imm_path* path, struct dp2_step const* end_step,
+                            struct eseq const* eseq);
 
 struct dp2
 {
-    struct seq_code const*     seq_code;
-    struct dp2_emission const* emission;
-    struct dp2_trans const*    transition;
-    struct dp2_states const*   states;
+    struct mstate const* const* mstates;
+    struct seq_code const*      seq_code;
+    struct dp2_emission const*  emission;
+    struct dp2_trans const*     transition;
+    struct dp2_states const*    states;
 };
 
 static unsigned min_seq(struct mstate const* const* mstates, unsigned nstates);
@@ -42,6 +46,7 @@ struct dp2 const* dp2_create(struct imm_abc const* abc, struct mstate const* con
                              unsigned const nstates, struct imm_state const* end_state)
 {
     struct dp2* dp = malloc(sizeof(struct dp2));
+    dp->mstates = mstates;
     dp->seq_code = seq_code_create(abc, min_seq(mstates, nstates), max_seq(mstates, nstates));
 
     struct state_idx* state_idx = state_idx_create();
@@ -57,7 +62,8 @@ struct dp2_states const* dp2_states(struct dp2 const* dp) { return dp->states; }
 
 struct seq_code const* dp2_seq_code(struct dp2 const* dp) { return dp->seq_code; }
 
-double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix, struct eseq const* eseq)
+double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix, struct eseq const* eseq,
+                   struct imm_path* path)
 {
     for (unsigned r = 0; r <= eseq_length(eseq); ++r) {
         unsigned seq_len = eseq_length(eseq) - r;
@@ -84,16 +90,37 @@ double dp2_viterbi(struct dp2 const* dp, struct dp2_matrix* matrix, struct eseq 
 
     struct dp2_step end_step = {.state = UINT_MAX, .seq_len = UINT_MAX};
     double          fs = final_score2(dp, matrix, &end_step, eseq);
+
+    if (path)
+        viterbi_path2(dp, matrix, path, &end_step, eseq);
+
     return fs;
 }
 
 void dp2_destroy(struct dp2 const* dp)
 {
+    imm_free(dp->mstates);
     seq_code_destroy(dp->seq_code);
     dp2_emission_destroy(dp->emission);
     dp2_trans_destroy(dp->transition);
     dp2_states_destroy(dp->states);
     imm_free(dp);
+}
+
+static void viterbi_path2(struct dp2 const* dp, struct dp2_matrix const* matrix,
+                          struct imm_path* path, struct dp2_step const* end_step,
+                          struct eseq const* eseq)
+{
+    unsigned row = eseq_length(eseq);
+    struct dp2_step const* step = end_step;
+
+    while (step->seq_len != UINT_MAX) {
+        struct imm_state const* state = mstate_get_state(dp->mstates[step->state]);
+        struct imm_step*        new_step = imm_step_create(state, step->seq_len);
+        imm_path_prepend(path, new_step);
+        row -= step->seq_len;
+        step = dp2_matrix_get_prev_step(matrix, row, step->state);
+    }
 }
 
 static double best_trans_score(struct dp2 const* dp, struct dp2_matrix const* matrix,
