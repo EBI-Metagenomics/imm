@@ -11,6 +11,7 @@ void test_hmm_likelihood_mute_state(void);
 void test_hmm_likelihood_two_mute_states(void);
 void test_hmm_likelihood_invalid(void);
 void test_hmm_likelihood_no_state(void);
+void test_hmm_wrong_states(void);
 void test_hmm_viterbi_one_mute_state(void);
 void test_hmm_viterbi_two_mute_states(void);
 void test_hmm_viterbi_mute_cycle(void);
@@ -38,6 +39,7 @@ int main(void)
     test_hmm_likelihood_two_mute_states();
     test_hmm_likelihood_invalid();
     test_hmm_likelihood_no_state();
+    test_hmm_wrong_states();
     test_hmm_viterbi_one_mute_state();
     test_hmm_viterbi_two_mute_states();
     test_hmm_viterbi_mute_cycle();
@@ -378,6 +380,28 @@ void test_hmm_likelihood_no_state(void)
     imm_hmm_destroy(hmm);
     imm_abc_destroy(abc);
     imm_seq_destroy(EMPTY);
+}
+
+void test_hmm_wrong_states(void)
+{
+    struct imm_abc const* abc = imm_abc_create("ACGT", '*');
+    struct imm_hmm*       hmm = imm_hmm_create(abc);
+
+    struct imm_mute_state const* state0 = imm_mute_state_create("state0", abc);
+    struct imm_mute_state const* state1 = imm_mute_state_create("state0", abc);
+
+    imm_hmm_add_state(hmm, cast_c(state0), log(0.5));
+    cass_equal_int(imm_hmm_set_start(hmm, cast_c(state1), log(0.3)), 1);
+    cass_equal_int(imm_hmm_set_trans(hmm, cast_c(state0), cast_c(state1), log(0.3)), 1);
+    cass_equal_int(imm_hmm_set_trans(hmm, cast_c(state1), cast_c(state0), log(0.3)), 1);
+    cass_cond(imm_hmm_create_dp(hmm, cast_c(state1)) == NULL);
+    cass_equal_int(imm_hmm_normalize_trans(hmm, cast_c(state1)), 1);
+    cass_equal_int(imm_hmm_normalize_trans(hmm, cast_c(state0)), 0);
+
+    imm_hmm_destroy(hmm);
+    imm_mute_state_destroy(state0);
+    imm_mute_state_destroy(state1);
+    imm_abc_destroy(abc);
 }
 
 void test_hmm_viterbi_one_mute_state(void)

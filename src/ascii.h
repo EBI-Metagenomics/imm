@@ -1,5 +1,5 @@
-#ifndef IMM_ASCII_H
-#define IMM_ASCII_H
+#ifndef ASCII_H
+#define ASCII_H
 
 #include <stddef.h>
 
