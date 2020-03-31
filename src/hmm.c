@@ -103,9 +103,13 @@ int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state,
 
     unsigned long i = mtrans_table_find(table, dst_state);
     if (i == mtrans_table_end(table)) {
-        mtrans_table_add(table, mtrans_create(dst_state, lprob));
+        if (!imm_lprob_is_zero(lprob))
+            mtrans_table_add(table, mtrans_create(dst_state, lprob));
     } else {
-        mtrans_set_lprob(mtrans_table_get(table, i), lprob);
+        if (imm_lprob_is_zero(lprob))
+            mtrans_table_del(table, i);
+        else
+            mtrans_set_lprob(mtrans_table_get(table, i), lprob);
     }
 
     return 0;

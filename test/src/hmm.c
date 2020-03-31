@@ -159,7 +159,7 @@ void test_hmm_likelihood_single_state(void)
 
     cass_cond(imm_hmm_normalize(hmm) == 0);
     cass_cond(imm_hmm_set_trans(hmm, cast_c(state), cast_c(state), zero()) == 0);
-    cass_cond(imm_hmm_normalize(hmm) == 1);
+    cass_cond(imm_hmm_normalize(hmm) == 0);
     cass_cond(imm_hmm_set_trans(hmm, cast_c(state), cast_c(state), log(0.5)) == 0);
 
     path = imm_path_create();
