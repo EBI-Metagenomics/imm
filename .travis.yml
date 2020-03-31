@@ -31,8 +31,7 @@ script:
   - mkdir prefix
   - mkdir build.release
   - cd build.release
-  - cmake -G"$GENERATOR" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/prefix
-    ..
+  - cmake -G"$GENERATOR" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/prefix ..
   - cmake --build . --config Release
   - ctest --output-on-failure -C Release
   - cmake --build . --config Release --target install
