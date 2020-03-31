@@ -141,9 +141,13 @@ void test_perf_viterbi(void)
     struct imm_dp const* dp = imm_hmm_create_dp(hmm, cast_c(end));
     struct imm_results const* results = imm_dp_viterbi(dp, seq, 0);
     elapsed_end(elapsed);
+
     cass_cond(imm_results_size(results) == 1);
     struct imm_result const* r = imm_results_get(results, 0);
     double                   score = imm_result_loglik(r);
+    imm_results_destroy(results);
+
+    results = imm_dp_viterbi(dp, seq, 0);
     imm_results_destroy(results);
 
     cass_cond(is_valid(score) && !is_zero(score));

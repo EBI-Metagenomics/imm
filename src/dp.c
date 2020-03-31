@@ -87,7 +87,7 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
     struct elapsed* elapsed = elapsed_create();
 
     elapsed_start(elapsed);
-    fprintf(stderr, "imm_hmm_create_dp: %f seconds\n", elapsed_end(elapsed));
+    fprintf(stderr, "hmm_create_dp: %f seconds\n", elapsed_end(elapsed));
     if (!dp) {
         elapsed_destroy(elapsed);
         return NULL;
@@ -119,9 +119,15 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
                     struct imm_path* path = imm_path_create();
 
                     struct dp_matrix*  matrix = dp->matrices[thread_id()];
+
+                    elapsed_start(elapsed1);
                     struct eseq const* eseq =
                         seq_code_create_eseq(dp->seq_code, imm_subseq_cast(&subseq));
+                    fprintf(stderr, "create_eseq  : %f seconds\n", elapsed_end(elapsed1));
+
+                    elapsed_start(elapsed1);
                     dp_matrix_setup(matrix, eseq);
+                    fprintf(stderr, "matrix_setup : %f seconds\n", elapsed_end(elapsed1));
 
                     elapsed_start(elapsed1);
                     double score = viterbi(dp, matrix, eseq, path);
