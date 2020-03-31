@@ -1,3 +1,4 @@
+#include "compiler.h"
 #include "dp.h"
 #include "dp_emission.h"
 #include "dp_matrix.h"
@@ -234,7 +235,7 @@ static double best_trans_score(struct imm_dp const* dp, struct dp_matrix const* 
     prev_step->state = UINT_MAX;
     prev_step->seq_len = UINT_MAX;
 
-    if (row == 0)
+    if (UNLIKELY(row == 0))
         score = dp_states_start_lprob(dp->states, target_state);
 
     for (unsigned i = 0; i < dp_trans_ntrans(dp->transition, target_state); ++i) {
@@ -244,11 +245,11 @@ static double best_trans_score(struct imm_dp const* dp, struct dp_matrix const* 
             continue;
 
         unsigned min_seq = dp_states_min_seq(dp->states, source_state);
+        if (min_seq == 0 && source_state > target_state)
+            continue;
+
         unsigned max_seq = MIN(dp_states_max_seq(dp->states, source_state), row);
         for (unsigned len = min_seq; len <= max_seq; ++len) {
-
-            if (len == 0 && source_state > target_state)
-                continue;
 
             struct dp_step step = {.state = source_state, .seq_len = len};
 
