@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 project(imm VERSION 0.0.7 LANGUAGES C)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
 # Generate compile_commands.json file
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -125,3 +127,13 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/imm-config.cmake
 
 enable_testing()
 add_subdirectory(test)
+
+option(COVERAGE "Enable coverage")
+if(COVERAGE)
+    include(CodeCoverage)
+    append_coverage_compiler_flags()
+    setup_target_for_coverage_lcov(
+        NAME coverage
+        EXECUTABLE ctest
+        DEPENDENCIES all_tests)
+endif()
