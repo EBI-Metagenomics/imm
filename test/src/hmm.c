@@ -1618,7 +1618,7 @@ double single_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq,
     if (dp == NULL)
         return imm_lprob_invalid();
 
-    struct imm_results const* results = imm_dp_viterbi(dp, seq, end_state, 0);
+    struct imm_results const* results = imm_dp_viterbi(dp, seq, 0);
     if (results == NULL) {
         imm_dp_destroy(dp);
         return imm_lprob_invalid();

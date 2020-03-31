@@ -30,7 +30,7 @@ IMM_EXPORT double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq c
                                      struct imm_path const* path);
 
 IMM_EXPORT struct imm_dp const* imm_hmm_create_dp(struct imm_hmm const*   hmm,
-                                              struct imm_state const* end_state);
+                                                  struct imm_state const* end_state);
 
 IMM_EXPORT int imm_hmm_normalize(struct imm_hmm* hmm);
 

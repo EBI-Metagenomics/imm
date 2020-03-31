@@ -71,14 +71,14 @@ struct imm_dp const* dp_create(struct imm_abc const* abc, struct mstate const* c
 }
 
 struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq const* seq,
-                                         struct imm_state const* end_state,
-                                         unsigned                window_length)
+                                         unsigned window_length)
 {
     if (seq_code_abc(dp->seq_code) != imm_seq_get_abc(seq)) {
         imm_error("dp and seq must have the same alphabet");
         return NULL;
     }
 
+    struct imm_state const* end_state = mstate_get_state(dp->mstates[dp->states->end_state]);
     if (imm_seq_length(seq) < imm_state_min_seq(end_state)) {
         imm_error("sequence is shorter than end_state's lower bound");
         return NULL;
