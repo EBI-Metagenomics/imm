@@ -11,8 +11,7 @@ jobs:
     - os: osx
       env: GENERATOR="Unix Makefiles"
       before_script:
-        curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=logaddexp
-        DO_CMD=sudo bash
+        curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=logaddexp DO_CMD=sudo bash
     - os: linux
       name: Install
       sudo: required
