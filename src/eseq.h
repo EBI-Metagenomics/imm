@@ -19,7 +19,6 @@ static inline unsigned eseq_length(struct eseq const* eseq)
 {
     return matrixu_nrows(eseq->code) - 1;
 }
-/* TODO: remove IMM_EXPORT */
-IMM_EXPORT void eseq_destroy(struct eseq const* eseq);
+void eseq_destroy(struct eseq const* eseq);
 
 #endif

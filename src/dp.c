@@ -115,7 +115,7 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
             dp->matrices[thread_id()] = dp_matrix_create(dp->states);
 
         if (!dp->eseqs[thread_id()])
-            dp->eseqs[thread_id()] = seq_code_create_eseq2(dp->seq_code);
+            dp->eseqs[thread_id()] = seq_code_create_eseq(dp->seq_code);
 
         _Pragma("omp single")
         {

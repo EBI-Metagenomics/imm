@@ -145,13 +145,24 @@ void test_perf_viterbi(void)
     cass_cond(imm_results_size(results) == 1);
     struct imm_result const* r = imm_results_get(results, 0);
     double                   score = imm_result_loglik(r);
+    cass_cond(is_valid(score) && !is_zero(score));
+    cass_close(score, -65826.0106185297);
     imm_results_destroy(results);
 
     results = imm_dp_viterbi(dp, seq, 0);
-    imm_results_destroy(results);
-
+    r = imm_results_get(results, 0);
+    score = imm_result_loglik(r);
     cass_cond(is_valid(score) && !is_zero(score));
     cass_close(score, -65826.0106185297);
+    imm_results_destroy(results);
+
+    results = imm_dp_viterbi(dp, seq, 0);
+    r = imm_results_get(results, 0);
+    score = imm_result_loglik(r);
+    cass_cond(is_valid(score) && !is_zero(score));
+    cass_close(score, -65826.0106185297);
+    imm_results_destroy(results);
+
     imm_seq_destroy(seq);
 
 #ifdef NDEBUG
