@@ -130,6 +130,12 @@ add_subdirectory(test)
 
 option(COVERAGE "Enable coverage")
 if(COVERAGE)
+
+    string(TOUPPER "${CMAKE_BUILD_TYPE}" uppercase_CMAKE_BUILD_TYPE)
+    if(NOT ${uppercase_CMAKE_BUILD_TYPE} MATCHES "DEBUG")
+        message(FATAL_ERROR "CMAKE_BUILD_TYPE must be set to Debug.")
+    endif()
+
     include(CodeCoverage)
     append_coverage_compiler_flags()
     setup_target_for_coverage_lcov(
