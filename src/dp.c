@@ -4,7 +4,7 @@
 #include "dp_states.h"
 #include "dp_step.h"
 #include "dp_trans.h"
-#include "elapsed/elapsed.h"
+#include "elapsed.h"
 #include "free.h"
 #include "imm/dp.h"
 #include "imm/lprob.h"
