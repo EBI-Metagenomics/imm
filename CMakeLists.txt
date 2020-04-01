@@ -66,13 +66,13 @@ generate_export_header(imm BASE_NAME IMM
     INCLUDE_GUARD_NAME IMM_EXPORT_H
     EXPORT_FILE_NAME ${CMAKE_CURRENT_BINARY_DIR}/imm/export.h)
 
-add_library(warning INTERFACE)
-target_compile_options(warning INTERFACE
-    $<$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>:/W3>
-    $<$<NOT:$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>>:-Wall -Wextra -pedantic
-    -Wstrict-prototypes -Wshadow -Wconversion -Wmissing-prototypes
-    -Wno-unused-parameter -Wsign-conversion>
-)
+if(${CMAKE_C_COMPILER_ID} MATCHES "MSVC")
+    set(WARNING_FLAGS /W3)
+else()
+    set(WARNING_FLAGS -Wall -Wextra -pedantic -Wstrict-prototypes -Wshadow
+        -Wconversion -Wmissing-prototypes -Wno-unused-parameter -Wsign-conversion
+    )
+endif()
 
 target_include_directories(imm
     PUBLIC
@@ -90,8 +90,8 @@ target_compile_features(imm PRIVATE c_std_11)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRECATE>)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:__extension__>)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${OpenMP_C_FOUND}>:OPENMP>)
+target_compile_options(imm PRIVATE ${WARNING_FLAGS})
 target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
-target_link_libraries(imm PRIVATE warning)
 
 include(CheckCSourceCompiles)
 check_c_source_compiles(
@@ -133,7 +133,6 @@ add_subdirectory(test)
 
 option(COVERAGE "Enable coverage")
 if(COVERAGE)
-
     string(TOUPPER "${CMAKE_BUILD_TYPE}" uppercase_CMAKE_BUILD_TYPE)
     if(NOT ${uppercase_CMAKE_BUILD_TYPE} MATCHES "DEBUG")
         message(FATAL_ERROR "CMAKE_BUILD_TYPE must be set to Debug.")

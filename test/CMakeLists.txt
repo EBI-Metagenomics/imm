@@ -4,11 +4,7 @@ function(imm_add_test name)
     add_executable(test_${name} src/${name}.c)
     add_dependencies(all_tests test_${name})
     target_link_libraries(test_${name} PRIVATE IMM::imm)
-    target_link_libraries(test_${name} PRIVATE warning)
-    target_include_directories(test_${name}
-        PRIVATE
-            ${CMAKE_CURRENT_SOURCE_DIR}/../src
-    )
+    target_compile_options(test_${name} PRIVATE ${WARNING_FLAGS})
     add_test(NAME ${name} COMMAND test_${name})
 endfunction()
 
