@@ -50,6 +50,21 @@ static void     viterbi_path(struct imm_dp const* dp, struct dp_matrix const* ma
 static unsigned min_seq(struct mstate const* const* mstates, unsigned nstates);
 static unsigned max_seq(struct mstate const* const* mstates, unsigned nstates);
 
+static inline void set_score(struct imm_dp const* dp, struct dp_matrix* matrix,
+                             struct eseq const* eseq, double trans_score, unsigned min_len,
+                             unsigned max_len, unsigned row, unsigned state)
+{
+    for (unsigned len = min_len; len <= max_len; ++len) {
+        struct dp_step step = {.state = state, .seq_len = len};
+
+        unsigned seq_code = eseq_get(eseq, row, len);
+        seq_code -= seq_code_offset(dp->seq_code, min_len);
+
+        double score = trans_score + dp_emission_score(dp->emission, state, seq_code);
+        dp_matrix_set_score(matrix, row, step, score);
+    }
+}
+
 struct imm_dp const* dp_create(struct imm_abc const* abc, struct mstate const* const* mstates,
                                unsigned const nstates, struct imm_state const* end_state)
 {
@@ -158,8 +173,22 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
 static double viterbi(struct imm_dp const* dp, struct dp_matrix* matrix,
                       struct eseq const* eseq, struct imm_path* path)
 {
-    for (unsigned r = 0; r <= eseq_length(eseq); ++r) {
-        unsigned seq_len = eseq_length(eseq) - r;
+    unsigned seq_len = eseq_length(eseq);
+
+    for (unsigned i = 0; i < dp_states_nstates(dp->states); ++i) {
+
+        unsigned min_len = dp_states_min_seq(dp->states, i);
+        unsigned max_len = MIN(dp_states_max_seq(dp->states, i), seq_len);
+
+        struct dp_step* prev_step = dp_matrix_get_prev_step(matrix, 0, i);
+        double          tscore = best_trans_score(dp, matrix, i, 0, prev_step);
+
+        tscore = MAX(dp_states_start_lprob(dp->states, i), tscore);
+        set_score(dp, matrix, eseq, tscore, min_len, max_len, 0, i);
+    }
+
+    for (unsigned r = 1; r <= eseq_length(eseq); ++r) {
+        --seq_len;
 
         for (unsigned i = 0; i < dp_states_nstates(dp->states); ++i) {
 
@@ -167,17 +196,9 @@ static double viterbi(struct imm_dp const* dp, struct dp_matrix* matrix,
             unsigned max_len = MIN(dp_states_max_seq(dp->states, i), seq_len);
 
             struct dp_step* prev_step = dp_matrix_get_prev_step(matrix, r, i);
-            double          trans_score = best_trans_score(dp, matrix, i, r, prev_step);
+            double          tscore = best_trans_score(dp, matrix, i, r, prev_step);
 
-            for (unsigned len = min_len; len <= max_len; ++len) {
-                struct dp_step step = {.state = i, .seq_len = len};
-
-                unsigned seq_code = eseq_get(eseq, r, len);
-                seq_code -= seq_code_offset(dp->seq_code, min_len);
-
-                double score = trans_score + dp_emission_score(dp->emission, i, seq_code);
-                dp_matrix_set_score(matrix, r, step, score);
-            }
+            set_score(dp, matrix, eseq, tscore, min_len, max_len, r, i);
         }
     }
 
@@ -261,6 +282,7 @@ static double best_trans_score(struct imm_dp const* dp, struct dp_matrix const* 
         }
     }
 
+#if 0
     if (UNLIKELY(row == 0)) {
         double start = dp_states_start_lprob(dp->states, target_state);
         if (start > score) {
@@ -271,6 +293,7 @@ static double best_trans_score(struct imm_dp const* dp, struct dp_matrix const* 
     }
     /* else if (prev_step->state == UINT_MAX) */
     /*     return imm_lprob_invalid(); */
+#endif
 
     return score;
 }
