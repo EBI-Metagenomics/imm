@@ -241,7 +241,7 @@ static double best_trans_score(struct imm_dp const* dp, struct dp_matrix const* 
     for (unsigned i = 0; i < dp_trans_ntrans(dp->transition, target_state); ++i) {
 
         unsigned source_state = dp_trans_source_state(dp->transition, target_state, i);
-        if (row < dp_states_min_seq(dp->states, source_state))
+        if (UNLIKELY(row < dp_states_min_seq(dp->states, source_state)))
             continue;
 
         unsigned min_seq = dp_states_min_seq(dp->states, source_state);
@@ -267,7 +267,7 @@ static double best_trans_score(struct imm_dp const* dp, struct dp_matrix const* 
         }
     }
 
-    if (row > 0 && prev_step->state == UINT_MAX)
+    if (LIKELY(row > 0) && prev_step->state == UINT_MAX)
         return imm_lprob_invalid();
 
     return score;
