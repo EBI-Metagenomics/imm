@@ -21,7 +21,10 @@ if(CMAKE_VERSION VERSION_GREATER 3.12.0)
 endif()
 
 find_package(logaddexp REQUIRED)
-find_package(OpenMP)
+option(OPENMP "Enable OpenMP" On)
+if(OPENMP)
+    find_package(OpenMP)
+endif()
 
 add_library(imm
     src/abc.c
