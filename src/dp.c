@@ -1,5 +1,5 @@
-#include "compiler.h"
 #include "dp.h"
+#include "compiler.h"
 #include "dp_emission.h"
 #include "dp_matrix.h"
 #include "dp_states.h"
@@ -235,25 +235,19 @@ static double best_trans_score(struct imm_dp const* dp, struct dp_matrix const* 
     prev_step->state = UINT_MAX;
     prev_step->seq_len = UINT_MAX;
 
-    if (UNLIKELY(row == 0))
-        score = dp_states_start_lprob(dp->states, target_state);
-
     for (unsigned i = 0; i < dp_trans_ntrans(dp->transition, target_state); ++i) {
 
         unsigned source_state = dp_trans_source_state(dp->transition, target_state, i);
-        if (UNLIKELY(row < dp_states_min_seq(dp->states, source_state)))
-            continue;
-
         unsigned min_seq = dp_states_min_seq(dp->states, source_state);
-        if (min_seq == 0 && source_state > target_state)
+
+        if (UNLIKELY(row < min_seq) || (min_seq == 0 && source_state > target_state))
             continue;
 
         unsigned max_seq = MIN(dp_states_max_seq(dp->states, source_state), row);
         for (unsigned len = min_seq; len <= max_seq; ++len) {
 
-            struct dp_step step = {.state = source_state, .seq_len = len};
-
-            unsigned const prev_row = row - len;
+            struct dp_step const step = {.state = source_state, .seq_len = len};
+            unsigned             prev_row = row - len;
 
             double v0 = dp_matrix_get_score(matrix, prev_row, step);
             double v1 = dp_trans_score(dp->transition, target_state, i);
@@ -267,8 +261,16 @@ static double best_trans_score(struct imm_dp const* dp, struct dp_matrix const* 
         }
     }
 
-    if (LIKELY(row > 0) && prev_step->state == UINT_MAX)
-        return imm_lprob_invalid();
+    if (UNLIKELY(row == 0)) {
+        double start = dp_states_start_lprob(dp->states, target_state);
+        if (start > score) {
+            score = start;
+            /* prev_step->state = UINT_MAX; */
+            /* prev_step->seq_len = UINT_MAX; */
+        }
+    }
+    /* else if (prev_step->state == UINT_MAX) */
+    /*     return imm_lprob_invalid(); */
 
     return score;
 }
