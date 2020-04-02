@@ -23,8 +23,6 @@ IMM_EXPORT void                     imm_results_free(struct imm_results const* r
 IMM_EXPORT double                 imm_result_loglik(struct imm_result const* result);
 IMM_EXPORT struct imm_path const* imm_result_path(struct imm_result const* result);
 IMM_EXPORT struct imm_subseq      imm_result_subseq(struct imm_result const* result);
-IMM_EXPORT unsigned               imm_result_start(struct imm_result const* result);
-IMM_EXPORT unsigned               imm_result_stop(struct imm_result const* result);
 IMM_EXPORT void                   imm_result_destroy(struct imm_result const* result);
 IMM_EXPORT void                   imm_result_free(struct imm_result const* result);
 
