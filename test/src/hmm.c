@@ -24,6 +24,7 @@ void test_hmm_viterbi_profile_delete(void);
 void test_hmm_viterbi_global_profile(void);
 void test_hmm_viterbi_table_states(void);
 void test_hmm_viterbi_cycle_mute_ending(void);
+void test_hmm_write_one_mute_state(void);
 
 double single_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq,
                       struct imm_state const* end_state, struct imm_path* path);
@@ -52,6 +53,7 @@ int main(void)
     test_hmm_viterbi_global_profile();
     test_hmm_viterbi_table_states();
     test_hmm_viterbi_cycle_mute_ending();
+    test_hmm_write_one_mute_state();
     return cass_status();
 }
 
@@ -1659,4 +1661,31 @@ double single_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq,
     imm_dp_destroy(dp);
 
     return score;
+}
+
+void test_hmm_write_one_mute_state(void)
+{
+    struct imm_abc const* abc = imm_abc_create("ACGT", '*');
+    struct imm_seq const* EMPTY = imm_seq_create("", abc);
+    struct imm_seq const* C = imm_seq_create("C", abc);
+    struct imm_hmm*       hmm = imm_hmm_create(abc);
+
+    struct imm_mute_state const* state = imm_mute_state_create("state", abc);
+
+    imm_hmm_add_state(hmm, cast_c(state), log(0.5));
+    imm_hmm_set_start(hmm, cast_c(state), imm_lprob_zero());
+
+    struct imm_dp const* dp = imm_hmm_create_dp(hmm, cast_c(state));
+
+    FILE* file = fopen("test_hmm.tmp/one_mute_state.imm", "w");
+    cass_cond(file != NULL);
+    cass_equal_int(imm_hmm_write(hmm, dp, file), 0);
+    fclose(file);
+
+    imm_dp_destroy(dp);
+    imm_hmm_destroy(hmm);
+    imm_mute_state_destroy(state);
+    imm_abc_destroy(abc);
+    imm_seq_destroy(EMPTY);
+    imm_seq_destroy(C);
 }

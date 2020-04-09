@@ -22,6 +22,7 @@
 #include "mtrans_table.h"
 #include "seq_code.h"
 #include "state_idx.h"
+#include "io_write.h"
 #include "thread.h"
 #include <limits.h>
 #include <stdio.h>
@@ -68,7 +69,7 @@ static inline void set_score(struct imm_dp const* dp, struct dp_matrix* matrix,
 struct imm_dp const* dp_create(struct imm_abc const* abc, struct mstate const* const* mstates,
                                unsigned const nstates, struct imm_state const* end_state)
 {
-    struct imm_dp* dp = malloc(sizeof(struct imm_dp));
+    struct imm_dp* dp = malloc(sizeof(*dp));
     dp->mstates = mstates;
     dp->seq_code = seq_code_create(abc, min_seq(mstates, nstates), max_seq(mstates, nstates));
 
@@ -88,6 +89,14 @@ struct imm_dp const* dp_create(struct imm_abc const* abc, struct mstate const* c
     }
 
     return dp;
+}
+
+int dp_write(struct imm_dp const* dp, FILE* stream)
+{
+    if (io_write_states(stream, dp->mstates, dp_states_nstates(dp->states)))
+        return 1;
+
+    return 0;
 }
 
 struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq const* seq,

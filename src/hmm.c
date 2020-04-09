@@ -8,6 +8,7 @@
 #include "imm/state.h"
 #include "imm/step.h"
 #include "imm/subseq.h"
+#include "io_write.h"
 #include "min.h"
 #include "mstate.h"
 #include "mstate_sort.h"
@@ -284,6 +285,21 @@ int imm_hmm_normalize_trans(struct imm_hmm* hmm, struct imm_state const* src)
         return 1;
     }
     return hmm_normalize_trans(mstate_table_get(hmm->table, i));
+}
+
+int imm_hmm_write(struct imm_hmm const* hmm, struct imm_dp const* dp, FILE* stream)
+{
+    if (io_write_abc(stream, hmm->abc)) {
+        imm_error("could not write abc");
+        return 1;
+    }
+
+    if (dp_write(dp, stream)) {
+        imm_error("could not write dp");
+        return 1;
+    }
+
+    return 0;
 }
 
 static double hmm_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state)

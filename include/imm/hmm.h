@@ -3,6 +3,7 @@
 
 #include "imm/export.h"
 #include "imm/seq.h"
+#include <stdio.h>
 
 struct imm_abc;
 struct imm_hmm;
@@ -37,5 +38,7 @@ IMM_EXPORT int imm_hmm_normalize(struct imm_hmm* hmm);
 IMM_EXPORT int imm_hmm_normalize_start(struct imm_hmm* hmm);
 
 IMM_EXPORT int imm_hmm_normalize_trans(struct imm_hmm* hmm, struct imm_state const* src);
+
+IMM_EXPORT int imm_hmm_write(struct imm_hmm const* hmm, struct imm_dp const* dp, FILE* stream);
 
 #endif
