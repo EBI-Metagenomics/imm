@@ -1,4 +1,5 @@
 #include "seq_code.h"
+#include "cast.h"
 #include "eseq.h"
 #include "free.h"
 #include "imath.h"
@@ -14,16 +15,16 @@ struct seq_code const* seq_code_create(struct imm_abc const* abc, unsigned min_s
                                        unsigned max_seq)
 {
     IMM_BUG(min_seq > max_seq);
-    struct seq_code* seq_code = malloc(sizeof(struct seq_code));
+    struct seq_code* seq_code = malloc(sizeof(*seq_code));
 
-    seq_code->min_seq = min_seq;
-    seq_code->max_seq = max_seq;
+    seq_code->min_seq = cast_u8_u(min_seq);
+    seq_code->max_seq = cast_u8_u(max_seq);
     seq_code->abc = abc;
 
     if (max_seq == 0)
         seq_code->stride = NULL;
     else {
-        seq_code->stride = malloc(sizeof(unsigned) * max_seq);
+        seq_code->stride = malloc(sizeof(*seq_code->stride) * seq_code_stride_size(seq_code));
         seq_code->stride[max_seq - 1] = 1;
     }
 
@@ -32,7 +33,7 @@ struct seq_code const* seq_code_create(struct imm_abc const* abc, unsigned min_s
             seq_code->stride[len] = seq_code->stride[len + 1] * imm_abc_length(abc);
     }
 
-    seq_code->offset = malloc(sizeof(unsigned) * (max_seq - min_seq + 1));
+    seq_code->offset = malloc(sizeof(*seq_code->offset) * seq_code_offset_size(seq_code));
     seq_code->offset[0] = 0;
     for (unsigned len = min_seq + 1; len <= max_seq; ++len) {
 
@@ -43,8 +44,7 @@ struct seq_code const* seq_code_create(struct imm_abc const* abc, unsigned min_s
 
     unsigned long ncombs = ipow(imm_abc_length(abc), max_seq);
 
-    IMM_BUG(ncombs > UINT_MAX);
-    seq_code->size = seq_code->offset[max_seq - min_seq] + (unsigned)ncombs;
+    seq_code->size = seq_code->offset[max_seq - min_seq] + cast_u_lu(ncombs);
 
     return seq_code;
 }
@@ -64,7 +64,7 @@ unsigned seq_code_encode(struct seq_code const* seq_code, struct imm_seq const* 
 
 struct eseq* seq_code_create_eseq(struct seq_code const* seq_code)
 {
-    struct eseq* eseq = malloc(sizeof(struct eseq));
+    struct eseq* eseq = malloc(sizeof(*eseq));
     eseq->seq_code = seq_code;
     eseq->code = matrixu_create(1, seq_code->max_seq - seq_code->min_seq + 1);
     return eseq;

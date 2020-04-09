@@ -7,7 +7,7 @@ struct dp_matrix* dp_matrix_create(struct dp_states const* states)
     struct dp_matrix* matrix = malloc(sizeof(struct dp_matrix));
 
     matrix->states = states;
-    matrix->state_col = malloc(sizeof(int) * dp_states_nstates(states));
+    matrix->state_col = malloc(sizeof(*matrix->state_col) * dp_states_nstates(states));
 
     unsigned next_col = 0;
     for (unsigned i = 0; i < dp_states_nstates(states); ++i) {

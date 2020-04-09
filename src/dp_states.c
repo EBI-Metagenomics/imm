@@ -1,4 +1,5 @@
 #include "dp_states.h"
+#include "cast.h"
 #include "free.h"
 #include "imm/state.h"
 #include "mstate.h"
@@ -19,8 +20,8 @@ struct dp_states const* dp_states_create(struct mstate const* const* mstates, un
 
     for (unsigned i = 0; i < nstates; ++i) {
         state_idx_add(state_idx, mstate_get_state(mstates[i]), i);
-        states->min_seq[i] = imm_state_min_seq(mstate_get_state(mstates[i]));
-        states->max_seq[i] = imm_state_max_seq(mstate_get_state(mstates[i]));
+        states->min_seq[i] = cast_u8_u(imm_state_min_seq(mstate_get_state(mstates[i])));
+        states->max_seq[i] = cast_u8_u(imm_state_max_seq(mstate_get_state(mstates[i])));
         states->start_lprob[i] = mstate_get_start(mstates[i]);
     }
 

@@ -1,17 +1,19 @@
 #ifndef DP_STATES_H
 #define DP_STATES_H
 
+#include <inttypes.h>
+
 struct mstate;
 struct imm_state;
 struct state_idx;
 
 struct dp_states
 {
-    unsigned* min_seq;
-    unsigned* max_seq;
-    double*   start_lprob;
-    unsigned  nstates;
-    unsigned  end_state;
+    uint32_t nstates;
+    uint8_t* min_seq;
+    uint8_t* max_seq;
+    double*  start_lprob;
+    uint32_t end_state;
 };
 
 struct dp_states const* dp_states_create(struct mstate const* const* mstates, unsigned nstates,

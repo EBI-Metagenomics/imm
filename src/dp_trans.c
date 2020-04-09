@@ -21,7 +21,7 @@ static unsigned create_incoming_transitions(struct list_head*           incoming
                                             struct state_idx const*     state_idx);
 
 struct dp_trans const* dp_trans_create(struct mstate const* const* mstates, unsigned nstates,
-                                         struct state_idx* state_idx)
+                                       struct state_idx* state_idx)
 {
     struct list_head incoming_trans[nstates];
     for (unsigned i = 0; i < nstates; ++i)
@@ -29,13 +29,14 @@ struct dp_trans const* dp_trans_create(struct mstate const* const* mstates, unsi
 
     unsigned ntrans = create_incoming_transitions(incoming_trans, mstates, nstates, state_idx);
 
-    struct dp_trans* trans_tbl = malloc(sizeof(struct dp_trans));
-    trans_tbl->offset = malloc(sizeof(unsigned) * (nstates + 1));
+    struct dp_trans* trans_tbl = malloc(sizeof(*trans_tbl));
+    trans_tbl->offset = malloc(sizeof(*trans_tbl->offset) * dp_trans_offset_size(nstates));
     trans_tbl->offset[0] = 0;
 
     if (ntrans > 0) {
-        trans_tbl->score = malloc(sizeof(double) * ntrans);
-        trans_tbl->source_state = malloc(sizeof(unsigned) * ntrans);
+        trans_tbl->score = malloc(sizeof(*trans_tbl->score) * dp_trans_score_size(ntrans));
+        trans_tbl->source_state =
+            malloc(sizeof(*trans_tbl->source_state) * dp_trans_source_state_size(ntrans));
     } else {
         trans_tbl->score = NULL;
         trans_tbl->source_state = NULL;

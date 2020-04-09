@@ -1,14 +1,16 @@
 #ifndef DP_TRANS_H
 #define DP_TRANS_H
 
+#include <inttypes.h>
+
 struct mstate;
 struct state_idx;
 
 struct dp_trans
 {
     double*   score;
-    unsigned* source_state;
-    unsigned* offset;
+    uint32_t* source_state;
+    uint32_t* offset;
 };
 
 struct dp_trans const* dp_trans_create(struct mstate const* const* mstates, unsigned nstates,
@@ -32,5 +34,11 @@ static inline unsigned dp_trans_source_state(struct dp_trans const* trans_tbl,
 }
 
 void dp_trans_destroy(struct dp_trans const* transition);
+
+static inline unsigned dp_trans_score_size(unsigned ntrans) { return ntrans; }
+
+static inline unsigned dp_trans_source_state_size(unsigned ntrans) { return ntrans; }
+
+static inline unsigned dp_trans_offset_size(unsigned nstates) { return nstates + 1; }
 
 #endif

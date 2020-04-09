@@ -1,5 +1,6 @@
 #include "dp_emission.h"
 #include "cartes.h"
+#include "cast.h"
 #include "free.h"
 #include "imm/abc.h"
 #include "imm/seq.h"
@@ -9,12 +10,12 @@
 #include <stdlib.h>
 
 struct dp_emission const* dp_emission_create(struct seq_code const*      seq_code,
-                                              struct mstate const* const* mstates,
-                                              unsigned                    nstates)
+                                             struct mstate const* const* mstates,
+                                             unsigned                    nstates)
 {
-    struct dp_emission* emiss_tbl = malloc(sizeof(struct dp_emission));
+    struct dp_emission* emiss_tbl = malloc(sizeof(*emiss_tbl));
 
-    emiss_tbl->offset = malloc(sizeof(unsigned) * (nstates + 1));
+    emiss_tbl->offset = malloc(sizeof(*emiss_tbl->offset) * dp_emission_offset_size(nstates));
     emiss_tbl->offset[0] = 0;
 
     unsigned size = seq_code_size(seq_code, imm_state_min_seq(mstate_get_state(mstates[0])));
@@ -22,9 +23,10 @@ struct dp_emission const* dp_emission_create(struct seq_code const*      seq_cod
         emiss_tbl->offset[i] = size;
         size += seq_code_size(seq_code, imm_state_min_seq(mstate_get_state(mstates[i])));
     }
-    emiss_tbl->offset[nstates] = size;
+    emiss_tbl->offset[nstates] = cast_u32_u(size);
 
-    emiss_tbl->score = malloc(sizeof(double) * size);
+    emiss_tbl->score =
+        malloc(sizeof(*emiss_tbl->score) * dp_emission_score_size(emiss_tbl, nstates));
 
     struct imm_abc const* abc = seq_code_abc(seq_code);
     char const*           set = imm_abc_symbols(abc);

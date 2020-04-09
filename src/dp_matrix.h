@@ -7,6 +7,7 @@
 #include "eseq.h"
 #include "matrixd.h"
 #include "step_matrix.h"
+#include <inttypes.h>
 
 struct imm_dp;
 struct imm_seq;
@@ -16,8 +17,8 @@ struct dp_matrix
     struct dp_states const* states;
     struct matrixd*         score;
     struct step_matrix*     prev_step;
-    int*                    state_col;
-    unsigned                nstates;
+    int32_t*                state_col;
+    uint32_t                nstates;
 };
 
 struct dp_matrix* dp_matrix_create(struct dp_states const* states);
