@@ -1,6 +1,7 @@
 #include "imm/abc.h"
 #include "free.h"
 #include "imm/report.h"
+#include "cast.h"
 #include <string.h>
 
 struct imm_abc const* imm_abc_create(char const* symbols, char const any_symbol)
@@ -21,7 +22,7 @@ struct imm_abc const* imm_abc_create(char const* symbols, char const any_symbol)
         return NULL;
     }
 
-    abc->length = (unsigned)strlen(symbols);
+    abc->length = cast_u_zu(strlen(symbols));
     for (unsigned i = 0; i < abc->length; ++i) {
         if (symbols[i] == any_symbol) {
             imm_error("any_symbol cannot be in the alphabet");
