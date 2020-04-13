@@ -93,7 +93,7 @@ struct imm_dp const* dp_create(struct imm_abc const* abc, struct mstate const* c
 
 int dp_write(struct imm_dp const* dp, FILE* stream)
 {
-    if (io_write_states(stream, dp->mstates, dp_states_nstates(dp->states))) {
+    if (mstate_write_states(stream, dp->mstates, dp_states_nstates(dp->states))) {
         imm_error("could not write states");
         return 1;
     }

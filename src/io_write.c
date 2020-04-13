@@ -16,22 +16,6 @@ struct abc_chunk
     char        any_symbol;
 };
 
-struct state_chunk
-{
-    uint8_t     state_type;
-    uint16_t    name_size;
-    char const* name;
-    double      start_lprob;
-    uint32_t    impl_chunk_size;
-    char*       impl_chunk;
-};
-
-struct states_chunk
-{
-    uint32_t           nstates;
-    struct state_chunk state_chunk;
-};
-
 struct dp_emission_chunk
 {
     uint32_t  score_size;
@@ -73,55 +57,6 @@ int io_write_abc(FILE* stream, struct imm_abc const* abc)
 
     if (fwrite(&chunk.any_symbol, sizeof(chunk.any_symbol), 1, stream) < 1)
         return 1;
-
-    return 0;
-}
-
-int io_write_state(FILE* stream, struct mstate const* mstate)
-{
-    struct imm_state const* state = mstate_get_state(mstate);
-
-    struct state_chunk chunk = {.state_type = 0,
-                                .name_size =
-                                    (cast_u16_zu(strlen(imm_state_get_name(state))) + 1),
-                                .name = imm_state_get_name(state),
-                                .start_lprob = mstate_get_start(mstate),
-                                .impl_chunk_size = 0,
-                                .impl_chunk = NULL};
-
-    if (fwrite(&chunk.state_type, sizeof(chunk.state_type), 1, stream) < 1)
-        return 1;
-
-    if (fwrite(&chunk.name_size, sizeof(chunk.name_size), 1, stream) < 1)
-        return 1;
-
-    if (fwrite(chunk.name, sizeof(*chunk.name), chunk.name_size, stream) < chunk.name_size)
-        return 1;
-
-    if (fwrite(&chunk.start_lprob, sizeof(chunk.start_lprob), 1, stream) < 1)
-        return 1;
-
-    if (fwrite(&chunk.impl_chunk_size, sizeof(chunk.impl_chunk_size), 1, stream) < 1)
-        return 1;
-
-    if (fwrite(chunk.impl_chunk, sizeof(*chunk.impl_chunk), chunk.impl_chunk_size, stream) <
-        chunk.impl_chunk_size)
-        return 1;
-
-    return 0;
-}
-
-int io_write_states(FILE* stream, struct mstate const* const* mstates, uint32_t nstates)
-{
-    struct states_chunk chunk = {.nstates = nstates};
-
-    if (fwrite(&chunk.nstates, sizeof(chunk.nstates), 1, stream) < 1)
-        return 1;
-
-    for (uint32_t i = 0; i < nstates; ++i) {
-        if (io_write_state(stream, mstates[i]))
-            return 1;
-    }
 
     return 0;
 }
