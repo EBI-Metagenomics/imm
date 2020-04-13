@@ -95,7 +95,7 @@ int io_write_state(FILE* stream, struct mstate const* mstate)
     if (fwrite(&chunk.name_size, sizeof(chunk.name_size), 1, stream) < 1)
         return 1;
 
-    if (fwrite(chunk.name, sizeof(*chunk.name) * chunk.name_size, 1, stream) < 1)
+    if (fwrite(chunk.name, sizeof(*chunk.name), chunk.name_size, stream) < chunk.name_size)
         return 1;
 
     if (fwrite(&chunk.start_lprob, sizeof(chunk.start_lprob), 1, stream) < 1)
@@ -104,11 +104,9 @@ int io_write_state(FILE* stream, struct mstate const* mstate)
     if (fwrite(&chunk.impl_chunk_size, sizeof(chunk.impl_chunk_size), 1, stream) < 1)
         return 1;
 
-    if (chunk.impl_chunk_size > 0) {
-        if (fwrite(chunk.impl_chunk, sizeof(*chunk.impl_chunk) * chunk.impl_chunk_size, 1,
-                   stream) < 1)
-            return 1;
-    }
+    if (fwrite(chunk.impl_chunk, sizeof(*chunk.impl_chunk), chunk.impl_chunk_size, stream) <
+        chunk.impl_chunk_size)
+        return 1;
 
     return 0;
 }
