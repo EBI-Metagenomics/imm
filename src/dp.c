@@ -16,13 +16,13 @@
 #include "imm/step.h"
 #include "imm/subseq.h"
 #include "imm/window.h"
+#include "io_write.h"
 #include "min.h"
 #include "mstate.h"
 #include "mtrans.h"
 #include "mtrans_table.h"
 #include "seq_code.h"
 #include "state_idx.h"
-#include "io_write.h"
 #include "thread.h"
 #include <limits.h>
 #include <stdio.h>
@@ -93,8 +93,15 @@ struct imm_dp const* dp_create(struct imm_abc const* abc, struct mstate const* c
 
 int dp_write(struct imm_dp const* dp, FILE* stream)
 {
-    if (io_write_states(stream, dp->mstates, dp_states_nstates(dp->states)))
+    if (io_write_states(stream, dp->mstates, dp_states_nstates(dp->states))) {
+        imm_error("could not write states");
         return 1;
+    }
+
+    if (seq_code_write(dp->seq_code, stream)) {
+        imm_error("could not write seq_code");
+        return 1;
+    }
 
     return 0;
 }
@@ -156,15 +163,18 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
                     eseq_setup(eseq, imm_subseq_cast(&subseq));
 
                     /* elapsed_start(elapsed1); */
-                    /* fprintf(stderr, "create_eseq  : %f seconds\n", elapsed_end(elapsed1)); */
+                    /* fprintf(stderr, "create_eseq  : %f seconds\n", elapsed_end(elapsed1));
+                     */
 
                     /* elapsed_start(elapsed1); */
                     dp_matrix_setup(matrix, eseq);
-                    /* fprintf(stderr, "matrix_setup : %f seconds\n", elapsed_end(elapsed1)); */
+                    /* fprintf(stderr, "matrix_setup : %f seconds\n", elapsed_end(elapsed1));
+                     */
 
                     /* elapsed_start(elapsed1); */
                     double score = viterbi(dp, matrix, eseq, path);
-                    /* fprintf(stderr, "dp_viterbi   : %f seconds\n", elapsed_end(elapsed1)); */
+                    /* fprintf(stderr, "dp_viterbi   : %f seconds\n", elapsed_end(elapsed1));
+                     */
 
                     imm_results_set(results, i, subseq, path, score);
                 }

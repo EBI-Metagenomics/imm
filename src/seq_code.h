@@ -3,6 +3,7 @@
 
 #include "imm/export.h"
 #include <inttypes.h>
+#include <stdio.h>
 
 struct imm_abc;
 struct imm_seq;
@@ -16,6 +17,15 @@ struct seq_code
     uint32_t*             stride;
     uint32_t              size;
     struct imm_abc const* abc;
+};
+
+struct seq_code_chunk
+{
+    uint8_t   min_seq;
+    uint8_t   max_seq;
+    uint32_t* offset;
+    uint32_t* stride;
+    uint32_t  size;
 };
 
 static inline uint8_t seq_code_offset_size(struct seq_code const* seq_code)
@@ -53,5 +63,6 @@ static inline struct imm_abc const* seq_code_abc(struct seq_code const* seq_code
     return seq_code->abc;
 }
 void seq_code_destroy(struct seq_code const* seq_code);
+int  seq_code_write(struct seq_code const* seq_code, FILE* stream);
 
 #endif
