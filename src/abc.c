@@ -1,8 +1,16 @@
 #include "imm/abc.h"
+#include "abc.h"
+#include "cast.h"
 #include "free.h"
 #include "imm/report.h"
-#include "cast.h"
 #include <string.h>
+
+struct abc_chunk
+{
+    uint16_t    symbols_size;
+    char const* symbols;
+    char        any_symbol;
+};
 
 struct imm_abc const* imm_abc_create(char const* symbols, char const any_symbol)
 {
@@ -66,6 +74,25 @@ void imm_abc_destroy(struct imm_abc const* abc)
 {
     free_c(abc->symbols);
     free_c(abc);
+}
+
+int abc_write(FILE* stream, struct imm_abc const* abc)
+{
+    struct abc_chunk chunk = {.symbols_size = cast_u16_zu(strlen(abc->symbols) + 1),
+                              .symbols = abc->symbols,
+                              .any_symbol = abc->any_symbol};
+
+    if (fwrite(&chunk.symbols_size, sizeof(chunk.symbols_size), 1, stream) < 1)
+        return 1;
+
+    if (fwrite(chunk.symbols, sizeof(*chunk.symbols), chunk.symbols_size, stream) <
+        chunk.symbols_size)
+        return 1;
+
+    if (fwrite(&chunk.any_symbol, sizeof(chunk.any_symbol), 1, stream) < 1)
+        return 1;
+
+    return 0;
 }
 
 enum imm_symbol_type imm_abc_symbol_type(struct imm_abc const* abc, char symbol_id)

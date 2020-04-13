@@ -1,4 +1,5 @@
 #include "imm/hmm.h"
+#include "abc.h"
 #include "dp.h"
 #include "free.h"
 #include "imm/bug.h"
@@ -8,7 +9,6 @@
 #include "imm/state.h"
 #include "imm/step.h"
 #include "imm/subseq.h"
-#include "io_write.h"
 #include "min.h"
 #include "mstate.h"
 #include "mstate_sort.h"
@@ -289,7 +289,7 @@ int imm_hmm_normalize_trans(struct imm_hmm* hmm, struct imm_state const* src)
 
 int imm_hmm_write(struct imm_hmm const* hmm, struct imm_dp const* dp, FILE* stream)
 {
-    if (io_write_abc(stream, hmm->abc)) {
+    if (abc_write(stream, hmm->abc)) {
         imm_error("could not write abc");
         return 1;
     }

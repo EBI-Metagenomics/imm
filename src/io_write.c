@@ -9,13 +9,6 @@
 #include <inttypes.h>
 #include <string.h>
 
-struct abc_chunk
-{
-    uint16_t    symbols_size;
-    char const* symbols;
-    char        any_symbol;
-};
-
 struct dp_emission_chunk
 {
     uint32_t  score_size;
@@ -42,24 +35,6 @@ struct dp_states_chunk
     double*  start_lprob;
     uint32_t end_state;
 };
-
-int io_write_abc(FILE* stream, struct imm_abc const* abc)
-{
-    struct abc_chunk chunk = {.symbols_size = cast_u16_zu(strlen(abc->symbols) + 1),
-                              .symbols = abc->symbols,
-                              .any_symbol = abc->any_symbol};
-
-    if (fwrite(&chunk.symbols_size, sizeof(chunk.symbols_size), 1, stream) < 1)
-        return 1;
-
-    if (fwrite(chunk.symbols, sizeof(*chunk.symbols) * chunk.symbols_size, 1, stream) < 1)
-        return 1;
-
-    if (fwrite(&chunk.any_symbol, sizeof(chunk.any_symbol), 1, stream) < 1)
-        return 1;
-
-    return 0;
-}
 
 int io_write_dp_emission(FILE* stream, struct dp_emission const* emission, uint32_t nstates)
 {
