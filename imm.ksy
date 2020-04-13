@@ -20,6 +20,8 @@ seq:
     type: state
     repeat: expr
     repeat-expr: nstates
+  - id: seq_code
+    type: seq_code
 types:
   state:
     seq:
@@ -35,4 +37,20 @@ types:
       - id: start_lprob
         type: f8
       - id: impl_chunk_size
+        type: u4
+  seq_code:
+    seq:
+      - id: min_seq
+        type: u1
+      - id: max_seq
+        type: u1
+      - id: offset
+        type: u4
+        repeat: expr
+        repeat-expr: max_seq - min_seq + 1
+      - id: stride
+        type: u4
+        repeat: expr
+        repeat-expr: max_seq
+      - id: size
         type: u4
