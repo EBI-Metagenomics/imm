@@ -3,26 +3,36 @@ meta:
   file-extension: imm
   endian: le
 seq:
-  - id: symbols_size
-    type: u2
-  - id: symbols
-    type: str
-    encoding: ASCII
-    size: symbols_size
-    terminator: 0
-  - id: any_symbol
-    type: str
-    encoding: ASCII
-    size: 1
-  - id: nstates
-    type: u4
-  - id: states
-    type: state
-    repeat: expr
-    repeat-expr: nstates
+  - id: abc
+    type: abc
+  - id: hmm
+    type: hmm
   - id: seq_code
     type: seq_code
+  - id: dp_emission
+    type: dp_emission
 types:
+  abc:
+    seq:
+      - id: symbols_size
+        type: u2
+      - id: symbols
+        type: str
+        encoding: ASCII
+        size: symbols_size
+        terminator: 0
+      - id: any_symbol
+        type: str
+        encoding: ASCII
+        size: 1
+  hmm:
+    seq:
+      - id: nstates
+        type: u4
+      - id: states
+        type: state
+        repeat: expr
+        repeat-expr: nstates
   state:
     seq:
       - id: state_type
@@ -54,3 +64,17 @@ types:
         repeat-expr: max_seq
       - id: size
         type: u4
+  dp_emission:
+    seq:
+      - id: score_size
+        type: u4
+      - id: score
+        type: f8
+        repeat: expr
+        repeat-expr: score_size
+      - id: offset_size
+        type: u4
+      - id: offset
+        type: u4
+        repeat: expr
+        repeat-expr: offset_size

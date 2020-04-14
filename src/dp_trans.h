@@ -2,12 +2,14 @@
 #define DP_TRANS_H
 
 #include <inttypes.h>
+#include <stdio.h>
 
 struct mstate;
 struct state_idx;
 
 struct dp_trans
 {
+    uint32_t  ntrans;
     double*   score;
     uint32_t* source_state;
     uint32_t* offset;
@@ -34,6 +36,8 @@ static inline unsigned dp_trans_source_state(struct dp_trans const* trans_tbl,
 }
 
 void dp_trans_destroy(struct dp_trans const* transition);
+
+int dp_trans_write(struct dp_trans const* trans, uint32_t nstates, FILE* stream);
 
 static inline unsigned dp_trans_score_size(unsigned ntrans) { return ntrans; }
 

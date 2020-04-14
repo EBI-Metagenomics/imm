@@ -2,6 +2,7 @@
 #define DP_EMISSION_H
 
 #include <inttypes.h>
+#include <stdio.h>
 
 struct seq_code;
 struct mstate;
@@ -30,5 +31,6 @@ static inline unsigned dp_emission_score_size(struct dp_emission const* emission
     return emission->offset[nstates];
 }
 static inline unsigned dp_emission_offset_size(unsigned nstates) { return nstates + 1; }
+int dp_emission_write(struct dp_emission const* emission, uint32_t nstates, FILE* stream);
 
 #endif

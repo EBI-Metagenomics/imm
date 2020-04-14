@@ -9,6 +9,14 @@
 #include "seq_code.h"
 #include <stdlib.h>
 
+struct dp_emission_chunk
+{
+    uint32_t  score_size;
+    double*   score;
+    uint32_t  offset_size;
+    uint32_t* offset;
+};
+
 struct dp_emission const* dp_emission_create(struct seq_code const*      seq_code,
                                              struct mstate const* const* mstates,
                                              unsigned                    nstates)
@@ -61,4 +69,28 @@ void dp_emission_destroy(struct dp_emission const* emission)
     free_c(emission->score);
     free_c(emission->offset);
     free_c(emission);
+}
+
+int dp_emission_write(struct dp_emission const* emission, uint32_t nstates, FILE* stream)
+{
+    struct dp_emission_chunk chunk = {.score_size = dp_emission_score_size(emission, nstates),
+                                      .score = emission->score,
+                                      .offset_size = dp_emission_offset_size(nstates),
+                                      .offset = emission->offset};
+
+    if (fwrite(&chunk.score_size, sizeof(chunk.score_size), 1, stream) < 1)
+        return 1;
+
+    if (fwrite(chunk.score, sizeof(*chunk.score), dp_emission_score_size(emission, nstates),
+               stream) < dp_emission_score_size(emission, nstates))
+        return 1;
+
+    if (fwrite(&chunk.offset_size, sizeof(chunk.offset_size), 1, stream) < 1)
+        return 1;
+
+    if (fwrite(chunk.offset, sizeof(*chunk.offset), dp_emission_offset_size(nstates), stream) <
+        dp_emission_offset_size(nstates))
+        return 1;
+
+    return 0;
 }

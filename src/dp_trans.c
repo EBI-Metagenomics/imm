@@ -15,6 +15,15 @@ struct incoming_trans
     struct list_head list_entry;
 };
 
+struct dp_trans_chunk
+{
+    uint32_t  ntrans;
+    double*   score;
+    uint32_t* source_state;
+    uint32_t  offset_size;
+    uint32_t* offset;
+};
+
 static unsigned create_incoming_transitions(struct list_head*           incoming_trans,
                                             struct mstate const* const* mstates,
                                             unsigned                    nstates,
@@ -30,6 +39,7 @@ struct dp_trans const* dp_trans_create(struct mstate const* const* mstates, unsi
     unsigned ntrans = create_incoming_transitions(incoming_trans, mstates, nstates, state_idx);
 
     struct dp_trans* trans_tbl = malloc(sizeof(*trans_tbl));
+    trans_tbl->ntrans = ntrans;
     trans_tbl->offset = malloc(sizeof(*trans_tbl->offset) * dp_trans_offset_size(nstates));
     trans_tbl->offset[0] = 0;
 
@@ -106,4 +116,34 @@ void dp_trans_destroy(struct dp_trans const* trans_tbl)
     free_c(trans_tbl->source_state);
     free_c(trans_tbl->offset);
     free_c(trans_tbl);
+}
+
+int dp_trans_write(struct dp_trans const* trans, uint32_t nstates, FILE* stream)
+{
+    struct dp_trans_chunk chunk = {.ntrans = trans->ntrans,
+                                   .score = trans->score,
+                                   .source_state = trans->source_state,
+                                   .offset_size = nstates + 1,
+                                   .offset = trans->offset};
+
+    if (fwrite(&chunk.ntrans, sizeof(chunk.ntrans), 1, stream) < 1)
+        return 1;
+
+    if (fwrite(chunk.score, sizeof(*chunk.score), dp_trans_score_size(trans->ntrans), stream) <
+        dp_trans_score_size(trans->ntrans))
+        return 1;
+
+    if (fwrite(chunk.source_state, sizeof(*chunk.source_state),
+               dp_trans_source_state_size(trans->ntrans),
+               stream) < dp_trans_source_state_size(trans->ntrans))
+        return 1;
+
+    if (fwrite(&chunk.offset_size, sizeof(chunk.offset_size), 1, stream) < 1)
+        return 1;
+
+    if (fwrite(chunk.offset, sizeof(*chunk.offset), dp_trans_offset_size(nstates), stream) <
+        dp_trans_offset_size(nstates))
+        return 1;
+
+    return 0;
 }

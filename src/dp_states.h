@@ -2,6 +2,7 @@
 #define DP_STATES_H
 
 #include <inttypes.h>
+#include <stdio.h>
 
 struct mstate;
 struct imm_state;
@@ -46,5 +47,7 @@ static inline unsigned dp_states_end_state(struct dp_states const* states)
 }
 
 void dp_states_destroy(struct dp_states const* states);
+
+int dp_states_write(struct dp_states const* states, FILE* stream);
 
 #endif

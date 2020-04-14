@@ -16,7 +16,6 @@
 #include "imm/step.h"
 #include "imm/subseq.h"
 #include "imm/window.h"
-#include "io_write.h"
 #include "min.h"
 #include "mstate.h"
 #include "mtrans.h"
@@ -100,6 +99,16 @@ int dp_write(struct imm_dp const* dp, FILE* stream)
 
     if (seq_code_write(dp->seq_code, stream)) {
         imm_error("could not write seq_code");
+        return 1;
+    }
+
+    if (dp_emission_write(dp->emission, dp_states_nstates(dp->states), stream)) {
+        imm_error("could not write dp_emission");
+        return 1;
+    }
+
+    if (dp_trans_write(dp->transition, dp_states_nstates(dp->states), stream)) {
+        imm_error("could not write dp_trans");
         return 1;
     }
 
