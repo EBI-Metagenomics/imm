@@ -41,8 +41,6 @@ types:
         repeat-expr: ntransitions
   state:
     seq:
-      - id: state_type
-        type: u1
       - id: name_length
         type: u2
       - id: name
@@ -52,8 +50,12 @@ types:
         terminator: 0
       - id: start_lprob
         type: f8
+      - id: state_type
+        type: u1
       - id: impl_chunk_size
         type: u4
+      - id: impl_chunk
+        size: impl_chunk_size
   transition:
     seq:
       - id: source_state

@@ -7,7 +7,8 @@
 #include <string.h>
 
 struct imm_state const* imm_state_create(char const* name, struct imm_abc const* abc,
-                                         struct imm_state_funcs funcs, void* impl)
+                                         struct imm_state_funcs funcs, uint8_t type_id,
+                                         void* impl)
 {
     if (imm_abc_length(abc) == 0) {
         imm_error("empty alphabet");
@@ -25,6 +26,8 @@ struct imm_state const* imm_state_create(char const* name, struct imm_abc const*
     s->lprob = funcs.lprob;
     s->min_seq = funcs.min_seq;
     s->max_seq = funcs.max_seq;
+    s->write = funcs.write;
+    s->type_id = type_id;
     s->impl = impl;
     return s;
 }
