@@ -3,23 +3,21 @@ meta:
   file-extension: imm
   endian: le
 seq:
-  - id: abc
-    type: abc
   - id: hmm
     type: hmm
-  - id: seq_code
-    type: seq_code
-  - id: dp_emission
-    type: dp_emission
+#  - id: seq_code
+#    type: seq_code
+#  - id: dp_emission
+#    type: dp_emission
 types:
   abc:
     seq:
-      - id: symbols_size
+      - id: nsymbols
         type: u2
       - id: symbols
         type: str
         encoding: ASCII
-        size: symbols_size
+        size: nsymbols
         terminator: 0
       - id: any_symbol
         type: str
@@ -27,18 +25,20 @@ types:
         size: 1
   hmm:
     seq:
+      - id: abc
+        type: abc
       - id: nstates
         type: u4
       - id: states
         type: state
         repeat: expr
         repeat-expr: nstates
-      - id: ntrans
+      - id: ntransitions
         type: u4
-      - id: trans
-        type: trans
+      - id: transitions
+        type: transition
         repeat: expr
-        repeat-expr: ntrans
+        repeat-expr: ntransitions
   state:
     seq:
       - id: state_type
@@ -54,11 +54,11 @@ types:
         type: f8
       - id: impl_chunk_size
         type: u4
-  trans:
+  transition:
     seq:
       - id: source_state
         type: u4
-      - id: target_source
+      - id: target_state
         type: u4
       - id: lprob
         type: f8
