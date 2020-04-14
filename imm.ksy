@@ -33,6 +33,12 @@ types:
         type: state
         repeat: expr
         repeat-expr: nstates
+      - id: ntrans
+        type: u4
+      - id: trans
+        type: trans
+        repeat: expr
+        repeat-expr: ntrans
   state:
     seq:
       - id: state_type
@@ -48,6 +54,14 @@ types:
         type: f8
       - id: impl_chunk_size
         type: u4
+  trans:
+    seq:
+      - id: source_state
+        type: u4
+      - id: target_source
+        type: u4
+      - id: lprob
+        type: f8
   seq_code:
     seq:
       - id: min_seq

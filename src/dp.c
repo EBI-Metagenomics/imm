@@ -92,11 +92,6 @@ struct imm_dp const* dp_create(struct imm_abc const* abc, struct mstate const* c
 
 int dp_write(struct imm_dp const* dp, FILE* stream)
 {
-    if (mstate_write_states(stream, dp->mstates, dp_states_nstates(dp->states))) {
-        imm_error("could not write states");
-        return 1;
-    }
-
     if (seq_code_write(dp->seq_code, stream)) {
         imm_error("could not write seq_code");
         return 1;
@@ -114,6 +109,12 @@ int dp_write(struct imm_dp const* dp, FILE* stream)
 
     return 0;
 }
+
+struct mstate const* const* dp_mstates(struct imm_dp const* dp) { return dp->mstates; }
+
+struct dp_states const* dp_states(struct imm_dp const* dp) { return dp->states; }
+
+struct dp_trans const* dp_trans_table(struct imm_dp const* dp) { return dp->transition; }
 
 struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq const* seq,
                                          unsigned window_length)

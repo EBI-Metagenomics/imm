@@ -1,6 +1,8 @@
 #include "imm/hmm.h"
 #include "abc.h"
 #include "dp.h"
+#include "dp_states.h"
+#include "dp_trans.h"
 #include "free.h"
 #include "imm/bug.h"
 #include "imm/lprob.h"
@@ -292,6 +294,41 @@ int imm_hmm_write(struct imm_hmm const* hmm, struct imm_dp const* dp, FILE* stre
     if (abc_write(stream, hmm->abc)) {
         imm_error("could not write abc");
         return 1;
+    }
+
+    struct dp_states const* states = dp_states(dp);
+    if (mstate_write_states(stream, dp_mstates(dp), dp_states_nstates(states))) {
+        imm_error("could not write states");
+        return 1;
+    }
+
+    struct dp_trans const* trans_tbl = dp_trans_table(dp);
+    uint32_t               ntrans = dp_trans_total_ntrans(trans_tbl);
+    if (fwrite(&ntrans, sizeof(ntrans), 1, stream) < 1) {
+        imm_error("could not write ntrans");
+        return 1;
+    }
+
+    for (uint32_t target_state = 0; target_state < dp_states_nstates(states); ++target_state) {
+        for (uint32_t trans = 0; trans < dp_trans_ntrans(trans_tbl, target_state); ++trans) {
+            uint32_t source_state = dp_trans_source_state(trans_tbl, target_state, trans);
+            double   lprob = dp_trans_score(trans_tbl, target_state, trans);
+
+            if (fwrite(&source_state, sizeof(source_state), 1, stream) < 1) {
+                imm_error("could not write source_state");
+                return 1;
+            }
+
+            if (fwrite(&target_state, sizeof(target_state), 1, stream) < 1) {
+                imm_error("could not write target_state");
+                return 1;
+            }
+
+            if (fwrite(&lprob, sizeof(lprob), 1, stream) < 1) {
+                imm_error("could not write lprob");
+                return 1;
+            }
+        }
     }
 
     if (dp_write(dp, stream)) {
