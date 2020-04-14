@@ -9,6 +9,11 @@ seq:
 #    type: seq_code
 #  - id: dp_emission
 #    type: dp_emission
+enums:
+  state_type:
+    0: mute
+    1: normal
+    2: table
 types:
   abc:
     seq:
@@ -52,6 +57,7 @@ types:
         type: f8
       - id: state_type
         type: u1
+        enum: state_type
       - id: impl_chunk_size
         type: u4
       - id: impl_chunk
