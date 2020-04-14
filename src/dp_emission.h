@@ -15,9 +15,9 @@ struct dp_emission
 
 struct dp_emission const* dp_emission_create(struct seq_code const*      seq_code,
                                              struct mstate const* const* mstates,
-                                             unsigned                    nstates);
+                                             uint32_t                    nstates);
 
-static inline double dp_emission_score(struct dp_emission const* emission, unsigned state,
+static inline double dp_emission_score(struct dp_emission const* emission, uint32_t state,
                                        unsigned seq_code)
 {
     return emission->score[emission->offset[state] + seq_code];
@@ -25,12 +25,6 @@ static inline double dp_emission_score(struct dp_emission const* emission, unsig
 
 void dp_emission_destroy(struct dp_emission const* emission);
 
-static inline unsigned dp_emission_score_size(struct dp_emission const* emission,
-                                              unsigned                  nstates)
-{
-    return emission->offset[nstates];
-}
-static inline unsigned dp_emission_offset_size(unsigned nstates) { return nstates + 1; }
 int dp_emission_write(struct dp_emission const* emission, uint32_t nstates, FILE* stream);
 
 #endif

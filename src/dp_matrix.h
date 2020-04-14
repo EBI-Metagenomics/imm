@@ -2,7 +2,7 @@
 #define DP_MATRIX_H
 
 #include "dp.h"
-#include "dp_states.h"
+#include "dp_state_table.h"
 #include "dp_step.h"
 #include "eseq.h"
 #include "matrixd.h"
@@ -14,14 +14,14 @@ struct imm_seq;
 
 struct dp_matrix
 {
-    struct dp_states const* states;
+    struct dp_state_table const* states;
     struct matrixd*         score;
     struct step_matrix*     prev_step;
     int32_t*                state_col;
     uint32_t                nstates;
 };
 
-struct dp_matrix* dp_matrix_create(struct dp_states const* states);
+struct dp_matrix* dp_matrix_create(struct dp_state_table const* states);
 void              dp_matrix_setup(struct dp_matrix* matrix, struct eseq const* eseq);
 
 static inline double dp_matrix_get_score(struct dp_matrix const* dp_matrix, unsigned row,

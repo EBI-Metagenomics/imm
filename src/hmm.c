@@ -1,8 +1,8 @@
 #include "imm/hmm.h"
 #include "abc.h"
 #include "dp.h"
-#include "dp_states.h"
-#include "dp_trans.h"
+#include "dp_state_table.h"
+#include "dp_trans_table.h"
 #include "free.h"
 #include "imm/bug.h"
 #include "imm/lprob.h"
@@ -83,8 +83,6 @@ int imm_hmm_set_start(struct imm_hmm* hmm, struct imm_state const* state, double
 int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state,
                       struct imm_state const* dst_state, double lprob)
 {
-    /* TODO: do not create transition for lprob=-INF or
-     * remove it if it already exists */
     unsigned long src = mstate_table_find(hmm->table, src_state);
     if (src == mstate_table_end(hmm->table)) {
         imm_error("source state not found");
@@ -296,23 +294,25 @@ int imm_hmm_write(struct imm_hmm const* hmm, struct imm_dp const* dp, FILE* stre
         return 1;
     }
 
-    struct dp_states const* states = dp_states(dp);
-    if (mstate_write_states(stream, dp_mstates(dp), dp_states_nstates(states))) {
+    struct dp_state_table const* states = dp_get_dp_states(dp);
+    if (mstate_write_states(stream, dp_get_mstates(dp), dp_state_table_nstates(states))) {
         imm_error("could not write states");
         return 1;
     }
 
-    struct dp_trans const* trans_tbl = dp_trans_table(dp);
-    uint32_t               ntrans = dp_trans_total_ntrans(trans_tbl);
+    struct dp_trans_table const* trans_tbl = dp_get_dp_trans(dp);
+    uint32_t                     ntrans = dp_trans_table_total_ntrans(trans_tbl);
     if (fwrite(&ntrans, sizeof(ntrans), 1, stream) < 1) {
         imm_error("could not write ntrans");
         return 1;
     }
 
-    for (uint32_t target_state = 0; target_state < dp_states_nstates(states); ++target_state) {
-        for (uint32_t trans = 0; trans < dp_trans_ntrans(trans_tbl, target_state); ++trans) {
-            uint32_t source_state = dp_trans_source_state(trans_tbl, target_state, trans);
-            double   lprob = dp_trans_score(trans_tbl, target_state, trans);
+    for (uint32_t target_state = 0; target_state < dp_state_table_nstates(states); ++target_state) {
+        for (uint32_t trans = 0; trans < dp_trans_table_ntrans(trans_tbl, target_state);
+             ++trans) {
+            uint32_t source_state =
+                dp_trans_table_source_state(trans_tbl, target_state, trans);
+            double lprob = dp_trans_table_score(trans_tbl, target_state, trans);
 
             if (fwrite(&source_state, sizeof(source_state), 1, stream) < 1) {
                 imm_error("could not write source_state");

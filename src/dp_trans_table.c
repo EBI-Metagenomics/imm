@@ -1,4 +1,4 @@
-#include "dp_trans.h"
+#include "dp_trans_table.h"
 #include "free.h"
 #include "imm/lprob.h"
 #include "list.h"
@@ -10,7 +10,7 @@
 
 struct incoming_trans
 {
-    unsigned         source_state;
+    uint32_t         source_state;
     double           score;
     struct list_head list_entry;
 };
@@ -24,36 +24,42 @@ struct dp_trans_chunk
     uint32_t* offset;
 };
 
-static unsigned create_incoming_transitions(struct list_head*           incoming_trans,
+static uint32_t create_incoming_transitions(struct list_head*           incoming_trans,
                                             struct mstate const* const* mstates,
-                                            unsigned                    nstates,
+                                            uint32_t                    nstates,
                                             struct state_idx const*     state_idx);
 
-struct dp_trans const* dp_trans_create(struct mstate const* const* mstates, unsigned nstates,
+static inline uint32_t score_size(uint32_t ntrans) { return ntrans; }
+
+static inline uint32_t source_state_size(uint32_t ntrans) { return ntrans; }
+
+static inline uint32_t offset_size(uint32_t nstates) { return nstates + 1; }
+
+struct dp_trans_table const* dp_trans_table_create(struct mstate const* const* mstates, uint32_t nstates,
                                        struct state_idx* state_idx)
 {
     struct list_head incoming_trans[nstates];
-    for (unsigned i = 0; i < nstates; ++i)
+    for (uint32_t i = 0; i < nstates; ++i)
         INIT_LIST_HEAD(incoming_trans + i);
 
-    unsigned ntrans = create_incoming_transitions(incoming_trans, mstates, nstates, state_idx);
+    uint32_t ntrans = create_incoming_transitions(incoming_trans, mstates, nstates, state_idx);
 
-    struct dp_trans* trans_tbl = malloc(sizeof(*trans_tbl));
+    struct dp_trans_table* trans_tbl = malloc(sizeof(*trans_tbl));
     trans_tbl->ntrans = ntrans;
-    trans_tbl->offset = malloc(sizeof(*trans_tbl->offset) * dp_trans_offset_size(nstates));
+    trans_tbl->offset = malloc(sizeof(*trans_tbl->offset) * offset_size(nstates));
     trans_tbl->offset[0] = 0;
 
     if (ntrans > 0) {
-        trans_tbl->score = malloc(sizeof(*trans_tbl->score) * dp_trans_score_size(ntrans));
+        trans_tbl->score = malloc(sizeof(*trans_tbl->score) * score_size(ntrans));
         trans_tbl->source_state =
-            malloc(sizeof(*trans_tbl->source_state) * dp_trans_source_state_size(ntrans));
+            malloc(sizeof(*trans_tbl->source_state) * source_state_size(ntrans));
     } else {
         trans_tbl->score = NULL;
         trans_tbl->source_state = NULL;
     }
 
-    for (unsigned i = 0; i < nstates; ++i) {
-        unsigned               j = 0;
+    for (uint32_t i = 0; i < nstates; ++i) {
+        uint32_t               j = 0;
         struct incoming_trans* it = NULL;
         list_for_each_entry (it, incoming_trans + i, list_entry) {
 
@@ -64,7 +70,7 @@ struct dp_trans const* dp_trans_create(struct mstate const* const* mstates, unsi
         trans_tbl->offset[i + 1] = trans_tbl->offset[i] + j;
     }
 
-    for (unsigned i = 0; i < nstates; ++i) {
+    for (uint32_t i = 0; i < nstates; ++i) {
         struct incoming_trans* it = NULL;
         struct incoming_trans* tmp = NULL;
         list_for_each_entry_safe (it, tmp, incoming_trans + i, list_entry) {
@@ -75,16 +81,16 @@ struct dp_trans const* dp_trans_create(struct mstate const* const* mstates, unsi
     return trans_tbl;
 }
 
-static unsigned create_incoming_transitions(struct list_head*           incoming_trans,
+static uint32_t create_incoming_transitions(struct list_head*           incoming_trans,
                                             struct mstate const* const* mstates,
-                                            unsigned                    nstates,
+                                            uint32_t                    nstates,
                                             struct state_idx const*     state_idx)
 {
-    unsigned ntrans = 0;
-    for (unsigned i = 0; i < nstates; ++i) {
+    uint32_t ntrans = 0;
+    for (uint32_t i = 0; i < nstates; ++i) {
 
         struct imm_state const*    src_state = mstate_get_state(mstates[i]);
-        unsigned                   src = state_idx_find(state_idx, src_state);
+        uint32_t                   src = state_idx_find(state_idx, src_state);
         struct mtrans_table const* table = mstate_get_mtrans_table(mstates[i]);
 
         unsigned long iter = 0;
@@ -94,11 +100,8 @@ static unsigned create_incoming_transitions(struct list_head*           incoming
             struct mtrans const* mtrans = mtrans_table_get(table, iter);
             double               lprob = mtrans_get_lprob(mtrans);
 
-            if (imm_lprob_is_zero(lprob))
-                continue;
-
             struct imm_state const* dst_state = mtrans_get_state(mtrans);
-            unsigned                dst = state_idx_find(state_idx, dst_state);
+            uint32_t                dst = state_idx_find(state_idx, dst_state);
 
             struct incoming_trans* it = malloc(sizeof(struct incoming_trans));
             it->score = lprob;
@@ -110,7 +113,7 @@ static unsigned create_incoming_transitions(struct list_head*           incoming
     return ntrans;
 }
 
-void dp_trans_destroy(struct dp_trans const* trans_tbl)
+void dp_trans_table_destroy(struct dp_trans_table const* trans_tbl)
 {
     free_c(trans_tbl->score);
     free_c(trans_tbl->source_state);
@@ -118,7 +121,7 @@ void dp_trans_destroy(struct dp_trans const* trans_tbl)
     free_c(trans_tbl);
 }
 
-int dp_trans_write(struct dp_trans const* trans, uint32_t nstates, FILE* stream)
+int dp_trans_table_write(struct dp_trans_table const* trans, uint32_t nstates, FILE* stream)
 {
     struct dp_trans_chunk chunk = {.ntrans = trans->ntrans,
                                    .score = trans->score,
@@ -129,20 +132,19 @@ int dp_trans_write(struct dp_trans const* trans, uint32_t nstates, FILE* stream)
     if (fwrite(&chunk.ntrans, sizeof(chunk.ntrans), 1, stream) < 1)
         return 1;
 
-    if (fwrite(chunk.score, sizeof(*chunk.score), dp_trans_score_size(trans->ntrans), stream) <
-        dp_trans_score_size(trans->ntrans))
+    if (fwrite(chunk.score, sizeof(*chunk.score), score_size(trans->ntrans), stream) <
+        score_size(trans->ntrans))
         return 1;
 
     if (fwrite(chunk.source_state, sizeof(*chunk.source_state),
-               dp_trans_source_state_size(trans->ntrans),
-               stream) < dp_trans_source_state_size(trans->ntrans))
+               source_state_size(trans->ntrans), stream) < source_state_size(trans->ntrans))
         return 1;
 
     if (fwrite(&chunk.offset_size, sizeof(chunk.offset_size), 1, stream) < 1)
         return 1;
 
-    if (fwrite(chunk.offset, sizeof(*chunk.offset), dp_trans_offset_size(nstates), stream) <
-        dp_trans_offset_size(nstates))
+    if (fwrite(chunk.offset, sizeof(*chunk.offset), offset_size(nstates), stream) <
+        offset_size(nstates))
         return 1;
 
     return 0;
