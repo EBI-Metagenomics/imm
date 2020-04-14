@@ -294,13 +294,13 @@ int imm_hmm_write(struct imm_hmm const* hmm, struct imm_dp const* dp, FILE* stre
         return 1;
     }
 
-    struct dp_state_table const* states = dp_get_dp_states(dp);
+    struct dp_state_table const* states = dp_get_state_table(dp);
     if (mstate_write_states(stream, dp_get_mstates(dp), dp_state_table_nstates(states))) {
         imm_error("could not write states");
         return 1;
     }
 
-    struct dp_trans_table const* trans_tbl = dp_get_dp_trans(dp);
+    struct dp_trans_table const* trans_tbl = dp_get_trans_table(dp);
     uint32_t                     ntrans = dp_trans_table_total_ntrans(trans_tbl);
     if (fwrite(&ntrans, sizeof(ntrans), 1, stream) < 1) {
         imm_error("could not write ntrans");
