@@ -294,8 +294,8 @@ int imm_hmm_write(struct imm_hmm const* hmm, struct imm_dp const* dp, FILE* stre
         return 1;
     }
 
-    struct dp_state_table const* states = dp_get_state_table(dp);
-    if (mstate_write_states(stream, dp_get_mstates(dp), dp_state_table_nstates(states))) {
+    struct dp_state_table const* state_tbl = dp_get_state_table(dp);
+    if (mstate_write_states(stream, dp_get_mstates(dp), dp_state_table_nstates(state_tbl))) {
         imm_error("could not write states");
         return 1;
     }
@@ -307,19 +307,20 @@ int imm_hmm_write(struct imm_hmm const* hmm, struct imm_dp const* dp, FILE* stre
         return 1;
     }
 
-    for (uint32_t target_state = 0; target_state < dp_state_table_nstates(states); ++target_state) {
-        for (uint32_t trans = 0; trans < dp_trans_table_ntrans(trans_tbl, target_state);
-             ++trans) {
-            uint32_t source_state =
-                dp_trans_table_source_state(trans_tbl, target_state, trans);
-            double lprob = dp_trans_table_score(trans_tbl, target_state, trans);
+    for (uint32_t tgt_state = 0; tgt_state < dp_state_table_nstates(state_tbl); ++tgt_state) {
 
-            if (fwrite(&source_state, sizeof(source_state), 1, stream) < 1) {
+        ntrans = dp_trans_table_ntrans(trans_tbl, tgt_state);
+        for (uint32_t trans = 0; trans < ntrans; ++trans) {
+
+            uint32_t src_state = dp_trans_table_source_state(trans_tbl, tgt_state, trans);
+            double   lprob = dp_trans_table_score(trans_tbl, tgt_state, trans);
+
+            if (fwrite(&src_state, sizeof(src_state), 1, stream) < 1) {
                 imm_error("could not write source_state");
                 return 1;
             }
 
-            if (fwrite(&target_state, sizeof(target_state), 1, stream) < 1) {
+            if (fwrite(&tgt_state, sizeof(tgt_state), 1, stream) < 1) {
                 imm_error("could not write target_state");
                 return 1;
             }
@@ -331,10 +332,10 @@ int imm_hmm_write(struct imm_hmm const* hmm, struct imm_dp const* dp, FILE* stre
         }
     }
 
-    if (dp_write(dp, stream)) {
-        imm_error("could not write dp");
-        return 1;
-    }
+    /* if (dp_write(dp, stream)) { */
+    /*     imm_error("could not write dp"); */
+    /*     return 1; */
+    /* } */
 
     return 0;
 }

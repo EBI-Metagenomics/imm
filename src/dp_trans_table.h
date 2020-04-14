@@ -24,8 +24,8 @@ static inline uint32_t dp_trans_table_total_ntrans(struct dp_trans_table const* 
     return trans_tbl->ntrans;
 }
 
-static inline double dp_trans_table_ntrans(struct dp_trans_table const* trans_tbl,
-                                           uint32_t                     target_state)
+static inline uint32_t dp_trans_table_ntrans(struct dp_trans_table const* trans_tbl,
+                                             uint32_t                     target_state)
 {
     return trans_tbl->offset[target_state + 1] - trans_tbl->offset[target_state];
 }

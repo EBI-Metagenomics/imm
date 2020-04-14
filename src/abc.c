@@ -7,7 +7,7 @@
 
 struct abc_chunk
 {
-    uint16_t    symbols_size;
+    uint16_t    nsymbols;
     char const* symbols;
     char        any_symbol;
 };
@@ -78,15 +78,15 @@ void imm_abc_destroy(struct imm_abc const* abc)
 
 int abc_write(FILE* stream, struct imm_abc const* abc)
 {
-    struct abc_chunk chunk = {.symbols_size = cast_u16_zu(strlen(abc->symbols) + 1),
+    struct abc_chunk chunk = {.nsymbols = cast_u16_zu(strlen(abc->symbols)),
                               .symbols = abc->symbols,
                               .any_symbol = abc->any_symbol};
 
-    if (fwrite(&chunk.symbols_size, sizeof(chunk.symbols_size), 1, stream) < 1)
+    if (fwrite(&chunk.nsymbols, sizeof(chunk.nsymbols), 1, stream) < 1)
         return 1;
 
-    if (fwrite(chunk.symbols, sizeof(*chunk.symbols), chunk.symbols_size, stream) <
-        chunk.symbols_size)
+    if (fwrite(chunk.symbols, sizeof(*chunk.symbols), chunk.nsymbols + 1, stream) <
+        chunk.nsymbols + 1)
         return 1;
 
     if (fwrite(&chunk.any_symbol, sizeof(chunk.any_symbol), 1, stream) < 1)

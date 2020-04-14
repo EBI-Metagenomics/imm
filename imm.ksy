@@ -17,7 +17,7 @@ types:
       - id: symbols
         type: str
         encoding: ASCII
-        size: nsymbols
+        size: nsymbols + 1
         terminator: 0
       - id: any_symbol
         type: str
@@ -43,12 +43,12 @@ types:
     seq:
       - id: state_type
         type: u1
-      - id: name_size
+      - id: name_length
         type: u2
       - id: name
         type: str
         encoding: ASCII
-        size: name_size
+        size: name_length + 1
         terminator: 0
       - id: start_lprob
         type: f8

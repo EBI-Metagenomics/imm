@@ -11,7 +11,7 @@
 struct mstate_chunk
 {
     uint8_t     state_type;
-    uint16_t    name_size;
+    uint16_t    name_length;
     char const* name;
     double      start_lprob;
     uint32_t    impl_chunk_size;
@@ -61,20 +61,19 @@ int mstate_write_states(FILE* stream, struct mstate const* const* mstates, uint3
         return 1;
 
     for (uint32_t i = 0; i < nstates; ++i) {
-        if (mstate_write( mstates[i], stream))
+        if (mstate_write(mstates[i], stream))
             return 1;
     }
 
     return 0;
 }
 
-static int mstate_write( struct mstate const* mstate, FILE* stream)
+static int mstate_write(struct mstate const* mstate, FILE* stream)
 {
     struct imm_state const* state = mstate_get_state(mstate);
 
     struct mstate_chunk chunk = {.state_type = 0,
-                                 .name_size =
-                                     (cast_u16_zu(strlen(imm_state_get_name(state))) + 1),
+                                 .name_length = cast_u16_zu(strlen(imm_state_get_name(state))),
                                  .name = imm_state_get_name(state),
                                  .start_lprob = mstate_get_start(mstate),
                                  .impl_chunk_size = 0,
@@ -83,10 +82,11 @@ static int mstate_write( struct mstate const* mstate, FILE* stream)
     if (fwrite(&chunk.state_type, sizeof(chunk.state_type), 1, stream) < 1)
         return 1;
 
-    if (fwrite(&chunk.name_size, sizeof(chunk.name_size), 1, stream) < 1)
+    if (fwrite(&chunk.name_length, sizeof(chunk.name_length), 1, stream) < 1)
         return 1;
 
-    if (fwrite(chunk.name, sizeof(*chunk.name), chunk.name_size, stream) < chunk.name_size)
+    if (fwrite(chunk.name, sizeof(*chunk.name), chunk.name_length + 1, stream) <
+        chunk.name_length + 1)
         return 1;
 
     if (fwrite(&chunk.start_lprob, sizeof(chunk.start_lprob), 1, stream) < 1)
