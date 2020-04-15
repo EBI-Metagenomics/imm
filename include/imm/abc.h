@@ -2,11 +2,12 @@
 #define IMM_ABC_H
 
 #include "imm/export.h"
+#include <inttypes.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
 
-#define IMM_ABC_INVALID_IDX UINT_MAX
+#define IMM_ABC_INVALID_IDX UINT8_MAX
 
 /** @file abc.h
  * Alphabet module.
@@ -35,17 +36,17 @@ enum imm_symbol_type
 struct imm_abc
 {
     char const* symbols;
-    unsigned    length;
-    unsigned    symbol_idx[IMM_SYMBOL_IDX_SIZE];
+    uint8_t     length;
+    uint8_t     symbol_idx[IMM_SYMBOL_IDX_SIZE];
     char        any_symbol;
 };
 
-static inline size_t __imm_abc_index(char const c) { return (size_t)(c - IMM_FIRST_CHAR); }
+static inline uint8_t __imm_abc_index(char const c) { return (uint8_t)(c - IMM_FIRST_CHAR); }
 
 IMM_EXPORT struct imm_abc const* imm_abc_create(char const* symbols, char any_symbol);
 IMM_EXPORT struct imm_abc const* imm_abc_clone(struct imm_abc const* abc);
 IMM_EXPORT void                  imm_abc_destroy(struct imm_abc const* abc);
-static inline unsigned    imm_abc_length(struct imm_abc const* abc) { return abc->length; }
+static inline uint8_t     imm_abc_length(struct imm_abc const* abc) { return abc->length; }
 static inline char const* imm_abc_symbols(struct imm_abc const* abc) { return abc->symbols; }
 static inline bool        imm_abc_has_symbol(struct imm_abc const* abc, char symbol_id)
 {
@@ -54,11 +55,11 @@ static inline bool        imm_abc_has_symbol(struct imm_abc const* abc, char sym
 
     return abc->symbol_idx[__imm_abc_index(symbol_id)] != IMM_ABC_INVALID_IDX;
 }
-static inline unsigned imm_abc_symbol_idx(struct imm_abc const* abc, char symbol_id)
+static inline uint8_t imm_abc_symbol_idx(struct imm_abc const* abc, char symbol_id)
 {
     return abc->symbol_idx[__imm_abc_index(symbol_id)];
 }
-static inline char imm_abc_symbol_id(struct imm_abc const* abc, unsigned symbol_idx)
+static inline char imm_abc_symbol_id(struct imm_abc const* abc, uint8_t symbol_idx)
 {
     return abc->symbols[symbol_idx];
 }
