@@ -1683,7 +1683,7 @@ void test_hmm_write_read_two_states(void)
 
     FILE* file = fopen("test_hmm.tmp/one_mute_state.imm", "w");
     cass_cond(file != NULL);
-    cass_equal_int(imm_hmm_write(hmm, dp, file), 0);
+    cass_equal_int(imm_io_write(file, hmm, dp), 0);
     fclose(file);
 
     imm_dp_destroy(dp);
@@ -1693,13 +1693,12 @@ void test_hmm_write_read_two_states(void)
     imm_abc_destroy(abc);
     imm_seq_destroy(C);
 
-
     file = fopen("test_hmm.tmp/one_mute_state.imm", "r");
     cass_cond(file != NULL);
-    hmm = imm_hmm_read(file);
-    cass_cond(hmm != NULL);
+    struct imm_io const* io = imm_io_read(file);
+    cass_cond(io != NULL);
     fclose(file);
 
-    imm_abc_destroy(imm_hmm_abc(hmm));
-    imm_hmm_destroy(hmm);
+    /* imm_abc_destroy(imm_hmm_abc(hmm)); */
+    /* imm_hmm_destroy(hmm); */
 }

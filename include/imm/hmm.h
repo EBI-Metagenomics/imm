@@ -14,8 +14,6 @@ struct imm_state;
 IMM_EXPORT struct imm_hmm* imm_hmm_create(struct imm_abc const* abc);
 IMM_EXPORT void            imm_hmm_destroy(struct imm_hmm* hmm);
 
-IMM_EXPORT struct imm_abc const* imm_hmm_abc(struct imm_hmm const* hmm);
-
 IMM_EXPORT int imm_hmm_add_state(struct imm_hmm* hmm, struct imm_state const* state,
                                  double start_lprob);
 IMM_EXPORT int imm_hmm_del_state(struct imm_hmm* hmm, struct imm_state const* state);
@@ -40,9 +38,5 @@ IMM_EXPORT int imm_hmm_normalize(struct imm_hmm* hmm);
 IMM_EXPORT int imm_hmm_normalize_start(struct imm_hmm* hmm);
 
 IMM_EXPORT int imm_hmm_normalize_trans(struct imm_hmm* hmm, struct imm_state const* src);
-
-IMM_EXPORT int imm_hmm_write(struct imm_hmm const* hmm, struct imm_dp const* dp, FILE* stream);
-
-IMM_EXPORT struct imm_hmm* imm_hmm_read(FILE* stream);
 
 #endif

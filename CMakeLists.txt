@@ -37,6 +37,7 @@ add_library(imm
     src/dp_trans_table.c
     src/eseq.c
     src/hmm.c
+    src/io.c
     src/mstate.c
     src/mstate_sort.c
     src/mstate_table.c
