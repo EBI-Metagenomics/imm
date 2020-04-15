@@ -7,9 +7,9 @@
 
 struct abc_chunk
 {
-    uint16_t nsymbols;
-    char*    symbols;
-    char     any_symbol;
+    uint8_t nsymbols;
+    char*   symbols;
+    char    any_symbol;
 };
 
 struct imm_abc const* imm_abc_create(char const* symbols, char const any_symbol)
@@ -78,7 +78,7 @@ void imm_abc_destroy(struct imm_abc const* abc)
 
 int abc_write(FILE* stream, struct imm_abc const* abc)
 {
-    struct abc_chunk chunk = {.nsymbols = cast_u16_zu(strlen(abc->symbols)),
+    struct abc_chunk chunk = {.nsymbols = cast_u8_zu(strlen(abc->symbols)),
                               .symbols = (char*)abc->symbols,
                               .any_symbol = abc->any_symbol};
 
@@ -102,7 +102,7 @@ struct imm_abc const* abc_read(FILE* stream)
     if (fread(&chunk.nsymbols, sizeof(chunk.nsymbols), 1, stream) < 1)
         return NULL;
 
-    chunk.symbols = malloc(sizeof(*chunk.symbols) * chunk.nsymbols);
+    chunk.symbols = malloc(sizeof(*chunk.symbols) * (chunk.nsymbols + 1));
 
     if (fread(chunk.symbols, sizeof(*chunk.symbols), chunk.nsymbols + 1, stream) <
         chunk.nsymbols + 1) {
@@ -118,15 +118,16 @@ struct imm_abc const* abc_read(FILE* stream)
     struct imm_abc* abc = malloc(sizeof(*abc));
     abc->symbols = chunk.symbols;
     abc->length = chunk.nsymbols;
-    abc->any_symbol = chunk.any_symbol;
 
     for (uint8_t i = 0; i < IMM_SYMBOL_IDX_SIZE; ++i)
         abc->symbol_idx[i] = IMM_ABC_INVALID_IDX;
 
-    for (uint32_t i = 0; i < chunk.nsymbols; ++i)
+    for (uint8_t i = 0; i < chunk.nsymbols; ++i)
         abc->symbol_idx[__imm_abc_index(chunk.symbols[i])] = i;
 
-    return NULL;
+    abc->any_symbol = chunk.any_symbol;
+
+    return abc;
 }
 
 enum imm_symbol_type imm_abc_symbol_type(struct imm_abc const* abc, char symbol_id)

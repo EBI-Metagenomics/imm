@@ -31,7 +31,7 @@ static int    hmm_normalize_trans(struct mstate* mstate);
 
 struct imm_hmm* imm_hmm_create(struct imm_abc const* abc)
 {
-    struct imm_hmm* hmm = malloc(sizeof(struct imm_hmm));
+    struct imm_hmm* hmm = malloc(sizeof(*hmm));
     hmm->abc = abc;
     hmm->table = mstate_table_create();
     return hmm;
@@ -42,6 +42,8 @@ void imm_hmm_destroy(struct imm_hmm* hmm)
     mstate_table_destroy(hmm->table);
     free_c(hmm);
 }
+
+struct imm_abc const* imm_hmm_abc(struct imm_hmm const* hmm) { return hmm->abc; }
 
 int imm_hmm_add_state(struct imm_hmm* hmm, struct imm_state const* state, double start_lprob)
 {
@@ -340,15 +342,19 @@ int imm_hmm_write(struct imm_hmm const* hmm, struct imm_dp const* dp, FILE* stre
     return 0;
 }
 
-int imm_hmm_read(FILE* stream)
+struct imm_hmm* imm_hmm_read(FILE* stream)
 {
     struct imm_abc const* abc = abc_read(stream);
     if (!abc) {
         imm_error("could not read abc");
-        return 1;
+        return NULL;
     }
 
-    return 0;
+    struct imm_hmm* hmm = malloc(sizeof(*hmm));
+    hmm->abc = abc;
+    hmm->table = mstate_table_create();
+
+    return hmm;
 }
 
 static double hmm_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state)

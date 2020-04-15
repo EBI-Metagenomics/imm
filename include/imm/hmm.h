@@ -6,13 +6,15 @@
 #include <stdio.h>
 
 struct imm_abc;
+struct imm_dp;
 struct imm_hmm;
 struct imm_path;
 struct imm_state;
-struct imm_dp;
 
 IMM_EXPORT struct imm_hmm* imm_hmm_create(struct imm_abc const* abc);
 IMM_EXPORT void            imm_hmm_destroy(struct imm_hmm* hmm);
+
+IMM_EXPORT struct imm_abc const* imm_hmm_abc(struct imm_hmm const* hmm);
 
 IMM_EXPORT int imm_hmm_add_state(struct imm_hmm* hmm, struct imm_state const* state,
                                  double start_lprob);
@@ -41,6 +43,6 @@ IMM_EXPORT int imm_hmm_normalize_trans(struct imm_hmm* hmm, struct imm_state con
 
 IMM_EXPORT int imm_hmm_write(struct imm_hmm const* hmm, struct imm_dp const* dp, FILE* stream);
 
-IMM_EXPORT int imm_hmm_read(FILE* stream);
+IMM_EXPORT struct imm_hmm* imm_hmm_read(FILE* stream);
 
 #endif

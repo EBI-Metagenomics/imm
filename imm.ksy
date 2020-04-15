@@ -32,7 +32,7 @@ types:
   abc:
     seq:
       - id: nsymbols
-        type: u2
+        type: u1
       - id: symbols
         type: str
         encoding: ASCII
