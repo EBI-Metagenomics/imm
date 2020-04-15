@@ -35,8 +35,9 @@ static inline uint32_t source_state_size(uint32_t ntrans) { return ntrans; }
 
 static inline uint32_t offset_size(uint32_t nstates) { return nstates + 1; }
 
-struct dp_trans_table const* dp_trans_table_create(struct mstate const* const* mstates, uint32_t nstates,
-                                       struct state_idx* state_idx)
+struct dp_trans_table const* dp_trans_table_create(struct mstate const* const* mstates,
+                                                   uint32_t                    nstates,
+                                                   struct state_idx*           state_idx)
 {
     struct list_head incoming_trans[nstates];
     for (uint32_t i = 0; i < nstates; ++i)
@@ -44,18 +45,17 @@ struct dp_trans_table const* dp_trans_table_create(struct mstate const* const* m
 
     uint32_t ntrans = create_incoming_transitions(incoming_trans, mstates, nstates, state_idx);
 
-    struct dp_trans_table* trans_tbl = malloc(sizeof(*trans_tbl));
-    trans_tbl->ntrans = ntrans;
-    trans_tbl->offset = malloc(sizeof(*trans_tbl->offset) * offset_size(nstates));
-    trans_tbl->offset[0] = 0;
+    struct dp_trans_table* tbl = malloc(sizeof(*tbl));
+    tbl->ntrans = ntrans;
+    tbl->offset = malloc(sizeof(*tbl->offset) * offset_size(nstates));
+    tbl->offset[0] = 0;
 
     if (ntrans > 0) {
-        trans_tbl->score = malloc(sizeof(*trans_tbl->score) * score_size(ntrans));
-        trans_tbl->source_state =
-            malloc(sizeof(*trans_tbl->source_state) * source_state_size(ntrans));
+        tbl->score = malloc(sizeof(*tbl->score) * score_size(ntrans));
+        tbl->source_state = malloc(sizeof(*tbl->source_state) * source_state_size(ntrans));
     } else {
-        trans_tbl->score = NULL;
-        trans_tbl->source_state = NULL;
+        tbl->score = NULL;
+        tbl->source_state = NULL;
     }
 
     for (uint32_t i = 0; i < nstates; ++i) {
@@ -63,11 +63,11 @@ struct dp_trans_table const* dp_trans_table_create(struct mstate const* const* m
         struct incoming_trans* it = NULL;
         list_for_each_entry (it, incoming_trans + i, list_entry) {
 
-            trans_tbl->score[trans_tbl->offset[i] + j] = it->score;
-            trans_tbl->source_state[trans_tbl->offset[i] + j] = it->source_state;
+            tbl->score[tbl->offset[i] + j] = it->score;
+            tbl->source_state[tbl->offset[i] + j] = it->source_state;
             ++j;
         }
-        trans_tbl->offset[i + 1] = trans_tbl->offset[i] + j;
+        tbl->offset[i + 1] = tbl->offset[i] + j;
     }
 
     for (uint32_t i = 0; i < nstates; ++i) {
@@ -78,7 +78,7 @@ struct dp_trans_table const* dp_trans_table_create(struct mstate const* const* m
         }
     }
 
-    return trans_tbl;
+    return tbl;
 }
 
 static uint32_t create_incoming_transitions(struct list_head*           incoming_trans,

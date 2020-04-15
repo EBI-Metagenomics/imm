@@ -5,29 +5,14 @@ meta:
 seq:
   - id: hmm
     type: hmm
-#  - id: seq_code
-#    type: seq_code
-#  - id: dp_emission
-#    type: dp_emission
+  - id: dp
+    type: dp
 enums:
   state_type:
     0: mute
     1: normal
     2: table
 types:
-  abc:
-    seq:
-      - id: nsymbols
-        type: u2
-      - id: symbols
-        type: str
-        encoding: ASCII
-        size: nsymbols + 1
-        terminator: 0
-      - id: any_symbol
-        type: str
-        encoding: ASCII
-        size: 1
   hmm:
     seq:
       - id: abc
@@ -44,6 +29,19 @@ types:
         type: transition
         repeat: expr
         repeat-expr: ntransitions
+  abc:
+    seq:
+      - id: nsymbols
+        type: u2
+      - id: symbols
+        type: str
+        encoding: ASCII
+        size: nsymbols + 1
+        terminator: 0
+      - id: any_symbol
+        type: str
+        encoding: ASCII
+        size: 1
   state:
     seq:
       - id: name_length
@@ -70,6 +68,14 @@ types:
         type: u4
       - id: lprob
         type: f8
+  dp:
+    seq:
+      - id: seq_code
+        type: seq_code
+      - id: dp_emission
+        type: dp_emission
+      - id: dp_trans_table
+        type: dp_trans_table
   seq_code:
     seq:
       - id: min_seq
@@ -94,6 +100,24 @@ types:
         type: f8
         repeat: expr
         repeat-expr: score_size
+      - id: offset_size
+        type: u4
+      - id: offset
+        type: u4
+        repeat: expr
+        repeat-expr: offset_size
+  dp_trans_table:
+    seq:
+      - id: ntrans
+        type: u4
+      - id: score
+        type: f8
+        repeat: expr
+        repeat-expr: ntrans
+      - id: source_state
+        type: u4
+        repeat: expr
+        repeat-expr: ntrans
       - id: offset_size
         type: u4
       - id: offset

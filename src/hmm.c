@@ -332,10 +332,10 @@ int imm_hmm_write(struct imm_hmm const* hmm, struct imm_dp const* dp, FILE* stre
         }
     }
 
-    /* if (dp_write(dp, stream)) { */
-    /*     imm_error("could not write dp"); */
-    /*     return 1; */
-    /* } */
+    if (dp_write(dp, stream)) {
+        imm_error("could not write dp");
+        return 1;
+    }
 
     return 0;
 }

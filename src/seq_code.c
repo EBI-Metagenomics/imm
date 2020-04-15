@@ -11,6 +11,25 @@
 #include <limits.h>
 #include <stdlib.h>
 
+struct seq_code_chunk
+{
+    uint8_t   min_seq;
+    uint8_t   max_seq;
+    uint32_t* offset;
+    uint32_t* stride;
+    uint32_t  size;
+};
+
+static inline uint8_t offset_size(struct seq_code const* seq_code)
+{
+    return seq_code->max_seq - seq_code->min_seq + 1;
+}
+
+static inline uint8_t stride_size(struct seq_code const* seq_code)
+{
+    return seq_code->max_seq;
+}
+
 struct seq_code const* seq_code_create(struct imm_abc const* abc, unsigned min_seq,
                                        unsigned max_seq)
 {
@@ -24,7 +43,7 @@ struct seq_code const* seq_code_create(struct imm_abc const* abc, unsigned min_s
     if (max_seq == 0)
         seq_code->stride = NULL;
     else {
-        seq_code->stride = malloc(sizeof(*seq_code->stride) * seq_code_stride_size(seq_code));
+        seq_code->stride = malloc(sizeof(*seq_code->stride) * stride_size(seq_code));
         seq_code->stride[max_seq - 1] = 1;
     }
 
@@ -33,7 +52,7 @@ struct seq_code const* seq_code_create(struct imm_abc const* abc, unsigned min_s
             seq_code->stride[len] = seq_code->stride[len + 1] * imm_abc_length(abc);
     }
 
-    seq_code->offset = malloc(sizeof(*seq_code->offset) * seq_code_offset_size(seq_code));
+    seq_code->offset = malloc(sizeof(*seq_code->offset) * offset_size(seq_code));
     seq_code->offset[0] = 0;
     for (unsigned len = min_seq + 1; len <= max_seq; ++len) {
 
@@ -91,12 +110,12 @@ int seq_code_write(struct seq_code const* seq_code, FILE* stream)
     if (fwrite(&chunk.max_seq, sizeof(chunk.max_seq), 1, stream) < 1)
         return 1;
 
-    if (fwrite(chunk.offset, sizeof(*chunk.offset), seq_code_offset_size(seq_code), stream) <
-        seq_code_offset_size(seq_code))
+    if (fwrite(chunk.offset, sizeof(*chunk.offset), offset_size(seq_code), stream) <
+        offset_size(seq_code))
         return 1;
 
-    if (fwrite(chunk.stride, sizeof(*chunk.stride), seq_code_stride_size(seq_code), stream) <
-        seq_code_stride_size(seq_code))
+    if (fwrite(chunk.stride, sizeof(*chunk.stride), stride_size(seq_code), stream) <
+        stride_size(seq_code))
         return 1;
 
     if (fwrite(&chunk.size, sizeof(chunk.size), 1, stream) < 1)
