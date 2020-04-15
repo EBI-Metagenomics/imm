@@ -340,6 +340,17 @@ int imm_hmm_write(struct imm_hmm const* hmm, struct imm_dp const* dp, FILE* stre
     return 0;
 }
 
+int imm_hmm_read(FILE* stream)
+{
+    struct imm_abc const* abc = abc_read(stream);
+    if (!abc) {
+        imm_error("could not read abc");
+        return 1;
+    }
+
+    return 0;
+}
+
 static double hmm_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state)
 {
     unsigned long i = mstate_table_find(hmm->table, state);

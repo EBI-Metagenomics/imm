@@ -41,4 +41,6 @@ IMM_EXPORT int imm_hmm_normalize_trans(struct imm_hmm* hmm, struct imm_state con
 
 IMM_EXPORT int imm_hmm_write(struct imm_hmm const* hmm, struct imm_dp const* dp, FILE* stream);
 
+IMM_EXPORT int imm_hmm_read(FILE* stream);
+
 #endif
