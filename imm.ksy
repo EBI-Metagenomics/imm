@@ -44,6 +44,8 @@ types:
         size: 1
   state:
     seq:
+      - id: start_lprob
+        type: f8
       - id: name_length
         type: u2
       - id: name
@@ -51,8 +53,6 @@ types:
         encoding: ASCII
         size: name_length + 1
         terminator: 0
-      - id: start_lprob
-        type: f8
       - id: state_type
         type: u1
         enum: state_type

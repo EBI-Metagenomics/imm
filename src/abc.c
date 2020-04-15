@@ -1,3 +1,4 @@
+#include "io.h"
 #include "imm/abc.h"
 #include "abc.h"
 #include "cast.h"
@@ -95,39 +96,43 @@ int abc_write(FILE* stream, struct imm_abc const* abc)
     return 0;
 }
 
-struct imm_abc const* abc_read(FILE* stream)
+int abc_read(FILE* stream, struct imm_io* io)
 {
     struct abc_chunk chunk = {.nsymbols = 0, .symbols = NULL, .any_symbol = '\0'};
 
-    if (fread(&chunk.nsymbols, sizeof(chunk.nsymbols), 1, stream) < 1)
-        return NULL;
+    if (fread(&chunk.nsymbols, sizeof(chunk.nsymbols), 1, stream) < 1) {
+        imm_error("could not read nsymbols");
+        return 1;
+    }
 
     chunk.symbols = malloc(sizeof(*chunk.symbols) * (chunk.nsymbols + 1));
 
     if (fread(chunk.symbols, sizeof(*chunk.symbols), chunk.nsymbols + 1, stream) <
         chunk.nsymbols + 1) {
+        imm_error("could not read symbols");
         free_c(chunk.symbols);
-        return NULL;
+        return 1;
     }
 
     if (fread(&chunk.any_symbol, sizeof(chunk.any_symbol), 1, stream) < 1) {
+        imm_error("could not read any_symbol");
         free_c(chunk.symbols);
-        return NULL;
+        return 1;
     }
 
-    struct imm_abc* abc = malloc(sizeof(*abc));
-    abc->symbols = chunk.symbols;
-    abc->length = chunk.nsymbols;
+    io->abc = malloc(sizeof(*io->abc));
+    io->abc->symbols = chunk.symbols;
+    io->abc->length = chunk.nsymbols;
 
     for (uint8_t i = 0; i < IMM_SYMBOL_IDX_SIZE; ++i)
-        abc->symbol_idx[i] = IMM_ABC_INVALID_IDX;
+        io->abc->symbol_idx[i] = IMM_ABC_INVALID_IDX;
 
     for (uint8_t i = 0; i < chunk.nsymbols; ++i)
-        abc->symbol_idx[__imm_abc_index(chunk.symbols[i])] = i;
+        io->abc->symbol_idx[__imm_abc_index(chunk.symbols[i])] = i;
 
-    abc->any_symbol = chunk.any_symbol;
+    io->abc->any_symbol = chunk.any_symbol;
 
-    return abc;
+    return 0;
 }
 
 enum imm_symbol_type imm_abc_symbol_type(struct imm_abc const* abc, char symbol_id)

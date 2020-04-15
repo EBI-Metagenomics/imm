@@ -2,18 +2,17 @@
 #include "cast.h"
 #include "free.h"
 #include "imm/state.h"
+#include "io.h"
 #include "mtrans.h"
 #include "mtrans_table.h"
+#include "state.h"
 #include <limits.h>
 #include <math.h>
 #include <string.h>
 
 struct mstate_chunk
 {
-    uint16_t    name_length;
-    char const* name;
-    double      start_lprob;
-    uint8_t     state_type;
+    double start_lprob;
 };
 
 struct mstates_chunk
@@ -66,30 +65,53 @@ int mstate_write_states(FILE* stream, struct mstate const* const* mstates, uint3
     return 0;
 }
 
+int mstate_read_states(FILE* stream, struct imm_io* io)
+{
+    /* TODO: fix memory leak */
+    uint32_t nstates = 0;
+
+    if (fread(&nstates, sizeof(nstates), 1, stream) < 1) {
+        imm_error("could not read nstates");
+        return 1;
+    }
+
+    io->mstates = malloc(sizeof(*io->mstates) * nstates);
+    for (uint32_t i = 0; i < nstates; ++i)
+        io->mstates[i] = NULL;
+
+    for (uint32_t i = 0; i < nstates; ++i) {
+
+        struct mstate_chunk chunk;
+
+        if (fread(&chunk.start_lprob, sizeof(chunk.start_lprob), 1, stream) < 1) {
+            imm_error("could not read start_lprob");
+            return 1;
+        }
+
+        struct imm_state const* state = state_read(stream, io->abc);
+        if (!state) {
+            imm_error("could not read state");
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 static int mstate_write(struct mstate const* mstate, FILE* stream)
 {
+    struct mstate_chunk chunk = {mstate_get_start(mstate)};
+
+    if (fwrite(&chunk.start_lprob, sizeof(chunk.start_lprob), 1, stream) < 1) {
+        imm_error("could not write start_lprob");
+        return 1;
+    }
+
     struct imm_state const* state = mstate_get_state(mstate);
-
-    struct mstate_chunk chunk = {.name_length = cast_u16_zu(strlen(imm_state_get_name(state))),
-                                 .name = imm_state_get_name(state),
-                                 .start_lprob = mstate_get_start(mstate),
-                                 .state_type = imm_state_type_id(state)};
-
-    if (fwrite(&chunk.name_length, sizeof(chunk.name_length), 1, stream) < 1)
+    if (state_write(state, stream)) {
+        imm_error("could not write state");
         return 1;
-
-    if (fwrite(chunk.name, sizeof(*chunk.name), chunk.name_length + 1, stream) <
-        chunk.name_length + 1)
-        return 1;
-
-    if (fwrite(&chunk.start_lprob, sizeof(chunk.start_lprob), 1, stream) < 1)
-        return 1;
-
-    if (fwrite(&chunk.state_type, sizeof(chunk.state_type), 1, stream) < 1)
-        return 1;
-
-    if (imm_state_write(mstate_get_state(mstate), stream))
-        return 1;
+    }
 
     return 0;
 }

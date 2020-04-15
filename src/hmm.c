@@ -1,4 +1,3 @@
-#include "io.h"
 #include "imm/hmm.h"
 #include "abc.h"
 #include "dp.h"
@@ -13,6 +12,7 @@
 #include "imm/state.h"
 #include "imm/step.h"
 #include "imm/subseq.h"
+#include "io.h"
 #include "min.h"
 #include "mstate.h"
 #include "mstate_sort.h"
@@ -337,11 +337,15 @@ int hmm_write(struct imm_hmm const* hmm, struct imm_dp const* dp, FILE* stream)
     return 0;
 }
 
-int hmm_read(FILE* stream, struct imm_io *io)
+int hmm_read(FILE* stream, struct imm_io* io)
 {
-    io->abc = abc_read(stream);
-    if (io->abc) {
+    if (abc_read(stream, io)) {
         imm_error("could not read abc");
+        return 1;
+    }
+
+    if (!mstate_read_states(stream, io)) {
+        imm_error("could not read states");
         return 1;
     }
 

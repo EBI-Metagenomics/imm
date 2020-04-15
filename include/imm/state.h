@@ -75,10 +75,6 @@ static inline unsigned imm_state_max_seq(struct imm_state const* state)
 {
     return state->max_seq(state);
 }
-static inline int imm_state_write(struct imm_state const* state, FILE* stream)
-{
-    return state->write(state, stream);
-}
 static inline uint8_t imm_state_type_id(struct imm_state const* state)
 {
     return state->type_id;
