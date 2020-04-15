@@ -64,6 +64,9 @@ types:
       - id: normal_state
         type: normal_state
         if: state_type == state_type::normal
+      - id: table_state
+        type: table_state
+        if: state_type == state_type::table
   mute_state: {}
   normal_state:
     seq:
