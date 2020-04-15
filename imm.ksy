@@ -76,6 +76,8 @@ types:
         type: dp_emission
       - id: dp_trans_table
         type: dp_trans_table
+      - id: dp_state_table
+        type: dp_state_table
   seq_code:
     seq:
       - id: min_seq
@@ -124,3 +126,21 @@ types:
         type: u4
         repeat: expr
         repeat-expr: offset_size
+  dp_state_table:
+    seq:
+      - id: nstates
+        type: u4
+      - id: min_seq
+        type: u1
+        repeat: expr
+        repeat-expr: nstates
+      - id: max_seq
+        type: u1
+        repeat: expr
+        repeat-expr: nstates
+      - id: start_lprob
+        type: f8
+        repeat: expr
+        repeat-expr: nstates
+      - id: end_state
+        type: u4

@@ -210,7 +210,12 @@ int dp_write(struct imm_dp const* dp, FILE* stream)
 
     if (dp_trans_table_write(dp->trans_table, dp_state_table_nstates(dp->state_table),
                              stream)) {
-        imm_error("could not write dp_trans");
+        imm_error("could not write dp_trans_table");
+        return 1;
+    }
+
+    if (dp_state_table_write(dp->state_table, stream)) {
+        imm_error("could not write dp_state_table");
         return 1;
     }
 

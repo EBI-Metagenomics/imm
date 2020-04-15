@@ -63,7 +63,8 @@ int dp_state_table_write(struct dp_state_table const* state_tbl, FILE* stream)
         state_tbl->nstates)
         return 1;
 
-    if (fwrite(chunk.max_seq, sizeof(*chunk.max_seq), 1, stream) < state_tbl->nstates)
+    if (fwrite(chunk.max_seq, sizeof(*chunk.max_seq), state_tbl->nstates, stream) <
+        state_tbl->nstates)
         return 1;
 
     if (fwrite(chunk.start_lprob, sizeof(*chunk.start_lprob), state_tbl->nstates, stream) <
