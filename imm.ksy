@@ -58,8 +58,22 @@ types:
         enum: state_type
       - id: impl_chunk_size
         type: u4
-      - id: impl_chunk
-        size: impl_chunk_size
+      - id: mute_state
+        type: mute_state
+        if: state_type == state_type::mute
+      - id: normal_state
+        type: normal_state
+        if: state_type == state_type::normal
+  mute_state: {}
+  normal_state:
+    seq:
+      - id: lprobs_size
+        type: u1
+      - id: lprobs
+        type: f8
+        repeat: expr
+        repeat-expr: lprobs_size
+  table_state: {}
   transition:
     seq:
       - id: source_state
