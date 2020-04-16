@@ -358,6 +358,39 @@ int hmm_read(FILE* stream, struct imm_io* io)
         mstate_table_add(io->hmm->table, io_mstate(io, i));
     }
 
+    uint32_t ntrans = 0;
+
+    if (fread(&ntrans, sizeof(ntrans), 1, stream) < 1) {
+        imm_error("could not read ntransitions");
+        return 1;
+    }
+
+    for (uint32_t i = 0; i < ntrans; ++i) {
+
+        uint32_t src_state = 0;
+        uint32_t tgt_state = 0;
+        double   lprob = 0;
+
+        if (fread(&src_state, sizeof(src_state), 1, stream) < 1) {
+            imm_error("could not read source_state");
+            return 1;
+        }
+
+        if (fread(&tgt_state, sizeof(tgt_state), 1, stream) < 1) {
+            imm_error("could not read target_state");
+            return 1;
+        }
+
+        if (fread(&lprob, sizeof(lprob), 1, stream) < 1) {
+            imm_error("could not read lprob");
+            return 1;
+        }
+
+        struct mtrans_table* trans_tbl = mstate_get_mtrans_table(io_mstate(io, src_state));
+        struct imm_state const* tgt = mstate_get_state(io_mstate(io, tgt_state));
+        mtrans_table_add(trans_tbl, mtrans_create(tgt, lprob));
+    }
+
     return 0;
 }
 
