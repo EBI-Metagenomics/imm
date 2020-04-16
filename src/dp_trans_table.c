@@ -1,6 +1,7 @@
 #include "dp_trans_table.h"
 #include "free.h"
 #include "imm/lprob.h"
+#include "io.h"
 #include "list.h"
 #include "mstate.h"
 #include "mtrans.h"
@@ -15,7 +16,7 @@ struct incoming_trans
     struct list_head list_entry;
 };
 
-struct dp_trans_chunk
+struct dp_trans_table_chunk
 {
     uint32_t  ntrans;
     double*   score;
@@ -123,11 +124,11 @@ void dp_trans_table_destroy(struct dp_trans_table const* trans_tbl)
 
 int dp_trans_table_write(struct dp_trans_table const* trans, uint32_t nstates, FILE* stream)
 {
-    struct dp_trans_chunk chunk = {.ntrans = trans->ntrans,
-                                   .score = trans->score,
-                                   .source_state = trans->source_state,
-                                   .offset_size = nstates + 1,
-                                   .offset = trans->offset};
+    struct dp_trans_table_chunk chunk = {.ntrans = trans->ntrans,
+                                         .score = trans->score,
+                                         .source_state = trans->source_state,
+                                         .offset_size = nstates + 1,
+                                         .offset = trans->offset};
 
     if (fwrite(&chunk.ntrans, sizeof(chunk.ntrans), 1, stream) < 1)
         return 1;
@@ -148,4 +149,69 @@ int dp_trans_table_write(struct dp_trans_table const* trans, uint32_t nstates, F
         return 1;
 
     return 0;
+}
+
+int dp_trans_table_read(FILE* stream, struct imm_io* io)
+{
+    struct dp_trans_table_chunk chunk = {
+        .ntrans = 0, .score = NULL, .source_state = NULL, .offset_size = 0, .offset = NULL};
+
+    struct dp_trans_table* trans_tbl = malloc(sizeof(*trans_tbl));
+
+    if (fread(&chunk.ntrans, sizeof(chunk.ntrans), 1, stream) < 1) {
+        imm_error("could not read ntransitions");
+        goto err;
+    }
+
+    chunk.score = malloc(sizeof(*chunk.score));
+
+    if (fread(chunk.score, sizeof(*chunk.score), score_size(chunk.ntrans), stream) <
+        score_size(chunk.ntrans)) {
+        imm_error("could not read score");
+        goto err;
+    }
+
+    chunk.source_state = malloc(sizeof(*chunk.source_state) * source_state_size(chunk.ntrans));
+
+    if (fread(chunk.source_state, sizeof(*chunk.source_state), source_state_size(chunk.ntrans),
+              stream) < source_state_size(chunk.ntrans)) {
+        imm_error("could not read source_state");
+        goto err;
+    }
+
+    if (fread(&chunk.offset_size, sizeof(chunk.offset_size), 1, stream) < 1) {
+        imm_error("could not read offset_size");
+        goto err;
+    }
+
+    chunk.offset = malloc(sizeof(*chunk.offset) * chunk.offset_size);
+
+    if (fread(chunk.offset, sizeof(*chunk.offset), chunk.offset_size, stream) <
+        chunk.offset_size) {
+        imm_error("could not read offset");
+        goto err;
+    }
+
+    trans_tbl->ntrans = chunk.ntrans;
+    trans_tbl->score = chunk.score;
+    trans_tbl->source_state = chunk.source_state;
+    trans_tbl->offset = chunk.offset;
+
+    io->trans_table = trans_tbl;
+
+    return 0;
+
+err:
+    if (chunk.score)
+        free_c(chunk.score);
+
+    if (chunk.source_state)
+        free_c(chunk.source_state);
+
+    if (chunk.offset)
+        free_c(chunk.offset);
+
+    free_c(trans_tbl);
+
+    return 1;
 }

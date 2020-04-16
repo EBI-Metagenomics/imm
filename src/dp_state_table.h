@@ -4,8 +4,9 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-struct mstate;
+struct imm_io;
 struct imm_state;
+struct mstate;
 struct state_idx;
 
 struct dp_state_table
@@ -53,5 +54,7 @@ static inline uint32_t dp_state_table_end_state(struct dp_state_table const* sta
 void dp_state_table_destroy(struct dp_state_table const* state_tbl);
 
 int dp_state_table_write(struct dp_state_table const* state_tbl, FILE* stream);
+
+int dp_state_table_read(FILE* stream, struct imm_io* io);
 
 #endif

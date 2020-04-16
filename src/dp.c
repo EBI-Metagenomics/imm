@@ -234,6 +234,16 @@ int dp_read(FILE* stream, struct imm_io* io)
         return 1;
     }
 
+    if (dp_trans_table_read(stream, io)) {
+        imm_error("could not read dp_trans_table");
+        return 1;
+    }
+
+    if (dp_state_table_read(stream, io)) {
+        imm_error("could not read dp_state_table");
+        return 1;
+    }
+
     return 0;
 }
 
