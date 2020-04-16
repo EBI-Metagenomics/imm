@@ -37,6 +37,11 @@ struct imm_io const* imm_io_read(FILE* stream)
         goto err;
     }
 
+    if (dp_read(stream, io)) {
+        imm_error("could not read dp");
+        goto err;
+    }
+
     return io;
 
 err:

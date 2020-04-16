@@ -222,6 +222,16 @@ int dp_write(struct imm_dp const* dp, FILE* stream)
     return 0;
 }
 
+int  dp_read(FILE* stream, struct imm_io* io)
+{
+    if (seq_code_read(stream, io)) {
+        imm_error("could not read seq_code");
+        return 1;
+    }
+
+    return 0;
+}
+
 struct mstate const* const* dp_get_mstates(struct imm_dp const* dp) { return dp->mstates; }
 
 struct dp_state_table const* dp_get_state_table(struct imm_dp const* dp)

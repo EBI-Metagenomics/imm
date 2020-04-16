@@ -7,6 +7,7 @@
 #include "imm/bug.h"
 #include "imm/seq.h"
 #include "imm/subseq.h"
+#include "io.h"
 #include "matrixu.h"
 #include <limits.h>
 #include <stdlib.h>
@@ -122,4 +123,66 @@ int seq_code_write(struct seq_code const* seq_code, FILE* stream)
         return 1;
 
     return 0;
+}
+
+int seq_code_read(FILE* stream, struct imm_io* io)
+{
+    struct seq_code_chunk chunk = {
+        .min_seq = 0, .max_seq = 0, .offset = NULL, .stride = NULL, .size = 0};
+
+    struct seq_code* seq_code = malloc(sizeof(*seq_code));
+    seq_code->offset = NULL;
+    seq_code->stride = NULL;
+    seq_code->size = 0;
+
+    if (fread(&chunk.min_seq, sizeof(chunk.min_seq), 1, stream) < 1) {
+        imm_error("could not read min_seq");
+        goto err;
+    }
+
+    if (fread(&chunk.max_seq, sizeof(chunk.max_seq), 1, stream) < 1) {
+        imm_error("could not read max_seq");
+        goto err;
+    }
+
+    seq_code->min_seq = chunk.min_seq;
+    seq_code->max_seq = chunk.max_seq;
+
+    chunk.offset = malloc(sizeof(*chunk.offset) * offset_size(seq_code));
+
+    if (fread(chunk.offset, sizeof(*chunk.offset), offset_size(seq_code), stream) <
+        offset_size(seq_code)) {
+        imm_error("could not read offset");
+        goto err;
+    }
+
+    chunk.stride = malloc(sizeof(*chunk.stride) * offset_size(seq_code));
+
+    if (fread(chunk.stride, sizeof(*chunk.stride), stride_size(seq_code), stream) <
+        stride_size(seq_code)) {
+        imm_error("could not read stride");
+        goto err;
+    }
+
+    if (fread(&chunk.size, sizeof(chunk.size), 1, stream) < 1) {
+        imm_error("could not read size");
+        goto err;
+    }
+
+    seq_code->offset = chunk.offset;
+    seq_code->stride = chunk.stride;
+    seq_code->size = chunk.size;
+
+    return 0;
+
+err:
+    if (chunk.offset)
+        free_c(chunk.offset);
+
+    if (chunk.stride)
+        free_c(chunk.stride);
+
+    free_c(seq_code);
+
+    return 1;
 }

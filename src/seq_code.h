@@ -5,9 +5,10 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-struct imm_abc;
-struct imm_seq;
 struct eseq;
+struct imm_abc;
+struct imm_io;
+struct imm_seq;
 
 struct seq_code
 {
@@ -45,5 +46,6 @@ static inline struct imm_abc const* seq_code_abc(struct seq_code const* seq_code
 }
 void seq_code_destroy(struct seq_code const* seq_code);
 int  seq_code_write(struct seq_code const* seq_code, FILE* stream);
+int  seq_code_read(FILE* stream, struct imm_io* io);
 
 #endif
