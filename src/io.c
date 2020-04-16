@@ -1,11 +1,12 @@
-#include "imm/hmm.h"
-#include "imm/abc.h"
 #include "imm/io.h"
-#include "io.h"
 #include "dp.h"
-#include "hmm.h"
-#include "imm/report.h"
 #include "free.h"
+#include "hmm.h"
+#include "imm/abc.h"
+#include "imm/hmm.h"
+#include "imm/report.h"
+#include "io.h"
+#include "mstate.h"
 #include <stdlib.h>
 
 int imm_io_write(FILE* stream, struct imm_hmm const* hmm, struct imm_dp const* dp)
@@ -25,7 +26,7 @@ int imm_io_write(FILE* stream, struct imm_hmm const* hmm, struct imm_dp const* d
 
 struct imm_io const* imm_io_read(FILE* stream)
 {
-    struct imm_io *io = malloc(sizeof(*io));
+    struct imm_io* io = malloc(sizeof(*io));
 
     if (!hmm_read(stream, io)) {
         imm_error("could not read hmm");
@@ -47,3 +48,14 @@ err:
     free_c(io);
     return NULL;
 }
+
+struct imm_state const* imm_io_state(struct imm_io const* io, uint32_t i)
+{
+    return mstate_get_state(io->mstates[i]);
+}
+
+uint32_t imm_io_nstates(struct imm_io const* io) { return io->nstates; }
+
+struct imm_abc const* imm_io_abc(struct imm_io const* io) { return io->abc; }
+
+struct imm_hmm * imm_io_hmm(struct imm_io const* io) { return io->hmm; }

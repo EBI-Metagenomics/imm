@@ -1696,9 +1696,27 @@ void test_hmm_write_read_two_states(void)
     file = fopen("test_hmm.tmp/one_mute_state.imm", "r");
     cass_cond(file != NULL);
     struct imm_io const* io = imm_io_read(file);
-    /* cass_cond(io != NULL); */
+    cass_cond(io != NULL);
     fclose(file);
 
-    /* imm_abc_destroy(imm_hmm_abc(hmm)); */
-    /* imm_hmm_destroy(hmm); */
+    cass_equal_uint64(imm_io_nstates(io), 2);
+    for (uint32_t i = 0; i < imm_io_nstates(io); ++i) {
+        struct imm_state const* state = imm_io_state(io, i);
+
+        if (imm_state_type_id(state) == IMM_MUTE_STATE_TYPE_ID) {
+
+            cass_cond(strcmp(imm_state_get_name(state), "state0") == 0);
+            struct imm_mute_state const *mute_state = imm_state_get_impl_c(state);
+            imm_mute_state_destroy(mute_state);
+
+        } else if (imm_state_type_id(state) == IMM_NORMAL_STATE_TYPE_ID) {
+
+            cass_cond(strcmp(imm_state_get_name(state), "state1") == 0);
+            struct imm_normal_state const *normal_state = imm_state_get_impl_c(state);
+            imm_normal_state_destroy(normal_state);
+        }
+    }
+
+    imm_abc_destroy(imm_io_abc(io));
+    /* imm_hmm_destroy(imm_io_hmm(io)); */
 }

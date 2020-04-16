@@ -68,18 +68,18 @@ int mstate_write_states(FILE* stream, struct mstate const* const* mstates, uint3
 int mstate_read_states(FILE* stream, struct imm_io* io)
 {
     /* TODO: fix memory leak */
-    uint32_t nstates = 0;
+    io->nstates = 0;
 
-    if (fread(&nstates, sizeof(nstates), 1, stream) < 1) {
+    if (fread(&io->nstates, sizeof(io->nstates), 1, stream) < 1) {
         imm_error("could not read nstates");
         return 1;
     }
 
-    io->mstates = malloc(sizeof(*io->mstates) * nstates);
-    for (uint32_t i = 0; i < nstates; ++i)
+    io->mstates = malloc(sizeof(*io->mstates) * io->nstates);
+    for (uint32_t i = 0; i < io->nstates; ++i)
         io->mstates[i] = NULL;
 
-    for (uint32_t i = 0; i < nstates; ++i) {
+    for (uint32_t i = 0; i < io->nstates; ++i) {
 
         struct mstate_chunk chunk;
 
@@ -93,6 +93,8 @@ int mstate_read_states(FILE* stream, struct imm_io* io)
             imm_error("could not read state");
             return 1;
         }
+
+        io->mstates[i] = mstate_create(state, chunk.start_lprob);
     }
 
     return 0;

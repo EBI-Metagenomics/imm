@@ -1,9 +1,9 @@
-#include "io.h"
 #include "imm/abc.h"
 #include "abc.h"
 #include "cast.h"
 #include "free.h"
 #include "imm/report.h"
+#include "io.h"
 #include <string.h>
 
 struct abc_chunk
@@ -120,17 +120,19 @@ int abc_read(FILE* stream, struct imm_io* io)
         return 1;
     }
 
-    io->abc = malloc(sizeof(*io->abc));
-    io->abc->symbols = chunk.symbols;
-    io->abc->length = chunk.nsymbols;
+    struct imm_abc* abc = malloc(sizeof(*io->abc));
+    abc->symbols = chunk.symbols;
+    abc->length = chunk.nsymbols;
 
     for (uint8_t i = 0; i < IMM_SYMBOL_IDX_SIZE; ++i)
-        io->abc->symbol_idx[i] = IMM_ABC_INVALID_IDX;
+        abc->symbol_idx[i] = IMM_ABC_INVALID_IDX;
 
     for (uint8_t i = 0; i < chunk.nsymbols; ++i)
-        io->abc->symbol_idx[__imm_abc_index(chunk.symbols[i])] = i;
+        abc->symbol_idx[__imm_abc_index(chunk.symbols[i])] = i;
 
-    io->abc->any_symbol = chunk.any_symbol;
+    abc->any_symbol = chunk.any_symbol;
+
+    io->abc = abc;
 
     return 0;
 }
