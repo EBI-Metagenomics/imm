@@ -222,10 +222,15 @@ int dp_write(struct imm_dp const* dp, FILE* stream)
     return 0;
 }
 
-int  dp_read(FILE* stream, struct imm_io* io)
+int dp_read(FILE* stream, struct imm_io* io)
 {
     if (seq_code_read(stream, io)) {
         imm_error("could not read seq_code");
+        return 1;
+    }
+
+    if (dp_emission_read(stream, io)) {
+        imm_error("could not read dp_emission");
         return 1;
     }
 

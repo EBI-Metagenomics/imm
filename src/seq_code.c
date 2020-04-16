@@ -173,6 +173,8 @@ int seq_code_read(FILE* stream, struct imm_io* io)
     seq_code->stride = chunk.stride;
     seq_code->size = chunk.size;
 
+    io->seq_code = seq_code;
+
     return 0;
 
 err:

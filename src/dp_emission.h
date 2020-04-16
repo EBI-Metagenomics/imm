@@ -4,8 +4,9 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-struct seq_code;
+struct imm_io;
 struct mstate;
+struct seq_code;
 
 struct dp_emission
 {
@@ -26,5 +27,6 @@ static inline double dp_emission_score(struct dp_emission const* emission, uint3
 void dp_emission_destroy(struct dp_emission const* emission);
 
 int dp_emission_write(struct dp_emission const* emission, uint32_t nstates, FILE* stream);
+int dp_emission_read(FILE* stream, struct imm_io* io);
 
 #endif

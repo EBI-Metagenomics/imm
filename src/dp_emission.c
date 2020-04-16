@@ -5,6 +5,7 @@
 #include "imm/abc.h"
 #include "imm/seq.h"
 #include "imm/state.h"
+#include "io.h"
 #include "mstate.h"
 #include "seq_code.h"
 #include <stdlib.h>
@@ -98,4 +99,58 @@ int dp_emission_write(struct dp_emission const* emission, uint32_t nstates, FILE
         return 1;
 
     return 0;
+}
+
+int dp_emission_read(FILE* stream, struct imm_io* io)
+{
+    struct dp_emission_chunk chunk = {
+        .score_size = 0, .score = NULL, .offset_size = 0, .offset = NULL};
+
+    struct dp_emission* emission = malloc(sizeof(*emission));
+    emission->offset = NULL;
+    emission->score = NULL;
+
+    if (fread(&chunk.score_size, sizeof(chunk.score_size), 1, stream) < 1) {
+        imm_error("could not read score_size");
+        goto err;
+    }
+
+    chunk.score = malloc(sizeof(*chunk.score) * chunk.score_size);
+
+    if (fread(chunk.score, sizeof(*chunk.score), chunk.score_size, stream) <
+        chunk.score_size) {
+        imm_error("could not read score");
+        goto err;
+    }
+
+    if (fread(&chunk.offset_size, sizeof(chunk.offset_size), 1, stream) < 1) {
+        imm_error("could not read offset_size");
+        goto err;
+    }
+
+    chunk.offset = malloc(sizeof(*chunk.offset) * chunk.offset_size);
+
+    if (fread(chunk.offset, sizeof(*chunk.offset), chunk.offset_size, stream) <
+        chunk.offset_size) {
+        imm_error("could not read offset");
+        goto err;
+    }
+
+    emission->offset = chunk.offset;
+    emission->score = chunk.score;
+
+    io->emission = emission;
+
+    return 0;
+
+err:
+    if (chunk.score)
+        free_c(chunk.score);
+
+    if (chunk.offset)
+        free_c(chunk.offset);
+
+    free_c(emission);
+
+    return 1;
 }
