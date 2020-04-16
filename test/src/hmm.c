@@ -1718,5 +1718,6 @@ void test_hmm_write_read_two_states(void)
     }
 
     imm_abc_destroy(imm_io_abc(io));
-    /* imm_hmm_destroy(imm_io_hmm(io)); */
+    imm_hmm_destroy(imm_io_hmm(io));
+    imm_io_destroy(io);
 }

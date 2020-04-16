@@ -6,6 +6,7 @@
 #include "free.h"
 #include "hmm.h"
 #include "imm/bug.h"
+#include "imm/io.h"
 #include "imm/lprob.h"
 #include "imm/path.h"
 #include "imm/report.h"
@@ -344,14 +345,18 @@ int hmm_read(FILE* stream, struct imm_io* io)
         return 1;
     }
 
-    if (!mstate_read_states(stream, io)) {
+    if (mstate_read_states(stream, io)) {
         imm_error("could not read states");
         return 1;
     }
 
-    struct imm_hmm* hmm = malloc(sizeof(*hmm));
-    hmm->abc = io->abc;
-    hmm->table = mstate_table_create();
+    io->hmm = malloc(sizeof(*io->hmm));
+    io->hmm->abc = io->abc;
+    io->hmm->table = mstate_table_create();
+
+    for (uint32_t i = 0; i < imm_io_nstates(io); ++i) {
+        mstate_table_add(io->hmm->table, io_mstate(io, i));
+    }
 
     return 0;
 }

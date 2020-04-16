@@ -27,8 +27,12 @@ int imm_io_write(FILE* stream, struct imm_hmm const* hmm, struct imm_dp const* d
 struct imm_io const* imm_io_read(FILE* stream)
 {
     struct imm_io* io = malloc(sizeof(*io));
+    io->abc = NULL;
+    io->hmm = NULL;
+    io->mstates = NULL;
+    io->nstates = 0;
 
-    if (!hmm_read(stream, io)) {
+    if (hmm_read(stream, io)) {
         imm_error("could not read hmm");
         goto err;
     }
@@ -49,6 +53,13 @@ err:
     return NULL;
 }
 
+void imm_io_destroy(struct imm_io const* io)
+{
+    if (io->mstates)
+        free_c(io->mstates);
+    free_c(io);
+}
+
 struct imm_state const* imm_io_state(struct imm_io const* io, uint32_t i)
 {
     return mstate_get_state(io->mstates[i]);
@@ -58,4 +69,4 @@ uint32_t imm_io_nstates(struct imm_io const* io) { return io->nstates; }
 
 struct imm_abc const* imm_io_abc(struct imm_io const* io) { return io->abc; }
 
-struct imm_hmm * imm_io_hmm(struct imm_io const* io) { return io->hmm; }
+struct imm_hmm* imm_io_hmm(struct imm_io const* io) { return io->hmm; }

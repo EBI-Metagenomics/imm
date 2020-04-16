@@ -81,6 +81,7 @@ int normal_state_read(FILE* stream, struct imm_state* state)
 
     struct imm_normal_state* normal_state = malloc(sizeof(*normal_state));
     normal_state->interface = state;
+    normal_state->lprobs = chunk.lprobs;
     state->impl = normal_state;
 
     return 0;

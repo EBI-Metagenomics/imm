@@ -15,7 +15,7 @@ static inline int panic_sub_ui(unsigned a, unsigned b)
     }
 
     unsigned r = b - a;
-    if (r > (unsigned)-INT_MIN)
+    if (r > (unsigned)INT_MIN)
         imm_die("panic_sub_ui underflow");
 
     return (int)-r;

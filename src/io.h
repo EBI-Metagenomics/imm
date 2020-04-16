@@ -15,4 +15,9 @@ struct imm_io
     uint32_t              nstates;
 };
 
+static inline struct mstate* io_mstate(struct imm_io const* io, uint32_t i)
+{
+    return io->mstates[i];
+}
+
 #endif

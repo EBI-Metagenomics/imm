@@ -88,13 +88,14 @@ struct imm_state const* state_read(FILE* stream, struct imm_abc const* abc)
     }
 
     struct imm_state *state = malloc(sizeof(*state));
+    state->impl = NULL;
     state->name = chunk.name;
     state->abc = abc;
     state->type_id = chunk.state_type;
 
     if (state_factory_read(stream, state)) {
         imm_error("could not state_factory_read");
-        free_c(state);
+        imm_state_destroy(state);
         return NULL;
     }
 
