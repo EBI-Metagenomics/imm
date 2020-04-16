@@ -84,7 +84,7 @@ int imm_hmm_set_start(struct imm_hmm* hmm, struct imm_state const* state, double
 }
 
 int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state,
-                      struct imm_state const* dst_state, double lprob)
+                      struct imm_state const* tgt_state, double lprob)
 {
     unsigned long src = mstate_table_find(hmm->table, src_state);
     if (src == mstate_table_end(hmm->table)) {
@@ -92,8 +92,8 @@ int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state,
         return 1;
     }
 
-    unsigned long dst = mstate_table_find(hmm->table, dst_state);
-    if (dst == mstate_table_end(hmm->table)) {
+    unsigned long tgt = mstate_table_find(hmm->table, tgt_state);
+    if (tgt == mstate_table_end(hmm->table)) {
         imm_error("destination state not found");
         return 1;
     }
@@ -105,10 +105,10 @@ int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state,
 
     struct mtrans_table* table = mstate_get_mtrans_table(mstate_table_get(hmm->table, src));
 
-    unsigned long i = mtrans_table_find(table, dst_state);
+    unsigned long i = mtrans_table_find(table, tgt_state);
     if (i == mtrans_table_end(table)) {
         if (!imm_lprob_is_zero(lprob))
-            mtrans_table_add(table, mtrans_create(dst_state, lprob));
+            mtrans_table_add(table, mtrans_create(tgt_state, lprob));
     } else {
         if (imm_lprob_is_zero(lprob))
             mtrans_table_del(table, i);
@@ -120,7 +120,7 @@ int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state,
 }
 
 double imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* src_state,
-                         struct imm_state const* dst_state)
+                         struct imm_state const* tgt_state)
 {
     unsigned long src = mstate_table_find(hmm->table, src_state);
     if (src == mstate_table_end(hmm->table)) {
@@ -128,15 +128,15 @@ double imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* src_
         return imm_lprob_invalid();
     }
 
-    unsigned long dst = mstate_table_find(hmm->table, dst_state);
-    if (dst == mstate_table_end(hmm->table)) {
+    unsigned long tgt = mstate_table_find(hmm->table, tgt_state);
+    if (tgt == mstate_table_end(hmm->table)) {
         imm_error("destination state not found");
         return imm_lprob_invalid();
     }
 
     struct mtrans_table const* table =
         mstate_get_mtrans_table(mstate_table_get(hmm->table, src));
-    unsigned long i = mtrans_table_find(table, dst_state);
+    unsigned long i = mtrans_table_find(table, tgt_state);
 
     if (i == mtrans_table_end(table))
         return imm_lprob_zero();
@@ -386,7 +386,7 @@ int hmm_read(FILE* stream, struct imm_io* io)
             return 1;
         }
 
-        struct mtrans_table* trans_tbl = mstate_get_mtrans_table(io_mstate(io, src_state));
+        struct mtrans_table*    trans_tbl = mstate_get_mtrans_table(io_mstate(io, src_state));
         struct imm_state const* tgt = mstate_get_state(io_mstate(io, tgt_state));
         mtrans_table_add(trans_tbl, mtrans_create(tgt, lprob));
     }

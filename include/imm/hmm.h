@@ -22,10 +22,10 @@ IMM_EXPORT int imm_hmm_set_start(struct imm_hmm* hmm, struct imm_state const* st
                                  double lprob);
 
 IMM_EXPORT int    imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state,
-                                    struct imm_state const* dst_state, double lprob);
+                                    struct imm_state const* tgt_state, double lprob);
 IMM_EXPORT double imm_hmm_get_trans(struct imm_hmm const*   hmm,
                                     struct imm_state const* src_state,
-                                    struct imm_state const* dst_state);
+                                    struct imm_state const* tgt_state);
 
 IMM_EXPORT double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
                                      struct imm_path const* path);
