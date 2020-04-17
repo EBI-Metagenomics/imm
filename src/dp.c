@@ -39,6 +39,7 @@ struct imm_dp
     unsigned                     max_nthreads;
 };
 
+static void     finish_creation(struct imm_dp* dp);
 static double   viterbi(struct imm_dp const* dp, struct dp_matrix* matrix,
                         struct eseq const* eseq, struct imm_path* path);
 static double   best_trans_score(struct imm_dp const* dp, struct dp_matrix const* matrix,
@@ -172,7 +173,7 @@ void imm_dp_destroy(struct imm_dp const* dp)
     free_c(dp);
 }
 
-struct imm_dp const* dp_create(struct imm_abc const* abc, struct mstate const* const* mstates,
+struct imm_dp const* dp_create(struct imm_abc const* abc, struct mstate const** mstates,
                                uint32_t nstates, struct imm_state const* end_state)
 {
     struct imm_dp* dp = malloc(sizeof(*dp));
@@ -185,16 +186,24 @@ struct imm_dp const* dp_create(struct imm_abc const* abc, struct mstate const* c
     dp->trans_table = dp_trans_table_create(mstates, nstates, state_idx);
     state_idx_destroy(state_idx);
 
-    dp->max_nthreads = thread_max_size();
-    dp->matrices = malloc(sizeof(struct dp_matrix*) * dp->max_nthreads);
-    dp->eseqs = malloc(sizeof(struct eseq*) * dp->max_nthreads);
-
-    for (unsigned i = 0; i < dp->max_nthreads; ++i) {
-        dp->matrices[i] = NULL;
-        dp->eseqs[i] = NULL;
-    }
+    finish_creation(dp);
 
     return dp;
+}
+
+void dp_create_from_io(struct imm_io* io)
+{
+    struct imm_dp* dp = malloc(sizeof(*dp));
+
+    dp->mstates = (struct mstate const**)io->mstates;
+    dp->seq_code = io->seq_code;
+    dp->emission = io->emission;
+    dp->trans_table = io->trans_table;
+    dp->state_table = io->state_table;
+
+    finish_creation(dp);
+
+    io->dp = dp;
 }
 
 int dp_write(struct imm_dp const* dp, FILE* stream)
@@ -258,6 +267,18 @@ struct dp_state_table const* dp_get_state_table(struct imm_dp const* dp)
 struct dp_trans_table const* dp_get_trans_table(struct imm_dp const* dp)
 {
     return dp->trans_table;
+}
+
+static void finish_creation(struct imm_dp* dp)
+{
+    dp->max_nthreads = thread_max_size();
+    dp->matrices = malloc(sizeof(struct dp_matrix*) * dp->max_nthreads);
+    dp->eseqs = malloc(sizeof(struct eseq*) * dp->max_nthreads);
+
+    for (unsigned i = 0; i < dp->max_nthreads; ++i) {
+        dp->matrices[i] = NULL;
+        dp->eseqs[i] = NULL;
+    }
 }
 
 struct dp_emission const* dp_get_emission(struct imm_dp const* dp) { return dp->emission; }

@@ -20,6 +20,7 @@ struct imm_io
     struct dp_emission const*    emission;
     struct dp_trans_table const* trans_table;
     struct dp_state_table const* state_table;
+    struct imm_dp const*         dp;
 };
 
 #endif

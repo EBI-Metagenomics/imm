@@ -1,15 +1,15 @@
 #include "imm/io.h"
 #include "dp.h"
+#include "dp_emission.h"
+#include "dp_trans_table.h"
 #include "free.h"
 #include "hmm.h"
 #include "imm/abc.h"
 #include "imm/hmm.h"
 #include "imm/report.h"
-#include "seq_code.h"
-#include "dp_emission.h"
-#include "dp_trans_table.h"
 #include "io.h"
 #include "mstate.h"
+#include "seq_code.h"
 #include <stdlib.h>
 
 int imm_io_write(FILE* stream, struct imm_hmm const* hmm, struct imm_dp const* dp)
@@ -37,6 +37,7 @@ struct imm_io const* imm_io_read(FILE* stream)
     io->seq_code = NULL;
     io->emission = NULL;
     io->trans_table = NULL;
+    io->state_table = NULL;
 
     if (hmm_read(stream, io)) {
         imm_error("could not read hmm");
@@ -47,6 +48,8 @@ struct imm_io const* imm_io_read(FILE* stream)
         imm_error("could not read dp");
         goto err;
     }
+
+    dp_create_from_io(io);
 
     return io;
 
