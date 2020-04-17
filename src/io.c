@@ -5,6 +5,9 @@
 #include "imm/abc.h"
 #include "imm/hmm.h"
 #include "imm/report.h"
+#include "seq_code.h"
+#include "dp_emission.h"
+#include "dp_trans_table.h"
 #include "io.h"
 #include "mstate.h"
 #include <stdlib.h>
@@ -31,6 +34,9 @@ struct imm_io const* imm_io_read(FILE* stream)
     io->hmm = NULL;
     io->mstates = NULL;
     io->nstates = 0;
+    io->seq_code = NULL;
+    io->emission = NULL;
+    io->trans_table = NULL;
 
     if (hmm_read(stream, io)) {
         imm_error("could not read hmm");
@@ -53,6 +59,15 @@ err:
 
     if (io->mstates)
         free_c(io->mstates);
+
+    if (io->seq_code)
+        seq_code_destroy(io->seq_code);
+
+    if (io->emission)
+        dp_emission_destroy(io->emission);
+
+    if (io->trans_table)
+        dp_trans_table_destroy(io->trans_table);
 
     free_c(io);
     return NULL;

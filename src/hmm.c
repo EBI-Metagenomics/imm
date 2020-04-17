@@ -5,6 +5,7 @@
 #include "dp_trans_table.h"
 #include "free.h"
 #include "hmm.h"
+#include "imm/abc.h"
 #include "imm/bug.h"
 #include "imm/io.h"
 #include "imm/lprob.h"
@@ -31,6 +32,8 @@ struct imm_hmm
 
 static double hmm_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state);
 static int    hmm_normalize_trans(struct mstate* mstate);
+static int    read_transitions(FILE* stream, struct imm_hmm* hmm,
+                               struct mstate* const* const mstates);
 
 struct imm_hmm* imm_hmm_create(struct imm_abc const* abc)
 {
@@ -340,24 +343,47 @@ int hmm_write(struct imm_hmm const* hmm, struct imm_dp const* dp, FILE* stream)
 
 int hmm_read(FILE* stream, struct imm_io* io)
 {
-    if (abc_read(stream, io)) {
+    struct imm_hmm* hmm = NULL;
+    io->mstates = NULL;
+
+    if (!(io->abc = abc_read(stream))) {
         imm_error("could not read abc");
-        return 1;
+        goto err;
     }
 
-    if (mstate_read_states(stream, io)) {
+    hmm = imm_hmm_create(io->abc);
+
+    if (!(io->mstates = mstate_read_states(stream, &io->nstates, io->abc))) {
         imm_error("could not read states");
-        return 1;
+        goto err;
     }
 
-    io->hmm = malloc(sizeof(*io->hmm));
-    io->hmm->abc = io->abc;
-    io->hmm->table = mstate_table_create();
-
-    for (uint32_t i = 0; i < imm_io_nstates(io); ++i) {
-        mstate_table_add(io->hmm->table, io_mstate(io, i));
+    for (uint32_t i = 0; i < io->nstates; ++i) {
+        mstate_table_add(hmm->table, io->mstates[i]);
     }
 
+    if (read_transitions(stream, hmm, io->mstates)) {
+        imm_error("could not read transitions");
+        goto err;
+    }
+
+    io->hmm = hmm;
+
+    return 0;
+
+err:
+    if (io->abc)
+        imm_abc_destroy(io->abc);
+
+    if (hmm)
+        imm_hmm_destroy(hmm);
+
+    return 1;
+}
+
+static int read_transitions(FILE* stream, struct imm_hmm* hmm,
+                            struct mstate* const* const mstates)
+{
     uint32_t ntrans = 0;
 
     if (fread(&ntrans, sizeof(ntrans), 1, stream) < 1) {
@@ -386,9 +412,9 @@ int hmm_read(FILE* stream, struct imm_io* io)
             return 1;
         }
 
-        struct mtrans_table*    trans_tbl = mstate_get_mtrans_table(io_mstate(io, src_state));
-        struct imm_state const* tgt = mstate_get_state(io_mstate(io, tgt_state));
-        mtrans_table_add(trans_tbl, mtrans_create(tgt, lprob));
+        struct mtrans_table*    tbl = mstate_get_mtrans_table(mstates[src_state]);
+        struct imm_state const* tgt = mstate_get_state(mstates[tgt_state]);
+        mtrans_table_add(tbl, mtrans_create(tgt, lprob));
     }
 
     return 0;
