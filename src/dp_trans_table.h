@@ -47,6 +47,6 @@ void dp_trans_table_destroy(struct dp_trans_table const* transition);
 
 int dp_trans_table_write(struct dp_trans_table const* trans, uint32_t nstates, FILE* stream);
 
-int dp_trans_table_read(FILE* stream, struct imm_io* io);
+struct dp_trans_table const* dp_trans_table_read(FILE* stream);
 
 #endif

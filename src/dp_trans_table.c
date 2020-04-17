@@ -151,7 +151,7 @@ int dp_trans_table_write(struct dp_trans_table const* trans, uint32_t nstates, F
     return 0;
 }
 
-int dp_trans_table_read(FILE* stream, struct imm_io* io)
+struct dp_trans_table const* dp_trans_table_read(FILE* stream)
 {
     struct dp_trans_table_chunk chunk = {
         .ntrans = 0, .score = NULL, .source_state = NULL, .offset_size = 0, .offset = NULL};
@@ -197,9 +197,7 @@ int dp_trans_table_read(FILE* stream, struct imm_io* io)
     trans_tbl->source_state = chunk.source_state;
     trans_tbl->offset = chunk.offset;
 
-    io->trans_table = trans_tbl;
-
-    return 0;
+    return trans_tbl;
 
 err:
     if (chunk.score)
@@ -213,5 +211,5 @@ err:
 
     free_c(trans_tbl);
 
-    return 1;
+    return NULL;
 }

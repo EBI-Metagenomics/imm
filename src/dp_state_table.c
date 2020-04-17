@@ -88,7 +88,7 @@ int dp_state_table_write(struct dp_state_table const* state_tbl, FILE* stream)
     return 0;
 }
 
-int dp_state_table_read(FILE* stream, struct imm_io* io)
+struct dp_state_table *dp_state_table_read(FILE* stream)
 {
     struct dp_state_table_chunk chunk = {
         .nstates = 0, .min_seq = NULL, .max_seq = NULL, .start_lprob = NULL, .end_state = 0};
@@ -131,7 +131,7 @@ int dp_state_table_read(FILE* stream, struct imm_io* io)
     state_tbl->start_lprob = chunk.start_lprob;
     state_tbl->end_state = chunk.end_state;
 
-    return 0;
+    return state_tbl;
 
 err:
     free_c(state_tbl);
@@ -145,5 +145,5 @@ err:
     if (chunk.start_lprob)
         free_c(chunk.start_lprob);
 
-    return 1;
+    return NULL;
 }

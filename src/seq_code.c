@@ -7,7 +7,6 @@
 #include "imm/bug.h"
 #include "imm/seq.h"
 #include "imm/subseq.h"
-#include "io.h"
 #include "matrixu.h"
 #include <limits.h>
 #include <stdlib.h>
@@ -125,7 +124,7 @@ int seq_code_write(struct seq_code const* seq_code, FILE* stream)
     return 0;
 }
 
-int seq_code_read(FILE* stream, struct imm_io* io)
+struct seq_code const* seq_code_read(FILE* stream)
 {
     struct seq_code_chunk chunk = {
         .min_seq = 0, .max_seq = 0, .offset = NULL, .stride = NULL, .size = 0};
@@ -173,9 +172,7 @@ int seq_code_read(FILE* stream, struct imm_io* io)
     seq_code->stride = chunk.stride;
     seq_code->size = chunk.size;
 
-    io->seq_code = seq_code;
-
-    return 0;
+    return seq_code;
 
 err:
     if (chunk.offset)
@@ -186,5 +183,5 @@ err:
 
     free_c(seq_code);
 
-    return 1;
+    return NULL;
 }

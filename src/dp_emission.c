@@ -101,7 +101,7 @@ int dp_emission_write(struct dp_emission const* emission, uint32_t nstates, FILE
     return 0;
 }
 
-int dp_emission_read(FILE* stream, struct imm_io* io)
+struct dp_emission const* dp_emission_read(FILE* stream)
 {
     struct dp_emission_chunk chunk = {
         .score_size = 0, .score = NULL, .offset_size = 0, .offset = NULL};
@@ -139,9 +139,7 @@ int dp_emission_read(FILE* stream, struct imm_io* io)
     emission->offset = chunk.offset;
     emission->score = chunk.score;
 
-    io->emission = emission;
-
-    return 0;
+    return emission;
 
 err:
     if (chunk.score)
@@ -152,5 +150,5 @@ err:
 
     free_c(emission);
 
-    return 1;
+    return NULL;
 }

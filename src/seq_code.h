@@ -44,8 +44,8 @@ static inline struct imm_abc const* seq_code_abc(struct seq_code const* seq_code
 {
     return seq_code->abc;
 }
-void seq_code_destroy(struct seq_code const* seq_code);
-int  seq_code_write(struct seq_code const* seq_code, FILE* stream);
-int  seq_code_read(FILE* stream, struct imm_io* io);
+void                   seq_code_destroy(struct seq_code const* seq_code);
+int                    seq_code_write(struct seq_code const* seq_code, FILE* stream);
+struct seq_code const* seq_code_read(FILE* stream);
 
 #endif

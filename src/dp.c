@@ -5,6 +5,7 @@
 #include "dp_state_table.h"
 #include "dp_step.h"
 #include "dp_trans_table.h"
+#include "io.h"
 /* #include "elapsed.h" */
 #include "free.h"
 #include "imm/dp.h"
@@ -224,22 +225,22 @@ int dp_write(struct imm_dp const* dp, FILE* stream)
 
 int dp_read(FILE* stream, struct imm_io* io)
 {
-    if (seq_code_read(stream, io)) {
+    if (!(io->seq_code = seq_code_read(stream))) {
         imm_error("could not read seq_code");
         return 1;
     }
 
-    if (dp_emission_read(stream, io)) {
+    if (!(io->emission = dp_emission_read(stream))) {
         imm_error("could not read dp_emission");
         return 1;
     }
 
-    if (dp_trans_table_read(stream, io)) {
+    if (!(io->trans_table = dp_trans_table_read(stream))) {
         imm_error("could not read dp_trans_table");
         return 1;
     }
 
-    if (dp_state_table_read(stream, io)) {
+    if (!(io->state_table = dp_state_table_read(stream))) {
         imm_error("could not read dp_state_table");
         return 1;
     }

@@ -55,6 +55,6 @@ void dp_state_table_destroy(struct dp_state_table const* state_tbl);
 
 int dp_state_table_write(struct dp_state_table const* state_tbl, FILE* stream);
 
-int dp_state_table_read(FILE* stream, struct imm_io* io);
+struct dp_state_table* dp_state_table_read(FILE* stream);
 
 #endif

@@ -27,6 +27,6 @@ static inline double dp_emission_score(struct dp_emission const* emission, uint3
 void dp_emission_destroy(struct dp_emission const* emission);
 
 int dp_emission_write(struct dp_emission const* emission, uint32_t nstates, FILE* stream);
-int dp_emission_read(FILE* stream, struct imm_io* io);
+struct dp_emission const* dp_emission_read(FILE* stream);
 
 #endif
