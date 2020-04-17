@@ -24,7 +24,7 @@ void test_hmm_viterbi_profile_delete(void);
 void test_hmm_viterbi_global_profile(void);
 void test_hmm_viterbi_table_states(void);
 void test_hmm_viterbi_cycle_mute_ending(void);
-void test_hmm_write_read_two_states(void);
+void test_hmm_write_io_two_states(void);
 
 double single_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq,
                       struct imm_state const* end_state, struct imm_path* path);
@@ -53,7 +53,7 @@ int main(void)
     test_hmm_viterbi_global_profile();
     test_hmm_viterbi_table_states();
     test_hmm_viterbi_cycle_mute_ending();
-    test_hmm_write_read_two_states();
+    test_hmm_write_io_two_states();
     return cass_status();
 }
 
@@ -1663,7 +1663,7 @@ double single_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq,
     return score;
 }
 
-void test_hmm_write_read_two_states(void)
+void test_hmm_write_io_two_states(void)
 {
     struct imm_abc const* abc = imm_abc_create("ACGT", '*');
     struct imm_seq const* C = imm_seq_create("C", abc);
@@ -1676,12 +1676,17 @@ void test_hmm_write_read_two_states(void)
 
     imm_hmm_add_state(hmm, cast_c(state0), log(0.5));
     imm_hmm_set_start(hmm, cast_c(state0), log(0.1));
-    imm_hmm_add_state(hmm, cast_c(state1), log(0.2));
+    imm_hmm_add_state(hmm, cast_c(state1), log(0.001));
     imm_hmm_set_trans(hmm, cast_c(state0), cast_c(state1), log(0.9));
 
     struct imm_dp const* dp = imm_hmm_create_dp(hmm, cast_c(state0));
 
-    FILE* file = fopen("test_hmm.tmp/one_mute_state.imm", "w");
+    struct imm_path* path = imm_path_create();
+    cass_close(single_viterbi(hmm, C, cast_c(state1), path), log(0.25) + log(0.1) + log(0.9));
+    cass_close(imm_hmm_likelihood(hmm, C, path), log(0.25) + log(0.1) + log(0.9));
+    imm_path_destroy(path);
+
+    FILE* file = fopen("test_hmm.tmp/two_states.imm", "w");
     cass_cond(file != NULL);
     cass_equal_int(imm_io_write(file, hmm, dp), 0);
     fclose(file);
@@ -1693,7 +1698,7 @@ void test_hmm_write_read_two_states(void)
     imm_abc_destroy(abc);
     imm_seq_destroy(C);
 
-    file = fopen("test_hmm.tmp/one_mute_state.imm", "r");
+    file = fopen("test_hmm.tmp/two_states.imm", "r");
     cass_cond(file != NULL);
     struct imm_io const* io = imm_io_read(file);
     cass_cond(io != NULL);
@@ -1706,19 +1711,28 @@ void test_hmm_write_read_two_states(void)
         if (imm_state_type_id(state) == IMM_MUTE_STATE_TYPE_ID) {
 
             cass_cond(strcmp(imm_state_get_name(state), "state0") == 0);
-            struct imm_mute_state const *mute_state = imm_state_get_impl_c(state);
+            struct imm_mute_state const* mute_state = imm_state_get_impl_c(state);
             imm_mute_state_destroy(mute_state);
 
         } else if (imm_state_type_id(state) == IMM_NORMAL_STATE_TYPE_ID) {
 
             cass_cond(strcmp(imm_state_get_name(state), "state1") == 0);
-            struct imm_normal_state const *normal_state = imm_state_get_impl_c(state);
+            struct imm_normal_state const* normal_state = imm_state_get_impl_c(state);
             imm_normal_state_destroy(normal_state);
         }
     }
 
-    imm_abc_destroy(imm_io_abc(io));
-    imm_hmm_destroy(imm_io_hmm(io));
-    imm_dp_destroy(imm_io_dp(io));
+    abc = imm_io_abc(io);
+    hmm = imm_io_hmm(io);
+    dp = imm_io_dp(io);
+
+    path = imm_path_create();
+    cass_close(single_viterbi(hmm, C, cast_c(state1), path), log(0.25) + log(0.1) + log(0.9));
+    cass_close(imm_hmm_likelihood(hmm, C, path), log(0.25) + log(0.1) + log(0.9));
+    imm_path_destroy(path);
+
+    imm_abc_destroy(abc);
+    imm_hmm_destroy(hmm);
+    imm_dp_destroy(dp);
     imm_io_destroy(io);
 }
