@@ -18,5 +18,6 @@ IMM_EXPORT struct imm_state const* imm_io_state(struct imm_io const* io, uint32_
 IMM_EXPORT uint32_t                imm_io_nstates(struct imm_io const* io);
 IMM_EXPORT struct imm_abc const*   imm_io_abc(struct imm_io const* io);
 IMM_EXPORT struct imm_hmm*         imm_io_hmm(struct imm_io const* io);
+IMM_EXPORT struct imm_dp const*    imm_io_dp(struct imm_io const* io);
 
 #endif

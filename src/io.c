@@ -78,8 +78,6 @@ err:
 
 void imm_io_destroy(struct imm_io const* io)
 {
-    if (io->mstates)
-        free_c(io->mstates);
     free_c(io);
 }
 
@@ -93,3 +91,5 @@ uint32_t imm_io_nstates(struct imm_io const* io) { return io->nstates; }
 struct imm_abc const* imm_io_abc(struct imm_io const* io) { return io->abc; }
 
 struct imm_hmm* imm_io_hmm(struct imm_io const* io) { return io->hmm; }
+
+struct imm_dp const* imm_io_dp(struct imm_io const* io) { return io->dp; }
