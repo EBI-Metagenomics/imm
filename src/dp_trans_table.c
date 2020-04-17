@@ -163,7 +163,7 @@ struct dp_trans_table const* dp_trans_table_read(FILE* stream)
         goto err;
     }
 
-    chunk.score = malloc(sizeof(*chunk.score));
+    chunk.score = malloc(sizeof(*chunk.score) * score_size(chunk.ntrans));
 
     if (fread(chunk.score, sizeof(*chunk.score), score_size(chunk.ntrans), stream) <
         score_size(chunk.ntrans)) {

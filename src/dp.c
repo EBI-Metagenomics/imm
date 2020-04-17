@@ -234,7 +234,7 @@ int dp_write(struct imm_dp const* dp, FILE* stream)
 
 int dp_read(FILE* stream, struct imm_io* io)
 {
-    if (!(io->seq_code = seq_code_read(stream))) {
+    if (!(io->seq_code = seq_code_read(stream, io->abc))) {
         imm_error("could not read seq_code");
         return 1;
     }

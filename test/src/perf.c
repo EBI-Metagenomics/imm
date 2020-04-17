@@ -448,9 +448,12 @@ void test_perf_viterbi(void)
     cass_close(score, -65826.0106185297);
     imm_results_destroy(results);
 
-    results = imm_dp_viterbi(dp, seq, 0);
-    imm_results_destroy(results);
+    FILE* file = fopen("test_perf.tmp/perf.imm", "w");
+    cass_cond(file != NULL);
+    cass_equal_int(imm_io_write(file, hmm, dp), 0);
+    fclose(file);
 
+#if 0
     results = imm_dp_viterbi(dp, seq, 0);
     imm_results_destroy(results);
     results = imm_dp_viterbi(dp, seq, 0);
@@ -511,6 +514,9 @@ void test_perf_viterbi(void)
     imm_results_destroy(results);
     results = imm_dp_viterbi(dp, seq, 0);
     imm_results_destroy(results);
+    results = imm_dp_viterbi(dp, seq, 0);
+    imm_results_destroy(results);
+#endif
 
     imm_seq_destroy(seq);
 
@@ -532,4 +538,28 @@ void test_perf_viterbi(void)
     imm_mute_state_destroy(end);
     imm_abc_destroy(abc);
     imm_dp_destroy(dp);
+
+    file = fopen("test_perf.tmp/perf.imm", "r");
+    cass_cond(file != NULL);
+    struct imm_io const* io = imm_io_read(file);
+    cass_cond(io != NULL);
+    fclose(file);
+
+    abc = imm_io_abc(io);
+    hmm = imm_io_hmm(io);
+    dp = imm_io_dp(io);
+
+    seq = imm_seq_create(str, abc);
+    results = imm_dp_viterbi(dp, seq, 0);
+    r = imm_results_get(results, 0);
+    score = imm_result_loglik(r);
+    cass_cond(is_valid(score) && !is_zero(score));
+    cass_close(score, -65826.0106185297);
+    imm_results_destroy(results);
+
+    /* TODO: fix memory leak: delete states */
+    imm_abc_destroy(abc);
+    imm_hmm_destroy(hmm);
+    imm_dp_destroy(dp);
+    imm_seq_destroy(seq);
 }

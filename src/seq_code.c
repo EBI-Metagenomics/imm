@@ -124,7 +124,7 @@ int seq_code_write(struct seq_code const* seq_code, FILE* stream)
     return 0;
 }
 
-struct seq_code const* seq_code_read(FILE* stream)
+struct seq_code const* seq_code_read(FILE* stream, struct imm_abc const* abc)
 {
     struct seq_code_chunk chunk = {
         .min_seq = 0, .max_seq = 0, .offset = NULL, .stride = NULL, .size = 0};
@@ -133,6 +133,7 @@ struct seq_code const* seq_code_read(FILE* stream)
     seq_code->offset = NULL;
     seq_code->stride = NULL;
     seq_code->size = 0;
+    seq_code->abc = abc;
 
     if (fread(&chunk.min_seq, sizeof(chunk.min_seq), 1, stream) < 1) {
         imm_error("could not read min_seq");
