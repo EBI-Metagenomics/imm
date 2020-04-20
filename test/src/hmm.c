@@ -59,7 +59,6 @@ void test_hmm_del_get_state(void)
 
 void test_hmm_set_trans(void)
 {
-
     struct imm_abc const*        abc = imm_abc_create("ACGT", '*');
     struct imm_mute_state const* state0 = imm_mute_state_create("State0", abc);
     struct imm_mute_state const* state1 = imm_mute_state_create("State1", abc);

@@ -85,20 +85,20 @@ void test_hmm_write_io_two_states(void)
         if (imm_state_type_id(state) == IMM_MUTE_STATE_TYPE_ID) {
 
             cass_cond(strcmp(imm_state_get_name(state), "state0") == 0);
-            struct imm_mute_state const* mute_state = imm_state_get_impl_c(state);
-            imm_mute_state_destroy(mute_state);
+            /* struct imm_mute_state const* mute_state = imm_state_get_impl_c(state); */
 
         } else if (imm_state_type_id(state) == IMM_NORMAL_STATE_TYPE_ID) {
 
             cass_cond(strcmp(imm_state_get_name(state), "state1") == 0);
-            struct imm_normal_state const* normal_state = imm_state_get_impl_c(state);
-            imm_normal_state_destroy(normal_state);
+            /* struct imm_normal_state const* normal_state = imm_state_get_impl_c(state); */
         }
     }
 
+    imm_seq_destroy(C);
     imm_abc_destroy(abc);
     imm_hmm_destroy(hmm);
     imm_dp_destroy(dp);
+    imm_io_destroy_states(io);
     imm_io_destroy(io);
 }
 

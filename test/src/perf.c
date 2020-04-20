@@ -562,4 +562,6 @@ void test_perf_viterbi(void)
     imm_hmm_destroy(hmm);
     imm_dp_destroy(dp);
     imm_seq_destroy(seq);
+    imm_io_destroy_states(io);
+    imm_io_destroy(io);
 }

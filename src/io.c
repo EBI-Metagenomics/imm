@@ -6,7 +6,11 @@
 #include "hmm.h"
 #include "imm/abc.h"
 #include "imm/hmm.h"
+#include "imm/mute_state.h"
+#include "imm/normal_state.h"
 #include "imm/report.h"
+#include "imm/state.h"
+#include "imm/state_factory.h"
 #include "io.h"
 #include "mstate.h"
 #include "seq_code.h"
@@ -33,6 +37,7 @@ struct imm_io const* imm_io_read(FILE* stream)
     io->abc = NULL;
     io->hmm = NULL;
     io->mstates = NULL;
+    io->states = NULL;
     io->nstates = 0;
     io->seq_code = NULL;
     io->emission = NULL;
@@ -78,12 +83,31 @@ err:
 
 void imm_io_destroy(struct imm_io const* io)
 {
+    free_c(io->states);
     free_c(io);
+}
+
+void imm_io_destroy_states(struct imm_io const* io)
+{
+    for (uint32_t i = 0; i < imm_io_nstates(io); ++i) {
+        struct imm_state const* state = imm_io_state(io, i);
+
+        if (imm_state_type_id(state) == IMM_MUTE_STATE_TYPE_ID) {
+
+            imm_mute_state_destroy(imm_state_get_impl_c(state));
+
+        } else if (imm_state_type_id(state) == IMM_NORMAL_STATE_TYPE_ID) {
+
+            imm_normal_state_destroy(imm_state_get_impl_c(state));
+        } else {
+            imm_die("unrecognized state");
+        }
+    }
 }
 
 struct imm_state const* imm_io_state(struct imm_io const* io, uint32_t i)
 {
-    return mstate_get_state(io->mstates[i]);
+    return io->states[i];
 }
 
 uint32_t imm_io_nstates(struct imm_io const* io) { return io->nstates; }

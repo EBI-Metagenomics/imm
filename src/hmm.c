@@ -358,7 +358,10 @@ int hmm_read(FILE* stream, struct imm_io* io)
         goto err;
     }
 
+    io->states = malloc(sizeof(*io->states) * io->nstates);
+
     for (uint32_t i = 0; i < io->nstates; ++i) {
+        io->states[i] = io->mstates[i]->state;
         mstate_table_add(hmm->table, io->mstates[i]);
     }
 
