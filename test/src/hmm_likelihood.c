@@ -9,9 +9,6 @@ void test_hmm_likelihood_two_mute_states(void);
 void test_hmm_likelihood_invalid(void);
 void test_hmm_likelihood_no_state(void);
 
-double single_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq,
-                      struct imm_state const* end_state, struct imm_path** path);
-
 int main(void)
 {
     test_hmm_likelihood_single_state();
@@ -293,30 +290,4 @@ void test_hmm_likelihood_no_state(void)
     imm_hmm_destroy(hmm);
     imm_abc_destroy(abc);
     imm_seq_destroy(EMPTY);
-}
-
-double single_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq,
-                      struct imm_state const* end_state, struct imm_path** path)
-{
-    struct imm_dp const* dp = imm_hmm_create_dp(hmm, end_state);
-    if (dp == NULL) {
-        *path = imm_path_create();
-        return imm_lprob_invalid();
-    }
-
-    struct imm_results const* results = imm_dp_viterbi(dp, seq, 0);
-    if (results == NULL) {
-        *path = imm_path_create();
-        imm_dp_destroy(dp);
-        return imm_lprob_invalid();
-    }
-    struct imm_result const* r = imm_results_get(results, 0);
-
-    *path = imm_path_clone(imm_result_path(r));
-
-    double score = imm_result_loglik(r);
-    imm_results_destroy(results);
-    imm_dp_destroy(dp);
-
-    return score;
 }
