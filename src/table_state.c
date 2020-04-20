@@ -2,7 +2,7 @@
 #include "free.h"
 #include "imm/seq_table.h"
 #include "imm/state.h"
-#include "imm/state_factory.h"
+#include "imm/state_types.h"
 #include "min.h"
 #include <stdlib.h>
 

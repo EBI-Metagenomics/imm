@@ -10,7 +10,7 @@
 #include "imm/normal_state.h"
 #include "imm/report.h"
 #include "imm/state.h"
-#include "imm/state_factory.h"
+#include "imm/state_types.h"
 #include "io.h"
 #include "mstate.h"
 #include "seq_code.h"

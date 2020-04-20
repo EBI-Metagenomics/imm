@@ -2,7 +2,7 @@
 #include "free.h"
 #include "imm/lprob.h"
 #include "imm/state.h"
-#include "imm/state_factory.h"
+#include "imm/state_types.h"
 #include "mute_state.h"
 #include <stdlib.h>
 
