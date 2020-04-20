@@ -13,7 +13,7 @@ int main(void)
     return cass_status();
 }
 
-static inline struct imm_state const* cast_c(void const* s) { return imm_state_cast_c(s); }
+static inline struct imm_state const* cast(void const* s) { return imm_state_cast(s); }
 static inline double                  zero(void) { return imm_lprob_zero(); }
 
 void test_hmm_write_io_two_states(void)
@@ -27,16 +27,16 @@ void test_hmm_write_io_two_states(void)
     double                         lprobs1[] = {log(0.25), log(0.25), log(0.5), zero()};
     struct imm_normal_state const* state1 = imm_normal_state_create("state1", abc, lprobs1);
 
-    imm_hmm_add_state(hmm, cast_c(state0), log(0.5));
-    imm_hmm_set_start(hmm, cast_c(state0), log(0.1));
-    imm_hmm_add_state(hmm, cast_c(state1), log(0.001));
-    imm_hmm_set_trans(hmm, cast_c(state0), cast_c(state1), log(0.9));
+    imm_hmm_add_state(hmm, cast(state0), log(0.5));
+    imm_hmm_set_start(hmm, cast(state0), log(0.1));
+    imm_hmm_add_state(hmm, cast(state1), log(0.001));
+    imm_hmm_set_trans(hmm, cast(state0), cast(state1), log(0.9));
 
     /* TODO: use the same dp instead of calling single_viterbi */
-    struct imm_dp const* dp = imm_hmm_create_dp(hmm, cast_c(state1));
+    struct imm_dp const* dp = imm_hmm_create_dp(hmm, cast(state1));
 
     struct imm_path* path = NULL;
-    cass_close(single_viterbi(hmm, C, cast_c(state1), &path), log(0.25) + log(0.1) + log(0.9));
+    cass_close(single_viterbi(hmm, C, cast(state1), &path), log(0.25) + log(0.1) + log(0.9));
     cass_close(imm_hmm_likelihood(hmm, C, path), log(0.25) + log(0.1) + log(0.9));
     imm_path_destroy(path);
 

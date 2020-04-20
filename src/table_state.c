@@ -39,19 +39,19 @@ void imm_table_state_destroy(struct imm_table_state const* state)
 
 static double table_state_lprob(struct imm_state const* state, struct imm_seq const* seq)
 {
-    struct imm_table_state const* s = imm_state_get_impl_c(state);
+    struct imm_table_state const* s = imm_state_get_impl(state);
     return imm_seq_table_lprob(s->table, seq);
 }
 
 static unsigned table_state_min_seq(struct imm_state const* state)
 {
-    struct imm_table_state const* s = imm_state_get_impl_c(state);
+    struct imm_table_state const* s = imm_state_get_impl(state);
     return imm_seq_table_min_seq(s->table);
 }
 
 static unsigned table_state_max_seq(struct imm_state const* state)
 {
-    struct imm_table_state const* s = imm_state_get_impl_c(state);
+    struct imm_table_state const* s = imm_state_get_impl(state);
     return imm_seq_table_max_seq(s->table);
 }
 

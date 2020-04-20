@@ -19,7 +19,7 @@ int main(void)
     return cass_status();
 }
 
-static inline struct imm_state const* cast_c(void const* s) { return imm_state_cast_c(s); }
+static inline struct imm_state const* cast(void const* s) { return imm_state_cast(s); }
 
 void test_hmm_state_id(void)
 {
@@ -27,8 +27,8 @@ void test_hmm_state_id(void)
     struct imm_mute_state const* state = imm_mute_state_create("State0", abc);
     struct imm_hmm*              hmm = imm_hmm_create(abc);
 
-    cass_cond(imm_hmm_add_state(hmm, cast_c(state), log(1.0)) == 0);
-    cass_cond(imm_hmm_add_state(hmm, cast_c(state), log(1.0)) == 1);
+    cass_cond(imm_hmm_add_state(hmm, cast(state), log(1.0)) == 0);
+    cass_cond(imm_hmm_add_state(hmm, cast(state), log(1.0)) == 1);
 
     imm_hmm_destroy(hmm);
     imm_mute_state_destroy(state);
@@ -42,14 +42,14 @@ void test_hmm_del_get_state(void)
     struct imm_mute_state const* state1 = imm_mute_state_create("State1", abc);
     struct imm_hmm*              hmm = imm_hmm_create(abc);
 
-    cass_cond(imm_hmm_add_state(hmm, cast_c(state0), log(0.5)) == 0);
-    cass_cond(imm_hmm_add_state(hmm, cast_c(state1), log(0.5)) == 0);
+    cass_cond(imm_hmm_add_state(hmm, cast(state0), log(0.5)) == 0);
+    cass_cond(imm_hmm_add_state(hmm, cast(state1), log(0.5)) == 0);
 
-    cass_cond(imm_hmm_del_state(hmm, cast_c(state0)) == 0);
-    cass_cond(imm_hmm_del_state(hmm, cast_c(state1)) == 0);
+    cass_cond(imm_hmm_del_state(hmm, cast(state0)) == 0);
+    cass_cond(imm_hmm_del_state(hmm, cast(state1)) == 0);
 
-    cass_cond(imm_hmm_del_state(hmm, cast_c(state0)) == 1);
-    cass_cond(imm_hmm_del_state(hmm, cast_c(state1)) == 1);
+    cass_cond(imm_hmm_del_state(hmm, cast(state0)) == 1);
+    cass_cond(imm_hmm_del_state(hmm, cast(state1)) == 1);
 
     imm_hmm_destroy(hmm);
     imm_mute_state_destroy(state0);
@@ -64,10 +64,10 @@ void test_hmm_set_trans(void)
     struct imm_mute_state const* state1 = imm_mute_state_create("State1", abc);
     struct imm_hmm*              hmm = imm_hmm_create(abc);
 
-    imm_hmm_add_state(hmm, cast_c(state0), log(0.5));
-    imm_hmm_add_state(hmm, cast_c(state1), log(0.5));
+    imm_hmm_add_state(hmm, cast(state0), log(0.5));
+    imm_hmm_add_state(hmm, cast(state1), log(0.5));
 
-    cass_cond(imm_hmm_set_trans(hmm, cast_c(state0), cast_c(state1), log(0.5)) == 0);
+    cass_cond(imm_hmm_set_trans(hmm, cast(state0), cast(state1), log(0.5)) == 0);
 
     imm_hmm_destroy(hmm);
     imm_mute_state_destroy(state0);
@@ -83,13 +83,13 @@ void test_hmm_wrong_states(void)
     struct imm_mute_state const* state0 = imm_mute_state_create("state0", abc);
     struct imm_mute_state const* state1 = imm_mute_state_create("state0", abc);
 
-    imm_hmm_add_state(hmm, cast_c(state0), log(0.5));
-    cass_equal_int(imm_hmm_set_start(hmm, cast_c(state1), log(0.3)), 1);
-    cass_equal_int(imm_hmm_set_trans(hmm, cast_c(state0), cast_c(state1), log(0.3)), 1);
-    cass_equal_int(imm_hmm_set_trans(hmm, cast_c(state1), cast_c(state0), log(0.3)), 1);
-    cass_cond(imm_hmm_create_dp(hmm, cast_c(state1)) == NULL);
-    cass_equal_int(imm_hmm_normalize_trans(hmm, cast_c(state1)), 1);
-    cass_equal_int(imm_hmm_normalize_trans(hmm, cast_c(state0)), 0);
+    imm_hmm_add_state(hmm, cast(state0), log(0.5));
+    cass_equal_int(imm_hmm_set_start(hmm, cast(state1), log(0.3)), 1);
+    cass_equal_int(imm_hmm_set_trans(hmm, cast(state0), cast(state1), log(0.3)), 1);
+    cass_equal_int(imm_hmm_set_trans(hmm, cast(state1), cast(state0), log(0.3)), 1);
+    cass_cond(imm_hmm_create_dp(hmm, cast(state1)) == NULL);
+    cass_equal_int(imm_hmm_normalize_trans(hmm, cast(state1)), 1);
+    cass_equal_int(imm_hmm_normalize_trans(hmm, cast(state0)), 0);
 
     imm_hmm_destroy(hmm);
     imm_mute_state_destroy(state0);

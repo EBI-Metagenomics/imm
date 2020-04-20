@@ -15,7 +15,7 @@ int main(void)
 static inline double                  zero(void) { return imm_lprob_zero(); }
 static inline int                     is_valid(double a) { return imm_lprob_is_valid(a); }
 static inline int                     is_zero(double a) { return imm_lprob_is_zero(a); }
-static inline struct imm_state const* cast_c(void const* s) { return imm_state_cast_c(s); }
+static inline struct imm_state const* cast_c(void const* s) { return imm_state_cast(s); }
 static inline char*                   fmt_name(char* restrict buffer, char const* name, int i)
 {
     sprintf(buffer, "%s%d", name, i);

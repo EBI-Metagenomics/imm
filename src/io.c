@@ -94,11 +94,11 @@ void imm_io_destroy_states(struct imm_io const* io)
 
         if (imm_state_type_id(state) == IMM_MUTE_STATE_TYPE_ID) {
 
-            imm_mute_state_destroy(imm_state_get_impl_c(state));
+            imm_mute_state_destroy(imm_state_get_impl(state));
 
         } else if (imm_state_type_id(state) == IMM_NORMAL_STATE_TYPE_ID) {
 
-            imm_normal_state_destroy(imm_state_get_impl_c(state));
+            imm_normal_state_destroy(imm_state_get_impl(state));
         } else {
             imm_die("unrecognized state");
         }

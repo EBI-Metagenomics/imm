@@ -80,7 +80,7 @@ static inline uint8_t imm_state_type_id(struct imm_state const* state)
     return state->type_id;
 }
 
-static inline struct imm_state const* imm_state_cast_c(void const* state)
+static inline struct imm_state const* imm_state_cast(void const* state)
 {
     struct type_c
     {
@@ -89,7 +89,7 @@ static inline struct imm_state const* imm_state_cast_c(void const* state)
     return t->state;
 }
 
-static inline void const* imm_state_get_impl_c(struct imm_state const* state)
+static inline void const* imm_state_get_impl(struct imm_state const* state)
 {
     return state->impl;
 }
