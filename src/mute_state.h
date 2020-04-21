@@ -3,8 +3,9 @@
 
 #include <stdio.h>
 
+struct imm_abc;
 struct imm_state;
 
-int mute_state_read(FILE* stream, struct imm_state* state);
+struct imm_state const* mute_state_read(FILE* stream, struct imm_abc const* abc);
 
 #endif

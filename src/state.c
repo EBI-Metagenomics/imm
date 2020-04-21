@@ -13,12 +13,10 @@ struct state_chunk
 {
     uint16_t name_length;
     char*    name;
-    uint8_t  state_type;
 };
 
 struct imm_state const* imm_state_create(char const* name, struct imm_abc const* abc,
-                                         struct imm_state_vtable vtable, uint8_t type_id,
-                                         void* derived)
+                                         struct imm_state_vtable vtable, void* derived)
 {
     if (imm_abc_length(abc) == 0) {
         imm_error("empty alphabet");
@@ -34,33 +32,37 @@ struct imm_state const* imm_state_create(char const* name, struct imm_abc const*
     s->name = strdup(name);
     s->abc = abc;
     s->vtable = vtable;
-    s->type_id = type_id;
     s->derived = derived;
     return s;
 }
 
-void imm_state_destroy(struct imm_state const* state) { state->vtable.destroy(state); }
-
-int state_write(struct imm_state const* state, FILE* stream)
+void imm_state_destroy(struct imm_state const* state)
 {
-    struct state_chunk chunk = {.name_length = cast_u16_zu(strlen(imm_state_get_name(state))),
-                                .name = (char*)imm_state_get_name(state),
-                                .state_type = imm_state_type_id(state)};
-
-    if (fwrite(&chunk.name_length, sizeof(chunk.name_length), 1, stream) < 1)
-        return 1;
-
-    if (fwrite(chunk.name, sizeof(*chunk.name), chunk.name_length + 1, stream) <
-        chunk.name_length + 1)
-        return 1;
-
-    if (fwrite(&chunk.state_type, sizeof(chunk.state_type), 1, stream) < 1)
-        return 1;
-
-    return state->vtable.write(state, stream);
+    if (state->vtable.destroy)
+        state->vtable.destroy(state);
+    state_destroy(state);
 }
 
-struct imm_state const* state_read(FILE* stream, struct imm_abc const* abc)
+int state_write_base(struct imm_state const* state, FILE* stream)
+{
+    struct state_chunk chunk = {.name_length = cast_u16_zu(strlen(imm_state_get_name(state))),
+                                .name = (char*)imm_state_get_name(state)};
+
+    if (fwrite(&chunk.name_length, sizeof(chunk.name_length), 1, stream) < 1) {
+        imm_error("could not write name_length");
+        return 1;
+    }
+
+    if (fwrite(chunk.name, sizeof(*chunk.name), chunk.name_length + 1, stream) <
+        chunk.name_length + 1) {
+        imm_error("could not write name");
+        return 1;
+    }
+
+    return 0;
+}
+
+struct imm_state* state_read_base(FILE* stream, struct imm_abc const* abc)
 {
     struct state_chunk chunk;
 
@@ -76,21 +78,11 @@ struct imm_state const* state_read(FILE* stream, struct imm_abc const* abc)
         return NULL;
     }
 
-    if (fread(&chunk.state_type, sizeof(chunk.state_type), 1, stream) < 1) {
-        return NULL;
-    }
-
     struct imm_state* state = malloc(sizeof(*state));
     state->derived = NULL;
     state->name = chunk.name;
     state->abc = abc;
-    state->type_id = chunk.state_type;
-
-    if (state_factory_read(stream, state)) {
-        imm_error("could not state_factory_read");
-        imm_state_destroy(state);
-        return NULL;
-    }
+    state->vtable = (struct imm_state_vtable){NULL, NULL, NULL, NULL, NULL, NULL};
 
     return state;
 }

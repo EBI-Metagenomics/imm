@@ -46,6 +46,9 @@ types:
     seq:
       - id: start_lprob
         type: f8
+      - id: state_type
+        type: u1
+        enum: state_type
       - id: name_length
         type: u2
       - id: name
@@ -53,11 +56,6 @@ types:
         encoding: ASCII
         size: name_length + 1
         terminator: 0
-      - id: state_type
-        type: u1
-        enum: state_type
-      - id: impl_chunk_size
-        type: u4
       - id: mute_state
         type: mute_state
         if: state_type == state_type::mute

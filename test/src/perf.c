@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define TMP_FOLDER "test_perf.tmp"
+
 void test_perf_viterbi(void);
 
 int main(void)
@@ -458,7 +460,7 @@ void test_perf_viterbi(void)
     cass_close(score, -65826.0106185297);
     imm_results_destroy(results);
 
-    FILE* file = fopen("test_perf.tmp/perf.imm", "w");
+    FILE* file = fopen(TMP_FOLDER "/perf.imm", "w");
     cass_cond(file != NULL);
     cass_equal_int(imm_io_write(file, hmm, dp), 0);
     fclose(file);
@@ -549,7 +551,7 @@ void test_perf_viterbi(void)
     imm_abc_destroy(abc);
     imm_dp_destroy(dp);
 
-    file = fopen("test_perf.tmp/perf.imm", "r");
+    file = fopen(TMP_FOLDER "/perf.imm", "r");
     cass_cond(file != NULL);
     struct imm_io const* io = imm_io_read(file);
     cass_cond(io != NULL);

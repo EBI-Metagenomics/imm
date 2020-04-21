@@ -2,6 +2,8 @@
 #include "imm/imm.h"
 #include <stdlib.h>
 
+#define TMP_FOLDER "test_hmm_io.tmp"
+
 void test_hmm_write_io_two_states(void);
 
 int main(void)
@@ -39,7 +41,7 @@ void test_hmm_write_io_two_states(void)
     cass_close(imm_hmm_likelihood(hmm, C, path), log(0.25) + log(0.1) + log(0.9));
     imm_results_destroy(results);
 
-    FILE* file = fopen("test_hmm.tmp/two_states.imm", "w");
+    FILE* file = fopen(TMP_FOLDER "/two_states.imm", "w");
     cass_cond(file != NULL);
     cass_equal_int(imm_io_write(file, hmm, dp), 0);
     fclose(file);
@@ -51,7 +53,7 @@ void test_hmm_write_io_two_states(void)
     imm_abc_destroy(abc);
     imm_seq_destroy(C);
 
-    file = fopen("test_hmm.tmp/two_states.imm", "r");
+    file = fopen(TMP_FOLDER "/two_states.imm", "r");
     cass_cond(file != NULL);
     struct imm_io const* io = imm_io_read(file);
     cass_cond(io != NULL);

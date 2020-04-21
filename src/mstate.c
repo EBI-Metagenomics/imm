@@ -1,3 +1,4 @@
+#include "state_factory.h"
 #include "mstate.h"
 #include "cast.h"
 #include "free.h"
@@ -12,7 +13,8 @@
 
 struct mstate_chunk
 {
-    double start_lprob;
+    double  start_lprob;
+    uint8_t type_id;
 };
 
 struct mstates_chunk
@@ -40,10 +42,7 @@ void mstate_destroy(struct mstate* mstate)
 
 double mstate_get_start(struct mstate const* mstate) { return mstate->start_lprob; }
 
-void mstate_set_start(struct mstate* mstate, double const lprob)
-{
-    mstate->start_lprob = lprob;
-}
+void mstate_set_start(struct mstate* mstate, double const lprob) { mstate->start_lprob = lprob; }
 
 struct mtrans_table* mstate_get_mtrans_table(struct mstate const* mstate)
 {
@@ -87,7 +86,18 @@ struct mstate** mstate_read_states(FILE* stream, uint32_t* nstates, struct imm_a
             goto err;
         }
 
-        struct imm_state const* state = state_read(stream, abc);
+        if (fread(&chunk.type_id, sizeof(chunk.type_id), 1, stream) < 1) {
+            imm_error("could not read type_id");
+            goto err;
+        }
+
+        struct imm_state const* state = state_factory_read(stream, chunk.type_id, abc);
+        /* if (state_factory_read(stream, state)) { */
+        /*     imm_error("could not state_factory_read"); */
+        /*     return NULL; */
+        /* } */
+
+        /* struct imm_state const* state = state_read(stream, abc); */
         if (!state) {
             imm_error("could not read state");
             goto err;
@@ -113,14 +123,20 @@ err:
 
 static int mstate_write(struct mstate const* mstate, FILE* stream)
 {
-    struct mstate_chunk chunk = {mstate_get_start(mstate)};
+    struct imm_state const* state = mstate_get_state(mstate);
+
+    struct mstate_chunk chunk = {mstate_get_start(mstate), imm_state_type_id(state)};
 
     if (fwrite(&chunk.start_lprob, sizeof(chunk.start_lprob), 1, stream) < 1) {
         imm_error("could not write start_lprob");
         return 1;
     }
 
-    struct imm_state const* state = mstate_get_state(mstate);
+    if (fwrite(&chunk.type_id, sizeof(chunk.type_id), 1, stream) < 1) {
+        imm_error("could not write type_id");
+        return 1;
+    }
+
     if (state_write(state, stream)) {
         imm_error("could not write state");
         return 1;
