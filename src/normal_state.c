@@ -6,12 +6,13 @@
 #include "imm/state.h"
 #include "imm/state_types.h"
 #include "normal_state.h"
+#include "state.h"
 #include <stdlib.h>
 #include <string.h>
 
 struct imm_normal_state
 {
-    struct imm_state const* interface;
+    struct imm_state const* base;
     double*                 lprobs;
 };
 
@@ -25,6 +26,7 @@ static double   normal_state_lprob(struct imm_state const* state, struct imm_seq
 static unsigned normal_state_min_seq(struct imm_state const* state);
 static unsigned normal_state_max_seq(struct imm_state const* state);
 static int      normal_state_write(struct imm_state const* state, FILE* stream);
+static void     normal_state_destroy(struct imm_state const* state);
 
 struct imm_normal_state const* imm_normal_state_create(char const*           name,
                                                        struct imm_abc const* abc,
@@ -37,14 +39,15 @@ struct imm_normal_state const* imm_normal_state_create(char const*           nam
     memcpy(state->lprobs, lprobs, sizeof(*state->lprobs) * len);
 
     struct imm_state_funcs funcs = {normal_state_lprob, normal_state_min_seq,
-                                    normal_state_max_seq, normal_state_write};
-    state->interface = imm_state_create(name, abc, funcs, IMM_NORMAL_STATE_TYPE_ID, state);
+                                    normal_state_max_seq, normal_state_write,
+                                    normal_state_destroy};
+    state->base = imm_state_create(name, abc, funcs, IMM_NORMAL_STATE_TYPE_ID, state);
     return state;
 }
 
 void imm_normal_state_destroy(struct imm_normal_state const* state)
 {
-    imm_state_destroy(state->interface);
+    state_destroy(state->base);
     free_c(state->lprobs);
     free_c(state);
 }
@@ -78,9 +81,10 @@ int normal_state_read(FILE* stream, struct imm_state* state)
     state->min_seq = normal_state_min_seq;
     state->max_seq = normal_state_max_seq;
     state->write = normal_state_write;
+    state->destroy = normal_state_destroy;
 
     struct imm_normal_state* normal_state = malloc(sizeof(*normal_state));
-    normal_state->interface = state;
+    normal_state->base = state;
     normal_state->lprobs = chunk.lprobs;
     state->impl = normal_state;
 
@@ -132,4 +136,9 @@ static int normal_state_write(struct imm_state const* state, FILE* stream)
     }
 
     return 0;
+}
+
+static void normal_state_destroy(struct imm_state const* state)
+{
+    imm_normal_state_destroy(imm_state_get_impl(state));
 }

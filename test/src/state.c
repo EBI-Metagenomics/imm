@@ -4,12 +4,14 @@
 void test_normal_state(void);
 void test_mute_state(void);
 void test_table_state(void);
+void test_state_destroy(void);
 
 int main(void)
 {
     test_normal_state();
     test_mute_state();
     test_table_state();
+    test_state_destroy();
     return cass_status();
 }
 
@@ -101,4 +103,29 @@ void test_table_state(void)
     imm_seq_destroy(AGT);
     imm_seq_destroy(GG);
     imm_seq_destroy(GGT);
+}
+
+void test_state_destroy(void)
+{
+    struct imm_abc const* abc = imm_abc_create("ACGT", '*');
+    struct imm_seq const* A = imm_seq_create("A", abc);
+    struct imm_seq const* C = imm_seq_create("C", abc);
+    struct imm_seq const* G = imm_seq_create("G", abc);
+    struct imm_seq const* T = imm_seq_create("T", abc);
+
+    double lprobs[] = {log(0.25), log(0.25), log(0.5), imm_lprob_zero()};
+    struct imm_normal_state const* state = imm_normal_state_create("State0", abc, lprobs);
+
+    cass_cond(strcmp(imm_state_get_name(imm_state_cast(state)), "State0") == 0);
+    cass_close(imm_state_lprob(imm_state_cast(state), A), log(0.25));
+    cass_close(imm_state_lprob(imm_state_cast(state), C), log(0.25));
+    cass_close(imm_state_lprob(imm_state_cast(state), G), log(0.5));
+    cass_cond(imm_lprob_is_zero(imm_state_lprob(imm_state_cast(state), T)));
+
+    imm_state_destroy(imm_state_cast(state));
+    imm_abc_destroy(abc);
+    imm_seq_destroy(A);
+    imm_seq_destroy(C);
+    imm_seq_destroy(G);
+    imm_seq_destroy(T);
 }

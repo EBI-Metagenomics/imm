@@ -21,6 +21,7 @@ typedef double (*imm_state_lprob_t)(struct imm_state const* state, struct imm_se
 typedef unsigned (*imm_state_min_seq_t)(struct imm_state const* state);
 typedef unsigned (*imm_state_max_seq_t)(struct imm_state const* state);
 typedef int (*imm_state_write_t)(struct imm_state const* state, FILE* stream);
+typedef void (*imm_state_destroy_t)(struct imm_state const* state);
 
 struct imm_state_funcs
 {
@@ -28,6 +29,7 @@ struct imm_state_funcs
     imm_state_min_seq_t min_seq;
     imm_state_max_seq_t max_seq;
     imm_state_write_t   write;
+    imm_state_destroy_t destroy;
 };
 
 struct imm_state
@@ -39,6 +41,7 @@ struct imm_state
     imm_state_min_seq_t min_seq;
     imm_state_max_seq_t max_seq;
     imm_state_write_t   write;
+    imm_state_destroy_t destroy;
     uint8_t             type_id;
     void*               impl;
 };

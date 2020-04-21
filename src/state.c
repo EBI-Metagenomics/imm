@@ -1,4 +1,3 @@
-#include "state_factory.h"
 #include "state.h"
 #include "ascii.h"
 #include "cast.h"
@@ -6,6 +5,7 @@
 #include "imm/abc.h"
 #include "imm/report.h"
 #include "imm/state.h"
+#include "state_factory.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -37,16 +37,13 @@ struct imm_state const* imm_state_create(char const* name, struct imm_abc const*
     s->min_seq = funcs.min_seq;
     s->max_seq = funcs.max_seq;
     s->write = funcs.write;
+    s->destroy = funcs.destroy;
     s->type_id = type_id;
     s->impl = impl;
     return s;
 }
 
-void imm_state_destroy(struct imm_state const* state)
-{
-    free_c(state->name);
-    free_c(state);
-}
+void imm_state_destroy(struct imm_state const* state) { state->destroy(state); }
 
 int state_write(struct imm_state const* state, FILE* stream)
 {
@@ -87,7 +84,7 @@ struct imm_state const* state_read(FILE* stream, struct imm_abc const* abc)
         return NULL;
     }
 
-    struct imm_state *state = malloc(sizeof(*state));
+    struct imm_state* state = malloc(sizeof(*state));
     state->impl = NULL;
     state->name = chunk.name;
     state->abc = abc;
@@ -100,4 +97,10 @@ struct imm_state const* state_read(FILE* stream, struct imm_abc const* abc)
     }
 
     return state;
+}
+
+void state_destroy(struct imm_state const* state)
+{
+    free_c(state->name);
+    free_c(state);
 }

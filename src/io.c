@@ -89,20 +89,8 @@ void imm_io_destroy(struct imm_io const* io)
 
 void imm_io_destroy_states(struct imm_io const* io)
 {
-    for (uint32_t i = 0; i < imm_io_nstates(io); ++i) {
-        struct imm_state const* state = imm_io_state(io, i);
-
-        if (imm_state_type_id(state) == IMM_MUTE_STATE_TYPE_ID) {
-
-            imm_mute_state_destroy(imm_state_get_impl(state));
-
-        } else if (imm_state_type_id(state) == IMM_NORMAL_STATE_TYPE_ID) {
-
-            imm_normal_state_destroy(imm_state_get_impl(state));
-        } else {
-            imm_die("unrecognized state");
-        }
-    }
+    for (uint32_t i = 0; i < imm_io_nstates(io); ++i)
+        imm_state_destroy(imm_io_state(io, i));
 }
 
 struct imm_state const* imm_io_state(struct imm_io const* io, uint32_t i)

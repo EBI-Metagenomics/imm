@@ -1,3 +1,4 @@
+#include "state.h"
 #include "imm/table_state.h"
 #include "free.h"
 #include "imm/seq_table.h"
@@ -16,6 +17,7 @@ static double   table_state_lprob(struct imm_state const* state, struct imm_seq 
 static unsigned table_state_min_seq(struct imm_state const* state);
 static unsigned table_state_max_seq(struct imm_state const* state);
 static int      table_state_write(struct imm_state const* state, FILE* stream);
+static void     table_state_destroy(struct imm_state const* state);
 
 struct imm_table_state* imm_table_state_create(char const*                 name,
                                                struct imm_seq_table const* table)
@@ -24,7 +26,8 @@ struct imm_table_state* imm_table_state_create(char const*                 name,
     state->table = imm_seq_table_clone(table);
 
     struct imm_state_funcs funcs = {table_state_lprob, table_state_min_seq,
-                                    table_state_max_seq, table_state_write};
+                                    table_state_max_seq, table_state_write,
+                                    table_state_destroy};
     state->interface = imm_state_create(name, imm_seq_table_get_abc(table), funcs,
                                         IMM_TABLE_STATE_TYPE_ID, state);
     return state;
@@ -32,7 +35,7 @@ struct imm_table_state* imm_table_state_create(char const*                 name,
 
 void imm_table_state_destroy(struct imm_table_state const* state)
 {
-    imm_state_destroy(state->interface);
+    state_destroy(state->interface);
     imm_seq_table_destroy(state->table);
     free_c(state);
 }
@@ -59,4 +62,9 @@ static int table_state_write(struct imm_state const* state, FILE* stream)
 {
     imm_die("table_state_write not implemented");
     return 0;
+}
+
+static void table_state_destroy(struct imm_state const* state)
+{
+    imm_table_state_destroy(imm_state_get_impl(state));
 }

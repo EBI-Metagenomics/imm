@@ -8,5 +8,6 @@ struct imm_abc;
 
 int                     state_write(struct imm_state const* state, FILE* stream);
 struct imm_state const* state_read(FILE* stream, struct imm_abc const* abc);
+void                    state_destroy(struct imm_state const* state);
 
 #endif
