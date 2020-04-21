@@ -35,7 +35,9 @@ struct imm_table_state* imm_table_state_create(char const* name, struct imm_seq_
 
 void imm_table_state_destroy(struct imm_table_state const* state)
 {
-    table_state_destroy(state->base);
+    struct imm_state const* base = state->base;
+    table_state_destroy(base);
+    state_destroy(base);
 }
 
 struct imm_state const* imm_table_state_base(struct imm_table_state const* state)

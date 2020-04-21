@@ -48,7 +48,9 @@ struct imm_normal_state const* imm_normal_state_create(char const* name, struct 
 
 void imm_normal_state_destroy(struct imm_normal_state const* state)
 {
-    normal_state_destroy(state->base);
+    struct imm_state const* base = state->base;
+    normal_state_destroy(base);
+    state_destroy(base);
 }
 
 struct imm_state const* imm_normal_state_base(struct imm_normal_state const* state)

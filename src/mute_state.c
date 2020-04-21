@@ -1,7 +1,7 @@
 #include "mute_state.h"
-#include "imm/mute_state.h"
 #include "free.h"
 #include "imm/lprob.h"
+#include "imm/mute_state.h"
 #include "imm/state.h"
 #include "imm/state_types.h"
 #include "state.h"
@@ -17,11 +17,11 @@ static double   mute_state_lprob(struct imm_state const* state, struct imm_seq c
 static unsigned mute_state_min_seq(struct imm_state const* state);
 static unsigned mute_state_max_seq(struct imm_state const* state);
 static int      mute_state_write(struct imm_state const* state, FILE* stream);
-static void                    mute_state_destroy(struct imm_state const* state);
+static void     mute_state_destroy(struct imm_state const* state);
 
-static struct imm_state_vtable const vtable = {
-    mute_state_type_id, mute_state_lprob, mute_state_min_seq, mute_state_max_seq,
-    mute_state_write, mute_state_destroy};
+static struct imm_state_vtable const vtable = {mute_state_type_id, mute_state_lprob,
+                                               mute_state_min_seq, mute_state_max_seq,
+                                               mute_state_write,   mute_state_destroy};
 
 struct imm_mute_state const* imm_mute_state_create(char const* name, struct imm_abc const* abc)
 {
@@ -31,7 +31,12 @@ struct imm_mute_state const* imm_mute_state_create(char const* name, struct imm_
     return state;
 }
 
-void imm_mute_state_destroy(struct imm_mute_state const* state) { mute_state_destroy(state->base); }
+void imm_mute_state_destroy(struct imm_mute_state const* state)
+{
+    struct imm_state const* base = state->base;
+    mute_state_destroy(base);
+    state_destroy(base);
+}
 
 struct imm_state const* imm_mute_state_base(struct imm_mute_state const* state)
 {
