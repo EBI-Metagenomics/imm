@@ -62,7 +62,8 @@ void test_hmm_set_trans(void)
     imm_hmm_add_state(hmm, imm_mute_state_base(state0), log(0.5));
     imm_hmm_add_state(hmm, imm_mute_state_base(state1), log(0.5));
 
-    cass_cond(imm_hmm_set_trans(hmm, imm_mute_state_base(state0), imm_mute_state_base(state1), log(0.5)) == 0);
+    cass_cond(imm_hmm_set_trans(hmm, imm_mute_state_base(state0), imm_mute_state_base(state1),
+                                log(0.5)) == 0);
 
     imm_hmm_destroy(hmm);
     imm_mute_state_destroy(state0);
@@ -80,8 +81,12 @@ void test_hmm_wrong_states(void)
 
     imm_hmm_add_state(hmm, imm_mute_state_base(state0), log(0.5));
     cass_equal_int(imm_hmm_set_start(hmm, imm_mute_state_base(state1), log(0.3)), 1);
-    cass_equal_int(imm_hmm_set_trans(hmm, imm_mute_state_base(state0), imm_mute_state_base(state1), log(0.3)), 1);
-    cass_equal_int(imm_hmm_set_trans(hmm, imm_mute_state_base(state1), imm_mute_state_base(state0), log(0.3)), 1);
+    cass_equal_int(
+        imm_hmm_set_trans(hmm, imm_mute_state_base(state0), imm_mute_state_base(state1), log(0.3)),
+        1);
+    cass_equal_int(
+        imm_hmm_set_trans(hmm, imm_mute_state_base(state1), imm_mute_state_base(state0), log(0.3)),
+        1);
     cass_cond(imm_hmm_create_dp(hmm, imm_mute_state_base(state1)) == NULL);
     cass_equal_int(imm_hmm_normalize_trans(hmm, imm_mute_state_base(state1)), 1);
     cass_equal_int(imm_hmm_normalize_trans(hmm, imm_mute_state_base(state0)), 0);

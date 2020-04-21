@@ -10,7 +10,7 @@ int main(void)
     return cass_status();
 }
 
-static inline double                  zero(void) { return imm_lprob_zero(); }
+static inline double zero(void) { return imm_lprob_zero(); }
 
 void test_hmm_write_io_two_states(void)
 {

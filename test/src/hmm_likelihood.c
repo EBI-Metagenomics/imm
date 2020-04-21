@@ -20,9 +20,9 @@ int main(void)
     return cass_status();
 }
 
-static inline int                     is_zero(double a) { return imm_lprob_is_zero(a); }
-static inline double                  zero(void) { return imm_lprob_zero(); }
-static inline int                     is_valid(double a) { return imm_lprob_is_valid(a); }
+static inline int    is_zero(double a) { return imm_lprob_is_zero(a); }
+static inline double zero(void) { return imm_lprob_zero(); }
+static inline int    is_valid(double a) { return imm_lprob_is_valid(a); }
 
 void test_hmm_likelihood_single_state(void)
 {
@@ -69,9 +69,11 @@ void test_hmm_likelihood_single_state(void)
     imm_path_destroy(path);
 
     cass_cond(imm_hmm_normalize(hmm) == 0);
-    cass_cond(imm_hmm_set_trans(hmm, imm_normal_state_base(state), imm_normal_state_base(state), zero()) == 0);
+    cass_cond(imm_hmm_set_trans(hmm, imm_normal_state_base(state), imm_normal_state_base(state),
+                                zero()) == 0);
     cass_cond(imm_hmm_normalize(hmm) == 0);
-    cass_cond(imm_hmm_set_trans(hmm, imm_normal_state_base(state), imm_normal_state_base(state), log(0.5)) == 0);
+    cass_cond(imm_hmm_set_trans(hmm, imm_normal_state_base(state), imm_normal_state_base(state),
+                                log(0.5)) == 0);
 
     path = imm_path_create();
     imm_path_append(path, imm_step_create(imm_normal_state_base(state), 1));
