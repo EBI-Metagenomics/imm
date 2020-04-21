@@ -10,7 +10,6 @@ int main(void)
     return cass_status();
 }
 
-static inline struct imm_state const* cast(void const* s) { return imm_state_cast(s); }
 static inline double                  zero(void) { return imm_lprob_zero(); }
 
 void test_hmm_write_io_two_states(void)
@@ -24,12 +23,12 @@ void test_hmm_write_io_two_states(void)
     double                         lprobs1[] = {log(0.25), log(0.25), log(0.5), zero()};
     struct imm_normal_state const* state1 = imm_normal_state_create("state1", abc, lprobs1);
 
-    imm_hmm_add_state(hmm, cast(state0), log(0.5));
-    imm_hmm_set_start(hmm, cast(state0), log(0.1));
-    imm_hmm_add_state(hmm, cast(state1), log(0.001));
-    imm_hmm_set_trans(hmm, cast(state0), cast(state1), log(0.9));
+    imm_hmm_add_state(hmm, imm_mute_state_base(state0), log(0.5));
+    imm_hmm_set_start(hmm, imm_mute_state_base(state0), log(0.1));
+    imm_hmm_add_state(hmm, imm_normal_state_base(state1), log(0.001));
+    imm_hmm_set_trans(hmm, imm_mute_state_base(state0), imm_normal_state_base(state1), log(0.9));
 
-    struct imm_dp const* dp = imm_hmm_create_dp(hmm, cast(state1));
+    struct imm_dp const* dp = imm_hmm_create_dp(hmm, imm_normal_state_base(state1));
 
     struct imm_results const* results = imm_dp_viterbi(dp, C, 0);
     cass_cond(results != NULL);

@@ -1,15 +1,15 @@
-#include "state.h"
 #include "imm/table_state.h"
 #include "free.h"
 #include "imm/seq_table.h"
 #include "imm/state.h"
 #include "imm/state_types.h"
 #include "min.h"
+#include "state.h"
 #include <stdlib.h>
 
 struct imm_table_state
 {
-    struct imm_state const*     interface;
+    struct imm_state const*     base;
     struct imm_seq_table const* table;
 };
 
@@ -28,16 +28,21 @@ struct imm_table_state* imm_table_state_create(char const*                 name,
     struct imm_state_funcs funcs = {table_state_lprob, table_state_min_seq,
                                     table_state_max_seq, table_state_write,
                                     table_state_destroy};
-    state->interface = imm_state_create(name, imm_seq_table_get_abc(table), funcs,
-                                        IMM_TABLE_STATE_TYPE_ID, state);
+    state->base = imm_state_create(name, imm_seq_table_get_abc(table), funcs,
+                                   IMM_TABLE_STATE_TYPE_ID, state);
     return state;
 }
 
 void imm_table_state_destroy(struct imm_table_state const* state)
 {
-    state_destroy(state->interface);
+    state_destroy(state->base);
     imm_seq_table_destroy(state->table);
     free_c(state);
+}
+
+struct imm_state const* imm_table_state_base(struct imm_table_state const* state)
+{
+    return state->base;
 }
 
 static double table_state_lprob(struct imm_state const* state, struct imm_seq const* seq)

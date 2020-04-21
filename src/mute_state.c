@@ -1,15 +1,15 @@
-#include "state.h"
 #include "imm/mute_state.h"
 #include "free.h"
 #include "imm/lprob.h"
 #include "imm/state.h"
 #include "imm/state_types.h"
 #include "mute_state.h"
+#include "state.h"
 #include <stdlib.h>
 
 struct imm_mute_state
 {
-    struct imm_state const* interface;
+    struct imm_state const* base;
 };
 
 static double   mute_state_lprob(struct imm_state const* state, struct imm_seq const* seq);
@@ -24,14 +24,19 @@ struct imm_mute_state const* imm_mute_state_create(char const* name, struct imm_
 
     struct imm_state_funcs funcs = {mute_state_lprob, mute_state_min_seq, mute_state_max_seq,
                                     mute_state_write, mute_state_destroy};
-    state->interface = imm_state_create(name, abc, funcs, IMM_MUTE_STATE_TYPE_ID, state);
+    state->base = imm_state_create(name, abc, funcs, IMM_MUTE_STATE_TYPE_ID, state);
     return state;
 }
 
 void imm_mute_state_destroy(struct imm_mute_state const* state)
 {
-    state_destroy(state->interface);
+    state_destroy(state->base);
     free_c(state);
+}
+
+struct imm_state const* imm_mute_state_base(struct imm_mute_state const* state)
+{
+    return state->base;
 }
 
 int mute_state_read(FILE* stream, struct imm_state* state)
@@ -55,7 +60,7 @@ int mute_state_read(FILE* stream, struct imm_state* state)
     state->destroy = mute_state_destroy;
 
     struct imm_mute_state* mute_state = malloc(sizeof(*mute_state));
-    mute_state->interface = state;
+    mute_state->base = state;
     state->impl = mute_state;
 
     return 0;

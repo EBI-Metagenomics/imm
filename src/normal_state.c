@@ -52,6 +52,11 @@ void imm_normal_state_destroy(struct imm_normal_state const* state)
     free_c(state);
 }
 
+struct imm_state const* imm_normal_state_base(struct imm_normal_state const* state)
+{
+    return state->base;
+}
+
 int normal_state_read(FILE* stream, struct imm_state* state)
 {
     struct normal_state_chunk chunk = {.lprobs_size = 0, .lprobs = NULL};
