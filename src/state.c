@@ -18,7 +18,7 @@ struct state_chunk
 
 struct imm_state const* imm_state_create(char const* name, struct imm_abc const* abc,
                                          struct imm_state_vtable vtable, uint8_t type_id,
-                                         void* impl)
+                                         void* derived)
 {
     if (imm_abc_length(abc) == 0) {
         imm_error("empty alphabet");
@@ -35,7 +35,7 @@ struct imm_state const* imm_state_create(char const* name, struct imm_abc const*
     s->abc = abc;
     s->vtable = vtable;
     s->type_id = type_id;
-    s->derived = impl;
+    s->derived = derived;
     return s;
 }
 
