@@ -19,17 +19,15 @@ static unsigned table_state_max_seq(struct imm_state const* state);
 static int      table_state_write(struct imm_state const* state, FILE* stream);
 static void     table_state_destroy(struct imm_state const* state);
 
-struct imm_table_state* imm_table_state_create(char const*                 name,
-                                               struct imm_seq_table const* table)
+struct imm_table_state* imm_table_state_create(char const* name, struct imm_seq_table const* table)
 {
     struct imm_table_state* state = malloc(sizeof(struct imm_table_state));
     state->table = imm_seq_table_clone(table);
 
-    struct imm_state_funcs funcs = {table_state_lprob, table_state_min_seq,
-                                    table_state_max_seq, table_state_write,
-                                    table_state_destroy};
-    state->base = imm_state_create(name, imm_seq_table_get_abc(table), funcs,
-                                   IMM_TABLE_STATE_TYPE_ID, state);
+    struct imm_state_vtable funcs = {table_state_lprob, table_state_min_seq, table_state_max_seq,
+                                    table_state_write, table_state_destroy};
+    state->base =
+        imm_state_create(name, imm_seq_table_get_abc(table), funcs, IMM_TABLE_STATE_TYPE_ID, state);
     return state;
 }
 
@@ -47,19 +45,19 @@ struct imm_state const* imm_table_state_base(struct imm_table_state const* state
 
 static double table_state_lprob(struct imm_state const* state, struct imm_seq const* seq)
 {
-    struct imm_table_state const* s = imm_state_get_impl(state);
+    struct imm_table_state const* s = imm_state_derived(state);
     return imm_seq_table_lprob(s->table, seq);
 }
 
 static unsigned table_state_min_seq(struct imm_state const* state)
 {
-    struct imm_table_state const* s = imm_state_get_impl(state);
+    struct imm_table_state const* s = imm_state_derived(state);
     return imm_seq_table_min_seq(s->table);
 }
 
 static unsigned table_state_max_seq(struct imm_state const* state)
 {
-    struct imm_table_state const* s = imm_state_get_impl(state);
+    struct imm_table_state const* s = imm_state_derived(state);
     return imm_seq_table_max_seq(s->table);
 }
 
@@ -71,5 +69,5 @@ static int table_state_write(struct imm_state const* state, FILE* stream)
 
 static void table_state_destroy(struct imm_state const* state)
 {
-    imm_table_state_destroy(imm_state_get_impl(state));
+    imm_table_state_destroy(imm_state_derived(state));
 }

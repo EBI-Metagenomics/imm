@@ -17,7 +17,7 @@ struct state_chunk
 };
 
 struct imm_state const* imm_state_create(char const* name, struct imm_abc const* abc,
-                                         struct imm_state_funcs funcs, uint8_t type_id,
+                                         struct imm_state_vtable vtable, uint8_t type_id,
                                          void* impl)
 {
     if (imm_abc_length(abc) == 0) {
@@ -33,17 +33,13 @@ struct imm_state const* imm_state_create(char const* name, struct imm_abc const*
     struct imm_state* s = malloc(sizeof(struct imm_state));
     s->name = strdup(name);
     s->abc = abc;
-    s->lprob = funcs.lprob;
-    s->min_seq = funcs.min_seq;
-    s->max_seq = funcs.max_seq;
-    s->write = funcs.write;
-    s->destroy = funcs.destroy;
+    s->vtable = vtable;
     s->type_id = type_id;
-    s->impl = impl;
+    s->derived = impl;
     return s;
 }
 
-void imm_state_destroy(struct imm_state const* state) { state->destroy(state); }
+void imm_state_destroy(struct imm_state const* state) { state->vtable.destroy(state); }
 
 int state_write(struct imm_state const* state, FILE* stream)
 {
@@ -61,7 +57,7 @@ int state_write(struct imm_state const* state, FILE* stream)
     if (fwrite(&chunk.state_type, sizeof(chunk.state_type), 1, stream) < 1)
         return 1;
 
-    return state->write(state, stream);
+    return state->vtable.write(state, stream);
 }
 
 struct imm_state const* state_read(FILE* stream, struct imm_abc const* abc)
@@ -85,7 +81,7 @@ struct imm_state const* state_read(FILE* stream, struct imm_abc const* abc)
     }
 
     struct imm_state* state = malloc(sizeof(*state));
-    state->impl = NULL;
+    state->derived = NULL;
     state->name = chunk.name;
     state->abc = abc;
     state->type_id = chunk.state_type;

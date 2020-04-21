@@ -28,9 +28,8 @@ static unsigned normal_state_max_seq(struct imm_state const* state);
 static int      normal_state_write(struct imm_state const* state, FILE* stream);
 static void     normal_state_destroy(struct imm_state const* state);
 
-struct imm_normal_state const* imm_normal_state_create(char const*           name,
-                                                       struct imm_abc const* abc,
-                                                       double const*         lprobs)
+struct imm_normal_state const* imm_normal_state_create(char const* name, struct imm_abc const* abc,
+                                                       double const* lprobs)
 {
     struct imm_normal_state* state = malloc(sizeof(struct imm_normal_state));
 
@@ -38,9 +37,8 @@ struct imm_normal_state const* imm_normal_state_create(char const*           nam
     state->lprobs = malloc(sizeof(*state->lprobs) * len);
     memcpy(state->lprobs, lprobs, sizeof(*state->lprobs) * len);
 
-    struct imm_state_funcs funcs = {normal_state_lprob, normal_state_min_seq,
-                                    normal_state_max_seq, normal_state_write,
-                                    normal_state_destroy};
+    struct imm_state_vtable funcs = {normal_state_lprob, normal_state_min_seq, normal_state_max_seq,
+                                    normal_state_write, normal_state_destroy};
     state->base = imm_state_create(name, abc, funcs, IMM_NORMAL_STATE_TYPE_ID, state);
     return state;
 }
@@ -75,30 +73,29 @@ int normal_state_read(FILE* stream, struct imm_state* state)
 
     chunk.lprobs = malloc(sizeof(*chunk.lprobs) * chunk.lprobs_size);
 
-    if (fread(chunk.lprobs, sizeof(*chunk.lprobs), chunk.lprobs_size, stream) <
-        chunk.lprobs_size) {
+    if (fread(chunk.lprobs, sizeof(*chunk.lprobs), chunk.lprobs_size, stream) < chunk.lprobs_size) {
         imm_error("could not read lprobs");
         free_c(chunk.lprobs);
         return 1;
     }
 
-    state->lprob = normal_state_lprob;
-    state->min_seq = normal_state_min_seq;
-    state->max_seq = normal_state_max_seq;
-    state->write = normal_state_write;
-    state->destroy = normal_state_destroy;
+    state->vtable.lprob = normal_state_lprob;
+    state->vtable.min_seq = normal_state_min_seq;
+    state->vtable.max_seq = normal_state_max_seq;
+    state->vtable.write = normal_state_write;
+    state->vtable.destroy = normal_state_destroy;
 
     struct imm_normal_state* normal_state = malloc(sizeof(*normal_state));
     normal_state->base = state;
     normal_state->lprobs = chunk.lprobs;
-    state->impl = normal_state;
+    state->derived = normal_state;
 
     return 0;
 }
 
 static double normal_state_lprob(struct imm_state const* state, struct imm_seq const* seq)
 {
-    struct imm_normal_state const* s = imm_state_get_impl(state);
+    struct imm_normal_state const* s = imm_state_derived(state);
     if (imm_seq_length(seq) == 1) {
         struct imm_abc const* abc = imm_state_get_abc(state);
         unsigned              idx = imm_abc_symbol_idx(abc, imm_seq_string(seq)[0]);
@@ -114,15 +111,14 @@ static unsigned normal_state_max_seq(struct imm_state const* state) { return 1; 
 
 static int normal_state_write(struct imm_state const* state, FILE* stream)
 {
-    struct imm_normal_state const* s = imm_state_get_impl(state);
+    struct imm_normal_state const* s = imm_state_derived(state);
 
     struct normal_state_chunk chunk = {
         .lprobs_size = cast_u8_u(imm_abc_length(imm_state_get_abc(state))),
         .lprobs = s->lprobs,
     };
 
-    uint32_t chunk_size =
-        sizeof(chunk.lprobs_size) + sizeof(*chunk.lprobs) * chunk.lprobs_size;
+    uint32_t chunk_size = sizeof(chunk.lprobs_size) + sizeof(*chunk.lprobs) * chunk.lprobs_size;
 
     if (fwrite(&chunk_size, sizeof(chunk_size), 1, stream) < 1) {
         imm_error("could not write chunk_size");
@@ -145,5 +141,5 @@ static int normal_state_write(struct imm_state const* state, FILE* stream)
 
 static void normal_state_destroy(struct imm_state const* state)
 {
-    imm_normal_state_destroy(imm_state_get_impl(state));
+    imm_normal_state_destroy(imm_state_derived(state));
 }

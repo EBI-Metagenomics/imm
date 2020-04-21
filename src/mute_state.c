@@ -22,7 +22,7 @@ struct imm_mute_state const* imm_mute_state_create(char const* name, struct imm_
 {
     struct imm_mute_state* state = malloc(sizeof(struct imm_mute_state));
 
-    struct imm_state_funcs funcs = {mute_state_lprob, mute_state_min_seq, mute_state_max_seq,
+    struct imm_state_vtable funcs = {mute_state_lprob, mute_state_min_seq, mute_state_max_seq,
                                     mute_state_write, mute_state_destroy};
     state->base = imm_state_create(name, abc, funcs, IMM_MUTE_STATE_TYPE_ID, state);
     return state;
@@ -53,15 +53,15 @@ int mute_state_read(FILE* stream, struct imm_state* state)
         return 1;
     }
 
-    state->lprob = mute_state_lprob;
-    state->min_seq = mute_state_min_seq;
-    state->max_seq = mute_state_max_seq;
-    state->write = mute_state_write;
-    state->destroy = mute_state_destroy;
+    state->vtable.lprob = mute_state_lprob;
+    state->vtable.min_seq = mute_state_min_seq;
+    state->vtable.max_seq = mute_state_max_seq;
+    state->vtable.write = mute_state_write;
+    state->vtable.destroy = mute_state_destroy;
 
     struct imm_mute_state* mute_state = malloc(sizeof(*mute_state));
     mute_state->base = state;
-    state->impl = mute_state;
+    state->derived = mute_state;
 
     return 0;
 }
@@ -91,5 +91,5 @@ static int mute_state_write(struct imm_state const* state, FILE* stream)
 
 static void mute_state_destroy(struct imm_state const* state)
 {
-    imm_mute_state_destroy(imm_state_get_impl(state));
+    imm_mute_state_destroy(imm_state_derived(state));
 }
