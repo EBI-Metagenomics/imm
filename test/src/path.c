@@ -19,11 +19,11 @@ void test_path(void)
 
     struct imm_path* path = imm_path_create();
 
-    imm_path_append(path, imm_step_create(imm_normal_state_base(state0), 1));
-    imm_path_append(path, imm_step_create(imm_normal_state_base(state1), 1));
+    imm_path_append(path, imm_step_create(imm_normal_state_parent(state0), 1));
+    imm_path_append(path, imm_step_create(imm_normal_state_parent(state1), 1));
 
-    cass_cond(imm_step_create(imm_normal_state_base(state1), 2) == NULL);
-    cass_cond(imm_step_create(imm_normal_state_base(state1), 0) == NULL);
+    cass_cond(imm_step_create(imm_normal_state_parent(state1), 2) == NULL);
+    cass_cond(imm_step_create(imm_normal_state_parent(state1), 0) == NULL);
 
     struct imm_path* new_path = imm_path_clone(path);
 

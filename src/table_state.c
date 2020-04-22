@@ -9,7 +9,7 @@
 
 struct imm_table_state
 {
-    struct imm_state const*     base;
+    struct imm_state const*     parent;
     struct imm_seq_table const* table;
 };
 
@@ -29,20 +29,20 @@ struct imm_table_state* imm_table_state_create(char const* name, struct imm_seq_
     struct imm_table_state* state = malloc(sizeof(struct imm_table_state));
     state->table = imm_seq_table_clone(table);
 
-    state->base = imm_state_create(name, imm_seq_table_get_abc(table), vtable, state);
+    state->parent = imm_state_create(name, imm_seq_table_get_abc(table), vtable, state);
     return state;
 }
 
 void imm_table_state_destroy(struct imm_table_state const* state)
 {
-    struct imm_state const* base = state->base;
-    table_state_destroy(base);
-    state_destroy(base);
+    struct imm_state const* parent = state->parent;
+    table_state_destroy(parent);
+    imm_state_destroy_parent(parent);
 }
 
-struct imm_state const* imm_table_state_base(struct imm_table_state const* state)
+struct imm_state const* imm_table_state_parent(struct imm_table_state const* state)
 {
-    return state->base;
+    return state->parent;
 }
 
 static uint8_t table_state_type_id(struct imm_state const* state)
@@ -52,19 +52,19 @@ static uint8_t table_state_type_id(struct imm_state const* state)
 
 static double table_state_lprob(struct imm_state const* state, struct imm_seq const* seq)
 {
-    struct imm_table_state const* s = imm_state_derived(state);
+    struct imm_table_state const* s = imm_state_child(state);
     return imm_seq_table_lprob(s->table, seq);
 }
 
 static unsigned table_state_min_seq(struct imm_state const* state)
 {
-    struct imm_table_state const* s = imm_state_derived(state);
+    struct imm_table_state const* s = imm_state_child(state);
     return imm_seq_table_min_seq(s->table);
 }
 
 static unsigned table_state_max_seq(struct imm_state const* state)
 {
-    struct imm_table_state const* s = imm_state_derived(state);
+    struct imm_table_state const* s = imm_state_child(state);
     return imm_seq_table_max_seq(s->table);
 }
 
@@ -76,7 +76,7 @@ static int table_state_write(struct imm_state const* state, FILE* stream)
 
 static void table_state_destroy(struct imm_state const* state)
 {
-    struct imm_table_state const* s = imm_state_derived(state);
+    struct imm_table_state const* s = imm_state_child(state);
     imm_seq_table_destroy(s->table);
     free_c(s);
 }

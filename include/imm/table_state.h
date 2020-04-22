@@ -15,6 +15,6 @@ struct imm_table_state;
 IMM_EXPORT struct imm_table_state* imm_table_state_create(char const*                 name,
                                                           struct imm_seq_table const* table);
 IMM_EXPORT void imm_table_state_destroy(struct imm_table_state const* state);
-IMM_EXPORT struct imm_state const* imm_table_state_base(struct imm_table_state const* state);
+IMM_EXPORT struct imm_state const* imm_table_state_parent(struct imm_table_state const* state);
 
 #endif

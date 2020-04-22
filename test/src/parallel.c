@@ -27,11 +27,11 @@ void test_parallel(void)
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
     struct imm_mute_state const* start = imm_mute_state_create("START", abc);
-    imm_hmm_add_state(hmm, imm_mute_state_base(start), log(1.0));
+    imm_hmm_add_state(hmm, imm_mute_state_parent(start), log(1.0));
 
     double end_lprobs[] = {log(0.05), log(0.05), log(0.05), log(0.05), log(0.05)};
     struct imm_normal_state const* end = imm_normal_state_create("END", abc, end_lprobs);
-    imm_hmm_add_state(hmm, imm_normal_state_base(end), zero());
+    imm_hmm_add_state(hmm, imm_normal_state_parent(end), zero());
 
     double B_lprobs[] = {log(1.0), zero(), zero(), zero(), zero()};
     double E_lprobs[] = {zero(), zero(), zero(), log(1.0), zero()};
@@ -40,20 +40,20 @@ void test_parallel(void)
     double I_lprobs[] = {zero(), zero(), log(1.0), zero(), zero()};
 
     struct imm_normal_state const* B = imm_normal_state_create("B", abc, B_lprobs);
-    imm_hmm_add_state(hmm, imm_normal_state_base(B), zero());
+    imm_hmm_add_state(hmm, imm_normal_state_parent(B), zero());
     struct imm_normal_state const* E = imm_normal_state_create("E", abc, E_lprobs);
-    imm_hmm_add_state(hmm, imm_normal_state_base(E), zero());
+    imm_hmm_add_state(hmm, imm_normal_state_parent(E), zero());
     struct imm_normal_state const* J = imm_normal_state_create("J", abc, J_lprobs);
-    imm_hmm_add_state(hmm, imm_normal_state_base(J), zero());
+    imm_hmm_add_state(hmm, imm_normal_state_parent(J), zero());
 
-    imm_hmm_set_trans(hmm, imm_mute_state_base(start), imm_normal_state_base(B), log(0.2));
-    imm_hmm_set_trans(hmm, imm_normal_state_base(B), imm_normal_state_base(B), log(0.2));
-    imm_hmm_set_trans(hmm, imm_normal_state_base(E), imm_normal_state_base(E), log(0.2));
-    imm_hmm_set_trans(hmm, imm_normal_state_base(J), imm_normal_state_base(J), log(0.2));
-    imm_hmm_set_trans(hmm, imm_normal_state_base(E), imm_normal_state_base(J), log(0.2));
-    imm_hmm_set_trans(hmm, imm_normal_state_base(J), imm_normal_state_base(B), log(0.2));
-    imm_hmm_set_trans(hmm, imm_normal_state_base(E), imm_normal_state_base(end), log(0.2));
-    imm_hmm_set_trans(hmm, imm_normal_state_base(end), imm_normal_state_base(end), log(0.2));
+    imm_hmm_set_trans(hmm, imm_mute_state_parent(start), imm_normal_state_parent(B), log(0.2));
+    imm_hmm_set_trans(hmm, imm_normal_state_parent(B), imm_normal_state_parent(B), log(0.2));
+    imm_hmm_set_trans(hmm, imm_normal_state_parent(E), imm_normal_state_parent(E), log(0.2));
+    imm_hmm_set_trans(hmm, imm_normal_state_parent(J), imm_normal_state_parent(J), log(0.2));
+    imm_hmm_set_trans(hmm, imm_normal_state_parent(E), imm_normal_state_parent(J), log(0.2));
+    imm_hmm_set_trans(hmm, imm_normal_state_parent(J), imm_normal_state_parent(B), log(0.2));
+    imm_hmm_set_trans(hmm, imm_normal_state_parent(E), imm_normal_state_parent(end), log(0.2));
+    imm_hmm_set_trans(hmm, imm_normal_state_parent(end), imm_normal_state_parent(end), log(0.2));
 
     struct imm_normal_state const* M[ncore_nodes];
     struct imm_normal_state const* I[ncore_nodes];
@@ -65,39 +65,39 @@ void test_parallel(void)
         I[i] = imm_normal_state_create(fmt_name(name, "I", i), abc, I_lprobs);
         D[i] = imm_mute_state_create(fmt_name(name, "D", i), abc);
 
-        imm_hmm_add_state(hmm, imm_normal_state_base(M[i]), zero());
-        imm_hmm_add_state(hmm, imm_normal_state_base(I[i]), zero());
-        imm_hmm_add_state(hmm, imm_mute_state_base(D[i]), zero());
+        imm_hmm_add_state(hmm, imm_normal_state_parent(M[i]), zero());
+        imm_hmm_add_state(hmm, imm_normal_state_parent(I[i]), zero());
+        imm_hmm_add_state(hmm, imm_mute_state_parent(D[i]), zero());
 
         if (i == 0)
-            imm_hmm_set_trans(hmm, imm_normal_state_base(B), imm_normal_state_base(M[0]),
+            imm_hmm_set_trans(hmm, imm_normal_state_parent(B), imm_normal_state_parent(M[0]),
                               log(0.2));
 
-        imm_hmm_set_trans(hmm, imm_normal_state_base(M[i]), imm_normal_state_base(I[i]),
+        imm_hmm_set_trans(hmm, imm_normal_state_parent(M[i]), imm_normal_state_parent(I[i]),
                           log(0.2));
-        imm_hmm_set_trans(hmm, imm_normal_state_base(I[i]), imm_normal_state_base(I[i]),
+        imm_hmm_set_trans(hmm, imm_normal_state_parent(I[i]), imm_normal_state_parent(I[i]),
                           log(0.2));
 
         if (i > 0) {
-            imm_hmm_set_trans(hmm, imm_normal_state_base(M[i - 1]),
-                              imm_normal_state_base(M[i]), log(0.2));
-            imm_hmm_set_trans(hmm, imm_mute_state_base(D[i - 1]), imm_normal_state_base(M[i]),
+            imm_hmm_set_trans(hmm, imm_normal_state_parent(M[i - 1]),
+                              imm_normal_state_parent(M[i]), log(0.2));
+            imm_hmm_set_trans(hmm, imm_mute_state_parent(D[i - 1]), imm_normal_state_parent(M[i]),
                               log(0.2));
-            imm_hmm_set_trans(hmm, imm_normal_state_base(I[i - 1]),
-                              imm_normal_state_base(M[i]), log(0.2));
+            imm_hmm_set_trans(hmm, imm_normal_state_parent(I[i - 1]),
+                              imm_normal_state_parent(M[i]), log(0.2));
 
-            imm_hmm_set_trans(hmm, imm_normal_state_base(M[i - 1]), imm_mute_state_base(D[i]),
+            imm_hmm_set_trans(hmm, imm_normal_state_parent(M[i - 1]), imm_mute_state_parent(D[i]),
                               log(0.2));
-            imm_hmm_set_trans(hmm, imm_mute_state_base(D[i - 1]), imm_mute_state_base(D[i]),
+            imm_hmm_set_trans(hmm, imm_mute_state_parent(D[i - 1]), imm_mute_state_parent(D[i]),
                               log(0.2));
         }
 
         if (i == ncore_nodes - 1) {
-            imm_hmm_set_trans(hmm, imm_normal_state_base(M[i]), imm_normal_state_base(E),
+            imm_hmm_set_trans(hmm, imm_normal_state_parent(M[i]), imm_normal_state_parent(E),
                               log(0.2));
-            imm_hmm_set_trans(hmm, imm_mute_state_base(D[i]), imm_normal_state_base(E),
+            imm_hmm_set_trans(hmm, imm_mute_state_parent(D[i]), imm_normal_state_parent(E),
                               log(0.2));
-            imm_hmm_set_trans(hmm, imm_normal_state_base(I[i]), imm_normal_state_base(E),
+            imm_hmm_set_trans(hmm, imm_normal_state_parent(I[i]), imm_normal_state_parent(E),
                               log(0.2));
         }
     }
@@ -150,7 +150,7 @@ void test_parallel(void)
 
     elapsed_start(elapsed);
     struct imm_seq const*     seq = imm_seq_create(str, abc);
-    struct imm_dp const*      dp = imm_hmm_create_dp(hmm, imm_normal_state_base(end));
+    struct imm_dp const*      dp = imm_hmm_create_dp(hmm, imm_normal_state_parent(end));
     struct imm_results const* results = imm_dp_viterbi(dp, seq, 50);
 
     cass_cond(imm_results_size(results) == 79);

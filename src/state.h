@@ -11,8 +11,7 @@ static inline int state_write(struct imm_state const* state, FILE* stream)
 {
     return state->vtable.write(state, stream);
 }
-int               state_write_base(struct imm_state const* state, FILE* stream);
-struct imm_state* state_read_base(FILE* stream, struct imm_abc const* abc);
-void              state_destroy(struct imm_state const* state);
+int               state_write_parent(struct imm_state const* state, FILE* stream);
+struct imm_state* state_read_parent(FILE* stream, struct imm_abc const* abc);
 
 #endif

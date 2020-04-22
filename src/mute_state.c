@@ -9,7 +9,7 @@
 
 struct imm_mute_state
 {
-    struct imm_state const* base;
+    struct imm_state const* parent;
 };
 
 static uint8_t  mute_state_type_id(struct imm_state const* state);
@@ -27,20 +27,20 @@ struct imm_mute_state const* imm_mute_state_create(char const* name, struct imm_
 {
     struct imm_mute_state* state = malloc(sizeof(struct imm_mute_state));
 
-    state->base = imm_state_create(name, abc, vtable, state);
+    state->parent = imm_state_create(name, abc, vtable, state);
     return state;
 }
 
 void imm_mute_state_destroy(struct imm_mute_state const* state)
 {
-    struct imm_state const* base = state->base;
-    mute_state_destroy(base);
-    state_destroy(base);
+    struct imm_state const* parent = state->parent;
+    mute_state_destroy(parent);
+    imm_state_destroy_parent(parent);
 }
 
-struct imm_state const* imm_mute_state_base(struct imm_mute_state const* state)
+struct imm_state const* imm_mute_state_parent(struct imm_mute_state const* state)
 {
-    return state->base;
+    return state->parent;
 }
 
 static uint8_t mute_state_type_id(struct imm_state const* state) { return IMM_MUTE_STATE_TYPE_ID; }
@@ -58,7 +58,7 @@ static unsigned mute_state_max_seq(struct imm_state const* state) { return 0; }
 
 static int mute_state_write(struct imm_state const* state, FILE* stream)
 {
-    if (state_write_base(state, stream))
+    if (state_write_parent(state, stream))
         return 1;
 
     return 0;
@@ -66,23 +66,23 @@ static int mute_state_write(struct imm_state const* state, FILE* stream)
 
 struct imm_state const* mute_state_read(FILE* stream, struct imm_abc const* abc)
 {
-    struct imm_state* state = state_read_base(stream, abc);
+    struct imm_state* state = state_read_parent(stream, abc);
     if (!state) {
-        imm_error("could not state_read_base");
+        imm_error("could not state_read_parent");
         return NULL;
     }
 
     state->vtable = vtable;
 
     struct imm_mute_state* mute_state = malloc(sizeof(*mute_state));
-    mute_state->base = state;
-    state->derived = mute_state;
+    mute_state->parent = state;
+    state->child = mute_state;
 
     return state;
 }
 
 static void mute_state_destroy(struct imm_state const* state)
 {
-    struct imm_mute_state const* s = imm_state_derived(state);
+    struct imm_mute_state const* s = imm_state_child(state);
     free_c(s);
 }

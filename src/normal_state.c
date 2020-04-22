@@ -12,7 +12,7 @@
 
 struct imm_normal_state
 {
-    struct imm_state const* base;
+    struct imm_state const* parent;
     double*                 lprobs;
 };
 
@@ -42,20 +42,20 @@ struct imm_normal_state const* imm_normal_state_create(char const* name, struct 
     state->lprobs = malloc(sizeof(*state->lprobs) * len);
     memcpy(state->lprobs, lprobs, sizeof(*state->lprobs) * len);
 
-    state->base = imm_state_create(name, abc, vtable, state);
+    state->parent = imm_state_create(name, abc, vtable, state);
     return state;
 }
 
 void imm_normal_state_destroy(struct imm_normal_state const* state)
 {
-    struct imm_state const* base = state->base;
-    normal_state_destroy(base);
-    state_destroy(base);
+    struct imm_state const* parent = state->parent;
+    normal_state_destroy(parent);
+    imm_state_destroy_parent(parent);
 }
 
-struct imm_state const* imm_normal_state_base(struct imm_normal_state const* state)
+struct imm_state const* imm_normal_state_parent(struct imm_normal_state const* state)
 {
-    return state->base;
+    return state->parent;
 }
 
 static uint8_t normal_state_type_id(struct imm_state const* state)
@@ -65,7 +65,7 @@ static uint8_t normal_state_type_id(struct imm_state const* state)
 
 static double normal_state_lprob(struct imm_state const* state, struct imm_seq const* seq)
 {
-    struct imm_normal_state const* s = imm_state_derived(state);
+    struct imm_normal_state const* s = imm_state_child(state);
     if (imm_seq_length(seq) == 1) {
         struct imm_abc const* abc = imm_state_get_abc(state);
         unsigned              idx = imm_abc_symbol_idx(abc, imm_seq_string(seq)[0]);
@@ -81,10 +81,10 @@ static unsigned normal_state_max_seq(struct imm_state const* state) { return 1; 
 
 static int normal_state_write(struct imm_state const* state, FILE* stream)
 {
-    if (state_write_base(state, stream))
+    if (state_write_parent(state, stream))
         return 1;
 
-    struct imm_normal_state const* s = imm_state_derived(state);
+    struct imm_normal_state const* s = imm_state_child(state);
 
     struct normal_state_chunk chunk = {
         .lprobs_size = cast_u8_u(imm_abc_length(imm_state_get_abc(state))),
@@ -107,16 +107,16 @@ static int normal_state_write(struct imm_state const* state, FILE* stream)
 
 static void normal_state_destroy(struct imm_state const* state)
 {
-    struct imm_normal_state const* s = imm_state_derived(state);
+    struct imm_normal_state const* s = imm_state_child(state);
     free_c(s->lprobs);
     free_c(s);
 }
 
 struct imm_state const* normal_state_read(FILE* stream, struct imm_abc const* abc)
 {
-    struct imm_state* state = state_read_base(stream, abc);
+    struct imm_state* state = state_read_parent(stream, abc);
     if (!state) {
-        imm_error("could not state_read_base");
+        imm_error("could not state_read_parent");
         return NULL;
     }
 
@@ -140,9 +140,9 @@ struct imm_state const* normal_state_read(FILE* stream, struct imm_abc const* ab
     state->vtable = vtable;
 
     struct imm_normal_state* normal_state = malloc(sizeof(*normal_state));
-    normal_state->base = state;
+    normal_state->parent = state;
     normal_state->lprobs = chunk.lprobs;
-    state->derived = normal_state;
+    state->child = normal_state;
 
     return state;
 }
