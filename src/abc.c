@@ -2,6 +2,7 @@
 #include "abc.h"
 #include "cast.h"
 #include "free.h"
+#include "imm/abc_types.h"
 #include "imm/report.h"
 #include "io.h"
 #include <string.h>
@@ -13,7 +14,17 @@ struct abc_chunk
     char    any_symbol;
 };
 
+static uint8_t abc_type_id(struct imm_abc const* abc);
+
+static struct imm_abc_vtable const __vtable = {abc_type_id, NULL};
+
 struct imm_abc const* imm_abc_create(char const* symbols, char const any_symbol)
+{
+    return __imm_abc_create_parent(symbols, any_symbol, __vtable, NULL);
+}
+
+struct imm_abc const* __imm_abc_create_parent(char const* symbols, char any_symbol,
+                                              struct imm_abc_vtable vtable, void* child)
 {
     if (any_symbol < IMM_FIRST_CHAR || any_symbol > IMM_LAST_CHAR) {
         imm_error("any_symbol is outside the range [%c, %c] ", IMM_FIRST_CHAR, IMM_LAST_CHAR);
@@ -56,7 +67,16 @@ struct imm_abc const* imm_abc_create(char const* symbols, char const any_symbol)
     }
     abc->symbols = strdup(symbols);
 
+    abc->vtable = vtable;
+    abc->child = child;
+
     return abc;
+}
+
+void __imm_abc_destroy_parent(struct imm_abc const* abc)
+{
+    free_c(abc->symbols);
+    free_c(abc);
 }
 
 struct imm_abc const* imm_abc_clone(struct imm_abc const* abc)
@@ -73,8 +93,9 @@ struct imm_abc const* imm_abc_clone(struct imm_abc const* abc)
 
 void imm_abc_destroy(struct imm_abc const* abc)
 {
-    free_c(abc->symbols);
-    free_c(abc);
+    if (abc->vtable.destroy)
+        abc->vtable.destroy(abc);
+    __imm_abc_destroy_parent(abc);
 }
 
 int abc_write(FILE* stream, struct imm_abc const* abc)
@@ -145,3 +166,5 @@ enum imm_symbol_type imm_abc_symbol_type(struct imm_abc const* abc, char symbol_
 
     return IMM_SYMBOL_UNKNOWN;
 }
+
+static uint8_t abc_type_id(struct imm_abc const* abc) { return IMM_ABC_TYPE_ID; }

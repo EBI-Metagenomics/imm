@@ -29,9 +29,9 @@ static unsigned normal_state_max_seq(struct imm_state const* state);
 static int      normal_state_write(struct imm_state const* state, FILE* stream);
 static void     normal_state_destroy(struct imm_state const* state);
 
-static struct imm_state_vtable vtable = {normal_state_type_id, normal_state_lprob,
-                                         normal_state_min_seq, normal_state_max_seq,
-                                         normal_state_write,   normal_state_destroy};
+static struct imm_state_vtable const vtable = {normal_state_type_id, normal_state_lprob,
+                                               normal_state_min_seq, normal_state_max_seq,
+                                               normal_state_write,   normal_state_destroy};
 
 struct imm_normal_state const* imm_normal_state_create(char const* name, struct imm_abc const* abc,
                                                        double const* lprobs)

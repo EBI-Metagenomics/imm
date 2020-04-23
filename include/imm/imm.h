@@ -8,6 +8,7 @@ extern "C"
 
 #include "imm/abc.h"
 #include "imm/abc_table.h"
+#include "imm/abc_types.h"
 #include "imm/bug.h"
 #include "imm/dp.h"
 #include "imm/hmm.h"

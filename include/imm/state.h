@@ -44,7 +44,7 @@ struct imm_state
 };
 
 IMM_EXPORT struct imm_state const* imm_state_create(char const* name, struct imm_abc const* abc,
-                                                    struct imm_state_vtable vtable, void* impl);
+                                                    struct imm_state_vtable vtable, void* child);
 IMM_EXPORT void                    imm_state_destroy(struct imm_state const* state);
 IMM_EXPORT void                    imm_state_destroy_parent(struct imm_state const* state);
 
@@ -79,9 +79,6 @@ static inline unsigned imm_state_max_seq(struct imm_state const* state)
     return state->vtable.max_seq(state);
 }
 
-static inline void const* imm_state_child(struct imm_state const* state)
-{
-    return state->child;
-}
+static inline void const* imm_state_child(struct imm_state const* state) { return state->child; }
 
 #endif
