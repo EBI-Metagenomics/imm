@@ -87,6 +87,8 @@ struct imm_abc const* imm_abc_clone(struct imm_abc const* abc)
     nabc->length = abc->length;
     memcpy(nabc->symbol_idx, abc->symbol_idx, sizeof(*abc->symbol_idx) * IMM_SYMBOL_IDX_SIZE);
     nabc->any_symbol = abc->any_symbol;
+    nabc->vtable = abc->vtable;
+    nabc->child = NULL;
 
     return nabc;
 }

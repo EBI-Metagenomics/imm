@@ -58,6 +58,15 @@ struct imm_state const* imm_normal_state_parent(struct imm_normal_state const* s
     return state->parent;
 }
 
+struct imm_normal_state const* imm_normal_state_child(struct imm_state const* state)
+{
+    if (imm_state_type_id(state) != IMM_NORMAL_STATE_TYPE_ID) {
+        imm_error("could not cast to normal_state");
+        return NULL;
+    }
+    return __imm_state_child(state);
+}
+
 static uint8_t normal_state_type_id(struct imm_state const* state)
 {
     return IMM_NORMAL_STATE_TYPE_ID;
@@ -65,7 +74,7 @@ static uint8_t normal_state_type_id(struct imm_state const* state)
 
 static double normal_state_lprob(struct imm_state const* state, struct imm_seq const* seq)
 {
-    struct imm_normal_state const* s = imm_state_child(state);
+    struct imm_normal_state const* s = __imm_state_child(state);
     if (imm_seq_length(seq) == 1) {
         struct imm_abc const* abc = imm_state_get_abc(state);
         unsigned              idx = imm_abc_symbol_idx(abc, imm_seq_string(seq)[0]);
@@ -84,7 +93,7 @@ static int normal_state_write(struct imm_state const* state, FILE* stream)
     if (state_write_parent(state, stream))
         return 1;
 
-    struct imm_normal_state const* s = imm_state_child(state);
+    struct imm_normal_state const* s = __imm_state_child(state);
 
     struct normal_state_chunk chunk = {
         .lprobs_size = cast_u8_u(imm_abc_length(imm_state_get_abc(state))),
@@ -107,7 +116,7 @@ static int normal_state_write(struct imm_state const* state, FILE* stream)
 
 static void normal_state_destroy(struct imm_state const* state)
 {
-    struct imm_normal_state const* s = imm_state_child(state);
+    struct imm_normal_state const* s = __imm_state_child(state);
     free_c(s->lprobs);
     free_c(s);
 }

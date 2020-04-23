@@ -43,6 +43,15 @@ struct imm_state const* imm_mute_state_parent(struct imm_mute_state const* state
     return state->parent;
 }
 
+struct imm_mute_state const* imm_mute_state_child(struct imm_state const* state)
+{
+    if (imm_state_type_id(state) != IMM_MUTE_STATE_TYPE_ID) {
+        imm_error("could not cast to mute_state");
+        return NULL;
+    }
+    return __imm_state_child(state);
+}
+
 static uint8_t mute_state_type_id(struct imm_state const* state) { return IMM_MUTE_STATE_TYPE_ID; }
 
 static double mute_state_lprob(struct imm_state const* state, struct imm_seq const* seq)
@@ -83,6 +92,6 @@ struct imm_state const* mute_state_read(FILE* stream, struct imm_abc const* abc)
 
 static void mute_state_destroy(struct imm_state const* state)
 {
-    struct imm_mute_state const* s = imm_state_child(state);
+    struct imm_mute_state const* s = __imm_state_child(state);
     free_c(s);
 }

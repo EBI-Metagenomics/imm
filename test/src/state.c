@@ -23,7 +23,7 @@ void test_normal_state(void)
     struct imm_seq const* G = imm_seq_create("G", abc);
     struct imm_seq const* T = imm_seq_create("T", abc);
 
-    double lprobs[] = {log(0.25), log(0.25), log(0.5), imm_lprob_zero()};
+    double                         lprobs[] = {log(0.25), log(0.25), log(0.5), imm_lprob_zero()};
     struct imm_normal_state const* state = imm_normal_state_create("State0", abc, lprobs);
 
     cass_cond(strcmp(imm_state_get_name(imm_normal_state_parent(state)), "State0") == 0);
@@ -31,6 +31,10 @@ void test_normal_state(void)
     cass_close(imm_state_lprob(imm_normal_state_parent(state), C), log(0.25));
     cass_close(imm_state_lprob(imm_normal_state_parent(state), G), log(0.5));
     cass_cond(imm_lprob_is_zero(imm_state_lprob(imm_normal_state_parent(state), T)));
+
+    struct imm_state const* parent = imm_normal_state_parent(state);
+    cass_cond(imm_mute_state_child(parent) == NULL);
+    cass_cond((state = imm_normal_state_child(parent)) != NULL);
 
     imm_normal_state_destroy(state);
     imm_abc_destroy(abc);
@@ -52,6 +56,10 @@ void test_mute_state(void)
     cass_close(0.0, imm_state_lprob(imm_mute_state_parent(state), EMPTY));
     cass_cond(imm_lprob_is_zero(imm_state_lprob(imm_mute_state_parent(state), A)));
 
+    struct imm_state const* parent = imm_mute_state_parent(state);
+    cass_cond(imm_normal_state_child(parent) == NULL);
+    cass_cond((state = imm_mute_state_child(parent)) != NULL);
+
     imm_mute_state_destroy(state);
     imm_abc_destroy(abc);
     imm_seq_destroy(A);
@@ -67,8 +75,8 @@ void test_table_state(void)
     struct imm_seq const* GG = imm_seq_create("GG", abc);
     struct imm_seq const* GGT = imm_seq_create("GGT", abc);
 
-    struct imm_seq_table*   table = imm_seq_table_create(abc);
-    struct imm_table_state* state = imm_table_state_create("S0", table);
+    struct imm_seq_table*         table = imm_seq_table_create(abc);
+    struct imm_table_state const* state = imm_table_state_create("S0", table);
     imm_seq_table_destroy(table);
 
     cass_cond(strcmp(imm_state_get_name(imm_table_state_parent(state)), "S0") == 0);
@@ -96,8 +104,12 @@ void test_table_state(void)
 
     cass_close(imm_state_lprob(imm_table_state_parent(state), GG), log(0.5 / 0.6));
     cass_close(imm_state_lprob(imm_table_state_parent(state), EMPTY), log(0.1 / 0.6));
-    imm_table_state_destroy(state);
 
+    struct imm_state const* parent = imm_table_state_parent(state);
+    cass_cond(imm_normal_state_child(parent) == NULL);
+    cass_cond((state = imm_table_state_child(parent)) != NULL);
+
+    imm_table_state_destroy(state);
     imm_abc_destroy(abc);
     imm_seq_destroy(EMPTY);
     imm_seq_destroy(AGT);
@@ -113,7 +125,7 @@ void test_state_destroy(void)
     struct imm_seq const* G = imm_seq_create("G", abc);
     struct imm_seq const* T = imm_seq_create("T", abc);
 
-    double lprobs[] = {log(0.25), log(0.25), log(0.5), imm_lprob_zero()};
+    double                         lprobs[] = {log(0.25), log(0.25), log(0.5), imm_lprob_zero()};
     struct imm_normal_state const* state = imm_normal_state_create("State0", abc, lprobs);
 
     cass_cond(strcmp(imm_state_get_name(imm_normal_state_parent(state)), "State0") == 0);

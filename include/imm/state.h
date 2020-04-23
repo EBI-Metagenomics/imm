@@ -79,6 +79,6 @@ static inline unsigned imm_state_max_seq(struct imm_state const* state)
     return state->vtable.max_seq(state);
 }
 
-static inline void const* imm_state_child(struct imm_state const* state) { return state->child; }
+static inline void const* __imm_state_child(struct imm_state const* state) { return state->child; }
 
 #endif

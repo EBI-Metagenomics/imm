@@ -108,7 +108,8 @@ void test_hmm_viterbi_two_mute_states(void)
 
     imm_hmm_set_trans(hmm, imm_mute_state_parent(state0), imm_mute_state_parent(state1), log(0.1));
 
-    cass_close(single_viterbi(hmm, EMPTY, imm_mute_state_parent(state1), &path), log(0.5) + log(0.1));
+    cass_close(single_viterbi(hmm, EMPTY, imm_mute_state_parent(state1), &path),
+               log(0.5) + log(0.1));
     cass_close(imm_hmm_likelihood(hmm, EMPTY, path), log(0.5) + log(0.1));
     imm_path_destroy(path);
 
@@ -184,7 +185,8 @@ void test_hmm_viterbi_one_normal_state(void)
     cass_cond(!is_valid(imm_hmm_likelihood(hmm, AC, path)));
     imm_path_destroy(path);
 
-    imm_hmm_set_trans(hmm, imm_normal_state_parent(state), imm_normal_state_parent(state), log(0.1));
+    imm_hmm_set_trans(hmm, imm_normal_state_parent(state), imm_normal_state_parent(state),
+                      log(0.1));
 
     cass_close(single_viterbi(hmm, A, imm_normal_state_parent(state), &path), log(0.1) + log(0.25));
     cass_close(imm_hmm_likelihood(hmm, A, path), log(0.1) + log(0.25));
@@ -244,14 +246,16 @@ void test_hmm_viterbi_two_normal_states(void)
 
     imm_hmm_add_state(hmm, imm_normal_state_parent(state0), log(0.1));
     imm_hmm_add_state(hmm, imm_normal_state_parent(state1), log(0.2));
-    imm_hmm_set_trans(hmm, imm_normal_state_parent(state0), imm_normal_state_parent(state1), log(0.3));
+    imm_hmm_set_trans(hmm, imm_normal_state_parent(state0), imm_normal_state_parent(state1),
+                      log(0.3));
 
     struct imm_path* path = NULL;
     cass_cond(!is_valid(single_viterbi(hmm, EMPTY, imm_normal_state_parent(state0), &path)));
     cass_cond(!is_valid(imm_hmm_likelihood(hmm, EMPTY, path)));
     imm_path_destroy(path);
 
-    cass_close(single_viterbi(hmm, A, imm_normal_state_parent(state0), &path), log(0.1) + log(0.25));
+    cass_close(single_viterbi(hmm, A, imm_normal_state_parent(state0), &path),
+               log(0.1) + log(0.25));
     cass_close(imm_hmm_likelihood(hmm, A, path), log(0.1) + log(0.25));
     imm_path_destroy(path);
 
@@ -272,7 +276,8 @@ void test_hmm_viterbi_two_normal_states(void)
     cass_cond(!is_valid(imm_hmm_likelihood(hmm, ATT, path)));
     imm_path_destroy(path);
 
-    imm_hmm_set_trans(hmm, imm_normal_state_parent(state1), imm_normal_state_parent(state1), log(0.5));
+    imm_hmm_set_trans(hmm, imm_normal_state_parent(state1), imm_normal_state_parent(state1),
+                      log(0.5));
 
     desired = log(0.2) + log(0.25) + 4 * log(0.5);
     cass_close(single_viterbi(hmm, ATT, imm_normal_state_parent(state1), &path), desired);
@@ -320,9 +325,12 @@ void test_hmm_viterbi_normal_states(void)
     imm_hmm_add_state(hmm, imm_normal_state_parent(state0), log(1.0));
     imm_hmm_add_state(hmm, imm_normal_state_parent(state1), zero());
 
-    imm_hmm_set_trans(hmm, imm_normal_state_parent(state0), imm_normal_state_parent(state0), log(0.1));
-    imm_hmm_set_trans(hmm, imm_normal_state_parent(state0), imm_normal_state_parent(state1), log(0.2));
-    imm_hmm_set_trans(hmm, imm_normal_state_parent(state1), imm_normal_state_parent(state1), log(1.0));
+    imm_hmm_set_trans(hmm, imm_normal_state_parent(state0), imm_normal_state_parent(state0),
+                      log(0.1));
+    imm_hmm_set_trans(hmm, imm_normal_state_parent(state0), imm_normal_state_parent(state1),
+                      log(0.2));
+    imm_hmm_set_trans(hmm, imm_normal_state_parent(state1), imm_normal_state_parent(state1),
+                      log(1.0));
 
     imm_hmm_normalize(hmm);
 
@@ -371,10 +379,14 @@ void test_hmm_viterbi_normal_states(void)
     cass_close(imm_hmm_likelihood(hmm, AGTC, path), -6.303991659557);
     imm_path_destroy(path);
 
-    imm_hmm_set_trans(hmm, imm_normal_state_parent(state0), imm_normal_state_parent(state0), zero());
-    imm_hmm_set_trans(hmm, imm_normal_state_parent(state0), imm_normal_state_parent(state1), zero());
-    imm_hmm_set_trans(hmm, imm_normal_state_parent(state1), imm_normal_state_parent(state0), zero());
-    imm_hmm_set_trans(hmm, imm_normal_state_parent(state1), imm_normal_state_parent(state1), zero());
+    imm_hmm_set_trans(hmm, imm_normal_state_parent(state0), imm_normal_state_parent(state0),
+                      zero());
+    imm_hmm_set_trans(hmm, imm_normal_state_parent(state0), imm_normal_state_parent(state1),
+                      zero());
+    imm_hmm_set_trans(hmm, imm_normal_state_parent(state1), imm_normal_state_parent(state0),
+                      zero());
+    imm_hmm_set_trans(hmm, imm_normal_state_parent(state1), imm_normal_state_parent(state1),
+                      zero());
 
     imm_hmm_set_start(hmm, imm_normal_state_parent(state0), zero());
     imm_hmm_set_start(hmm, imm_normal_state_parent(state1), zero());
@@ -429,7 +441,8 @@ void test_hmm_viterbi_normal_states(void)
     cass_cond(!is_valid(imm_hmm_likelihood(hmm, AA, path)));
     imm_path_destroy(path);
 
-    imm_hmm_set_trans(hmm, imm_normal_state_parent(state0), imm_normal_state_parent(state0), log(0.9));
+    imm_hmm_set_trans(hmm, imm_normal_state_parent(state0), imm_normal_state_parent(state0),
+                      log(0.9));
 
     cass_cond(!is_valid(single_viterbi(hmm, EMPTY, imm_normal_state_parent(state0), &path)));
     cass_cond(!is_valid(imm_hmm_likelihood(hmm, EMPTY, path)));
@@ -456,7 +469,8 @@ void test_hmm_viterbi_normal_states(void)
     cass_cond(!is_valid(imm_hmm_likelihood(hmm, AA, path)));
     imm_path_destroy(path);
 
-    imm_hmm_set_trans(hmm, imm_normal_state_parent(state0), imm_normal_state_parent(state1), log(0.2));
+    imm_hmm_set_trans(hmm, imm_normal_state_parent(state0), imm_normal_state_parent(state1),
+                      log(0.2));
 
     cass_cond(!is_valid(single_viterbi(hmm, EMPTY, imm_normal_state_parent(state0), &path)));
     cass_cond(!is_valid(imm_hmm_likelihood(hmm, EMPTY, path)));
@@ -1039,7 +1053,7 @@ void test_hmm_viterbi_table_states(void)
     cass_cond(imm_seq_table_lprob(table, A) == log(0.1));
     cass_cond(imm_seq_table_lprob(table, TAT) == log(0.2));
     cass_cond(imm_lprob_is_zero(imm_seq_table_lprob(table, seqT)));
-    struct imm_table_state* T = imm_table_state_create("T", table);
+    struct imm_table_state const* T = imm_table_state_create("T", table);
     imm_seq_table_destroy(table);
 
     struct imm_mute_state const* D = imm_mute_state_create("D", abc);
