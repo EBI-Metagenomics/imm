@@ -38,7 +38,7 @@ void imm_table_state_destroy(struct imm_table_state const* state)
 {
     struct imm_state const* parent = state->parent;
     table_state_destroy(parent);
-    imm_state_destroy_parent(parent);
+    __imm_state_destroy_parent(parent);
 }
 
 struct imm_state const* imm_table_state_parent(struct imm_table_state const* state)

@@ -50,7 +50,7 @@ void imm_normal_state_destroy(struct imm_normal_state const* state)
 {
     struct imm_state const* parent = state->parent;
     normal_state_destroy(parent);
-    imm_state_destroy_parent(parent);
+    __imm_state_destroy_parent(parent);
 }
 
 struct imm_state const* imm_normal_state_parent(struct imm_normal_state const* state)

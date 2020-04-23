@@ -31,11 +31,13 @@ struct imm_abc;
 
 typedef uint8_t (*imm_abc_type_id_t)(struct imm_abc const* abc);
 typedef void (*imm_abc_destroy_t)(struct imm_abc const* abc);
+typedef struct imm_abc const* (*imm_abc_clone_t)(struct imm_abc const* abc);
 
 struct imm_abc_vtable
 {
     imm_abc_type_id_t type_id;
     imm_abc_destroy_t destroy;
+    imm_abc_clone_t   clone;
 };
 
 /**
@@ -62,6 +64,7 @@ IMM_EXPORT struct imm_abc const* __imm_abc_create_parent(char const* symbols, ch
                                                          struct imm_abc_vtable vtable, void* child);
 IMM_EXPORT void                  __imm_abc_destroy_parent(struct imm_abc const* abc);
 IMM_EXPORT struct imm_abc const* imm_abc_clone(struct imm_abc const* abc);
+IMM_EXPORT struct imm_abc const* __imm_abc_clone_parent(struct imm_abc const* abc);
 IMM_EXPORT void                  imm_abc_destroy(struct imm_abc const* abc);
 static inline uint8_t            imm_abc_length(struct imm_abc const* abc) { return abc->length; }
 static inline char const*        imm_abc_symbols(struct imm_abc const* abc) { return abc->symbols; }

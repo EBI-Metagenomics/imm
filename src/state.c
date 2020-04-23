@@ -40,10 +40,10 @@ void imm_state_destroy(struct imm_state const* state)
 {
     if (state->vtable.destroy)
         state->vtable.destroy(state);
-    imm_state_destroy_parent(state);
+    __imm_state_destroy_parent(state);
 }
 
-void imm_state_destroy_parent(struct imm_state const* state)
+void __imm_state_destroy_parent(struct imm_state const* state)
 {
     free_c(state->name);
     free_c(state);

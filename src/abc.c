@@ -14,9 +14,10 @@ struct abc_chunk
     char    any_symbol;
 };
 
-static uint8_t abc_type_id(struct imm_abc const* abc);
+static uint8_t               abc_type_id(struct imm_abc const* abc);
+static struct imm_abc const* abc_clone(struct imm_abc const* abc);
 
-static struct imm_abc_vtable const __vtable = {abc_type_id, NULL};
+static struct imm_abc_vtable const __vtable = {abc_type_id, NULL, abc_clone};
 
 struct imm_abc const* imm_abc_create(char const* symbols, char const any_symbol)
 {
@@ -79,19 +80,7 @@ void __imm_abc_destroy_parent(struct imm_abc const* abc)
     free_c(abc);
 }
 
-struct imm_abc const* imm_abc_clone(struct imm_abc const* abc)
-{
-    struct imm_abc* nabc = malloc(sizeof(struct imm_abc));
-
-    nabc->symbols = strdup(abc->symbols);
-    nabc->length = abc->length;
-    memcpy(nabc->symbol_idx, abc->symbol_idx, sizeof(*abc->symbol_idx) * IMM_SYMBOL_IDX_SIZE);
-    nabc->any_symbol = abc->any_symbol;
-    nabc->vtable = abc->vtable;
-    nabc->child = NULL;
-
-    return nabc;
-}
+struct imm_abc const* imm_abc_clone(struct imm_abc const* abc) { return abc->vtable.clone(abc); }
 
 void imm_abc_destroy(struct imm_abc const* abc)
 {
@@ -170,3 +159,22 @@ enum imm_symbol_type imm_abc_symbol_type(struct imm_abc const* abc, char symbol_
 }
 
 static uint8_t abc_type_id(struct imm_abc const* abc) { return IMM_ABC_TYPE_ID; }
+
+static struct imm_abc const* abc_clone(struct imm_abc const* abc)
+{
+    return __imm_abc_clone_parent(abc);
+}
+
+struct imm_abc const* __imm_abc_clone_parent(struct imm_abc const* abc)
+{
+    struct imm_abc* nabc = malloc(sizeof(struct imm_abc));
+
+    nabc->symbols = strdup(abc->symbols);
+    nabc->length = abc->length;
+    memcpy(nabc->symbol_idx, abc->symbol_idx, sizeof(*abc->symbol_idx) * IMM_SYMBOL_IDX_SIZE);
+    nabc->any_symbol = abc->any_symbol;
+    nabc->vtable = abc->vtable;
+    nabc->child = NULL;
+
+    return nabc;
+}
