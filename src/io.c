@@ -5,6 +5,7 @@
 #include "free.h"
 #include "hmm.h"
 #include "imm/abc.h"
+#include "imm/abc_types.h"
 #include "imm/hmm.h"
 #include "imm/mute_state.h"
 #include "imm/normal_state.h"
@@ -17,6 +18,10 @@
 #include "normal_state.h"
 #include "seq_code.h"
 #include <stdlib.h>
+
+static struct imm_abc const* read_abc(FILE* stream, uint8_t type_id);
+
+static struct imm_io_vtable const vtable = {read_abc};
 
 int imm_io_write(FILE* stream, struct imm_hmm const* hmm, struct imm_dp const* dp)
 {
@@ -45,6 +50,7 @@ struct imm_io const* imm_io_read(FILE* stream)
     io->emission = NULL;
     io->trans_table = NULL;
     io->state_table = NULL;
+    io->vtable = vtable;
 
     if (hmm_read(stream, io)) {
         imm_error("could not read hmm");
@@ -105,20 +111,32 @@ struct imm_hmm* imm_io_hmm(struct imm_io const* io) { return io->hmm; }
 
 struct imm_dp const* imm_io_dp(struct imm_io const* io) { return io->dp; }
 
-int imm_io_read_abc(struct imm_io* io, FILE* stream)
+int io_read_abc(struct imm_io* io, FILE* stream)
 {
-    /* TODO: check type_id */
     uint8_t type_id = 0;
     if (fread(&type_id, sizeof(type_id), 1, stream) < 1) {
         imm_error("could not read type_id");
         return 1;
     }
 
-    if (!(io->abc = imm_abc_read(stream))) {
-        imm_error("could not read abc");
-        return 1;
+    io->abc = io->vtable.read_abc(stream, type_id);
+
+    return !io->abc;
+}
+
+static struct imm_abc const* read_abc(FILE* stream, uint8_t type_id)
+{
+    if (type_id != IMM_ABC_TYPE_ID) {
+        imm_error("unknown abc type_id");
+        return NULL;
     }
-    return 0;
+
+    struct imm_abc const* abc = imm_abc_read(stream);
+    if (!abc) {
+        imm_error("could not read abc");
+        return abc;
+    }
+    return abc;
 }
 
 int imm_io_write_abc(struct imm_io const* io, struct imm_abc const* abc, FILE* stream)

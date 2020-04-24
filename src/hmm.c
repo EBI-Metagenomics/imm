@@ -342,7 +342,7 @@ int hmm_read(FILE* stream, struct imm_io* io)
     struct imm_hmm* hmm = NULL;
     io->mstates = NULL;
 
-    if (imm_io_read_abc(io, stream)) {
+    if (io_read_abc(io, stream)) {
         imm_error("could not read abc");
         goto err;
     }

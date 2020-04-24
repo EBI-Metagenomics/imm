@@ -1,6 +1,7 @@
 #ifndef IO_H
 #define IO_H
 
+#include "imm/io.h"
 #include <inttypes.h>
 
 struct dp_emission;
@@ -22,6 +23,9 @@ struct imm_io
     struct dp_trans_table const* trans_table;
     struct dp_state_table const* state_table;
     struct imm_dp const*         dp;
+    struct imm_io_vtable         vtable;
 };
+
+int io_read_abc(struct imm_io* io, FILE* stream);
 
 #endif
