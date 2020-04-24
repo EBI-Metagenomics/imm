@@ -100,15 +100,21 @@ int __imm_abc_write_parent(struct imm_abc const* abc, FILE* stream)
                               .symbols = (char*)abc->symbols,
                               .any_symbol = abc->any_symbol};
 
-    if (fwrite(&chunk.nsymbols, sizeof(chunk.nsymbols), 1, stream) < 1)
+    if (fwrite(&chunk.nsymbols, sizeof(chunk.nsymbols), 1, stream) < 1) {
+        imm_error("could not write nsymbols");
         return 1;
+    }
 
     if (fwrite(chunk.symbols, sizeof(*chunk.symbols), chunk.nsymbols + 1, stream) <
-        chunk.nsymbols + 1)
+        chunk.nsymbols + 1) {
+        imm_error("could not write symbols");
         return 1;
+    }
 
-    if (fwrite(&chunk.any_symbol, sizeof(chunk.any_symbol), 1, stream) < 1)
+    if (fwrite(&chunk.any_symbol, sizeof(chunk.any_symbol), 1, stream) < 1) {
+        imm_error("could not write any_symbol");
         return 1;
+    }
 
     return 0;
 }

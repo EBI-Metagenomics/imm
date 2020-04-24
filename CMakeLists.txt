@@ -52,7 +52,6 @@ add_library(imm
     src/seq_code.c
     src/seq_table.c
     src/state.c
-    src/state_factory.c
     src/state_idx.c
     src/step.c
     src/table_state.c

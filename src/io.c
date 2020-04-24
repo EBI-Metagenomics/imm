@@ -13,6 +13,8 @@
 #include "imm/state_types.h"
 #include "io.h"
 #include "mstate.h"
+#include "mute_state.h"
+#include "normal_state.h"
 #include "seq_code.h"
 #include <stdlib.h>
 
@@ -93,10 +95,7 @@ void imm_io_destroy_states(struct imm_io const* io)
         imm_state_destroy(imm_io_state(io, i));
 }
 
-struct imm_state const* imm_io_state(struct imm_io const* io, uint32_t i)
-{
-    return io->states[i];
-}
+struct imm_state const* imm_io_state(struct imm_io const* io, uint32_t i) { return io->states[i]; }
 
 uint32_t imm_io_nstates(struct imm_io const* io) { return io->nstates; }
 
@@ -105,3 +104,55 @@ struct imm_abc const* imm_io_abc(struct imm_io const* io) { return io->abc; }
 struct imm_hmm* imm_io_hmm(struct imm_io const* io) { return io->hmm; }
 
 struct imm_dp const* imm_io_dp(struct imm_io const* io) { return io->dp; }
+
+int imm_io_read_abc(struct imm_io* io, FILE* stream)
+{
+    /* TODO: check type_id */
+    uint8_t type_id = 0;
+    if (fread(&type_id, sizeof(type_id), 1, stream) < 1) {
+        imm_error("could not read type_id");
+        return 1;
+    }
+
+    if (!(io->abc = imm_abc_read(stream))) {
+        imm_error("could not read abc");
+        return 1;
+    }
+    return 0;
+}
+
+int imm_io_write_abc(struct imm_io const* io, struct imm_abc const* abc, FILE* stream)
+{
+    uint8_t type_id = imm_abc_type_id(abc);
+    if (fwrite(&type_id, sizeof(type_id), 1, stream) < 1) {
+        imm_error("could not write type_id");
+        return 1;
+    }
+
+    if (imm_abc_write(abc, stream)) {
+        imm_error("could not write abc");
+        return 1;
+    }
+    return 0;
+}
+
+/* TODO: consider not exporting it */
+struct imm_state const* __imm_io_read_state(FILE* stream, uint8_t type_id,
+                                            struct imm_abc const* abc)
+{
+    struct imm_state const* state = NULL;
+
+    switch (type_id) {
+    case IMM_MUTE_STATE_TYPE_ID:
+        if (!(state = mute_state_read(stream, abc)))
+            imm_error("could not read mute_state");
+        break;
+    case IMM_NORMAL_STATE_TYPE_ID:
+        if (!(state = normal_state_read(stream, abc)))
+            imm_error("could not read normal_state");
+        break;
+    default:
+        imm_error("unknown type_id");
+    }
+    return state;
+}

@@ -290,7 +290,8 @@ int imm_hmm_normalize_trans(struct imm_hmm* hmm, struct imm_state const* src)
 
 int hmm_write(struct imm_hmm const* hmm, struct imm_dp const* dp, FILE* stream)
 {
-    if (imm_abc_write(hmm->abc, stream)) {
+    /* TODO: pass io, not NULL */
+    if (imm_io_write_abc(NULL, hmm->abc, stream)) {
         imm_error("could not write abc");
         return 1;
     }
@@ -341,7 +342,7 @@ int hmm_read(FILE* stream, struct imm_io* io)
     struct imm_hmm* hmm = NULL;
     io->mstates = NULL;
 
-    if (!(io->abc = imm_abc_read(stream))) {
+    if (imm_io_read_abc(io, stream)) {
         imm_error("could not read abc");
         goto err;
     }
