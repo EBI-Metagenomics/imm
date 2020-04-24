@@ -81,12 +81,12 @@ void test_perf_viterbi(void)
                           log(0.2));
 
         if (i > 0) {
-            imm_hmm_set_trans(hmm, imm_normal_state_parent(M[i - 1]),
-                              imm_normal_state_parent(M[i]), log(0.2));
+            imm_hmm_set_trans(hmm, imm_normal_state_parent(M[i - 1]), imm_normal_state_parent(M[i]),
+                              log(0.2));
             imm_hmm_set_trans(hmm, imm_mute_state_parent(D[i - 1]), imm_normal_state_parent(M[i]),
                               log(0.2));
-            imm_hmm_set_trans(hmm, imm_normal_state_parent(I[i - 1]),
-                              imm_normal_state_parent(M[i]), log(0.2));
+            imm_hmm_set_trans(hmm, imm_normal_state_parent(I[i - 1]), imm_normal_state_parent(M[i]),
+                              log(0.2));
 
             imm_hmm_set_trans(hmm, imm_normal_state_parent(M[i - 1]), imm_mute_state_parent(D[i]),
                               log(0.2));
@@ -460,9 +460,10 @@ void test_perf_viterbi(void)
     cass_close(score, -65826.0106185297);
     imm_results_destroy(results);
 
-    FILE* file = fopen(TMP_FOLDER "/perf.imm", "w");
+    struct imm_io const* io = imm_io_create(hmm, dp);
+    FILE*                file = fopen(TMP_FOLDER "/perf.imm", "w");
     cass_cond(file != NULL);
-    cass_equal_int(imm_io_write(file, hmm, dp), 0);
+    cass_equal_int(imm_io_write(io, file), 0);
     fclose(file);
 
 #if 0
@@ -553,7 +554,7 @@ void test_perf_viterbi(void)
 
     file = fopen(TMP_FOLDER "/perf.imm", "r");
     cass_cond(file != NULL);
-    struct imm_io const* io = imm_io_read(file);
+    io = imm_io_read(file);
     cass_cond(io != NULL);
     fclose(file);
 

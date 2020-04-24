@@ -28,7 +28,8 @@ void test_hmm_write_io_two_states(void)
     imm_hmm_add_state(hmm, imm_mute_state_parent(state0), log(0.5));
     imm_hmm_set_start(hmm, imm_mute_state_parent(state0), log(0.1));
     imm_hmm_add_state(hmm, imm_normal_state_parent(state1), log(0.001));
-    imm_hmm_set_trans(hmm, imm_mute_state_parent(state0), imm_normal_state_parent(state1), log(0.9));
+    imm_hmm_set_trans(hmm, imm_mute_state_parent(state0), imm_normal_state_parent(state1),
+                      log(0.9));
 
     struct imm_dp const* dp = imm_hmm_create_dp(hmm, imm_normal_state_parent(state1));
 
@@ -41,9 +42,10 @@ void test_hmm_write_io_two_states(void)
     cass_close(imm_hmm_likelihood(hmm, C, path), log(0.25) + log(0.1) + log(0.9));
     imm_results_destroy(results);
 
-    FILE* file = fopen(TMP_FOLDER "/two_states.imm", "w");
+    struct imm_io const* io = imm_io_create(hmm, dp);
+    FILE*                file = fopen(TMP_FOLDER "/two_states.imm", "w");
     cass_cond(file != NULL);
-    cass_equal_int(imm_io_write(file, hmm, dp), 0);
+    cass_equal_int(imm_io_write(io, file), 0);
     fclose(file);
 
     imm_dp_destroy(dp);
@@ -55,7 +57,7 @@ void test_hmm_write_io_two_states(void)
 
     file = fopen(TMP_FOLDER "/two_states.imm", "r");
     cass_cond(file != NULL);
-    struct imm_io const* io = imm_io_read(file);
+    io = imm_io_read(file);
     cass_cond(io != NULL);
     fclose(file);
 

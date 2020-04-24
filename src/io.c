@@ -1,6 +1,7 @@
 #include "imm/io.h"
 #include "dp.h"
 #include "dp_emission.h"
+#include "dp_state_table.h"
 #include "dp_trans_table.h"
 #include "free.h"
 #include "hmm.h"
@@ -19,18 +20,48 @@
 #include "seq_code.h"
 #include <stdlib.h>
 
+static int write_abc(struct imm_abc const* abc, FILE* stream, uint8_t type_id);
+static int write_abc_chunk(struct imm_io const* io, struct imm_abc const* abc, FILE* stream);
 static struct imm_abc const* read_abc(FILE* stream, uint8_t type_id);
 
-static struct imm_io_vtable const vtable = {read_abc};
+static struct imm_io_vtable const vtable = {read_abc, write_abc};
 
-int imm_io_write(FILE* stream, struct imm_hmm const* hmm, struct imm_dp const* dp)
+struct imm_io const* imm_io_create(struct imm_hmm* hmm, struct imm_dp const* dp)
 {
-    if (hmm_write(hmm, dp, stream)) {
+    struct imm_io* io = malloc(sizeof(*io));
+
+    io->abc = hmm_abc(hmm);
+    io->hmm = hmm;
+    io->mstates = dp_get_mstates(dp);
+
+    io->nstates = dp_state_table_nstates(dp_get_state_table(dp));
+    io->states = malloc(sizeof(*io->states) * io->nstates);
+    for (uint32_t i = 0; i < io->nstates; ++i)
+        io->states[i] = io->mstates[i]->state;
+
+    io->seq_code = dp_get_seq_code(dp);
+    io->emission = dp_get_emission(dp);
+    io->trans_table = dp_get_trans_table(dp);
+    io->state_table = dp_get_state_table(dp);
+    io->dp = dp;
+    io->vtable = vtable;
+
+    return io;
+}
+
+int imm_io_write(struct imm_io const* io, FILE* stream)
+{
+    if (write_abc_chunk(io, io->abc, stream)) {
+        imm_error("could not write abc");
+        return 1;
+    }
+
+    if (hmm_write(io->dp, stream)) {
         imm_error("could not write hmm");
         return 1;
     }
 
-    if (dp_write(dp, stream)) {
+    if (dp_write(io->dp, stream)) {
         imm_error("could not write dp");
         return 1;
     }
@@ -124,39 +155,7 @@ int io_read_abc(struct imm_io* io, FILE* stream)
     return !io->abc;
 }
 
-static struct imm_abc const* read_abc(FILE* stream, uint8_t type_id)
-{
-    if (type_id != IMM_ABC_TYPE_ID) {
-        imm_error("unknown abc type_id");
-        return NULL;
-    }
-
-    struct imm_abc const* abc = imm_abc_read(stream);
-    if (!abc) {
-        imm_error("could not read abc");
-        return abc;
-    }
-    return abc;
-}
-
-int imm_io_write_abc(struct imm_io const* io, struct imm_abc const* abc, FILE* stream)
-{
-    uint8_t type_id = imm_abc_type_id(abc);
-    if (fwrite(&type_id, sizeof(type_id), 1, stream) < 1) {
-        imm_error("could not write type_id");
-        return 1;
-    }
-
-    if (imm_abc_write(abc, stream)) {
-        imm_error("could not write abc");
-        return 1;
-    }
-    return 0;
-}
-
-/* TODO: consider not exporting it */
-struct imm_state const* __imm_io_read_state(FILE* stream, uint8_t type_id,
-                                            struct imm_abc const* abc)
+struct imm_state const* io_read_state(FILE* stream, uint8_t type_id, struct imm_abc const* abc)
 {
     struct imm_state const* state = NULL;
 
@@ -173,4 +172,48 @@ struct imm_state const* __imm_io_read_state(FILE* stream, uint8_t type_id,
         imm_error("unknown type_id");
     }
     return state;
+}
+
+static int write_abc(struct imm_abc const* abc, FILE* stream, uint8_t type_id)
+{
+    if (type_id != IMM_ABC_TYPE_ID) {
+        imm_error("unknown abc type_id");
+        return 1;
+    }
+
+    if (imm_abc_write(abc, stream)) {
+        imm_error("could not write abc");
+        return 1;
+    }
+    return 0;
+}
+
+static int write_abc_chunk(struct imm_io const* io, struct imm_abc const* abc, FILE* stream)
+{
+    uint8_t type_id = imm_abc_type_id(abc);
+    if (fwrite(&type_id, sizeof(type_id), 1, stream) < 1) {
+        imm_error("could not write type_id");
+        return 1;
+    }
+
+    if (io->vtable.write_abc(abc, stream, type_id)) {
+        imm_error("could not write abc");
+        return 1;
+    }
+    return 0;
+}
+
+static struct imm_abc const* read_abc(FILE* stream, uint8_t type_id)
+{
+    if (type_id != IMM_ABC_TYPE_ID) {
+        imm_error("unknown abc type_id");
+        return NULL;
+    }
+
+    struct imm_abc const* abc = imm_abc_read(stream);
+    if (!abc) {
+        imm_error("could not read abc");
+        return abc;
+    }
+    return abc;
 }

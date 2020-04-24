@@ -91,7 +91,7 @@ struct mstate** mstate_read_states(FILE* stream, uint32_t* nstates, struct imm_a
             goto err;
         }
 
-        struct imm_state const* state = __imm_io_read_state(stream, chunk.type_id, abc);
+        struct imm_state const* state = io_read_state(stream, chunk.type_id, abc);
         if (!state) {
             imm_error("could not read state");
             goto err;

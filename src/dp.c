@@ -40,8 +40,8 @@ struct imm_dp
 };
 
 static void     finish_creation(struct imm_dp* dp);
-static double   viterbi(struct imm_dp const* dp, struct dp_matrix* matrix,
-                        struct eseq const* eseq, struct imm_path* path);
+static double   viterbi(struct imm_dp const* dp, struct dp_matrix* matrix, struct eseq const* eseq,
+                        struct imm_path* path);
 static double   best_trans_score(struct imm_dp const* dp, struct dp_matrix const* matrix,
                                  unsigned target_state, unsigned row, struct dp_step* prev_step);
 static double   final_score(struct imm_dp const* dp, struct dp_matrix const* matrix,
@@ -75,8 +75,7 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
         return NULL;
     }
 
-    struct imm_state const* end_state =
-        mstate_get_state(dp->mstates[dp->state_table->end_state]);
+    struct imm_state const* end_state = mstate_get_state(dp->mstates[dp->state_table->end_state]);
     if (imm_seq_length(seq) < imm_state_min_seq(end_state)) {
         imm_error("sequence is shorter than end_state's lower bound");
         return NULL;
@@ -218,8 +217,7 @@ int dp_write(struct imm_dp const* dp, FILE* stream)
         return 1;
     }
 
-    if (dp_trans_table_write(dp->trans_table, dp_state_table_nstates(dp->state_table),
-                             stream)) {
+    if (dp_trans_table_write(dp->trans_table, dp_state_table_nstates(dp->state_table), stream)) {
         imm_error("could not write dp_trans_table");
         return 1;
     }
@@ -259,15 +257,9 @@ int dp_read(FILE* stream, struct imm_io* io)
 
 struct mstate const* const* dp_get_mstates(struct imm_dp const* dp) { return dp->mstates; }
 
-struct dp_state_table const* dp_get_state_table(struct imm_dp const* dp)
-{
-    return dp->state_table;
-}
+struct dp_state_table const* dp_get_state_table(struct imm_dp const* dp) { return dp->state_table; }
 
-struct dp_trans_table const* dp_get_trans_table(struct imm_dp const* dp)
-{
-    return dp->trans_table;
-}
+struct dp_trans_table const* dp_get_trans_table(struct imm_dp const* dp) { return dp->trans_table; }
 
 static void finish_creation(struct imm_dp* dp)
 {
@@ -283,8 +275,10 @@ static void finish_creation(struct imm_dp* dp)
 
 struct dp_emission const* dp_get_emission(struct imm_dp const* dp) { return dp->emission; }
 
-static double viterbi(struct imm_dp const* dp, struct dp_matrix* matrix,
-                      struct eseq const* eseq, struct imm_path* path)
+struct seq_code const* dp_get_seq_code(struct imm_dp const* dp) { return dp->seq_code; }
+
+static double viterbi(struct imm_dp const* dp, struct dp_matrix* matrix, struct eseq const* eseq,
+                      struct imm_path* path)
 {
     unsigned seq_len = eseq_length(eseq);
 
@@ -401,8 +395,7 @@ static double final_score(struct imm_dp const* dp, struct dp_matrix const* matri
 
     unsigned length = eseq_length(eseq);
 
-    for (unsigned len = MIN(dp_state_table_max_seq(dp->state_table, end_state), length);;
-         --len) {
+    for (unsigned len = MIN(dp_state_table_max_seq(dp->state_table, end_state), length);; --len) {
 
         step.seq_len = len;
         double s = dp_matrix_get_score(matrix, length - len, step);

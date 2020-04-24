@@ -29,8 +29,8 @@ struct imm_hmm
     struct mstate_table*  table;
 };
 
-static double hmm_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state);
-static int    hmm_normalize_trans(struct mstate* mstate);
+static double get_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state);
+static int    normalize_transitions(struct mstate* mstate);
 static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct mstate* const* const mstates);
 
 struct imm_hmm* imm_hmm_create(struct imm_abc const* abc)
@@ -41,7 +41,7 @@ struct imm_hmm* imm_hmm_create(struct imm_abc const* abc)
     return hmm;
 }
 
-void imm_hmm_destroy(struct imm_hmm* hmm)
+void imm_hmm_destroy(struct imm_hmm const* hmm)
 {
     mstate_table_destroy(hmm->table);
     free_c(hmm);
@@ -168,7 +168,7 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
     unsigned start = 0;
     IMM_SUBSEQ(subseq, seq, start, step_len);
 
-    double lprob = hmm_start_lprob(hmm, state) + imm_state_lprob(state, imm_subseq_cast(&subseq));
+    double lprob = get_start_lprob(hmm, state) + imm_state_lprob(state, imm_subseq_cast(&subseq));
 
     struct imm_state const* prev_state = NULL;
 
@@ -236,7 +236,7 @@ int imm_hmm_normalize(struct imm_hmm* hmm)
     mstate_table_for_each (i, hmm->table) {
         if (mstate_table_exist(hmm->table, i)) {
 
-            if (hmm_normalize_trans(mstate_table_get(hmm->table, i)))
+            if (normalize_transitions(mstate_table_get(hmm->table, i)))
                 return 1;
         }
     }
@@ -285,17 +285,13 @@ int imm_hmm_normalize_trans(struct imm_hmm* hmm, struct imm_state const* src)
         imm_error("source state not found");
         return 1;
     }
-    return hmm_normalize_trans(mstate_table_get(hmm->table, i));
+    return normalize_transitions(mstate_table_get(hmm->table, i));
 }
 
-int hmm_write(struct imm_hmm const* hmm, struct imm_dp const* dp, FILE* stream)
-{
-    /* TODO: pass io, not NULL */
-    if (imm_io_write_abc(NULL, hmm->abc, stream)) {
-        imm_error("could not write abc");
-        return 1;
-    }
+struct imm_abc const* hmm_abc(struct imm_hmm const* hmm) { return hmm->abc; }
 
+int hmm_write(struct imm_dp const* dp, FILE* stream)
+{
     struct dp_state_table const* state_tbl = dp_get_state_table(dp);
     if (mstate_write_states(stream, dp_get_mstates(dp), dp_state_table_nstates(state_tbl))) {
         imm_error("could not write states");
@@ -380,6 +376,52 @@ err:
     return 1;
 }
 
+static double get_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state)
+{
+    unsigned long i = mstate_table_find(hmm->table, state);
+    if (i == mstate_table_end(hmm->table)) {
+        imm_error("state not found");
+        return imm_lprob_invalid();
+    }
+    return mstate_get_start(mstate_table_get(hmm->table, i));
+}
+
+static int normalize_transitions(struct mstate* mstate)
+{
+    struct mtrans_table* table = mstate_get_mtrans_table(mstate);
+    unsigned             size = mtrans_table_size(table);
+    if (size == 0)
+        return 0;
+
+    double* lprobs = malloc(sizeof(double) * (size_t)size);
+    double* lprob = lprobs;
+
+    unsigned long i = 0;
+    mtrans_table_for_each (i, table) {
+        if (mtrans_table_exist(table, i)) {
+            *lprob = mtrans_get_lprob(mtrans_table_get(table, i));
+            ++lprob;
+        }
+    }
+
+    if (imm_lprob_normalize(lprobs, size)) {
+        imm_error("could not normalize transitions");
+        free_c(lprobs);
+        return 1;
+    }
+
+    lprob = lprobs;
+    mtrans_table_for_each (i, table) {
+        if (mtrans_table_exist(table, i)) {
+            mtrans_set_lprob(mtrans_table_get(table, i), *lprob);
+            ++lprob;
+        }
+    }
+    free_c(lprobs);
+
+    return 0;
+}
+
 static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct mstate* const* const mstates)
 {
     uint32_t ntrans = 0;
@@ -414,52 +456,6 @@ static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct mstate* co
         struct imm_state const* tgt = mstate_get_state(mstates[tgt_state]);
         mtrans_table_add(tbl, mtrans_create(tgt, lprob));
     }
-
-    return 0;
-}
-
-static double hmm_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state)
-{
-    unsigned long i = mstate_table_find(hmm->table, state);
-    if (i == mstate_table_end(hmm->table)) {
-        imm_error("state not found");
-        return imm_lprob_invalid();
-    }
-    return mstate_get_start(mstate_table_get(hmm->table, i));
-}
-
-static int hmm_normalize_trans(struct mstate* mstate)
-{
-    struct mtrans_table* table = mstate_get_mtrans_table(mstate);
-    unsigned             size = mtrans_table_size(table);
-    if (size == 0)
-        return 0;
-
-    double* lprobs = malloc(sizeof(double) * (size_t)size);
-    double* lprob = lprobs;
-
-    unsigned long i = 0;
-    mtrans_table_for_each (i, table) {
-        if (mtrans_table_exist(table, i)) {
-            *lprob = mtrans_get_lprob(mtrans_table_get(table, i));
-            ++lprob;
-        }
-    }
-
-    if (imm_lprob_normalize(lprobs, size)) {
-        imm_error("could not normalize transitions");
-        free_c(lprobs);
-        return 1;
-    }
-
-    lprob = lprobs;
-    mtrans_table_for_each (i, table) {
-        if (mtrans_table_exist(table, i)) {
-            mtrans_set_lprob(mtrans_table_get(table, i), *lprob);
-            ++lprob;
-        }
-    }
-    free_c(lprobs);
 
     return 0;
 }
