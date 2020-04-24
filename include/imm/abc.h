@@ -6,6 +6,7 @@
 #include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 
 #define IMM_ABC_INVALID_IDX UINT8_MAX
 
@@ -30,12 +31,14 @@ enum imm_symbol_type
 struct imm_abc;
 
 typedef uint8_t (*imm_abc_type_id_t)(struct imm_abc const* abc);
+typedef int (*imm_abc_write_t)(struct imm_abc const* abc, FILE* stream);
 typedef void (*imm_abc_destroy_t)(struct imm_abc const* abc);
 typedef struct imm_abc const* (*imm_abc_clone_t)(struct imm_abc const* abc);
 
 struct imm_abc_vtable
 {
     imm_abc_type_id_t type_id;
+    imm_abc_write_t   write;
     imm_abc_destroy_t destroy;
     imm_abc_clone_t   clone;
 };
@@ -68,24 +71,37 @@ IMM_EXPORT struct imm_abc const* __imm_abc_clone_parent(struct imm_abc const* ab
 IMM_EXPORT void                  imm_abc_destroy(struct imm_abc const* abc);
 static inline uint8_t            imm_abc_length(struct imm_abc const* abc) { return abc->length; }
 static inline char const*        imm_abc_symbols(struct imm_abc const* abc) { return abc->symbols; }
-static inline bool               imm_abc_has_symbol(struct imm_abc const* abc, char symbol_id)
+IMM_EXPORT int                   imm_abc_write(struct imm_abc const* abc, FILE* stream);
+IMM_EXPORT int                   __imm_abc_write_parent(struct imm_abc const* abc, FILE* stream);
+IMM_EXPORT struct imm_abc const* imm_abc_read(FILE* stream);
+IMM_EXPORT struct imm_abc const* __imm_abc_read_parent(FILE* stream);
+
+static inline bool imm_abc_has_symbol(struct imm_abc const* abc, char symbol_id)
 {
     if (symbol_id < IMM_FIRST_CHAR || symbol_id > IMM_LAST_CHAR)
         return false;
 
     return abc->symbol_idx[__imm_abc_index(symbol_id)] != IMM_ABC_INVALID_IDX;
 }
+
 static inline uint8_t imm_abc_symbol_idx(struct imm_abc const* abc, char symbol_id)
 {
     return abc->symbol_idx[__imm_abc_index(symbol_id)];
 }
+
 static inline char imm_abc_symbol_id(struct imm_abc const* abc, uint8_t symbol_idx)
 {
     return abc->symbols[symbol_idx];
 }
+
+static inline uint8_t imm_abc_type_id(struct imm_abc const* abc)
+{
+    return abc->vtable.type_id(abc);
+}
+
 static inline char imm_abc_any_symbol(struct imm_abc const* abc) { return abc->any_symbol; }
 IMM_EXPORT enum imm_symbol_type imm_abc_symbol_type(struct imm_abc const* abc, char symbol_id);
 
-static inline void const* imm_abc_child(struct imm_abc const* abc) { return abc->child; }
+static inline void const* __imm_abc_child(struct imm_abc const* abc) { return abc->child; }
 
 #endif

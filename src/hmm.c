@@ -1,5 +1,4 @@
 #include "imm/hmm.h"
-#include "abc.h"
 #include "dp.h"
 #include "dp_state_table.h"
 #include "dp_trans_table.h"
@@ -32,8 +31,7 @@ struct imm_hmm
 
 static double hmm_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state);
 static int    hmm_normalize_trans(struct mstate* mstate);
-static int    read_transitions(FILE* stream, struct imm_hmm* hmm,
-                               struct mstate* const* const mstates);
+static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct mstate* const* const mstates);
 
 struct imm_hmm* imm_hmm_create(struct imm_abc const* abc)
 {
@@ -137,9 +135,8 @@ double imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* src_
         return imm_lprob_invalid();
     }
 
-    struct mtrans_table const* table =
-        mstate_get_mtrans_table(mstate_table_get(hmm->table, src));
-    unsigned long i = mtrans_table_find(table, tgt_state);
+    struct mtrans_table const* table = mstate_get_mtrans_table(mstate_table_get(hmm->table, src));
+    unsigned long              i = mtrans_table_find(table, tgt_state);
 
     if (i == mtrans_table_end(table))
         return imm_lprob_zero();
@@ -171,8 +168,7 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
     unsigned start = 0;
     IMM_SUBSEQ(subseq, seq, start, step_len);
 
-    double lprob =
-        hmm_start_lprob(hmm, state) + imm_state_lprob(state, imm_subseq_cast(&subseq));
+    double lprob = hmm_start_lprob(hmm, state) + imm_state_lprob(state, imm_subseq_cast(&subseq));
 
     struct imm_state const* prev_state = NULL;
 
@@ -213,8 +209,7 @@ invalid:
     return imm_lprob_invalid();
 }
 
-struct imm_dp const* imm_hmm_create_dp(struct imm_hmm const*   hmm,
-                                       struct imm_state const* end_state)
+struct imm_dp const* imm_hmm_create_dp(struct imm_hmm const* hmm, struct imm_state const* end_state)
 {
     unsigned long end = mstate_table_find(hmm->table, end_state);
     if (end == mstate_table_end(hmm->table)) {
@@ -295,7 +290,7 @@ int imm_hmm_normalize_trans(struct imm_hmm* hmm, struct imm_state const* src)
 
 int hmm_write(struct imm_hmm const* hmm, struct imm_dp const* dp, FILE* stream)
 {
-    if (abc_write(stream, hmm->abc)) {
+    if (imm_abc_write(hmm->abc, stream)) {
         imm_error("could not write abc");
         return 1;
     }
@@ -346,7 +341,7 @@ int hmm_read(FILE* stream, struct imm_io* io)
     struct imm_hmm* hmm = NULL;
     io->mstates = NULL;
 
-    if (!(io->abc = abc_read(stream))) {
+    if (!(io->abc = imm_abc_read(stream))) {
         imm_error("could not read abc");
         goto err;
     }
@@ -384,8 +379,7 @@ err:
     return 1;
 }
 
-static int read_transitions(FILE* stream, struct imm_hmm* hmm,
-                            struct mstate* const* const mstates)
+static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct mstate* const* const mstates)
 {
     uint32_t ntrans = 0;
 

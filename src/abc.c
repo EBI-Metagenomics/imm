@@ -1,5 +1,4 @@
 #include "imm/abc.h"
-#include "abc.h"
 #include "cast.h"
 #include "free.h"
 #include "imm/abc_types.h"
@@ -15,9 +14,10 @@ struct abc_chunk
 };
 
 static uint8_t               abc_type_id(struct imm_abc const* abc);
+static int                   abc_write(struct imm_abc const* abc, FILE* stream);
 static struct imm_abc const* abc_clone(struct imm_abc const* abc);
 
-static struct imm_abc_vtable const __vtable = {abc_type_id, NULL, abc_clone};
+static struct imm_abc_vtable const __vtable = {abc_type_id, abc_write, NULL, abc_clone};
 
 struct imm_abc const* imm_abc_create(char const* symbols, char const any_symbol)
 {
@@ -89,7 +89,12 @@ void imm_abc_destroy(struct imm_abc const* abc)
     __imm_abc_destroy_parent(abc);
 }
 
-int abc_write(FILE* stream, struct imm_abc const* abc)
+int imm_abc_write(struct imm_abc const* abc, FILE* stream)
+{
+    return abc->vtable.write(abc, stream);
+}
+
+int __imm_abc_write_parent(struct imm_abc const* abc, FILE* stream)
 {
     struct abc_chunk chunk = {.nsymbols = cast_u8_zu(strlen(abc->symbols)),
                               .symbols = (char*)abc->symbols,
@@ -108,7 +113,9 @@ int abc_write(FILE* stream, struct imm_abc const* abc)
     return 0;
 }
 
-struct imm_abc const* abc_read(FILE* stream)
+struct imm_abc const* imm_abc_read(FILE* stream) { return __imm_abc_read_parent(stream); }
+
+struct imm_abc const* __imm_abc_read_parent(FILE* stream)
 {
     struct abc_chunk chunk = {.nsymbols = 0, .symbols = NULL, .any_symbol = '\0'};
 
@@ -159,6 +166,11 @@ enum imm_symbol_type imm_abc_symbol_type(struct imm_abc const* abc, char symbol_
 }
 
 static uint8_t abc_type_id(struct imm_abc const* abc) { return IMM_ABC_TYPE_ID; }
+
+static int abc_write(struct imm_abc const* abc, FILE* stream)
+{
+    return __imm_abc_write_parent(abc, stream);
+}
 
 static struct imm_abc const* abc_clone(struct imm_abc const* abc)
 {

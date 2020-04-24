@@ -1,4 +1,3 @@
-#include "state_factory.h"
 #include "mstate.h"
 #include "cast.h"
 #include "free.h"
@@ -7,6 +6,7 @@
 #include "mtrans.h"
 #include "mtrans_table.h"
 #include "state.h"
+#include "state_factory.h"
 #include <limits.h>
 #include <math.h>
 #include <string.h>
@@ -92,6 +92,7 @@ struct mstate** mstate_read_states(FILE* stream, uint32_t* nstates, struct imm_a
         }
 
         struct imm_state const* state = state_factory_read(stream, chunk.type_id, abc);
+        /* TODO: clean-up */
         /* if (state_factory_read(stream, state)) { */
         /*     imm_error("could not state_factory_read"); */
         /*     return NULL; */
