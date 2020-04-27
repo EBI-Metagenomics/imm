@@ -1,5 +1,5 @@
-#ifndef IMM_KHASH_PTR_H
-#define IMM_KHASH_PTR_H
+#ifndef KHASH_PTR_H
+#define KHASH_PTR_H
 
 #include "khash.h"
 #include <assert.h>
@@ -29,7 +29,7 @@
 /* Source: http://graphics.stanford.edu/~seander/bithacks.html#BitReverseObvious */
 static kh_inline uint64_t reverse_bits(uint64_t v)
 {
-    unsigned long r = v; // r will be reversed bits of v; first get LSB of v
+    unsigned long r = v;                        // r will be reversed bits of v; first get LSB of v
     int           s = sizeof(v) * CHAR_BIT - 1; // extra shift needed at end
 
     for (v >>= 1; v; v >>= 1) {
@@ -49,7 +49,7 @@ static kh_inline khint_t ptr_hash_func(void const* ptr)
 
 #define ptr_hash_equal(a, b) ((a) == (b))
 
-#define KHASH_MAP_INIT_PTR(name, khval_t)                                                     \
+#define KHASH_MAP_INIT_PTR(name, khval_t)                                                          \
     KHASH_INIT(name, void const*, khval_t, 1, ptr_hash_func, ptr_hash_equal)
 
 #endif
