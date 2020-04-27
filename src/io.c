@@ -37,7 +37,7 @@ struct mstates_chunk
 };
 
 static struct imm_abc const* read_abc(FILE* stream, uint8_t type_id);
-static int                   read_abc_chunk(struct imm_io* io, FILE* stream);
+static int                   read_abc_chunk(FILE* stream, struct imm_io* io);
 static int                   read_hmm(FILE* stream, struct imm_io* io);
 static struct mstate** read_mstates(FILE* stream, uint32_t* nstates, struct imm_abc const* abc);
 static struct imm_state const* read_state(FILE* stream, uint8_t type_id, struct imm_abc const* abc);
@@ -183,7 +183,7 @@ static struct imm_abc const* read_abc(FILE* stream, uint8_t type_id)
     return abc;
 }
 
-static int read_abc_chunk(struct imm_io* io, FILE* stream)
+static int read_abc_chunk(FILE* stream, struct imm_io* io)
 {
     uint8_t type_id = 0;
     if (fread(&type_id, sizeof(type_id), 1, stream) < 1) {
@@ -201,7 +201,7 @@ static int read_hmm(FILE* stream, struct imm_io* io)
     struct imm_hmm* hmm = NULL;
     io->mstates = NULL;
 
-    if (read_abc_chunk(io, stream)) {
+    if (read_abc_chunk(stream, io)) {
         imm_error("could not read abc");
         goto err;
     }
