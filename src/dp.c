@@ -205,31 +205,6 @@ void dp_create_from_io(struct imm_io* io)
     io->dp = dp;
 }
 
-int dp_write(struct imm_dp const* dp, FILE* stream)
-{
-    if (seq_code_write(dp->seq_code, stream)) {
-        imm_error("could not write seq_code");
-        return 1;
-    }
-
-    if (dp_emission_write(dp->emission, dp_state_table_nstates(dp->state_table), stream)) {
-        imm_error("could not write dp_emission");
-        return 1;
-    }
-
-    if (dp_trans_table_write(dp->trans_table, dp_state_table_nstates(dp->state_table), stream)) {
-        imm_error("could not write dp_trans_table");
-        return 1;
-    }
-
-    if (dp_state_table_write(dp->state_table, stream)) {
-        imm_error("could not write dp_state_table");
-        return 1;
-    }
-
-    return 0;
-}
-
 int dp_read(FILE* stream, struct imm_io* io)
 {
     if (!(io->seq_code = seq_code_read(stream, io->abc))) {

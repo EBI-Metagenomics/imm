@@ -26,7 +26,4 @@ struct imm_io
     struct imm_io_vtable         vtable;
 };
 
-int                     io_read_abc(struct imm_io* io, FILE* stream);
-struct imm_state const* io_read_state(FILE* stream, uint8_t type_id, struct imm_abc const* abc);
-
 #endif

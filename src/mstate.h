@@ -25,7 +25,5 @@ static inline struct imm_state const* mstate_get_state(struct mstate const* msta
 double               mstate_get_start(struct mstate const* mstate);
 void                 mstate_set_start(struct mstate* mstate, double lprob);
 struct mtrans_table* mstate_get_mtrans_table(struct mstate const* mstate);
-int mstate_write_states(FILE* stream, struct mstate const* const* mstates, uint32_t nstates);
-struct mstate** mstate_read_states(FILE* stream, uint32_t* nstates, struct imm_abc const* abc);
 
 #endif
