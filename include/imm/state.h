@@ -15,13 +15,15 @@
  */
 
 struct imm_abc;
+struct imm_io;
 struct imm_state;
 
 typedef uint8_t (*imm_state_type_id_t)(struct imm_state const* state);
 typedef double (*imm_state_lprob_t)(struct imm_state const* state, struct imm_seq const* seq);
 typedef unsigned (*imm_state_min_seq_t)(struct imm_state const* state);
 typedef unsigned (*imm_state_max_seq_t)(struct imm_state const* state);
-typedef int (*imm_state_write_t)(struct imm_state const* state, FILE* stream);
+typedef int (*imm_state_write_t)(struct imm_state const* state, struct imm_io const* io,
+                                 FILE* stream);
 typedef void (*imm_state_destroy_t)(struct imm_state const* state);
 
 struct imm_state_vtable

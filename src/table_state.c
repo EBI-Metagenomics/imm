@@ -17,8 +17,8 @@ static uint8_t  table_state_type_id(struct imm_state const* state);
 static double   table_state_lprob(struct imm_state const* state, struct imm_seq const* seq);
 static unsigned table_state_min_seq(struct imm_state const* state);
 static unsigned table_state_max_seq(struct imm_state const* state);
-static int      table_state_write(struct imm_state const* state, FILE* stream);
-static void     table_state_destroy(struct imm_state const* state);
+static int  table_state_write(struct imm_state const* state, struct imm_io const* io, FILE* stream);
+static void table_state_destroy(struct imm_state const* state);
 
 static struct imm_state_vtable const vtable = {table_state_type_id, table_state_lprob,
                                                table_state_min_seq, table_state_max_seq,
@@ -78,7 +78,7 @@ static unsigned table_state_max_seq(struct imm_state const* state)
     return imm_seq_table_max_seq(s->table);
 }
 
-static int table_state_write(struct imm_state const* state, FILE* stream)
+static int table_state_write(struct imm_state const* state, struct imm_io const* io, FILE* stream)
 {
     imm_die("table_state_write not implemented");
     return 0;

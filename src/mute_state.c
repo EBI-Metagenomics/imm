@@ -16,8 +16,8 @@ static uint8_t  mute_state_type_id(struct imm_state const* state);
 static double   mute_state_lprob(struct imm_state const* state, struct imm_seq const* seq);
 static unsigned mute_state_min_seq(struct imm_state const* state);
 static unsigned mute_state_max_seq(struct imm_state const* state);
-static int      mute_state_write(struct imm_state const* state, FILE* stream);
-static void     mute_state_destroy(struct imm_state const* state);
+static int  mute_state_write(struct imm_state const* state, struct imm_io const* io, FILE* stream);
+static void mute_state_destroy(struct imm_state const* state);
 
 static struct imm_state_vtable const vtable = {mute_state_type_id, mute_state_lprob,
                                                mute_state_min_seq, mute_state_max_seq,
@@ -65,7 +65,7 @@ static unsigned mute_state_min_seq(struct imm_state const* state) { return 0; }
 
 static unsigned mute_state_max_seq(struct imm_state const* state) { return 0; }
 
-static int mute_state_write(struct imm_state const* state, FILE* stream)
+static int mute_state_write(struct imm_state const* state, struct imm_io const* io, FILE* stream)
 {
     if (state_write_parent(state, stream))
         return 1;

@@ -26,8 +26,8 @@ static uint8_t  normal_state_type_id(struct imm_state const* state);
 static double   normal_state_lprob(struct imm_state const* state, struct imm_seq const* seq);
 static unsigned normal_state_min_seq(struct imm_state const* state);
 static unsigned normal_state_max_seq(struct imm_state const* state);
-static int      normal_state_write(struct imm_state const* state, FILE* stream);
-static void     normal_state_destroy(struct imm_state const* state);
+static int normal_state_write(struct imm_state const* state, struct imm_io const* io, FILE* stream);
+static void normal_state_destroy(struct imm_state const* state);
 
 static struct imm_state_vtable const vtable = {normal_state_type_id, normal_state_lprob,
                                                normal_state_min_seq, normal_state_max_seq,
@@ -88,7 +88,7 @@ static unsigned normal_state_min_seq(struct imm_state const* state) { return 1; 
 
 static unsigned normal_state_max_seq(struct imm_state const* state) { return 1; }
 
-static int normal_state_write(struct imm_state const* state, FILE* stream)
+static int normal_state_write(struct imm_state const* state, struct imm_io const* io, FILE* stream)
 {
     if (state_write_parent(state, stream))
         return 1;

@@ -45,8 +45,9 @@ static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct mstate* co
 static int write_abc(struct imm_io const* io, FILE* stream);
 static int write_dp(struct imm_io const* io, FILE* stream);
 static int write_hmm(struct imm_io const* io, FILE* stream);
-static int write_mstate(struct mstate const* mstate, FILE* stream);
-static int write_mstates(FILE* stream, struct mstate const* const* mstates, uint32_t nstates);
+static int write_mstate(struct mstate const* mstate, struct imm_io const* io, FILE* stream);
+static int write_mstates(struct imm_io const* io, FILE* stream, struct mstate const* const* mstates,
+                         uint32_t nstates);
 
 static struct imm_io_vtable const __vtable = {read_abc, NULL};
 
@@ -408,7 +409,7 @@ static int write_dp(struct imm_io const* io, FILE* stream)
 
 static int write_hmm(struct imm_io const* io, FILE* stream)
 {
-    if (write_mstates(stream, (struct mstate const* const*)io->mstates, io->nstates)) {
+    if (write_mstates(io, stream, (struct mstate const* const*)io->mstates, io->nstates)) {
         imm_error("could not write states");
         return 1;
     }
@@ -447,7 +448,7 @@ static int write_hmm(struct imm_io const* io, FILE* stream)
     return 0;
 }
 
-static int write_mstate(struct mstate const* mstate, FILE* stream)
+static int write_mstate(struct mstate const* mstate, struct imm_io const* io, FILE* stream)
 {
     struct imm_state const* state = mstate_get_state(mstate);
 
@@ -463,7 +464,7 @@ static int write_mstate(struct mstate const* mstate, FILE* stream)
         return 1;
     }
 
-    if (state_write(state, stream)) {
+    if (state_write(state, io, stream)) {
         imm_error("could not write state");
         return 1;
     }
@@ -471,7 +472,8 @@ static int write_mstate(struct mstate const* mstate, FILE* stream)
     return 0;
 }
 
-static int write_mstates(FILE* stream, struct mstate const* const* mstates, uint32_t nstates)
+static int write_mstates(struct imm_io const* io, FILE* stream, struct mstate const* const* mstates,
+                         uint32_t nstates)
 {
     struct mstates_chunk chunk = {.nstates = nstates};
 
@@ -479,7 +481,7 @@ static int write_mstates(FILE* stream, struct mstate const* const* mstates, uint
         return 1;
 
     for (uint32_t i = 0; i < nstates; ++i) {
-        if (write_mstate(mstates[i], stream))
+        if (write_mstate(mstates[i], io, stream))
             return 1;
     }
 
