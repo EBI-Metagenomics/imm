@@ -24,8 +24,8 @@ struct imm_abc const* imm_abc_create(char const* symbols, char const any_symbol)
     return __imm_abc_create_parent(symbols, any_symbol, __vtable, NULL);
 }
 
-struct imm_abc const* __imm_abc_create_parent(char const* symbols, char any_symbol,
-                                              struct imm_abc_vtable vtable, void* child)
+struct imm_abc* __imm_abc_create_parent(char const* symbols, char any_symbol,
+                                        struct imm_abc_vtable vtable, void* child)
 {
     if (any_symbol < IMM_FIRST_CHAR || any_symbol > IMM_LAST_CHAR) {
         imm_error("any_symbol is outside the range [%c, %c] ", IMM_FIRST_CHAR, IMM_LAST_CHAR);
@@ -121,7 +121,7 @@ int __imm_abc_write_parent(struct imm_abc const* abc, FILE* stream)
 
 struct imm_abc const* imm_abc_read(FILE* stream) { return __imm_abc_read_parent(stream); }
 
-struct imm_abc const* __imm_abc_read_parent(FILE* stream)
+struct imm_abc* __imm_abc_read_parent(FILE* stream)
 {
     struct abc_chunk chunk = {.nsymbols = 0, .symbols = NULL, .any_symbol = '\0'};
 
@@ -148,7 +148,7 @@ struct imm_abc const* __imm_abc_read_parent(FILE* stream)
         goto err;
     }
 
-    struct imm_abc const* abc = imm_abc_create(chunk.symbols, chunk.any_symbol);
+    struct imm_abc* abc = __imm_abc_create_parent(chunk.symbols, chunk.any_symbol, __vtable, NULL);
     free_c(chunk.symbols);
 
     return abc;

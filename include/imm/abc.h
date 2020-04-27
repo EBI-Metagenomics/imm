@@ -63,7 +63,7 @@ struct imm_abc
 static inline uint8_t __imm_abc_index(char const c) { return (uint8_t)(c - IMM_FIRST_CHAR); }
 
 IMM_EXPORT struct imm_abc const* imm_abc_create(char const* symbols, char any_symbol);
-IMM_EXPORT struct imm_abc const* __imm_abc_create_parent(char const* symbols, char any_symbol,
+IMM_EXPORT struct imm_abc*       __imm_abc_create_parent(char const* symbols, char any_symbol,
                                                          struct imm_abc_vtable vtable, void* child);
 IMM_EXPORT void                  __imm_abc_destroy_parent(struct imm_abc const* abc);
 IMM_EXPORT struct imm_abc const* imm_abc_clone(struct imm_abc const* abc);
@@ -74,7 +74,7 @@ static inline char const*        imm_abc_symbols(struct imm_abc const* abc) { re
 IMM_EXPORT int                   imm_abc_write(struct imm_abc const* abc, FILE* stream);
 IMM_EXPORT int                   __imm_abc_write_parent(struct imm_abc const* abc, FILE* stream);
 IMM_EXPORT struct imm_abc const* imm_abc_read(FILE* stream);
-IMM_EXPORT struct imm_abc const* __imm_abc_read_parent(FILE* stream);
+IMM_EXPORT struct imm_abc*       __imm_abc_read_parent(FILE* stream);
 
 static inline bool imm_abc_has_symbol(struct imm_abc const* abc, char symbol_id)
 {

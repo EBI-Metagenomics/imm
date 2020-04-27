@@ -12,12 +12,12 @@ struct imm_io;
 struct imm_state;
 
 typedef struct imm_abc const* (*imm_io_read_abc_t)(FILE* stream, uint8_t type_id);
-typedef int (*imm_io_write_abc_t)(struct imm_abc const* abc, FILE* stream, uint8_t type_id);
+typedef void (*imm_io_destroy_t)(struct imm_io const* io);
 
 struct imm_io_vtable
 {
-    imm_io_read_abc_t  read_abc;
-    imm_io_write_abc_t write_abc;
+    imm_io_read_abc_t read_abc;
+    imm_io_destroy_t  destroy;
 };
 
 IMM_EXPORT struct imm_io const*    imm_io_create(struct imm_hmm* hmm, struct imm_dp const* dp);
@@ -30,5 +30,10 @@ IMM_EXPORT uint32_t                imm_io_nstates(struct imm_io const* io);
 IMM_EXPORT struct imm_abc const*   imm_io_abc(struct imm_io const* io);
 IMM_EXPORT struct imm_hmm*         imm_io_hmm(struct imm_io const* io);
 IMM_EXPORT struct imm_dp const*    imm_io_dp(struct imm_io const* io);
+
+IMM_EXPORT void*                __imm_io_child(struct imm_io const* io);
+IMM_EXPORT struct imm_io const* __imm_io_create_parent(struct imm_hmm* hmm, struct imm_dp const* dp,
+                                                       struct imm_io_vtable vtable, void* child);
+IMM_EXPORT void                 __imm_io_destroy_parent(struct imm_io const* io);
 
 #endif

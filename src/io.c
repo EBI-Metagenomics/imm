@@ -42,36 +42,17 @@ static int                   read_hmm(FILE* stream, struct imm_io* io);
 static struct mstate** read_mstates(FILE* stream, uint32_t* nstates, struct imm_abc const* abc);
 static struct imm_state const* read_state(FILE* stream, uint8_t type_id, struct imm_abc const* abc);
 static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct mstate* const* const mstates);
-static int write_abc(struct imm_abc const* abc, FILE* stream, uint8_t type_id);
-static int write_abc_chunk(struct imm_io const* io, FILE* stream);
+static int write_abc(struct imm_io const* io, FILE* stream);
 static int write_dp(struct imm_io const* io, FILE* stream);
 static int write_hmm(struct imm_io const* io, FILE* stream);
 static int write_mstate(struct mstate const* mstate, FILE* stream);
 static int write_mstates(FILE* stream, struct mstate const* const* mstates, uint32_t nstates);
 
-static struct imm_io_vtable const vtable = {read_abc, write_abc};
+static struct imm_io_vtable const __vtable = {read_abc, NULL};
 
 struct imm_io const* imm_io_create(struct imm_hmm* hmm, struct imm_dp const* dp)
 {
-    struct imm_io* io = malloc(sizeof(*io));
-
-    io->abc = hmm_abc(hmm);
-    io->hmm = hmm;
-    io->mstates = hmm_get_mstates(hmm, dp);
-
-    io->nstates = dp_state_table_nstates(dp_get_state_table(dp));
-    io->states = malloc(sizeof(*io->states) * io->nstates);
-    for (uint32_t i = 0; i < io->nstates; ++i)
-        io->states[i] = io->mstates[i]->state;
-
-    io->seq_code = dp_get_seq_code(dp);
-    io->emission = dp_get_emission(dp);
-    io->trans_table = dp_get_trans_table(dp);
-    io->state_table = dp_get_state_table(dp);
-    io->dp = dp;
-    io->vtable = vtable;
-
-    return io;
+    return __imm_io_create_parent(hmm, dp, __vtable, NULL);
 }
 
 struct imm_io const* imm_io_create_from_file(FILE* stream)
@@ -87,7 +68,9 @@ struct imm_io const* imm_io_create_from_file(FILE* stream)
     io->state_table = NULL;
     io->states = NULL;
     io->trans_table = NULL;
-    io->vtable = vtable;
+
+    io->vtable = __vtable;
+    io->child = NULL;
 
     if (read_hmm(stream, io)) {
         imm_error("could not read hmm");
@@ -134,13 +117,14 @@ void imm_io_destroy_states(struct imm_io const* io)
 
 void imm_io_destroy(struct imm_io const* io)
 {
-    free_c(io->states);
-    free_c(io);
+    if (io->vtable.destroy)
+        io->vtable.destroy(io);
+    __imm_io_destroy_parent(io);
 }
 
 int imm_io_write(struct imm_io const* io, FILE* stream)
 {
-    if (write_abc_chunk(io, stream)) {
+    if (write_abc(io, stream)) {
         imm_error("could not write abc");
         return 1;
     }
@@ -167,6 +151,40 @@ struct imm_abc const* imm_io_abc(struct imm_io const* io) { return io->abc; }
 struct imm_hmm* imm_io_hmm(struct imm_io const* io) { return io->hmm; }
 
 struct imm_dp const* imm_io_dp(struct imm_io const* io) { return io->dp; }
+
+void* __imm_io_child(struct imm_io const* io) { return io->child; }
+
+struct imm_io const* __imm_io_create_parent(struct imm_hmm* hmm, struct imm_dp const* dp,
+                                            struct imm_io_vtable vtable, void* child)
+{
+    struct imm_io* io = malloc(sizeof(*io));
+
+    io->abc = hmm_abc(hmm);
+    io->hmm = hmm;
+    io->mstates = hmm_get_mstates(hmm, dp);
+
+    io->nstates = dp_state_table_nstates(dp_get_state_table(dp));
+    io->states = malloc(sizeof(*io->states) * io->nstates);
+    for (uint32_t i = 0; i < io->nstates; ++i)
+        io->states[i] = io->mstates[i]->state;
+
+    io->seq_code = dp_get_seq_code(dp);
+    io->emission = dp_get_emission(dp);
+    io->trans_table = dp_get_trans_table(dp);
+    io->state_table = dp_get_state_table(dp);
+    io->dp = dp;
+
+    io->vtable = vtable;
+    io->child = child;
+
+    return io;
+}
+
+void __imm_io_destroy_parent(struct imm_io const* io)
+{
+    free_c(io->states);
+    free_c(io);
+}
 
 static struct imm_abc const* read_abc(FILE* stream, uint8_t type_id)
 {
@@ -304,7 +322,7 @@ static struct imm_state const* read_state(FILE* stream, uint8_t type_id, struct 
             imm_error("could not read normal_state");
         break;
     default:
-        imm_error("unknown type_id");
+        imm_error("unknown state type_id");
     }
     return state;
 }
@@ -347,21 +365,7 @@ static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct mstate* co
     return 0;
 }
 
-static int write_abc(struct imm_abc const* abc, FILE* stream, uint8_t type_id)
-{
-    if (type_id != IMM_ABC_TYPE_ID) {
-        imm_error("unknown abc type_id");
-        return 1;
-    }
-
-    if (imm_abc_write(abc, stream)) {
-        imm_error("could not write abc");
-        return 1;
-    }
-    return 0;
-}
-
-static int write_abc_chunk(struct imm_io const* io, FILE* stream)
+static int write_abc(struct imm_io const* io, FILE* stream)
 {
     uint8_t type_id = imm_abc_type_id(io->abc);
     if (fwrite(&type_id, sizeof(type_id), 1, stream) < 1) {
@@ -369,10 +373,11 @@ static int write_abc_chunk(struct imm_io const* io, FILE* stream)
         return 1;
     }
 
-    if (io->vtable.write_abc(io->abc, stream, type_id)) {
+    if (imm_abc_write(io->abc, stream)) {
         imm_error("could not write abc");
         return 1;
     }
+
     return 0;
 }
 
