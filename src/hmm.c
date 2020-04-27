@@ -339,3 +339,8 @@ void hmm_add_mstate(struct imm_hmm* hmm, struct mstate* mstate)
 {
     mstate_table_add(hmm->table, mstate);
 }
+
+struct mstate** hmm_get_mstates(struct imm_hmm const* hmm, struct imm_dp const* dp)
+{
+    return (struct mstate**)dp_get_mstates(dp);
+}

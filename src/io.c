@@ -38,7 +38,7 @@ struct imm_io const* imm_io_create(struct imm_hmm* hmm, struct imm_dp const* dp)
 
     io->abc = hmm_abc(hmm);
     io->hmm = hmm;
-    io->mstates = dp_get_mstates(dp);
+    io->mstates = hmm_get_mstates(hmm, dp);
 
     io->nstates = dp_state_table_nstates(dp_get_state_table(dp));
     io->states = malloc(sizeof(*io->states) * io->nstates);
@@ -269,7 +269,7 @@ err:
 
 static int write_hmm(struct imm_io const* io, FILE* stream)
 {
-    if (mstate_write_states(stream, io->mstates, io->nstates)) {
+    if (mstate_write_states(stream, (struct mstate const* const*)io->mstates, io->nstates)) {
         imm_error("could not write states");
         return 1;
     }
