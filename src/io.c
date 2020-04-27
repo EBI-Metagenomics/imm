@@ -23,11 +23,11 @@
 #include "seq_code.h"
 #include <stdlib.h>
 
-static int write_abc(struct imm_abc const* abc, FILE* stream, uint8_t type_id);
-static int write_abc_chunk(struct imm_io const* io, struct imm_abc const* abc, FILE* stream);
+static int                   write_abc(struct imm_abc const* abc, FILE* stream, uint8_t type_id);
+static int                   write_abc_chunk(struct imm_io const* io, FILE* stream);
 static struct imm_abc const* read_abc(FILE* stream, uint8_t type_id);
 static int                   hmm_read(FILE* stream, struct imm_io* io);
-static int                   hmm_write(struct imm_dp const* dp, FILE* stream);
+static int                   write_hmm(struct imm_io const* io, FILE* stream);
 static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct mstate* const* const mstates);
 
 static struct imm_io_vtable const vtable = {read_abc, write_abc};
@@ -120,12 +120,12 @@ void imm_io_destroy(struct imm_io const* io)
 
 int imm_io_write(struct imm_io const* io, FILE* stream)
 {
-    if (write_abc_chunk(io, io->abc, stream)) {
+    if (write_abc_chunk(io, stream)) {
         imm_error("could not write abc");
         return 1;
     }
 
-    if (hmm_write(io->dp, stream)) {
+    if (write_hmm(io, stream)) {
         imm_error("could not write hmm");
         return 1;
     }
@@ -194,15 +194,15 @@ static int write_abc(struct imm_abc const* abc, FILE* stream, uint8_t type_id)
     return 0;
 }
 
-static int write_abc_chunk(struct imm_io const* io, struct imm_abc const* abc, FILE* stream)
+static int write_abc_chunk(struct imm_io const* io, FILE* stream)
 {
-    uint8_t type_id = imm_abc_type_id(abc);
+    uint8_t type_id = imm_abc_type_id(io->abc);
     if (fwrite(&type_id, sizeof(type_id), 1, stream) < 1) {
         imm_error("could not write type_id");
         return 1;
     }
 
-    if (io->vtable.write_abc(abc, stream, type_id)) {
+    if (io->vtable.write_abc(io->abc, stream, type_id)) {
         imm_error("could not write abc");
         return 1;
     }
@@ -267,28 +267,26 @@ err:
     return 1;
 }
 
-static int hmm_write(struct imm_dp const* dp, FILE* stream)
+static int write_hmm(struct imm_io const* io, FILE* stream)
 {
-    struct dp_state_table const* state_tbl = dp_get_state_table(dp);
-    if (mstate_write_states(stream, dp_get_mstates(dp), dp_state_table_nstates(state_tbl))) {
+    if (mstate_write_states(stream, io->mstates, io->nstates)) {
         imm_error("could not write states");
         return 1;
     }
 
-    struct dp_trans_table const* trans_tbl = dp_get_trans_table(dp);
-    uint32_t                     ntrans = dp_trans_table_total_ntrans(trans_tbl);
+    uint32_t ntrans = dp_trans_table_total_ntrans(io->trans_table);
     if (fwrite(&ntrans, sizeof(ntrans), 1, stream) < 1) {
         imm_error("could not write ntrans");
         return 1;
     }
 
-    for (uint32_t tgt_state = 0; tgt_state < dp_state_table_nstates(state_tbl); ++tgt_state) {
+    for (uint32_t tgt_state = 0; tgt_state < io->nstates; ++tgt_state) {
 
-        ntrans = dp_trans_table_ntrans(trans_tbl, tgt_state);
+        ntrans = dp_trans_table_ntrans(io->trans_table, tgt_state);
         for (uint32_t trans = 0; trans < ntrans; ++trans) {
 
-            uint32_t src_state = dp_trans_table_source_state(trans_tbl, tgt_state, trans);
-            double   lprob = dp_trans_table_score(trans_tbl, tgt_state, trans);
+            uint32_t src_state = dp_trans_table_source_state(io->trans_table, tgt_state, trans);
+            double   lprob = dp_trans_table_score(io->trans_table, tgt_state, trans);
 
             if (fwrite(&src_state, sizeof(src_state), 1, stream) < 1) {
                 imm_error("could not write source_state");
