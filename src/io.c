@@ -55,27 +55,7 @@ struct imm_io const* imm_io_create(struct imm_hmm* hmm, struct imm_dp const* dp)
     return io;
 }
 
-int imm_io_write(struct imm_io const* io, FILE* stream)
-{
-    if (write_abc_chunk(io, io->abc, stream)) {
-        imm_error("could not write abc");
-        return 1;
-    }
-
-    if (hmm_write(io->dp, stream)) {
-        imm_error("could not write hmm");
-        return 1;
-    }
-
-    if (dp_write(io->dp, stream)) {
-        imm_error("could not write dp");
-        return 1;
-    }
-
-    return 0;
-}
-
-struct imm_io const* imm_io_read(FILE* stream)
+struct imm_io const* imm_io_create_from_file(FILE* stream)
 {
     struct imm_io* io = malloc(sizeof(*io));
     io->abc = NULL;
@@ -126,16 +106,36 @@ err:
     return NULL;
 }
 
+void imm_io_destroy_states(struct imm_io const* io)
+{
+    for (uint32_t i = 0; i < imm_io_nstates(io); ++i)
+        imm_state_destroy(imm_io_state(io, i));
+}
+
 void imm_io_destroy(struct imm_io const* io)
 {
     free_c(io->states);
     free_c(io);
 }
 
-void imm_io_destroy_states(struct imm_io const* io)
+int imm_io_write(struct imm_io const* io, FILE* stream)
 {
-    for (uint32_t i = 0; i < imm_io_nstates(io); ++i)
-        imm_state_destroy(imm_io_state(io, i));
+    if (write_abc_chunk(io, io->abc, stream)) {
+        imm_error("could not write abc");
+        return 1;
+    }
+
+    if (hmm_write(io->dp, stream)) {
+        imm_error("could not write hmm");
+        return 1;
+    }
+
+    if (dp_write(io->dp, stream)) {
+        imm_error("could not write dp");
+        return 1;
+    }
+
+    return 0;
 }
 
 struct imm_state const* imm_io_state(struct imm_io const* io, uint32_t i) { return io->states[i]; }

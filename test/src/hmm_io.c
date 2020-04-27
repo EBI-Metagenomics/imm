@@ -54,10 +54,11 @@ void test_hmm_write_io_two_states(void)
     imm_normal_state_destroy(state1);
     imm_abc_destroy(abc);
     imm_seq_destroy(C);
+    imm_io_destroy(io);
 
     file = fopen(TMP_FOLDER "/two_states.imm", "r");
     cass_cond(file != NULL);
-    io = imm_io_read(file);
+    io = imm_io_create_from_file(file);
     cass_cond(io != NULL);
     fclose(file);
 

@@ -465,6 +465,7 @@ void test_perf_viterbi(void)
     cass_cond(file != NULL);
     cass_equal_int(imm_io_write(io, file), 0);
     fclose(file);
+    imm_io_destroy(io);
 
 #if 0
     results = imm_dp_viterbi(dp, seq, 0);
@@ -554,7 +555,7 @@ void test_perf_viterbi(void)
 
     file = fopen(TMP_FOLDER "/perf.imm", "r");
     cass_cond(file != NULL);
-    io = imm_io_read(file);
+    io = imm_io_create_from_file(file);
     cass_cond(io != NULL);
     fclose(file);
 

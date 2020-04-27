@@ -21,10 +21,10 @@ struct imm_io_vtable
 };
 
 IMM_EXPORT struct imm_io const*    imm_io_create(struct imm_hmm* hmm, struct imm_dp const* dp);
-IMM_EXPORT int                     imm_io_write(struct imm_io const* io, FILE* stream);
-IMM_EXPORT struct imm_io const*    imm_io_read(FILE* stream);
-IMM_EXPORT void                    imm_io_destroy(struct imm_io const* io);
+IMM_EXPORT struct imm_io const*    imm_io_create_from_file(FILE* stream);
 IMM_EXPORT void                    imm_io_destroy_states(struct imm_io const* io);
+IMM_EXPORT void                    imm_io_destroy(struct imm_io const* io);
+IMM_EXPORT int                     imm_io_write(struct imm_io const* io, FILE* stream);
 IMM_EXPORT struct imm_state const* imm_io_state(struct imm_io const* io, uint32_t i);
 IMM_EXPORT uint32_t                imm_io_nstates(struct imm_io const* io);
 IMM_EXPORT struct imm_abc const*   imm_io_abc(struct imm_io const* io);
