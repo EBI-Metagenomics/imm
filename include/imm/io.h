@@ -30,7 +30,7 @@ IMM_EXPORT struct imm_dp const*    imm_io_dp(struct imm_io const* io);
 
 IMM_EXPORT void*                 __imm_io_derived(struct imm_io const* io);
 IMM_EXPORT struct imm_io*        __imm_io_create(struct imm_hmm* hmm, struct imm_dp const* dp,
-                                                 void* child);
+                                                 void* derived);
 IMM_EXPORT void                  __imm_io_destroy(struct imm_io const* io);
 IMM_EXPORT struct imm_abc const* __imm_io_read_abc(FILE* stream, uint8_t type_id);
 IMM_EXPORT int                   __imm_io_write(struct imm_io const* io, FILE* stream);

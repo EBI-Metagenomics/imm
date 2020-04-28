@@ -125,7 +125,7 @@ struct imm_dp const* imm_io_dp(struct imm_io const* io) { return io->dp; }
 
 void* __imm_io_derived(struct imm_io const* io) { return io->derived; }
 
-struct imm_io* __imm_io_create(struct imm_hmm* hmm, struct imm_dp const* dp, void* child)
+struct imm_io* __imm_io_create(struct imm_hmm* hmm, struct imm_dp const* dp, void* derived)
 {
     struct imm_io* io = malloc(sizeof(*io));
 
@@ -145,7 +145,7 @@ struct imm_io* __imm_io_create(struct imm_hmm* hmm, struct imm_dp const* dp, voi
     io->dp = dp;
 
     io->vtable = __vtable;
-    io->derived = child;
+    io->derived = derived;
 
     return io;
 }

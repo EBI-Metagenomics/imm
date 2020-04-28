@@ -15,7 +15,7 @@ struct state_chunk
 };
 
 struct imm_state const* imm_state_create(char const* name, struct imm_abc const* abc,
-                                         struct imm_state_vtable vtable, void* child)
+                                         struct imm_state_vtable vtable, void* derived)
 {
     if (imm_abc_length(abc) == 0) {
         imm_error("empty alphabet");
@@ -31,24 +31,19 @@ struct imm_state const* imm_state_create(char const* name, struct imm_abc const*
     s->name = strdup(name);
     s->abc = abc;
     s->vtable = vtable;
-    s->child = child;
+    s->derived = derived;
     return s;
 }
 
-void imm_state_destroy(struct imm_state const* state)
-{
-    if (state->vtable.destroy)
-        state->vtable.destroy(state);
-    __imm_state_destroy_parent(state);
-}
+void imm_state_destroy(struct imm_state const* state) { state->vtable.destroy(state); }
 
-void __imm_state_destroy_parent(struct imm_state const* state)
+void __imm_state_destroy(struct imm_state const* state)
 {
     free_c(state->name);
     free_c(state);
 }
 
-int state_write_parent(struct imm_state const* state, FILE* stream)
+int __imm_state_write(struct imm_state const* state, FILE* stream)
 {
     struct state_chunk chunk = {.name_length = cast_u16_zu(strlen(imm_state_get_name(state))),
                                 .name = (char*)imm_state_get_name(state)};
@@ -67,7 +62,7 @@ int state_write_parent(struct imm_state const* state, FILE* stream)
     return 0;
 }
 
-struct imm_state* state_read_parent(FILE* stream, struct imm_abc const* abc)
+struct imm_state* state_read(FILE* stream, struct imm_abc const* abc)
 {
     struct state_chunk chunk;
 
@@ -84,7 +79,7 @@ struct imm_state* state_read_parent(FILE* stream, struct imm_abc const* abc)
     }
 
     struct imm_state* state = malloc(sizeof(*state));
-    state->child = NULL;
+    state->derived = NULL;
     state->name = chunk.name;
     state->abc = abc;
     state->vtable = (struct imm_state_vtable){NULL, NULL, NULL, NULL, NULL, NULL};

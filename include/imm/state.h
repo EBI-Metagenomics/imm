@@ -18,22 +18,14 @@ struct imm_abc;
 struct imm_io;
 struct imm_state;
 
-typedef uint8_t (*imm_state_type_id_t)(struct imm_state const* state);
-typedef double (*imm_state_lprob_t)(struct imm_state const* state, struct imm_seq const* seq);
-typedef unsigned (*imm_state_min_seq_t)(struct imm_state const* state);
-typedef unsigned (*imm_state_max_seq_t)(struct imm_state const* state);
-typedef int (*imm_state_write_t)(struct imm_state const* state, struct imm_io const* io,
-                                 FILE* stream);
-typedef void (*imm_state_destroy_t)(struct imm_state const* state);
-
 struct imm_state_vtable
 {
-    imm_state_type_id_t type_id;
-    imm_state_lprob_t   lprob;
-    imm_state_min_seq_t min_seq;
-    imm_state_max_seq_t max_seq;
-    imm_state_write_t   write;
-    imm_state_destroy_t destroy;
+    uint8_t (*type_id)(struct imm_state const* state);
+    double (*lprob)(struct imm_state const* state, struct imm_seq const* seq);
+    unsigned (*min_seq)(struct imm_state const* state);
+    unsigned (*max_seq)(struct imm_state const* state);
+    int (*write)(struct imm_state const* state, struct imm_io const* io, FILE* stream);
+    void (*destroy)(struct imm_state const* state);
 };
 
 struct imm_state
@@ -42,13 +34,12 @@ struct imm_state
     struct imm_abc const* abc;
 
     struct imm_state_vtable vtable;
-    void*                   child;
+    void*                   derived;
 };
 
 IMM_EXPORT struct imm_state const* imm_state_create(char const* name, struct imm_abc const* abc,
-                                                    struct imm_state_vtable vtable, void* child);
+                                                    struct imm_state_vtable vtable, void* derived);
 IMM_EXPORT void                    imm_state_destroy(struct imm_state const* state);
-IMM_EXPORT void                    __imm_state_destroy_parent(struct imm_state const* state);
 
 static inline char const* imm_state_get_name(struct imm_state const* state) { return state->name; }
 
@@ -81,6 +72,12 @@ static inline unsigned imm_state_max_seq(struct imm_state const* state)
     return state->vtable.max_seq(state);
 }
 
-static inline void const* __imm_state_child(struct imm_state const* state) { return state->child; }
+static inline void const* __imm_state_derived(struct imm_state const* state)
+{
+    return state->derived;
+}
+
+IMM_EXPORT void __imm_state_destroy(struct imm_state const* state);
+IMM_EXPORT int  __imm_state_write(struct imm_state const* state, FILE* stream);
 
 #endif
