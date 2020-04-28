@@ -25,7 +25,7 @@ struct imm_io
     struct imm_dp const*         dp;
 
     struct imm_io_vtable vtable;
-    void*                child;
+    void*                derived;
 };
 
 #endif

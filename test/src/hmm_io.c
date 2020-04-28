@@ -88,10 +88,12 @@ void test_hmm_write_io_two_states(void)
         }
     }
 
+    for (uint32_t i = 0; i < imm_io_nstates(io); ++i)
+        imm_state_destroy(imm_io_state(io, i));
+
     imm_seq_destroy(C);
     imm_abc_destroy(abc);
     imm_hmm_destroy(hmm);
     imm_dp_destroy(dp);
-    imm_io_destroy_states(io);
     imm_io_destroy(io);
 }

@@ -571,10 +571,12 @@ void test_perf_viterbi(void)
     cass_close(score, -65826.0106185297);
     imm_results_destroy(results);
 
+    for (uint32_t i = 0; i < imm_io_nstates(io); ++i)
+        imm_state_destroy(imm_io_state(io, i));
+
     imm_abc_destroy(abc);
     imm_hmm_destroy(hmm);
     imm_dp_destroy(dp);
     imm_seq_destroy(seq);
-    imm_io_destroy_states(io);
     imm_io_destroy(io);
 }
