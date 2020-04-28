@@ -13,19 +13,51 @@ struct abc_chunk
     char    any_symbol;
 };
 
-static uint8_t               abc_type_id(struct imm_abc const* abc);
-static int                   abc_write(struct imm_abc const* abc, FILE* stream);
-static struct imm_abc const* abc_clone(struct imm_abc const* abc);
+static struct imm_abc_vtable const __vtable = {__imm_abc_type_id, __imm_abc_write,
+                                               __imm_abc_destroy, __imm_abc_clone};
 
-static struct imm_abc_vtable const __vtable = {abc_type_id, abc_write, NULL, abc_clone};
+struct imm_abc const* imm_abc_clone(struct imm_abc const* abc) { return abc->vtable.clone(abc); }
 
 struct imm_abc const* imm_abc_create(char const* symbols, char const any_symbol)
 {
-    return __imm_abc_create_parent(symbols, any_symbol, __vtable, NULL);
+    return __imm_abc_create(symbols, any_symbol, NULL);
 }
 
-struct imm_abc* __imm_abc_create_parent(char const* symbols, char any_symbol,
-                                        struct imm_abc_vtable vtable, void* child)
+void imm_abc_destroy(struct imm_abc const* abc) { abc->vtable.destroy(abc); }
+
+struct imm_abc const* imm_abc_read(FILE* stream) { return __imm_abc_read(stream); }
+
+enum imm_symbol_type imm_abc_symbol_type(struct imm_abc const* abc, char symbol_id)
+{
+    if (symbol_id == abc->any_symbol)
+        return IMM_SYMBOL_ANY;
+
+    if (imm_abc_has_symbol(abc, symbol_id))
+        return IMM_SYMBOL_NORMAL;
+
+    return IMM_SYMBOL_UNKNOWN;
+}
+
+int imm_abc_write(struct imm_abc const* abc, FILE* stream)
+{
+    return abc->vtable.write(abc, stream);
+}
+
+struct imm_abc const* __imm_abc_clone(struct imm_abc const* abc)
+{
+    struct imm_abc* nabc = malloc(sizeof(struct imm_abc));
+
+    nabc->symbols = strdup(abc->symbols);
+    nabc->length = abc->length;
+    memcpy(nabc->symbol_idx, abc->symbol_idx, sizeof(*abc->symbol_idx) * IMM_SYMBOL_IDX_SIZE);
+    nabc->any_symbol = abc->any_symbol;
+    nabc->vtable = abc->vtable;
+    nabc->derived = NULL;
+
+    return nabc;
+}
+
+struct imm_abc* __imm_abc_create(char const* symbols, char any_symbol, void* derived)
 {
     if (any_symbol < IMM_FIRST_CHAR || any_symbol > IMM_LAST_CHAR) {
         imm_error("any_symbol is outside the range [%c, %c] ", IMM_FIRST_CHAR, IMM_LAST_CHAR);
@@ -68,60 +100,19 @@ struct imm_abc* __imm_abc_create_parent(char const* symbols, char any_symbol,
     }
     abc->symbols = strdup(symbols);
 
-    abc->vtable = vtable;
-    abc->child = child;
+    abc->vtable = __vtable;
+    abc->derived = derived;
 
     return abc;
 }
 
-void __imm_abc_destroy_parent(struct imm_abc const* abc)
+void __imm_abc_destroy(struct imm_abc const* abc)
 {
     free_c(abc->symbols);
     free_c(abc);
 }
 
-struct imm_abc const* imm_abc_clone(struct imm_abc const* abc) { return abc->vtable.clone(abc); }
-
-void imm_abc_destroy(struct imm_abc const* abc)
-{
-    if (abc->vtable.destroy)
-        abc->vtable.destroy(abc);
-    __imm_abc_destroy_parent(abc);
-}
-
-int imm_abc_write(struct imm_abc const* abc, FILE* stream)
-{
-    return abc->vtable.write(abc, stream);
-}
-
-int __imm_abc_write_parent(struct imm_abc const* abc, FILE* stream)
-{
-    struct abc_chunk chunk = {.nsymbols = cast_u8_zu(strlen(abc->symbols)),
-                              .symbols = (char*)abc->symbols,
-                              .any_symbol = abc->any_symbol};
-
-    if (fwrite(&chunk.nsymbols, sizeof(chunk.nsymbols), 1, stream) < 1) {
-        imm_error("could not write nsymbols");
-        return 1;
-    }
-
-    if (fwrite(chunk.symbols, sizeof(*chunk.symbols), chunk.nsymbols + 1, stream) <
-        chunk.nsymbols + 1) {
-        imm_error("could not write symbols");
-        return 1;
-    }
-
-    if (fwrite(&chunk.any_symbol, sizeof(chunk.any_symbol), 1, stream) < 1) {
-        imm_error("could not write any_symbol");
-        return 1;
-    }
-
-    return 0;
-}
-
-struct imm_abc const* imm_abc_read(FILE* stream) { return __imm_abc_read_parent(stream); }
-
-struct imm_abc* __imm_abc_read_parent(FILE* stream)
+struct imm_abc* __imm_abc_read(FILE* stream)
 {
     struct abc_chunk chunk = {.nsymbols = 0, .symbols = NULL, .any_symbol = '\0'};
 
@@ -148,7 +139,7 @@ struct imm_abc* __imm_abc_read_parent(FILE* stream)
         goto err;
     }
 
-    struct imm_abc* abc = __imm_abc_create_parent(chunk.symbols, chunk.any_symbol, __vtable, NULL);
+    struct imm_abc* abc = __imm_abc_create(chunk.symbols, chunk.any_symbol, NULL);
     free_c(chunk.symbols);
 
     return abc;
@@ -160,39 +151,29 @@ err:
     return NULL;
 }
 
-enum imm_symbol_type imm_abc_symbol_type(struct imm_abc const* abc, char symbol_id)
+uint8_t __imm_abc_type_id(struct imm_abc const* abc) { return IMM_ABC_TYPE_ID; }
+
+int __imm_abc_write(struct imm_abc const* abc, FILE* stream)
 {
-    if (symbol_id == abc->any_symbol)
-        return IMM_SYMBOL_ANY;
+    struct abc_chunk chunk = {.nsymbols = cast_u8_zu(strlen(abc->symbols)),
+                              .symbols = (char*)abc->symbols,
+                              .any_symbol = abc->any_symbol};
 
-    if (imm_abc_has_symbol(abc, symbol_id))
-        return IMM_SYMBOL_NORMAL;
+    if (fwrite(&chunk.nsymbols, sizeof(chunk.nsymbols), 1, stream) < 1) {
+        imm_error("could not write nsymbols");
+        return 1;
+    }
 
-    return IMM_SYMBOL_UNKNOWN;
-}
+    if (fwrite(chunk.symbols, sizeof(*chunk.symbols), chunk.nsymbols + 1, stream) <
+        chunk.nsymbols + 1) {
+        imm_error("could not write symbols");
+        return 1;
+    }
 
-static uint8_t abc_type_id(struct imm_abc const* abc) { return IMM_ABC_TYPE_ID; }
+    if (fwrite(&chunk.any_symbol, sizeof(chunk.any_symbol), 1, stream) < 1) {
+        imm_error("could not write any_symbol");
+        return 1;
+    }
 
-static int abc_write(struct imm_abc const* abc, FILE* stream)
-{
-    return __imm_abc_write_parent(abc, stream);
-}
-
-static struct imm_abc const* abc_clone(struct imm_abc const* abc)
-{
-    return __imm_abc_clone_parent(abc);
-}
-
-struct imm_abc const* __imm_abc_clone_parent(struct imm_abc const* abc)
-{
-    struct imm_abc* nabc = malloc(sizeof(struct imm_abc));
-
-    nabc->symbols = strdup(abc->symbols);
-    nabc->length = abc->length;
-    memcpy(nabc->symbol_idx, abc->symbol_idx, sizeof(*abc->symbol_idx) * IMM_SYMBOL_IDX_SIZE);
-    nabc->any_symbol = abc->any_symbol;
-    nabc->vtable = abc->vtable;
-    nabc->child = NULL;
-
-    return nabc;
+    return 0;
 }
