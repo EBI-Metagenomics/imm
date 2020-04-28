@@ -22,16 +22,14 @@ struct normal_state_chunk
     double* lprobs;
 };
 
-static uint8_t  normal_state_type_id(struct imm_state const* state);
-static double   normal_state_lprob(struct imm_state const* state, struct imm_seq const* seq);
-static unsigned normal_state_min_seq(struct imm_state const* state);
-static unsigned normal_state_max_seq(struct imm_state const* state);
-static int normal_state_write(struct imm_state const* state, struct imm_io const* io, FILE* stream);
-static void normal_state_destroy(struct imm_state const* state);
+static uint8_t  type_id(struct imm_state const* state);
+static double   lprob(struct imm_state const* state, struct imm_seq const* seq);
+static unsigned min_seq(struct imm_state const* state);
+static unsigned max_seq(struct imm_state const* state);
+static int      write(struct imm_state const* state, struct imm_io const* io, FILE* stream);
+static void     destroy(struct imm_state const* state);
 
-static struct imm_state_vtable const vtable = {normal_state_type_id, normal_state_lprob,
-                                               normal_state_min_seq, normal_state_max_seq,
-                                               normal_state_write,   normal_state_destroy};
+static struct imm_state_vtable const vtable = {type_id, lprob, min_seq, max_seq, write, destroy};
 
 struct imm_normal_state const* imm_normal_state_create(char const* name, struct imm_abc const* abc,
                                                        double const* lprobs)
@@ -65,12 +63,9 @@ struct imm_normal_state const* imm_normal_state_derived(struct imm_state const* 
     return __imm_state_derived(state);
 }
 
-static uint8_t normal_state_type_id(struct imm_state const* state)
-{
-    return IMM_NORMAL_STATE_TYPE_ID;
-}
+static uint8_t type_id(struct imm_state const* state) { return IMM_NORMAL_STATE_TYPE_ID; }
 
-static double normal_state_lprob(struct imm_state const* state, struct imm_seq const* seq)
+static double lprob(struct imm_state const* state, struct imm_seq const* seq)
 {
     struct imm_normal_state const* s = __imm_state_derived(state);
     if (imm_seq_length(seq) == 1) {
@@ -82,11 +77,11 @@ static double normal_state_lprob(struct imm_state const* state, struct imm_seq c
     return imm_lprob_zero();
 }
 
-static unsigned normal_state_min_seq(struct imm_state const* state) { return 1; }
+static unsigned min_seq(struct imm_state const* state) { return 1; }
 
-static unsigned normal_state_max_seq(struct imm_state const* state) { return 1; }
+static unsigned max_seq(struct imm_state const* state) { return 1; }
 
-static int normal_state_write(struct imm_state const* state, struct imm_io const* io, FILE* stream)
+static int write(struct imm_state const* state, struct imm_io const* io, FILE* stream)
 {
     if (__imm_state_write(state, stream))
         return 1;
@@ -112,7 +107,7 @@ static int normal_state_write(struct imm_state const* state, struct imm_io const
     return 0;
 }
 
-static void normal_state_destroy(struct imm_state const* state)
+static void destroy(struct imm_state const* state)
 {
     struct imm_normal_state const* s = __imm_state_derived(state);
     free_c(s->lprobs);

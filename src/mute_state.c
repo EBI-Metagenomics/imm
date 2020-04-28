@@ -16,11 +16,10 @@ static uint8_t  type_id(struct imm_state const* state);
 static double   lprob(struct imm_state const* state, struct imm_seq const* seq);
 static unsigned min_seq(struct imm_state const* state);
 static unsigned max_seq(struct imm_state const* state);
-static int  mute_state_write(struct imm_state const* state, struct imm_io const* io, FILE* stream);
-static void mute_state_destroy(struct imm_state const* state);
+static int      write(struct imm_state const* state, struct imm_io const* io, FILE* stream);
+static void     destroy(struct imm_state const* state);
 
-static struct imm_state_vtable const vtable = {
-    type_id, lprob, min_seq, max_seq, mute_state_write, mute_state_destroy};
+static struct imm_state_vtable const vtable = {type_id, lprob, min_seq, max_seq, write, destroy};
 
 struct imm_mute_state const* imm_mute_state_create(char const* name, struct imm_abc const* abc)
 {
@@ -62,7 +61,7 @@ static unsigned min_seq(struct imm_state const* state) { return 0; }
 
 static unsigned max_seq(struct imm_state const* state) { return 0; }
 
-static int mute_state_write(struct imm_state const* state, struct imm_io const* io, FILE* stream)
+static int write(struct imm_state const* state, struct imm_io const* io, FILE* stream)
 {
     if (__imm_state_write(state, stream))
         return 1;
@@ -87,7 +86,7 @@ struct imm_state const* mute_state_read(FILE* stream, struct imm_abc const* abc)
     return state;
 }
 
-static void mute_state_destroy(struct imm_state const* state)
+static void destroy(struct imm_state const* state)
 {
     struct imm_mute_state const* s = __imm_state_derived(state);
     free_c(s);
