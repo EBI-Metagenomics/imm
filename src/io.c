@@ -7,6 +7,7 @@
 #include "hmm.h"
 #include "imm/abc.h"
 #include "imm/abc_types.h"
+#include "imm/dp.h"
 #include "imm/hmm.h"
 #include "imm/mute_state.h"
 #include "imm/normal_state.h"
@@ -48,7 +49,8 @@ static int write_mstate(struct mstate const* mstate, struct imm_io const* io, FI
 static int write_mstates(struct imm_io const* io, FILE* stream, struct mstate const* const* mstates,
                          uint32_t nstates);
 
-static struct imm_io_vtable const __vtable = {__imm_io_read_abc, __imm_io_destroy, __imm_io_write};
+static struct imm_io_vtable const __vtable = {__imm_io_read_abc, __imm_io_destroy, __imm_io_write,
+                                              __imm_io_destroy_on_read_failure};
 
 struct imm_io const* imm_io_create(struct imm_hmm* hmm, struct imm_dp const* dp)
 {
@@ -57,21 +59,13 @@ struct imm_io const* imm_io_create(struct imm_hmm* hmm, struct imm_dp const* dp)
 
 struct imm_io const* imm_io_create_from_file(FILE* stream)
 {
-    struct imm_io* io = malloc(sizeof(*io));
-    io->abc = NULL;
-    io->dp = NULL;
-    io->emission = NULL;
-    io->hmm = NULL;
-    io->mstates = NULL;
-    io->nstates = 0;
-    io->seq_code = NULL;
-    io->state_table = NULL;
-    io->states = NULL;
-    io->trans_table = NULL;
+    struct imm_io* io = __imm_io_new(NULL);
+    __imm_io_read(io, stream);
+    return io;
+}
 
-    io->vtable = __vtable;
-    io->derived = NULL;
-
+int __imm_io_read(struct imm_io* io, FILE* stream)
+{
     if (read_hmm(stream, io)) {
         imm_error("could not read hmm");
         goto err;
@@ -83,30 +77,11 @@ struct imm_io const* imm_io_create_from_file(FILE* stream)
     }
 
     dp_create_from_io(io);
-
-    return io;
+    return 0;
 
 err:
-    if (io->abc)
-        imm_abc_destroy(io->abc);
-
-    if (io->hmm)
-        imm_hmm_destroy(io->hmm);
-
-    if (io->mstates)
-        free_c(io->mstates);
-
-    if (io->seq_code)
-        seq_code_destroy(io->seq_code);
-
-    if (io->emission)
-        dp_emission_destroy(io->emission);
-
-    if (io->trans_table)
-        dp_trans_table_destroy(io->trans_table);
-
-    free_c(io);
-    return NULL;
+    io->vtable.destroy_on_read_failure(io);
+    return 1;
 }
 
 void imm_io_destroy(struct imm_io const* io) { io->vtable.destroy(io); }
@@ -154,6 +129,58 @@ void __imm_io_destroy(struct imm_io const* io)
 {
     free_c(io->states);
     free_c(io);
+}
+
+void __imm_io_destroy_on_read_failure(struct imm_io const* io)
+{
+    if (io->abc)
+        imm_abc_destroy(io->abc);
+
+    if (io->hmm)
+        imm_hmm_destroy(io->hmm);
+
+    if (io->mstates)
+        free_c(io->mstates);
+
+    if (io->states)
+        free_c(io->states);
+
+    if (io->seq_code)
+        seq_code_destroy(io->seq_code);
+
+    if (io->emission)
+        dp_emission_destroy(io->emission);
+
+    if (io->trans_table)
+        dp_trans_table_destroy(io->trans_table);
+
+    if (io->state_table)
+        dp_state_table_destroy(io->state_table);
+
+    if (io->dp)
+        imm_dp_destroy(io->dp);
+
+    free_c(io);
+}
+
+struct imm_io* __imm_io_new(void* derived)
+{
+    struct imm_io* io = malloc(sizeof(*io));
+    io->abc = NULL;
+    io->dp = NULL;
+    io->emission = NULL;
+    io->hmm = NULL;
+    io->mstates = NULL;
+    io->nstates = 0;
+    io->seq_code = NULL;
+    io->state_table = NULL;
+    io->states = NULL;
+    io->trans_table = NULL;
+
+    io->vtable = __vtable;
+    io->derived = NULL;
+
+    return io;
 }
 
 struct imm_abc const* __imm_io_read_abc(FILE* stream, uint8_t type_id)
