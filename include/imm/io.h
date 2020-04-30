@@ -13,7 +13,6 @@ struct imm_state;
 
 struct imm_io_vtable
 {
-    struct imm_abc const* (*read_abc)(FILE* stream, uint8_t type_id);
     void (*destroy)(struct imm_io const* io);
     int (*write)(struct imm_io const* io, FILE* stream);
     void (*destroy_on_read_failure)(struct imm_io const* io);
@@ -36,8 +35,13 @@ IMM_EXPORT void                  __imm_io_destroy(struct imm_io const* io);
 IMM_EXPORT void                  __imm_io_destroy_on_read_failure(struct imm_io const* io);
 IMM_EXPORT struct imm_io*        __imm_io_new(void* derived);
 IMM_EXPORT int                   __imm_io_read(struct imm_io* io, FILE* stream);
-IMM_EXPORT struct imm_abc const* __imm_io_read_abc(FILE* stream, uint8_t type_id);
+IMM_EXPORT int                   __imm_io_read_abc(struct imm_io* io, FILE* stream);
+IMM_EXPORT int                   __imm_io_read_dp(struct imm_io* io, FILE* stream);
+IMM_EXPORT int                   __imm_io_read_hmm(struct imm_io* io, FILE* stream);
 IMM_EXPORT struct imm_io_vtable* __imm_io_vtable(struct imm_io* io);
 IMM_EXPORT int                   __imm_io_write(struct imm_io const* io, FILE* stream);
+IMM_EXPORT int                   __imm_io_write_abc(struct imm_io const* io, FILE* stream);
+IMM_EXPORT int                   __imm_io_write_dp(struct imm_io const* io, FILE* stream);
+IMM_EXPORT int                   __imm_io_write_hmm(struct imm_io const* io, FILE* stream);
 
 #endif

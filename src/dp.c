@@ -205,31 +205,6 @@ void dp_create_from_io(struct imm_io* io)
     io->dp = dp;
 }
 
-int dp_read(FILE* stream, struct imm_io* io)
-{
-    if (!(io->seq_code = seq_code_read(stream, io->abc))) {
-        imm_error("could not read seq_code");
-        return 1;
-    }
-
-    if (!(io->emission = dp_emission_read(stream))) {
-        imm_error("could not read dp_emission");
-        return 1;
-    }
-
-    if (!(io->trans_table = dp_trans_table_read(stream))) {
-        imm_error("could not read dp_trans_table");
-        return 1;
-    }
-
-    if (!(io->state_table = dp_state_table_read(stream))) {
-        imm_error("could not read dp_state_table");
-        return 1;
-    }
-
-    return 0;
-}
-
 struct mstate const* const* dp_get_mstates(struct imm_dp const* dp) { return dp->mstates; }
 
 struct dp_state_table const* dp_get_state_table(struct imm_dp const* dp) { return dp->state_table; }
