@@ -39,7 +39,6 @@ IMM_EXPORT int                   __imm_io_read_abc(struct imm_io* io, FILE* stre
 IMM_EXPORT int                   __imm_io_read_dp(struct imm_io* io, FILE* stream);
 IMM_EXPORT int                   __imm_io_read_hmm(struct imm_io* io, FILE* stream);
 IMM_EXPORT struct imm_io_vtable* __imm_io_vtable(struct imm_io* io);
-IMM_EXPORT int                   __imm_io_write(struct imm_io const* io, FILE* stream);
 IMM_EXPORT int                   __imm_io_write_abc(struct imm_io const* io, FILE* stream);
 IMM_EXPORT int                   __imm_io_write_dp(struct imm_io const* io, FILE* stream);
 IMM_EXPORT int                   __imm_io_write_hmm(struct imm_io const* io, FILE* stream);

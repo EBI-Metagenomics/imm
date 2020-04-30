@@ -40,11 +40,12 @@ struct mstates_chunk
 static struct mstate** read_mstates(FILE* stream, uint32_t* nstates, struct imm_abc const* abc);
 static struct imm_state const* read_state(FILE* stream, uint8_t type_id, struct imm_abc const* abc);
 static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct mstate* const* const mstates);
+static int write(struct imm_io const* io, FILE* stream);
 static int write_mstate(struct mstate const* mstate, struct imm_io const* io, FILE* stream);
 static int write_mstates(struct imm_io const* io, FILE* stream, struct mstate const* const* mstates,
                          uint32_t nstates);
 
-static struct imm_io_vtable const __vtable = {__imm_io_destroy, __imm_io_write,
+static struct imm_io_vtable const __vtable = {__imm_io_destroy, write,
                                               __imm_io_destroy_on_read_failure};
 
 struct imm_io const* imm_io_create(struct imm_hmm* hmm, struct imm_dp const* dp)
@@ -232,26 +233,6 @@ int __imm_io_read_dp(struct imm_io* io, FILE* stream)
 
 struct imm_io_vtable* __imm_io_vtable(struct imm_io* io) { return &io->vtable; }
 
-int __imm_io_write(struct imm_io const* io, FILE* stream)
-{
-    if (__imm_io_write_abc(io, stream)) {
-        imm_error("could not write abc");
-        return 1;
-    }
-
-    if (__imm_io_write_hmm(io, stream)) {
-        imm_error("could not write hmm");
-        return 1;
-    }
-
-    if (__imm_io_write_dp(io, stream)) {
-        imm_error("could not write dp");
-        return 1;
-    }
-
-    return 0;
-}
-
 int __imm_io_write_abc(struct imm_io const* io, FILE* stream)
 {
     uint8_t type_id = imm_abc_type_id(io->abc);
@@ -334,7 +315,7 @@ int __imm_io_write_hmm(struct imm_io const* io, FILE* stream)
     return 0;
 }
 
-int __imm_io_read_hmm(FILE* stream, struct imm_io* io)
+int __imm_io_read_hmm(struct imm_io* io, FILE* stream)
 {
     struct imm_hmm* hmm = NULL;
     io->mstates = NULL;
@@ -475,6 +456,26 @@ static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct mstate* co
         struct mtrans_table*    tbl = mstate_get_mtrans_table(mstates[src_state]);
         struct imm_state const* tgt = mstate_get_state(mstates[tgt_state]);
         mtrans_table_add(tbl, mtrans_create(tgt, lprob));
+    }
+
+    return 0;
+}
+
+static int write(struct imm_io const* io, FILE* stream)
+{
+    if (__imm_io_write_abc(io, stream)) {
+        imm_error("could not write abc");
+        return 1;
+    }
+
+    if (__imm_io_write_hmm(io, stream)) {
+        imm_error("could not write hmm");
+        return 1;
+    }
+
+    if (__imm_io_write_dp(io, stream)) {
+        imm_error("could not write dp");
+        return 1;
     }
 
     return 0;
