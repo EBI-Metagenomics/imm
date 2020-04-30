@@ -43,26 +43,7 @@ void __imm_state_destroy(struct imm_state const* state)
     free_c(state);
 }
 
-int __imm_state_write(struct imm_state const* state, FILE* stream)
-{
-    struct state_chunk chunk = {.name_length = cast_u16_zu(strlen(imm_state_get_name(state))),
-                                .name = (char*)imm_state_get_name(state)};
-
-    if (fwrite(&chunk.name_length, sizeof(chunk.name_length), 1, stream) < 1) {
-        imm_error("could not write name_length");
-        return 1;
-    }
-
-    if (fwrite(chunk.name, sizeof(*chunk.name), chunk.name_length + 1, stream) <
-        chunk.name_length + 1) {
-        imm_error("could not write name");
-        return 1;
-    }
-
-    return 0;
-}
-
-struct imm_state* state_read(FILE* stream, struct imm_abc const* abc)
+struct imm_state* __imm_state_read(FILE* stream, struct imm_abc const* abc)
 {
     struct state_chunk chunk;
 
@@ -85,4 +66,23 @@ struct imm_state* state_read(FILE* stream, struct imm_abc const* abc)
     state->vtable = (struct imm_state_vtable){NULL, NULL, NULL, NULL, NULL, NULL};
 
     return state;
+}
+
+int __imm_state_write(struct imm_state const* state, FILE* stream)
+{
+    struct state_chunk chunk = {.name_length = cast_u16_zu(strlen(imm_state_get_name(state))),
+                                .name = (char*)imm_state_get_name(state)};
+
+    if (fwrite(&chunk.name_length, sizeof(chunk.name_length), 1, stream) < 1) {
+        imm_error("could not write name_length");
+        return 1;
+    }
+
+    if (fwrite(chunk.name, sizeof(*chunk.name), chunk.name_length + 1, stream) <
+        chunk.name_length + 1) {
+        imm_error("could not write name");
+        return 1;
+    }
+
+    return 0;
 }

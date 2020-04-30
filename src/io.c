@@ -37,15 +37,14 @@ struct mstates_chunk
     struct mstate_chunk mstate_chunk;
 };
 
-static struct mstate** read_mstates(FILE* stream, uint32_t* nstates, struct imm_abc const* abc);
-static struct imm_state const* read_state(FILE* stream, uint8_t type_id, struct imm_abc const* abc);
+static struct mstate** read_mstates(struct imm_io* io, FILE* stream);
 static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct mstate* const* const mstates);
 static int write(struct imm_io const* io, FILE* stream);
 static int write_mstate(struct mstate const* mstate, struct imm_io const* io, FILE* stream);
 static int write_mstates(struct imm_io const* io, FILE* stream, struct mstate const* const* mstates,
                          uint32_t nstates);
 
-static struct imm_io_vtable const __vtable = {__imm_io_destroy, write,
+static struct imm_io_vtable const __vtable = {__imm_io_destroy, __imm_io_read_state, write,
                                               __imm_io_destroy_on_read_failure};
 
 struct imm_io const* imm_io_create(struct imm_hmm* hmm, struct imm_dp const* dp)
@@ -154,7 +153,7 @@ struct imm_io* __imm_io_new(void* derived)
     io->trans_table = NULL;
 
     io->vtable = __vtable;
-    io->derived = NULL;
+    io->derived = derived;
 
     return io;
 }
@@ -176,7 +175,7 @@ int __imm_io_read(struct imm_io* io, FILE* stream)
         goto err;
     }
 
-    dp_create_from_io(io);
+    __imm_dp_create_from_io(io);
     return 0;
 
 err:
@@ -322,7 +321,7 @@ int __imm_io_read_hmm(struct imm_io* io, FILE* stream)
 
     hmm = imm_hmm_create(io->abc);
 
-    if (!(io->mstates = read_mstates(stream, &io->nstates, io->abc))) {
+    if (!(io->mstates = read_mstates(io, stream))) {
         imm_error("could not read states");
         goto err;
     }
@@ -353,22 +352,42 @@ err:
     return 1;
 }
 
+struct imm_state const* __imm_io_read_state(struct imm_io const* io, FILE* stream, uint8_t type_id)
+{
+    struct imm_state const* state = NULL;
+
+    switch (type_id) {
+    case IMM_MUTE_STATE_TYPE_ID:
+        if (!(state = mute_state_read(stream, io->abc)))
+            imm_error("could not read mute_state");
+        break;
+    case IMM_NORMAL_STATE_TYPE_ID:
+        if (!(state = normal_state_read(stream, io->abc)))
+            imm_error("could not read normal_state");
+        break;
+    default:
+        imm_error("unknown state type_id");
+    }
+
+    return state;
+}
+
 void __imm_io_set_abc(struct imm_io* io, struct imm_abc const* abc) { io->abc = abc; }
 
-static struct mstate** read_mstates(FILE* stream, uint32_t* nstates, struct imm_abc const* abc)
+static struct mstate** read_mstates(struct imm_io* io, FILE* stream)
 {
     struct mstate** mstates = NULL;
 
-    if (fread(nstates, sizeof(*nstates), 1, stream) < 1) {
+    if (fread(&io->nstates, sizeof(io->nstates), 1, stream) < 1) {
         imm_error("could not read nstates");
         goto err;
     }
 
-    mstates = malloc(sizeof(*mstates) * (*nstates));
-    for (uint32_t i = 0; i < *nstates; ++i)
+    mstates = malloc(sizeof(*mstates) * (io->nstates));
+    for (uint32_t i = 0; i < io->nstates; ++i)
         mstates[i] = NULL;
 
-    for (uint32_t i = 0; i < *nstates; ++i) {
+    for (uint32_t i = 0; i < io->nstates; ++i) {
 
         struct mstate_chunk chunk;
 
@@ -382,7 +401,7 @@ static struct mstate** read_mstates(FILE* stream, uint32_t* nstates, struct imm_
             goto err;
         }
 
-        struct imm_state const* state = read_state(stream, chunk.type_id, abc);
+        struct imm_state const* state = io->vtable.read_state(io, stream, chunk.type_id);
         if (!state) {
             imm_error("could not read state");
             goto err;
@@ -395,7 +414,7 @@ static struct mstate** read_mstates(FILE* stream, uint32_t* nstates, struct imm_
 
 err:
     if (mstates) {
-        for (uint32_t i = 0; i < *nstates; ++i) {
+        for (uint32_t i = 0; i < io->nstates; ++i) {
             if (mstates[i])
                 mstate_destroy(mstates[i]);
         }
@@ -404,25 +423,6 @@ err:
     }
 
     return NULL;
-}
-
-static struct imm_state const* read_state(FILE* stream, uint8_t type_id, struct imm_abc const* abc)
-{
-    struct imm_state const* state = NULL;
-
-    switch (type_id) {
-    case IMM_MUTE_STATE_TYPE_ID:
-        if (!(state = mute_state_read(stream, abc)))
-            imm_error("could not read mute_state");
-        break;
-    case IMM_NORMAL_STATE_TYPE_ID:
-        if (!(state = normal_state_read(stream, abc)))
-            imm_error("could not read normal_state");
-        break;
-    default:
-        imm_error("unknown state type_id");
-    }
-    return state;
 }
 
 static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct mstate* const* const mstates)

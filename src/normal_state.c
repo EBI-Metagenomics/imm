@@ -117,7 +117,7 @@ static void destroy(struct imm_state const* state)
 
 struct imm_state const* normal_state_read(FILE* stream, struct imm_abc const* abc)
 {
-    struct imm_state* state = state_read(stream, abc);
+    struct imm_state* state = __imm_state_read(stream, abc);
     if (!state) {
         imm_error("could not state_read");
         return NULL;

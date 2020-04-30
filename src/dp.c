@@ -190,21 +190,6 @@ struct imm_dp const* dp_create(struct imm_abc const* abc, struct mstate const** 
     return dp;
 }
 
-void dp_create_from_io(struct imm_io* io)
-{
-    struct imm_dp* dp = malloc(sizeof(*dp));
-
-    dp->mstates = (struct mstate const**)io->mstates;
-    dp->seq_code = io->seq_code;
-    dp->emission = io->emission;
-    dp->trans_table = io->trans_table;
-    dp->state_table = io->state_table;
-
-    finish_creation(dp);
-
-    io->dp = dp;
-}
-
 struct mstate const* const* dp_get_mstates(struct imm_dp const* dp) { return dp->mstates; }
 
 struct dp_state_table const* dp_get_state_table(struct imm_dp const* dp) { return dp->state_table; }
@@ -226,6 +211,21 @@ static void finish_creation(struct imm_dp* dp)
 struct dp_emission const* dp_get_emission(struct imm_dp const* dp) { return dp->emission; }
 
 struct seq_code const* dp_get_seq_code(struct imm_dp const* dp) { return dp->seq_code; }
+
+void __imm_dp_create_from_io(struct imm_io* io)
+{
+    struct imm_dp* dp = malloc(sizeof(*dp));
+
+    dp->mstates = (struct mstate const**)io->mstates;
+    dp->seq_code = io->seq_code;
+    dp->emission = io->emission;
+    dp->trans_table = io->trans_table;
+    dp->state_table = io->state_table;
+
+    finish_creation(dp);
+
+    io->dp = dp;
+}
 
 static double viterbi(struct imm_dp const* dp, struct dp_matrix* matrix, struct eseq const* eseq,
                       struct imm_path* path)

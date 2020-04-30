@@ -77,7 +77,8 @@ static inline void const* __imm_state_derived(struct imm_state const* state)
     return state->derived;
 }
 
-IMM_EXPORT void __imm_state_destroy(struct imm_state const* state);
-IMM_EXPORT int  __imm_state_write(struct imm_state const* state, FILE* stream);
+IMM_EXPORT void              __imm_state_destroy(struct imm_state const* state);
+IMM_EXPORT struct imm_state* __imm_state_read(FILE* stream, struct imm_abc const* abc);
+IMM_EXPORT int               __imm_state_write(struct imm_state const* state, FILE* stream);
 
 #endif

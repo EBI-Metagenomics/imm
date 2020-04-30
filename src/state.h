@@ -12,6 +12,5 @@ static inline int state_write(struct imm_state const* state, struct imm_io const
 {
     return state->vtable.write(state, io, stream);
 }
-struct imm_state* state_read(FILE* stream, struct imm_abc const* abc);
 
 #endif
