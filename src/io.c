@@ -353,6 +353,8 @@ err:
     return 1;
 }
 
+void __imm_io_set_abc(struct imm_io* io, struct imm_abc const* abc) { io->abc = abc; }
+
 static struct mstate** read_mstates(FILE* stream, uint32_t* nstates, struct imm_abc const* abc)
 {
     struct mstate** mstates = NULL;
