@@ -39,10 +39,10 @@ struct imm_abc_vtable
 };
 
 /**
- * Immutable alphabet.
+ * Alphabet.
  *
  * It represents a finite set of symbols and a special any-symbol
- * symbol.
+ * symbol. It should be used as an immutable object.
  */
 struct imm_abc
 {
@@ -55,16 +55,28 @@ struct imm_abc
     void*                 derived;
 };
 
-static inline uint8_t __imm_abc_index(char const c) { return (uint8_t)(c - IMM_FIRST_CHAR); }
-
+static inline char               imm_abc_any_symbol(struct imm_abc const* abc);
 IMM_EXPORT struct imm_abc const* imm_abc_clone(struct imm_abc const* abc);
 IMM_EXPORT struct imm_abc const* imm_abc_create(char const* symbols, char any_symbol);
 IMM_EXPORT void                  imm_abc_destroy(struct imm_abc const* abc);
+static inline bool               imm_abc_has_symbol(struct imm_abc const* abc, char symbol_id);
 static inline uint8_t            imm_abc_length(struct imm_abc const* abc) { return abc->length; }
 IMM_EXPORT struct imm_abc const* imm_abc_read(FILE* stream);
-static inline char const*        imm_abc_symbols(struct imm_abc const* abc) { return abc->symbols; }
+static inline char               imm_abc_symbol_id(struct imm_abc const* abc, uint8_t symbol_idx);
+static inline uint8_t            imm_abc_symbol_idx(struct imm_abc const* abc, char symbol_id);
 IMM_EXPORT enum imm_symbol_type  imm_abc_symbol_type(struct imm_abc const* abc, char symbol_id);
+static inline char const*        imm_abc_symbols(struct imm_abc const* abc) { return abc->symbols; }
+static inline uint8_t            imm_abc_type_id(struct imm_abc const* abc);
 IMM_EXPORT int                   imm_abc_write(struct imm_abc const* abc, FILE* stream);
+
+IMM_EXPORT struct imm_abc const* __imm_abc_clone(struct imm_abc const* abc);
+IMM_EXPORT struct imm_abc* __imm_abc_create(char const* symbols, char any_symbol, void* derived);
+static inline void const*  __imm_abc_derived(struct imm_abc const* abc);
+IMM_EXPORT void            __imm_abc_destroy(struct imm_abc const* abc);
+static inline uint8_t      __imm_abc_index(char const c);
+IMM_EXPORT struct imm_abc* __imm_abc_read(FILE* stream);
+IMM_EXPORT uint8_t         __imm_abc_type_id(struct imm_abc const* abc);
+IMM_EXPORT int             __imm_abc_write(struct imm_abc const* abc, FILE* stream);
 
 static inline char imm_abc_any_symbol(struct imm_abc const* abc) { return abc->any_symbol; }
 
@@ -76,14 +88,14 @@ static inline bool imm_abc_has_symbol(struct imm_abc const* abc, char symbol_id)
     return abc->symbol_idx[__imm_abc_index(symbol_id)] != IMM_ABC_INVALID_IDX;
 }
 
-static inline uint8_t imm_abc_symbol_idx(struct imm_abc const* abc, char symbol_id)
-{
-    return abc->symbol_idx[__imm_abc_index(symbol_id)];
-}
-
 static inline char imm_abc_symbol_id(struct imm_abc const* abc, uint8_t symbol_idx)
 {
     return abc->symbols[symbol_idx];
+}
+
+static inline uint8_t imm_abc_symbol_idx(struct imm_abc const* abc, char symbol_id)
+{
+    return abc->symbol_idx[__imm_abc_index(symbol_id)];
 }
 
 static inline uint8_t imm_abc_type_id(struct imm_abc const* abc)
@@ -91,12 +103,6 @@ static inline uint8_t imm_abc_type_id(struct imm_abc const* abc)
     return abc->vtable.type_id(abc);
 }
 
-IMM_EXPORT struct imm_abc const* __imm_abc_clone(struct imm_abc const* abc);
-IMM_EXPORT struct imm_abc* __imm_abc_create(char const* symbols, char any_symbol, void* derived);
-static inline void const*  __imm_abc_derived(struct imm_abc const* abc) { return abc->derived; }
-IMM_EXPORT void            __imm_abc_destroy(struct imm_abc const* abc);
-IMM_EXPORT struct imm_abc* __imm_abc_read(FILE* stream);
-IMM_EXPORT uint8_t         __imm_abc_type_id(struct imm_abc const* abc);
-IMM_EXPORT int             __imm_abc_write(struct imm_abc const* abc, FILE* stream);
+static inline uint8_t __imm_abc_index(char const c) { return (uint8_t)(c - IMM_FIRST_CHAR); }
 
 #endif
