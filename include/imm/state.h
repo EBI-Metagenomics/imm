@@ -22,8 +22,8 @@ struct imm_state_vtable
 {
     uint8_t (*type_id)(struct imm_state const* state);
     double (*lprob)(struct imm_state const* state, struct imm_seq const* seq);
-    unsigned (*min_seq)(struct imm_state const* state);
-    unsigned (*max_seq)(struct imm_state const* state);
+    uint8_t (*min_seq)(struct imm_state const* state);
+    uint8_t (*max_seq)(struct imm_state const* state);
     int (*write)(struct imm_state const* state, struct imm_io const* io, FILE* stream);
     void (*destroy)(struct imm_state const* state);
 };
@@ -62,12 +62,12 @@ static inline double imm_state_lprob(struct imm_state const* state, struct imm_s
     return state->vtable.lprob(state, seq);
 }
 
-static inline unsigned imm_state_min_seq(struct imm_state const* state)
+static inline uint8_t imm_state_min_seq(struct imm_state const* state)
 {
     return state->vtable.min_seq(state);
 }
 
-static inline unsigned imm_state_max_seq(struct imm_state const* state)
+static inline uint8_t imm_state_max_seq(struct imm_state const* state)
 {
     return state->vtable.max_seq(state);
 }

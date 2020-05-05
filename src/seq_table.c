@@ -1,4 +1,5 @@
 #include "imm/seq_table.h"
+#include "cast.h"
 #include "free.h"
 #include "imm//bug.h"
 #include "imm/lprob.h"
@@ -18,8 +19,8 @@ struct imm_seq_table
 {
     struct imm_abc const* abc;
     khash_t(emission) * emission_table;
-    unsigned min_seq;
-    unsigned max_seq;
+    uint8_t min_seq;
+    uint8_t max_seq;
 };
 
 struct imm_seq_table* imm_seq_table_create(struct imm_abc const* abc)
@@ -67,8 +68,7 @@ void imm_seq_table_destroy(struct imm_seq_table const* table)
     free_c(table);
 }
 
-int imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const* seq,
-                      double const lprob)
+int imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const* seq, double const lprob)
 {
     if (table->abc != imm_seq_get_abc(seq)) {
         imm_error("alphabets must be the same");
@@ -93,8 +93,8 @@ int imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const* seq,
     kh_key(table->emission_table, iter) = emiss->seq;
     kh_val(table->emission_table, iter) = emiss;
 
-    table->min_seq = MIN(table->min_seq, imm_seq_length(seq));
-    table->max_seq = MAX(table->max_seq, imm_seq_length(seq));
+    table->min_seq = MIN(table->min_seq, cast_u8_u(imm_seq_length(seq)));
+    table->max_seq = MAX(table->max_seq, cast_u8_u(imm_seq_length(seq)));
 
     return 0;
 }
@@ -151,6 +151,6 @@ struct imm_abc const* imm_seq_table_get_abc(struct imm_seq_table const* table)
     return table->abc;
 }
 
-unsigned imm_seq_table_min_seq(struct imm_seq_table const* table) { return table->min_seq; }
+uint8_t imm_seq_table_min_seq(struct imm_seq_table const* table) { return table->min_seq; }
 
-unsigned imm_seq_table_max_seq(struct imm_seq_table const* table) { return table->max_seq; }
+uint8_t imm_seq_table_max_seq(struct imm_seq_table const* table) { return table->max_seq; }

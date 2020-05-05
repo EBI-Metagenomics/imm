@@ -105,4 +105,6 @@ static inline uint8_t imm_abc_type_id(struct imm_abc const* abc)
 
 static inline uint8_t __imm_abc_index(char const c) { return (uint8_t)(c - IMM_FIRST_CHAR); }
 
+static inline void const* __imm_abc_derived(struct imm_abc const* abc) { return abc->derived; }
+
 #endif

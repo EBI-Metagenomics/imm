@@ -3,7 +3,7 @@
 #include "imm/seq.h"
 #include "imm/subseq.h"
 
-void eseq_setup(struct eseq const* eseq, struct imm_seq const* seq)
+void eseq_setup(struct eseq* eseq, struct imm_seq const* seq)
 {
     unsigned ncols = matrixu_ncols(eseq->code);
     matrixu_resize(eseq->code, imm_seq_length(seq) + 1, ncols);

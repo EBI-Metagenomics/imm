@@ -13,12 +13,12 @@ struct imm_table_state
     struct imm_seq_table const* table;
 };
 
-static uint8_t  type_id(struct imm_state const* state);
-static double   lprob(struct imm_state const* state, struct imm_seq const* seq);
-static unsigned min_seq(struct imm_state const* state);
-static unsigned max_seq(struct imm_state const* state);
-static int      write(struct imm_state const* state, struct imm_io const* io, FILE* stream);
-static void     destroy(struct imm_state const* state);
+static uint8_t type_id(struct imm_state const* state);
+static double  lprob(struct imm_state const* state, struct imm_seq const* seq);
+static uint8_t min_seq(struct imm_state const* state);
+static uint8_t max_seq(struct imm_state const* state);
+static int     write(struct imm_state const* state, struct imm_io const* io, FILE* stream);
+static void    destroy(struct imm_state const* state);
 
 static struct imm_state_vtable const vtable = {type_id, lprob, min_seq, max_seq, write, destroy};
 
@@ -59,13 +59,13 @@ static double lprob(struct imm_state const* state, struct imm_seq const* seq)
     return imm_seq_table_lprob(s->table, seq);
 }
 
-static unsigned min_seq(struct imm_state const* state)
+static uint8_t min_seq(struct imm_state const* state)
 {
     struct imm_table_state const* s = __imm_state_derived(state);
     return imm_seq_table_min_seq(s->table);
 }
 
-static unsigned max_seq(struct imm_state const* state)
+static uint8_t max_seq(struct imm_state const* state)
 {
     struct imm_table_state const* s = __imm_state_derived(state);
     return imm_seq_table_max_seq(s->table);

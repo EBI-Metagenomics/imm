@@ -10,7 +10,7 @@ struct eseq
     struct seq_code const* seq_code;
 };
 
-void                   eseq_setup(struct eseq const* eseq, struct imm_seq const* seq);
+void                   eseq_setup(struct eseq* eseq, struct imm_seq const* seq);
 static inline unsigned eseq_get(struct eseq const* eseq, unsigned position, unsigned length)
 {
     return matrixu_get(eseq->code, position, length - seq_code_min_seq(eseq->seq_code));

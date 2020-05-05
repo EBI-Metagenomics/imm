@@ -22,12 +22,12 @@ struct normal_state_chunk
     double* lprobs;
 };
 
-static uint8_t  type_id(struct imm_state const* state);
-static double   lprob(struct imm_state const* state, struct imm_seq const* seq);
-static unsigned min_seq(struct imm_state const* state);
-static unsigned max_seq(struct imm_state const* state);
-static int      write(struct imm_state const* state, struct imm_io const* io, FILE* stream);
-static void     destroy(struct imm_state const* state);
+static uint8_t type_id(struct imm_state const* state);
+static double  lprob(struct imm_state const* state, struct imm_seq const* seq);
+static uint8_t min_seq(struct imm_state const* state);
+static uint8_t max_seq(struct imm_state const* state);
+static int     write(struct imm_state const* state, struct imm_io const* io, FILE* stream);
+static void    destroy(struct imm_state const* state);
 
 static struct imm_state_vtable const vtable = {type_id, lprob, min_seq, max_seq, write, destroy};
 
@@ -77,9 +77,9 @@ static double lprob(struct imm_state const* state, struct imm_seq const* seq)
     return imm_lprob_zero();
 }
 
-static unsigned min_seq(struct imm_state const* state) { return 1; }
+static uint8_t min_seq(struct imm_state const* state) { return 1; }
 
-static unsigned max_seq(struct imm_state const* state) { return 1; }
+static uint8_t max_seq(struct imm_state const* state) { return 1; }
 
 static int write(struct imm_state const* state, struct imm_io const* io, FILE* stream)
 {

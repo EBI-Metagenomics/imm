@@ -9,10 +9,10 @@ struct imm_results;
 struct imm_seq;
 struct imm_state;
 
+IMM_EXPORT void                      imm_dp_destroy(struct imm_dp const* dp);
 IMM_EXPORT struct imm_results const* imm_dp_viterbi(struct imm_dp const*  dp,
                                                     struct imm_seq const* seq,
                                                     unsigned              window_length);
-IMM_EXPORT void                      imm_dp_destroy(struct imm_dp const* dp);
 
 IMM_EXPORT void __imm_dp_create_from_io(struct imm_io* io);
 
