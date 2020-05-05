@@ -4,7 +4,6 @@
 #include "imm/abc.h"
 #include "imm/export.h"
 #include "imm/lprob.h"
-#include "imm/report.h"
 
 struct imm_abc_table
 {
@@ -14,6 +13,15 @@ struct imm_abc_table
 
 IMM_EXPORT struct imm_abc_table const* imm_abc_table_create(struct imm_abc const* abc,
                                                             double const*         lprobs);
+IMM_EXPORT void                        imm_abc_table_destroy(struct imm_abc_table const* abc_table);
+static inline struct imm_abc const*    imm_abc_table_get_abc(struct imm_abc_table const* abc_table);
+static inline double imm_abc_table_lprob(struct imm_abc_table const* abc_table, char symbol);
+
+static inline struct imm_abc const* imm_abc_table_get_abc(struct imm_abc_table const* abc_table)
+{
+    return abc_table->abc;
+}
+
 static inline double imm_abc_table_lprob(struct imm_abc_table const* abc_table, char symbol)
 {
     unsigned idx = imm_abc_symbol_idx(abc_table->abc, symbol);
@@ -22,12 +30,6 @@ static inline double imm_abc_table_lprob(struct imm_abc_table const* abc_table, 
         return imm_lprob_invalid();
     }
     return abc_table->lprobs[idx];
-}
-IMM_EXPORT void imm_abc_table_destroy(struct imm_abc_table const* abc_table);
-static inline struct imm_abc const* imm_abc_table_get_abc(
-    struct imm_abc_table const* abc_table)
-{
-    return abc_table->abc;
 }
 
 #endif
