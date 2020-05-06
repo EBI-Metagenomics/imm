@@ -19,7 +19,7 @@ static uint8_t min_seq(struct imm_state const* state);
 static uint8_t type_id(struct imm_state const* state);
 static int     write(struct imm_state const* state, struct imm_io const* io, FILE* stream);
 
-static struct imm_state_vtable const __vtable = {type_id, lprob, min_seq, max_seq, write, destroy};
+static struct imm_state_vtable const __vtable = {destroy, lprob, max_seq, min_seq, type_id, write};
 
 struct imm_mute_state const* imm_mute_state_create(char const* name, struct imm_abc const* abc)
 {

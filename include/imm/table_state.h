@@ -10,12 +10,13 @@
  */
 
 struct imm_seq_table;
+struct imm_state;
 struct imm_table_state;
 
 IMM_EXPORT struct imm_table_state const* imm_table_state_create(char const*                 name,
                                                                 struct imm_seq_table const* table);
+IMM_EXPORT struct imm_table_state const* imm_table_state_derived(struct imm_state const* state);
 IMM_EXPORT void                    imm_table_state_destroy(struct imm_table_state const* state);
 IMM_EXPORT struct imm_state const* imm_table_state_super(struct imm_table_state const* state);
-IMM_EXPORT struct imm_table_state const* imm_table_state_derived(struct imm_state const* state);
 
 #endif

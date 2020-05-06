@@ -27,7 +27,7 @@ struct imm_state const* imm_state_create(char const* name, struct imm_abc const*
         return NULL;
     }
 
-    struct imm_state* s = malloc(sizeof(struct imm_state));
+    struct imm_state* s = malloc(sizeof(*s));
     s->name = strdup(name);
     s->abc = abc;
     s->vtable = vtable;
@@ -60,10 +60,10 @@ struct imm_state* __imm_state_read(FILE* stream, struct imm_abc const* abc)
     }
 
     struct imm_state* state = malloc(sizeof(*state));
-    state->derived = NULL;
     state->name = chunk.name;
     state->abc = abc;
     state->vtable = (struct imm_state_vtable){NULL, NULL, NULL, NULL, NULL, NULL};
+    state->derived = NULL;
 
     return state;
 }
