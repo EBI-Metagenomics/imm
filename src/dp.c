@@ -51,6 +51,10 @@ static uint8_t max_seq(struct mstate const* const* mstates, uint32_t nstates);
 static uint8_t min_seq(struct mstate const* const* mstates, uint32_t nstates);
 static inline void set_score(struct imm_dp const* dp, struct task* task, double trans_score,
                              uint32_t min_len, uint32_t max_len, uint32_t row, uint32_t state);
+static void        task_create(struct task* task, struct dp_state_table const* state_table,
+                               struct seq_code const* seq_code);
+static void        task_destroy(struct task* task);
+static inline void task_setup(struct task* task, struct imm_seq const* seq);
 static double      viterbi(struct imm_dp const* dp, struct task* task, struct imm_path* path);
 static void viterbi_path(struct imm_dp const* dp, struct task const* task, struct imm_path* path,
                          struct dp_step const* end_step);
@@ -64,11 +68,8 @@ void imm_dp_destroy(struct imm_dp const* dp)
     dp_state_table_destroy(dp->state_table);
 
     for (unsigned i = 0; i < dp->ntasks; ++i) {
-
-        if (dp->tasks[i].matrix) {
-            dp_matrix_destroy(dp->tasks[i].matrix);
-            eseq_destroy(dp->tasks[i].eseq);
-        }
+        if (dp->tasks[i].matrix)
+            task_destroy(dp->tasks + i);
     }
 
     free_c(dp->tasks);
@@ -89,9 +90,6 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
         return NULL;
     }
 
-    if (!dp)
-        return NULL;
-
     if (window_length == 0)
         window_length = imm_seq_length(seq);
 
@@ -101,18 +99,15 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
 
     _Pragma("omp parallel if(nwindows > 1)")
     {
-        if (!dp->tasks[thread_id()].matrix) {
-            dp->tasks[thread_id()].matrix = dp_matrix_create(dp->state_table);
-            dp->tasks[thread_id()].eseq = seq_code_create_eseq(dp->seq_code);
-        }
+        if (!dp->tasks[thread_id()].matrix)
+            task_create(dp->tasks + thread_id(), dp->state_table, dp->seq_code);
 
 #pragma omp for
         for (unsigned i = 0; i < nwindows; ++i) {
             struct imm_subseq const subseq = imm_window_get(window, i);
             struct task*            task = dp->tasks + thread_id();
 
-            eseq_setup(task->eseq, imm_subseq_cast(&subseq));
-            dp_matrix_setup(task->matrix, task->eseq);
+            task_setup(task, imm_subseq_cast(&subseq));
 
             struct imm_path* path = imm_path_create();
             double           score = viterbi(dp, task, path);
@@ -271,6 +266,25 @@ static inline void set_score(struct imm_dp const* dp, struct task* task, double 
         double score = trans_score + dp_emission_score(dp->emission, state, seq_code);
         dp_matrix_set_score(task->matrix, row, step, score);
     }
+}
+
+static void task_create(struct task* task, struct dp_state_table const* state_table,
+                        struct seq_code const* seq_code)
+{
+    task->matrix = dp_matrix_create(state_table);
+    task->eseq = seq_code_create_eseq(seq_code);
+}
+
+static void task_destroy(struct task* task)
+{
+    dp_matrix_destroy(task->matrix);
+    eseq_destroy(task->eseq);
+}
+
+static inline void task_setup(struct task* task, struct imm_seq const* seq)
+{
+    eseq_setup(task->eseq, seq);
+    dp_matrix_setup(task->matrix, task->eseq);
 }
 
 static double viterbi(struct imm_dp const* dp, struct task* task, struct imm_path* path)
