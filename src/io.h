@@ -16,8 +16,8 @@ struct imm_io
     struct imm_abc const*        abc;
     struct imm_hmm*              hmm;
     struct mstate**              mstates;
-    struct imm_state const**     states;
     uint32_t                     nstates;
+    struct imm_state const**     states;
     struct seq_code const*       seq_code;
     struct dp_emission const*    emission;
     struct dp_trans_table const* trans_table;
