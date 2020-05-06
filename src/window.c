@@ -18,7 +18,7 @@ struct imm_window* imm_window_create(struct imm_seq const* seq, unsigned length)
 {
     length = MIN(length, imm_seq_length(seq));
 
-    struct imm_window* window = malloc(sizeof(struct imm_window));
+    struct imm_window* window = malloc(sizeof(*window));
     window->seq = seq;
     window->length = length;
     window->offset = 0;
