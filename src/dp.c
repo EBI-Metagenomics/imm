@@ -171,12 +171,12 @@ static double best_trans_score(struct imm_dp const* dp, struct dp_matrix const* 
     for (uint32_t i = 0; i < dp_trans_table_ntrans(dp->trans_table, target_state); ++i) {
 
         uint32_t source_state = dp_trans_table_source_state(dp->trans_table, target_state, i);
-        unsigned min_seq = dp_state_table_min_seq(dp->state_table, source_state);
+        uint32_t min_seq = dp_state_table_min_seq(dp->state_table, source_state);
 
         if (UNLIKELY(row < min_seq) || (min_seq == 0 && source_state > target_state))
             continue;
 
-        unsigned max_seq = MIN(dp_state_table_max_seq(dp->state_table, source_state), row);
+        uint32_t max_seq = MIN(dp_state_table_max_seq(dp->state_table, source_state), row);
         for (uint32_t len = min_seq; len <= max_seq; ++len) {
 
             struct dp_step step = {.state = source_state, .seq_len = len};
