@@ -79,7 +79,7 @@ struct imm_io* __imm_io_create(struct imm_hmm* hmm, struct imm_dp const* dp, voi
 
     io->abc = hmm_abc(hmm);
     io->hmm = hmm;
-    io->mstates = hmm_get_mstates(hmm, dp);
+    io->mstates = (struct mstate**)hmm_get_mstates(hmm, dp);
 
     io->nstates = dp_state_table_nstates(dp_get_state_table(dp));
     io->states = malloc(sizeof(*io->states) * io->nstates);
