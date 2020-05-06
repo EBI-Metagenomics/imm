@@ -8,9 +8,9 @@ struct mtrans
     double                  lprob;
 };
 
-struct mtrans* mtrans_create(struct imm_state const* state, double const lprob)
+struct mtrans* mtrans_create(struct imm_state const* state, double lprob)
 {
-    struct mtrans* mtrans = malloc(sizeof(struct mtrans));
+    struct mtrans* mtrans = malloc(sizeof(*mtrans));
     mtrans->state = state;
     mtrans->lprob = lprob;
     return mtrans;
@@ -22,8 +22,8 @@ void mtrans_destroy(struct mtrans const* mtrans)
     free_c(mtrans);
 }
 
-struct imm_state const* mtrans_get_state(struct mtrans const* mtrans) { return mtrans->state; }
-
 double mtrans_get_lprob(struct mtrans const* mtrans) { return mtrans->lprob; }
+
+struct imm_state const* mtrans_get_state(struct mtrans const* mtrans) { return mtrans->state; }
 
 void mtrans_set_lprob(struct mtrans* mtrans, double lprob) { mtrans->lprob = lprob; }
