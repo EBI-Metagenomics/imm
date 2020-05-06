@@ -3,6 +3,12 @@
 #include "imm/seq.h"
 #include "imm/subseq.h"
 
+void eseq_destroy(struct eseq const* eseq)
+{
+    matrixu_destroy(eseq->code);
+    free_c(eseq);
+}
+
 void eseq_setup(struct eseq* eseq, struct imm_seq const* seq)
 {
     unsigned ncols = matrixu_ncols(eseq->code);
@@ -24,10 +30,4 @@ void eseq_setup(struct eseq* eseq, struct imm_seq const* seq)
             matrixu_set(eseq->code, i, j, code);
         }
     }
-}
-
-void eseq_destroy(struct eseq const* eseq)
-{
-    matrixu_destroy(eseq->code);
-    free_c(eseq);
 }
