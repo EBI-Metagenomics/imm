@@ -34,10 +34,7 @@ int imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const* seq, do
 
     int      ret = 0;
     khiter_t iter = kh_put(emission, table->emission_table, seq, &ret);
-    if (ret == -1) {
-        imm_error("hash table failed");
-        return 1;
-    }
+    IMM_BUG(ret == -1);
     if (ret == 0) {
         imm_error("sequence already exist");
         return 1;
@@ -101,6 +98,25 @@ void imm_seq_table_destroy(struct imm_seq_table const* table)
     free_c(table);
 }
 
+double imm_seq_table_lprob(struct imm_seq_table const* table, struct imm_seq const* seq)
+{
+    if (table->abc != imm_seq_get_abc(seq)) {
+        imm_error("alphabets must be the same");
+        return imm_lprob_invalid();
+    }
+
+    khiter_t i = kh_get(emission, table->emission_table, seq);
+
+    if (i == kh_end(table->emission_table))
+        return imm_lprob_zero();
+
+    return kh_val(table->emission_table, i)->lprob;
+}
+
+uint8_t imm_seq_table_max_seq(struct imm_seq_table const* table) { return table->max_seq; }
+
+uint8_t imm_seq_table_min_seq(struct imm_seq_table const* table) { return table->min_seq; }
+
 int imm_seq_table_normalize(struct imm_seq_table* table)
 {
     khiter_t const len = kh_size(table->emission_table);
@@ -132,22 +148,3 @@ int imm_seq_table_normalize(struct imm_seq_table* table)
     free_c(lprobs);
     return 0;
 }
-
-double imm_seq_table_lprob(struct imm_seq_table const* table, struct imm_seq const* seq)
-{
-    if (table->abc != imm_seq_get_abc(seq)) {
-        imm_error("alphabets must be the same");
-        return imm_lprob_invalid();
-    }
-
-    khiter_t i = kh_get(emission, table->emission_table, seq);
-
-    if (i == kh_end(table->emission_table))
-        return imm_lprob_zero();
-
-    return kh_val(table->emission_table, i)->lprob;
-}
-
-uint8_t imm_seq_table_min_seq(struct imm_seq_table const* table) { return table->min_seq; }
-
-uint8_t imm_seq_table_max_seq(struct imm_seq_table const* table) { return table->max_seq; }

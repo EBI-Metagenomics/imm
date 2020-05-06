@@ -18,6 +18,12 @@ static inline uint32_t cast_u32_u(unsigned src)
     return (uint32_t)src;
 }
 
+static inline uint32_t cast_u32_ul(unsigned long src)
+{
+    IMM_BUG(src > UINT32_MAX);
+    return (uint32_t)src;
+}
+
 static inline unsigned cast_u_lu(unsigned long src)
 {
     IMM_BUG(src > UINT_MAX);
