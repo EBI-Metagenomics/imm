@@ -19,13 +19,13 @@ static uint8_t min_seq(struct imm_state const* state);
 static uint8_t type_id(struct imm_state const* state);
 static int     write(struct imm_state const* state, struct imm_io const* io, FILE* stream);
 
-static struct imm_state_vtable const vtable = {type_id, lprob, min_seq, max_seq, write, destroy};
+static struct imm_state_vtable const __vtable = {type_id, lprob, min_seq, max_seq, write, destroy};
 
 struct imm_mute_state const* imm_mute_state_create(char const* name, struct imm_abc const* abc)
 {
     struct imm_mute_state* state = malloc(sizeof(*state));
 
-    state->super = imm_state_create(name, abc, vtable, state);
+    state->super = imm_state_create(name, abc, __vtable, state);
     return state;
 }
 
@@ -58,7 +58,7 @@ struct imm_state const* mute_state_read(FILE* stream, struct imm_abc const* abc)
 
     struct imm_mute_state* mute_state = malloc(sizeof(*mute_state));
     mute_state->super = state;
-    state->vtable = vtable;
+    state->vtable = __vtable;
     state->derived = mute_state;
 
     return state;

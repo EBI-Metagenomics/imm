@@ -15,8 +15,8 @@ struct imm_state;
 IMM_EXPORT struct imm_normal_state const* imm_normal_state_create(char const*           name,
                                                                   struct imm_abc const* abc,
                                                                   double const*         lprobs);
+IMM_EXPORT struct imm_normal_state const* imm_normal_state_derived(struct imm_state const* state);
 IMM_EXPORT void                    imm_normal_state_destroy(struct imm_normal_state const* state);
 IMM_EXPORT struct imm_state const* imm_normal_state_super(struct imm_normal_state const* state);
-IMM_EXPORT struct imm_normal_state const* imm_normal_state_derived(struct imm_state const* state);
 
 #endif
