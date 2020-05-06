@@ -4,14 +4,14 @@
 
 struct dp_matrix* dp_matrix_create(struct dp_state_table const* states)
 {
-    struct dp_matrix* matrix = malloc(sizeof(struct dp_matrix));
+    struct dp_matrix* matrix = malloc(sizeof(*matrix));
 
     matrix->states = states;
     matrix->state_col = malloc(sizeof(*matrix->state_col) * dp_state_table_nstates(states));
 
-    unsigned next_col = 0;
-    for (unsigned i = 0; i < dp_state_table_nstates(states); ++i) {
-        matrix->state_col[i] = panic_sub_ui(next_col, dp_state_table_min_seq(states, i));
+    uint32_t next_col = 0;
+    for (uint32_t i = 0; i < dp_state_table_nstates(states); ++i) {
+        matrix->state_col[i] = panic_sub_ui32(next_col, dp_state_table_min_seq(states, i));
         next_col += dp_state_table_max_seq(states, i) - dp_state_table_min_seq(states, i) + 1;
     }
 
