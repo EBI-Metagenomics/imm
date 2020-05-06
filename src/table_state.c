@@ -28,7 +28,7 @@ struct imm_table_state const* imm_table_state_create(char const*                
     struct imm_table_state* state = malloc(sizeof(struct imm_table_state));
     state->table = imm_seq_table_clone(table);
 
-    state->super = imm_state_create(name, imm_seq_table_get_abc(table), vtable, state);
+    state->super = imm_state_create(name, imm_seq_table_abc(table), vtable, state);
     return state;
 }
 
