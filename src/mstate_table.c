@@ -42,8 +42,7 @@ void mstate_table_add(struct mstate_table* table, struct mstate* mstate)
     kh_val(table->ktable, i) = mstate;
 }
 
-unsigned long mstate_table_find(struct mstate_table const* table,
-                                struct imm_state const*    state)
+unsigned long mstate_table_find(struct mstate_table const* table, struct imm_state const* state)
 {
     return kh_get(mstate, table->ktable, state);
 }
@@ -82,15 +81,12 @@ unsigned long mstate_table_begin(struct mstate_table const* table)
     return kh_begin(table->ktable);
 }
 
-unsigned long mstate_table_end(struct mstate_table const* table)
-{
-    return kh_end(table->ktable);
-}
+unsigned long mstate_table_end(struct mstate_table const* table) { return kh_end(table->ktable); }
 
 unsigned mstate_table_size(struct mstate_table const* table)
 {
-    size_t n = kh_size(table->ktable);
-    IMM_BUG(n > UINT_MAX);
+    khint_t n = kh_size(table->ktable);
+    IMM_BUG(n < 0 || n > UINT_MAX);
     return (unsigned)n;
 }
 
