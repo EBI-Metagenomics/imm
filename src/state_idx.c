@@ -1,5 +1,6 @@
 #include "state_idx.h"
 #include "free.h"
+#include "imm/bug.h"
 #include "imm/report.h"
 #include "khash_ptr.h"
 
@@ -16,9 +17,23 @@ struct state_idx
     khash_t(item) * table;
 };
 
+void state_idx_add(struct state_idx* state_idx, struct imm_state const* state, uint32_t idx)
+{
+    int      ret = 0;
+    khiter_t iter = kh_put(item, state_idx->table, state, &ret);
+    IMM_BUG(ret == -1 || ret == 0);
+
+    struct item* item = malloc(sizeof(*item));
+    item->state = state;
+    item->idx = idx;
+
+    kh_key(state_idx->table, iter) = item->state;
+    kh_val(state_idx->table, iter) = item;
+}
+
 struct state_idx* state_idx_create(void)
 {
-    struct state_idx* state_idx = malloc(sizeof(struct state_idx));
+    struct state_idx* state_idx = malloc(sizeof(*state_idx));
     state_idx->table = kh_init(item);
     return state_idx;
 }
@@ -34,29 +49,9 @@ void state_idx_destroy(struct state_idx* state_idx)
     free_c(state_idx);
 }
 
-void state_idx_add(struct state_idx* state_idx, struct imm_state const* state, uint32_t idx)
-{
-    int      ret = 0;
-    khiter_t iter = kh_put(item, state_idx->table, state, &ret);
-    if (ret == -1)
-        imm_die("hash table failed");
-    if (ret == 0)
-        imm_die("state already exist");
-
-    struct item* item = malloc(sizeof(struct item));
-    item->state = state;
-    item->idx = idx;
-
-    kh_key(state_idx->table, iter) = item->state;
-    kh_val(state_idx->table, iter) = item;
-}
-
 uint32_t state_idx_find(struct state_idx const* state_idx, struct imm_state const* state)
 {
     khiter_t i = kh_get(item, state_idx->table, state);
-
-    if (i == kh_end(state_idx->table))
-        imm_die("state not found");
-
+    IMM_BUG(i == kh_end(state_idx->table));
     return kh_val(state_idx->table, i)->idx;
 }
