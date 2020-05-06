@@ -21,24 +21,24 @@ struct dp_state_table const* dp_state_table_create(struct mstate const* const* m
                                                    struct imm_state const*     end_state,
                                                    struct state_idx*           state_idx)
 {
-    struct dp_state_table* state_tbl = malloc(sizeof(struct dp_state_table));
+    struct dp_state_table* table = malloc(sizeof(*table));
 
-    state_tbl->nstates = nstates;
+    table->nstates = nstates;
 
-    state_tbl->min_seq = malloc(sizeof(*state_tbl->min_seq) * nstates);
-    state_tbl->max_seq = malloc(sizeof(*state_tbl->max_seq) * nstates);
-    state_tbl->start_lprob = malloc(sizeof(*state_tbl->start_lprob) * nstates);
+    table->min_seq = malloc(sizeof(*table->min_seq) * nstates);
+    table->max_seq = malloc(sizeof(*table->max_seq) * nstates);
+    table->start_lprob = malloc(sizeof(*table->start_lprob) * nstates);
 
     for (uint32_t i = 0; i < nstates; ++i) {
         state_idx_add(state_idx, mstate_get_state(mstates[i]), i);
-        state_tbl->min_seq[i] = cast_u8_u(imm_state_min_seq(mstate_get_state(mstates[i])));
-        state_tbl->max_seq[i] = cast_u8_u(imm_state_max_seq(mstate_get_state(mstates[i])));
-        state_tbl->start_lprob[i] = mstate_get_start(mstates[i]);
+        table->min_seq[i] = imm_state_min_seq(mstate_get_state(mstates[i]));
+        table->max_seq[i] = imm_state_max_seq(mstate_get_state(mstates[i]));
+        table->start_lprob[i] = mstate_get_start(mstates[i]);
     }
 
-    state_tbl->end_state = state_idx_find(state_idx, end_state);
+    table->end_state = state_idx_find(state_idx, end_state);
 
-    return state_tbl;
+    return table;
 }
 
 void dp_state_table_destroy(struct dp_state_table const* state_tbl)
@@ -47,6 +47,66 @@ void dp_state_table_destroy(struct dp_state_table const* state_tbl)
     free_c(state_tbl->max_seq);
     free_c(state_tbl->start_lprob);
     free_c(state_tbl);
+}
+
+struct dp_state_table* dp_state_table_read(FILE* stream)
+{
+    struct dp_state_table_chunk chunk = {
+        .nstates = 0, .min_seq = NULL, .max_seq = NULL, .start_lprob = NULL, .end_state = 0};
+
+    struct dp_state_table* table = malloc(sizeof(*table));
+
+    if (fread(&chunk.nstates, sizeof(chunk.nstates), 1, stream) < 1) {
+        imm_error("could not read nstates");
+        goto err;
+    }
+
+    chunk.min_seq = malloc(sizeof(*chunk.min_seq) * chunk.nstates);
+    chunk.max_seq = malloc(sizeof(*chunk.max_seq) * chunk.nstates);
+    chunk.start_lprob = malloc(sizeof(*chunk.start_lprob) * chunk.nstates);
+
+    if (fread(chunk.min_seq, sizeof(*chunk.min_seq), chunk.nstates, stream) < chunk.nstates) {
+        imm_error("could not read min_seq");
+        goto err;
+    }
+
+    if (fread(chunk.max_seq, sizeof(*chunk.max_seq), chunk.nstates, stream) < chunk.nstates) {
+        imm_error("could not read max_seq");
+        goto err;
+    }
+
+    if (fread(chunk.start_lprob, sizeof(*chunk.start_lprob), chunk.nstates, stream) <
+        chunk.nstates) {
+        imm_error("could not read start_lprob");
+        goto err;
+    }
+
+    if (fread(&chunk.end_state, sizeof(chunk.end_state), 1, stream) < 1) {
+        imm_error("could not read end_state");
+        goto err;
+    }
+
+    table->nstates = chunk.nstates;
+    table->min_seq = chunk.min_seq;
+    table->max_seq = chunk.max_seq;
+    table->start_lprob = chunk.start_lprob;
+    table->end_state = chunk.end_state;
+
+    return table;
+
+err:
+    free_c(table);
+
+    if (chunk.min_seq)
+        free_c(chunk.min_seq);
+
+    if (chunk.max_seq)
+        free_c(chunk.max_seq);
+
+    if (chunk.start_lprob)
+        free_c(chunk.start_lprob);
+
+    return NULL;
 }
 
 int dp_state_table_write(struct dp_state_table const* state_tbl, FILE* stream)
@@ -86,64 +146,4 @@ int dp_state_table_write(struct dp_state_table const* state_tbl, FILE* stream)
     }
 
     return 0;
-}
-
-struct dp_state_table *dp_state_table_read(FILE* stream)
-{
-    struct dp_state_table_chunk chunk = {
-        .nstates = 0, .min_seq = NULL, .max_seq = NULL, .start_lprob = NULL, .end_state = 0};
-
-    struct dp_state_table* state_tbl = malloc(sizeof(*state_tbl));
-
-    if (fread(&chunk.nstates, sizeof(chunk.nstates), 1, stream) < 1) {
-        imm_error("could not read nstates");
-        goto err;
-    }
-
-    chunk.min_seq = malloc(sizeof(*chunk.min_seq) * chunk.nstates);
-    chunk.max_seq = malloc(sizeof(*chunk.max_seq) * chunk.nstates);
-    chunk.start_lprob = malloc(sizeof(*chunk.start_lprob) * chunk.nstates);
-
-    if (fread(chunk.min_seq, sizeof(*chunk.min_seq), chunk.nstates, stream) < chunk.nstates) {
-        imm_error("could not read min_seq");
-        goto err;
-    }
-
-    if (fread(chunk.max_seq, sizeof(*chunk.max_seq), chunk.nstates, stream) < chunk.nstates) {
-        imm_error("could not read max_seq");
-        goto err;
-    }
-
-    if (fread(chunk.start_lprob, sizeof(*chunk.start_lprob), chunk.nstates, stream) <
-        chunk.nstates) {
-        imm_error("could not read start_lprob");
-        goto err;
-    }
-
-    if (fread(&chunk.end_state, sizeof(chunk.end_state), 1, stream) < 1) {
-        imm_error("could not read end_state");
-        goto err;
-    }
-
-    state_tbl->nstates = chunk.nstates;
-    state_tbl->min_seq = chunk.min_seq;
-    state_tbl->max_seq = chunk.max_seq;
-    state_tbl->start_lprob = chunk.start_lprob;
-    state_tbl->end_state = chunk.end_state;
-
-    return state_tbl;
-
-err:
-    free_c(state_tbl);
-
-    if (chunk.min_seq)
-        free_c(chunk.min_seq);
-
-    if (chunk.max_seq)
-        free_c(chunk.max_seq);
-
-    if (chunk.start_lprob)
-        free_c(chunk.start_lprob);
-
-    return NULL;
 }
