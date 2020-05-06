@@ -6,14 +6,14 @@
 struct imm_path;
 struct imm_step;
 
-IMM_EXPORT struct imm_path* imm_path_create(void);
-IMM_EXPORT struct imm_path* imm_path_clone(struct imm_path const* path);
-IMM_EXPORT void             imm_path_free(struct imm_path const* path);
-IMM_EXPORT void             imm_path_destroy(struct imm_path const* path);
-IMM_EXPORT void             imm_path_append(struct imm_path* path, struct imm_step* step);
-IMM_EXPORT void             imm_path_prepend(struct imm_path* path, struct imm_step* step);
+IMM_EXPORT void                   imm_path_append(struct imm_path* path, struct imm_step* step);
+IMM_EXPORT struct imm_path*       imm_path_clone(struct imm_path const* path);
+IMM_EXPORT struct imm_path*       imm_path_create(void);
+IMM_EXPORT void                   imm_path_destroy(struct imm_path const* path);
 IMM_EXPORT struct imm_step const* imm_path_first(struct imm_path const* path);
+IMM_EXPORT void                   imm_path_free(struct imm_path const* path);
 IMM_EXPORT struct imm_step const* imm_path_next(struct imm_path const* path,
                                                 struct imm_step const* step);
+IMM_EXPORT void                   imm_path_prepend(struct imm_path* path, struct imm_step* step);
 
 #endif

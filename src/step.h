@@ -1,5 +1,5 @@
-#ifndef IMM_STEP_STRUCT_H
-#define IMM_STEP_STRUCT_H
+#ifndef STEP_H
+#define STEP_H
 
 #include "free.h"
 #include "list.h"

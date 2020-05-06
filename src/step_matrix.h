@@ -1,8 +1,8 @@
-#ifndef IMM_STEP_MATRIX_H
-#define IMM_STEP_MATRIX_H
+#ifndef STEP_MATRIX_H
+#define STEP_MATRIX_H
 
-#include "make_matrix.h"
 #include "dp_step.h"
+#include "make_matrix.h"
 
 MAKE_MATRIX_STRUCT(step_matrix, struct dp_step)
 MAKE_MATRIX_CREATE(step_matrix, struct dp_step)
