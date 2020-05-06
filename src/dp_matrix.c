@@ -21,17 +21,17 @@ struct dp_matrix* dp_matrix_create(struct dp_state_table const* states)
     return matrix;
 }
 
-void dp_matrix_setup(struct dp_matrix* matrix, struct eseq const* eseq)
-{
-    unsigned seq_len = eseq_length(eseq);
-    matrixd_resize(matrix->score, seq_len + 1, matrixd_ncols(matrix->score));
-    step_matrix_resize(matrix->prev_step, seq_len + 1, step_matrix_ncols(matrix->prev_step));
-}
-
 void dp_matrix_destroy(struct dp_matrix const* matrix)
 {
     matrixd_destroy(matrix->score);
     step_matrix_destroy(matrix->prev_step);
     free_c(matrix->state_col);
     free_c(matrix);
+}
+
+void dp_matrix_setup(struct dp_matrix* matrix, struct eseq const* eseq)
+{
+    unsigned seq_len = eseq_length(eseq);
+    matrixd_resize(matrix->score, seq_len + 1, matrixd_ncols(matrix->score));
+    step_matrix_resize(matrix->prev_step, seq_len + 1, step_matrix_ncols(matrix->prev_step));
 }
