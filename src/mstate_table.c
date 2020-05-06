@@ -14,25 +14,6 @@ struct mstate_table
     khash_t(mstate) * ktable;
 };
 
-struct mstate_table* mstate_table_create(void)
-{
-    struct mstate_table* mstate_table = malloc(sizeof(struct mstate_table));
-    mstate_table->ktable = kh_init(mstate);
-    return mstate_table;
-}
-
-void mstate_table_destroy(struct mstate_table* table)
-{
-    unsigned long i = 0;
-    mstate_table_for_each (i, table) {
-        if (kh_exist(table->ktable, i))
-            mstate_destroy(kh_val(table->ktable, i));
-    }
-
-    kh_destroy(mstate, table->ktable);
-    free_c(table);
-}
-
 void mstate_table_add(struct mstate_table* table, struct mstate* mstate)
 {
     int      ret = 0;
@@ -42,19 +23,32 @@ void mstate_table_add(struct mstate_table* table, struct mstate* mstate)
     kh_val(table->ktable, i) = mstate;
 }
 
-unsigned long mstate_table_find(struct mstate_table const* table, struct imm_state const* state)
+struct mstate const** mstate_table_array(struct mstate_table const* table)
 {
-    return kh_get(mstate, table->ktable, state);
+    uint32_t              size = mstate_table_size(table);
+    struct mstate const** mstates = malloc(sizeof(*mstates) * size);
+
+    struct mstate const** mstate = mstates;
+    unsigned long         i = 0;
+    mstate_table_for_each (i, table) {
+        if (mstate_table_exist(table, i)) {
+            *mstate = mstate_table_get(table, i);
+            ++mstate;
+        }
+    }
+    return mstates;
 }
 
-struct mstate* mstate_table_get(struct mstate_table const* table, unsigned long iter)
+unsigned long mstate_table_begin(struct mstate_table const* table)
 {
-    return kh_val(table->ktable, (khiter_t)iter);
+    return kh_begin(table->ktable);
 }
 
-int mstate_table_exist(struct mstate_table const* table, unsigned long iter)
+struct mstate_table* mstate_table_create(void)
 {
-    return kh_exist(table->ktable, (khiter_t)iter);
+    struct mstate_table* mstate_table = malloc(sizeof(*mstate_table));
+    mstate_table->ktable = kh_init(mstate);
+    return mstate_table;
 }
 
 void mstate_table_del(struct mstate_table* table, unsigned long iter)
@@ -76,32 +70,38 @@ void mstate_table_del(struct mstate_table* table, unsigned long iter)
     }
 }
 
-unsigned long mstate_table_begin(struct mstate_table const* table)
+void mstate_table_destroy(struct mstate_table* table)
 {
-    return kh_begin(table->ktable);
+    unsigned long i = 0;
+    mstate_table_for_each (i, table) {
+        if (kh_exist(table->ktable, i))
+            mstate_destroy(kh_val(table->ktable, i));
+    }
+
+    kh_destroy(mstate, table->ktable);
+    free_c(table);
 }
 
 unsigned long mstate_table_end(struct mstate_table const* table) { return kh_end(table->ktable); }
 
-unsigned mstate_table_size(struct mstate_table const* table)
+int mstate_table_exist(struct mstate_table const* table, unsigned long iter)
 {
-    khint_t n = kh_size(table->ktable);
-    IMM_BUG(n < 0 || n > UINT_MAX);
-    return (unsigned)n;
+    return kh_exist(table->ktable, (khiter_t)iter);
 }
 
-struct mstate const** mstate_table_array(struct mstate_table const* table)
+unsigned long mstate_table_find(struct mstate_table const* table, struct imm_state const* state)
 {
-    unsigned              size = mstate_table_size(table);
-    struct mstate const** mstates = malloc(sizeof(struct mstate*) * size);
+    return kh_get(mstate, table->ktable, state);
+}
 
-    struct mstate const** mstate = mstates;
-    unsigned long         i = 0;
-    mstate_table_for_each (i, table) {
-        if (mstate_table_exist(table, i)) {
-            *mstate = mstate_table_get(table, i);
-            ++mstate;
-        }
-    }
-    return mstates;
+struct mstate* mstate_table_get(struct mstate_table const* table, unsigned long iter)
+{
+    return kh_val(table->ktable, (khiter_t)iter);
+}
+
+uint32_t mstate_table_size(struct mstate_table const* table)
+{
+    khint_t n = kh_size(table->ktable);
+    IMM_BUG(n < 0 || n > UINT32_MAX);
+    return (uint32_t)n;
 }
