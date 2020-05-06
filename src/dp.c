@@ -44,7 +44,7 @@ struct imm_dp
 };
 
 static double  best_trans_score(struct imm_dp const* dp, struct dp_matrix const* matrix,
-                                uint32_t target_state, uint32_t row, struct dp_step* prev_step);
+                                uint32_t tgt_state, uint32_t row, struct dp_step* prev_step);
 static void    create_tasks(struct imm_dp* dp);
 static double  final_score(struct imm_dp const* dp, struct task* task, struct dp_step* end_step);
 static uint8_t max_seq(struct mstate const* const* mstates, uint32_t nstates);
@@ -163,27 +163,27 @@ struct dp_state_table const* dp_get_state_table(struct imm_dp const* dp) { retur
 struct dp_trans_table const* dp_get_trans_table(struct imm_dp const* dp) { return dp->trans_table; }
 
 static double best_trans_score(struct imm_dp const* dp, struct dp_matrix const* matrix,
-                               uint32_t target_state, uint32_t row, struct dp_step* prev_step)
+                               uint32_t tgt_state, uint32_t row, struct dp_step* prev_step)
 {
     double score = imm_lprob_zero();
     *prev_step = dp_step_invalid();
 
-    for (uint32_t i = 0; i < dp_trans_table_ntrans(dp->trans_table, target_state); ++i) {
+    for (uint32_t i = 0; i < dp_trans_table_ntrans(dp->trans_table, tgt_state); ++i) {
 
-        uint32_t source_state = dp_trans_table_source_state(dp->trans_table, target_state, i);
-        uint32_t min_seq = dp_state_table_min_seq(dp->state_table, source_state);
+        uint32_t src_state = dp_trans_table_source_state(dp->trans_table, tgt_state, i);
+        uint32_t min_seq = dp_state_table_min_seq(dp->state_table, src_state);
 
-        if (UNLIKELY(row < min_seq) || (min_seq == 0 && source_state > target_state))
+        if (UNLIKELY(row < min_seq) || (min_seq == 0 && src_state > tgt_state))
             continue;
 
-        uint32_t max_seq = MIN(dp_state_table_max_seq(dp->state_table, source_state), row);
+        uint32_t max_seq = MIN(dp_state_table_max_seq(dp->state_table, src_state), row);
         for (uint32_t len = min_seq; len <= max_seq; ++len) {
 
-            struct dp_step step = {.state = source_state, .seq_len = len};
+            struct dp_step step = {.state = src_state, .seq_len = len};
             uint32_t       prev_row = row - len;
 
             double v0 = dp_matrix_get_score(matrix, prev_row, step);
-            double v1 = dp_trans_table_score(dp->trans_table, target_state, i);
+            double v1 = dp_trans_table_score(dp->trans_table, tgt_state, i);
             double v = v0 + v1;
 
             if (v > score) {
