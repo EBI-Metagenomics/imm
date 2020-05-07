@@ -54,7 +54,7 @@ struct seq_code const* seq_code_create(struct imm_abc const* abc, uint8_t min_se
 
     unsigned long ncombs = ipow(imm_abc_length(abc), max_seq);
 
-    seq_code->size = seq_code->offset[max_seq - min_seq] + cast_u32_ul(ncombs);
+    seq_code->size = seq_code->offset[max_seq - min_seq] + cast_ul_u32(ncombs);
 
     return seq_code;
 }

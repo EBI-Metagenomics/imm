@@ -75,7 +75,7 @@ struct imm_abc* __imm_abc_create(char const* symbols, char any_symbol, void* der
         return NULL;
     }
 
-    abc->length = cast_u8_zu(strlen(symbols));
+    abc->length = cast_zu_u8(strlen(symbols));
     for (uint8_t i = 0; i < abc->length; ++i) {
         if (symbols[i] == any_symbol) {
             imm_error("any_symbol cannot be in the alphabet");
@@ -155,7 +155,7 @@ uint8_t __imm_abc_type_id(struct imm_abc const* abc) { return IMM_ABC_TYPE_ID; }
 
 int __imm_abc_write(struct imm_abc const* abc, FILE* stream)
 {
-    struct abc_chunk chunk = {.nsymbols = cast_u8_zu(strlen(abc->symbols)),
+    struct abc_chunk chunk = {.nsymbols = cast_zu_u8(strlen(abc->symbols)),
                               .symbols = (char*)abc->symbols,
                               .any_symbol = abc->any_symbol};
 

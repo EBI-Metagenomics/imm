@@ -34,7 +34,7 @@ struct dp_emission const* dp_emission_create(struct seq_code const*      seq_cod
         emiss_tbl->offset[i] = size;
         size += seq_code_size(seq_code, imm_state_min_seq(mstate_get_state(mstates[i])));
     }
-    emiss_tbl->offset[nstates] = cast_u32_u(size);
+    emiss_tbl->offset[nstates] = cast_u_u32(size);
 
     emiss_tbl->score = malloc(sizeof(*emiss_tbl->score) * score_size(emiss_tbl, nstates));
 
