@@ -5,6 +5,10 @@
 #include <inttypes.h>
 #include <limits.h>
 
+static inline unsigned long ipow(unsigned long base, unsigned exp);
+static inline int           panic_sub_ui(unsigned a, unsigned b);
+static inline int           panic_sub_ui32(uint32_t a, uint32_t b);
+
 static inline unsigned long ipow(unsigned long base, unsigned exp)
 {
     unsigned long result = 1;
