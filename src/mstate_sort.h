@@ -1,5 +1,5 @@
-#ifndef IMM_MSTATE_SORT_H
-#define IMM_MSTATE_SORT_H
+#ifndef MSTATE_SORT_H
+#define MSTATE_SORT_H
 
 #include <inttypes.h>
 

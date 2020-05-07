@@ -1,5 +1,5 @@
-#ifndef IMM_SEQ_CODE_H
-#define IMM_SEQ_CODE_H
+#ifndef SEQ_CODE_H
+#define SEQ_CODE_H
 
 #include "imm/export.h"
 #include <inttypes.h>
