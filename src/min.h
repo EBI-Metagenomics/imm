@@ -1,5 +1,5 @@
-#ifndef IMM_MIN_H
-#define IMM_MIN_H
+#ifndef MIN_H
+#define MIN_H
 
 #ifndef MIN
 #define MIN(X, Y) ((X) < (Y) ? (X) : (Y))

@@ -1,5 +1,5 @@
-#ifndef IMM_MATRIXU_H
-#define IMM_MATRIXU_H
+#ifndef MATRIXU_H
+#define MATRIXU_H
 
 #include "make_matrix.h"
 

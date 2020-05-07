@@ -1,5 +1,5 @@
-#ifndef IMM_MSTATE_H
-#define IMM_MSTATE_H
+#ifndef MSTATE_H
+#define MSTATE_H
 
 #include <inttypes.h>
 #include <stdio.h>

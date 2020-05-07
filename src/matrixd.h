@@ -1,5 +1,5 @@
-#ifndef IMM_MATRIXD_H
-#define IMM_MATRIXD_H
+#ifndef MATRIXD_H
+#define MATRIXD_H
 
 #include "make_matrix.h"
 
