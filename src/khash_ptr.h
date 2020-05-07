@@ -1,7 +1,7 @@
 #ifndef KHASH_PTR_H
 #define KHASH_PTR_H
 
-#include "khash.h"
+#include "lib/khash.h"
 #include <assert.h>
 #include <stdint.h>
 
@@ -26,8 +26,22 @@
  */
 #define GOLDEN_RATIO_64 0x61C8864680B583EBull
 
+static inline khint_t  ptr_hash_func(void const* ptr);
+static inline uint64_t reverse_bits(uint64_t v);
+
+#define __ptr_hash_equal(a, b) ((a) == (b))
+
+#define KHASH_MAP_INIT_PTR(name, khval_t)                                                          \
+    KHASH_INIT(name, void const*, khval_t, 1, ptr_hash_func, __ptr_hash_equal)
+
+static inline khint_t ptr_hash_func(void const* ptr)
+{
+    uint64_t val = (uint64_t)ptr;
+    return (khint_t)reverse_bits(val * GOLDEN_RATIO_64);
+}
+
 /* Source: http://graphics.stanford.edu/~seander/bithacks.html#BitReverseObvious */
-static kh_inline uint64_t reverse_bits(uint64_t v)
+static inline uint64_t reverse_bits(uint64_t v)
 {
     unsigned long r = v;                        // r will be reversed bits of v; first get LSB of v
     int           s = sizeof(v) * CHAR_BIT - 1; // extra shift needed at end
@@ -40,16 +54,5 @@ static kh_inline uint64_t reverse_bits(uint64_t v)
     r <<= s; // shift when v's highest bits are zero
     return r;
 }
-
-static kh_inline khint_t ptr_hash_func(void const* ptr)
-{
-    uint64_t val = (uint64_t)ptr;
-    return (khint_t)reverse_bits(val * GOLDEN_RATIO_64);
-}
-
-#define ptr_hash_equal(a, b) ((a) == (b))
-
-#define KHASH_MAP_INIT_PTR(name, khval_t)                                                          \
-    KHASH_INIT(name, void const*, khval_t, 1, ptr_hash_func, ptr_hash_equal)
 
 #endif
