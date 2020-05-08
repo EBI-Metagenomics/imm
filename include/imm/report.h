@@ -10,7 +10,7 @@
 #define ATTR_FORMAT
 #endif
 
-IMM_EXPORT void imm_die(char const* err, ...) ATTR_FORMAT;
-IMM_EXPORT void imm_error(char const* err, ...) ATTR_FORMAT;
+IMM_API void imm_die(char const* err, ...) ATTR_FORMAT;
+IMM_API void imm_error(char const* err, ...) ATTR_FORMAT;
 
 #endif

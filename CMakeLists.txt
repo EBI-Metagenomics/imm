@@ -65,6 +65,7 @@ add_library(IMM::imm ALIAS imm)
 include(GenerateExportHeader)
 generate_export_header(imm BASE_NAME IMM
     INCLUDE_GUARD_NAME IMM_EXPORT_H
+    EXPORT_MACRO_NAME IMM_API
     EXPORT_FILE_NAME ${CMAKE_CURRENT_BINARY_DIR}/imm/export.h)
 
 if(${CMAKE_C_COMPILER_ID} MATCHES "MSVC")
