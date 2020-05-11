@@ -459,12 +459,12 @@ void test_perf_viterbi(void)
     cass_close(score, -65826.0106185297);
     imm_results_destroy(results);
 
-    struct imm_io const* io = imm_io_create(hmm, dp);
-    FILE*                file = fopen(TMP_FOLDER "/perf.imm", "w");
-    cass_cond(file != NULL);
-    cass_equal_int(imm_io_write(io, file), 0);
-    fclose(file);
-    imm_io_destroy(io);
+    struct imm_output* output = imm_output_create(TMP_FOLDER "/perf.imm");
+    cass_cond(output != NULL);
+    struct imm_model const* model = imm_model_create(hmm, dp);
+    cass_equal_int(imm_output_write(output, model), 0);
+    imm_model_destroy(model);
+    cass_equal_int(imm_output_destroy(output), 0);
 
 #if 0
     results = imm_dp_viterbi(dp, seq, 0);
@@ -552,15 +552,15 @@ void test_perf_viterbi(void)
     imm_abc_destroy(abc);
     imm_dp_destroy(dp);
 
-    file = fopen(TMP_FOLDER "/perf.imm", "r");
-    cass_cond(file != NULL);
-    io = imm_io_create_from_file(file);
-    cass_cond(io != NULL);
-    fclose(file);
+    struct imm_input* input = imm_input_create(TMP_FOLDER "/perf.imm");
+    cass_cond(input != NULL);
+    model = imm_input_read(input);
+    cass_cond(model != NULL);
+    cass_equal_int(imm_input_destroy(input), 0);
 
-    abc = imm_io_abc(io);
-    hmm = imm_io_hmm(io);
-    dp = imm_io_dp(io);
+    abc = imm_model_abc(model);
+    hmm = imm_model_hmm(model);
+    dp = imm_model_dp(model);
 
     seq = imm_seq_create(str, abc);
     results = imm_dp_viterbi(dp, seq, 0);
@@ -570,12 +570,12 @@ void test_perf_viterbi(void)
     cass_close(score, -65826.0106185297);
     imm_results_destroy(results);
 
-    for (uint32_t i = 0; i < imm_io_nstates(io); ++i)
-        imm_state_destroy(imm_io_state(io, i));
+    for (uint32_t i = 0; i < imm_model_nstates(model); ++i)
+        imm_state_destroy(imm_model_state(model, i));
 
     imm_abc_destroy(abc);
     imm_hmm_destroy(hmm);
     imm_dp_destroy(dp);
     imm_seq_destroy(seq);
-    imm_io_destroy(io);
+    imm_model_destroy(model);
 }

@@ -3,7 +3,6 @@
 #include "free.h"
 #include "imm/abc_types.h"
 #include "imm/report.h"
-#include "io.h"
 #include <string.h>
 
 struct abc_chunk

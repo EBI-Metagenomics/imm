@@ -41,11 +41,12 @@ void test_hmm_write_io_two_states(void)
     cass_close(imm_hmm_likelihood(hmm, C, path), log(0.25) + log(0.1) + log(0.9));
     imm_results_destroy(results);
 
-    struct imm_io const* io = imm_io_create(hmm, dp);
-    FILE*                file = fopen(TMP_FOLDER "/two_states.imm", "w");
-    cass_cond(file != NULL);
-    cass_equal_int(imm_io_write(io, file), 0);
-    fclose(file);
+    struct imm_output* output = imm_output_create(TMP_FOLDER "/two_states.imm");
+    cass_cond(output != NULL);
+    struct imm_model const* model = imm_model_create(hmm, dp);
+    cass_equal_int(imm_output_write(output, model), 0);
+    imm_model_destroy(model);
+    cass_equal_int(imm_output_destroy(output), 0);
 
     imm_dp_destroy(dp);
     imm_hmm_destroy(hmm);
@@ -53,19 +54,18 @@ void test_hmm_write_io_two_states(void)
     imm_normal_state_destroy(state1);
     imm_abc_destroy(abc);
     imm_seq_destroy(C);
-    imm_io_destroy(io);
 
-    file = fopen(TMP_FOLDER "/two_states.imm", "r");
-    cass_cond(file != NULL);
-    io = imm_io_create_from_file(file);
-    cass_cond(io != NULL);
-    fclose(file);
+    struct imm_input* input = imm_input_create(TMP_FOLDER "/two_states.imm");
+    cass_cond(input != NULL);
+    model = imm_input_read(input);
+    cass_cond(model != NULL);
+    cass_equal_int(imm_input_destroy(input), 0);
 
-    cass_equal_uint64(imm_io_nstates(io), 2);
+    cass_equal_uint64(imm_model_nstates(model), 2);
 
-    abc = imm_io_abc(io);
-    hmm = imm_io_hmm(io);
-    dp = imm_io_dp(io);
+    abc = imm_model_abc(model);
+    hmm = imm_model_hmm(model);
+    dp = imm_model_dp(model);
     C = imm_seq_create("C", abc);
 
     results = imm_dp_viterbi(dp, C, 0);
@@ -77,8 +77,8 @@ void test_hmm_write_io_two_states(void)
     cass_close(imm_hmm_likelihood(hmm, C, path), log(0.25) + log(0.1) + log(0.9));
     imm_results_destroy(results);
 
-    for (uint32_t i = 0; i < imm_io_nstates(io); ++i) {
-        struct imm_state const* state = imm_io_state(io, i);
+    for (uint32_t i = 0; i < imm_model_nstates(model); ++i) {
+        struct imm_state const* state = imm_model_state(model, i);
 
         if (imm_state_type_id(state) == IMM_MUTE_STATE_TYPE_ID) {
             cass_cond(strcmp(imm_state_get_name(state), "state0") == 0);
@@ -87,12 +87,12 @@ void test_hmm_write_io_two_states(void)
         }
     }
 
-    for (uint32_t i = 0; i < imm_io_nstates(io); ++i)
-        imm_state_destroy(imm_io_state(io, i));
+    for (uint32_t i = 0; i < imm_model_nstates(model); ++i)
+        imm_state_destroy(imm_model_state(model, i));
 
     imm_seq_destroy(C);
     imm_abc_destroy(abc);
     imm_hmm_destroy(hmm);
     imm_dp_destroy(dp);
-    imm_io_destroy(io);
+    imm_model_destroy(model);
 }

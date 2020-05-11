@@ -1,7 +1,7 @@
-#ifndef IO_H
-#define IO_H
+#ifndef MODEL_H
+#define MODEL_H
 
-#include "imm/io.h"
+#include "imm/model.h"
 #include <inttypes.h>
 
 struct dp_emission;
@@ -11,7 +11,7 @@ struct imm_hmm;
 struct mstate;
 struct seq_code;
 
-struct imm_io
+struct imm_model
 {
     struct imm_abc const*        abc;
     struct imm_hmm*              hmm;
@@ -24,8 +24,8 @@ struct imm_io
     struct dp_state_table const* state_table;
     struct imm_dp const*         dp;
 
-    struct imm_io_vtable vtable;
-    void*                derived;
+    struct imm_model_vtable vtable;
+    void*                   derived;
 };
 
 #endif

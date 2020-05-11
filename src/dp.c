@@ -15,8 +15,8 @@
 #include "imm/step.h"
 #include "imm/subseq.h"
 #include "imm/window.h"
-#include "io.h"
 #include "min.h"
+#include "model.h"
 #include "mstate.h"
 #include "mtrans.h"
 #include "mtrans_table.h"
@@ -119,19 +119,19 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
     return results;
 }
 
-void __imm_dp_create_from_io(struct imm_io* io)
+void __imm_dp_create_from_io(struct imm_model* entry)
 {
     struct imm_dp* dp = malloc(sizeof(*dp));
 
-    dp->mstates = (struct mstate const**)io->mstates;
-    dp->seq_code = io->seq_code;
-    dp->emission = io->emission;
-    dp->trans_table = io->trans_table;
-    dp->state_table = io->state_table;
+    dp->mstates = (struct mstate const**)entry->mstates;
+    dp->seq_code = entry->seq_code;
+    dp->emission = entry->emission;
+    dp->trans_table = entry->trans_table;
+    dp->state_table = entry->state_table;
 
     create_tasks(dp);
 
-    io->dp = dp;
+    entry->dp = dp;
 }
 
 struct imm_dp const* dp_create(struct imm_abc const* abc, struct mstate const** mstates,

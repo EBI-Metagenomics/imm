@@ -5,7 +5,6 @@
 #include "imm/abc.h"
 #include "imm/seq.h"
 #include "imm/state.h"
-#include "io.h"
 #include "mstate.h"
 #include "seq_code.h"
 #include <stdlib.h>

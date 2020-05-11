@@ -5,12 +5,13 @@
 #include <stdio.h>
 
 struct imm_abc;
-struct imm_io;
+struct imm_model;
 struct imm_state;
 
-static inline int state_write(struct imm_state const* state, struct imm_io const* io, FILE* stream)
+static inline int state_write(struct imm_state const* state, struct imm_model const* entry,
+                              FILE* stream)
 {
-    return state->vtable.write(state, io, stream);
+    return state->vtable.write(state, entry, stream);
 }
 
 #endif

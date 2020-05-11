@@ -2,7 +2,6 @@
 #include "cast.h"
 #include "free.h"
 #include "imm/state.h"
-#include "io.h"
 #include "mstate.h"
 #include "state_idx.h"
 #include <stdlib.h>

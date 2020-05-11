@@ -37,7 +37,8 @@ add_library(imm
     src/dp_trans_table.c
     src/eseq.c
     src/hmm.c
-    src/io.c
+    src/input.c
+    src/model.c
     src/mstate.c
     src/mstate_sort.c
     src/mstate_table.c
@@ -45,6 +46,7 @@ add_library(imm
     src/mtrans_table.c
     src/mute_state.c
     src/normal_state.c
+    src/output.c
     src/path.c
     src/report.c
     src/results.c

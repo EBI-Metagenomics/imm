@@ -1,7 +1,6 @@
 #include "dp_trans_table.h"
 #include "free.h"
 #include "imm/lprob.h"
-#include "io.h"
 #include "list.h"
 #include "mstate.h"
 #include "mtrans.h"

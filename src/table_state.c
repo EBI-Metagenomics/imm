@@ -18,7 +18,7 @@ static double  lprob(struct imm_state const* state, struct imm_seq const* seq);
 static uint8_t max_seq(struct imm_state const* state);
 static uint8_t min_seq(struct imm_state const* state);
 static uint8_t type_id(struct imm_state const* state);
-static int     write(struct imm_state const* state, struct imm_io const* io, FILE* stream);
+static int     write(struct imm_state const* state, struct imm_model const* entry, FILE* stream);
 
 static struct imm_state_vtable const __vtable = {destroy, lprob, max_seq, min_seq, type_id, write};
 
@@ -79,7 +79,7 @@ static uint8_t min_seq(struct imm_state const* state)
 
 static uint8_t type_id(struct imm_state const* state) { return IMM_TABLE_STATE_TYPE_ID; }
 
-static int write(struct imm_state const* state, struct imm_io const* io, FILE* stream)
+static int write(struct imm_state const* state, struct imm_model const* entry, FILE* stream)
 {
     imm_die("table_state write is not implemented yet");
     return 0;
