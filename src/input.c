@@ -1,9 +1,18 @@
 #include "imm/input.h"
 #include "free.h"
+#include "imm/io.h"
 #include "imm/report.h"
 #include "model.h"
 #include <stdlib.h>
 #include <string.h>
+
+struct imm_input
+{
+    FILE*       stream;
+    char const* filepath;
+
+    bool eof;
+};
 
 struct imm_input* imm_input_create(char const* filepath)
 {
@@ -16,7 +25,7 @@ struct imm_input* imm_input_create(char const* filepath)
     struct imm_input* input = malloc(sizeof(*input));
     input->stream = stream;
     input->filepath = strdup(filepath);
-    input->status = 0;
+    input->eof = false;
 
     return input;
 }
@@ -32,8 +41,27 @@ int imm_input_destroy(struct imm_input const* input)
     return 0;
 }
 
+bool imm_input_eof(struct imm_input const* input) { return input->eof; }
+
 struct imm_model const* imm_input_read(struct imm_input* input)
 {
+    uint8_t block_type = 0x00;
+
+    if (fread(&block_type, sizeof(block_type), 1, input->stream) < 1) {
+        imm_error("could not read block type");
+        return NULL;
+    }
+
+    if (block_type == IMM_IO_BLOCK_EOF) {
+        input->eof = true;
+        return NULL;
+    }
+
+    if (block_type != IMM_IO_BLOCK_MODEL) {
+        imm_error("unknown block type");
+        return NULL;
+    }
+
     struct imm_model* model = __imm_model_new(NULL);
     if (__imm_model_read(model, input->stream)) {
         imm_error("failed to read file %s", input->filepath);

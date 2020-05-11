@@ -46,6 +46,9 @@ void test_hmm_write_io_two_states(void)
     struct imm_model const* model = imm_model_create(hmm, dp);
     cass_equal_int(imm_output_write(output, model), 0);
     imm_model_destroy(model);
+    model = imm_model_create(hmm, dp);
+    cass_equal_int(imm_output_write(output, model), 0);
+    imm_model_destroy(model);
     cass_equal_int(imm_output_destroy(output), 0);
 
     imm_dp_destroy(dp);
@@ -57,9 +60,10 @@ void test_hmm_write_io_two_states(void)
 
     struct imm_input* input = imm_input_create(TMP_FOLDER "/two_states.imm");
     cass_cond(input != NULL);
+    cass_cond(!imm_input_eof(input));
     model = imm_input_read(input);
+    cass_cond(!imm_input_eof(input));
     cass_cond(model != NULL);
-    cass_equal_int(imm_input_destroy(input), 0);
 
     cass_equal_uint64(imm_model_nstates(model), 2);
 
@@ -86,6 +90,26 @@ void test_hmm_write_io_two_states(void)
             cass_cond(strcmp(imm_state_get_name(state), "state1") == 0);
         }
     }
+
+    for (uint32_t i = 0; i < imm_model_nstates(model); ++i)
+        imm_state_destroy(imm_model_state(model, i));
+
+    imm_seq_destroy(C);
+    imm_abc_destroy(abc);
+    imm_hmm_destroy(hmm);
+    imm_dp_destroy(dp);
+    imm_model_destroy(model);
+
+    model = imm_input_read(input);
+    cass_cond(model != NULL);
+    cass_cond(imm_input_read(input) == NULL);
+    cass_cond(imm_input_eof(input));
+    cass_equal_int(imm_input_destroy(input), 0);
+
+    abc = imm_model_abc(model);
+    hmm = imm_model_hmm(model);
+    dp = imm_model_dp(model);
+    C = imm_seq_create("C", abc);
 
     for (uint32_t i = 0; i < imm_model_nstates(model); ++i)
         imm_state_destroy(imm_model_state(model, i));
