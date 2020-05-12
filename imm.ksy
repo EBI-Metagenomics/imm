@@ -3,16 +3,35 @@ meta:
   file-extension: imm
   endian: le
 seq:
-  - id: hmm
-    type: hmm
-  - id: dp
-    type: dp
+  - id: blocks
+    type: block
+    repeat: until
+    repeat-until: _.block_type == block_type::end_of_file
 enums:
   state_type:
-    0: mute
-    1: normal
-    2: table
+    0x00: mute
+    0x01: normal
+    0x02: table
+  block_type:
+    0x00: model
+    0xff: end_of_file
 types:
+  block:
+    seq:
+      - id: block_type
+        type: u1
+        enum: block_type
+      - id: body
+        type:
+          switch-on: block_type
+          cases:
+            'block_type::model': model
+  model:
+    seq:
+      - id: hmm
+        type: hmm
+      - id: dp
+        type: dp
   hmm:
     seq:
       - id: abc
