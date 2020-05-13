@@ -6,7 +6,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-static struct imm_input_vtable __vtable = {__imm_input_read_block};
+static struct imm_model const* read_block(struct imm_input* input, uint8_t block_type);
+
+struct imm_input_vtable imm_input_vtable = {read_block};
 
 struct imm_input* imm_input_create(char const* filepath)
 {
@@ -20,7 +22,7 @@ struct imm_input* imm_input_create(char const* filepath)
     input->stream = stream;
     input->filepath = strdup(filepath);
     input->eof = false;
-    input->vtable = __vtable;
+    input->vtable = imm_input_vtable;
 
     return input;
 }
@@ -50,7 +52,7 @@ struct imm_model const* imm_input_read(struct imm_input* input)
     return input->vtable.read_block(input, block_type);
 }
 
-struct imm_model const* __imm_input_read_block(struct imm_input* input, uint8_t block_type)
+static struct imm_model const* read_block(struct imm_input* input, uint8_t block_type)
 {
     if (block_type == IMM_IO_BLOCK_EOF) {
         input->eof = true;
