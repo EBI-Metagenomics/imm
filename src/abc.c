@@ -24,7 +24,44 @@ struct imm_abc const* imm_abc_create(char const* symbols, char const any_symbol)
 
 void imm_abc_destroy(struct imm_abc const* abc) { abc->vtable.destroy(abc); }
 
-struct imm_abc const* imm_abc_read(FILE* stream) { return __imm_abc_read(stream); }
+struct imm_abc* imm_abc_read(FILE* stream)
+{
+    struct abc_chunk chunk = {.nsymbols = 0, .symbols = NULL, .any_symbol = '\0'};
+
+    if (fread(&chunk.nsymbols, sizeof(chunk.nsymbols), 1, stream) < 1) {
+        imm_error("could not read nsymbols");
+        goto err;
+    }
+
+    chunk.symbols = malloc(sizeof(*chunk.symbols) * (chunk.nsymbols + 1));
+
+    if (fread(chunk.symbols, sizeof(*chunk.symbols), chunk.nsymbols + 1, stream) <
+        chunk.nsymbols + 1) {
+        imm_error("could not read symbols");
+        goto err;
+    }
+
+    if (chunk.symbols[chunk.nsymbols] != '\0') {
+        imm_error("missing null character");
+        goto err;
+    }
+
+    if (fread(&chunk.any_symbol, sizeof(chunk.any_symbol), 1, stream) < 1) {
+        imm_error("could not read any_symbol");
+        goto err;
+    }
+
+    struct imm_abc* abc = __imm_abc_create(chunk.symbols, chunk.any_symbol, NULL);
+    free_c(chunk.symbols);
+
+    return abc;
+
+err:
+    if (chunk.symbols)
+        free_c(chunk.symbols);
+
+    return NULL;
+}
 
 enum imm_symbol_type imm_abc_symbol_type(struct imm_abc const* abc, char symbol_id)
 {
@@ -109,45 +146,6 @@ void __imm_abc_destroy(struct imm_abc const* abc)
 {
     free_c(abc->symbols);
     free_c(abc);
-}
-
-struct imm_abc* __imm_abc_read(FILE* stream)
-{
-    struct abc_chunk chunk = {.nsymbols = 0, .symbols = NULL, .any_symbol = '\0'};
-
-    if (fread(&chunk.nsymbols, sizeof(chunk.nsymbols), 1, stream) < 1) {
-        imm_error("could not read nsymbols");
-        goto err;
-    }
-
-    chunk.symbols = malloc(sizeof(*chunk.symbols) * (chunk.nsymbols + 1));
-
-    if (fread(chunk.symbols, sizeof(*chunk.symbols), chunk.nsymbols + 1, stream) <
-        chunk.nsymbols + 1) {
-        imm_error("could not read symbols");
-        goto err;
-    }
-
-    if (chunk.symbols[chunk.nsymbols] != '\0') {
-        imm_error("missing null character");
-        goto err;
-    }
-
-    if (fread(&chunk.any_symbol, sizeof(chunk.any_symbol), 1, stream) < 1) {
-        imm_error("could not read any_symbol");
-        goto err;
-    }
-
-    struct imm_abc* abc = __imm_abc_create(chunk.symbols, chunk.any_symbol, NULL);
-    free_c(chunk.symbols);
-
-    return abc;
-
-err:
-    if (chunk.symbols)
-        free_c(chunk.symbols);
-
-    return NULL;
 }
 
 uint8_t __imm_abc_type_id(struct imm_abc const* abc) { return IMM_ABC_TYPE_ID; }

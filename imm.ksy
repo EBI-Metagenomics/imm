@@ -28,14 +28,14 @@ types:
             'block_type::model': model
   model:
     seq:
+      - id: abc
+        type: abc
       - id: hmm
         type: hmm
       - id: dp
         type: dp
   hmm:
     seq:
-      - id: abc
-        type: abc
       - id: nstates
         type: u4
       - id: states
@@ -77,15 +77,13 @@ types:
         encoding: ASCII
         size: name_length + 1
         terminator: 0
-      - id: mute_state
-        type: mute_state
-        if: state_type == state_type::mute
-      - id: normal_state
-        type: normal_state
-        if: state_type == state_type::normal
-      - id: table_state
-        type: table_state
-        if: state_type == state_type::table
+      - id: body
+        type:
+          switch-on: state_type
+          cases:
+            'state_type::mute': mute_state
+            'state_type::normal': normal_state
+            'state_type::table': table_state
   mute_state: {}
   normal_state:
     seq:

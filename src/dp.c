@@ -119,21 +119,6 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
     return results;
 }
 
-void __imm_dp_create_from_io(struct imm_model* entry)
-{
-    struct imm_dp* dp = malloc(sizeof(*dp));
-
-    dp->mstates = (struct mstate const**)entry->mstates;
-    dp->seq_code = entry->seq_code;
-    dp->emission = entry->emission;
-    dp->trans_table = entry->trans_table;
-    dp->state_table = entry->state_table;
-
-    create_tasks(dp);
-
-    entry->dp = dp;
-}
-
 struct imm_dp const* dp_create(struct imm_abc const* abc, struct mstate const** mstates,
                                uint32_t nstates, struct imm_state const* end_state)
 {
@@ -150,6 +135,21 @@ struct imm_dp const* dp_create(struct imm_abc const* abc, struct mstate const** 
     create_tasks(dp);
 
     return dp;
+}
+
+void dp_create_from_model(struct imm_model* model)
+{
+    struct imm_dp* dp = malloc(sizeof(*dp));
+
+    dp->mstates = (struct mstate const**)model->mstates;
+    dp->seq_code = model->seq_code;
+    dp->emission = model->emission;
+    dp->trans_table = model->trans_table;
+    dp->state_table = model->state_table;
+
+    create_tasks(dp);
+
+    model->dp = dp;
 }
 
 struct dp_emission const* dp_get_emission(struct imm_dp const* dp) { return dp->emission; }
