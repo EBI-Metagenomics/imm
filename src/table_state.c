@@ -4,7 +4,7 @@
 #include "imm/state.h"
 #include "imm/state_types.h"
 #include "min.h"
-#include "state.h"
+#include "table_state.h"
 #include <stdlib.h>
 
 struct imm_table_state
@@ -18,9 +18,8 @@ static double  lprob(struct imm_state const* state, struct imm_seq const* seq);
 static uint8_t max_seq(struct imm_state const* state);
 static uint8_t min_seq(struct imm_state const* state);
 static uint8_t type_id(struct imm_state const* state);
-static int     write(struct imm_state const* state, struct imm_model const* entry, FILE* stream);
 
-static struct imm_state_vtable const __vtable = {destroy, lprob, max_seq, min_seq, type_id, write};
+static struct imm_state_vtable const __vtable = {destroy, lprob, max_seq, min_seq, type_id};
 
 struct imm_table_state const* imm_table_state_create(char const*                 name,
                                                      struct imm_seq_table const* table)
@@ -79,7 +78,7 @@ static uint8_t min_seq(struct imm_state const* state)
 
 static uint8_t type_id(struct imm_state const* state) { return IMM_TABLE_STATE_TYPE_ID; }
 
-static int write(struct imm_state const* state, struct imm_model const* entry, FILE* stream)
+int table_state_write(struct imm_state const* state, struct imm_model const* model, FILE* stream)
 {
     imm_die("table_state write is not implemented yet");
     return 0;

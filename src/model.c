@@ -10,6 +10,7 @@
 #include "imm/dp.h"
 #include "imm/hmm.h"
 #include "imm/report.h"
+#include "imm/state.h"
 #include "imm/state_types.h"
 #include "model.h"
 #include "mstate.h"
@@ -18,27 +19,13 @@
 #include "mute_state.h"
 #include "normal_state.h"
 #include "seq_code.h"
-#include "state.h"
+#include "table_state.h"
 #include <stdlib.h>
 #include <string.h>
 
-struct mstate_chunk
-{
-    double  start_lprob;
-    uint8_t type_id;
-};
-
-struct mstates_chunk
-{
-    uint32_t            nstates;
-    struct mstate_chunk mstate_chunk;
-};
-
-static void                    deep_destroy(struct imm_model const* model);
-static int                     read_abc(struct imm_model* model, FILE* stream);
-static struct mstate**         read_mstates(struct imm_model* model, FILE* stream);
-static struct imm_state const* read_state(struct imm_model const* model, FILE* stream,
-                                          uint8_t type_id, void* args);
+static void            deep_destroy(struct imm_model const* model);
+static int             read_abc(struct imm_model* model, FILE* stream);
+static struct mstate** read_mstates(struct imm_model* model, FILE* stream);
 static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct mstate* const* const mstates);
 static int write_abc(struct imm_model const* model, FILE* stream);
 static int write_mstate(struct imm_model const* model, FILE* stream, struct mstate const* mstate);
@@ -65,8 +52,10 @@ struct imm_model* imm_model_create(struct imm_hmm* hmm, struct imm_dp const* dp)
     model->trans_table = dp_get_trans_table(dp);
     model->state_table = dp_get_state_table(dp);
     model->dp = dp;
-    model->read_state = read_state;
+    model->read_state = __imm_model_read_state;
     model->read_state_args = NULL;
+    model->write_state = __imm_model_write_state;
+    model->write_state_args = NULL;
 
     return model;
 }
@@ -85,7 +74,8 @@ uint32_t imm_model_nstates(struct imm_model const* model) { return model->nstate
 
 struct imm_model const* imm_model_read(FILE* stream)
 {
-    struct imm_model* model = __imm_model_new(read_state, NULL);
+    struct imm_model* model =
+        __imm_model_new(__imm_model_read_state, NULL, __imm_model_write_state, NULL);
 
     if (read_abc(model, stream)) {
         imm_error("could not read abc");
@@ -134,7 +124,8 @@ int imm_model_write(struct imm_model const* model, FILE* stream)
     return 0;
 }
 
-struct imm_model* __imm_model_new(imm_model_read_state_cb read_state, void* read_state_args)
+struct imm_model* __imm_model_new(imm_model_read_state_cb read_state, void* read_state_args,
+                                  imm_model_write_state_cb write_state, void* write_state_args)
 {
     struct imm_model* model = malloc(sizeof(*model));
     model->abc = NULL;
@@ -149,6 +140,8 @@ struct imm_model* __imm_model_new(imm_model_read_state_cb read_state, void* read
     model->dp = NULL;
     model->read_state = read_state;
     model->read_state_args = read_state_args;
+    model->write_state = write_state;
+    model->write_state_args = write_state_args;
 
     return model;
 }
@@ -215,14 +208,34 @@ err:
     return 1;
 }
 
-void __imm_model_set_abc(struct imm_model* model, struct imm_abc const* abc) { model->abc = abc; }
-
-void __imm_model_set_read_state(struct imm_model* model, imm_model_read_state_cb read_state,
-                                void* args)
+struct imm_state const* __imm_model_read_state(struct imm_model const* model, FILE* stream,
+                                               void* args)
 {
-    model->read_state = read_state;
-    model->read_state_args = args;
+    struct imm_state const* state = NULL;
+    uint8_t                 type_id = 0;
+
+    if (fread(&type_id, sizeof(type_id), 1, stream) < 1) {
+        imm_error("could not read type id");
+        return NULL;
+    }
+
+    switch (type_id) {
+    case IMM_MUTE_STATE_TYPE_ID:
+        if (!(state = imm_mute_state_read(stream, model->abc)))
+            imm_error("could not read mute_state");
+        break;
+    case IMM_NORMAL_STATE_TYPE_ID:
+        if (!(state = imm_normal_state_read(stream, model->abc)))
+            imm_error("could not read normal_state");
+        break;
+    default:
+        imm_error("unknown state type_id");
+    }
+
+    return state;
 }
+
+void __imm_model_set_abc(struct imm_model* model, struct imm_abc const* abc) { model->abc = abc; }
 
 int __imm_model_write_dp(struct imm_model const* model, FILE* stream)
 {
@@ -290,6 +303,33 @@ int __imm_model_write_hmm(struct imm_model const* model, FILE* stream)
     return 0;
 }
 
+int __imm_model_write_state(struct imm_model const* model, FILE* stream,
+                            struct imm_state const* state, void* args)
+{
+    uint8_t type_id = imm_state_type_id(state);
+    if (fwrite(&type_id, sizeof(type_id), 1, stream) < 1) {
+        imm_error("could not write state type id");
+        return 1;
+    }
+
+    int errno = 0;
+    switch (type_id) {
+    case IMM_MUTE_STATE_TYPE_ID:
+        errno = mute_state_write(state, model, stream);
+        break;
+    case IMM_NORMAL_STATE_TYPE_ID:
+        errno = normal_state_write(state, model, stream);
+        break;
+    case IMM_TABLE_STATE_TYPE_ID:
+        errno = table_state_write(state, model, stream);
+        break;
+    default:
+        imm_error("unknown state type id");
+        errno = 1;
+    }
+    return errno;
+}
+
 static void deep_destroy(struct imm_model const* model)
 {
     if (model->abc)
@@ -346,26 +386,19 @@ static struct mstate** read_mstates(struct imm_model* model, FILE* stream)
 
     for (uint32_t i = 0; i < model->nstates; ++i) {
 
-        struct mstate_chunk chunk = {0., 0};
-
-        if (fread(&chunk.start_lprob, sizeof(chunk.start_lprob), 1, stream) < 1) {
-            imm_error("could not read start_lprob");
+        double start_lprob = 0.;
+        if (fread(&start_lprob, sizeof(start_lprob), 1, stream) < 1) {
+            imm_error("could not read start lprob");
             goto err;
         }
 
-        if (fread(&chunk.type_id, sizeof(chunk.type_id), 1, stream) < 1) {
-            imm_error("could not read type_id");
-            goto err;
-        }
-
-        struct imm_state const* state =
-            model->read_state(model, stream, chunk.type_id, model->read_state_args);
+        struct imm_state const* state = model->read_state(model, stream, model->read_state_args);
         if (!state) {
             imm_error("could not read state");
             goto err;
         }
 
-        mstates[i] = mstate_create(state, chunk.start_lprob);
+        mstates[i] = mstate_create(state, start_lprob);
     }
 
     return mstates;
@@ -381,27 +414,6 @@ err:
     }
 
     return NULL;
-}
-
-static struct imm_state const* read_state(struct imm_model const* model, FILE* stream,
-                                          uint8_t type_id, void* args)
-{
-    struct imm_state const* state = NULL;
-
-    switch (type_id) {
-    case IMM_MUTE_STATE_TYPE_ID:
-        if (!(state = mute_state_read(stream, model->abc)))
-            imm_error("could not read mute_state");
-        break;
-    case IMM_NORMAL_STATE_TYPE_ID:
-        if (!(state = normal_state_read(stream, model->abc)))
-            imm_error("could not read normal_state");
-        break;
-    default:
-        imm_error("unknown state type_id");
-    }
-
-    return state;
 }
 
 static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct mstate* const* const mstates)
@@ -456,19 +468,14 @@ static int write_mstate(struct imm_model const* model, FILE* stream, struct msta
 {
     struct imm_state const* state = mstate_get_state(mstate);
 
-    struct mstate_chunk chunk = {mstate_get_start(mstate), imm_state_type_id(state)};
+    double start_lprob = mstate_get_start(mstate);
 
-    if (fwrite(&chunk.start_lprob, sizeof(chunk.start_lprob), 1, stream) < 1) {
+    if (fwrite(&start_lprob, sizeof(start_lprob), 1, stream) < 1) {
         imm_error("could not write start_lprob");
         return 1;
     }
 
-    if (fwrite(&chunk.type_id, sizeof(chunk.type_id), 1, stream) < 1) {
-        imm_error("could not write type_id");
-        return 1;
-    }
-
-    if (state_write(state, model, stream)) {
+    if (model->write_state(model, stream, state, model->write_state_args)) {
         imm_error("could not write state");
         return 1;
     }
@@ -479,9 +486,7 @@ static int write_mstate(struct imm_model const* model, FILE* stream, struct msta
 static int write_mstates(struct imm_model const* model, FILE* stream,
                          struct mstate const* const* mstates, uint32_t nstates)
 {
-    struct mstates_chunk chunk = {.nstates = nstates};
-
-    if (fwrite(&chunk.nstates, sizeof(chunk.nstates), 1, stream) < 1) {
+    if (fwrite(&nstates, sizeof(nstates), 1, stream) < 1) {
         imm_error("could not write nstates");
         return 1;
     }

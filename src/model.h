@@ -26,6 +26,9 @@ struct imm_model
 
     imm_model_read_state_cb read_state;
     void*                   read_state_args;
+
+    imm_model_write_state_cb write_state;
+    void*                    write_state_args;
 };
 
 #endif

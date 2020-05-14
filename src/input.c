@@ -6,7 +6,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct imm_model const* read_block(struct imm_input* input, uint8_t block_type);
+struct imm_input
+{
+    FILE*       stream;
+    char const* filepath;
+
+    bool eof;
+};
+
+static struct imm_model const* read_block(struct imm_input* input, uint8_t block_type);
 
 struct imm_input* imm_input_create(char const* filepath)
 {
@@ -49,7 +57,7 @@ struct imm_model const* imm_input_read(struct imm_input* input)
     return read_block(input, block_type);
 }
 
-struct imm_model const* read_block(struct imm_input* input, uint8_t block_type)
+static struct imm_model const* read_block(struct imm_input* input, uint8_t block_type)
 {
     if (block_type == IMM_IO_BLOCK_EOF) {
         input->eof = true;

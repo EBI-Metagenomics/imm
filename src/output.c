@@ -6,6 +6,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+struct imm_output
+{
+    FILE*       stream;
+    char const* filepath;
+};
+
 struct imm_output* imm_output_create(char const* filepath)
 {
     FILE* stream = fopen(filepath, "w");

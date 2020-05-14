@@ -25,7 +25,6 @@ struct imm_state_vtable
     uint8_t (*max_seq)(struct imm_state const* state);
     uint8_t (*min_seq)(struct imm_state const* state);
     uint8_t (*type_id)(struct imm_state const* state);
-    int (*write)(struct imm_state const* state, struct imm_model const* entry, FILE* stream);
 };
 
 struct imm_state

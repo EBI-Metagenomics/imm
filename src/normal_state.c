@@ -5,7 +5,6 @@
 #include "imm/normal_state.h"
 #include "imm/state.h"
 #include "imm/state_types.h"
-#include "state.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -26,9 +25,8 @@ static double  lprob(struct imm_state const* state, struct imm_seq const* seq);
 static uint8_t max_seq(struct imm_state const* state);
 static uint8_t min_seq(struct imm_state const* state);
 static uint8_t type_id(struct imm_state const* state);
-static int     write(struct imm_state const* state, struct imm_model const* entry, FILE* stream);
 
-static struct imm_state_vtable const __vtable = {destroy, lprob, max_seq, min_seq, type_id, write};
+static struct imm_state_vtable const __vtable = {destroy, lprob, max_seq, min_seq, type_id};
 
 struct imm_normal_state const* imm_normal_state_create(char const* name, struct imm_abc const* abc,
                                                        double const* lprobs)
@@ -57,16 +55,11 @@ void imm_normal_state_destroy(struct imm_normal_state const* state)
     state->super->vtable.destroy(state->super);
 }
 
-struct imm_state const* imm_normal_state_super(struct imm_normal_state const* state)
-{
-    return state->super;
-}
-
-struct imm_state const* normal_state_read(FILE* stream, struct imm_abc const* abc)
+struct imm_state const* imm_normal_state_read(FILE* stream, struct imm_abc const* abc)
 {
     struct imm_state* state = __imm_state_read(stream, abc);
     if (!state) {
-        imm_error("could not state_read");
+        imm_error("could not read normal state");
         return NULL;
     }
 
@@ -96,6 +89,11 @@ struct imm_state const* normal_state_read(FILE* stream, struct imm_abc const* ab
     return state;
 }
 
+struct imm_state const* imm_normal_state_super(struct imm_normal_state const* state)
+{
+    return state->super;
+}
+
 static void destroy(struct imm_state const* state)
 {
     struct imm_normal_state const* s = __imm_state_derived(state);
@@ -122,7 +120,7 @@ static uint8_t max_seq(struct imm_state const* state) { return 1; }
 
 static uint8_t type_id(struct imm_state const* state) { return IMM_NORMAL_STATE_TYPE_ID; }
 
-static int write(struct imm_state const* state, struct imm_model const* entry, FILE* stream)
+int normal_state_write(struct imm_state const* state, struct imm_model const* model, FILE* stream)
 {
     if (__imm_state_write(state, stream))
         return 1;

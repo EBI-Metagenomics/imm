@@ -1,10 +1,9 @@
-#include "state.h"
+#include "imm/state.h"
 #include "ascii.h"
 #include "cast.h"
 #include "free.h"
 #include "imm/abc.h"
 #include "imm/report.h"
-#include "imm/state.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -62,7 +61,7 @@ struct imm_state* __imm_state_read(FILE* stream, struct imm_abc const* abc)
     struct imm_state* state = malloc(sizeof(*state));
     state->name = chunk.name;
     state->abc = abc;
-    state->vtable = (struct imm_state_vtable){NULL, NULL, NULL, NULL, NULL, NULL};
+    state->vtable = (struct imm_state_vtable){NULL, NULL, NULL, NULL, NULL};
     state->derived = NULL;
 
     return state;

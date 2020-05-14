@@ -5,12 +5,7 @@
 #include <stdio.h>
 
 struct imm_model;
-
-struct imm_output
-{
-    FILE*       stream;
-    char const* filepath;
-};
+struct imm_output;
 
 IMM_API struct imm_output* imm_output_create(char const* filepath);
 IMM_API int                imm_output_destroy(struct imm_output const* output);
