@@ -64,8 +64,8 @@ static struct imm_model const* read_block(struct imm_input* input, uint8_t block
         return NULL;
     }
 
-    struct imm_model* model = __imm_model_new(NULL);
-    if (imm_model_read(model, input->stream)) {
+    struct imm_model const* model = NULL;
+    if (!(model = imm_model_read(input->stream))) {
         imm_error("failed to read file %s", input->filepath);
         return NULL;
     }

@@ -50,8 +50,6 @@ types:
         repeat-expr: ntransitions
   abc:
     seq:
-      - id: abc_type
-        type: u1
       - id: nsymbols
         type: u1
       - id: symbols

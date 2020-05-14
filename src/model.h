@@ -24,8 +24,8 @@ struct imm_model
     struct dp_state_table const* state_table;
     struct imm_dp const*         dp;
 
-    struct imm_model_vtable vtable;
-    void*                   derived;
+    imm_model_read_state_cb read_state;
+    void*                   read_state_args;
 };
 
 #endif

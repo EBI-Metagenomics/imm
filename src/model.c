@@ -35,54 +35,19 @@ struct mstates_chunk
 };
 
 static void                    deep_destroy(struct imm_model const* model);
-static void                    destroy(struct imm_model const* model);
-static int                     read(struct imm_model* model, FILE* stream);
-static struct imm_abc const*   read_abc(struct imm_model* model, FILE* stream, uint8_t type_id);
+static int                     read_abc(struct imm_model* model, FILE* stream);
 static struct mstate**         read_mstates(struct imm_model* model, FILE* stream);
 static struct imm_state const* read_state(struct imm_model const* model, FILE* stream,
-                                          uint8_t type_id);
+                                          uint8_t type_id, void* args);
 static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct mstate* const* const mstates);
-static int write(struct imm_model const* model, FILE* stream);
 static int write_abc(struct imm_model const* model, FILE* stream);
 static int write_mstate(struct imm_model const* model, FILE* stream, struct mstate const* mstate);
 static int write_mstates(struct imm_model const* model, FILE* stream,
                          struct mstate const* const* mstates, uint32_t nstates);
 
-struct imm_model_vtable const imm_model_vtable = {deep_destroy, destroy, read,     read_abc,
-                                                  read_state,   write,   write_abc};
-
 struct imm_abc const* imm_model_abc(struct imm_model const* model) { return model->abc; }
 
 struct imm_model* imm_model_create(struct imm_hmm* hmm, struct imm_dp const* dp)
-{
-    return __imm_model_create(hmm, dp, imm_model_vtable, NULL);
-}
-
-void imm_model_destroy(struct imm_model const* model) { model->vtable.destroy(model); }
-
-struct imm_dp const* imm_model_dp(struct imm_model const* model) { return model->dp; }
-
-struct imm_hmm* imm_model_hmm(struct imm_model const* model) { return model->hmm; }
-
-uint32_t imm_model_nstates(struct imm_model const* model) { return model->nstates; }
-
-int imm_model_read(struct imm_model* model, FILE* stream)
-{
-    return model->vtable.read(model, stream);
-}
-
-struct imm_state const* imm_model_state(struct imm_model const* model, uint32_t i)
-{
-    return model->states[i];
-}
-
-int imm_model_write(struct imm_model const* model, FILE* stream)
-{
-    return model->vtable.write(model, stream);
-}
-
-struct imm_model* __imm_model_create(struct imm_hmm* hmm, struct imm_dp const* dp,
-                                     struct imm_model_vtable vtable, void* derived)
 {
     struct imm_model* model = malloc(sizeof(*model));
 
@@ -100,18 +65,76 @@ struct imm_model* __imm_model_create(struct imm_hmm* hmm, struct imm_dp const* d
     model->trans_table = dp_get_trans_table(dp);
     model->state_table = dp_get_state_table(dp);
     model->dp = dp;
-
-    model->vtable = vtable;
-    model->derived = derived;
+    model->read_state = read_state;
+    model->read_state_args = NULL;
 
     return model;
 }
 
-void* __imm_model_derived(struct imm_model* model) { return model->derived; }
+void imm_model_destroy(struct imm_model const* model)
+{
+    free_c(model->states);
+    free_c(model);
+}
 
-void const* __imm_model_derived_c(struct imm_model const* model) { return model->derived; }
+struct imm_dp const* imm_model_dp(struct imm_model const* model) { return model->dp; }
 
-struct imm_model* __imm_model_new(void* derived)
+struct imm_hmm* imm_model_hmm(struct imm_model const* model) { return model->hmm; }
+
+uint32_t imm_model_nstates(struct imm_model const* model) { return model->nstates; }
+
+struct imm_model const* imm_model_read(FILE* stream)
+{
+    struct imm_model* model = __imm_model_new(read_state, NULL);
+
+    if (read_abc(model, stream)) {
+        imm_error("could not read abc");
+        goto err;
+    }
+
+    if (__imm_model_read_hmm(model, stream)) {
+        imm_error("could not read hmm");
+        goto err;
+    }
+
+    if (__imm_model_read_dp(model, stream)) {
+        imm_error("could not read dp");
+        goto err;
+    }
+
+    return model;
+
+err:
+    deep_destroy(model);
+    return NULL;
+}
+
+struct imm_state const* imm_model_state(struct imm_model const* model, uint32_t i)
+{
+    return model->states[i];
+}
+
+int imm_model_write(struct imm_model const* model, FILE* stream)
+{
+    if (write_abc(model, stream)) {
+        imm_error("could not write abc");
+        return 1;
+    }
+
+    if (__imm_model_write_hmm(model, stream)) {
+        imm_error("could not write hmm");
+        return 1;
+    }
+
+    if (__imm_model_write_dp(model, stream)) {
+        imm_error("could not write dp");
+        return 1;
+    }
+
+    return 0;
+}
+
+struct imm_model* __imm_model_new(imm_model_read_state_cb read_state, void* read_state_args)
 {
     struct imm_model* model = malloc(sizeof(*model));
     model->abc = NULL;
@@ -124,9 +147,8 @@ struct imm_model* __imm_model_new(void* derived)
     model->trans_table = NULL;
     model->state_table = NULL;
     model->dp = NULL;
-
-    model->vtable = imm_model_vtable;
-    model->derived = derived;
+    model->read_state = read_state;
+    model->read_state_args = read_state_args;
 
     return model;
 }
@@ -152,6 +174,8 @@ int __imm_model_read_dp(struct imm_model* model, FILE* stream)
         imm_error("could not read dp_state_table");
         return 1;
     }
+
+    dp_create_from_model(model);
 
     return 0;
 }
@@ -193,9 +217,11 @@ err:
 
 void __imm_model_set_abc(struct imm_model* model, struct imm_abc const* abc) { model->abc = abc; }
 
-struct imm_model_vtable const* __imm_model_vtable(struct imm_model const* model)
+void __imm_model_set_read_state(struct imm_model* model, imm_model_read_state_cb read_state,
+                                void* args)
 {
-    return &model->vtable;
+    model->read_state = read_state;
+    model->read_state_args = args;
 }
 
 int __imm_model_write_dp(struct imm_model const* model, FILE* stream)
@@ -296,58 +322,13 @@ static void deep_destroy(struct imm_model const* model)
     free_c(model);
 }
 
-static void destroy(struct imm_model const* model)
+static int read_abc(struct imm_model* model, FILE* stream)
 {
-    free_c(model->states);
-    free_c(model);
-}
-
-static int read(struct imm_model* model, FILE* stream)
-{
-    uint8_t abc_type_id = 0;
-    if (fread(&abc_type_id, sizeof(abc_type_id), 1, stream) < 1) {
-        imm_error("could not read abc type id");
-        goto err;
-    }
-
-    model->abc = model->vtable.read_abc(model, stream, abc_type_id);
-    if (!model->abc) {
+    if (!(model->abc = imm_abc_read(stream))) {
         imm_error("could not read abc");
-        goto err;
+        return 1;
     }
-
-    if (__imm_model_read_hmm(model, stream)) {
-        imm_error("could not read hmm");
-        goto err;
-    }
-
-    if (__imm_model_read_dp(model, stream)) {
-        imm_error("could not read dp");
-        goto err;
-    }
-
-    dp_create_from_model(model);
     return 0;
-
-err:
-    model->vtable.deep_destroy(model);
-    return 1;
-}
-
-static struct imm_abc const* read_abc(struct imm_model* model, FILE* stream, uint8_t type_id)
-{
-    if (type_id != IMM_ABC_TYPE_ID) {
-        imm_error("unknown abc type_id");
-        return NULL;
-    }
-
-    struct imm_abc* const abc = imm_abc_read(stream);
-    if (!abc) {
-        imm_error("could not read abc");
-        return NULL;
-    }
-
-    return abc;
 }
 
 static struct mstate** read_mstates(struct imm_model* model, FILE* stream)
@@ -377,7 +358,8 @@ static struct mstate** read_mstates(struct imm_model* model, FILE* stream)
             goto err;
         }
 
-        struct imm_state const* state = model->vtable.read_state(model, stream, chunk.type_id);
+        struct imm_state const* state =
+            model->read_state(model, stream, chunk.type_id, model->read_state_args);
         if (!state) {
             imm_error("could not read state");
             goto err;
@@ -402,7 +384,7 @@ err:
 }
 
 static struct imm_state const* read_state(struct imm_model const* model, FILE* stream,
-                                          uint8_t type_id)
+                                          uint8_t type_id, void* args)
 {
     struct imm_state const* state = NULL;
 
@@ -460,34 +442,8 @@ static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct mstate* co
     return 0;
 }
 
-static int write(struct imm_model const* model, FILE* stream)
-{
-    if (model->vtable.write_abc(model, stream)) {
-        imm_error("could not write abc");
-        return 1;
-    }
-
-    if (__imm_model_write_hmm(model, stream)) {
-        imm_error("could not write hmm");
-        return 1;
-    }
-
-    if (__imm_model_write_dp(model, stream)) {
-        imm_error("could not write dp");
-        return 1;
-    }
-
-    return 0;
-}
-
 static int write_abc(struct imm_model const* model, FILE* stream)
 {
-    uint8_t type_id = imm_abc_type_id(model->abc);
-    if (fwrite(&type_id, sizeof(type_id), 1, stream) < 1) {
-        imm_error("could not write type_id");
-        return 1;
-    }
-
     if (imm_abc_write(model->abc, stream)) {
         imm_error("could not write abc");
         return 1;
