@@ -24,6 +24,8 @@ void imm_result_destroy(struct imm_result const* result)
     free_c(result);
 }
 
+void imm_result_free(struct imm_result const* result) { free_c(result); }
+
 double imm_result_loglik(struct imm_result const* result) { return result->loglik; }
 
 struct imm_path const* imm_result_path(struct imm_result const* result) { return result->path; }
@@ -49,6 +51,8 @@ void imm_results_destroy(struct imm_results const* results)
 
     free_c(results);
 }
+
+void imm_results_free(struct imm_results const* results) { free_c(results); }
 
 struct imm_result const* imm_results_get(struct imm_results const* results, unsigned idx)
 {

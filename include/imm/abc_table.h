@@ -14,10 +14,10 @@ struct imm_abc_table
 IMM_API struct imm_abc_table const* imm_abc_table_create(struct imm_abc const* abc,
                                                          double const*         lprobs);
 IMM_API void                        imm_abc_table_destroy(struct imm_abc_table const* abc_table);
-static inline struct imm_abc const* imm_abc_table_get_abc(struct imm_abc_table const* abc_table);
+static inline struct imm_abc const* imm_abc_table_abc(struct imm_abc_table const* abc_table);
 static inline double imm_abc_table_lprob(struct imm_abc_table const* abc_table, char symbol);
 
-static inline struct imm_abc const* imm_abc_table_get_abc(struct imm_abc_table const* abc_table)
+static inline struct imm_abc const* imm_abc_table_abc(struct imm_abc_table const* abc_table)
 {
     return abc_table->abc;
 }
