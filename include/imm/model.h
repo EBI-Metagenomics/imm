@@ -25,6 +25,12 @@ IMM_API struct imm_model const* imm_model_read(FILE* stream);
 IMM_API struct imm_state const* imm_model_state(struct imm_model const* model, uint32_t i);
 IMM_API int                     imm_model_write(struct imm_model const* model, FILE* stream);
 
+IMM_API struct imm_model* __imm_model_create(struct imm_hmm* hmm, struct imm_dp const* dp,
+                                             imm_model_read_state_cb  read_state,
+                                             void*                    read_state_args,
+                                             imm_model_write_state_cb write_state,
+                                             void*                    write_state_args);
+IMM_API void              __imm_model_deep_destroy(struct imm_model const* model);
 IMM_API struct imm_model* __imm_model_new(imm_model_read_state_cb read_state, void* read_state_args,
                                           imm_model_write_state_cb write_state,
                                           void*                    write_state_args);

@@ -9,21 +9,20 @@
 #include "imm/abc_types.h"
 #include "imm/dp.h"
 #include "imm/hmm.h"
+#include "imm/mute_state.h"
+#include "imm/normal_state.h"
 #include "imm/report.h"
 #include "imm/state.h"
 #include "imm/state_types.h"
+#include "imm/table_state.h"
 #include "model.h"
 #include "mstate.h"
 #include "mtrans.h"
 #include "mtrans_table.h"
-#include "mute_state.h"
-#include "normal_state.h"
 #include "seq_code.h"
-#include "table_state.h"
 #include <stdlib.h>
 #include <string.h>
 
-static void            deep_destroy(struct imm_model const* model);
 static int             read_abc(struct imm_model* model, FILE* stream);
 static struct mstate** read_mstates(struct imm_model* model, FILE* stream);
 static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct mstate* const* const mstates);
@@ -36,28 +35,7 @@ struct imm_abc const* imm_model_abc(struct imm_model const* model) { return mode
 
 struct imm_model* imm_model_create(struct imm_hmm* hmm, struct imm_dp const* dp)
 {
-    struct imm_model* model = malloc(sizeof(*model));
-
-    model->abc = hmm_abc(hmm);
-    model->hmm = hmm;
-    model->mstates = (struct mstate**)hmm_get_mstates(hmm, dp);
-
-    model->nstates = dp_state_table_nstates(dp_get_state_table(dp));
-    model->states = malloc(sizeof(*model->states) * model->nstates);
-    for (uint32_t i = 0; i < model->nstates; ++i)
-        model->states[i] = model->mstates[i]->state;
-
-    model->seq_code = dp_get_seq_code(dp);
-    model->emission = dp_get_emission(dp);
-    model->trans_table = dp_get_trans_table(dp);
-    model->state_table = dp_get_state_table(dp);
-    model->dp = dp;
-    model->read_state = __imm_model_read_state;
-    model->read_state_args = NULL;
-    model->write_state = __imm_model_write_state;
-    model->write_state_args = NULL;
-
-    return model;
+    return __imm_model_create(hmm, dp, __imm_model_read_state, NULL, __imm_model_write_state, NULL);
 }
 
 void imm_model_destroy(struct imm_model const* model)
@@ -95,7 +73,7 @@ struct imm_model const* imm_model_read(FILE* stream)
     return model;
 
 err:
-    deep_destroy(model);
+    __imm_model_deep_destroy(model);
     return NULL;
 }
 
@@ -122,6 +100,34 @@ int imm_model_write(struct imm_model const* model, FILE* stream)
     }
 
     return 0;
+}
+
+struct imm_model* __imm_model_create(struct imm_hmm* hmm, struct imm_dp const* dp,
+                                     imm_model_read_state_cb read_state, void* read_state_args,
+                                     imm_model_write_state_cb write_state, void* write_state_args)
+{
+    struct imm_model* model = malloc(sizeof(*model));
+
+    model->abc = hmm_abc(hmm);
+    model->hmm = hmm;
+    model->mstates = (struct mstate**)hmm_get_mstates(hmm, dp);
+
+    model->nstates = dp_state_table_nstates(dp_get_state_table(dp));
+    model->states = malloc(sizeof(*model->states) * model->nstates);
+    for (uint32_t i = 0; i < model->nstates; ++i)
+        model->states[i] = model->mstates[i]->state;
+
+    model->seq_code = dp_get_seq_code(dp);
+    model->emission = dp_get_emission(dp);
+    model->trans_table = dp_get_trans_table(dp);
+    model->state_table = dp_get_state_table(dp);
+    model->dp = dp;
+    model->read_state = read_state;
+    model->read_state_args = read_state_args;
+    model->write_state = write_state;
+    model->write_state_args = write_state_args;
+
+    return model;
 }
 
 struct imm_model* __imm_model_new(imm_model_read_state_cb read_state, void* read_state_args,
@@ -222,14 +228,18 @@ struct imm_state const* __imm_model_read_state(struct imm_model const* model, FI
     switch (type_id) {
     case IMM_MUTE_STATE_TYPE_ID:
         if (!(state = imm_mute_state_read(stream, model->abc)))
-            imm_error("could not read mute_state");
+            imm_error("could not read mute state");
         break;
     case IMM_NORMAL_STATE_TYPE_ID:
         if (!(state = imm_normal_state_read(stream, model->abc)))
-            imm_error("could not read normal_state");
+            imm_error("could not read normal state");
+        break;
+    case IMM_TABLE_STATE_TYPE_ID:
+        if (!(state = imm_table_state_read(stream, model->abc)))
+            imm_error("could not read table state");
         break;
     default:
-        imm_error("unknown state type_id");
+        imm_error("unknown state type id");
     }
 
     return state;
@@ -315,13 +325,13 @@ int __imm_model_write_state(struct imm_model const* model, FILE* stream,
     int errno = 0;
     switch (type_id) {
     case IMM_MUTE_STATE_TYPE_ID:
-        errno = mute_state_write(state, model, stream);
+        errno = imm_mute_state_write(state, model, stream);
         break;
     case IMM_NORMAL_STATE_TYPE_ID:
-        errno = normal_state_write(state, model, stream);
+        errno = imm_normal_state_write(state, model, stream);
         break;
     case IMM_TABLE_STATE_TYPE_ID:
-        errno = table_state_write(state, model, stream);
+        errno = imm_table_state_write(state, model, stream);
         break;
     default:
         imm_error("unknown state type id");
@@ -330,7 +340,7 @@ int __imm_model_write_state(struct imm_model const* model, FILE* stream,
     return errno;
 }
 
-static void deep_destroy(struct imm_model const* model)
+void __imm_model_deep_destroy(struct imm_model const* model)
 {
     if (model->abc)
         imm_abc_destroy(model->abc);

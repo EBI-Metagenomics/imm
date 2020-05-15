@@ -1,8 +1,7 @@
-#include "normal_state.h"
+#include "imm/normal_state.h"
 #include "free.h"
 #include "imm/abc.h"
 #include "imm/lprob.h"
-#include "imm/normal_state.h"
 #include "imm/state.h"
 #include "imm/state_types.h"
 #include <stdlib.h>
@@ -94,6 +93,33 @@ struct imm_state const* imm_normal_state_super(struct imm_normal_state const* st
     return state->super;
 }
 
+int imm_normal_state_write(struct imm_state const* state, struct imm_model const* model,
+                           FILE* stream)
+{
+    if (__imm_state_write(state, stream))
+        return 1;
+
+    struct imm_normal_state const* s = __imm_state_derived(state);
+
+    struct normal_state_chunk chunk = {
+        .lprobs_size = imm_abc_length(imm_state_get_abc(state)),
+        .lprobs = s->lprobs,
+    };
+
+    if (fwrite(&chunk.lprobs_size, sizeof(chunk.lprobs_size), 1, stream) < 1) {
+        imm_error("could not write lprobs_size");
+        return 1;
+    }
+
+    if (fwrite(chunk.lprobs, sizeof(*chunk.lprobs), chunk.lprobs_size, stream) <
+        chunk.lprobs_size) {
+        imm_error("could not write lprobs");
+        return 1;
+    }
+
+    return 0;
+}
+
 static void destroy(struct imm_state const* state)
 {
     struct imm_normal_state const* s = __imm_state_derived(state);
@@ -119,29 +145,3 @@ static uint8_t min_seq(struct imm_state const* state) { return 1; }
 static uint8_t max_seq(struct imm_state const* state) { return 1; }
 
 static uint8_t type_id(struct imm_state const* state) { return IMM_NORMAL_STATE_TYPE_ID; }
-
-int normal_state_write(struct imm_state const* state, struct imm_model const* model, FILE* stream)
-{
-    if (__imm_state_write(state, stream))
-        return 1;
-
-    struct imm_normal_state const* s = __imm_state_derived(state);
-
-    struct normal_state_chunk chunk = {
-        .lprobs_size = imm_abc_length(imm_state_get_abc(state)),
-        .lprobs = s->lprobs,
-    };
-
-    if (fwrite(&chunk.lprobs_size, sizeof(chunk.lprobs_size), 1, stream) < 1) {
-        imm_error("could not write lprobs_size");
-        return 1;
-    }
-
-    if (fwrite(chunk.lprobs, sizeof(*chunk.lprobs), chunk.lprobs_size, stream) <
-        chunk.lprobs_size) {
-        imm_error("could not write lprobs");
-        return 1;
-    }
-
-    return 0;
-}

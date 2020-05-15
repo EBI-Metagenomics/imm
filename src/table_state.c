@@ -4,7 +4,6 @@
 #include "imm/state.h"
 #include "imm/state_types.h"
 #include "min.h"
-#include "table_state.h"
 #include <stdlib.h>
 
 struct imm_table_state
@@ -45,6 +44,12 @@ void imm_table_state_destroy(struct imm_table_state const* state)
     state->super->vtable.destroy(state->super);
 }
 
+struct imm_state const* imm_table_state_read(FILE* stream, struct imm_abc const* abc)
+{
+    imm_die("imm_table_state_read not implemented");
+    return NULL;
+}
+
 struct imm_state const* imm_table_state_super(struct imm_table_state const* state)
 {
     return state->super;
@@ -78,7 +83,8 @@ static uint8_t min_seq(struct imm_state const* state)
 
 static uint8_t type_id(struct imm_state const* state) { return IMM_TABLE_STATE_TYPE_ID; }
 
-int table_state_write(struct imm_state const* state, struct imm_model const* model, FILE* stream)
+int imm_table_state_write(struct imm_state const* state, struct imm_model const* model,
+                          FILE* stream)
 {
     imm_die("table_state write is not implemented yet");
     return 0;

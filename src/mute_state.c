@@ -1,7 +1,6 @@
-#include "mute_state.h"
+#include "imm/mute_state.h"
 #include "free.h"
 #include "imm/lprob.h"
-#include "imm/mute_state.h"
 #include "imm/state.h"
 #include "imm/state_types.h"
 #include <stdlib.h>
@@ -62,7 +61,7 @@ struct imm_state const* imm_mute_state_super(struct imm_mute_state const* state)
     return state->super;
 }
 
-int mute_state_write(struct imm_state const* state, struct imm_model const* model, FILE* stream)
+int imm_mute_state_write(struct imm_state const* state, struct imm_model const* model, FILE* stream)
 {
     return __imm_state_write(state, stream);
 }
