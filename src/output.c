@@ -3,6 +3,7 @@
 #include "imm/io.h"
 #include "imm/report.h"
 #include "model.h"
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -10,25 +11,14 @@ struct imm_output
 {
     FILE*       stream;
     char const* filepath;
+    bool        closed;
 };
 
-struct imm_output* imm_output_create(char const* filepath)
+int imm_output_close(struct imm_output* output)
 {
-    FILE* stream = fopen(filepath, "w");
-    if (!stream) {
-        imm_error("could not open file %s for writing", filepath);
-        return NULL;
-    }
+    if (output->closed)
+        return 0;
 
-    struct imm_output* output = malloc(sizeof(*output));
-    output->stream = stream;
-    output->filepath = strdup(filepath);
-
-    return output;
-}
-
-int imm_output_destroy(struct imm_output const* output)
-{
     uint8_t block_type = IMM_IO_BLOCK_EOF;
     int     errno = 0;
 
@@ -41,6 +31,30 @@ int imm_output_destroy(struct imm_output const* output)
         imm_error("failed to close file %s", output->filepath);
         errno = 1;
     }
+
+    output->closed = true;
+    return errno;
+}
+
+struct imm_output* imm_output_create(char const* filepath)
+{
+    FILE* stream = fopen(filepath, "w");
+    if (!stream) {
+        imm_error("could not open file %s for writing", filepath);
+        return NULL;
+    }
+
+    struct imm_output* output = malloc(sizeof(*output));
+    output->stream = stream;
+    output->filepath = strdup(filepath);
+    output->closed = false;
+
+    return output;
+}
+
+int imm_output_destroy(struct imm_output* output)
+{
+    int errno = imm_output_close(output);
     free_c(output->filepath);
     free_c(output);
     return errno;
