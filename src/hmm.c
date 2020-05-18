@@ -245,6 +245,16 @@ int imm_hmm_normalize_trans(struct imm_hmm* hmm, struct imm_state const* src_sta
     return normalize_transitions(mstate_table_get(hmm->table, i));
 }
 
+double imm_hmm_get_start(struct imm_hmm const* hmm, struct imm_state const* state)
+{
+    unsigned long i = mstate_table_find(hmm->table, state);
+    if (i == mstate_table_end(hmm->table)) {
+        imm_error("state not found");
+        return imm_lprob_invalid();
+    }
+    return mstate_get_start(mstate_table_get(hmm->table, i));
+}
+
 int imm_hmm_set_start(struct imm_hmm* hmm, struct imm_state const* state, double lprob)
 {
     unsigned long i = mstate_table_find(hmm->table, state);
