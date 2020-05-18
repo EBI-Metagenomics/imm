@@ -12,9 +12,26 @@ struct imm_input
     char const* filepath;
 
     bool eof;
+    bool closed;
 };
 
 static struct imm_model const* read_block(struct imm_input* input, uint8_t block_type);
+
+int imm_input_close(struct imm_input* input)
+{
+    if (input->closed)
+        return 0;
+
+    int errno = 0;
+
+    if (fclose(input->stream)) {
+        imm_error("failed to close file %s", input->filepath);
+        errno = 1;
+    }
+
+    input->closed = true;
+    return errno;
+}
 
 struct imm_input* imm_input_create(char const* filepath)
 {
@@ -28,19 +45,17 @@ struct imm_input* imm_input_create(char const* filepath)
     input->stream = stream;
     input->filepath = strdup(filepath);
     input->eof = false;
+    input->closed = false;
 
     return input;
 }
 
-int imm_input_destroy(struct imm_input const* input)
+int imm_input_destroy(struct imm_input* input)
 {
-    if (fclose(input->stream)) {
-        imm_error("failed to close file %s", input->filepath);
-        return 1;
-    }
+    int errno = imm_input_close(input);
     free_c(input->filepath);
     free_c(input);
-    return 0;
+    return errno;
 }
 
 bool imm_input_eof(struct imm_input const* input) { return input->eof; }
