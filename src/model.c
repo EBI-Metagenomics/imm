@@ -484,6 +484,7 @@ static int write_mstate(struct imm_model const* model, FILE* stream, struct msta
         imm_error("could not write start_lprob");
         return 1;
     }
+    printf("%s\n", imm_state_get_name(state));
 
     if (model->write_state(model, stream, state, model->write_state_args)) {
         imm_error("could not write state");

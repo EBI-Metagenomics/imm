@@ -31,18 +31,24 @@ struct edge
 
 KHASH_MAP_INIT_PTR(node, struct node*)
 
-static int  check_mute_cycles(struct list_head* node_list);
-static int  check_mute_visit(struct node* node);
-static void create_edges(struct list_head* node_list, khash_t(node) * table);
-static void create_nodes(struct mstate const** mstates, uint32_t nstates,
-                         struct list_head* node_list, khash_t(node) * node_table);
-static void destroy_edges(struct list_head* edges);
-static void destroy_node(struct node* node);
-static void destroy_node_list(struct list_head* node_list);
-static void unmark_nodes(struct list_head* node_list);
-static void visit(struct node* node, struct mstate const*** mstate);
+static int        check_mute_cycles(struct list_head* node_list);
+static int        check_mute_visit(struct node* node);
+static void       create_edges(struct list_head* node_list, khash_t(node) * table);
+static void       create_nodes(struct mstate const** mstates, uint32_t nstates,
+                               struct list_head* node_list, khash_t(node) * node_table);
+static void       destroy_edges(struct list_head* edges);
+static void       destroy_node(struct node* node);
+static void       destroy_node_list(struct list_head* node_list);
+static inline int name_compare(const void* a, const void* b);
+static void       unmark_nodes(struct list_head* node_list);
+static void       visit(struct node* node, struct mstate const*** mstate);
 
-int mstate_sort(struct mstate const** mstates, uint32_t nstates)
+void mstate_name_sort(struct mstate const** mstates, uint32_t nstates)
+{
+    qsort(mstates, nstates, sizeof(*mstates), name_compare);
+}
+
+int mstate_topological_sort(struct mstate const** mstates, uint32_t nstates)
 {
     struct list_head node_list = LIST_HEAD_INIT(node_list);
     khash_t(node)* node_table = kh_init(node);
@@ -182,6 +188,13 @@ static void destroy_node_list(struct list_head* node_list)
         list_del(&node->list_entry);
         destroy_node(node);
     }
+}
+
+static inline int name_compare(void const* a, void const* b)
+{
+    char const* left = imm_state_get_name((*(struct mstate const**)a)->state);
+    char const* right = imm_state_get_name((*(struct mstate const**)b)->state);
+    return strcmp(left, right);
 }
 
 static void unmark_nodes(struct list_head* node_list)

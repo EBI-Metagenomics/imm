@@ -5,6 +5,7 @@
 
 struct mstate;
 
-int mstate_sort(struct mstate const** mstates, uint32_t nstates);
+void mstate_name_sort(struct mstate const** mstates, uint32_t nstates);
+int  mstate_topological_sort(struct mstate const** mstates, uint32_t nstates);
 
 #endif
