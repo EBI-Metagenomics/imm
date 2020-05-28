@@ -61,10 +61,6 @@ struct imm_dp const* imm_hmm_create_dp(struct imm_hmm const* hmm, struct imm_sta
     }
 
     struct mstate const** mstates = mstate_table_array(hmm->table);
-    printf("After NAME SORT\n");
-    for (unsigned i = 0; i < mstate_table_size(hmm->table); ++i)
-        printf("%s\n", imm_state_get_name(mstates[i]->state));
-    printf("\n");
 
     if (mstate_topological_sort(mstates, mstate_table_size(hmm->table))) {
         imm_error("could not sort mstates");
@@ -72,11 +68,6 @@ struct imm_dp const* imm_hmm_create_dp(struct imm_hmm const* hmm, struct imm_sta
         return NULL;
     }
     unsigned nstates = mstate_table_size(hmm->table);
-
-    printf("After TOPOLOGICAL SORT\n");
-    for (unsigned i = 0; i < mstate_table_size(hmm->table); ++i)
-        printf("%s\n", imm_state_get_name(mstates[i]->state));
-    printf("\n");
 
     return dp_create(hmm->abc, mstates, nstates, end_state);
 }
