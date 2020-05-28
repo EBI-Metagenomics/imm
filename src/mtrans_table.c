@@ -2,6 +2,7 @@
 #include "free.h"
 #include "imm/bug.h"
 #include "imm/report.h"
+#include "imm/state.h"
 #include "khash_ptr.h"
 #include "mtrans.h"
 
@@ -12,6 +13,9 @@ struct mtrans_table
     khash_t(mtrans) * ktable;
 };
 
+static void       mtrans_name_sort(struct mtrans const** mtrans, uint32_t ntrans);
+static inline int name_compare(void const* a, void const* b);
+
 void mtrans_table_add(struct mtrans_table* table, struct mtrans* mtrans)
 {
     int      ret = 0;
@@ -19,6 +23,23 @@ void mtrans_table_add(struct mtrans_table* table, struct mtrans* mtrans)
     IMM_BUG(ret == -1 || ret == 0);
     kh_key(table->ktable, i) = mtrans_get_state(mtrans);
     kh_val(table->ktable, i) = mtrans;
+}
+
+struct mtrans const** mtrans_table_array(struct mtrans_table const* table)
+{
+    uint32_t              size = mtrans_table_size(table);
+    struct mtrans const** mtrans = malloc(sizeof(*mtrans) * size);
+
+    struct mtrans const** t = mtrans;
+    unsigned long         i = 0;
+    mtrans_table_for_each (i, table) {
+        if (mtrans_table_exist(table, i)) {
+            *t = mtrans_table_get(table, i);
+            ++t;
+        }
+    }
+    mtrans_name_sort(mtrans, mtrans_table_size(table));
+    return mtrans;
 }
 
 unsigned long mtrans_table_begin(struct mtrans_table const* table)
@@ -74,4 +95,16 @@ unsigned mtrans_table_size(struct mtrans_table const* table)
     khint_t n = kh_size(table->ktable);
     IMM_BUG(n > UINT_MAX);
     return (unsigned)n;
+}
+
+static void mtrans_name_sort(struct mtrans const** mtrans, uint32_t ntrans)
+{
+    qsort(mtrans, ntrans, sizeof(*mtrans), name_compare);
+}
+
+static inline int name_compare(void const* a, void const* b)
+{
+    struct imm_state const* sa = mtrans_get_state(*(struct mtrans const**)a);
+    struct imm_state const* sb = mtrans_get_state(*(struct mtrans const**)b);
+    return strcmp(imm_state_get_name(sa), imm_state_get_name(sb));
 }

@@ -39,7 +39,7 @@ static void       create_nodes(struct mstate const** mstates, uint32_t nstates,
 static void       destroy_edges(struct list_head* edges);
 static void       destroy_node(struct node* node);
 static void       destroy_node_list(struct list_head* node_list);
-static inline int name_compare(const void* a, const void* b);
+static inline int name_compare(void const* a, void const* b);
 static void       unmark_nodes(struct list_head* node_list);
 static void       visit(struct node* node, struct mstate const*** mstate);
 
@@ -117,24 +117,23 @@ static void create_edges(struct list_head* node_list, khash_t(node) * table)
 {
     struct node* node = NULL;
     list_for_each_entry (node, node_list, list_entry) {
+
         struct mtrans_table const* mtrans_table = mstate_get_mtrans_table(node->mstate);
-        unsigned long              i = 0;
-        mtrans_table_for_each (i, mtrans_table) {
-            if (!mtrans_table_exist(mtrans_table, i))
-                continue;
+        struct mtrans const**      mtrans = mtrans_table_array(mtrans_table);
 
-            struct mtrans const* mtrans = mtrans_table_get(mtrans_table, i);
-            if (!imm_lprob_is_zero(mtrans_get_lprob(mtrans))) {
-                struct edge*            edge = malloc(sizeof(*edge));
-                struct imm_state const* state = mtrans_get_state(mtrans);
+        for (uint32_t i = 0; i < mtrans_table_size(mtrans_table); ++i) {
 
-                khiter_t iter = kh_get(node, table, state);
-                IMM_BUG(iter == kh_end(table));
+            struct mtrans const* t = mtrans[i];
 
-                edge->node = kh_val(table, iter);
-                list_add(&edge->list_entry, &node->edge_list);
-            }
+            struct edge* edge = malloc(sizeof(*edge));
+
+            khiter_t iter = kh_get(node, table, mtrans_get_state(t));
+            IMM_BUG(iter == kh_end(table));
+
+            edge->node = kh_val(table, iter);
+            list_add(&edge->list_entry, &node->edge_list);
         }
+        free_c(mtrans);
     }
 }
 

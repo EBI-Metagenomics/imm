@@ -4,6 +4,7 @@
 #include "imm/report.h"
 #include "khash_ptr.h"
 #include "mstate.h"
+#include "mstate_sort.h"
 #include "mtrans.h"
 #include "mtrans_table.h"
 
@@ -36,6 +37,7 @@ struct mstate const** mstate_table_array(struct mstate_table const* table)
             ++mstate;
         }
     }
+    mstate_name_sort(mstates, mstate_table_size(table));
     return mstates;
 }
 
