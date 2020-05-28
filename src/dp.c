@@ -6,7 +6,9 @@
 #include "dp_step.h"
 #include "dp_trans_table.h"
 #include "free.h"
+#include "imm/bug.h"
 #include "imm/dp.h"
+#include "imm/hmm.h"
 #include "imm/lprob.h"
 #include "imm/path.h"
 #include "imm/report.h"
@@ -36,8 +38,9 @@ struct imm_dp
 {
     struct mstate const* const*  mstates;
     struct seq_code const*       seq_code;
+    struct state_idx*            state_idx;
     struct dp_emission const*    emission;
-    struct dp_trans_table const* trans_table;
+    struct dp_trans_table*       trans_table;
     struct dp_state_table const* state_table;
     unsigned                     ntasks;
     struct task*                 tasks;
@@ -63,6 +66,7 @@ void imm_dp_destroy(struct imm_dp const* dp)
 {
     free_c(dp->mstates);
     seq_code_destroy(dp->seq_code);
+    state_idx_destroy(dp->state_idx);
     dp_emission_destroy(dp->emission);
     dp_trans_table_destroy(dp->trans_table);
     dp_state_table_destroy(dp->state_table);
@@ -119,18 +123,43 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
     return results;
 }
 
-struct imm_dp const* dp_create(struct imm_abc const* abc, struct mstate const** mstates,
-                               uint32_t nstates, struct imm_state const* end_state)
+int imm_dp_change_trans(struct imm_dp* dp, struct imm_hmm* hmm, struct imm_state const* src_state,
+                        struct imm_state const* tgt_state, double lprob)
+{
+    if (!imm_lprob_is_valid(lprob)) {
+        imm_error("invalid lprob");
+        return 1;
+    }
+
+    double prev = imm_hmm_get_trans(hmm, src_state, tgt_state);
+    if (!imm_lprob_is_valid(prev)) {
+        imm_error("transition does not exist");
+        return 1;
+    }
+    if (imm_lprob_is_zero(prev) && imm_lprob_is_zero(lprob))
+        return 0;
+
+    IMM_BUG(imm_hmm_set_trans(hmm, src_state, tgt_state, lprob) != 0);
+
+    uint32_t src = state_idx_find(dp->state_idx, src_state);
+    uint32_t tgt = state_idx_find(dp->state_idx, tgt_state);
+
+    dp_trans_table_change(dp->trans_table, src, tgt, lprob);
+
+    return 0;
+}
+
+struct imm_dp* dp_create(struct imm_abc const* abc, struct mstate const** mstates, uint32_t nstates,
+                         struct imm_state const* end_state)
 {
     struct imm_dp* dp = malloc(sizeof(*dp));
     dp->mstates = mstates;
     dp->seq_code = seq_code_create(abc, min_seq(mstates, nstates), max_seq(mstates, nstates));
 
-    struct state_idx* state_idx = state_idx_create();
-    dp->state_table = dp_state_table_create(mstates, nstates, end_state, state_idx);
+    dp->state_idx = state_idx_create();
+    dp->state_table = dp_state_table_create(mstates, nstates, end_state, dp->state_idx);
     dp->emission = dp_emission_create(dp->seq_code, mstates, nstates);
-    dp->trans_table = dp_trans_table_create(mstates, nstates, state_idx);
-    state_idx_destroy(state_idx);
+    dp->trans_table = dp_trans_table_create(mstates, nstates, dp->state_idx);
 
     create_tasks(dp);
 
@@ -147,6 +176,10 @@ void dp_create_from_model(struct imm_model* model)
     dp->trans_table = model->trans_table;
     dp->state_table = model->state_table;
 
+    dp->state_idx = state_idx_create();
+    for (uint32_t i = 0; i < dp_state_table_nstates(dp->state_table); ++i)
+        state_idx_add(dp->state_idx, dp->mstates[i]->state, i);
+
     create_tasks(dp);
 
     model->dp = dp;
@@ -160,7 +193,7 @@ struct seq_code const* dp_get_seq_code(struct imm_dp const* dp) { return dp->seq
 
 struct dp_state_table const* dp_get_state_table(struct imm_dp const* dp) { return dp->state_table; }
 
-struct dp_trans_table const* dp_get_trans_table(struct imm_dp const* dp) { return dp->trans_table; }
+struct dp_trans_table* dp_get_trans_table(struct imm_dp const* dp) { return dp->trans_table; }
 
 static double best_trans_score(struct imm_dp const* dp, struct dp_matrix const* matrix,
                                uint32_t tgt_state, uint32_t row, struct dp_step* prev_step)

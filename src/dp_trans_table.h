@@ -16,17 +16,19 @@ struct dp_trans_table
     uint32_t* offset;
 };
 
-struct dp_trans_table const* dp_trans_table_create(struct mstate const* const* mstates,
-                                                   uint32_t nstates, struct state_idx* state_idx);
-void                         dp_trans_table_destroy(struct dp_trans_table const* transition);
-static inline uint32_t       dp_trans_table_ntrans(struct dp_trans_table const* trans_tbl,
-                                                   uint32_t                     tgt_state);
-struct dp_trans_table const* dp_trans_table_read(FILE* stream);
-static inline double         dp_trans_table_score(struct dp_trans_table const* trans_tbl,
-                                                  uint32_t tgt_state, uint32_t trans);
-static inline uint32_t       dp_trans_table_source_state(struct dp_trans_table const* trans_tbl,
-                                                         uint32_t tgt_state, uint32_t trans);
-static inline uint32_t       dp_trans_table_total_ntrans(struct dp_trans_table const* trans_tbl);
+void dp_trans_table_change(struct dp_trans_table* trans_tbl, uint32_t src_state, uint32_t tgt_state,
+                           double lprob);
+struct dp_trans_table* dp_trans_table_create(struct mstate const* const* mstates, uint32_t nstates,
+                                             struct state_idx* state_idx);
+void                   dp_trans_table_destroy(struct dp_trans_table const* transition);
+static inline uint32_t dp_trans_table_ntrans(struct dp_trans_table const* trans_tbl,
+                                             uint32_t                     tgt_state);
+struct dp_trans_table* dp_trans_table_read(FILE* stream);
+static inline double   dp_trans_table_score(struct dp_trans_table const* trans_tbl,
+                                            uint32_t tgt_state, uint32_t trans);
+static inline uint32_t dp_trans_table_source_state(struct dp_trans_table const* trans_tbl,
+                                                   uint32_t tgt_state, uint32_t trans);
+static inline uint32_t dp_trans_table_total_ntrans(struct dp_trans_table const* trans_tbl);
 int dp_trans_table_write(struct dp_trans_table const* trans, uint32_t nstates, FILE* stream);
 
 static inline uint32_t dp_trans_table_ntrans(struct dp_trans_table const* trans_tbl,

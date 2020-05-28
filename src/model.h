@@ -20,7 +20,7 @@ struct imm_model
     struct imm_state const**     states;
     struct seq_code const*       seq_code;
     struct dp_emission const*    emission;
-    struct dp_trans_table const* trans_table;
+    struct dp_trans_table*       trans_table;
     struct dp_state_table const* state_table;
     struct imm_dp const*         dp;
 

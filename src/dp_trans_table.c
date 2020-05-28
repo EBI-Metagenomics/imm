@@ -1,5 +1,6 @@
 #include "dp_trans_table.h"
 #include "free.h"
+#include "imm/bug.h"
 #include "imm/lprob.h"
 #include "list.h"
 #include "mstate.h"
@@ -31,8 +32,22 @@ static inline uint32_t offset_size(uint32_t nstates) { return nstates + 1; }
 static inline uint32_t score_size(uint32_t ntrans) { return ntrans; }
 static inline uint32_t source_state_size(uint32_t ntrans) { return ntrans; }
 
-struct dp_trans_table const* dp_trans_table_create(struct mstate const* const* mstates,
-                                                   uint32_t nstates, struct state_idx* state_idx)
+void dp_trans_table_change(struct dp_trans_table* trans_tbl, uint32_t src_state, uint32_t tgt_state,
+                           double lprob)
+{
+    /* TODO: find a faster way to update the transition */
+    for (uint32_t i = 0; i < dp_trans_table_ntrans(trans_tbl, tgt_state); ++i) {
+        if (dp_trans_table_source_state(trans_tbl, tgt_state, i) == src_state) {
+
+            trans_tbl->score[trans_tbl->offset[tgt_state] + i] = lprob;
+            return;
+        }
+    }
+    IMM_BUG(true);
+}
+
+struct dp_trans_table* dp_trans_table_create(struct mstate const* const* mstates, uint32_t nstates,
+                                             struct state_idx* state_idx)
 {
     struct list_head incoming_trans[nstates];
     for (uint32_t i = 0; i < nstates; ++i)
@@ -83,7 +98,7 @@ void dp_trans_table_destroy(struct dp_trans_table const* trans_tbl)
     free_c(trans_tbl);
 }
 
-struct dp_trans_table const* dp_trans_table_read(FILE* stream)
+struct dp_trans_table* dp_trans_table_read(FILE* stream)
 {
     struct dp_trans_table_chunk chunk = {
         .ntrans = 0, .score = NULL, .source_state = NULL, .offset_size = 0, .offset = NULL};

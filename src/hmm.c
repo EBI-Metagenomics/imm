@@ -52,7 +52,7 @@ struct imm_hmm* imm_hmm_create(struct imm_abc const* abc)
     return hmm;
 }
 
-struct imm_dp const* imm_hmm_create_dp(struct imm_hmm const* hmm, struct imm_state const* end_state)
+struct imm_dp* imm_hmm_create_dp(struct imm_hmm const* hmm, struct imm_state const* end_state)
 {
     unsigned long end = mstate_table_find(hmm->table, end_state);
     if (end == mstate_table_end(hmm->table)) {
