@@ -139,12 +139,15 @@ int imm_dp_change_trans(struct imm_dp* dp, struct imm_hmm* hmm, struct imm_state
     if (imm_lprob_is_zero(prev) && imm_lprob_is_zero(lprob))
         return 0;
 
-    IMM_BUG(imm_hmm_set_trans(hmm, src_state, tgt_state, lprob) != 0);
-
     uint32_t src = state_idx_find(dp->state_idx, src_state);
     uint32_t tgt = state_idx_find(dp->state_idx, tgt_state);
 
-    dp_trans_table_change(dp->trans_table, src, tgt, lprob);
+    if (dp_trans_table_change(dp->trans_table, src, tgt, lprob)) {
+        imm_error("dp transition not found");
+        return 1;
+    }
+
+    IMM_BUG(imm_hmm_set_trans(hmm, src_state, tgt_state, lprob) != 0);
 
     return 0;
 }

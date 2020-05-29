@@ -32,18 +32,18 @@ static inline uint32_t offset_size(uint32_t nstates) { return nstates + 1; }
 static inline uint32_t score_size(uint32_t ntrans) { return ntrans; }
 static inline uint32_t source_state_size(uint32_t ntrans) { return ntrans; }
 
-void dp_trans_table_change(struct dp_trans_table* trans_tbl, uint32_t src_state, uint32_t tgt_state,
-                           double lprob)
+int dp_trans_table_change(struct dp_trans_table* trans_tbl, uint32_t src_state, uint32_t tgt_state,
+                          double lprob)
 {
     /* TODO: find a faster way to update the transition */
     for (uint32_t i = 0; i < dp_trans_table_ntrans(trans_tbl, tgt_state); ++i) {
         if (dp_trans_table_source_state(trans_tbl, tgt_state, i) == src_state) {
 
             trans_tbl->score[trans_tbl->offset[tgt_state] + i] = lprob;
-            return;
+            return 0;
         }
     }
-    IMM_BUG(true);
+    return 1;
 }
 
 struct dp_trans_table* dp_trans_table_create(struct mstate const* const* mstates, uint32_t nstates,

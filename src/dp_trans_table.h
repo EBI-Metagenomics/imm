@@ -16,8 +16,8 @@ struct dp_trans_table
     uint32_t* offset;
 };
 
-void dp_trans_table_change(struct dp_trans_table* trans_tbl, uint32_t src_state, uint32_t tgt_state,
-                           double lprob);
+int dp_trans_table_change(struct dp_trans_table* trans_tbl, uint32_t src_state, uint32_t tgt_state,
+                          double lprob);
 struct dp_trans_table* dp_trans_table_create(struct mstate const* const* mstates, uint32_t nstates,
                                              struct state_idx* state_idx);
 void                   dp_trans_table_destroy(struct dp_trans_table const* transition);
