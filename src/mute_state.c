@@ -61,7 +61,8 @@ struct imm_state const* imm_mute_state_super(struct imm_mute_state const* state)
     return state->super;
 }
 
-int imm_mute_state_write(struct imm_state const* state, struct imm_model const* model, FILE* stream)
+int imm_mute_state_write(struct imm_state const* state, struct imm_hmm_block const* hmm_block,
+                         FILE* stream)
 {
     return __imm_state_write(state, stream);
 }

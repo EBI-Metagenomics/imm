@@ -30,6 +30,14 @@ types:
     seq:
       - id: abc
         type: abc
+      - id: nhmm_blocks
+        type: u1
+      - id: hmm_block
+        type: hmm_block
+        repeat: expr
+        repeat-expr: nhmm_blocks
+  hmm_block:
+    seq:
       - id: hmm
         type: hmm
       - id: dp

@@ -11,7 +11,7 @@
  */
 
 struct imm_abc;
-struct imm_model;
+struct imm_hmm_block;
 struct imm_state;
 
 IMM_API struct imm_normal_state const* imm_normal_state_create(char const*           name,
@@ -21,7 +21,7 @@ IMM_API struct imm_normal_state const* imm_normal_state_derived(struct imm_state
 IMM_API void                    imm_normal_state_destroy(struct imm_normal_state const* state);
 IMM_API struct imm_state const* imm_normal_state_read(FILE* stream, struct imm_abc const* abc);
 IMM_API struct imm_state const* imm_normal_state_super(struct imm_normal_state const* state);
-IMM_API int imm_normal_state_write(struct imm_state const* state, struct imm_model const* model,
-                                   FILE* stream);
+IMM_API int                     imm_normal_state_write(struct imm_state const*     state,
+                                                       struct imm_hmm_block const* hmm_block, FILE* stream);
 
 #endif
