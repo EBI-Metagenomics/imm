@@ -12,14 +12,14 @@
 struct incoming_trans
 {
     uint32_t         source_state;
-    double           score;
+    score_t          score;
     struct list_head list_entry;
 };
 
 struct dp_trans_table_chunk
 {
     uint32_t  ntrans;
-    double*   score;
+    score_t*  score;
     uint32_t* source_state;
     uint32_t  offset_size;
     uint32_t* offset;
@@ -27,13 +27,14 @@ struct dp_trans_table_chunk
 
 static uint32_t        create_incoming_transitions(struct list_head*           incoming_trans,
                                                    struct mstate const* const* mstates, uint32_t nstates,
-                                                   struct state_idx const* state_idx);
+                                                   struct state_idx const*  state_idx,
+                                                   struct score_code const* score_code);
 static inline uint32_t offset_size(uint32_t nstates) { return nstates + 1; }
 static inline uint32_t score_size(uint32_t ntrans) { return ntrans; }
 static inline uint32_t source_state_size(uint32_t ntrans) { return ntrans; }
 
 int dp_trans_table_change(struct dp_trans_table* trans_tbl, uint32_t src_state, uint32_t tgt_state,
-                          double lprob)
+                          score_t lprob)
 {
     /* TODO: find a faster way to update the transition */
     for (uint32_t i = 0; i < dp_trans_table_ntrans(trans_tbl, tgt_state); ++i) {
@@ -47,13 +48,15 @@ int dp_trans_table_change(struct dp_trans_table* trans_tbl, uint32_t src_state, 
 }
 
 struct dp_trans_table* dp_trans_table_create(struct mstate const* const* mstates, uint32_t nstates,
-                                             struct state_idx* state_idx)
+                                             struct state_idx*        state_idx,
+                                             struct score_code const* score_code)
 {
     struct list_head incoming_trans[nstates];
     for (uint32_t i = 0; i < nstates; ++i)
         INIT_LIST_HEAD(incoming_trans + i);
 
-    uint32_t ntrans = create_incoming_transitions(incoming_trans, mstates, nstates, state_idx);
+    uint32_t ntrans =
+        create_incoming_transitions(incoming_trans, mstates, nstates, state_idx, score_code);
 
     struct dp_trans_table* tbl = malloc(sizeof(*tbl));
     tbl->ntrans = ntrans;
@@ -201,7 +204,8 @@ int dp_trans_table_write(struct dp_trans_table const* trans, uint32_t nstates, F
 
 static uint32_t create_incoming_transitions(struct list_head*           incoming_trans,
                                             struct mstate const* const* mstates, uint32_t nstates,
-                                            struct state_idx const* state_idx)
+                                            struct state_idx const*  state_idx,
+                                            struct score_code const* score_code)
 {
     uint32_t ntrans = 0;
     for (uint32_t i = 0; i < nstates; ++i) {
@@ -221,7 +225,7 @@ static uint32_t create_incoming_transitions(struct list_head*           incoming
             uint32_t                dst = state_idx_find(state_idx, dst_state);
 
             struct incoming_trans* it = malloc(sizeof(*it));
-            it->score = lprob;
+            it->score = score_code_encode(score_code, lprob);
             it->source_state = src;
             list_add_tail(&it->list_entry, incoming_trans + dst);
             ++ntrans;

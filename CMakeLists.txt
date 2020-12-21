@@ -21,7 +21,6 @@ if(CMAKE_VERSION VERSION_GREATER 3.12.0)
 endif()
 
 find_package(logaddexp REQUIRED)
-find_package(st1201 REQUIRED)
 option(OPENMP "Enable OpenMP" On)
 if(OPENMP)
     find_package(OpenMP)
@@ -51,6 +50,7 @@ add_library(imm
     src/path.c
     src/report.c
     src/results.c
+    src/score_code.c
     src/seq.c
     src/seq_code.c
     src/seq_table.c
@@ -90,7 +90,6 @@ target_include_directories(imm
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 target_link_libraries(imm PUBLIC LOGADDEXP::logaddexp)
-target_link_libraries(imm PUBLIC ST1201::st1201)
 target_link_libraries(imm PRIVATE $<$<BOOL:${OpenMP_C_FOUND}>:OpenMP::OpenMP_C>)
 set_target_properties(imm PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})

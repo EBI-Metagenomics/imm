@@ -11,14 +11,15 @@ struct dp_state_table_chunk
     uint32_t nstates;
     uint8_t* min_seq;
     uint8_t* max_seq;
-    double*  start_lprob;
+    score_t* start_score;
     uint32_t end_state;
 };
 
 struct dp_state_table const* dp_state_table_create(struct mstate const* const* mstates,
                                                    uint32_t                    nstates,
                                                    struct imm_state const*     end_state,
-                                                   struct state_idx*           state_idx)
+                                                   struct state_idx*           state_idx,
+                                                   struct score_code const*    score_code)
 {
     struct dp_state_table* table = malloc(sizeof(*table));
 
@@ -26,13 +27,14 @@ struct dp_state_table const* dp_state_table_create(struct mstate const* const* m
 
     table->min_seq = malloc(sizeof(*table->min_seq) * nstates);
     table->max_seq = malloc(sizeof(*table->max_seq) * nstates);
-    table->start_lprob = malloc(sizeof(*table->start_lprob) * nstates);
+    table->start_score = malloc(sizeof(*table->start_score) * nstates);
 
     for (uint32_t i = 0; i < nstates; ++i) {
         state_idx_add(state_idx, mstate_get_state(mstates[i]), i);
         table->min_seq[i] = imm_state_min_seq(mstate_get_state(mstates[i]));
         table->max_seq[i] = imm_state_max_seq(mstate_get_state(mstates[i]));
-        table->start_lprob[i] = mstate_get_start(mstates[i]);
+        double lprob = mstate_get_start(mstates[i]);
+        table->start_score[i] = score_code_encode(score_code, lprob);
     }
 
     table->end_state = state_idx_find(state_idx, end_state);
@@ -44,14 +46,14 @@ void dp_state_table_destroy(struct dp_state_table const* state_tbl)
 {
     free_c(state_tbl->min_seq);
     free_c(state_tbl->max_seq);
-    free_c(state_tbl->start_lprob);
+    free_c(state_tbl->start_score);
     free_c(state_tbl);
 }
 
 struct dp_state_table* dp_state_table_read(FILE* stream)
 {
     struct dp_state_table_chunk chunk = {
-        .nstates = 0, .min_seq = NULL, .max_seq = NULL, .start_lprob = NULL, .end_state = 0};
+        .nstates = 0, .min_seq = NULL, .max_seq = NULL, .start_score = NULL, .end_state = 0};
 
     struct dp_state_table* table = malloc(sizeof(*table));
 
@@ -62,7 +64,7 @@ struct dp_state_table* dp_state_table_read(FILE* stream)
 
     chunk.min_seq = malloc(sizeof(*chunk.min_seq) * chunk.nstates);
     chunk.max_seq = malloc(sizeof(*chunk.max_seq) * chunk.nstates);
-    chunk.start_lprob = malloc(sizeof(*chunk.start_lprob) * chunk.nstates);
+    chunk.start_score = malloc(sizeof(*chunk.start_score) * chunk.nstates);
 
     if (fread(chunk.min_seq, sizeof(*chunk.min_seq), chunk.nstates, stream) < chunk.nstates) {
         imm_error("could not read min_seq");
@@ -74,9 +76,9 @@ struct dp_state_table* dp_state_table_read(FILE* stream)
         goto err;
     }
 
-    if (fread(chunk.start_lprob, sizeof(*chunk.start_lprob), chunk.nstates, stream) <
+    if (fread(chunk.start_score, sizeof(*chunk.start_score), chunk.nstates, stream) <
         chunk.nstates) {
-        imm_error("could not read start_lprob");
+        imm_error("could not read start_score");
         goto err;
     }
 
@@ -88,7 +90,7 @@ struct dp_state_table* dp_state_table_read(FILE* stream)
     table->nstates = chunk.nstates;
     table->min_seq = chunk.min_seq;
     table->max_seq = chunk.max_seq;
-    table->start_lprob = chunk.start_lprob;
+    table->start_score = chunk.start_score;
     table->end_state = chunk.end_state;
 
     return table;
@@ -102,8 +104,8 @@ err:
     if (chunk.max_seq)
         free_c(chunk.max_seq);
 
-    if (chunk.start_lprob)
-        free_c(chunk.start_lprob);
+    if (chunk.start_score)
+        free_c(chunk.start_score);
 
     return NULL;
 }
@@ -113,7 +115,7 @@ int dp_state_table_write(struct dp_state_table const* state_tbl, FILE* stream)
     struct dp_state_table_chunk chunk = {.nstates = state_tbl->nstates,
                                          .min_seq = state_tbl->min_seq,
                                          .max_seq = state_tbl->max_seq,
-                                         .start_lprob = state_tbl->start_lprob,
+                                         .start_score = state_tbl->start_score,
                                          .end_state = state_tbl->end_state};
 
     if (fwrite(&chunk.nstates, sizeof(chunk.nstates), 1, stream) < 1) {
@@ -133,9 +135,9 @@ int dp_state_table_write(struct dp_state_table const* state_tbl, FILE* stream)
         return 1;
     }
 
-    if (fwrite(chunk.start_lprob, sizeof(*chunk.start_lprob), state_tbl->nstates, stream) <
+    if (fwrite(chunk.start_score, sizeof(*chunk.start_score), state_tbl->nstates, stream) <
         state_tbl->nstates) {
-        imm_error("could not write start_lprob");
+        imm_error("could not write start_score");
         return 1;
     }
 

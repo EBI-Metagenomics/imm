@@ -1,6 +1,8 @@
 #ifndef DP_TRANS_TABLE_H
 #define DP_TRANS_TABLE_H
 
+#include "score.h"
+#include "score_code.h"
 #include <inttypes.h>
 #include <stdio.h>
 
@@ -11,20 +13,21 @@ struct state_idx;
 struct dp_trans_table
 {
     uint32_t  ntrans;
-    double*   score;
+    score_t*  score;
     uint32_t* source_state;
     uint32_t* offset;
 };
 
 int dp_trans_table_change(struct dp_trans_table* trans_tbl, uint32_t src_state, uint32_t tgt_state,
-                          double lprob);
+                          score_t lprob);
 struct dp_trans_table* dp_trans_table_create(struct mstate const* const* mstates, uint32_t nstates,
-                                             struct state_idx* state_idx);
+                                             struct state_idx*        state_idx,
+                                             struct score_code const* score_code);
 void                   dp_trans_table_destroy(struct dp_trans_table const* transition);
 static inline uint32_t dp_trans_table_ntrans(struct dp_trans_table const* trans_tbl,
                                              uint32_t                     tgt_state);
 struct dp_trans_table* dp_trans_table_read(FILE* stream);
-static inline double   dp_trans_table_score(struct dp_trans_table const* trans_tbl,
+static inline score_t  dp_trans_table_score(struct dp_trans_table const* trans_tbl,
                                             uint32_t tgt_state, uint32_t trans);
 static inline uint32_t dp_trans_table_source_state(struct dp_trans_table const* trans_tbl,
                                                    uint32_t tgt_state, uint32_t trans);
@@ -37,8 +40,8 @@ static inline uint32_t dp_trans_table_ntrans(struct dp_trans_table const* trans_
     return trans_tbl->offset[tgt_state + 1] - trans_tbl->offset[tgt_state];
 }
 
-static inline double dp_trans_table_score(struct dp_trans_table const* trans_tbl,
-                                          uint32_t tgt_state, uint32_t trans)
+static inline score_t dp_trans_table_score(struct dp_trans_table const* trans_tbl,
+                                           uint32_t tgt_state, uint32_t trans)
 {
     return trans_tbl->score[trans_tbl->offset[tgt_state] + trans];
 }

@@ -6,13 +6,14 @@
 #include "imm/seq.h"
 #include "imm/state.h"
 #include "mstate.h"
+#include "score.h"
 #include "seq_code.h"
 #include <stdlib.h>
 
 struct dp_emission_chunk
 {
     uint32_t  score_size;
-    double*   score;
+    score_t*  score;
     uint32_t  offset_size;
     uint32_t* offset;
 };
@@ -21,7 +22,8 @@ static inline uint32_t offset_size(uint32_t nstates) { return nstates + 1; }
 static inline unsigned score_size(struct dp_emission const* emission, uint32_t nstates);
 
 struct dp_emission const* dp_emission_create(struct seq_code const*      seq_code,
-                                             struct mstate const* const* mstates, uint32_t nstates)
+                                             struct mstate const* const* mstates, uint32_t nstates,
+                                             struct score_code const* score_code)
 {
     struct dp_emission* emiss_tbl = malloc(sizeof(*emiss_tbl));
 
@@ -55,8 +57,9 @@ struct dp_emission const* dp_emission_create(struct seq_code const*      seq_cod
                 struct imm_seq seq = IMM_SEQ(abc, item, len);
                 unsigned       j = seq_code_encode(seq_code, &seq);
                 j -= seq_code_offset(seq_code, min_seq);
-                emiss_tbl->score[emiss_tbl->offset[i] + j] =
-                    imm_state_lprob(mstate_get_state(mstates[i]), &seq);
+                double  lprob = imm_state_lprob(mstate_get_state(mstates[i]), &seq);
+                score_t score = score_code_encode(score_code, lprob);
+                emiss_tbl->score[emiss_tbl->offset[i] + j] = score;
             }
         }
     }

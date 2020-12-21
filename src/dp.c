@@ -22,7 +22,10 @@
 #include "mstate.h"
 #include "mtrans.h"
 #include "mtrans_table.h"
+#include "score.h"
+#include "score_code.h"
 #include "seq_code.h"
+#include "st1201/st1201.h"
 #include "state_idx.h"
 #include "thread.h"
 #include <limits.h>
@@ -38,6 +41,7 @@ struct imm_dp
 {
     struct mstate const* const*  mstates;
     struct seq_code const*       seq_code;
+    struct score_code            score_code;
     struct state_idx*            state_idx;
     struct dp_emission const*    emission;
     struct dp_trans_table*       trans_table;
@@ -46,13 +50,13 @@ struct imm_dp
     struct task*                 tasks;
 };
 
-static double  best_trans_score(struct imm_dp const* dp, struct dp_matrix const* matrix,
+static score_t best_trans_score(struct imm_dp const* dp, struct dp_matrix const* matrix,
                                 uint32_t tgt_state, uint32_t row, struct dp_step* prev_step);
 static void    create_tasks(struct imm_dp* dp);
-static double  final_score(struct imm_dp const* dp, struct task* task, struct dp_step* end_step);
+static score_t final_score(struct imm_dp const* dp, struct task* task, struct dp_step* end_step);
 static uint8_t max_seq(struct mstate const* const* mstates, uint32_t nstates);
 static uint8_t min_seq(struct mstate const* const* mstates, uint32_t nstates);
-static inline void set_score(struct imm_dp const* dp, struct task* task, double trans_score,
+static inline void set_score(struct imm_dp const* dp, struct task* task, score_t trans_score,
                              uint32_t min_len, uint32_t max_len, uint32_t row, uint32_t state);
 static void        task_create(struct task* task, struct dp_state_table const* state_table,
                                struct seq_code const* seq_code);
@@ -142,7 +146,8 @@ int imm_dp_change_trans(struct imm_dp* dp, struct imm_hmm* hmm, struct imm_state
     uint32_t src = state_idx_find(dp->state_idx, src_state);
     uint32_t tgt = state_idx_find(dp->state_idx, tgt_state);
 
-    if (dp_trans_table_change(dp->trans_table, src, tgt, lprob)) {
+    score_t score = score_code_encode(&dp->score_code, lprob);
+    if (dp_trans_table_change(dp->trans_table, src, tgt, score)) {
         imm_error("dp transition not found");
         return 1;
     }
@@ -158,11 +163,14 @@ struct imm_dp* dp_create(struct imm_abc const* abc, struct mstate const** mstate
     struct imm_dp* dp = malloc(sizeof(*dp));
     dp->mstates = mstates;
     dp->seq_code = seq_code_create(abc, min_seq(mstates, nstates), max_seq(mstates, nstates));
+    /* TODO: figure out a decent range */
+    score_code_init(&dp->score_code, -100000., +100.);
 
     dp->state_idx = state_idx_create();
-    dp->state_table = dp_state_table_create(mstates, nstates, end_state, dp->state_idx);
-    dp->emission = dp_emission_create(dp->seq_code, mstates, nstates);
-    dp->trans_table = dp_trans_table_create(mstates, nstates, dp->state_idx);
+    dp->state_table =
+        dp_state_table_create(mstates, nstates, end_state, dp->state_idx, &dp->score_code);
+    dp->emission = dp_emission_create(dp->seq_code, mstates, nstates, &dp->score_code);
+    dp->trans_table = dp_trans_table_create(mstates, nstates, dp->state_idx, &dp->score_code);
 
     create_tasks(dp);
 
@@ -198,10 +206,10 @@ struct dp_state_table const* dp_get_state_table(struct imm_dp const* dp) { retur
 
 struct dp_trans_table* dp_get_trans_table(struct imm_dp const* dp) { return dp->trans_table; }
 
-static double best_trans_score(struct imm_dp const* dp, struct dp_matrix const* matrix,
-                               uint32_t tgt_state, uint32_t row, struct dp_step* prev_step)
+static score_t best_trans_score(struct imm_dp const* dp, struct dp_matrix const* matrix,
+                                uint32_t tgt_state, uint32_t row, struct dp_step* prev_step)
 {
-    double score = imm_lprob_zero();
+    score_t score = SCORE_MIN;
     *prev_step = dp_step_invalid();
 
     for (uint32_t i = 0; i < dp_trans_table_ntrans(dp->trans_table, tgt_state); ++i) {
@@ -218,9 +226,9 @@ static double best_trans_score(struct imm_dp const* dp, struct dp_matrix const* 
             struct dp_step step = {.state = src_state, .seq_len = len};
             uint32_t       prev_row = row - len;
 
-            double v0 = dp_matrix_get_score(matrix, prev_row, step);
-            double v1 = dp_trans_table_score(dp->trans_table, tgt_state, i);
-            double v = v0 + v1;
+            score_t v0 = dp_matrix_get_score(matrix, prev_row, step);
+            score_t v1 = dp_trans_table_score(dp->trans_table, tgt_state, i);
+            score_t v = v0 + v1;
 
             if (v > score) {
                 score = v;
@@ -243,9 +251,9 @@ static void create_tasks(struct imm_dp* dp)
     }
 }
 
-static double final_score(struct imm_dp const* dp, struct task* task, struct dp_step* end_step)
+static score_t final_score(struct imm_dp const* dp, struct task* task, struct dp_step* end_step)
 {
-    double   score = imm_lprob_zero();
+    score_t  score = SCORE_MIN;
     uint32_t end_state = dp_state_table_end_state(dp->state_table);
 
     *end_step = dp_step_invalid();
@@ -256,7 +264,7 @@ static double final_score(struct imm_dp const* dp, struct task* task, struct dp_
     for (unsigned len = MIN(dp_state_table_max_seq(dp->state_table, end_state), length);; --len) {
 
         step.seq_len = len;
-        double s = dp_matrix_get_score(task->matrix, length - len, step);
+        score_t s = dp_matrix_get_score(task->matrix, length - len, step);
         if (s > score) {
             score = s;
             end_step->state = end_state;
@@ -267,7 +275,7 @@ static double final_score(struct imm_dp const* dp, struct task* task, struct dp_
             break;
     }
     if (end_step->state == UINT32_MAX)
-        return imm_lprob_invalid();
+        return SCORE_INV;
 
     return score;
 }
@@ -290,7 +298,7 @@ static uint8_t min_seq(struct mstate const* const* mstates, uint32_t nstates)
     return min;
 }
 
-static inline void set_score(struct imm_dp const* dp, struct task* task, double trans_score,
+static inline void set_score(struct imm_dp const* dp, struct task* task, score_t trans_score,
                              uint32_t min_len, uint32_t max_len, uint32_t row, uint32_t state)
 {
     for (uint32_t len = min_len; len <= max_len; ++len) {
@@ -299,7 +307,7 @@ static inline void set_score(struct imm_dp const* dp, struct task* task, double 
         unsigned seq_code = eseq_get(task->eseq, row, len);
         seq_code -= seq_code_offset(dp->seq_code, min_len);
 
-        double score = trans_score + dp_emission_score(dp->emission, state, seq_code);
+        score_t score = trans_score + dp_emission_score(dp->emission, state, seq_code);
         dp_matrix_set_score(task->matrix, row, step, score);
     }
 }
@@ -332,9 +340,9 @@ static double viterbi(struct imm_dp const* dp, struct task* task, struct imm_pat
         for (uint32_t i = 0; i < dp_state_table_nstates(dp->state_table); ++i) {
 
             struct dp_step* prev_step = dp_matrix_get_prev_step(task->matrix, r, i);
-            double          tscore = best_trans_score(dp, task->matrix, i, r, prev_step);
+            score_t         tscore = best_trans_score(dp, task->matrix, i, r, prev_step);
             if (r == 0)
-                tscore = MAX(dp_state_table_start_lprob(dp->state_table, i), tscore);
+                tscore = MAX(dp_state_table_start_score(dp->state_table, i), tscore);
 
             unsigned min_len = dp_state_table_min_seq(dp->state_table, i);
             unsigned max_len = MIN(dp_state_table_max_seq(dp->state_table, i), remain);
@@ -344,12 +352,16 @@ static double viterbi(struct imm_dp const* dp, struct task* task, struct imm_pat
     }
 
     struct dp_step end_step = dp_step_invalid();
-    double const   score = final_score(dp, task, &end_step);
+    score_t const  score = final_score(dp, task, &end_step);
+    /* final_score(dp, task, &end_step); */
 
     if (path)
         viterbi_path(dp, task, path, &end_step);
 
-    return score;
+    if (score == SCORE_INV)
+        return imm_lprob_invalid();
+    return 0.0;
+    /* return score_code_decode(&dp->score_code, score); */
 }
 
 static void viterbi_path(struct imm_dp const* dp, struct task const* task, struct imm_path* path,
