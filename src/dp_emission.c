@@ -72,6 +72,14 @@ void dp_emission_destroy(struct dp_emission const* emission)
     free_c(emission);
 }
 
+void dp_emission_offsets_dump(struct dp_emission const* emission, uint32_t nstates)
+{
+    printf("state,offset\n");
+    for (uint32_t i = 0; i < nstates; ++i) {
+        printf("%" PRIu32 ",%" PRIu32 "\n", i, emission->offset[i]);
+    }
+}
+
 struct dp_emission const* dp_emission_read(FILE* stream)
 {
     struct dp_emission_chunk chunk = {
@@ -120,6 +128,14 @@ err:
     free_c(emission);
 
     return NULL;
+}
+
+void dp_emission_scores_dump(struct dp_emission const* emission, uint32_t nstates)
+{
+    printf("state,score\n");
+    for (uint32_t i = 0; i < nstates; ++i) {
+        printf("%" PRIu32 ",%lf\n", i, emission->score[i]);
+    }
 }
 
 int dp_emission_write(struct dp_emission const* emission, uint32_t nstates, FILE* stream)

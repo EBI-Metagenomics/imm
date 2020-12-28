@@ -98,6 +98,24 @@ void dp_trans_table_destroy(struct dp_trans_table const* trans_tbl)
     free_c(trans_tbl);
 }
 
+void dp_trans_table_dump(struct dp_trans_table const* trans_tbl)
+{
+    printf("trans,src_state,tgt_state,score\n");
+    uint32_t tgt = 0;
+    uint32_t trans = 0;
+    while (trans < trans_tbl->ntrans) {
+
+        uint32_t n = dp_trans_table_ntrans(trans_tbl, tgt);
+        for (uint32_t t = 0; t < n; ++t) {
+
+            double   score = trans_tbl->score[trans];
+            uint32_t src = trans_tbl->source_state[trans];
+            printf("%" PRIu32 ",%" PRIu32 ",%" PRIu32 ",%lf\n", trans, src, tgt, score);
+            ++trans;
+        }
+    }
+}
+
 struct dp_trans_table* dp_trans_table_read(FILE* stream)
 {
     struct dp_trans_table_chunk chunk = {

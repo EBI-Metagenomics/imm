@@ -48,6 +48,15 @@ void dp_state_table_destroy(struct dp_state_table const* state_tbl)
     free_c(state_tbl);
 }
 
+void dp_state_table_dump(struct dp_state_table const* state_tbl)
+{
+    printf("state,min_seq,max_seq,start_lprob\n");
+    for (uint32_t i = 0; i < state_tbl->nstates; ++i) {
+        printf("%" PRIu32 ",%" PRIu8 ",%" PRIu8 ",%lf\n", i, state_tbl->min_seq[i],
+               state_tbl->max_seq[i], state_tbl->start_lprob[i]);
+    }
+}
+
 struct dp_state_table* dp_state_table_read(FILE* stream)
 {
     struct dp_state_table_chunk chunk = {

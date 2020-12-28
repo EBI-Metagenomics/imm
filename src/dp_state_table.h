@@ -23,6 +23,7 @@ struct dp_state_table const* dp_state_table_create(struct mstate const* const* m
                                                    struct imm_state const*     end_state,
                                                    struct state_idx*           state_idx);
 void                         dp_state_table_destroy(struct dp_state_table const* state_tbl);
+void                         dp_state_table_dump(struct dp_state_table const* state_tbl);
 static inline uint32_t       dp_state_table_end_state(struct dp_state_table const* state_tbl);
 static inline uint8_t        dp_state_table_max_seq(struct dp_state_table const* state_tbl,
                                                     uint32_t                     state);
