@@ -51,4 +51,4 @@ jobs:
     - name: Install
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: cmake --build . --target install --config $BUILD_TYPE
+      run: sudo cmake --build . --target install --config $BUILD_TYPE
