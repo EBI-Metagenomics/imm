@@ -33,10 +33,10 @@ struct imm_abc* imm_abc_read(FILE* stream)
         goto err;
     }
 
-    chunk.symbols = malloc(sizeof(*chunk.symbols) * (size_t) (chunk.nsymbols + 1));
+    chunk.symbols = malloc(sizeof(*chunk.symbols) * (size_t)(chunk.nsymbols + 1));
 
-    if (fread(chunk.symbols, sizeof(*chunk.symbols), (size_t) (chunk.nsymbols + 1), stream) <
-        (size_t) (chunk.nsymbols + 1)) {
+    if (fread(chunk.symbols, sizeof(*chunk.symbols), (size_t)(chunk.nsymbols + 1), stream) <
+        (size_t)(chunk.nsymbols + 1)) {
         imm_error("could not read symbols");
         goto err;
     }
@@ -161,7 +161,7 @@ int __imm_abc_write(struct imm_abc const* abc, FILE* stream)
         return 1;
     }
 
-    if (fwrite(chunk.symbols, sizeof(*chunk.symbols), (size_t) (chunk.nsymbols + 1), stream) <
+    if (fwrite(chunk.symbols, sizeof(*chunk.symbols), (size_t)(chunk.nsymbols + 1), stream) <
         (size_t)(chunk.nsymbols + 1)) {
         imm_error("could not write symbols");
         return 1;
