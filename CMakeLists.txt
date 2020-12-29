@@ -109,6 +109,13 @@ check_c_source_compiles(
 )
 target_compile_definitions(imm PRIVATE $<$<BOOL:${HAVE_ATTR_FORMAT}>:HAVE_ATTR_FORMAT>)
 
+include(CheckTypeSize)
+check_type_size("intptr_t" SIZEOF_INTPTR_T)
+if(NOT HAVE_SIZEOF_INTPTR_T)
+    message(FATAL_ERROR "Could not determine the size of intptr_t.")
+endif()
+target_compile_definitions(imm PRIVATE SIZEOF_INTPTR_T=${SIZEOF_INTPTR_T})
+
 install(TARGETS imm EXPORT imm-targets
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib

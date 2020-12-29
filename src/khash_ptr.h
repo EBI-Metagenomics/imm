@@ -24,10 +24,11 @@
  * which is very slightly easier to multiply by and makes no
  * difference to the hash distribution.
  */
+#define GOLDEN_RATIO_32 0x61C88647
 #define GOLDEN_RATIO_64 0x61C8864680B583EBull
 
 static inline khint_t  ptr_hash_func(void const* ptr);
-static inline uint64_t reverse_bits(uint64_t v);
+static inline uintptr_t reverse_bits(uintptr_t v);
 
 #define __ptr_hash_equal(a, b) ((a) == (b))
 
@@ -36,12 +37,18 @@ static inline uint64_t reverse_bits(uint64_t v);
 
 static inline khint_t ptr_hash_func(void const* ptr)
 {
-    uint64_t val = (uint64_t)ptr;
+    uintptr_t val = (uintptr_t)ptr;
+#if SIZEOF_INTPTR_T == 8
     return (khint_t)reverse_bits(val * GOLDEN_RATIO_64);
+#elif SIZEOF_INTPTR_T == 4
+    return (khint_t)reverse_bits(val * GOLDEN_RATIO_32);
+#else
+#error SIZEOF_INTPTR_T not 4 or 8
+#endif
 }
 
 /* Source: http://graphics.stanford.edu/~seander/bithacks.html#BitReverseObvious */
-static inline uint64_t reverse_bits(uint64_t v)
+static inline uintptr_t reverse_bits(uintptr_t v)
 {
     unsigned long r = v;                        // r will be reversed bits of v; first get LSB of v
     int           s = sizeof(v) * CHAR_BIT - 1; // extra shift needed at end

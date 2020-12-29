@@ -103,7 +103,5 @@ struct mstate* mstate_table_get(struct mstate_table const* table, unsigned long 
 
 uint32_t mstate_table_size(struct mstate_table const* table)
 {
-    khint_t n = kh_size(table->ktable);
-    IMM_BUG(n < 0 || n > UINT32_MAX);
-    return (uint32_t)n;
+    return (uint32_t)kh_size(table->ktable);
 }

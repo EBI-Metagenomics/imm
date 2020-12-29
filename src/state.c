@@ -50,10 +50,10 @@ struct imm_state* __imm_state_read(FILE* stream, struct imm_abc const* abc)
         return NULL;
     }
 
-    chunk.name = malloc(sizeof(*chunk.name) * (chunk.name_length + 1));
+    chunk.name = malloc(sizeof(*chunk.name) * (size_t) (chunk.name_length + 1));
 
-    if (fread(chunk.name, sizeof(*chunk.name), chunk.name_length + 1, stream) <
-        chunk.name_length + 1) {
+    if (fread(chunk.name, sizeof(*chunk.name), (size_t) (chunk.name_length + 1), stream) <
+        (size_t) (chunk.name_length + 1)) {
         free_c(chunk.name);
         return NULL;
     }
@@ -77,8 +77,8 @@ int __imm_state_write(struct imm_state const* state, FILE* stream)
         return 1;
     }
 
-    if (fwrite(chunk.name, sizeof(*chunk.name), chunk.name_length + 1, stream) <
-        chunk.name_length + 1) {
+    if (fwrite(chunk.name, sizeof(*chunk.name), (size_t) (chunk.name_length + 1), stream) <
+        (size_t) (chunk.name_length + 1)) {
         imm_error("could not write name");
         return 1;
     }

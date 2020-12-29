@@ -201,7 +201,7 @@ void test_parallel(void)
     imm_seq_destroy(seq);
 
 #ifdef NDEBUG
-    cass_cond(elapsed_seconds(elapsed) < 1.0);
+    cass_cond(elapsed_seconds(elapsed) < 5.0);
 #endif
 
     elapsed_destroy(elapsed);

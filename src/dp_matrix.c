@@ -11,8 +11,10 @@ struct dp_matrix* dp_matrix_create(struct dp_state_table const* states)
 
     uint32_t next_col = 0;
     for (uint32_t i = 0; i < dp_state_table_nstates(states); ++i) {
-        matrix->state_col[i] = panic_sub_ui32(next_col, dp_state_table_min_seq(states, i));
-        next_col += dp_state_table_max_seq(states, i) - dp_state_table_min_seq(states, i) + 1;
+        uint8_t const min = dp_state_table_min_seq(states, i);
+        uint8_t const max = dp_state_table_max_seq(states, i);
+        matrix->state_col[i] = panic_sub_ui32(next_col, min);
+        next_col += (uint32_t) (max - min + 1);
     }
 
     matrix->score = matrixd_create(1, next_col);
