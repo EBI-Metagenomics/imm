@@ -1,21 +1,33 @@
+#include "cass/cass.h"
 #include "imm/imm.h"
+#include "stats.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-void perf_1thread_viterbi(void);
+#define NSAMPLES 100
 
-int main(void) { return 0; }
+void perf_1thread_viterbi(double* seconds);
 
-#if 0
+int main(void)
+{
+    double seconds[NSAMPLES] = {0.};
+    perf_1thread_viterbi(seconds);
+    struct stats stats = compute_stats(seconds, NSAMPLES);
+    printf("Avg: %.6f (+/- %.6f) seconds\n", stats.mean, stats.sem);
+    return 0;
+}
+
 static inline double zero(void) { return imm_lprob_zero(); }
+static inline int    is_valid(double a) { return imm_lprob_is_valid(a); }
+static inline int    is_zero(double a) { return imm_lprob_is_zero(a); }
 static inline char*  fmt_name(char* restrict buffer, char const* name, int i)
 {
     sprintf(buffer, "%s%d", name, i);
     return buffer;
 }
 
-void perf_1thread_viterbi(void)
+void perf_1thread_viterbi(double* seconds)
 {
     int ncore_nodes = 1000;
 
@@ -135,39 +147,22 @@ void perf_1thread_viterbi(void)
                        "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
                        "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
                        "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMME";
-    if (strlen(str) != 2000)
-        exit(1);
+    cass_cond(strlen(str) == 2000);
 
     struct imm_seq const* seq = imm_seq_create(str, abc);
-    elapsed_start(&elapsed);
-    struct imm_dp const*      dp = imm_hmm_create_dp(hmm, imm_mute_state_super(end));
-    struct imm_results const* results = imm_dp_viterbi(dp, seq, 0);
-    elapsed_end(&elapsed);
+    struct imm_dp const*  dp = imm_hmm_create_dp(hmm, imm_mute_state_super(end));
 
-    cass_cond(imm_results_size(results) == 1);
-    struct imm_result const* r = imm_results_get(results, 0);
-    double                   score = imm_result_loglik(r);
-    cass_cond(is_valid(score) && !is_zero(score));
-    cass_close(score, -65826.0106185297);
-    imm_results_destroy(results);
+    for (unsigned i = 0; i < NSAMPLES; ++i) {
+        struct imm_results const* results = imm_dp_viterbi(dp, seq, 0);
+        cass_cond(imm_results_size(results) == 1);
+        struct imm_result const* r = imm_results_get(results, 0);
+        double                   score = imm_result_loglik(r);
+        cass_cond(is_valid(score) && !is_zero(score));
+        cass_close(score, -65826.0106185297);
+        seconds[i] = imm_result_seconds(r);
+        imm_results_destroy(results);
+    }
 
-    results = imm_dp_viterbi(dp, seq, 0);
-    r = imm_results_get(results, 0);
-    score = imm_result_loglik(r);
-    cass_cond(is_valid(score) && !is_zero(score));
-    cass_close(score, -65826.0106185297);
-    imm_results_destroy(results);
-
-    results = imm_dp_viterbi(dp, seq, 0);
-    r = imm_results_get(results, 0);
-    score = imm_result_loglik(r);
-    cass_cond(is_valid(score) && !is_zero(score));
-    cass_close(score, -65826.0106185297);
-    imm_results_destroy(results);
-
-    imm_seq_destroy(seq);
-
-    imm_hmm_destroy(hmm);
     imm_mute_state_destroy(start);
     imm_normal_state_destroy(B);
     for (int i = 0; i < ncore_nodes; ++i) {
@@ -178,12 +173,9 @@ void perf_1thread_viterbi(void)
     imm_normal_state_destroy(J);
     imm_normal_state_destroy(E);
     imm_mute_state_destroy(end);
-    imm_abc_destroy(abc);
-    imm_dp_destroy(dp);
 
     imm_abc_destroy(abc);
     imm_hmm_destroy(hmm);
     imm_dp_destroy(dp);
     imm_seq_destroy(seq);
 }
-#endif

@@ -31,6 +31,8 @@ double imm_result_loglik(struct imm_result const* result) { return result->logli
 
 struct imm_path const* imm_result_path(struct imm_result const* result) { return result->path; }
 
+double imm_result_seconds(struct imm_result const* result) { return result->seconds; }
+
 struct imm_subseq imm_result_subseq(struct imm_result const* result) { return result->subseq; }
 
 struct imm_results* imm_results_create(struct imm_seq const* seq, unsigned const nresults)

@@ -13,6 +13,7 @@ IMM_API void                   imm_result_destroy(struct imm_result const* resul
 IMM_API void                   imm_result_free(struct imm_result const* result);
 IMM_API double                 imm_result_loglik(struct imm_result const* result);
 IMM_API struct imm_path const* imm_result_path(struct imm_result const* result);
+IMM_API double                 imm_result_seconds(struct imm_result const* result);
 IMM_API struct imm_subseq      imm_result_subseq(struct imm_result const* result);
 
 IMM_API struct imm_results*      imm_results_create(struct imm_seq const* seq, unsigned nresults);
