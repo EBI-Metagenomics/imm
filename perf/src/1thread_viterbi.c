@@ -1,17 +1,13 @@
-#include "cass/cass.h"
-#include "elapsed/elapsed.h"
 #include "imm/imm.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-void test_parallel(void);
+void perf_1thread_viterbi(void);
 
-int main(void)
-{
-    test_parallel();
-    return cass_status();
-}
+int main(void) { return 0; }
 
+#if 0
 static inline double zero(void) { return imm_lprob_zero(); }
 static inline char*  fmt_name(char* restrict buffer, char const* name, int i)
 {
@@ -19,7 +15,7 @@ static inline char*  fmt_name(char* restrict buffer, char const* name, int i)
     return buffer;
 }
 
-void test_parallel(void)
+void perf_1thread_viterbi(void)
 {
     int ncore_nodes = 1000;
 
@@ -29,9 +25,8 @@ void test_parallel(void)
     struct imm_mute_state const* start = imm_mute_state_create("START", abc);
     imm_hmm_add_state(hmm, imm_mute_state_super(start), log(1.0));
 
-    double end_lprobs[] = {log(0.05), log(0.05), log(0.05), log(0.05), log(0.05)};
-    struct imm_normal_state const* end = imm_normal_state_create("END", abc, end_lprobs);
-    imm_hmm_add_state(hmm, imm_normal_state_super(end), zero());
+    struct imm_mute_state const* end = imm_mute_state_create("END", abc);
+    imm_hmm_add_state(hmm, imm_mute_state_super(end), zero());
 
     double B_lprobs[] = {log(1.0), zero(), zero(), zero(), zero()};
     double E_lprobs[] = {zero(), zero(), zero(), log(1.0), zero()};
@@ -52,8 +47,7 @@ void test_parallel(void)
     imm_hmm_set_trans(hmm, imm_normal_state_super(J), imm_normal_state_super(J), log(0.2));
     imm_hmm_set_trans(hmm, imm_normal_state_super(E), imm_normal_state_super(J), log(0.2));
     imm_hmm_set_trans(hmm, imm_normal_state_super(J), imm_normal_state_super(B), log(0.2));
-    imm_hmm_set_trans(hmm, imm_normal_state_super(E), imm_normal_state_super(end), log(0.2));
-    imm_hmm_set_trans(hmm, imm_normal_state_super(end), imm_normal_state_super(end), log(0.2));
+    imm_hmm_set_trans(hmm, imm_normal_state_super(E), imm_mute_state_super(end), log(0.2));
 
     struct imm_normal_state const* M[ncore_nodes];
     struct imm_normal_state const* I[ncore_nodes];
@@ -101,14 +95,10 @@ void test_parallel(void)
         }
     }
 
-    struct elapsed elapsed = elapsed_init();
-
-    struct imm_path* path = imm_path_create();
-
     char const str[] = "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
                        "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
                        "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
-                       "BIIIMIMIMIMMMMMMIMMIMMMMMIIMIMMIMIMIMIMIMMMIMMIMME"
+                       "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
                        "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
                        "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
                        "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
@@ -145,66 +135,38 @@ void test_parallel(void)
                        "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
                        "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
                        "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMME";
-    cass_cond(strlen(str) == 2000);
+    if (strlen(str) != 2000)
+        exit(1);
 
+    struct imm_seq const* seq = imm_seq_create(str, abc);
     elapsed_start(&elapsed);
-    struct imm_seq const*     seq = imm_seq_create(str, abc);
-    struct imm_dp const*      dp = imm_hmm_create_dp(hmm, imm_normal_state_super(end));
-    struct imm_results const* results = imm_dp_viterbi(dp, seq, 50);
-
-    cass_cond(imm_results_size(results) == 79);
-
-    struct imm_result const* result = imm_results_get(results, 0);
-    struct imm_subseq        subseq = imm_result_subseq(result);
-    struct imm_seq const*    s = imm_subseq_cast(&subseq);
-    cass_close(imm_result_loglik(result), -1778.8892020572);
-    cass_cond(strncmp(imm_seq_string(s), "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM",
-                      imm_seq_length(s)) == 0);
-
-    result = imm_results_get(results, 1);
-    subseq = imm_result_subseq(result);
-    s = imm_subseq_cast(&subseq);
-    cass_cond(!imm_lprob_is_valid(imm_result_loglik(result)));
-    cass_cond(strncmp(imm_seq_string(s), "MIMMMMMMMMMIIMIMIMIMIMIIMIIIMIMIMIMMMMMMIMMIMIMIMI",
-                      imm_seq_length(s)) == 0);
-
-    result = imm_results_get(results, 2);
-    subseq = imm_result_subseq(result);
-    s = imm_subseq_cast(&subseq);
-    cass_cond(!imm_lprob_is_valid(imm_result_loglik(result)));
-    cass_cond(strncmp(imm_seq_string(s), "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ",
-                      imm_seq_length(s)) == 0);
-
-    result = imm_results_get(results, 3);
-    subseq = imm_result_subseq(result);
-    s = imm_subseq_cast(&subseq);
-    cass_cond(!imm_lprob_is_valid(imm_result_loglik(result)));
-    cass_cond(strncmp(imm_seq_string(s), "IMIMMIMIMIMIMIMMMMIMMIMEJBMIIMIIMMIMMMIMEJBMIIMIIM",
-                      imm_seq_length(s)) == 0);
-
-    result = imm_results_get(results, 4);
-    subseq = imm_result_subseq(result);
-    s = imm_subseq_cast(&subseq);
-    cass_close(imm_result_loglik(result), -1778.8892020572);
-    cass_cond(strncmp(imm_seq_string(s), "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM",
-                      imm_seq_length(s)) == 0);
-
-    result = imm_results_get(results, 8);
-    subseq = imm_result_subseq(result);
-    s = imm_subseq_cast(&subseq);
-    cass_close(imm_result_loglik(result), -1778.8892020572);
-    cass_cond(strncmp(imm_seq_string(s), "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM",
-                      imm_seq_length(s)) == 0);
-
+    struct imm_dp const*      dp = imm_hmm_create_dp(hmm, imm_mute_state_super(end));
+    struct imm_results const* results = imm_dp_viterbi(dp, seq, 0);
     elapsed_end(&elapsed);
-    imm_path_destroy(path);
+
+    cass_cond(imm_results_size(results) == 1);
+    struct imm_result const* r = imm_results_get(results, 0);
+    double                   score = imm_result_loglik(r);
+    cass_cond(is_valid(score) && !is_zero(score));
+    cass_close(score, -65826.0106185297);
+    imm_results_destroy(results);
+
+    results = imm_dp_viterbi(dp, seq, 0);
+    r = imm_results_get(results, 0);
+    score = imm_result_loglik(r);
+    cass_cond(is_valid(score) && !is_zero(score));
+    cass_close(score, -65826.0106185297);
+    imm_results_destroy(results);
+
+    results = imm_dp_viterbi(dp, seq, 0);
+    r = imm_results_get(results, 0);
+    score = imm_result_loglik(r);
+    cass_cond(is_valid(score) && !is_zero(score));
+    cass_close(score, -65826.0106185297);
+    imm_results_destroy(results);
+
     imm_seq_destroy(seq);
 
-#ifdef NDEBUG
-    cass_cond(elapsed_seconds(&elapsed) < 5.0);
-#endif
-
-    imm_results_destroy(results);
     imm_hmm_destroy(hmm);
     imm_mute_state_destroy(start);
     imm_normal_state_destroy(B);
@@ -215,7 +177,13 @@ void test_parallel(void)
     }
     imm_normal_state_destroy(J);
     imm_normal_state_destroy(E);
-    imm_normal_state_destroy(end);
+    imm_mute_state_destroy(end);
     imm_abc_destroy(abc);
     imm_dp_destroy(dp);
+
+    imm_abc_destroy(abc);
+    imm_hmm_destroy(hmm);
+    imm_dp_destroy(dp);
+    imm_seq_destroy(seq);
 }
+#endif

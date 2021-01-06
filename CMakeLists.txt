@@ -145,6 +145,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/imm-config.cmake
 
 enable_testing()
 add_subdirectory(test)
+add_subdirectory(perf)
 
 option(COVERAGE "Enable coverage")
 if(COVERAGE)

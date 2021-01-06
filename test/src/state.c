@@ -1,4 +1,4 @@
-#include "cass.h"
+#include "cass/cass.h"
 #include "imm/imm.h"
 
 void test_normal_state(void);
