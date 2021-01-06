@@ -103,7 +103,7 @@ void test_perf_viterbi(void)
         }
     }
 
-    struct elapsed* elapsed = elapsed_create();
+    struct elapsed elapsed = elapsed_init();
 
 #if 1
     char const str[] = "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
@@ -433,10 +433,10 @@ void test_perf_viterbi(void)
 #endif
 
     struct imm_seq const* seq = imm_seq_create(str, abc);
-    elapsed_start(elapsed);
+    elapsed_start(&elapsed);
     struct imm_dp const*      dp = imm_hmm_create_dp(hmm, imm_mute_state_super(end));
     struct imm_results const* results = imm_dp_viterbi(dp, seq, 0);
-    elapsed_end(elapsed);
+    elapsed_end(&elapsed);
 
     cass_cond(imm_results_size(results) == 1);
     struct imm_result const* r = imm_results_get(results, 0);
@@ -534,10 +534,9 @@ void test_perf_viterbi(void)
     imm_seq_destroy(seq);
 
 #ifdef NDEBUG
-    cass_cond(elapsed_seconds(elapsed) < 5.0);
+    cass_cond(elapsed_seconds(&elapsed) < 5.0);
 #endif
 
-    elapsed_destroy(elapsed);
     imm_hmm_destroy(hmm);
     imm_mute_state_destroy(start);
     imm_normal_state_destroy(B);

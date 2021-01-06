@@ -5,6 +5,7 @@
 #include "dp_state_table.h"
 #include "dp_step.h"
 #include "dp_trans_table.h"
+#include "elapsed/elapsed.h"
 #include "free.h"
 #include "imm/bug.h"
 #include "imm/dp.h"
@@ -114,8 +115,11 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
             task_setup(task, imm_subseq_cast(&subseq));
 
             struct imm_path* path = imm_path_create();
-            double           score = viterbi(dp, task, path);
-            imm_results_set(results, i, subseq, path, score);
+            struct elapsed   elapsed = elapsed_init();
+            elapsed_start(&elapsed);
+            double score = viterbi(dp, task, path);
+            elapsed_end(&elapsed);
+            imm_results_set(results, i, subseq, path, score, elapsed_seconds(&elapsed));
         }
     }
     imm_window_destroy(window);

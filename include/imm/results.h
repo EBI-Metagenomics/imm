@@ -20,7 +20,7 @@ IMM_API void                     imm_results_destroy(struct imm_results const* r
 IMM_API void                     imm_results_free(struct imm_results const* results);
 IMM_API struct imm_result const* imm_results_get(struct imm_results const* results, unsigned idx);
 IMM_API void imm_results_set(struct imm_results* results, unsigned idx, struct imm_subseq subseq,
-                             struct imm_path const* path, double loglik);
+                             struct imm_path const* path, double loglik, double seconds);
 IMM_API unsigned imm_results_size(struct imm_results const* results);
 
 #endif

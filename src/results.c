@@ -9,6 +9,7 @@ struct imm_result
     struct imm_path const* path;
     struct imm_subseq      subseq;
     double                 loglik;
+    double                 seconds;
 };
 
 struct imm_results
@@ -60,11 +61,12 @@ struct imm_result const* imm_results_get(struct imm_results const* results, unsi
 }
 
 void imm_results_set(struct imm_results* results, unsigned idx, struct imm_subseq subseq,
-                     struct imm_path const* path, double loglik)
+                     struct imm_path const* path, double loglik, double seconds)
 {
     results->result[idx]->path = path;
     results->result[idx]->subseq = subseq;
     results->result[idx]->loglik = loglik;
+    results->result[idx]->seconds = seconds;
 }
 
 unsigned imm_results_size(struct imm_results const* results) { return results->nresults; }

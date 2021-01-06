@@ -101,7 +101,7 @@ void test_parallel(void)
         }
     }
 
-    struct elapsed* elapsed = elapsed_create();
+    struct elapsed elapsed = elapsed_init();
 
     struct imm_path* path = imm_path_create();
 
@@ -147,7 +147,7 @@ void test_parallel(void)
                        "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMME";
     cass_cond(strlen(str) == 2000);
 
-    elapsed_start(elapsed);
+    elapsed_start(&elapsed);
     struct imm_seq const*     seq = imm_seq_create(str, abc);
     struct imm_dp const*      dp = imm_hmm_create_dp(hmm, imm_normal_state_super(end));
     struct imm_results const* results = imm_dp_viterbi(dp, seq, 50);
@@ -196,15 +196,14 @@ void test_parallel(void)
     cass_cond(strncmp(imm_seq_string(s), "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM",
                       imm_seq_length(s)) == 0);
 
-    elapsed_end(elapsed);
+    elapsed_end(&elapsed);
     imm_path_destroy(path);
     imm_seq_destroy(seq);
 
 #ifdef NDEBUG
-    cass_cond(elapsed_seconds(elapsed) < 5.0);
+    cass_cond(elapsed_seconds(&elapsed) < 5.0);
 #endif
 
-    elapsed_destroy(elapsed);
     imm_results_destroy(results);
     imm_hmm_destroy(hmm);
     imm_mute_state_destroy(start);
