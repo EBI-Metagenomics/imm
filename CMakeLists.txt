@@ -21,6 +21,7 @@ if(CMAKE_VERSION VERSION_GREATER 3.12.0)
 endif()
 
 find_package(logaddexp REQUIRED)
+find_package(elapsed REQUIRED)
 option(OPENMP "Enable OpenMP" On)
 if(OPENMP)
     find_package(OpenMP)
@@ -89,6 +90,7 @@ target_include_directories(imm
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 target_link_libraries(imm PUBLIC LOGADDEXP::logaddexp)
+target_link_libraries(imm PUBLIC ELAPSED::elapsed)
 target_link_libraries(imm PRIVATE $<$<BOOL:${OpenMP_C_FOUND}>:OpenMP::OpenMP_C>)
 set_target_properties(imm PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})

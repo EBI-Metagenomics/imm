@@ -2,7 +2,7 @@
 #define IMM_LPROB_H
 
 #include "imm/report.h"
-#include "logaddexp.h"
+#include "logaddexp/logaddexp.h"
 #include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
