@@ -14,6 +14,6 @@ $cmd >> $OUTPUT
 echo "" >> $OUTPUT
 echo "Date: $(date)" >> $OUTPUT
 echo "" >> $OUTPUT
-lscpu >> $OUTPUT
+lscpu | tr _ - >> $OUTPUT
 
 echo "done."

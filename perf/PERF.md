@@ -24,7 +24,7 @@ Vulnerability L1tf:              Not affected
 Vulnerability Mds:               Not affected
 Vulnerability Meltdown:          Not affected
 Vulnerability Spec store bypass: Vulnerable
-Vulnerability Spectre v1:        Mitigation; __user pointer sanitization
+Vulnerability Spectre v1:        Mitigation; --user pointer sanitization
 Vulnerability Spectre v2:        Vulnerable
 Vulnerability Srbds:             Not affected
 Vulnerability Tsx async abort:   Not affected
