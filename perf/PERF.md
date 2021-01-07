@@ -1,50 +1,21 @@
 # perf/perf-1thread-viterbi
 
-Avg: 0.629071 (+/- 0.002604) seconds
+Avg: 0.626896 (+/- 0.002666) seconds
 
-Date: Thu  7 Jan 01:22:29 GMT 2021
+Date: Thu  7 Jan 12:57:32 GMT 2021
 
-processor	: 0
-model name	: ARMv7 Processor rev 3 (v7l)
-BogoMIPS	: 270.00
-Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm crc32 
-CPU implementer	: 0x41
-CPU architecture: 7
-CPU variant	: 0x0
-CPU part	: 0xd08
-CPU revision	: 3
-
-processor	: 1
-model name	: ARMv7 Processor rev 3 (v7l)
-BogoMIPS	: 270.00
-Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm crc32 
-CPU implementer	: 0x41
-CPU architecture: 7
-CPU variant	: 0x0
-CPU part	: 0xd08
-CPU revision	: 3
-
-processor	: 2
-model name	: ARMv7 Processor rev 3 (v7l)
-BogoMIPS	: 270.00
-Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm crc32 
-CPU implementer	: 0x41
-CPU architecture: 7
-CPU variant	: 0x0
-CPU part	: 0xd08
-CPU revision	: 3
-
-processor	: 3
-model name	: ARMv7 Processor rev 3 (v7l)
-BogoMIPS	: 270.00
-Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm crc32 
-CPU implementer	: 0x41
-CPU architecture: 7
-CPU variant	: 0x0
-CPU part	: 0xd08
-CPU revision	: 3
-
-Hardware	: BCM2711
-Revision	: c03112
-Serial		: 10000000bd99bf2b
-Model		: Raspberry Pi 4 Model B Rev 1.2
+Architecture:        armv7l
+Byte Order:          Little Endian
+CPU(s):              4
+On-line CPU(s) list: 0-3
+Thread(s) per core:  1
+Core(s) per socket:  4
+Socket(s):           1
+Vendor ID:           ARM
+Model:               3
+Model name:          Cortex-A72
+Stepping:            r0p3
+CPU max MHz:         1500.0000
+CPU min MHz:         600.0000
+BogoMIPS:            270.00
+Flags:               half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm crc32
