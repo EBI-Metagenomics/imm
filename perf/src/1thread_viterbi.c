@@ -158,7 +158,7 @@ void perf_1thread_viterbi(double* seconds)
         struct imm_result const* r = imm_results_get(results, 0);
         double                   score = imm_result_loglik(r);
         cass_cond(is_valid(score) && !is_zero(score));
-        cass_close(score, -65826.0106185297);
+        cass_close(score, -65823.5546875000);
         seconds[i] = imm_result_seconds(r);
         imm_results_destroy(results);
     }
