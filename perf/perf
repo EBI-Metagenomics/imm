@@ -1,0 +1,19 @@
+#!/bin/bash
+
+OUTPUT=$(realpath PERF.md)
+
+test -e $OUTPUT && rm $OUTPUT
+touch $OUTPUT
+
+echo -n "Saving to $OUTPUT... "
+
+cmd=perf/perf_1thread_viterbi
+echo "# $cmd" | tr _ - >> $OUTPUT
+echo "" >> $OUTPUT
+$cmd >> $OUTPUT
+echo "" >> $OUTPUT
+echo "Date: $(date)" >> $OUTPUT
+echo "" >> $OUTPUT
+cat /proc/cpuinfo >> $OUTPUT
+
+echo "done."
