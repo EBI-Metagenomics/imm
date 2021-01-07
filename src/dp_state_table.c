@@ -11,7 +11,7 @@ struct dp_state_table_chunk
     uint32_t nstates;
     uint8_t* min_seq;
     uint8_t* max_seq;
-    double*  start_lprob;
+    float*   start_lprob;
     uint32_t end_state;
 };
 
@@ -32,7 +32,7 @@ struct dp_state_table const* dp_state_table_create(struct mstate const* const* m
         state_idx_add(state_idx, mstate_get_state(mstates[i]), i);
         table->min_seq[i] = imm_state_min_seq(mstate_get_state(mstates[i]));
         table->max_seq[i] = imm_state_max_seq(mstate_get_state(mstates[i]));
-        table->start_lprob[i] = mstate_get_start(mstates[i]);
+        table->start_lprob[i] = (float)mstate_get_start(mstates[i]);
     }
 
     table->end_state = state_idx_find(state_idx, end_state);
@@ -52,7 +52,7 @@ void dp_state_table_dump(struct dp_state_table const* state_tbl)
 {
     printf("state,min_seq,max_seq,start_lprob\n");
     for (uint32_t i = 0; i < state_tbl->nstates; ++i) {
-        printf("%" PRIu32 ",%" PRIu8 ",%" PRIu8 ",%lf\n", i, state_tbl->min_seq[i],
+        printf("%" PRIu32 ",%" PRIu8 ",%" PRIu8 ",%f\n", i, state_tbl->min_seq[i],
                state_tbl->max_seq[i], state_tbl->start_lprob[i]);
     }
 }

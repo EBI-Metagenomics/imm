@@ -14,10 +14,10 @@ struct dp_matrix* dp_matrix_create(struct dp_state_table const* states)
         uint8_t const min = dp_state_table_min_seq(states, i);
         uint8_t const max = dp_state_table_max_seq(states, i);
         matrix->state_col[i] = panic_sub_ui32(next_col, min);
-        next_col += (uint32_t) (max - min + 1);
+        next_col += (uint32_t)(max - min + 1);
     }
 
-    matrix->score = matrixd_create(1, next_col);
+    matrix->score = matrixf_create(1, next_col);
     matrix->prev_step = step_matrix_create(1, dp_state_table_nstates(states));
 
     return matrix;
@@ -25,7 +25,7 @@ struct dp_matrix* dp_matrix_create(struct dp_state_table const* states)
 
 void dp_matrix_destroy(struct dp_matrix const* matrix)
 {
-    matrixd_destroy(matrix->score);
+    matrixf_destroy(matrix->score);
     step_matrix_destroy(matrix->prev_step);
     free_c(matrix->state_col);
     free_c(matrix);
@@ -34,6 +34,6 @@ void dp_matrix_destroy(struct dp_matrix const* matrix)
 void dp_matrix_setup(struct dp_matrix* matrix, struct eseq const* eseq)
 {
     unsigned seq_len = eseq_length(eseq);
-    matrixd_resize(matrix->score, seq_len + 1, matrixd_ncols(matrix->score));
+    matrixf_resize(matrix->score, seq_len + 1, matrixf_ncols(matrix->score));
     step_matrix_resize(matrix->prev_step, seq_len + 1, step_matrix_ncols(matrix->prev_step));
 }

@@ -14,7 +14,7 @@ struct dp_state_table
     uint32_t nstates;
     uint8_t* min_seq;
     uint8_t* max_seq;
-    double*  start_lprob;
+    float*   start_lprob;
     uint32_t end_state;
 };
 
@@ -31,7 +31,7 @@ static inline uint8_t        dp_state_table_min_seq(struct dp_state_table const*
                                                     uint32_t                     state);
 static inline uint32_t       dp_state_table_nstates(struct dp_state_table const* state_tbl);
 struct dp_state_table*       dp_state_table_read(FILE* stream);
-static inline double         dp_state_table_start_lprob(struct dp_state_table const* state_tbl,
+static inline float          dp_state_table_start_lprob(struct dp_state_table const* state_tbl,
                                                         uint32_t                     state);
 int dp_state_table_write(struct dp_state_table const* state_tbl, FILE* stream);
 
@@ -55,8 +55,8 @@ static inline uint32_t dp_state_table_nstates(struct dp_state_table const* state
     return state_tbl->nstates;
 }
 
-static inline double dp_state_table_start_lprob(struct dp_state_table const* state_tbl,
-                                                uint32_t                     state)
+static inline float dp_state_table_start_lprob(struct dp_state_table const* state_tbl,
+                                               uint32_t                     state)
 {
     return state_tbl->start_lprob[state];
 }

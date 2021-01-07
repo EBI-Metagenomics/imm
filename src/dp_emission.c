@@ -12,7 +12,7 @@
 struct dp_emission_chunk
 {
     uint32_t  score_size;
-    double*   score;
+    float*    score;
     uint32_t  offset_size;
     uint32_t* offset;
 };
@@ -55,8 +55,8 @@ struct dp_emission const* dp_emission_create(struct seq_code const*      seq_cod
                 struct imm_seq seq = IMM_SEQ(abc, item, len);
                 unsigned       j = seq_code_encode(seq_code, &seq);
                 j -= seq_code_offset(seq_code, min_seq);
-                emiss_tbl->score[emiss_tbl->offset[i] + j] =
-                    imm_state_lprob(mstate_get_state(mstates[i]), &seq);
+                float score = (float)imm_state_lprob(mstate_get_state(mstates[i]), &seq);
+                emiss_tbl->score[emiss_tbl->offset[i] + j] = score;
             }
         }
     }
@@ -134,7 +134,7 @@ void dp_emission_scores_dump(struct dp_emission const* emission, uint32_t nstate
 {
     printf("state,score\n");
     for (uint32_t i = 0; i < nstates; ++i) {
-        printf("%" PRIu32 ",%lf\n", i, emission->score[i]);
+        printf("%" PRIu32 ",%f\n", i, emission->score[i]);
     }
 }
 

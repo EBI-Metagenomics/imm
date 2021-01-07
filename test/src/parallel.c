@@ -157,7 +157,7 @@ void test_parallel(void)
     struct imm_result const* result = imm_results_get(results, 0);
     struct imm_subseq        subseq = imm_result_subseq(result);
     struct imm_seq const*    s = imm_subseq_cast(&subseq);
-    cass_close(imm_result_loglik(result), -1778.8892020572);
+    cass_close(imm_result_loglik(result), -1778.9118652344);
     cass_cond(strncmp(imm_seq_string(s), "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM",
                       imm_seq_length(s)) == 0);
 
@@ -185,14 +185,14 @@ void test_parallel(void)
     result = imm_results_get(results, 4);
     subseq = imm_result_subseq(result);
     s = imm_subseq_cast(&subseq);
-    cass_close(imm_result_loglik(result), -1778.8892020572);
+    cass_close(imm_result_loglik(result), -1778.9118652344);
     cass_cond(strncmp(imm_seq_string(s), "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM",
                       imm_seq_length(s)) == 0);
 
     result = imm_results_get(results, 8);
     subseq = imm_result_subseq(result);
     s = imm_subseq_cast(&subseq);
-    cass_close(imm_result_loglik(result), -1778.8892020572);
+    cass_close(imm_result_loglik(result), -1778.9118652344);
     cass_cond(strncmp(imm_seq_string(s), "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM",
                       imm_seq_length(s)) == 0);
 

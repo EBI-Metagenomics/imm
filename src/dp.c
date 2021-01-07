@@ -47,13 +47,13 @@ struct imm_dp
     struct task*                 tasks;
 };
 
-static double  best_trans_score(struct imm_dp const* dp, struct dp_matrix const* matrix,
+static float   best_trans_score(struct imm_dp const* dp, struct dp_matrix const* matrix,
                                 uint32_t tgt_state, uint32_t row, struct dp_step* prev_step);
 static void    create_tasks(struct imm_dp* dp);
 static double  final_score(struct imm_dp const* dp, struct task* task, struct dp_step* end_step);
 static uint8_t max_seq(struct mstate const* const* mstates, uint32_t nstates);
 static uint8_t min_seq(struct mstate const* const* mstates, uint32_t nstates);
-static inline void set_score(struct imm_dp const* dp, struct task* task, double trans_score,
+static inline void set_score(struct imm_dp const* dp, struct task* task, float trans_score,
                              uint32_t min_len, uint32_t max_len, uint32_t row, uint32_t state);
 static void        task_create(struct task* task, struct dp_state_table const* state_table,
                                struct seq_code const* seq_code);
@@ -146,7 +146,7 @@ int imm_dp_change_trans(struct imm_dp* dp, struct imm_hmm* hmm, struct imm_state
     uint32_t src = state_idx_find(dp->state_idx, src_state);
     uint32_t tgt = state_idx_find(dp->state_idx, tgt_state);
 
-    if (dp_trans_table_change(dp->trans_table, src, tgt, lprob)) {
+    if (dp_trans_table_change(dp->trans_table, src, tgt, (float)lprob)) {
         imm_error("dp transition not found");
         return 1;
     }
@@ -202,10 +202,10 @@ struct dp_state_table const* dp_get_state_table(struct imm_dp const* dp) { retur
 
 struct dp_trans_table* dp_get_trans_table(struct imm_dp const* dp) { return dp->trans_table; }
 
-static double best_trans_score(struct imm_dp const* dp, struct dp_matrix const* matrix,
-                               uint32_t tgt_state, uint32_t row, struct dp_step* prev_step)
+static float best_trans_score(struct imm_dp const* dp, struct dp_matrix const* matrix,
+                              uint32_t tgt_state, uint32_t row, struct dp_step* prev_step)
 {
-    double score = imm_lprob_zero();
+    float score = (float)imm_lprob_zero();
     *prev_step = dp_step_invalid();
 
     for (uint32_t i = 0; i < dp_trans_table_ntrans(dp->trans_table, tgt_state); ++i) {
@@ -222,9 +222,9 @@ static double best_trans_score(struct imm_dp const* dp, struct dp_matrix const* 
             struct dp_step step = {.state = src_state, .seq_len = len};
             uint32_t       prev_row = row - len;
 
-            double v0 = dp_matrix_get_score(matrix, prev_row, step);
-            double v1 = dp_trans_table_score(dp->trans_table, tgt_state, i);
-            double v = v0 + v1;
+            float v0 = dp_matrix_get_score(matrix, prev_row, step);
+            float v1 = dp_trans_table_score(dp->trans_table, tgt_state, i);
+            float v = v0 + v1;
 
             if (v > score) {
                 score = v;
@@ -294,7 +294,7 @@ static uint8_t min_seq(struct mstate const* const* mstates, uint32_t nstates)
     return min;
 }
 
-static inline void set_score(struct imm_dp const* dp, struct task* task, double trans_score,
+static inline void set_score(struct imm_dp const* dp, struct task* task, float trans_score,
                              uint32_t min_len, uint32_t max_len, uint32_t row, uint32_t state)
 {
     for (uint32_t len = min_len; len <= max_len; ++len) {
@@ -303,7 +303,7 @@ static inline void set_score(struct imm_dp const* dp, struct task* task, double 
         unsigned seq_code = eseq_get(task->eseq, row, len);
         seq_code -= seq_code_offset(dp->seq_code, min_len);
 
-        double score = trans_score + dp_emission_score(dp->emission, state, seq_code);
+        float score = trans_score + dp_emission_score(dp->emission, state, seq_code);
         dp_matrix_set_score(task->matrix, row, step, score);
     }
 }
@@ -336,7 +336,7 @@ static double viterbi(struct imm_dp const* dp, struct task* task, struct imm_pat
         for (uint32_t i = 0; i < dp_state_table_nstates(dp->state_table); ++i) {
 
             struct dp_step* prev_step = dp_matrix_get_prev_step(task->matrix, r, i);
-            double          tscore = best_trans_score(dp, task->matrix, i, r, prev_step);
+            float           tscore = best_trans_score(dp, task->matrix, i, r, prev_step);
             if (r == 0)
                 tscore = MAX(dp_state_table_start_lprob(dp->state_table, i), tscore);
 

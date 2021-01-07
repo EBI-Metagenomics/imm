@@ -12,14 +12,14 @@
 struct incoming_trans
 {
     uint32_t         source_state;
-    double           score;
+    float            score;
     struct list_head list_entry;
 };
 
 struct dp_trans_table_chunk
 {
     uint32_t  ntrans;
-    double*   score;
+    float*    score;
     uint32_t* source_state;
     uint32_t  offset_size;
     uint32_t* offset;
@@ -33,7 +33,7 @@ static inline uint32_t score_size(uint32_t ntrans) { return ntrans; }
 static inline uint32_t source_state_size(uint32_t ntrans) { return ntrans; }
 
 int dp_trans_table_change(struct dp_trans_table* trans_tbl, uint32_t src_state, uint32_t tgt_state,
-                          double lprob)
+                          float lprob)
 {
     /* TODO: find a faster way to update the transition */
     for (uint32_t i = 0; i < dp_trans_table_ntrans(trans_tbl, tgt_state); ++i) {
@@ -108,9 +108,9 @@ void dp_trans_table_dump(struct dp_trans_table const* trans_tbl)
         uint32_t n = dp_trans_table_ntrans(trans_tbl, tgt);
         for (uint32_t t = 0; t < n; ++t) {
 
-            double   score = trans_tbl->score[trans];
+            float    score = trans_tbl->score[trans];
             uint32_t src = trans_tbl->source_state[trans];
-            printf("%" PRIu32 ",%" PRIu32 ",%" PRIu32 ",%lf\n", trans, src, tgt, score);
+            printf("%" PRIu32 ",%" PRIu32 ",%" PRIu32 ",%f\n", trans, src, tgt, score);
             ++trans;
         }
     }
@@ -233,7 +233,7 @@ static uint32_t create_incoming_transitions(struct list_head*           incoming
             if (!mtrans_table_exist(table, iter))
                 continue;
             struct mtrans const* mtrans = mtrans_table_get(table, iter);
-            double               lprob = mtrans_get_lprob(mtrans);
+            float                lprob = (float)mtrans_get_lprob(mtrans);
 
             struct imm_state const* dst_state = mtrans_get_state(mtrans);
             uint32_t                dst = state_idx_find(state_idx, dst_state);

@@ -9,9 +9,11 @@ function(imm_add_test name)
     target_compile_options(test_${name} PRIVATE ${WARNING_FLAGS})
     add_test(NAME ${name} COMMAND test_${name})
 
+    set(TMPDIR "${CMAKE_CURRENT_BINARY_DIR}/test_${name}.tmp")
     add_custom_command(TARGET test_${name} PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/test_${name}.tmp"
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${TMPDIR}
     )
+    target_compile_definitions(test_${name} PUBLIC "TMPDIR=\"${TMPDIR}\"")
 endfunction()
 
 imm_add_test(abc)

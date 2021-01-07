@@ -2,7 +2,7 @@
 #include "imm/imm.h"
 #include <stdlib.h>
 
-#define TMP_FOLDER "test_hmm_io.tmp"
+#define CLOSE(a, b) cass_close2(a, b, 1e-6, 0.0)
 
 void test_hmm_write_io_two_states(void);
 
@@ -37,11 +37,11 @@ void test_hmm_write_io_two_states(void)
     cass_equal_int(imm_results_size(results), 1);
     struct imm_path const* path = imm_result_path(imm_results_get(results, 0));
     double                 score = imm_result_loglik(imm_results_get(results, 0));
-    cass_close(score, log(0.25) + log(0.1) + log(0.9));
-    cass_close(imm_hmm_likelihood(hmm, C, path), log(0.25) + log(0.1) + log(0.9));
+    CLOSE(score, log(0.25) + log(0.1) + log(0.9));
+    CLOSE(imm_hmm_likelihood(hmm, C, path), log(0.25) + log(0.1) + log(0.9));
     imm_results_destroy(results);
 
-    struct imm_output* output = imm_output_create(TMP_FOLDER "/two_states.imm");
+    struct imm_output* output = imm_output_create(TMPDIR "/two_states.imm");
     cass_cond(output != NULL);
     struct imm_model const* model = imm_model_create(hmm, dp);
     cass_equal_int(imm_output_write(output, model), 0);
@@ -58,7 +58,7 @@ void test_hmm_write_io_two_states(void)
     imm_abc_destroy(abc);
     imm_seq_destroy(C);
 
-    struct imm_input* input = imm_input_create(TMP_FOLDER "/two_states.imm");
+    struct imm_input* input = imm_input_create(TMPDIR "/two_states.imm");
     cass_cond(input != NULL);
     cass_cond(!imm_input_eof(input));
     model = imm_input_read(input);
@@ -77,8 +77,8 @@ void test_hmm_write_io_two_states(void)
     cass_equal_int(imm_results_size(results), 1);
     path = imm_result_path(imm_results_get(results, 0));
     score = imm_result_loglik(imm_results_get(results, 0));
-    cass_close(score, log(0.25) + log(0.1) + log(0.9));
-    cass_close(imm_hmm_likelihood(hmm, C, path), log(0.25) + log(0.1) + log(0.9));
+    CLOSE(score, log(0.25) + log(0.1) + log(0.9));
+    CLOSE(imm_hmm_likelihood(hmm, C, path), log(0.25) + log(0.1) + log(0.9));
     imm_results_destroy(results);
 
     for (uint32_t i = 0; i < imm_model_nstates(model); ++i) {

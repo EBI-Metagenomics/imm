@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define TMP_FOLDER "test_perf.tmp"
-
 void test_perf_viterbi(void);
 
 int main(void)
@@ -442,24 +440,24 @@ void test_perf_viterbi(void)
     struct imm_result const* r = imm_results_get(results, 0);
     double                   score = imm_result_loglik(r);
     cass_cond(is_valid(score) && !is_zero(score));
-    cass_close(score, -65826.0106185297);
+    cass_close(score, -65823.5546875000);
     imm_results_destroy(results);
 
     results = imm_dp_viterbi(dp, seq, 0);
     r = imm_results_get(results, 0);
     score = imm_result_loglik(r);
     cass_cond(is_valid(score) && !is_zero(score));
-    cass_close(score, -65826.0106185297);
+    cass_close(score, -65823.5546875000);
     imm_results_destroy(results);
 
     results = imm_dp_viterbi(dp, seq, 0);
     r = imm_results_get(results, 0);
     score = imm_result_loglik(r);
     cass_cond(is_valid(score) && !is_zero(score));
-    cass_close(score, -65826.0106185297);
+    cass_close(score, -65823.5546875000);
     imm_results_destroy(results);
 
-    struct imm_output* output = imm_output_create(TMP_FOLDER "/perf.imm");
+    struct imm_output* output = imm_output_create(TMPDIR "/perf.imm");
     cass_cond(output != NULL);
     struct imm_model const* model = imm_model_create(hmm, dp);
     cass_equal_int(imm_output_write(output, model), 0);
@@ -551,7 +549,7 @@ void test_perf_viterbi(void)
     imm_abc_destroy(abc);
     imm_dp_destroy(dp);
 
-    struct imm_input* input = imm_input_create(TMP_FOLDER "/perf.imm");
+    struct imm_input* input = imm_input_create(TMPDIR "/perf.imm");
     cass_cond(input != NULL);
     model = imm_input_read(input);
     cass_cond(model != NULL);
@@ -566,7 +564,7 @@ void test_perf_viterbi(void)
     r = imm_results_get(results, 0);
     score = imm_result_loglik(r);
     cass_cond(is_valid(score) && !is_zero(score));
-    cass_close(score, -65826.0106185297);
+    cass_close(score, -65823.5546875000);
     imm_results_destroy(results);
 
     for (uint32_t i = 0; i < imm_model_nstates(model); ++i)
