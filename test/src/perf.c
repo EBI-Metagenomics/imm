@@ -567,7 +567,7 @@ void test_perf_viterbi(void)
     cass_close(score, -65823.5546875000);
     imm_results_destroy(results);
 
-    for (uint32_t i = 0; i < imm_model_nstates(model); ++i)
+    for (uint16_t i = 0; i < imm_model_nstates(model); ++i)
         imm_state_destroy(imm_model_state(model, i));
 
     imm_abc_destroy(abc);

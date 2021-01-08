@@ -29,7 +29,7 @@ static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct mstate* co
 static int write_abc(struct imm_model const* model, FILE* stream);
 static int write_mstate(struct imm_model const* model, FILE* stream, struct mstate const* mstate);
 static int write_mstates(struct imm_model const* model, FILE* stream,
-                         struct mstate const* const* mstates, uint32_t nstates);
+                         struct mstate const* const* mstates, uint16_t nstates);
 
 struct imm_abc const* imm_model_abc(struct imm_model const* model) { return model->abc; }
 
@@ -48,7 +48,7 @@ struct imm_dp const* imm_model_dp(struct imm_model const* model) { return model-
 
 struct imm_hmm* imm_model_hmm(struct imm_model const* model) { return model->hmm; }
 
-uint32_t imm_model_nstates(struct imm_model const* model) { return model->nstates; }
+uint16_t imm_model_nstates(struct imm_model const* model) { return model->nstates; }
 
 struct imm_model const* imm_model_read(FILE* stream)
 {
@@ -77,7 +77,7 @@ err:
     return NULL;
 }
 
-struct imm_state const* imm_model_state(struct imm_model const* model, uint32_t i)
+struct imm_state const* imm_model_state(struct imm_model const* model, uint16_t i)
 {
     return model->states[i];
 }
@@ -114,7 +114,7 @@ struct imm_model* __imm_model_create(struct imm_hmm* hmm, struct imm_dp const* d
 
     model->nstates = dp_state_table_nstates(dp_get_state_table(dp));
     model->states = malloc(sizeof(*model->states) * model->nstates);
-    for (uint32_t i = 0; i < model->nstates; ++i)
+    for (uint16_t i = 0; i < model->nstates; ++i)
         model->states[i] = model->mstates[i]->state;
 
     model->seq_code = dp_get_seq_code(dp);
@@ -193,7 +193,7 @@ int __imm_model_read_hmm(struct imm_model* model, FILE* stream)
 
     model->states = malloc(sizeof(*model->states) * model->nstates);
 
-    for (uint32_t i = 0; i < model->nstates; ++i) {
+    for (uint16_t i = 0; i < model->nstates; ++i) {
         model->states[i] = model->mstates[i]->state;
         hmm_add_mstate(hmm, model->mstates[i]);
     }
@@ -279,18 +279,18 @@ int __imm_model_write_hmm(struct imm_model const* model, FILE* stream)
         return 1;
     }
 
-    uint32_t ntrans = dp_trans_table_total_ntrans(model->trans_table);
+    uint16_t ntrans = dp_trans_table_total_ntrans(model->trans_table);
     if (fwrite(&ntrans, sizeof(ntrans), 1, stream) < 1) {
         imm_error("could not write ntrans");
         return 1;
     }
 
-    for (uint32_t tgt_state = 0; tgt_state < model->nstates; ++tgt_state) {
+    for (uint16_t tgt_state = 0; tgt_state < model->nstates; ++tgt_state) {
 
         ntrans = dp_trans_table_ntrans(model->trans_table, tgt_state);
-        for (uint32_t trans = 0; trans < ntrans; ++trans) {
+        for (uint16_t trans = 0; trans < ntrans; ++trans) {
 
-            uint32_t src_state = dp_trans_table_source_state(model->trans_table, tgt_state, trans);
+            uint16_t src_state = dp_trans_table_source_state(model->trans_table, tgt_state, trans);
             double   score = dp_trans_table_score(model->trans_table, tgt_state, trans);
 
             if (fwrite(&src_state, sizeof(src_state), 1, stream) < 1) {
@@ -391,10 +391,10 @@ static struct mstate** read_mstates(struct imm_model* model, FILE* stream)
     }
 
     mstates = malloc(sizeof(*mstates) * (model->nstates));
-    for (uint32_t i = 0; i < model->nstates; ++i)
+    for (uint16_t i = 0; i < model->nstates; ++i)
         mstates[i] = NULL;
 
-    for (uint32_t i = 0; i < model->nstates; ++i) {
+    for (uint16_t i = 0; i < model->nstates; ++i) {
 
         double start_lprob = 0.;
         if (fread(&start_lprob, sizeof(start_lprob), 1, stream) < 1) {
@@ -415,7 +415,7 @@ static struct mstate** read_mstates(struct imm_model* model, FILE* stream)
 
 err:
     if (mstates) {
-        for (uint32_t i = 0; i < model->nstates; ++i) {
+        for (uint16_t i = 0; i < model->nstates; ++i) {
             if (mstates[i])
                 mstate_destroy(mstates[i]);
         }
@@ -428,17 +428,17 @@ err:
 
 static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct mstate* const* const mstates)
 {
-    uint32_t ntrans = 0;
+    uint16_t ntrans = 0;
 
     if (fread(&ntrans, sizeof(ntrans), 1, stream) < 1) {
         imm_error("could not read ntransitions");
         return 1;
     }
 
-    for (uint32_t i = 0; i < ntrans; ++i) {
+    for (uint16_t i = 0; i < ntrans; ++i) {
 
-        uint32_t src_state = 0;
-        uint32_t tgt_state = 0;
+        uint16_t src_state = 0;
+        uint16_t tgt_state = 0;
         double   lprob = 0;
 
         if (fread(&src_state, sizeof(src_state), 1, stream) < 1) {
@@ -494,14 +494,14 @@ static int write_mstate(struct imm_model const* model, FILE* stream, struct msta
 }
 
 static int write_mstates(struct imm_model const* model, FILE* stream,
-                         struct mstate const* const* mstates, uint32_t nstates)
+                         struct mstate const* const* mstates, uint16_t nstates)
 {
     if (fwrite(&nstates, sizeof(nstates), 1, stream) < 1) {
         imm_error("could not write nstates");
         return 1;
     }
 
-    for (uint32_t i = 0; i < nstates; ++i) {
+    for (uint16_t i = 0; i < nstates; ++i) {
         if (write_mstate(model, stream, mstates[i])) {
             imm_error("could not write mstate");
             return 1;

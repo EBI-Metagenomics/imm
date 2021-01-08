@@ -9,12 +9,12 @@ struct dp_matrix* dp_matrix_create(struct dp_state_table const* states)
     matrix->states = states;
     matrix->state_col = malloc(sizeof(*matrix->state_col) * dp_state_table_nstates(states));
 
-    uint32_t next_col = 0;
-    for (uint32_t i = 0; i < dp_state_table_nstates(states); ++i) {
+    uint16_t next_col = 0;
+    for (uint16_t i = 0; i < dp_state_table_nstates(states); ++i) {
         uint8_t const min = dp_state_table_min_seq(states, i);
         uint8_t const max = dp_state_table_max_seq(states, i);
-        matrix->state_col[i] = panic_sub_ui32(next_col, min);
-        next_col += (uint32_t)(max - min + 1);
+        matrix->state_col[i] = (int16_t)(next_col - min);
+        next_col += max - min + 1;
     }
 
     matrix->score = matrixf_create(1, next_col);
@@ -33,7 +33,7 @@ void dp_matrix_destroy(struct dp_matrix const* matrix)
 
 void dp_matrix_setup(struct dp_matrix* matrix, struct eseq const* eseq)
 {
-    unsigned seq_len = eseq_length(eseq);
+    uint_fast16_t seq_len = eseq_length(eseq);
     matrixf_resize(matrix->score, seq_len + 1, matrixf_ncols(matrix->score));
     step_matrix_resize(matrix->prev_step, seq_len + 1, step_matrix_ncols(matrix->prev_step));
 }

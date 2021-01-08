@@ -7,17 +7,18 @@
 #include "imm/bug.h"
 #include "imm/seq.h"
 #include "imm/subseq.h"
-#include "matrixu.h"
+#include "matrix.h"
 #include <limits.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 struct seq_code_chunk
 {
     uint8_t   min_seq;
     uint8_t   max_seq;
-    uint32_t* offset;
-    uint32_t* stride;
-    uint32_t  size;
+    uint16_t* offset;
+    uint16_t* stride;
+    uint16_t  size;
 };
 
 static inline uint8_t offset_size(struct seq_code const* seq_code);
@@ -54,18 +55,19 @@ struct seq_code const* seq_code_create(struct imm_abc const* abc, uint8_t min_se
 
     unsigned long ncombs = ipow(imm_abc_length(abc), max_seq);
 
-    seq_code->size = seq_code->offset[max_seq - min_seq] + cast_ul_u32(ncombs);
+    seq_code->size = seq_code->offset[max_seq - min_seq] + cast_ul_u16(ncombs);
 
     return seq_code;
 }
 
-unsigned seq_code_encode(struct seq_code const* seq_code, struct imm_seq const* seq)
+uint16_t seq_code_encode(struct seq_code const* seq_code, struct imm_seq const* seq)
 {
-    uint32_t code = seq_code->offset[imm_seq_length(seq) - seq_code->min_seq];
-    for (unsigned i = 0; i < imm_seq_length(seq); ++i) {
+    uint16_t     code = seq_code->offset[imm_seq_length(seq) - seq_code->min_seq];
+    uint_fast8_t len = cast_u_u8(imm_seq_length(seq));
+    for (uint_fast8_t i = 0; i < len; ++i) {
 
-        unsigned j = imm_abc_symbol_idx(seq_code->abc, imm_seq_string(seq)[i]);
-        unsigned offset = seq_code->max_seq - imm_seq_length(seq);
+        uint8_t j = imm_abc_symbol_idx(seq_code->abc, imm_seq_string(seq)[i]);
+        uint8_t offset = seq_code->max_seq - len;
         code += seq_code->stride[i + offset] * j;
     }
 
@@ -76,7 +78,7 @@ struct eseq* seq_code_create_eseq(struct seq_code const* seq_code)
 {
     struct eseq* eseq = malloc(sizeof(*eseq));
     eseq->seq_code = seq_code;
-    eseq->code = matrixu_create(1, (unsigned)(seq_code->max_seq - seq_code->min_seq + 1));
+    eseq->code = matrixu16_create(1, (unsigned)(seq_code->max_seq - seq_code->min_seq + 1));
     return eseq;
 }
 

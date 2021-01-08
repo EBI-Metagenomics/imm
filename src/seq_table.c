@@ -47,8 +47,8 @@ int imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const* seq, do
     kh_key(table->emission_table, iter) = emiss->seq;
     kh_val(table->emission_table, iter) = emiss;
 
-    table->min_seq = MIN(table->min_seq, cast_u_u8(imm_seq_length(seq)));
-    table->max_seq = MAX(table->max_seq, cast_u_u8(imm_seq_length(seq)));
+    table->min_seq = (uint8_t)MIN(table->min_seq, cast_u_u8(imm_seq_length(seq)));
+    table->max_seq = (uint8_t)MAX(table->max_seq, cast_u_u8(imm_seq_length(seq)));
 
     return 0;
 }

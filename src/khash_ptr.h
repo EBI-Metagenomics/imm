@@ -27,7 +27,7 @@
 #define GOLDEN_RATIO_32 0x61C88647
 #define GOLDEN_RATIO_64 0x61C8864680B583EBull
 
-static inline khint_t  ptr_hash_func(void const* ptr);
+static inline khint_t   ptr_hash_func(void const* ptr);
 static inline uintptr_t reverse_bits(uintptr_t v);
 
 #define __ptr_hash_equal(a, b) ((a) == (b))

@@ -8,15 +8,15 @@
 
 struct dp_state_table_chunk
 {
-    uint32_t nstates;
+    uint16_t nstates;
     uint8_t* min_seq;
     uint8_t* max_seq;
     float*   start_lprob;
-    uint32_t end_state;
+    uint16_t end_state;
 };
 
 struct dp_state_table const* dp_state_table_create(struct mstate const* const* mstates,
-                                                   uint32_t                    nstates,
+                                                   uint16_t                    nstates,
                                                    struct imm_state const*     end_state,
                                                    struct state_idx*           state_idx)
 {
@@ -28,7 +28,7 @@ struct dp_state_table const* dp_state_table_create(struct mstate const* const* m
     table->max_seq = malloc(sizeof(*table->max_seq) * nstates);
     table->start_lprob = malloc(sizeof(*table->start_lprob) * nstates);
 
-    for (uint32_t i = 0; i < nstates; ++i) {
+    for (uint16_t i = 0; i < nstates; ++i) {
         state_idx_add(state_idx, mstate_get_state(mstates[i]), i);
         table->min_seq[i] = imm_state_min_seq(mstate_get_state(mstates[i]));
         table->max_seq[i] = imm_state_max_seq(mstate_get_state(mstates[i]));
@@ -51,8 +51,8 @@ void dp_state_table_destroy(struct dp_state_table const* state_tbl)
 void dp_state_table_dump(struct dp_state_table const* state_tbl)
 {
     printf("state,min_seq,max_seq,start_lprob\n");
-    for (uint32_t i = 0; i < state_tbl->nstates; ++i) {
-        printf("%" PRIu32 ",%" PRIu8 ",%" PRIu8 ",%f\n", i, state_tbl->min_seq[i],
+    for (uint16_t i = 0; i < state_tbl->nstates; ++i) {
+        printf("%" PRIu16 ",%" PRIu8 ",%" PRIu8 ",%f\n", i, state_tbl->min_seq[i],
                state_tbl->max_seq[i], state_tbl->start_lprob[i]);
     }
 }

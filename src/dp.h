@@ -14,7 +14,7 @@ struct imm_model;
 struct imm_state;
 struct mstate;
 
-struct imm_dp* dp_create(struct imm_abc const* abc, struct mstate const** mstates, uint32_t nstates,
+struct imm_dp* dp_create(struct imm_abc const* abc, struct mstate const** mstates, uint16_t nstates,
                          struct imm_state const* end_state);
 void           dp_create_from_model(struct imm_model* model);
 struct dp_emission const*    dp_get_emission(struct imm_dp const* dp);

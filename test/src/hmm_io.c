@@ -81,7 +81,7 @@ void test_hmm_write_io_two_states(void)
     CLOSE(imm_hmm_likelihood(hmm, C, path), log(0.25) + log(0.1) + log(0.9));
     imm_results_destroy(results);
 
-    for (uint32_t i = 0; i < imm_model_nstates(model); ++i) {
+    for (uint16_t i = 0; i < imm_model_nstates(model); ++i) {
         struct imm_state const* state = imm_model_state(model, i);
 
         if (imm_state_type_id(state) == IMM_MUTE_STATE_TYPE_ID) {
@@ -91,7 +91,7 @@ void test_hmm_write_io_two_states(void)
         }
     }
 
-    for (uint32_t i = 0; i < imm_model_nstates(model); ++i)
+    for (uint16_t i = 0; i < imm_model_nstates(model); ++i)
         imm_state_destroy(imm_model_state(model, i));
 
     imm_seq_destroy(C);
@@ -111,7 +111,7 @@ void test_hmm_write_io_two_states(void)
     dp = imm_model_dp(model);
     C = imm_seq_create("C", abc);
 
-    for (uint32_t i = 0; i < imm_model_nstates(model); ++i)
+    for (uint16_t i = 0; i < imm_model_nstates(model); ++i)
         imm_state_destroy(imm_model_state(model, i));
 
     imm_seq_destroy(C);

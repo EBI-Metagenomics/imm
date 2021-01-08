@@ -20,9 +20,9 @@ IMM_API struct imm_model*       imm_model_create(struct imm_hmm* hmm, struct imm
 IMM_API void                    imm_model_destroy(struct imm_model const* model);
 IMM_API struct imm_dp const*    imm_model_dp(struct imm_model const* model);
 IMM_API struct imm_hmm*         imm_model_hmm(struct imm_model const* model);
-IMM_API uint32_t                imm_model_nstates(struct imm_model const* model);
+IMM_API uint16_t                imm_model_nstates(struct imm_model const* model);
 IMM_API struct imm_model const* imm_model_read(FILE* stream);
-IMM_API struct imm_state const* imm_model_state(struct imm_model const* model, uint32_t i);
+IMM_API struct imm_state const* imm_model_state(struct imm_model const* model, uint16_t i);
 IMM_API int                     imm_model_write(struct imm_model const* model, FILE* stream);
 
 IMM_API struct imm_model* __imm_model_create(struct imm_hmm* hmm, struct imm_dp const* dp,

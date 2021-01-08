@@ -67,7 +67,7 @@ struct imm_dp* imm_hmm_create_dp(struct imm_hmm const* hmm, struct imm_state con
         free_c(mstates);
         return NULL;
     }
-    unsigned nstates = mstate_table_size(hmm->table);
+    uint16_t nstates = (uint16_t)mstate_table_size(hmm->table);
 
     return dp_create(hmm->abc, mstates, nstates, end_state);
 }

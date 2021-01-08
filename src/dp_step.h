@@ -6,13 +6,13 @@
 
 struct dp_step
 {
-    uint32_t state;
-    unsigned seq_len;
+    uint16_t state;
+    uint8_t  seq_len;
 };
 
 static inline struct dp_step dp_step_invalid(void)
 {
-    return (struct dp_step){UINT32_MAX, UINT_MAX};
+    return (struct dp_step){UINT16_MAX, UINT8_MAX};
 }
 
 #endif

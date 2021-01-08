@@ -16,7 +16,7 @@ struct imm_model
     struct imm_abc const*        abc;
     struct imm_hmm*              hmm;
     struct mstate**              mstates;
-    uint32_t                     nstates;
+    uint16_t                     nstates;
     struct imm_state const**     states;
     struct seq_code const*       seq_code;
     struct dp_emission const*    emission;

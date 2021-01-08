@@ -31,7 +31,7 @@ void imm_window_destroy(struct imm_window const* window) { free_c(window); }
 
 struct imm_subseq imm_window_get(struct imm_window const* window, unsigned index)
 {
-    unsigned const offset = MAX(window->length / 2, 1) * index;
+    unsigned const offset = MAX(window->length / 2, (unsigned)1) * index;
     unsigned const length = MIN(window->length, imm_seq_length(window->seq) - offset);
 
     IMM_SUBSEQ(subseq, window->seq, offset, length);
@@ -48,7 +48,7 @@ unsigned imm_window_size(struct imm_window const* window)
     unsigned poffset = 0;
     do {
         poffset = offset;
-        offset += MAX(window->length / 2, 1);
+        offset += MAX(window->length / 2, (unsigned)1);
         length = MIN(window->length, imm_seq_length(window->seq) - poffset);
         ++size;
 

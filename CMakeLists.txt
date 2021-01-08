@@ -78,6 +78,7 @@ else()
         -Wconversion -Wmissing-prototypes -Wno-unused-parameter -Wsign-conversion
         -Wno-unused-function # TODO: added only to please clangd for now
         -Wno-empty-translation-unit # TODO: added only to please clangd for now
+        -Wno-gnu-statement-expression
     )
 endif()
 
