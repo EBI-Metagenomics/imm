@@ -16,7 +16,7 @@ struct dp_state_table_chunk
 };
 
 struct dp_state_table const* dp_state_table_create(struct mstate const* const* mstates,
-                                                   uint16_t                    nstates,
+                                                   uint_fast16_t               nstates,
                                                    struct imm_state const*     end_state,
                                                    struct state_idx*           state_idx)
 {
@@ -28,7 +28,7 @@ struct dp_state_table const* dp_state_table_create(struct mstate const* const* m
     table->max_seq = malloc(sizeof(*table->max_seq) * nstates);
     table->start_lprob = malloc(sizeof(*table->start_lprob) * nstates);
 
-    for (uint16_t i = 0; i < nstates; ++i) {
+    for (uint_fast16_t i = 0; i < nstates; ++i) {
         state_idx_add(state_idx, mstate_get_state(mstates[i]), i);
         table->min_seq[i] = imm_state_min_seq(mstate_get_state(mstates[i]));
         table->max_seq[i] = imm_state_max_seq(mstate_get_state(mstates[i]));

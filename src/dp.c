@@ -366,7 +366,7 @@ static double viterbi(struct imm_dp const* dp, struct task* task, struct imm_pat
 static void viterbi_path(struct imm_dp const* dp, struct task const* task, struct imm_path* path,
                          struct dp_step const* end_step)
 {
-    unsigned              row = eseq_length(task->eseq);
+    uint_fast16_t         row = eseq_length(task->eseq);
     struct dp_step const* step = end_step;
 
     while (step->seq_len != DP_STEP_INVALID_SEQ_LEN) {
