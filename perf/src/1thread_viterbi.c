@@ -29,7 +29,7 @@ static inline char*  fmt_name(char* restrict buffer, char const* name, int i)
 
 void perf_1thread_viterbi(double* seconds)
 {
-    int ncore_nodes = 1000;
+    uint16_t ncore_nodes = 1000;
 
     struct imm_abc const* abc = imm_abc_create("BMIEJ", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
@@ -66,7 +66,7 @@ void perf_1thread_viterbi(double* seconds)
     struct imm_mute_state const*   D[ncore_nodes];
 
     char name[10] = "\0";
-    for (int i = 0; i < ncore_nodes; ++i) {
+    for (uint16_t i = 0; i < ncore_nodes; ++i) {
         M[i] = imm_normal_state_create(fmt_name(name, "M", i), abc, M_lprobs);
         I[i] = imm_normal_state_create(fmt_name(name, "I", i), abc, I_lprobs);
         D[i] = imm_mute_state_create(fmt_name(name, "D", i), abc);
@@ -165,7 +165,7 @@ void perf_1thread_viterbi(double* seconds)
 
     imm_mute_state_destroy(start);
     imm_normal_state_destroy(B);
-    for (int i = 0; i < ncore_nodes; ++i) {
+    for (uint16_t i = 0; i < ncore_nodes; ++i) {
         imm_normal_state_destroy(M[i]);
         imm_normal_state_destroy(I[i]);
         imm_mute_state_destroy(D[i]);
