@@ -279,7 +279,7 @@ int __imm_model_write_hmm(struct imm_model const* model, FILE* stream)
         return 1;
     }
 
-    uint16_t ntrans = dp_trans_table_total_ntrans(model->trans_table);
+    uint16_t ntrans = (uint16_t)dp_trans_table_total_ntrans(model->trans_table);
     if (fwrite(&ntrans, sizeof(ntrans), 1, stream) < 1) {
         imm_error("could not write ntrans");
         return 1;
@@ -288,9 +288,9 @@ int __imm_model_write_hmm(struct imm_model const* model, FILE* stream)
     for (uint16_t tgt_state = 0; tgt_state < model->nstates; ++tgt_state) {
 
         ntrans = dp_trans_table_ntrans(model->trans_table, tgt_state);
-        for (uint16_t trans = 0; trans < ntrans; ++trans) {
+        for (uint_fast16_t trans = 0; trans < ntrans; ++trans) {
 
-            uint16_t src_state = dp_trans_table_source_state(model->trans_table, tgt_state, trans);
+            uint16_t src_state = (uint16_t)dp_trans_table_source_state(model->trans_table, tgt_state, trans);
             double   score = dp_trans_table_score(model->trans_table, tgt_state, trans);
 
             if (fwrite(&src_state, sizeof(src_state), 1, stream) < 1) {
