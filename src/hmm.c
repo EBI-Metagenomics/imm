@@ -13,7 +13,7 @@
 #include "imm/state.h"
 #include "imm/step.h"
 #include "imm/subseq.h"
-#include "min.h"
+#include "minmax.h"
 #include "mstate.h"
 #include "mstate_sort.h"
 #include "mstate_table.h"

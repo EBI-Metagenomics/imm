@@ -2,7 +2,7 @@
 #include "free.h"
 #include "imm/report.h"
 #include "imm/subseq.h"
-#include "min.h"
+#include "minmax.h"
 #include <limits.h>
 #include <stdbool.h>
 

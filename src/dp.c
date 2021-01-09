@@ -18,7 +18,7 @@
 #include "imm/step.h"
 #include "imm/subseq.h"
 #include "imm/window.h"
-#include "min.h"
+#include "minmax.h"
 #include "model.h"
 #include "mstate.h"
 #include "mtrans.h"

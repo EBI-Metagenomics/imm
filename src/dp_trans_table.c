@@ -26,14 +26,15 @@ struct dp_trans_table_chunk
 };
 
 static uint_fast16_t        create_incoming_transitions(struct list_head*           incoming_trans,
-                                                   struct mstate const* const* mstates, uint_fast16_t nstates,
-                                                   struct state_idx const* state_idx);
+                                                        struct mstate const* const* mstates,
+                                                        uint_fast16_t               nstates,
+                                                        struct state_idx const*     state_idx);
 static inline uint_fast16_t offset_size(uint_fast16_t nstates) { return nstates + 1; }
 static inline uint_fast16_t score_size(uint_fast16_t ntrans) { return ntrans; }
 static inline uint_fast16_t source_state_size(uint_fast16_t ntrans) { return ntrans; }
 
-int dp_trans_table_change(struct dp_trans_table* trans_tbl, uint_fast16_t src_state, uint_fast16_t tgt_state,
-                          float lprob)
+int dp_trans_table_change(struct dp_trans_table* trans_tbl, uint_fast16_t src_state,
+                          uint_fast16_t tgt_state, float lprob)
 {
     /* TODO: find a faster way to update the transition */
     for (uint_fast16_t i = 0; i < dp_trans_table_ntrans(trans_tbl, tgt_state); ++i) {
@@ -46,8 +47,8 @@ int dp_trans_table_change(struct dp_trans_table* trans_tbl, uint_fast16_t src_st
     return 1;
 }
 
-struct dp_trans_table* dp_trans_table_create(struct mstate const* const* mstates, uint_fast16_t nstates,
-                                             struct state_idx* state_idx)
+struct dp_trans_table* dp_trans_table_create(struct mstate const* const* mstates,
+                                             uint_fast16_t nstates, struct state_idx* state_idx)
 {
     struct list_head incoming_trans[nstates];
     for (uint_fast16_t i = 0; i < nstates; ++i)
@@ -56,7 +57,7 @@ struct dp_trans_table* dp_trans_table_create(struct mstate const* const* mstates
     uint_fast16_t ntrans = create_incoming_transitions(incoming_trans, mstates, nstates, state_idx);
 
     struct dp_trans_table* tbl = malloc(sizeof(*tbl));
-    tbl->ntrans = (uint16_t) ntrans;
+    tbl->ntrans = (uint16_t)ntrans;
     tbl->offset = malloc(sizeof(*tbl->offset) * offset_size(nstates));
     tbl->offset[0] = 0;
 
@@ -69,7 +70,7 @@ struct dp_trans_table* dp_trans_table_create(struct mstate const* const* mstates
     }
 
     for (uint_fast16_t i = 0; i < nstates; ++i) {
-        uint_fast16_t               j = 0;
+        uint_fast16_t          j = 0;
         struct incoming_trans* it = NULL;
         list_for_each_entry (it, incoming_trans + i, list_entry) {
 
@@ -77,7 +78,7 @@ struct dp_trans_table* dp_trans_table_create(struct mstate const* const* mstates
             tbl->source_state[tbl->offset[i] + j] = it->source_state;
             ++j;
         }
-        tbl->offset[i + 1] = (uint16_t) (tbl->offset[i] + j);
+        tbl->offset[i + 1] = (uint16_t)(tbl->offset[i] + j);
     }
 
     for (uint_fast16_t i = 0; i < nstates; ++i) {
@@ -218,14 +219,15 @@ int dp_trans_table_write(struct dp_trans_table const* trans, uint_fast16_t nstat
 }
 
 static uint_fast16_t create_incoming_transitions(struct list_head*           incoming_trans,
-                                            struct mstate const* const* mstates, uint_fast16_t nstates,
-                                            struct state_idx const* state_idx)
+                                                 struct mstate const* const* mstates,
+                                                 uint_fast16_t               nstates,
+                                                 struct state_idx const*     state_idx)
 {
     uint_fast16_t ntrans = 0;
     for (uint_fast16_t i = 0; i < nstates; ++i) {
 
         struct imm_state const*    src_state = mstate_get_state(mstates[i]);
-        uint_fast16_t                   src = state_idx_find(state_idx, src_state);
+        uint_fast16_t              src = state_idx_find(state_idx, src_state);
         struct mtrans_table const* table = mstate_get_mtrans_table(mstates[i]);
 
         unsigned long iter = 0;
@@ -236,7 +238,7 @@ static uint_fast16_t create_incoming_transitions(struct list_head*           inc
             float                lprob = (float)mtrans_get_lprob(mtrans);
 
             struct imm_state const* dst_state = mtrans_get_state(mtrans);
-            uint_fast16_t                dst = state_idx_find(state_idx, dst_state);
+            uint_fast16_t           dst = state_idx_find(state_idx, dst_state);
 
             struct incoming_trans* it = malloc(sizeof(*it));
             it->score = lprob;

@@ -5,7 +5,7 @@
 #include "imm/lprob.h"
 #include "imm/report.h"
 #include "khash_seq.h"
-#include "min.h"
+#include "minmax.h"
 
 struct emission
 {

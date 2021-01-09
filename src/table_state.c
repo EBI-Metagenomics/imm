@@ -3,7 +3,7 @@
 #include "imm/seq_table.h"
 #include "imm/state.h"
 #include "imm/state_types.h"
-#include "min.h"
+#include "minmax.h"
 #include <stdlib.h>
 
 struct imm_table_state
