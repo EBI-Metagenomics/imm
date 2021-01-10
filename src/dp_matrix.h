@@ -3,10 +3,8 @@
 
 #include "dp.h"
 #include "dp_state_table.h"
-#include "dp_step.h"
 #include "eseq.h"
 #include "matrix.h"
-#include "step_matrix.h"
 #include <inttypes.h>
 
 struct imm_dp;
@@ -22,7 +20,8 @@ struct dp_matrix
     uint16_t                     nstates;
 };
 
-#define SEQ_LEN_INVALID UINT8_MAX
+#define INVALID_STATE UINT16_MAX
+#define INVALID_SEQ_LEN UINT8_MAX
 
 struct dp_matrix*   dp_matrix_create(struct dp_state_table const* states);
 void                dp_matrix_destroy(struct dp_matrix const* matrix);

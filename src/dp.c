@@ -3,7 +3,6 @@
 #include "dp_emission.h"
 #include "dp_matrix.h"
 #include "dp_state_table.h"
-#include "dp_step.h"
 #include "dp_trans_table.h"
 #include "elapsed/elapsed.h"
 #include "free.h"
@@ -216,8 +215,8 @@ static struct final_score best_trans_score(struct imm_dp const* dp, struct dp_ma
 {
     uint_fast8_t const row8 = (uint_fast8_t)MIN((uint_fast16_t)UINT_FAST8_MAX, (uint_fast16_t)row);
     float              score = (float)imm_lprob_zero();
-    uint_fast16_t      prev_state = STATE_INVALID;
-    uint_fast8_t       prev_seq_len = SEQ_LEN_INVALID;
+    uint_fast16_t      prev_state = INVALID_STATE;
+    uint_fast8_t       prev_seq_len = INVALID_SEQ_LEN;
 
     for (uint_fast16_t i = 0; i < dp_trans_table_ntrans(dp->trans_table, tgt_state); ++i) {
 
@@ -264,8 +263,8 @@ static struct final_score final_score(struct imm_dp const* dp, struct task* task
     float         score = (float)imm_lprob_zero();
     uint_fast16_t end_state = dp_state_table_end_state(dp->state_table);
 
-    uint_fast16_t final_state = STATE_INVALID;
-    uint_fast8_t  final_seq_len = SEQ_LEN_INVALID;
+    uint_fast16_t final_state = INVALID_STATE;
+    uint_fast8_t  final_seq_len = INVALID_SEQ_LEN;
 
     uint_fast16_t length = eseq_length(task->eseq);
     uint_fast8_t  max_seq = dp_state_table_max_seq(dp->state_table, end_state);
@@ -283,7 +282,7 @@ static struct final_score final_score(struct imm_dp const* dp, struct task* task
             break;
     }
     struct final_score final_score = {score, final_state, final_seq_len};
-    if (final_state == STATE_INVALID)
+    if (final_state == INVALID_STATE)
         final_score.score = (float)imm_lprob_invalid();
 
     return final_score;
@@ -375,7 +374,7 @@ static void viterbi_path(struct imm_dp const* dp, struct task const* task, struc
     uint_fast16_t state = end_state;
     uint_fast8_t  seq_len = end_seq_len;
 
-    while (seq_len != SEQ_LEN_INVALID) {
+    while (seq_len != INVALID_SEQ_LEN) {
         struct imm_state const* s = mstate_get_state(dp->mstates[state]);
         struct imm_step*        new_step = imm_step_create(s, seq_len);
         imm_path_prepend(path, new_step);
