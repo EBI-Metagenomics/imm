@@ -19,6 +19,8 @@ struct dp_matrix* dp_matrix_create(struct dp_state_table const* states)
 
     matrix->score = matrixf_create(1, next_col);
     matrix->prev_step = step_matrix_create(1, dp_state_table_nstates(states));
+    matrix->prev_state = matrixu16_create(1, dp_state_table_nstates(states));
+    matrix->prev_seq_len = matrixu8_create(1, dp_state_table_nstates(states));
 
     return matrix;
 }
@@ -27,6 +29,8 @@ void dp_matrix_destroy(struct dp_matrix const* matrix)
 {
     matrixf_destroy(matrix->score);
     step_matrix_destroy(matrix->prev_step);
+    matrixu16_destroy(matrix->prev_state);
+    matrixu8_destroy(matrix->prev_seq_len);
     free_c(matrix->state_col);
     free_c(matrix);
 }
@@ -36,4 +40,6 @@ void dp_matrix_setup(struct dp_matrix* matrix, struct eseq const* eseq)
     uint_fast16_t seq_len = eseq_length(eseq);
     matrixf_resize(matrix->score, seq_len + 1, matrixf_ncols(matrix->score));
     step_matrix_resize(matrix->prev_step, seq_len + 1, step_matrix_ncols(matrix->prev_step));
+    matrixu16_resize(matrix->prev_state, seq_len + 1, matrixu16_ncols(matrix->prev_state));
+    matrixu8_resize(matrix->prev_seq_len, seq_len + 1, matrixu8_ncols(matrix->prev_seq_len));
 }

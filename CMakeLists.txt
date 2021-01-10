@@ -99,6 +99,7 @@ target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPREC
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:__extension__>)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${OpenMP_C_FOUND}>:OPENMP>)
 target_compile_options(imm PRIVATE ${WARNING_FLAGS})
+target_compile_options(imm PRIVATE "-fverbose-asm")
 target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
 
 include(CheckCSourceCompiles)

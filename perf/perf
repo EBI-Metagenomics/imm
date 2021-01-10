@@ -17,3 +17,6 @@ echo "" >> $OUTPUT
 lscpu | tr _ - >> $OUTPUT
 
 echo "done."
+
+echo ""
+cat $OUTPUT

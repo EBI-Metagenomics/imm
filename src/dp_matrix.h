@@ -17,6 +17,8 @@ struct dp_matrix
     struct dp_state_table const* states;
     struct matrixf*              score;
     struct step_matrix*          prev_step;
+    struct matrixu16*            prev_state;
+    struct matrixu8*             prev_seq_len;
     int16_t*                     state_col;
     uint16_t                     nstates;
 };
