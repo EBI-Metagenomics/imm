@@ -24,9 +24,10 @@ struct dp_matrix
 struct dp_matrix*                   dp_matrix_create(struct dp_state_table const* states);
 void                                dp_matrix_destroy(struct dp_matrix const* matrix);
 static inline struct dp_step*       dp_matrix_get_prev_step(struct dp_matrix const* dp_matrix,
-                                                            uint_fast16_t row, uint16_t state);
+                                                            uint_fast16_t row, uint_fast16_t state);
 static inline struct dp_step const* dp_matrix_get_prev_step_c(struct dp_matrix const* dp_matrix,
-                                                              uint_fast16_t row, uint16_t state);
+                                                              uint_fast16_t           row,
+                                                              uint_fast16_t           state);
 static inline float dp_matrix_get_score(struct dp_matrix const* dp_matrix, uint_fast16_t row,
                                         struct dp_step step);
 static inline void  dp_matrix_set_score(struct dp_matrix const* dp_matrix, uint_fast16_t row,
@@ -34,13 +35,14 @@ static inline void  dp_matrix_set_score(struct dp_matrix const* dp_matrix, uint_
 void                dp_matrix_setup(struct dp_matrix* matrix, struct eseq const* eseq);
 
 static inline struct dp_step* dp_matrix_get_prev_step(struct dp_matrix const* dp_matrix,
-                                                      uint_fast16_t row, uint16_t state)
+                                                      uint_fast16_t row, uint_fast16_t state)
 {
     return step_matrix_get_ptr(dp_matrix->prev_step, row, state);
 }
 
 static inline struct dp_step const* dp_matrix_get_prev_step_c(struct dp_matrix const* dp_matrix,
-                                                              uint_fast16_t row, uint16_t state)
+                                                              uint_fast16_t           row,
+                                                              uint_fast16_t           state)
 {
     return step_matrix_get_ptr_c(dp_matrix->prev_step, row, state);
 }

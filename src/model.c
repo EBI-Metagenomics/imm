@@ -112,7 +112,7 @@ struct imm_model* __imm_model_create(struct imm_hmm* hmm, struct imm_dp const* d
     model->hmm = hmm;
     model->mstates = (struct mstate**)hmm_get_mstates(hmm, dp);
 
-    model->nstates = dp_state_table_nstates(dp_get_state_table(dp));
+    model->nstates = (uint16_t)dp_state_table_nstates(dp_get_state_table(dp));
     model->states = malloc(sizeof(*model->states) * model->nstates);
     for (uint16_t i = 0; i < model->nstates; ++i)
         model->states[i] = model->mstates[i]->state;
@@ -287,8 +287,8 @@ int __imm_model_write_hmm(struct imm_model const* model, FILE* stream)
 
     for (uint16_t tgt_state = 0; tgt_state < model->nstates; ++tgt_state) {
 
-        ntrans = dp_trans_table_ntrans(model->trans_table, tgt_state);
-        for (uint_fast16_t trans = 0; trans < ntrans; ++trans) {
+        uint_fast16_t n = dp_trans_table_ntrans(model->trans_table, tgt_state);
+        for (uint_fast16_t trans = 0; trans < n; ++trans) {
 
             uint16_t src_state =
                 (uint16_t)dp_trans_table_source_state(model->trans_table, tgt_state, trans);

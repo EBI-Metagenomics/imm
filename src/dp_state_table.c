@@ -22,7 +22,7 @@ struct dp_state_table const* dp_state_table_create(struct mstate const* const* m
 {
     struct dp_state_table* table = malloc(sizeof(*table));
 
-    table->nstates = nstates;
+    table->nstates = (uint16_t)nstates;
 
     table->min_seq = malloc(sizeof(*table->min_seq) * nstates);
     table->max_seq = malloc(sizeof(*table->max_seq) * nstates);
@@ -35,7 +35,7 @@ struct dp_state_table const* dp_state_table_create(struct mstate const* const* m
         table->start_lprob[i] = (float)mstate_get_start(mstates[i]);
     }
 
-    table->end_state = state_idx_find(state_idx, end_state);
+    table->end_state = (uint16_t)state_idx_find(state_idx, end_state);
 
     return table;
 }

@@ -11,23 +11,23 @@ void eseq_destroy(struct eseq const* eseq)
 
 void eseq_setup(struct eseq* eseq, struct imm_seq const* seq)
 {
-    unsigned ncols = matrixu16_ncols(eseq->code);
+    uint_fast32_t ncols = matrixu16_ncols(eseq->code);
     matrixu16_resize(eseq->code, imm_seq_length(seq) + 1, ncols);
 
-    for (unsigned i = 0; i <= imm_seq_length(seq); ++i) {
+    for (uint_fast32_t i = 0; i <= imm_seq_length(seq); ++i) {
 
-        for (unsigned j = 0; j < ncols; ++j) {
+        for (uint_fast32_t j = 0; j < ncols; ++j) {
 
-            unsigned length = eseq->seq_code->min_seq + j;
+            uint_fast32_t length = eseq->seq_code->min_seq + j;
             if (i + length > imm_seq_length(seq))
                 continue;
 
-            IMM_SUBSEQ(subseq, seq, i, length);
-            uint8_t  min_seq = eseq->seq_code->min_seq;
-            uint16_t code = seq_code_encode(eseq->seq_code, imm_subseq_cast(&subseq));
+            IMM_SUBSEQ(subseq, seq, (uint32_t)i, (uint32_t)length);
+            uint_fast8_t  min_seq = eseq->seq_code->min_seq;
+            uint_fast16_t code = seq_code_encode(eseq->seq_code, imm_subseq_cast(&subseq));
             code -= seq_code_offset(eseq->seq_code, min_seq);
 
-            matrixu16_set(eseq->code, i, j, code);
+            matrixu16_set(eseq->code, (uint32_t)i, (uint32_t)j, (uint16_t)code);
         }
     }
 }

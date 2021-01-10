@@ -2,6 +2,7 @@
 #define MAKE_MATRIX_H
 
 #include "free.h"
+#include <stdint.h>
 #include <stdlib.h>
 
 #define MAKE_MATRIX_STRUCT(NAME, T)                                                                \

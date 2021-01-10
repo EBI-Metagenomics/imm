@@ -1,7 +1,6 @@
 #ifndef ESEQ_H
 #define ESEQ_H
 
-#include "cast.h"
 #include "matrix.h"
 #include "seq_code.h"
 
@@ -25,7 +24,7 @@ static inline uint_fast16_t eseq_get(struct eseq const* eseq, uint_fast16_t posi
 
 static inline uint_fast16_t eseq_length(struct eseq const* eseq)
 {
-    return cast_u_u16(matrixu16_nrows(eseq->code) - 1);
+    return (uint_fast16_t)(matrixu16_nrows(eseq->code) - 1);
 }
 
 #endif
