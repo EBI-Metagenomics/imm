@@ -82,7 +82,7 @@ struct eseq* seq_code_create_eseq(struct seq_code const* seq_code)
 {
     struct eseq* eseq = malloc(sizeof(*eseq));
     eseq->seq_code = seq_code;
-    eseq->code = matrixu16_create(1, (unsigned)(seq_code->max_seq - seq_code->min_seq + 1));
+    eseq->code = matrixu16_create(1, (uint_fast16_t)(seq_code->max_seq - seq_code->min_seq + 1));
     return eseq;
 }
 

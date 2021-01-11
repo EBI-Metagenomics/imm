@@ -49,21 +49,21 @@ static inline void dp_matrix_set_prev_step(struct dp_matrix const* dp_matrix, ui
                                            uint_fast16_t state, uint_fast16_t step_state,
                                            uint_fast8_t step_seq_len)
 {
-    matrixu16_set(dp_matrix->prev_state, row, state, step_state);
-    matrixu8_set(dp_matrix->prev_seq_len, row, state, step_seq_len);
+    matrixu16_set(dp_matrix->prev_state, row, state, (uint16_t)step_state);
+    matrixu8_set(dp_matrix->prev_seq_len, row, state, (uint8_t)step_seq_len);
 }
 
 static inline float dp_matrix_get_score(struct dp_matrix const* dp_matrix, uint_fast16_t row,
                                         uint_fast16_t state, uint_fast8_t seq_len)
 {
-    unsigned col = (unsigned)(dp_matrix->state_col[state] + (int)seq_len);
+    uint_fast16_t col = (uint_fast16_t)(dp_matrix->state_col[state] + (int_fast16_t)seq_len);
     return matrixf_get(dp_matrix->score, row, col);
 }
 
 static inline void dp_matrix_set_score(struct dp_matrix const* dp_matrix, uint_fast16_t row,
                                        uint_fast16_t state, uint_fast8_t seq_len, float score)
 {
-    unsigned col = (unsigned)(dp_matrix->state_col[state] + (int)seq_len);
+    uint_fast16_t col = (uint_fast16_t)(dp_matrix->state_col[state] + (int_fast16_t)seq_len);
     matrixf_set(dp_matrix->score, row, col, score);
 }
 
