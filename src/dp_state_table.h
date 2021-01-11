@@ -18,6 +18,8 @@ struct dp_state_table
     uint16_t end_state;
 };
 
+#define DP_STATE_TABLE_MAX_SEQ 5
+
 struct dp_state_table const* dp_state_table_create(struct mstate const* const* mstates,
                                                    uint_fast16_t               nstates,
                                                    struct imm_state const*     end_state,
