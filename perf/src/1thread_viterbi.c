@@ -7,14 +7,36 @@
 
 #define NSAMPLES 100
 
-void perf_1thread_viterbi(double* seconds);
+#define ARRAYSIZE(x) (sizeof(x) / sizeof(*x))
+
+double perf_1thread_viterbi(double* seconds, uint16_t ncore_nodes, uint16_t seq_100length);
 
 int main(void)
 {
-    double seconds[NSAMPLES] = {0.};
-    perf_1thread_viterbi(seconds);
-    struct stats stats = compute_stats(seconds, NSAMPLES);
-    printf("Avg: %.6f (+/- %.6f) seconds\n", stats.mean, stats.sem);
+    double const scores[] = {
+        -394.311890,    -3943.085205,   -7886.054199,   -11829.023438,  -15771.992188,
+        -19714.960938,  -23657.929688,  -27600.898438,  -31543.867188,  -35486.835938,
+        -39429.804688,  -1681.885620,   -16818.085938,  -33636.054688,  -50454.023438,
+        -67271.992188,  -84089.960938,  -100907.929688, -117725.898438, -134543.875000,
+        -151361.843750, -168179.812500, -3291.288330,   -32911.835938,  -65823.554688,
+        -98735.273438,  -131647.000000, -164558.718750, -197470.437500, -230382.156250,
+        -263305.031250, -296536.281250, -329767.531250};
+
+    printf("ncore_nodes,seq_length,median,std_err_mean,score,perf_name\n");
+
+    uint16_t ncore_nodes[] = {100, 500, 1000};
+    uint16_t seq_100len[] = {1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
+    for (unsigned i = 0; i < 3; ++i) {
+        for (unsigned j = 0; j < ARRAYSIZE(seq_100len); ++j) {
+            uint16_t len = seq_100len[j];
+            double   seconds[NSAMPLES] = {0.};
+            double   score = perf_1thread_viterbi(seconds, ncore_nodes[i], len);
+            cass_close(score, scores[i * ARRAYSIZE(seq_100len) + j]);
+            struct stats stats = compute_stats(seconds, NSAMPLES);
+            char const   fmt[] = "%d,%d,%.6f,%.6f,%.6f,1thread_viterbi\n";
+            printf(fmt, ncore_nodes[i], len * 100, stats.median, stats.sem, score);
+        }
+    }
     return 0;
 }
 
@@ -27,10 +49,8 @@ static inline char*  fmt_name(char* restrict buffer, char const* name, int i)
     return buffer;
 }
 
-void perf_1thread_viterbi(double* seconds)
+double perf_1thread_viterbi(double* seconds, uint16_t ncore_nodes, uint16_t seq_100length)
 {
-    uint16_t ncore_nodes = 1000;
-
     struct imm_abc const* abc = imm_abc_create("BMIEJ", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
@@ -106,59 +126,32 @@ void perf_1thread_viterbi(double* seconds)
                               log(0.2));
         }
     }
-
-    char const str[] = "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
-                       "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
-                       "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
-                       "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
-                       "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
-                       "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
-                       "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
-                       "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
-                       "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
-                       "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
-                       "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
-                       "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
-                       "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
-                       "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
-                       "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
-                       "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
-                       "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
-                       "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
-                       "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
-                       "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
-                       "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
-                       "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
-                       "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
-                       "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
-                       "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
-                       "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
-                       "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
-                       "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
-                       "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
-                       "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
-                       "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
-                       "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
-                       "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
-                       "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
-                       "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
-                       "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
-                       "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
-                       "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
-                       "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
-                       "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMME";
-    cass_cond(strlen(str) == 2000);
+    char* str = malloc(sizeof(*str) * (100 * seq_100length + 1));
+    str[100 * seq_100length] = '\0';
+    char const str0[] = "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM";
+    char const str1[] = "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ";
+    char const str_end[] = "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMME";
+    for (uint16_t i = 0; i < seq_100length; ++i) {
+        for (uint16_t j = 0; j < 50; ++j) {
+            str[i * 100 + j] = str0[j];
+            if (i < seq_100length - 1)
+                str[i * 100 + 50 + j] = str1[j];
+            else
+                str[i * 100 + 50 + j] = str_end[j];
+        }
+    }
+    cass_cond(strlen(str) == 100 * seq_100length);
 
     struct imm_seq const* seq = imm_seq_create(str, abc);
     struct imm_dp const*  dp = imm_hmm_create_dp(hmm, imm_mute_state_super(end));
 
+    double score = 0.0;
     for (unsigned i = 0; i < NSAMPLES; ++i) {
         struct imm_results const* results = imm_dp_viterbi(dp, seq, 0);
         cass_cond(imm_results_size(results) == 1);
         struct imm_result const* r = imm_results_get(results, 0);
-        double                   score = imm_result_loglik(r);
+        score = imm_result_loglik(r);
         cass_cond(is_valid(score) && !is_zero(score));
-        cass_close(score, -65823.5546875000);
         seconds[i] = imm_result_seconds(r);
         imm_results_destroy(results);
     }
@@ -178,4 +171,7 @@ void perf_1thread_viterbi(double* seconds)
     imm_hmm_destroy(hmm);
     imm_dp_destroy(dp);
     imm_seq_destroy(seq);
+    free((void*)str);
+
+    return score;
 }
