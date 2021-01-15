@@ -7,3 +7,4 @@ endfunction()
 imm_add_perf(1thread_viterbi)
 
 file(COPY perf DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+file(COPY show-perf DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
