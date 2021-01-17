@@ -3,6 +3,7 @@
 #include "free.h"
 #include "imm/state.h"
 #include "mstate.h"
+#include "score.h"
 #include "state_idx.h"
 #include <stdlib.h>
 
@@ -11,7 +12,7 @@ struct dp_state_table_chunk
     uint16_t nstates;
     uint8_t* min_seq;
     uint8_t* max_seq;
-    float*   start_lprob;
+    score_t* start_lprob;
     uint16_t end_state;
 };
 
@@ -32,7 +33,7 @@ struct dp_state_table const* dp_state_table_create(struct mstate const* const* m
         state_idx_add(state_idx, mstate_get_state(mstates[i]), i);
         table->min_seq[i] = imm_state_min_seq(mstate_get_state(mstates[i]));
         table->max_seq[i] = imm_state_max_seq(mstate_get_state(mstates[i]));
-        table->start_lprob[i] = (float)mstate_get_start(mstates[i]);
+        table->start_lprob[i] = (score_t)mstate_get_start(mstates[i]);
     }
 
     table->end_state = (uint16_t)state_idx_find(state_idx, end_state);

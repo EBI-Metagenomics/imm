@@ -10,7 +10,7 @@
 struct emission
 {
     struct imm_seq const* seq;
-    double                lprob;
+    imm_float             lprob;
 };
 
 KHASH_MAP_INIT_SEQ(emission, struct emission*)
@@ -25,7 +25,7 @@ struct imm_seq_table
 
 struct imm_abc const* imm_seq_table_abc(struct imm_seq_table const* table) { return table->abc; }
 
-int imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const* seq, double lprob)
+int imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const* seq, imm_float lprob)
 {
     if (table->abc != imm_seq_get_abc(seq)) {
         imm_error("alphabets must be the same");
@@ -98,7 +98,7 @@ void imm_seq_table_destroy(struct imm_seq_table const* table)
     free_c(table);
 }
 
-double imm_seq_table_lprob(struct imm_seq_table const* table, struct imm_seq const* seq)
+imm_float imm_seq_table_lprob(struct imm_seq_table const* table, struct imm_seq const* seq)
 {
     if (table->abc != imm_seq_get_abc(seq)) {
         imm_error("alphabets must be the same");
@@ -120,8 +120,8 @@ uint8_t imm_seq_table_min_seq(struct imm_seq_table const* table) { return table-
 int imm_seq_table_normalize(struct imm_seq_table* table)
 {
     khiter_t const len = kh_size(table->emission_table);
-    double*        lprobs = malloc(sizeof(*lprobs) * len);
-    double*        lprob = lprobs;
+    imm_float*     lprobs = malloc(sizeof(*lprobs) * len);
+    imm_float*     lprob = lprobs;
 
     khash_t(emission)* emiss_tbl = table->emission_table;
 

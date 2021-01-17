@@ -12,11 +12,11 @@ struct imm_table_state
     struct imm_seq_table const* table;
 };
 
-static void    destroy(struct imm_state const* state);
-static double  lprob(struct imm_state const* state, struct imm_seq const* seq);
-static uint8_t max_seq(struct imm_state const* state);
-static uint8_t min_seq(struct imm_state const* state);
-static uint8_t type_id(struct imm_state const* state);
+static void      destroy(struct imm_state const* state);
+static imm_float lprob(struct imm_state const* state, struct imm_seq const* seq);
+static uint8_t   max_seq(struct imm_state const* state);
+static uint8_t   min_seq(struct imm_state const* state);
+static uint8_t   type_id(struct imm_state const* state);
 
 static struct imm_state_vtable const __vtable = {destroy, lprob, max_seq, min_seq, type_id};
 
@@ -63,7 +63,7 @@ static void destroy(struct imm_state const* state)
     __imm_state_destroy(state);
 }
 
-static double lprob(struct imm_state const* state, struct imm_seq const* seq)
+static imm_float lprob(struct imm_state const* state, struct imm_seq const* seq)
 {
     struct imm_table_state const* s = __imm_state_derived(state);
     return imm_seq_table_lprob(s->table, seq);

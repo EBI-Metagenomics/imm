@@ -20,9 +20,9 @@ int main(void)
     return cass_status();
 }
 
-static inline int    is_zero(double a) { return imm_lprob_is_zero(a); }
-static inline double zero(void) { return imm_lprob_zero(); }
-static inline int    is_valid(double a) { return imm_lprob_is_valid(a); }
+static inline int       is_zero(imm_float a) { return imm_lprob_is_zero(a); }
+static inline imm_float zero(void) { return imm_lprob_zero(); }
+static inline int       is_valid(imm_float a) { return imm_lprob_is_valid(a); }
 
 void test_hmm_likelihood_single_state(void)
 {
@@ -32,7 +32,7 @@ void test_hmm_likelihood_single_state(void)
     struct imm_seq const* AG = imm_seq_create("AG", abc);
     struct imm_seq const* AA = imm_seq_create("AA", abc);
 
-    double lprobs[] = {log(0.25), log(0.25), log(0.5), zero()};
+    imm_float lprobs[] = {log(0.25), log(0.25), log(0.5), zero()};
 
     struct imm_normal_state const* state = imm_normal_state_create("State0", abc, lprobs);
     struct imm_hmm*                hmm = imm_hmm_create(abc);
@@ -106,10 +106,10 @@ void test_hmm_likelihood_two_states(void)
     struct imm_seq const* GT = imm_seq_create("GT", abc);
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
-    double                         lprobs0[] = {log(0.25), log(0.25), log(0.5), zero()};
+    imm_float                      lprobs0[] = {log(0.25), log(0.25), log(0.5), zero()};
     struct imm_normal_state const* state0 = imm_normal_state_create("State0", abc, lprobs0);
 
-    double                         lprobs1[] = {log(0.5), log(0.25), log(0.5), log(1.0)};
+    imm_float                      lprobs1[] = {log(0.5), log(0.25), log(0.5), log(1.0)};
     struct imm_normal_state const* state1 = imm_normal_state_create("State1", abc, lprobs1);
 
     imm_hmm_add_state(hmm, imm_normal_state_super(state0), log(1.0));
@@ -250,7 +250,7 @@ void test_hmm_likelihood_invalid(void)
     struct imm_mute_state const* M1 = imm_mute_state_create("M1", abc);
     imm_hmm_add_state(hmm, imm_mute_state_super(M1), zero());
 
-    double const                   lprobs[] = {log(0.8), log(0.2)};
+    imm_float const                lprobs[] = {log(0.8), log(0.2)};
     struct imm_normal_state const* M2 = imm_normal_state_create("M2", abc, lprobs);
     imm_hmm_add_state(hmm, imm_normal_state_super(M2), zero());
 

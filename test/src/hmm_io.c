@@ -12,7 +12,7 @@ int main(void)
     return cass_status();
 }
 
-static inline double zero(void) { return imm_lprob_zero(); }
+static inline imm_float zero(void) { return imm_lprob_zero(); }
 
 void test_hmm_write_io_two_states(void)
 {
@@ -22,7 +22,7 @@ void test_hmm_write_io_two_states(void)
 
     struct imm_mute_state const* state0 = imm_mute_state_create("state0", abc);
 
-    double                         lprobs1[] = {log(0.25), log(0.25), log(0.5), zero()};
+    imm_float                      lprobs1[] = {log(0.25), log(0.25), log(0.5), zero()};
     struct imm_normal_state const* state1 = imm_normal_state_create("state1", abc, lprobs1);
 
     imm_hmm_add_state(hmm, imm_mute_state_super(state0), log(0.5));
@@ -36,7 +36,7 @@ void test_hmm_write_io_two_states(void)
     cass_cond(results != NULL);
     cass_equal_int(imm_results_size(results), 1);
     struct imm_path const* path = imm_result_path(imm_results_get(results, 0));
-    double                 score = imm_result_loglik(imm_results_get(results, 0));
+    imm_float              score = imm_result_loglik(imm_results_get(results, 0));
     CLOSE(score, log(0.25) + log(0.1) + log(0.9));
     CLOSE(imm_hmm_likelihood(hmm, C, path), log(0.25) + log(0.1) + log(0.9));
     imm_results_destroy(results);

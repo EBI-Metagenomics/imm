@@ -2,6 +2,7 @@
 #define IMM_DP_H
 
 #include "imm/export.h"
+#include "imm/float.h"
 
 struct imm_dp;
 struct imm_hmm;
@@ -15,6 +16,6 @@ IMM_API struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct
                                                  unsigned window_length);
 IMM_API int                       imm_dp_change_trans(struct imm_dp* dp, struct imm_hmm* hmm,
                                                       struct imm_state const* src_state,
-                                                      struct imm_state const* tgt_state, double lprob);
+                                                      struct imm_state const* tgt_state, imm_float lprob);
 
 #endif

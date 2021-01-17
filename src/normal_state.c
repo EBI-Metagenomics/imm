@@ -10,25 +10,25 @@
 struct imm_normal_state
 {
     struct imm_state const* super;
-    double*                 lprobs;
+    imm_float*              lprobs;
 };
 
 struct normal_state_chunk
 {
-    uint8_t lprobs_size;
-    double* lprobs;
+    uint8_t    lprobs_size;
+    imm_float* lprobs;
 };
 
-static void    destroy(struct imm_state const* state);
-static double  lprob(struct imm_state const* state, struct imm_seq const* seq);
-static uint8_t max_seq(struct imm_state const* state);
-static uint8_t min_seq(struct imm_state const* state);
-static uint8_t type_id(struct imm_state const* state);
+static void      destroy(struct imm_state const* state);
+static imm_float lprob(struct imm_state const* state, struct imm_seq const* seq);
+static uint8_t   max_seq(struct imm_state const* state);
+static uint8_t   min_seq(struct imm_state const* state);
+static uint8_t   type_id(struct imm_state const* state);
 
 static struct imm_state_vtable const __vtable = {destroy, lprob, max_seq, min_seq, type_id};
 
 struct imm_normal_state const* imm_normal_state_create(char const* name, struct imm_abc const* abc,
-                                                       double const* lprobs)
+                                                       imm_float const* lprobs)
 {
     struct imm_normal_state* state = malloc(sizeof(struct imm_normal_state));
 
@@ -128,7 +128,7 @@ static void destroy(struct imm_state const* state)
     __imm_state_destroy(state);
 }
 
-static double lprob(struct imm_state const* state, struct imm_seq const* seq)
+static imm_float lprob(struct imm_state const* state, struct imm_seq const* seq)
 {
     struct imm_normal_state const* s = __imm_state_derived(state);
     if (imm_seq_length(seq) == 1) {

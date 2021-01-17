@@ -12,8 +12,8 @@ int main(void)
     return cass_status();
 }
 
-static inline double zero(void) { return imm_lprob_zero(); }
-static inline char*  fmt_name(char* restrict buffer, char const* name, int i)
+static inline imm_float zero(void) { return imm_lprob_zero(); }
+static inline char*     fmt_name(char* restrict buffer, char const* name, int i)
 {
     sprintf(buffer, "%s%d", name, i);
     return buffer;
@@ -29,15 +29,15 @@ void test_parallel(void)
     struct imm_mute_state const* start = imm_mute_state_create("START", abc);
     imm_hmm_add_state(hmm, imm_mute_state_super(start), log(1.0));
 
-    double end_lprobs[] = {log(0.05), log(0.05), log(0.05), log(0.05), log(0.05)};
+    imm_float end_lprobs[] = {log(0.05), log(0.05), log(0.05), log(0.05), log(0.05)};
     struct imm_normal_state const* end = imm_normal_state_create("END", abc, end_lprobs);
     imm_hmm_add_state(hmm, imm_normal_state_super(end), zero());
 
-    double B_lprobs[] = {log(1.0), zero(), zero(), zero(), zero()};
-    double E_lprobs[] = {zero(), zero(), zero(), log(1.0), zero()};
-    double J_lprobs[] = {zero(), zero(), zero(), zero(), log(1.0)};
-    double M_lprobs[] = {zero(), log(1.0), zero(), zero(), zero()};
-    double I_lprobs[] = {zero(), zero(), log(1.0), zero(), zero()};
+    imm_float B_lprobs[] = {log(1.0), zero(), zero(), zero(), zero()};
+    imm_float E_lprobs[] = {zero(), zero(), zero(), log(1.0), zero()};
+    imm_float J_lprobs[] = {zero(), zero(), zero(), zero(), log(1.0)};
+    imm_float M_lprobs[] = {zero(), log(1.0), zero(), zero(), zero()};
+    imm_float I_lprobs[] = {zero(), zero(), log(1.0), zero(), zero()};
 
     struct imm_normal_state const* B = imm_normal_state_create("B", abc, B_lprobs);
     imm_hmm_add_state(hmm, imm_normal_state_super(B), zero());

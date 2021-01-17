@@ -292,7 +292,7 @@ int __imm_model_write_hmm(struct imm_model const* model, FILE* stream)
 
             uint16_t src_state =
                 (uint16_t)dp_trans_table_source_state(model->trans_table, tgt_state, trans);
-            double score = dp_trans_table_score(model->trans_table, tgt_state, trans);
+            score_t score = dp_trans_table_score(model->trans_table, tgt_state, trans);
 
             if (fwrite(&src_state, sizeof(src_state), 1, stream) < 1) {
                 imm_error("could not write source_state");
@@ -397,7 +397,7 @@ static struct mstate** read_mstates(struct imm_model* model, FILE* stream)
 
     for (uint16_t i = 0; i < model->nstates; ++i) {
 
-        double start_lprob = 0.;
+        score_t start_lprob = 0.;
         if (fread(&start_lprob, sizeof(start_lprob), 1, stream) < 1) {
             imm_error("could not read start lprob");
             goto err;
@@ -440,7 +440,7 @@ static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct mstate* co
 
         uint16_t src_state = 0;
         uint16_t tgt_state = 0;
-        double   lprob = 0;
+        score_t  lprob = 0;
 
         if (fread(&src_state, sizeof(src_state), 1, stream) < 1) {
             imm_error("could not read source_state");
@@ -479,7 +479,7 @@ static int write_mstate(struct imm_model const* model, FILE* stream, struct msta
 {
     struct imm_state const* state = mstate_get_state(mstate);
 
-    double start_lprob = mstate_get_start(mstate);
+    score_t start_lprob = mstate_get_start(mstate);
 
     if (fwrite(&start_lprob, sizeof(start_lprob), 1, stream) < 1) {
         imm_error("could not write start_lprob");

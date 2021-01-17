@@ -8,6 +8,7 @@
 #include "free.h"
 #include "imm/bug.h"
 #include "imm/dp.h"
+#include "imm/float.h"
 #include "imm/hmm.h"
 #include "imm/lprob.h"
 #include "imm/path.h"
@@ -22,6 +23,7 @@
 #include "mstate.h"
 #include "mtrans.h"
 #include "mtrans_table.h"
+#include "score.h"
 #include "seq_code.h"
 #include "state_idx.h"
 #include "thread.h"
@@ -49,7 +51,7 @@ struct imm_dp
 
 struct final_score
 {
-    float         score;
+    score_t       score;
     uint_fast16_t state;
     uint_fast8_t  seq_len;
 };
@@ -64,14 +66,14 @@ static void                      create_tasks(struct imm_dp* dp);
 static struct final_score        final_score(struct imm_dp const* dp, struct task* task);
 static uint_fast8_t              max_seq(struct mstate const* const* mstates, uint16_t nstates);
 static uint_fast8_t              min_seq(struct mstate const* const* mstates, uint16_t nstates);
-static inline void set_score(struct imm_dp const* dp, struct task* task, float trans_score,
+static inline void set_score(struct imm_dp const* dp, struct task* task, score_t trans_score,
                              uint_fast8_t min_len, uint_fast8_t max_len, uint_fast16_t row,
                              uint_fast16_t state);
 static void        task_create(struct task* task, struct dp_state_table const* state_table,
                                struct seq_code const* seq_code);
 static void        task_destroy(struct task* task);
 static inline void task_setup(struct task* task, struct imm_seq const* seq);
-static double      viterbi(struct imm_dp const* dp, struct task* task, struct imm_path* path);
+static imm_float   viterbi(struct imm_dp const* dp, struct task* task, struct imm_path* path);
 static void viterbi_path(struct imm_dp const* dp, struct task const* task, struct imm_path* path,
                          uint_fast16_t end_state, uint_fast8_t end_seq_len);
 
@@ -129,7 +131,7 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
             struct imm_path* path = imm_path_create();
             struct elapsed   elapsed = elapsed_init();
             elapsed_start(&elapsed);
-            double score = viterbi(dp, task, path);
+            imm_float score = viterbi(dp, task, path);
             elapsed_end(&elapsed);
             imm_results_set(results, i, subseq, path, score, elapsed_seconds(&elapsed));
         }
@@ -140,14 +142,14 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
 }
 
 int imm_dp_change_trans(struct imm_dp* dp, struct imm_hmm* hmm, struct imm_state const* src_state,
-                        struct imm_state const* tgt_state, double lprob)
+                        struct imm_state const* tgt_state, imm_float lprob)
 {
     if (!imm_lprob_is_valid(lprob)) {
         imm_error("invalid lprob");
         return 1;
     }
 
-    double prev = imm_hmm_get_trans(hmm, src_state, tgt_state);
+    imm_float prev = imm_hmm_get_trans(hmm, src_state, tgt_state);
     if (!imm_lprob_is_valid(prev)) {
         imm_error("transition does not exist");
         return 1;
@@ -158,7 +160,7 @@ int imm_dp_change_trans(struct imm_dp* dp, struct imm_hmm* hmm, struct imm_state
     uint_fast16_t src = state_idx_find(dp->state_idx, src_state);
     uint_fast16_t tgt = state_idx_find(dp->state_idx, tgt_state);
 
-    if (dp_trans_table_change(dp->trans_table, src, tgt, (float)lprob)) {
+    if (dp_trans_table_change(dp->trans_table, src, tgt, (score_t)lprob)) {
         imm_error("dp transition not found");
         return 1;
     }
@@ -218,7 +220,7 @@ static inline struct final_score best_trans_score(struct imm_dp const*    dp,
                                                   struct dp_matrix const* matrix,
                                                   uint_fast16_t tgt_state, uint_fast16_t row)
 {
-    float         score = (float)imm_lprob_zero();
+    score_t       score = (score_t)imm_lprob_zero();
     uint_fast16_t prev_state = INVALID_STATE;
     uint_fast8_t  prev_seq_len = INVALID_SEQ_LEN;
 
@@ -234,9 +236,9 @@ static inline struct final_score best_trans_score(struct imm_dp const*    dp,
         max_seq = (uint_fast8_t)MIN(max_seq, row);
         for (uint_fast8_t len = min_seq; len <= max_seq; ++len) {
 
-            float v0 = dp_matrix_get_score(matrix, row - len, src_state, len);
-            float v1 = dp_trans_table_score(dp->trans_table, tgt_state, i);
-            float v = v0 + v1;
+            score_t v0 = dp_matrix_get_score(matrix, row - len, src_state, len);
+            score_t v1 = dp_trans_table_score(dp->trans_table, tgt_state, i);
+            score_t v = v0 + v1;
 
             if (v > score) {
                 score = v;
@@ -253,7 +255,7 @@ static inline struct final_score best_trans_score_first_row(struct imm_dp const*
                                                             struct dp_matrix const* matrix,
                                                             uint_fast16_t           tgt_state)
 {
-    float         score = (float)imm_lprob_zero();
+    score_t       score = (score_t)imm_lprob_zero();
     uint_fast16_t prev_state = INVALID_STATE;
     uint_fast8_t  prev_seq_len = INVALID_SEQ_LEN;
 
@@ -265,9 +267,9 @@ static inline struct final_score best_trans_score_first_row(struct imm_dp const*
         if (min_seq > 0 || src_state > tgt_state)
             continue;
 
-        float v0 = dp_matrix_get_score(matrix, 0, src_state, 0);
-        float v1 = dp_trans_table_score(dp->trans_table, tgt_state, i);
-        float v = v0 + v1;
+        score_t v0 = dp_matrix_get_score(matrix, 0, src_state, 0);
+        score_t v1 = dp_trans_table_score(dp->trans_table, tgt_state, i);
+        score_t v = v0 + v1;
 
         if (v > score) {
             score = v;
@@ -292,7 +294,7 @@ static void create_tasks(struct imm_dp* dp)
 
 static struct final_score final_score(struct imm_dp const* dp, struct task* task)
 {
-    float         score = (float)imm_lprob_zero();
+    score_t       score = (score_t)imm_lprob_zero();
     uint_fast16_t end_state = dp_state_table_end_state(dp->state_table);
 
     uint_fast16_t final_state = INVALID_STATE;
@@ -303,7 +305,7 @@ static struct final_score final_score(struct imm_dp const* dp, struct task* task
 
     for (uint_fast8_t len = (uint_fast8_t)MIN(max_seq, length);; --len) {
 
-        float s = dp_matrix_get_score(task->matrix, length - len, end_state, len);
+        score_t s = dp_matrix_get_score(task->matrix, length - len, end_state, len);
         if (s > score) {
             score = s;
             final_state = end_state;
@@ -315,7 +317,7 @@ static struct final_score final_score(struct imm_dp const* dp, struct task* task
     }
     struct final_score fscore = {score, final_state, final_seq_len};
     if (final_state == INVALID_STATE)
-        fscore.score = (float)imm_lprob_invalid();
+        fscore.score = (score_t)imm_lprob_invalid();
 
     return fscore;
 }
@@ -338,7 +340,7 @@ static uint_fast8_t min_seq(struct mstate const* const* mstates, uint16_t nstate
     return min;
 }
 
-static inline void set_score(struct imm_dp const* dp, struct task* task, float trans_score,
+static inline void set_score(struct imm_dp const* dp, struct task* task, score_t trans_score,
                              uint_fast8_t min_len, uint_fast8_t max_len, uint_fast16_t row,
                              uint_fast16_t state)
 {
@@ -347,7 +349,7 @@ static inline void set_score(struct imm_dp const* dp, struct task* task, float t
         uint_fast16_t seq_code = eseq_get(task->eseq, row, len);
         seq_code -= seq_code_offset(dp->seq_code, min_len);
 
-        float score = trans_score + dp_emission_score(dp->emission, state, seq_code);
+        score_t score = trans_score + dp_emission_score(dp->emission, state, seq_code);
         dp_matrix_set_score(task->matrix, row, state, len, score);
     }
 }
@@ -446,7 +448,7 @@ static void _viterbi_safe(struct imm_dp const* dp, struct task* task, uint_fast1
     }
 }
 
-static double viterbi(struct imm_dp const* dp, struct task* task, struct imm_path* path)
+static imm_float viterbi(struct imm_dp const* dp, struct task* task, struct imm_path* path)
 {
     uint_fast16_t const len = eseq_length(task->eseq);
 

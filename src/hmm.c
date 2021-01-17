@@ -28,10 +28,10 @@ struct imm_hmm
     struct mstate_table*  table;
 };
 
-static double get_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state);
-static int    normalize_transitions(struct mstate* mstate);
+static imm_float get_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state);
+static int       normalize_transitions(struct mstate* mstate);
 
-int imm_hmm_add_state(struct imm_hmm* hmm, struct imm_state const* state, double start_lprob)
+int imm_hmm_add_state(struct imm_hmm* hmm, struct imm_state const* state, imm_float start_lprob)
 {
     unsigned long i = mstate_table_find(hmm->table, state);
     if (i != mstate_table_end(hmm->table)) {
@@ -90,8 +90,8 @@ void imm_hmm_destroy(struct imm_hmm const* hmm)
     free_c(hmm);
 }
 
-double imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* src_state,
-                         struct imm_state const* tgt_state)
+imm_float imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* src_state,
+                            struct imm_state const* tgt_state)
 {
     unsigned long src = mstate_table_find(hmm->table, src_state);
     if (src == mstate_table_end(hmm->table)) {
@@ -114,8 +114,8 @@ double imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* src_
     return mtrans_get_lprob(mtrans_table_get(table, i));
 }
 
-double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
-                          struct imm_path const* path)
+imm_float imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
+                             struct imm_path const* path)
 {
     if (hmm->abc != imm_seq_get_abc(seq)) {
         imm_error("hmm and seq must have the same alphabet");
@@ -138,7 +138,8 @@ double imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
     unsigned start = 0;
     IMM_SUBSEQ(subseq, seq, start, step_len);
 
-    double lprob = get_start_lprob(hmm, state) + imm_state_lprob(state, imm_subseq_cast(&subseq));
+    imm_float lprob =
+        get_start_lprob(hmm, state) + imm_state_lprob(state, imm_subseq_cast(&subseq));
 
     struct imm_state const* prev_state = NULL;
 
@@ -207,8 +208,8 @@ int imm_hmm_normalize_start(struct imm_hmm* hmm)
     if (size == 0)
         return 0;
 
-    double* lprobs = malloc(sizeof(*lprobs) * size);
-    double* lprob = lprobs;
+    imm_float* lprobs = malloc(sizeof(*lprobs) * size);
+    imm_float* lprob = lprobs;
 
     unsigned long i = 0;
     mstate_table_for_each (i, hmm->table) {
@@ -246,7 +247,7 @@ int imm_hmm_normalize_trans(struct imm_hmm* hmm, struct imm_state const* src_sta
     return normalize_transitions(mstate_table_get(hmm->table, i));
 }
 
-double imm_hmm_get_start(struct imm_hmm const* hmm, struct imm_state const* state)
+imm_float imm_hmm_get_start(struct imm_hmm const* hmm, struct imm_state const* state)
 {
     unsigned long i = mstate_table_find(hmm->table, state);
     if (i == mstate_table_end(hmm->table)) {
@@ -256,7 +257,7 @@ double imm_hmm_get_start(struct imm_hmm const* hmm, struct imm_state const* stat
     return mstate_get_start(mstate_table_get(hmm->table, i));
 }
 
-int imm_hmm_set_start(struct imm_hmm* hmm, struct imm_state const* state, double lprob)
+int imm_hmm_set_start(struct imm_hmm* hmm, struct imm_state const* state, imm_float lprob)
 {
     unsigned long i = mstate_table_find(hmm->table, state);
     if (i == mstate_table_end(hmm->table)) {
@@ -269,7 +270,7 @@ int imm_hmm_set_start(struct imm_hmm* hmm, struct imm_state const* state, double
 }
 
 int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state,
-                      struct imm_state const* tgt_state, double lprob)
+                      struct imm_state const* tgt_state, imm_float lprob)
 {
     unsigned long src = mstate_table_find(hmm->table, src_state);
     if (src == mstate_table_end(hmm->table)) {
@@ -316,7 +317,7 @@ struct mstate const* const* hmm_get_mstates(struct imm_hmm const* hmm, struct im
     return dp_get_mstates(dp);
 }
 
-static double get_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state)
+static imm_float get_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state)
 {
     unsigned long i = mstate_table_find(hmm->table, state);
     if (i == mstate_table_end(hmm->table)) {
@@ -333,8 +334,8 @@ static int normalize_transitions(struct mstate* mstate)
     if (size == 0)
         return 0;
 
-    double* lprobs = malloc(sizeof(double) * (size_t)size);
-    double* lprob = lprobs;
+    imm_float* lprobs = malloc(sizeof(imm_float) * (size_t)size);
+    imm_float* lprob = lprobs;
 
     unsigned long i = 0;
     mtrans_table_for_each (i, table) {

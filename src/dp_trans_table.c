@@ -6,20 +6,21 @@
 #include "mstate.h"
 #include "mtrans.h"
 #include "mtrans_table.h"
+#include "score.h"
 #include "state_idx.h"
 #include <stdlib.h>
 
 struct incoming_trans
 {
     uint16_t         source_state;
-    float            score;
+    score_t          score;
     struct list_head list_entry;
 };
 
 struct dp_trans_table_chunk
 {
     uint16_t  ntrans;
-    float*    score;
+    score_t*  score;
     uint16_t* source_state;
     uint16_t  offset_size;
     uint16_t* offset;
@@ -34,7 +35,7 @@ static inline uint_fast16_t score_size(uint_fast16_t ntrans) { return ntrans; }
 static inline uint_fast16_t source_state_size(uint_fast16_t ntrans) { return ntrans; }
 
 int dp_trans_table_change(struct dp_trans_table* trans_tbl, uint_fast16_t src_state,
-                          uint_fast16_t tgt_state, float lprob)
+                          uint_fast16_t tgt_state, score_t lprob)
 {
     /* TODO: find a faster way to update the transition */
     for (uint_fast16_t i = 0; i < dp_trans_table_ntrans(trans_tbl, tgt_state); ++i) {
@@ -109,7 +110,7 @@ void dp_trans_table_dump(struct dp_trans_table const* trans_tbl)
         uint_fast16_t n = dp_trans_table_ntrans(trans_tbl, tgt);
         for (uint_fast16_t t = 0; t < n; ++t) {
 
-            float    score = trans_tbl->score[trans];
+            score_t  score = trans_tbl->score[trans];
             uint16_t src = (uint16_t)trans_tbl->source_state[trans];
             printf("%" PRIu16 ",%" PRIu16 ",%" PRIu16 ",%f\n", trans, src, tgt, score);
             ++trans;
@@ -235,7 +236,7 @@ static uint_fast16_t create_incoming_transitions(struct list_head*           inc
             if (!mtrans_table_exist(table, iter))
                 continue;
             struct mtrans const* mtrans = mtrans_table_get(table, iter);
-            float                lprob = (float)mtrans_get_lprob(mtrans);
+            score_t              lprob = (score_t)mtrans_get_lprob(mtrans);
 
             struct imm_state const* dst_state = mtrans_get_state(mtrans);
             uint_fast16_t           dst = state_idx_find(state_idx, dst_state);

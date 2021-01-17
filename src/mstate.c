@@ -2,7 +2,7 @@
 #include "free.h"
 #include "mtrans_table.h"
 
-struct mstate* mstate_create(struct imm_state const* state, double start_lprob)
+struct mstate* mstate_create(struct imm_state const* state, imm_float start_lprob)
 {
     struct mstate* mstate = malloc(sizeof(*mstate));
     mstate->state = state;
@@ -22,6 +22,6 @@ struct mtrans_table* mstate_get_mtrans_table(struct mstate const* mstate)
     return mstate->mtrans_table;
 }
 
-double mstate_get_start(struct mstate const* mstate) { return mstate->start_lprob; }
+imm_float mstate_get_start(struct mstate const* mstate) { return mstate->start_lprob; }
 
-void mstate_set_start(struct mstate* mstate, double const lprob) { mstate->start_lprob = lprob; }
+void mstate_set_start(struct mstate* mstate, imm_float const lprob) { mstate->start_lprob = lprob; }

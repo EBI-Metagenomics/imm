@@ -12,10 +12,10 @@ int main(void)
     return cass_status();
 }
 
-static inline double zero(void) { return imm_lprob_zero(); }
-static inline int    is_valid(double a) { return imm_lprob_is_valid(a); }
-static inline int    is_zero(double a) { return imm_lprob_is_zero(a); }
-static inline char*  fmt_name(char* restrict buffer, char const* name, int i)
+static inline imm_float zero(void) { return imm_lprob_zero(); }
+static inline int       is_valid(imm_float a) { return imm_lprob_is_valid(a); }
+static inline int       is_zero(imm_float a) { return imm_lprob_is_zero(a); }
+static inline char*     fmt_name(char* restrict buffer, char const* name, int i)
 {
     sprintf(buffer, "%s%d", name, i);
     return buffer;
@@ -34,11 +34,11 @@ void test_perf_viterbi(void)
     struct imm_mute_state const* end = imm_mute_state_create("END", abc);
     imm_hmm_add_state(hmm, imm_mute_state_super(end), zero());
 
-    double B_lprobs[] = {log(1.0), zero(), zero(), zero(), zero()};
-    double E_lprobs[] = {zero(), zero(), zero(), log(1.0), zero()};
-    double J_lprobs[] = {zero(), zero(), zero(), zero(), log(1.0)};
-    double M_lprobs[] = {zero(), log(1.0), zero(), zero(), zero()};
-    double I_lprobs[] = {zero(), zero(), log(1.0), zero(), zero()};
+    imm_float B_lprobs[] = {log(1.0), zero(), zero(), zero(), zero()};
+    imm_float E_lprobs[] = {zero(), zero(), zero(), log(1.0), zero()};
+    imm_float J_lprobs[] = {zero(), zero(), zero(), zero(), log(1.0)};
+    imm_float M_lprobs[] = {zero(), log(1.0), zero(), zero(), zero()};
+    imm_float I_lprobs[] = {zero(), zero(), log(1.0), zero(), zero()};
 
     struct imm_normal_state const* B = imm_normal_state_create("B", abc, B_lprobs);
     imm_hmm_add_state(hmm, imm_normal_state_super(B), zero());
@@ -438,7 +438,7 @@ void test_perf_viterbi(void)
 
     cass_cond(imm_results_size(results) == 1);
     struct imm_result const* r = imm_results_get(results, 0);
-    double                   score = imm_result_loglik(r);
+    imm_float                score = imm_result_loglik(r);
     cass_cond(is_valid(score) && !is_zero(score));
     cass_close(score, -65823.5546875000);
     imm_results_destroy(results);

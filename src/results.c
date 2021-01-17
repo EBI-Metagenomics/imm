@@ -8,8 +8,8 @@ struct imm_result
 {
     struct imm_path const* path;
     struct imm_subseq      subseq;
-    double                 loglik;
-    double                 seconds;
+    imm_float              loglik;
+    imm_float              seconds;
 };
 
 struct imm_results
@@ -27,11 +27,11 @@ void imm_result_destroy(struct imm_result const* result)
 
 void imm_result_free(struct imm_result const* result) { free_c(result); }
 
-double imm_result_loglik(struct imm_result const* result) { return result->loglik; }
+imm_float imm_result_loglik(struct imm_result const* result) { return result->loglik; }
 
 struct imm_path const* imm_result_path(struct imm_result const* result) { return result->path; }
 
-double imm_result_seconds(struct imm_result const* result) { return result->seconds; }
+imm_float imm_result_seconds(struct imm_result const* result) { return result->seconds; }
 
 struct imm_subseq imm_result_subseq(struct imm_result const* result) { return result->subseq; }
 
@@ -63,7 +63,7 @@ struct imm_result const* imm_results_get(struct imm_results const* results, unsi
 }
 
 void imm_results_set(struct imm_results* results, unsigned idx, struct imm_subseq subseq,
-                     struct imm_path const* path, double loglik, double seconds)
+                     struct imm_path const* path, imm_float loglik, imm_float seconds)
 {
     results->result[idx]->path = path;
     results->result[idx]->subseq = subseq;
