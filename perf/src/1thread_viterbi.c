@@ -7,8 +7,6 @@
 
 #define NSAMPLES 100
 
-#define ARRAYSIZE(x) (sizeof(x) / sizeof(*x))
-
 imm_float perf_1thread_viterbi(double* seconds, uint16_t ncore_nodes, uint16_t seq_100length);
 
 int main(void)
@@ -27,11 +25,11 @@ int main(void)
     uint16_t ncore_nodes[] = {100, 500, 1000};
     uint16_t seq_100len[] = {1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
     for (unsigned i = 0; i < 3; ++i) {
-        for (unsigned j = 0; j < ARRAYSIZE(seq_100len); ++j) {
+        for (unsigned j = 0; j < IMM_ARRAY_SIZE(seq_100len); ++j) {
             uint16_t len = seq_100len[j];
             double   seconds[NSAMPLES] = {0.};
             imm_float   score = perf_1thread_viterbi(seconds, ncore_nodes[i], len);
-            cass_close(score, scores[i * ARRAYSIZE(seq_100len) + j]);
+            cass_close(score, scores[i * IMM_ARRAY_SIZE(seq_100len) + j]);
             struct stats stats = compute_stats(seconds, NSAMPLES);
             char const   fmt[] = "%d,%d,%.6f,%.6f,%.6f,1thread_viterbi\n";
             printf(fmt, ncore_nodes[i], len * 100, stats.median, stats.sem, score);

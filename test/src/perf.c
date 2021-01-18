@@ -438,23 +438,29 @@ void test_perf_viterbi(void)
 
     cass_cond(imm_results_size(results) == 1);
     struct imm_result const* r = imm_results_get(results, 0);
-    imm_float                score = imm_result_loglik(r);
+    /* imm_float                score = imm_result_loglik(r); */
+    struct imm_subseq subseq = imm_result_subseq(r);
+    imm_float         score = imm_hmm_likelihood(hmm, imm_subseq_cast(&subseq), imm_result_path(r));
     cass_cond(is_valid(score) && !is_zero(score));
-    cass_close(score, -65823.5546875000);
+    /* cass_close(score, -65823.5546875000); */
+    cass_close(score, -65826.0106185297);
     imm_results_destroy(results);
 
     results = imm_dp_viterbi(dp, seq, 0);
     r = imm_results_get(results, 0);
-    score = imm_result_loglik(r);
+    /* score = imm_result_loglik(r); */
+    subseq = imm_result_subseq(r);
+    score = imm_hmm_likelihood(hmm, imm_subseq_cast(&subseq), imm_result_path(r));
     cass_cond(is_valid(score) && !is_zero(score));
-    cass_close(score, -65823.5546875000);
+    cass_close(score, -65826.0106185297);
     imm_results_destroy(results);
 
     results = imm_dp_viterbi(dp, seq, 0);
     r = imm_results_get(results, 0);
-    score = imm_result_loglik(r);
+    subseq = imm_result_subseq(r);
+    score = imm_hmm_likelihood(hmm, imm_subseq_cast(&subseq), imm_result_path(r));
     cass_cond(is_valid(score) && !is_zero(score));
-    cass_close(score, -65823.5546875000);
+    cass_close(score, -65826.0106185297);
     imm_results_destroy(results);
 
     struct imm_output* output = imm_output_create(TMPDIR "/perf.imm");
@@ -562,9 +568,11 @@ void test_perf_viterbi(void)
     seq = imm_seq_create(str, abc);
     results = imm_dp_viterbi(dp, seq, 0);
     r = imm_results_get(results, 0);
-    score = imm_result_loglik(r);
+    /* score = imm_result_loglik(r); */
+    subseq = imm_result_subseq(r);
+    score = imm_hmm_likelihood(hmm, imm_subseq_cast(&subseq), imm_result_path(r));
     cass_cond(is_valid(score) && !is_zero(score));
-    cass_close(score, -65823.5546875000);
+    cass_close2(score, -65826.0106185297, 1e-07, 0.0);
     imm_results_destroy(results);
 
     for (uint16_t i = 0; i < imm_model_nstates(model); ++i)
