@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
-project(imm VERSION 0.0.9 LANGUAGES C)
+project(imm VERSION 0.0.10 LANGUAGES C)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
@@ -76,8 +76,8 @@ if(${CMAKE_C_COMPILER_ID} MATCHES "MSVC")
 else()
     set(WARNING_FLAGS -Wall -Wextra -pedantic -Wstrict-prototypes -Wshadow
         -Wconversion -Wmissing-prototypes -Wno-unused-parameter -Wsign-conversion
-        -Wno-unused-function # TODO: added only to please clangd for now
-        -Wno-empty-translation-unit # TODO: added only to please clangd for now
+        -Wno-unused-function # FIXME: added only to please clangd for now
+        -Wno-empty-translation-unit # FIXME: added only to please clangd for now
     )
 endif()
 
