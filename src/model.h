@@ -8,14 +8,14 @@ struct dp_emission;
 struct dp_state_table;
 struct imm_abc;
 struct imm_hmm;
-struct mstate;
+struct model_state;
 struct seq_code;
 
 struct imm_model
 {
     struct imm_abc const*        abc;
     struct imm_hmm*              hmm;
-    struct mstate**              mstates;
+    struct model_state**         mstates;
     uint16_t                     nstates;
     struct imm_state const**     states;
     struct seq_code const*       seq_code;

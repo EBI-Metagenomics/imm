@@ -7,7 +7,7 @@
 
 struct imm_io;
 struct imm_state;
-struct mstate;
+struct model_state;
 struct state_idx;
 
 struct dp_state_table
@@ -21,10 +21,10 @@ struct dp_state_table
 
 #define DP_STATE_TABLE_MAX_SEQ 5
 
-struct dp_state_table const* dp_state_table_create(struct mstate const* const* mstates,
-                                                   uint_fast16_t               nstates,
-                                                   struct imm_state const*     end_state,
-                                                   struct state_idx*           state_idx);
+struct dp_state_table const* dp_state_table_create(struct model_state const* const* mstates,
+                                                   uint_fast16_t                    nstates,
+                                                   struct imm_state const*          end_state,
+                                                   struct state_idx*                state_idx);
 void                         dp_state_table_destroy(struct dp_state_table const* state_tbl);
 void                         dp_state_table_dump(struct dp_state_table const* state_tbl);
 static inline uint_fast16_t  dp_state_table_end_state(struct dp_state_table const* state_tbl);

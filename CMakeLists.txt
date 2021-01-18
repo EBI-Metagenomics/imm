@@ -40,11 +40,11 @@ add_library(imm
     src/hmm.c
     src/input.c
     src/model.c
-    src/mstate.c
-    src/mstate_sort.c
-    src/mstate_table.c
-    src/mtrans.c
-    src/mtrans_table.c
+    src/model_state.c
+    src/model_state_sort.c
+    src/model_state_table.c
+    src/model_trans.c
+    src/model_trans_table.c
     src/mute_state.c
     src/normal_state.c
     src/output.c
@@ -81,6 +81,13 @@ else()
     )
 endif()
 
+option(IMM_DOUBLE_PRECISION "Enable double-precision floating-point format for internals" Off)
+if(IMM_DOUBLE_PRECISION)
+    message(STATUS "Double-precision floating-point format for internals - On")
+else()
+    message(STATUS "Double-precision floating-point format for internals - Off")
+endif()
+
 target_include_directories(imm
     PUBLIC
         $<INSTALL_INTERFACE:include>
@@ -98,6 +105,7 @@ target_compile_features(imm PRIVATE c_std_11)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRECATE>)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:__extension__>)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${OpenMP_C_FOUND}>:OPENMP>)
+target_compile_definitions(imm PRIVATE $<$<BOOL:${IMM_DOUBLE_PRECISION}>:IMM_DOUBLE_PRECISION>)
 target_compile_options(imm PRIVATE ${WARNING_FLAGS})
 target_compile_options(imm PRIVATE "-fverbose-asm")
 target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)

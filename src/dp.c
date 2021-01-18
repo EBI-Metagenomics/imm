@@ -20,9 +20,9 @@
 #include "imm/window.h"
 #include "minmax.h"
 #include "model.h"
-#include "mstate.h"
-#include "mtrans.h"
-#include "mtrans_table.h"
+#include "model_trans.h"
+#include "model_trans_table.h"
+#include "model_state.h"
 #include "score.h"
 #include "seq_code.h"
 #include "state_idx.h"
@@ -39,7 +39,7 @@ struct task
 
 struct imm_dp
 {
-    struct mstate const* const*  mstates;
+    struct model_state const* const*  mstates;
     struct seq_code const*       seq_code;
     struct state_idx*            state_idx;
     struct dp_emission const*    emission;
@@ -64,8 +64,8 @@ static inline struct final_score best_trans_score_first_row(struct imm_dp const*
                                                             uint_fast16_t           tgt_state);
 static void                      create_tasks(struct imm_dp* dp);
 static struct final_score        final_score(struct imm_dp const* dp, struct task* task);
-static uint_fast8_t              max_seq(struct mstate const* const* mstates, uint16_t nstates);
-static uint_fast8_t              min_seq(struct mstate const* const* mstates, uint16_t nstates);
+static uint_fast8_t              max_seq(struct model_state const* const* mstates, uint16_t nstates);
+static uint_fast8_t              min_seq(struct model_state const* const* mstates, uint16_t nstates);
 static inline void set_score(struct imm_dp const* dp, struct task* task, score_t trans_score,
                              uint_fast8_t min_len, uint_fast8_t max_len, uint_fast16_t row,
                              uint_fast16_t state);
@@ -103,7 +103,7 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
         return NULL;
     }
 
-    struct imm_state const* end_state = mstate_get_state(dp->mstates[dp->state_table->end_state]);
+    struct imm_state const* end_state = model_state_get_state(dp->mstates[dp->state_table->end_state]);
     if (imm_seq_length(seq) < imm_state_min_seq(end_state)) {
         imm_error("sequence is shorter than end_state's lower bound");
         return NULL;
@@ -170,7 +170,7 @@ int imm_dp_change_trans(struct imm_dp* dp, struct imm_hmm* hmm, struct imm_state
     return 0;
 }
 
-struct imm_dp* dp_create(struct imm_abc const* abc, struct mstate const** mstates, uint16_t nstates,
+struct imm_dp* dp_create(struct imm_abc const* abc, struct model_state const** mstates, uint16_t nstates,
                          struct imm_state const* end_state)
 {
     struct imm_dp* dp = malloc(sizeof(*dp));
@@ -191,7 +191,7 @@ void dp_create_from_model(struct imm_model* model)
 {
     struct imm_dp* dp = malloc(sizeof(*dp));
 
-    dp->mstates = (struct mstate const**)model->mstates;
+    dp->mstates = (struct model_state const**)model->mstates;
     dp->seq_code = model->seq_code;
     dp->emission = model->emission;
     dp->trans_table = model->trans_table;
@@ -208,7 +208,7 @@ void dp_create_from_model(struct imm_model* model)
 
 struct dp_emission const* dp_get_emission(struct imm_dp const* dp) { return dp->emission; }
 
-struct mstate const* const* dp_get_mstates(struct imm_dp const* dp) { return dp->mstates; }
+struct model_state const* const* dp_get_mstates(struct imm_dp const* dp) { return dp->mstates; }
 
 struct seq_code const* dp_get_seq_code(struct imm_dp const* dp) { return dp->seq_code; }
 
@@ -322,20 +322,20 @@ static struct final_score final_score(struct imm_dp const* dp, struct task* task
     return fscore;
 }
 
-static uint_fast8_t max_seq(struct mstate const* const* mstates, uint16_t nstates)
+static uint_fast8_t max_seq(struct model_state const* const* mstates, uint16_t nstates)
 {
-    uint_fast8_t max = imm_state_max_seq(mstate_get_state(mstates[0]));
+    uint_fast8_t max = imm_state_max_seq(model_state_get_state(mstates[0]));
     for (uint_fast16_t i = 1; i < nstates; ++i)
-        max = (uint_fast8_t)MAX(max, imm_state_max_seq(mstate_get_state(mstates[i])));
+        max = (uint_fast8_t)MAX(max, imm_state_max_seq(model_state_get_state(mstates[i])));
 
     return max;
 }
 
-static uint_fast8_t min_seq(struct mstate const* const* mstates, uint16_t nstates)
+static uint_fast8_t min_seq(struct model_state const* const* mstates, uint16_t nstates)
 {
-    uint_fast8_t min = imm_state_min_seq(mstate_get_state(mstates[0]));
+    uint_fast8_t min = imm_state_min_seq(model_state_get_state(mstates[0]));
     for (uint_fast16_t i = 1; i < nstates; ++i)
-        min = (uint_fast8_t)MIN(min, imm_state_min_seq(mstate_get_state(mstates[i])));
+        min = (uint_fast8_t)MIN(min, imm_state_min_seq(model_state_get_state(mstates[i])));
 
     return min;
 }
@@ -476,7 +476,7 @@ static void viterbi_path(struct imm_dp const* dp, struct task const* task, struc
     uint_fast8_t  seq_len = end_seq_len;
 
     while (seq_len != INVALID_SEQ_LEN) {
-        struct imm_state const* s = mstate_get_state(dp->mstates[state]);
+        struct imm_state const* s = model_state_get_state(dp->mstates[state]);
         struct imm_step*        new_step = imm_step_create(s, seq_len);
         imm_path_prepend(path, new_step);
         row -= seq_len;

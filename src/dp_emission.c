@@ -5,7 +5,7 @@
 #include "imm/abc.h"
 #include "imm/seq.h"
 #include "imm/state.h"
-#include "mstate.h"
+#include "model_state.h"
 #include "score.h"
 #include "seq_code.h"
 #include <stdlib.h>
@@ -21,19 +21,20 @@ struct dp_emission_chunk
 static inline uint_fast16_t offset_size(uint_fast16_t nstates) { return nstates + 1; }
 static inline uint_fast16_t score_size(struct dp_emission const* emission, uint_fast16_t nstates);
 
-struct dp_emission const* dp_emission_create(struct seq_code const*      seq_code,
-                                             struct mstate const* const* mstates,
-                                             uint_fast16_t               nstates)
+struct dp_emission const* dp_emission_create(struct seq_code const*           seq_code,
+                                             struct model_state const* const* mstates,
+                                             uint_fast16_t                    nstates)
 {
     struct dp_emission* emiss_tbl = malloc(sizeof(*emiss_tbl));
 
     emiss_tbl->offset = malloc(sizeof(*emiss_tbl->offset) * offset_size(nstates));
     emiss_tbl->offset[0] = 0;
 
-    uint_fast16_t size = seq_code_size(seq_code, imm_state_min_seq(mstate_get_state(mstates[0])));
+    uint_fast16_t size =
+        seq_code_size(seq_code, imm_state_min_seq(model_state_get_state(mstates[0])));
     for (uint_fast16_t i = 1; i < nstates; ++i) {
         emiss_tbl->offset[i] = (uint16_t)size;
-        size += seq_code_size(seq_code, imm_state_min_seq(mstate_get_state(mstates[i])));
+        size += seq_code_size(seq_code, imm_state_min_seq(model_state_get_state(mstates[i])));
     }
     emiss_tbl->offset[nstates] = (uint16_t)size;
 
@@ -46,8 +47,9 @@ struct dp_emission const* dp_emission_create(struct seq_code const*      seq_cod
 
     for (uint_fast16_t i = 0; i < nstates; ++i) {
 
-        uint8_t min_seq = imm_state_min_seq(mstate_get_state(mstates[i]));
-        for (uint8_t len = min_seq; len <= imm_state_max_seq(mstate_get_state(mstates[i])); ++len) {
+        uint8_t min_seq = imm_state_min_seq(model_state_get_state(mstates[i]));
+        for (uint8_t len = min_seq; len <= imm_state_max_seq(model_state_get_state(mstates[i]));
+             ++len) {
 
             imm_cartes_setup(cartes, len);
             char const* item = NULL;
@@ -56,7 +58,7 @@ struct dp_emission const* dp_emission_create(struct seq_code const*      seq_cod
                 struct imm_seq seq = IMM_SEQ(abc, item, len);
                 uint_fast16_t  j = seq_code_encode(seq_code, &seq);
                 j -= seq_code_offset(seq_code, min_seq);
-                score_t score = (score_t)imm_state_lprob(mstate_get_state(mstates[i]), &seq);
+                score_t score = (score_t)imm_state_lprob(model_state_get_state(mstates[i]), &seq);
                 emiss_tbl->score[emiss_tbl->offset[i] + j] = score;
             }
         }

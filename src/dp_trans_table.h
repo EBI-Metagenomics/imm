@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 struct imm_io;
-struct mstate;
+struct model_state;
 struct state_idx;
 
 struct dp_trans_table
@@ -20,7 +20,7 @@ struct dp_trans_table
 
 int dp_trans_table_change(struct dp_trans_table* trans_tbl, uint_fast16_t src_state,
                           uint_fast16_t tgt_state, score_t lprob);
-struct dp_trans_table*      dp_trans_table_create(struct mstate const* const* mstates,
+struct dp_trans_table*      dp_trans_table_create(struct model_state const* const* mstates,
                                                   uint_fast16_t nstates, struct state_idx* state_idx);
 void                        dp_trans_table_destroy(struct dp_trans_table const* transition);
 void                        dp_trans_table_dump(struct dp_trans_table const* trans_tbl);
