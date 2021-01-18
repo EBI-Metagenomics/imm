@@ -124,7 +124,7 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
                               log(0.2));
         }
     }
-    char* str = malloc(sizeof(*str) * (100 * seq_100length + 1));
+    char* str = malloc(sizeof(*str) * (unsigned)(100 * seq_100length + 1));
     str[100 * seq_100length] = '\0';
     char const str0[] = "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM";
     char const str1[] = "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ";
