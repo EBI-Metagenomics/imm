@@ -36,7 +36,11 @@ void test_hmm_write_io_two_states(void)
     cass_cond(results != NULL);
     cass_equal_int(imm_results_size(results), 1);
     struct imm_path const* path = imm_result_path(imm_results_get(results, 0));
-    imm_float              score = imm_result_loglik(imm_results_get(results, 0));
+
+    struct imm_result const* r = imm_results_get(results, 0);
+    struct imm_subseq        subseq = imm_result_subseq(r);
+    struct imm_seq const*    s = imm_subseq_cast(&subseq);
+    imm_float                score = imm_hmm_likelihood(hmm, s, imm_result_path(r));
     CLOSE(score, log(0.25) + log(0.1) + log(0.9));
     CLOSE(imm_hmm_likelihood(hmm, C, path), log(0.25) + log(0.1) + log(0.9));
     imm_results_destroy(results);
@@ -75,8 +79,11 @@ void test_hmm_write_io_two_states(void)
     results = imm_dp_viterbi(dp, C, 0);
     cass_cond(results != NULL);
     cass_equal_int(imm_results_size(results), 1);
-    path = imm_result_path(imm_results_get(results, 0));
-    score = imm_result_loglik(imm_results_get(results, 0));
+    r = imm_results_get(results, 0);
+    subseq = imm_result_subseq(r);
+    s = imm_subseq_cast(&subseq);
+    path = imm_result_path(r);
+    score = imm_hmm_likelihood(hmm, s, imm_result_path(r));
     CLOSE(score, log(0.25) + log(0.1) + log(0.9));
     CLOSE(imm_hmm_likelihood(hmm, C, path), log(0.25) + log(0.1) + log(0.9));
     imm_results_destroy(results);

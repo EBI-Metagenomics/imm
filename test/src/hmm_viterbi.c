@@ -1196,7 +1196,9 @@ imm_float single_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq,
 
     *path = imm_path_clone(imm_result_path(r));
 
-    imm_float score = imm_result_loglik(r);
+    struct imm_subseq     subseq = imm_result_subseq(r);
+    struct imm_seq const* s = imm_subseq_cast(&subseq);
+    imm_float             score = imm_hmm_likelihood(hmm, s, imm_result_path(r));
     imm_results_destroy(results);
     imm_dp_destroy(dp);
 

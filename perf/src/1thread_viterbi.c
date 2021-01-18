@@ -26,9 +26,9 @@ int main(void)
     uint16_t seq_100len[] = {1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
     for (unsigned i = 0; i < 3; ++i) {
         for (unsigned j = 0; j < IMM_ARRAY_SIZE(seq_100len); ++j) {
-            uint16_t len = seq_100len[j];
-            double   seconds[NSAMPLES] = {0.};
-            imm_float   score = perf_1thread_viterbi(seconds, ncore_nodes[i], len);
+            uint16_t  len = seq_100len[j];
+            double    seconds[NSAMPLES] = {0.};
+            imm_float score = perf_1thread_viterbi(seconds, ncore_nodes[i], len);
             cass_close(score, scores[i * IMM_ARRAY_SIZE(seq_100len) + j]);
             struct stats stats = compute_stats(seconds, NSAMPLES);
             char const   fmt[] = "%d,%d,%.6f,%.6f,%.6f,1thread_viterbi\n";
@@ -39,9 +39,9 @@ int main(void)
 }
 
 static inline imm_float zero(void) { return imm_lprob_zero(); }
-static inline int    is_valid(imm_float a) { return imm_lprob_is_valid(a); }
-static inline int    is_zero(imm_float a) { return imm_lprob_is_zero(a); }
-static inline char*  fmt_name(char* restrict buffer, char const* name, int i)
+static inline int       is_valid(imm_float a) { return imm_lprob_is_valid(a); }
+static inline int       is_zero(imm_float a) { return imm_lprob_is_zero(a); }
+static inline char*     fmt_name(char* restrict buffer, char const* name, int i)
 {
     sprintf(buffer, "%s%d", name, i);
     return buffer;
@@ -148,7 +148,9 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
         struct imm_results const* results = imm_dp_viterbi(dp, seq, 0);
         cass_cond(imm_results_size(results) == 1);
         struct imm_result const* r = imm_results_get(results, 0);
-        score = imm_result_loglik(r);
+        struct imm_subseq        subseq = imm_result_subseq(r);
+        struct imm_seq const*    s = imm_subseq_cast(&subseq);
+        score = imm_hmm_likelihood(hmm, s, imm_result_path(r));
         cass_cond(is_valid(score) && !is_zero(score));
         seconds[i] = imm_result_seconds(r);
         imm_results_destroy(results);

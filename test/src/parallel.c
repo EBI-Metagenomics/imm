@@ -165,21 +165,24 @@ void test_parallel(void)
     result = imm_results_get(results, 1);
     subseq = imm_result_subseq(result);
     s = imm_subseq_cast(&subseq);
-    cass_cond(!imm_lprob_is_valid(imm_result_loglik(result)));
+    score = imm_hmm_likelihood(hmm, s, imm_result_path(result));
+    cass_cond(!imm_lprob_is_valid(score));
     cass_cond(strncmp(imm_seq_string(s), "MIMMMMMMMMMIIMIMIMIMIMIIMIIIMIMIMIMMMMMMIMMIMIMIMI",
                       imm_seq_length(s)) == 0);
 
     result = imm_results_get(results, 2);
     subseq = imm_result_subseq(result);
     s = imm_subseq_cast(&subseq);
-    cass_cond(!imm_lprob_is_valid(imm_result_loglik(result)));
+    score = imm_hmm_likelihood(hmm, s, imm_result_path(result));
+    cass_cond(!imm_lprob_is_valid(score));
     cass_cond(strncmp(imm_seq_string(s), "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ",
                       imm_seq_length(s)) == 0);
 
     result = imm_results_get(results, 3);
     subseq = imm_result_subseq(result);
     s = imm_subseq_cast(&subseq);
-    cass_cond(!imm_lprob_is_valid(imm_result_loglik(result)));
+    score = imm_hmm_likelihood(hmm, s, imm_result_path(result));
+    cass_cond(!imm_lprob_is_valid(score));
     cass_cond(strncmp(imm_seq_string(s), "IMIMMIMIMIMIMIMMMMIMMIMEJBMIIMIIMMIMMMIMEJBMIIMIIM",
                       imm_seq_length(s)) == 0);
 
