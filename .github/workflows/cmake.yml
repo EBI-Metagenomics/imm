@@ -2,16 +2,15 @@ name: CMake
 
 on: [push]
 
-strategy:
-  matrix:
-    double_precision: ['On', 'Off']
-
 env:
   BUILD_TYPE: Release
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        double_precision: ['On', 'Off']
 
     steps:
     - uses: actions/checkout@v2
