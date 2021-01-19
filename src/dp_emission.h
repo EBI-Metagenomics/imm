@@ -12,7 +12,7 @@ struct seq_code;
 struct dp_emission
 {
     score_t*  score;  /**< Sequence emission score of a state. */
-    uint16_t* offset; /**< Maps state to score array offset. */
+    uint32_t* offset; /**< Maps state to score array offset. */
 };
 
 struct dp_emission const* dp_emission_create(struct seq_code const*           seq_code,
