@@ -96,7 +96,7 @@ void imm_dp_destroy(struct imm_dp const* dp)
 }
 
 struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq const* seq,
-                                         unsigned window_length)
+                                         uint16_t window_length)
 {
     if (seq_code_abc(dp->seq_code) != imm_seq_get_abc(seq)) {
         imm_error("dp and seq must have the same alphabet");
@@ -110,11 +110,13 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
         return NULL;
     }
 
+    /* TODO: setup windowing if seq length is too large */
+    IMM_BUG(imm_seq_length(seq) > IMM_WINDOW_MAX_LEN);
     if (window_length == 0)
-        window_length = imm_seq_length(seq);
+        window_length = (uint16_t)imm_seq_length(seq);
 
     struct imm_window const* window = imm_window_create(seq, window_length);
-    unsigned const           nwindows = imm_window_size(window);
+    uint_fast16_t            nwindows = imm_window_size(window);
     struct imm_results*      results = imm_results_create(seq, nwindows);
 
     _Pragma("omp parallel if(nwindows > 1)")
@@ -123,7 +125,7 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
             task_create(dp->tasks + thread_id(), dp->state_table, dp->seq_code);
 
 #pragma omp for
-        for (unsigned i = 0; i < nwindows; ++i) {
+        for (uint_fast16_t i = 0; i < nwindows; ++i) {
             struct imm_subseq const subseq = imm_window_get(window, i);
             struct task*            task = dp->tasks + thread_id();
 

@@ -25,7 +25,7 @@ static inline struct imm_abc const* imm_abc_table_abc(struct imm_abc_table const
 
 static inline imm_float imm_abc_table_lprob(struct imm_abc_table const* abc_table, char symbol)
 {
-    unsigned idx = imm_abc_symbol_idx(abc_table->abc, symbol);
+    uint8_t idx = imm_abc_symbol_idx(abc_table->abc, symbol);
     if (idx == IMM_ABC_INVALID_IDX) {
         imm_error("symbol not found");
         return imm_lprob_invalid();

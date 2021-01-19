@@ -14,7 +14,7 @@ struct imm_result
 struct imm_results
 {
     struct imm_seq const* seq;
-    unsigned              nresults;
+    uint16_t              nresults;
     struct imm_result*    result[];
 };
 
@@ -32,13 +32,13 @@ imm_float imm_result_seconds(struct imm_result const* result) { return result->s
 
 struct imm_subseq imm_result_subseq(struct imm_result const* result) { return result->subseq; }
 
-struct imm_results* imm_results_create(struct imm_seq const* seq, unsigned const nresults)
+struct imm_results* imm_results_create(struct imm_seq const* seq, uint16_t const nresults)
 {
     struct imm_results* results = malloc(sizeof(*results) + sizeof(struct imm_result* [nresults]));
 
     results->seq = seq;
     results->nresults = nresults;
-    for (unsigned i = 0; i < results->nresults; ++i)
+    for (uint16_t i = 0; i < results->nresults; ++i)
         results->result[i] = malloc(sizeof(*results->result[i]));
 
     return results;
@@ -46,7 +46,7 @@ struct imm_results* imm_results_create(struct imm_seq const* seq, unsigned const
 
 void imm_results_destroy(struct imm_results const* results)
 {
-    for (unsigned i = 0; i < results->nresults; ++i)
+    for (uint16_t i = 0; i < results->nresults; ++i)
         imm_result_destroy(results->result[i]);
 
     free_c(results);
@@ -54,12 +54,12 @@ void imm_results_destroy(struct imm_results const* results)
 
 void imm_results_free(struct imm_results const* results) { free_c(results); }
 
-struct imm_result const* imm_results_get(struct imm_results const* results, unsigned idx)
+struct imm_result const* imm_results_get(struct imm_results const* results, uint16_t idx)
 {
     return results->result[idx];
 }
 
-void imm_results_set(struct imm_results* results, unsigned idx, struct imm_subseq subseq,
+void imm_results_set(struct imm_results* results, uint16_t idx, struct imm_subseq subseq,
                      struct imm_path const* path, imm_float seconds)
 {
     results->result[idx]->path = path;
@@ -67,4 +67,4 @@ void imm_results_set(struct imm_results* results, unsigned idx, struct imm_subse
     results->result[idx]->seconds = seconds;
 }
 
-unsigned imm_results_size(struct imm_results const* results) { return results->nresults; }
+uint16_t imm_results_size(struct imm_results const* results) { return results->nresults; }
