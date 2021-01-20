@@ -11,7 +11,7 @@ imm_float perf_1thread_viterbi(double* seconds, uint16_t ncore_nodes, uint16_t s
 
 int main(void)
 {
-    imm_float const scores[] = {
+    imm_float const logliks[] = {
         -394.3122885464,    -3943.1228854637,   -7886.2457709276,   -11829.3686563895,
         -15772.4915418512,  -19715.6144273129,  -23658.7373127746,  -27601.8601982363,
         -31544.9830836981,  -35488.1059691598,  -39431.2288546215,  -1681.8626184936,
@@ -27,15 +27,15 @@ int main(void)
 
     uint16_t ncore_nodes[] = {100, 500, 1000};
     uint16_t seq_100len[] = {1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
-    for (unsigned i = 0; i < 3; ++i) {
+    for (unsigned i = 0; i < IMM_ARRAY_SIZE(ncore_nodes); ++i) {
         for (unsigned j = 0; j < IMM_ARRAY_SIZE(seq_100len); ++j) {
             uint16_t  len = seq_100len[j];
             double    seconds[NSAMPLES] = {0.};
-            imm_float score = perf_1thread_viterbi(seconds, ncore_nodes[i], len);
-            cass_close(score, scores[i * IMM_ARRAY_SIZE(seq_100len) + j]);
+            imm_float loglik = perf_1thread_viterbi(seconds, ncore_nodes[i], len);
+            cass_close(loglik, logliks[i * IMM_ARRAY_SIZE(seq_100len) + j]);
             struct stats stats = compute_stats(seconds, NSAMPLES);
             char const   fmt[] = "%d,%d,%.6f,%.6f,%.6f,1thread_viterbi\n";
-            printf(fmt, ncore_nodes[i], len * 100, stats.median, stats.sem, score);
+            printf(fmt, ncore_nodes[i], len * 100, stats.median, stats.sem, loglik);
         }
     }
     return 0;
@@ -146,15 +146,15 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
     struct imm_seq const* seq = imm_seq_create(str, abc);
     struct imm_dp const*  dp = imm_hmm_create_dp(hmm, imm_mute_state_super(end));
 
-    imm_float score = 0.0;
+    imm_float loglik = 0.0;
     for (unsigned i = 0; i < NSAMPLES; ++i) {
         struct imm_results const* results = imm_dp_viterbi(dp, seq, 0);
         cass_cond(imm_results_size(results) == 1);
         struct imm_result const* r = imm_results_get(results, 0);
         struct imm_subseq        subseq = imm_result_subseq(r);
         struct imm_seq const*    s = imm_subseq_cast(&subseq);
-        score = imm_hmm_likelihood(hmm, s, imm_result_path(r));
-        cass_cond(is_valid(score) && !is_zero(score));
+        loglik = imm_hmm_likelihood(hmm, s, imm_result_path(r));
+        cass_cond(is_valid(loglik) && !is_zero(loglik));
         seconds[i] = imm_result_seconds(r);
         imm_results_destroy(results);
     }
@@ -176,5 +176,5 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
     imm_seq_destroy(seq);
     free((void*)str);
 
-    return score;
+    return loglik;
 }
