@@ -22,6 +22,8 @@ IMM_API void                     imm_results_free(struct imm_results const* resu
 IMM_API struct imm_result const* imm_results_get(struct imm_results const* results, uint16_t idx);
 IMM_API void imm_results_set(struct imm_results* results, uint16_t idx, struct imm_subseq subseq,
                              struct imm_path const* path, imm_float seconds);
-IMM_API uint16_t imm_results_size(struct imm_results const* results);
+IMM_API void imm_results_set_elapsed(struct imm_results* results, imm_float seconds);
+IMM_API imm_float imm_results_seconds(struct imm_results const* results);
+IMM_API uint16_t  imm_results_size(struct imm_results const* results);
 
 #endif

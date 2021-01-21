@@ -119,6 +119,8 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
     uint_fast16_t            nwindows = imm_window_size(window);
     struct imm_results*      results = imm_results_create(seq, nwindows);
 
+    struct elapsed elapsed_total = elapsed_init();
+    elapsed_start(&elapsed_total);
     _Pragma("omp parallel if(nwindows > 1)")
     {
         if (!dp->tasks[thread_id()].matrix)
@@ -139,6 +141,8 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
             imm_results_set(results, i, subseq, path, elapsed_seconds(&elapsed));
         }
     }
+    elapsed_end(&elapsed_total);
+    imm_results_set_elapsed(results, elapsed_seconds(&elapsed_total));
     imm_window_destroy(window);
 
     return results;

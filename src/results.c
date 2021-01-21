@@ -14,6 +14,7 @@ struct imm_result
 struct imm_results
 {
     struct imm_seq const* seq;
+    imm_float             seconds;
     uint16_t              nresults;
     struct imm_result*    result[];
 };
@@ -66,5 +67,12 @@ void imm_results_set(struct imm_results* results, uint16_t idx, struct imm_subse
     results->result[idx]->subseq = subseq;
     results->result[idx]->seconds = seconds;
 }
+
+void imm_results_set_elapsed(struct imm_results* results, imm_float seconds)
+{
+    results->seconds = seconds;
+}
+
+imm_float imm_results_seconds(struct imm_results const* results) { return results->seconds; }
 
 uint16_t imm_results_size(struct imm_results const* results) { return results->nresults; }
