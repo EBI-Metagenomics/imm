@@ -11,7 +11,7 @@
  */
 
 struct imm_abc;
-struct imm_hmm_block;
+struct imm_model;
 struct imm_mute_state;
 struct imm_state;
 
@@ -21,7 +21,7 @@ IMM_API struct imm_mute_state const* imm_mute_state_derived(struct imm_state con
 IMM_API void                         imm_mute_state_destroy(struct imm_mute_state const* state);
 IMM_API struct imm_state const*      imm_mute_state_read(FILE* stream, struct imm_abc const* abc);
 IMM_API struct imm_state const*      imm_mute_state_super(struct imm_mute_state const* state);
-IMM_API int                          imm_mute_state_write(struct imm_state const*     state,
-                                                          struct imm_hmm_block const* hmm_block, FILE* stream);
+IMM_API int imm_mute_state_write(struct imm_state const* state, struct imm_model const* model,
+                                 FILE* stream);
 
 #endif

@@ -83,7 +83,7 @@ static uint8_t min_seq(struct imm_state const* state)
 
 static uint8_t type_id(struct imm_state const* state) { return IMM_TABLE_STATE_TYPE_ID; }
 
-int imm_table_state_write(struct imm_state const* state, struct imm_hmm_block const* hmm_block,
+int imm_table_state_write(struct imm_state const* state, struct imm_model const* model,
                           FILE* stream)
 {
     imm_die("table_state write is not implemented yet");
