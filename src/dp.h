@@ -8,10 +8,19 @@ struct dp_emission;
 struct dp_state_table;
 struct dp_trans_table;
 struct imm_abc;
-struct imm_dp;
 struct imm_model;
 struct imm_state;
 struct model_state;
+
+struct imm_dp
+{
+    struct model_state const* const* mstates;
+    struct seq_code const*           seq_code;
+    struct state_idx*                state_idx;
+    struct dp_emission const*        emission;
+    struct dp_trans_table*           trans_table;
+    struct dp_state_table const*     state_table;
+};
 
 struct imm_dp*            dp_create(struct imm_abc const* abc, struct model_state const** mstates,
                                     uint16_t nstates, struct imm_state const* end_state);

@@ -35,6 +35,7 @@ add_library(imm
     src/dp_emission.c
     src/dp_matrix.c
     src/dp_state_table.c
+    src/dp_task.c
     src/dp_trans_table.c
     src/eseq.c
     src/hmm.c

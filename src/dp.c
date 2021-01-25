@@ -3,11 +3,13 @@
 #include "dp_emission.h"
 #include "dp_matrix.h"
 #include "dp_state_table.h"
+#include "dp_task.h"
 #include "dp_trans_table.h"
 #include "elapsed/elapsed.h"
 #include "free.h"
 #include "imm/bug.h"
 #include "imm/dp.h"
+#include "imm/dp_task.h"
 #include "imm/float.h"
 #include "imm/hmm.h"
 #include "imm/lprob.h"
@@ -31,24 +33,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-struct task
-{
-    struct dp_matrix* matrix;
-    struct eseq*      eseq;
-};
-
-struct imm_dp
-{
-    struct model_state const* const* mstates;
-    struct seq_code const*           seq_code;
-    struct state_idx*                state_idx;
-    struct dp_emission const*        emission;
-    struct dp_trans_table*           trans_table;
-    struct dp_state_table const*     state_table;
-    unsigned                         ntasks;
-    struct task*                     tasks;
-};
-
 struct final_score
 {
     score_t       score;
@@ -62,20 +46,15 @@ static inline struct final_score best_trans_score(struct imm_dp const*    dp,
 static inline struct final_score best_trans_score_first_row(struct imm_dp const*    dp,
                                                             struct dp_matrix const* matrix,
                                                             uint_fast16_t           tgt_state);
-static void                      create_tasks(struct imm_dp* dp);
-static struct final_score        final_score(struct imm_dp const* dp, struct task* task);
+static struct final_score        final_score(struct imm_dp const* dp, struct imm_dp_task* task);
 static uint_fast8_t max_seq(struct model_state const* const* mstates, uint16_t nstates);
 static uint_fast8_t min_seq(struct model_state const* const* mstates, uint16_t nstates);
-static inline void  set_score(struct imm_dp const* dp, struct task* task, score_t trans_score,
-                              uint_fast8_t min_len, uint_fast8_t max_len, uint_fast16_t row,
-                              uint_fast16_t state);
-static void         task_create(struct task* task, struct dp_state_table const* state_table,
-                                struct seq_code const* seq_code);
-static void         task_destroy(struct task* task);
-static inline void  task_setup(struct task* task, struct imm_seq const* seq);
-static void         viterbi(struct imm_dp const* dp, struct task* task, struct imm_path* path);
-static void viterbi_path(struct imm_dp const* dp, struct task const* task, struct imm_path* path,
-                         uint_fast16_t end_state, uint_fast8_t end_seq_len);
+static inline void set_score(struct imm_dp const* dp, struct imm_dp_task* task, score_t trans_score,
+                             uint_fast8_t min_len, uint_fast8_t max_len, uint_fast16_t row,
+                             uint_fast16_t state);
+static void viterbi(struct imm_dp const* dp, struct imm_dp_task* task, struct imm_path* path);
+static void viterbi_path(struct imm_dp const* dp, struct imm_dp_task const* task,
+                         struct imm_path* path, uint_fast16_t end_state, uint_fast8_t end_seq_len);
 
 void imm_dp_destroy(struct imm_dp const* dp)
 {
@@ -85,13 +64,6 @@ void imm_dp_destroy(struct imm_dp const* dp)
     dp_emission_destroy(dp->emission);
     dp_trans_table_destroy(dp->trans_table);
     dp_state_table_destroy(dp->state_table);
-
-    for (unsigned i = 0; i < dp->ntasks; ++i) {
-        if (dp->tasks[i].matrix)
-            task_destroy(dp->tasks + i);
-    }
-
-    free_c(dp->tasks);
     free_c(dp);
 }
 
@@ -121,14 +93,13 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
 
     struct elapsed elapsed_total = elapsed_init();
     elapsed_start(&elapsed_total);
-    if (!dp->tasks[thread_id()].matrix)
-        task_create(dp->tasks + thread_id(), dp->state_table, dp->seq_code);
+    /* FIXME: receive it instead of creating it here */
+    struct imm_dp_task* task = imm_dp_task_create(dp);
 
     for (uint_fast16_t i = 0; i < nwindows; ++i) {
         struct imm_subseq const subseq = imm_window_get(window, i);
-        struct task*            task = dp->tasks + thread_id();
 
-        task_setup(task, imm_subseq_cast(&subseq));
+        imm_dp_task_setup(task, imm_subseq_cast(&subseq));
 
         struct imm_path* path = imm_path_create();
         struct elapsed   elapsed = elapsed_init();
@@ -140,6 +111,7 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
     elapsed_end(&elapsed_total);
     imm_results_set_elapsed(results, elapsed_seconds(&elapsed_total));
     imm_window_destroy(window);
+    imm_dp_task_destroy(task);
 
     return results;
 }
@@ -185,8 +157,6 @@ struct imm_dp* dp_create(struct imm_abc const* abc, struct model_state const** m
     dp->emission = dp_emission_create(dp->seq_code, mstates, nstates);
     dp->trans_table = dp_trans_table_create(mstates, nstates, dp->state_idx);
 
-    create_tasks(dp);
-
     return dp;
 }
 
@@ -203,8 +173,6 @@ void dp_create_from_model(struct imm_model* model)
     dp->state_idx = state_idx_create();
     for (uint16_t i = 0; i < dp_state_table_nstates(dp->state_table); ++i)
         state_idx_add(dp->state_idx, dp->mstates[i]->state, i);
-
-    create_tasks(dp);
 
     model->dp = dp;
 }
@@ -284,18 +252,7 @@ static inline struct final_score best_trans_score_first_row(struct imm_dp const*
     return (struct final_score){score, prev_state, prev_seq_len};
 }
 
-static void create_tasks(struct imm_dp* dp)
-{
-    dp->ntasks = thread_max_size();
-    dp->tasks = malloc(sizeof(*dp->tasks) * dp->ntasks);
-
-    for (unsigned i = 0; i < dp->ntasks; ++i) {
-        dp->tasks[i].matrix = NULL;
-        dp->tasks[i].eseq = NULL;
-    }
-}
-
-static struct final_score final_score(struct imm_dp const* dp, struct task* task)
+static struct final_score final_score(struct imm_dp const* dp, struct imm_dp_task* task)
 {
     score_t       score = (score_t)imm_lprob_zero();
     uint_fast16_t end_state = dp_state_table_end_state(dp->state_table);
@@ -343,7 +300,7 @@ static uint_fast8_t min_seq(struct model_state const* const* mstates, uint16_t n
     return min;
 }
 
-static inline void set_score(struct imm_dp const* dp, struct task* task, score_t trans_score,
+static inline void set_score(struct imm_dp const* dp, struct imm_dp_task* task, score_t trans_score,
                              uint_fast8_t min_len, uint_fast8_t max_len, uint_fast16_t row,
                              uint_fast16_t state)
 {
@@ -357,33 +314,16 @@ static inline void set_score(struct imm_dp const* dp, struct task* task, score_t
     }
 }
 
-static void task_create(struct task* task, struct dp_state_table const* state_table,
-                        struct seq_code const* seq_code)
-{
-    task->matrix = dp_matrix_create(state_table);
-    task->eseq = seq_code_create_eseq(seq_code);
-}
+static void _viterbi_first_row(struct imm_dp const* dp, struct imm_dp_task* task,
+                               uint_fast16_t remain);
+static void _viterbi_first_row_safe(struct imm_dp const* dp, struct imm_dp_task* task);
+static void _viterbi(struct imm_dp const* dp, struct imm_dp_task* task,
+                     uint_fast16_t const start_row, uint_fast16_t const stop_row);
+static void _viterbi_safe(struct imm_dp const* dp, struct imm_dp_task* task,
+                          uint_fast16_t const start_row, uint_fast16_t const stop_row);
 
-static void task_destroy(struct task* task)
-{
-    dp_matrix_destroy(task->matrix);
-    eseq_destroy(task->eseq);
-}
-
-static inline void task_setup(struct task* task, struct imm_seq const* seq)
-{
-    eseq_setup(task->eseq, seq);
-    dp_matrix_setup(task->matrix, task->eseq);
-}
-
-static void _viterbi_first_row(struct imm_dp const* dp, struct task* task, uint_fast16_t remain);
-static void _viterbi_first_row_safe(struct imm_dp const* dp, struct task* task);
-static void _viterbi(struct imm_dp const* dp, struct task* task, uint_fast16_t const start_row,
-                     uint_fast16_t const stop_row);
-static void _viterbi_safe(struct imm_dp const* dp, struct task* task, uint_fast16_t const start_row,
-                          uint_fast16_t const stop_row);
-
-static void _viterbi_first_row(struct imm_dp const* dp, struct task* task, uint_fast16_t remain)
+static void _viterbi_first_row(struct imm_dp const* dp, struct imm_dp_task* task,
+                               uint_fast16_t remain)
 {
     for (uint_fast16_t i = 0; i < dp_state_table_nstates(dp->state_table); ++i) {
 
@@ -399,7 +339,7 @@ static void _viterbi_first_row(struct imm_dp const* dp, struct task* task, uint_
     }
 }
 
-static void _viterbi_first_row_safe(struct imm_dp const* dp, struct task* task)
+static void _viterbi_first_row_safe(struct imm_dp const* dp, struct imm_dp_task* task)
 {
     for (uint_fast16_t i = 0; i < dp_state_table_nstates(dp->state_table); ++i) {
 
@@ -414,8 +354,8 @@ static void _viterbi_first_row_safe(struct imm_dp const* dp, struct task* task)
     }
 }
 
-static void _viterbi(struct imm_dp const* dp, struct task* task, uint_fast16_t const start_row,
-                     uint_fast16_t const stop_row)
+static void _viterbi(struct imm_dp const* dp, struct imm_dp_task* task,
+                     uint_fast16_t const start_row, uint_fast16_t const stop_row)
 {
     for (uint_fast16_t r = start_row; r <= stop_row; ++r) {
 
@@ -433,8 +373,8 @@ static void _viterbi(struct imm_dp const* dp, struct task* task, uint_fast16_t c
     }
 }
 
-static void _viterbi_safe(struct imm_dp const* dp, struct task* task, uint_fast16_t const start_row,
-                          uint_fast16_t const stop_row)
+static void _viterbi_safe(struct imm_dp const* dp, struct imm_dp_task* task,
+                          uint_fast16_t const start_row, uint_fast16_t const stop_row)
 {
     for (uint_fast16_t r = start_row; r <= stop_row; ++r) {
 
@@ -451,7 +391,7 @@ static void _viterbi_safe(struct imm_dp const* dp, struct task* task, uint_fast1
     }
 }
 
-static void viterbi(struct imm_dp const* dp, struct task* task, struct imm_path* path)
+static void viterbi(struct imm_dp const* dp, struct imm_dp_task* task, struct imm_path* path)
 {
     uint_fast16_t const len = eseq_length(task->eseq);
 
@@ -468,8 +408,8 @@ static void viterbi(struct imm_dp const* dp, struct task* task, struct imm_path*
     viterbi_path(dp, task, path, fscore.state, fscore.seq_len);
 }
 
-static void viterbi_path(struct imm_dp const* dp, struct task const* task, struct imm_path* path,
-                         uint_fast16_t end_state, uint_fast8_t end_seq_len)
+static void viterbi_path(struct imm_dp const* dp, struct imm_dp_task const* task,
+                         struct imm_path* path, uint_fast16_t end_state, uint_fast8_t end_seq_len)
 {
     uint_fast16_t row = eseq_length(task->eseq);
     uint_fast16_t state = end_state;
