@@ -3,10 +3,9 @@
 
 #include "dp.h"
 #include "dp_state_table.h"
-#include "dp_step.h"
 #include "eseq.h"
-#include "matrixd.h"
-#include "step_matrix.h"
+#include "matrix.h"
+#include "score.h"
 #include <inttypes.h>
 
 struct imm_dp;
@@ -15,48 +14,58 @@ struct imm_seq;
 struct dp_matrix
 {
     struct dp_state_table const* states;
-    struct matrixd*              score;
-    struct step_matrix*          prev_step;
-    int32_t*                     state_col;
-    uint32_t                     nstates;
+    struct matrixs*              score;
+    struct matrixu16*            prev_state;
+    struct matrixu8*             prev_seq_len;
+    int16_t*                     state_col;
+    uint16_t                     nstates;
 };
 
-struct dp_matrix*                   dp_matrix_create(struct dp_state_table const* states);
-void                                dp_matrix_destroy(struct dp_matrix const* matrix);
-static inline struct dp_step*       dp_matrix_get_prev_step(struct dp_matrix const* dp_matrix,
-                                                            unsigned row, uint32_t state);
-static inline struct dp_step const* dp_matrix_get_prev_step_c(struct dp_matrix const* dp_matrix,
-                                                              unsigned row, uint32_t state);
-static inline double dp_matrix_get_score(struct dp_matrix const* dp_matrix, unsigned row,
-                                         struct dp_step step);
-static inline void   dp_matrix_set_score(struct dp_matrix const* dp_matrix, unsigned row,
-                                         struct dp_step step, double score);
-void                 dp_matrix_setup(struct dp_matrix* matrix, struct eseq const* eseq);
+#define INVALID_STATE UINT16_MAX
+#define INVALID_SEQ_LEN UINT8_MAX
 
-static inline struct dp_step* dp_matrix_get_prev_step(struct dp_matrix const* dp_matrix,
-                                                      unsigned row, uint32_t state)
+struct dp_matrix*     dp_matrix_create(struct dp_state_table const* states);
+void                  dp_matrix_destroy(struct dp_matrix const* matrix);
+static inline void    dp_matrix_get_prev_step(struct dp_matrix const* dp_matrix, uint_fast16_t row,
+                                              uint_fast16_t state, uint_fast16_t* step_state,
+                                              uint_fast8_t* step_seq_len);
+static inline void    dp_matrix_set_prev_step(struct dp_matrix const* dp_matrix, uint_fast16_t row,
+                                              uint_fast16_t state, uint_fast16_t step_state,
+                                              uint_fast8_t step_seq_len);
+static inline score_t dp_matrix_get_score(struct dp_matrix const* dp_matrix, uint_fast16_t row,
+                                          uint_fast16_t state, uint_fast8_t seq_len);
+static inline void    dp_matrix_set_score(struct dp_matrix const* dp_matrix, uint_fast16_t row,
+                                          uint_fast16_t state, uint_fast8_t seq_len, score_t score);
+void                  dp_matrix_setup(struct dp_matrix* matrix, struct eseq const* eseq);
+
+static inline void dp_matrix_get_prev_step(struct dp_matrix const* dp_matrix, uint_fast16_t row,
+                                           uint_fast16_t state, uint_fast16_t* step_state,
+                                           uint_fast8_t* step_seq_len)
 {
-    return step_matrix_get_ptr(dp_matrix->prev_step, row, state);
+    *step_state = matrixu16_get(dp_matrix->prev_state, row, state);
+    *step_seq_len = matrixu8_get(dp_matrix->prev_seq_len, row, state);
 }
 
-static inline struct dp_step const* dp_matrix_get_prev_step_c(struct dp_matrix const* dp_matrix,
-                                                              unsigned row, uint32_t state)
+static inline void dp_matrix_set_prev_step(struct dp_matrix const* dp_matrix, uint_fast16_t row,
+                                           uint_fast16_t state, uint_fast16_t step_state,
+                                           uint_fast8_t step_seq_len)
 {
-    return step_matrix_get_ptr_c(dp_matrix->prev_step, row, state);
+    matrixu16_set(dp_matrix->prev_state, row, state, (uint16_t)step_state);
+    matrixu8_set(dp_matrix->prev_seq_len, row, state, (uint8_t)step_seq_len);
 }
 
-static inline double dp_matrix_get_score(struct dp_matrix const* dp_matrix, unsigned row,
-                                         struct dp_step step)
+static inline score_t dp_matrix_get_score(struct dp_matrix const* dp_matrix, uint_fast16_t row,
+                                          uint_fast16_t state, uint_fast8_t seq_len)
 {
-    unsigned col = (unsigned)(dp_matrix->state_col[step.state] + (int)step.seq_len);
-    return matrixd_get(dp_matrix->score, row, col);
+    uint_fast16_t col = (uint_fast16_t)(dp_matrix->state_col[state] + (int_fast16_t)seq_len);
+    return matrixs_get(dp_matrix->score, row, col);
 }
 
-static inline void dp_matrix_set_score(struct dp_matrix const* dp_matrix, unsigned row,
-                                       struct dp_step step, double score)
+static inline void dp_matrix_set_score(struct dp_matrix const* dp_matrix, uint_fast16_t row,
+                                       uint_fast16_t state, uint_fast8_t seq_len, score_t score)
 {
-    unsigned col = (unsigned)(dp_matrix->state_col[step.state] + (int)step.seq_len);
-    matrixd_set(dp_matrix->score, row, col, score);
+    uint_fast16_t col = (uint_fast16_t)(dp_matrix->state_col[state] + (int_fast16_t)seq_len);
+    matrixs_set(dp_matrix->score, row, col, score);
 }
 
 #endif

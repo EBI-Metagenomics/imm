@@ -7,7 +7,7 @@
 struct item
 {
     struct imm_state const* state;
-    uint32_t                idx;
+    uint_fast16_t           idx;
 };
 
 KHASH_MAP_INIT_PTR(item, struct item*)
@@ -17,7 +17,7 @@ struct state_idx
     khash_t(item) * table;
 };
 
-void state_idx_add(struct state_idx* state_idx, struct imm_state const* state, uint32_t idx)
+void state_idx_add(struct state_idx* state_idx, struct imm_state const* state, uint_fast16_t idx)
 {
     int      ret = 0;
     khiter_t iter = kh_put(item, state_idx->table, state, &ret);
@@ -49,9 +49,9 @@ void state_idx_destroy(struct state_idx* state_idx)
     free_c(state_idx);
 }
 
-uint32_t state_idx_find(struct state_idx const* state_idx, struct imm_state const* state)
+uint_fast16_t state_idx_find(struct state_idx const* state_idx, struct imm_state const* state)
 {
     khiter_t i = kh_get(item, state_idx->table, state);
     IMM_BUG(i == kh_end(state_idx->table));
-    return kh_val(state_idx->table, i)->idx;
+    return (uint_fast16_t)kh_val(state_idx->table, i)->idx;
 }

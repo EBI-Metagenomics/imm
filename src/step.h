@@ -7,7 +7,7 @@
 struct imm_step
 {
     struct imm_state const* state;
-    unsigned                seq_len;
+    uint8_t                 seq_len;
     struct list_head        list_entry;
 };
 

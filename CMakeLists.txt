@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
-project(imm VERSION 0.0.9 LANGUAGES C)
+project(imm VERSION 0.0.10 LANGUAGES C)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
@@ -21,6 +21,7 @@ if(CMAKE_VERSION VERSION_GREATER 3.12.0)
 endif()
 
 find_package(logaddexp REQUIRED)
+find_package(elapsed REQUIRED)
 option(OPENMP "Enable OpenMP" On)
 if(OPENMP)
     find_package(OpenMP)
@@ -39,11 +40,11 @@ add_library(imm
     src/hmm.c
     src/input.c
     src/model.c
-    src/mstate.c
-    src/mstate_sort.c
-    src/mstate_table.c
-    src/mtrans.c
-    src/mtrans_table.c
+    src/model_state.c
+    src/model_state_sort.c
+    src/model_state_table.c
+    src/model_trans.c
+    src/model_trans_table.c
     src/mute_state.c
     src/normal_state.c
     src/output.c
@@ -75,9 +76,16 @@ if(${CMAKE_C_COMPILER_ID} MATCHES "MSVC")
 else()
     set(WARNING_FLAGS -Wall -Wextra -pedantic -Wstrict-prototypes -Wshadow
         -Wconversion -Wmissing-prototypes -Wno-unused-parameter -Wsign-conversion
-        -Wno-unused-function # TODO: added only to please clangd for now
-        -Wno-empty-translation-unit # TODO: added only to please clangd for now
+        -Wno-unused-function # FIXME: added only to please clangd for now
+        -Wno-empty-translation-unit # FIXME: added only to please clangd for now
     )
+endif()
+
+option(IMM_DOUBLE_PRECISION "Enable double-precision floating-point format for internals" Off)
+if(IMM_DOUBLE_PRECISION)
+    message(STATUS "Double-precision floating-point format for internals - On")
+else()
+    message(STATUS "Double-precision floating-point format for internals - Off")
 endif()
 
 target_include_directories(imm
@@ -89,6 +97,7 @@ target_include_directories(imm
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 target_link_libraries(imm PUBLIC LOGADDEXP::logaddexp)
+target_link_libraries(imm PUBLIC ELAPSED::elapsed)
 target_link_libraries(imm PRIVATE $<$<BOOL:${OpenMP_C_FOUND}>:OpenMP::OpenMP_C>)
 set_target_properties(imm PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
@@ -96,7 +105,9 @@ target_compile_features(imm PRIVATE c_std_11)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRECATE>)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:__extension__>)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${OpenMP_C_FOUND}>:OPENMP>)
+target_compile_definitions(imm PRIVATE $<$<BOOL:${IMM_DOUBLE_PRECISION}>:IMM_DOUBLE_PRECISION>)
 target_compile_options(imm PRIVATE ${WARNING_FLAGS})
+target_compile_options(imm PRIVATE "-fverbose-asm")
 target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
 
 include(CheckCSourceCompiles)
@@ -108,6 +119,13 @@ check_c_source_compiles(
     HAVE_ATTR_FORMAT
 )
 target_compile_definitions(imm PRIVATE $<$<BOOL:${HAVE_ATTR_FORMAT}>:HAVE_ATTR_FORMAT>)
+
+include(CheckTypeSize)
+check_type_size("intptr_t" SIZEOF_INTPTR_T)
+if(NOT HAVE_SIZEOF_INTPTR_T)
+    message(FATAL_ERROR "Could not determine the size of intptr_t.")
+endif()
+target_compile_definitions(imm PRIVATE SIZEOF_INTPTR_T=${SIZEOF_INTPTR_T})
 
 install(TARGETS imm EXPORT imm-targets
     RUNTIME DESTINATION bin
@@ -136,6 +154,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/imm-config.cmake
 
 enable_testing()
 add_subdirectory(test)
+add_subdirectory(perf)
 
 option(COVERAGE "Enable coverage")
 if(COVERAGE)

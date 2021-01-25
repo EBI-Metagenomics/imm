@@ -7,23 +7,28 @@
 #include "imm/bug.h"
 #include "imm/seq.h"
 #include "imm/subseq.h"
-#include "matrixu.h"
+#include "matrix.h"
 #include <limits.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 struct seq_code_chunk
 {
     uint8_t   min_seq;
     uint8_t   max_seq;
-    uint32_t* offset;
-    uint32_t* stride;
-    uint32_t  size;
+    uint16_t* offset;
+    uint16_t* stride;
+    uint16_t  size;
 };
 
-static inline uint8_t offset_size(struct seq_code const* seq_code);
-static inline uint8_t stride_size(struct seq_code const* seq_code) { return seq_code->max_seq; }
+static inline uint_fast8_t offset_size(struct seq_code const* seq_code);
+static inline uint_fast8_t stride_size(struct seq_code const* seq_code)
+{
+    return seq_code->max_seq;
+}
 
-struct seq_code const* seq_code_create(struct imm_abc const* abc, uint8_t min_seq, uint8_t max_seq)
+struct seq_code const* seq_code_create(struct imm_abc const* abc, uint_fast8_t min_seq,
+                                       uint_fast8_t max_seq)
 {
     IMM_BUG(min_seq > max_seq);
     struct seq_code* seq_code = malloc(sizeof(*seq_code));
@@ -40,13 +45,13 @@ struct seq_code const* seq_code_create(struct imm_abc const* abc, uint8_t min_se
     }
 
     if (max_seq > 1) {
-        for (unsigned len = max_seq - 2; 1 <= len + 1; --len)
+        for (unsigned len = (unsigned)(max_seq - 2); 1 <= len + 1; --len)
             seq_code->stride[len] = seq_code->stride[len + 1] * imm_abc_length(abc);
     }
 
     seq_code->offset = malloc(sizeof(*seq_code->offset) * offset_size(seq_code));
     seq_code->offset[0] = 0;
-    for (unsigned len = min_seq + 1; len <= max_seq; ++len) {
+    for (unsigned len = (unsigned)(min_seq + 1); len <= max_seq; ++len) {
 
         unsigned i = len - min_seq;
         seq_code->offset[i] = seq_code->offset[i - 1] + seq_code->stride[max_seq - (len - 1) - 1];
@@ -54,18 +59,19 @@ struct seq_code const* seq_code_create(struct imm_abc const* abc, uint8_t min_se
 
     unsigned long ncombs = ipow(imm_abc_length(abc), max_seq);
 
-    seq_code->size = seq_code->offset[max_seq - min_seq] + cast_ul_u32(ncombs);
+    seq_code->size = seq_code->offset[max_seq - min_seq] + cast_ul_u16(ncombs);
 
     return seq_code;
 }
 
-unsigned seq_code_encode(struct seq_code const* seq_code, struct imm_seq const* seq)
+uint_fast16_t seq_code_encode(struct seq_code const* seq_code, struct imm_seq const* seq)
 {
-    uint32_t code = seq_code->offset[imm_seq_length(seq) - seq_code->min_seq];
-    for (unsigned i = 0; i < imm_seq_length(seq); ++i) {
+    uint_fast16_t code = seq_code->offset[imm_seq_length(seq) - seq_code->min_seq];
+    uint_fast8_t  len = (uint_fast8_t)imm_seq_length(seq);
+    for (uint_fast8_t i = 0; i < len; ++i) {
 
-        unsigned j = imm_abc_symbol_idx(seq_code->abc, imm_seq_string(seq)[i]);
-        unsigned offset = seq_code->max_seq - imm_seq_length(seq);
+        uint_fast8_t j = imm_abc_symbol_idx(seq_code->abc, imm_seq_string(seq)[i]);
+        uint_fast8_t offset = (uint_fast8_t)(seq_code->max_seq - len);
         code += seq_code->stride[i + offset] * j;
     }
 
@@ -76,7 +82,7 @@ struct eseq* seq_code_create_eseq(struct seq_code const* seq_code)
 {
     struct eseq* eseq = malloc(sizeof(*eseq));
     eseq->seq_code = seq_code;
-    eseq->code = matrixu_create(1, seq_code->max_seq - seq_code->min_seq + 1);
+    eseq->code = matrixu16_create(1, (uint_fast16_t)(seq_code->max_seq - seq_code->min_seq + 1));
     return eseq;
 }
 
@@ -188,7 +194,7 @@ err:
     return NULL;
 }
 
-static inline uint8_t offset_size(struct seq_code const* seq_code)
+static inline uint_fast8_t offset_size(struct seq_code const* seq_code)
 {
-    return seq_code->max_seq - seq_code->min_seq + 1;
+    return (uint_fast8_t)(seq_code->max_seq - seq_code->min_seq + 1);
 }

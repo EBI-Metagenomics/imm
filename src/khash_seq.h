@@ -3,7 +3,7 @@
 
 #include "imm/seq.h"
 #include "lib/khash.h"
-#include "min.h"
+#include "minmax.h"
 
 static inline int     seq_hash_equal(struct imm_seq const* a, struct imm_seq const* b);
 static inline khint_t seq_hash_func(struct imm_seq const* seq);

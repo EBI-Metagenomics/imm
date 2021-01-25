@@ -2,5 +2,7 @@
 
 include(CMakeFindDependencyMacro)
 find_dependency(logaddexp)
+find_dependency(elapsed)
 include("${CMAKE_CURRENT_LIST_DIR}/imm-targets.cmake")
 check_required_components(logaddexp)
+check_required_components(elapsed)

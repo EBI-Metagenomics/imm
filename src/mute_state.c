@@ -10,11 +10,11 @@ struct imm_mute_state
     struct imm_state const* super;
 };
 
-static void    destroy(struct imm_state const* state);
-static double  lprob(struct imm_state const* state, struct imm_seq const* seq);
-static uint8_t max_seq(struct imm_state const* state);
-static uint8_t min_seq(struct imm_state const* state);
-static uint8_t type_id(struct imm_state const* state);
+static void      destroy(struct imm_state const* state);
+static imm_float lprob(struct imm_state const* state, struct imm_seq const* seq);
+static uint8_t   max_seq(struct imm_state const* state);
+static uint8_t   min_seq(struct imm_state const* state);
+static uint8_t   type_id(struct imm_state const* state);
 
 static struct imm_state_vtable const __vtable = {destroy, lprob, max_seq, min_seq, type_id};
 
@@ -73,10 +73,10 @@ static void destroy(struct imm_state const* state)
     __imm_state_destroy(state);
 }
 
-static double lprob(struct imm_state const* state, struct imm_seq const* seq)
+static imm_float lprob(struct imm_state const* state, struct imm_seq const* seq)
 {
     if (imm_seq_length(seq) == 0)
-        return 0.;
+        return (imm_float)0.;
     return imm_lprob_zero();
 }
 

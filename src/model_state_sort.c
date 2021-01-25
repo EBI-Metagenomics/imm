@@ -1,4 +1,4 @@
-#include "mstate_sort.h"
+#include "model_state_sort.h"
 #include "free.h"
 #include "imm/bug.h"
 #include "imm/lprob.h"
@@ -6,9 +6,9 @@
 #include "imm/state.h"
 #include "khash_ptr.h"
 #include "list.h"
-#include "mstate.h"
-#include "mtrans.h"
-#include "mtrans_table.h"
+#include "model_state.h"
+#include "model_trans.h"
+#include "model_trans_table.h"
 
 #define INITIAL_MARK 0
 #define TEMPORARY_MARK 1
@@ -16,11 +16,11 @@
 
 struct node
 {
-    struct imm_state const* state;
-    struct mstate const*    mstate;
-    int                     mark;
-    struct list_head        edge_list;
-    struct list_head        list_entry;
+    struct imm_state const*   state;
+    struct model_state const* mstate;
+    int                       mark;
+    struct list_head          edge_list;
+    struct list_head          list_entry;
 };
 
 struct edge
@@ -34,21 +34,21 @@ KHASH_MAP_INIT_PTR(node, struct node*)
 static int        check_mute_cycles(struct list_head* node_list);
 static int        check_mute_visit(struct node* node);
 static void       create_edges(struct list_head* node_list, khash_t(node) * table);
-static void       create_nodes(struct mstate const** mstates, uint32_t nstates,
+static void       create_nodes(struct model_state const** mstates, uint32_t nstates,
                                struct list_head* node_list, khash_t(node) * node_table);
 static void       destroy_edges(struct list_head* edges);
 static void       destroy_node(struct node* node);
 static void       destroy_node_list(struct list_head* node_list);
 static inline int name_compare(void const* a, void const* b);
 static void       unmark_nodes(struct list_head* node_list);
-static void       visit(struct node* node, struct mstate const*** mstate);
+static void       visit(struct node* node, struct model_state const*** mstate);
 
-void mstate_name_sort(struct mstate const** mstates, uint32_t nstates)
+void model_state_name_sort(struct model_state const** mstates, uint32_t nstates)
 {
     qsort(mstates, nstates, sizeof(*mstates), name_compare);
 }
 
-int mstate_topological_sort(struct mstate const** mstates, uint32_t nstates)
+int model_state_topological_sort(struct model_state const** mstates, uint32_t nstates)
 {
     struct list_head node_list = LIST_HEAD_INIT(node_list);
     khash_t(node)* node_table = kh_init(node);
@@ -63,9 +63,9 @@ int mstate_topological_sort(struct mstate const** mstates, uint32_t nstates)
     }
     unmark_nodes(&node_list);
 
-    struct mstate const** mstate_arr = malloc(sizeof(*mstate_arr) * nstates);
-    struct mstate const** cur = mstate_arr + nstates;
-    struct node*          node = NULL;
+    struct model_state const** mstate_arr = malloc(sizeof(*mstate_arr) * nstates);
+    struct model_state const** cur = mstate_arr + nstates;
+    struct node*               node = NULL;
     list_for_each_entry (node, &node_list, list_entry) {
         visit(node, &cur);
     }
@@ -118,16 +118,16 @@ static void create_edges(struct list_head* node_list, khash_t(node) * table)
     struct node* node = NULL;
     list_for_each_entry (node, node_list, list_entry) {
 
-        struct mtrans_table const* mtrans_table = mstate_get_mtrans_table(node->mstate);
-        struct mtrans const**      mtrans = mtrans_table_array(mtrans_table);
+        struct model_trans_table const* mtrans_table = model_state_get_mtrans_table(node->mstate);
+        struct model_trans const**      mtrans = model_trans_table_array(mtrans_table);
 
-        for (uint32_t i = 0; i < mtrans_table_size(mtrans_table); ++i) {
+        for (uint32_t i = 0; i < model_trans_table_size(mtrans_table); ++i) {
 
-            struct mtrans const* t = mtrans[i];
+            struct model_trans const* t = mtrans[i];
 
             struct edge* edge = malloc(sizeof(*edge));
 
-            khiter_t iter = kh_get(node, table, mtrans_get_state(t));
+            khiter_t iter = kh_get(node, table, model_trans_get_state(t));
             IMM_BUG(iter == kh_end(table));
 
             edge->node = kh_val(table, iter);
@@ -137,19 +137,19 @@ static void create_edges(struct list_head* node_list, khash_t(node) * table)
     }
 }
 
-static void create_nodes(struct mstate const** mstates, uint32_t nstates,
+static void create_nodes(struct model_state const** mstates, uint32_t nstates,
                          struct list_head* node_list, khash_t(node) * node_table)
 {
     for (uint32_t i = 0; i < nstates; ++i) {
-        struct mstate const* mstate = mstates[i];
+        struct model_state const* mstate = mstates[i];
 
         struct node* node = malloc(sizeof(*node));
-        node->state = mstate_get_state(mstate);
+        node->state = model_state_get_state(mstate);
         node->mstate = mstate;
         node->mark = INITIAL_MARK;
 
         INIT_LIST_HEAD(&node->edge_list);
-        if (imm_lprob_is_zero(mstate_get_start(node->mstate)))
+        if (imm_lprob_is_zero(model_state_get_start(node->mstate)))
             list_add_tail(&node->list_entry, node_list);
         else
             list_add(&node->list_entry, node_list);
@@ -191,8 +191,8 @@ static void destroy_node_list(struct list_head* node_list)
 
 static inline int name_compare(void const* a, void const* b)
 {
-    char const* left = imm_state_get_name((*(struct mstate const**)a)->state);
-    char const* right = imm_state_get_name((*(struct mstate const**)b)->state);
+    char const* left = imm_state_get_name((*(struct model_state const**)a)->state);
+    char const* right = imm_state_get_name((*(struct model_state const**)b)->state);
     return strcmp(left, right);
 }
 
@@ -204,7 +204,7 @@ static void unmark_nodes(struct list_head* node_list)
     }
 }
 
-static void visit(struct node* node, struct mstate const*** mstate)
+static void visit(struct node* node, struct model_state const*** mstate)
 {
     if (node->mark == PERMANENT_MARK)
         return;

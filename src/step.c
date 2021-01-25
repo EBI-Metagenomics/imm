@@ -12,7 +12,7 @@ struct imm_step* imm_step_clone(struct imm_step const* step)
     return new_step;
 }
 
-struct imm_step* imm_step_create(struct imm_state const* state, unsigned seq_len)
+struct imm_step* imm_step_create(struct imm_state const* state, uint8_t seq_len)
 {
     if (seq_len < imm_state_min_seq(state) || imm_state_max_seq(state) < seq_len) {
         imm_error("seq_len outside the state's range");
@@ -26,6 +26,6 @@ struct imm_step* imm_step_create(struct imm_state const* state, unsigned seq_len
 
 void imm_step_destroy(struct imm_step const* step) { free_c(step); }
 
-unsigned imm_step_seq_len(struct imm_step const* step) { return step->seq_len; }
+uint8_t imm_step_seq_len(struct imm_step const* step) { return step->seq_len; }
 
 struct imm_state const* imm_step_state(struct imm_step const* step) { return step->state; }

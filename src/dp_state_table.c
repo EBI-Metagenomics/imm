@@ -2,40 +2,41 @@
 #include "cast.h"
 #include "free.h"
 #include "imm/state.h"
-#include "mstate.h"
+#include "model_state.h"
+#include "score.h"
 #include "state_idx.h"
 #include <stdlib.h>
 
 struct dp_state_table_chunk
 {
-    uint32_t nstates;
+    uint16_t nstates;
     uint8_t* min_seq;
     uint8_t* max_seq;
-    double*  start_lprob;
-    uint32_t end_state;
+    score_t* start_lprob;
+    uint16_t end_state;
 };
 
-struct dp_state_table const* dp_state_table_create(struct mstate const* const* mstates,
-                                                   uint32_t                    nstates,
+struct dp_state_table const* dp_state_table_create(struct model_state const* const* mstates,
+                                                   uint_fast16_t               nstates,
                                                    struct imm_state const*     end_state,
                                                    struct state_idx*           state_idx)
 {
     struct dp_state_table* table = malloc(sizeof(*table));
 
-    table->nstates = nstates;
+    table->nstates = (uint16_t)nstates;
 
     table->min_seq = malloc(sizeof(*table->min_seq) * nstates);
     table->max_seq = malloc(sizeof(*table->max_seq) * nstates);
     table->start_lprob = malloc(sizeof(*table->start_lprob) * nstates);
 
-    for (uint32_t i = 0; i < nstates; ++i) {
-        state_idx_add(state_idx, mstate_get_state(mstates[i]), i);
-        table->min_seq[i] = imm_state_min_seq(mstate_get_state(mstates[i]));
-        table->max_seq[i] = imm_state_max_seq(mstate_get_state(mstates[i]));
-        table->start_lprob[i] = mstate_get_start(mstates[i]);
+    for (uint_fast16_t i = 0; i < nstates; ++i) {
+        state_idx_add(state_idx, model_state_get_state(mstates[i]), i);
+        table->min_seq[i] = imm_state_min_seq(model_state_get_state(mstates[i]));
+        table->max_seq[i] = imm_state_max_seq(model_state_get_state(mstates[i]));
+        table->start_lprob[i] = (score_t)model_state_get_start(mstates[i]);
     }
 
-    table->end_state = state_idx_find(state_idx, end_state);
+    table->end_state = (uint16_t)state_idx_find(state_idx, end_state);
 
     return table;
 }
@@ -46,6 +47,15 @@ void dp_state_table_destroy(struct dp_state_table const* state_tbl)
     free_c(state_tbl->max_seq);
     free_c(state_tbl->start_lprob);
     free_c(state_tbl);
+}
+
+void dp_state_table_dump(struct dp_state_table const* state_tbl)
+{
+    printf("state,min_seq,max_seq,start_lprob\n");
+    for (uint16_t i = 0; i < state_tbl->nstates; ++i) {
+        printf("%" PRIu16 ",%" PRIu8 ",%" PRIu8 ",%f\n", i, state_tbl->min_seq[i],
+               state_tbl->max_seq[i], state_tbl->start_lprob[i]);
+    }
 }
 
 struct dp_state_table* dp_state_table_read(FILE* stream)
