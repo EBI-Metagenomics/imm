@@ -121,25 +121,21 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
 
     struct elapsed elapsed_total = elapsed_init();
     elapsed_start(&elapsed_total);
-    _Pragma("omp parallel if(nwindows > 1)")
-    {
-        if (!dp->tasks[thread_id()].matrix)
-            task_create(dp->tasks + thread_id(), dp->state_table, dp->seq_code);
+    if (!dp->tasks[thread_id()].matrix)
+        task_create(dp->tasks + thread_id(), dp->state_table, dp->seq_code);
 
-#pragma omp for
-        for (uint_fast16_t i = 0; i < nwindows; ++i) {
-            struct imm_subseq const subseq = imm_window_get(window, i);
-            struct task*            task = dp->tasks + thread_id();
+    for (uint_fast16_t i = 0; i < nwindows; ++i) {
+        struct imm_subseq const subseq = imm_window_get(window, i);
+        struct task*            task = dp->tasks + thread_id();
 
-            task_setup(task, imm_subseq_cast(&subseq));
+        task_setup(task, imm_subseq_cast(&subseq));
 
-            struct imm_path* path = imm_path_create();
-            struct elapsed   elapsed = elapsed_init();
-            elapsed_start(&elapsed);
-            viterbi(dp, task, path);
-            elapsed_end(&elapsed);
-            imm_results_set(results, i, subseq, path, elapsed_seconds(&elapsed));
-        }
+        struct imm_path* path = imm_path_create();
+        struct elapsed   elapsed = elapsed_init();
+        elapsed_start(&elapsed);
+        viterbi(dp, task, path);
+        elapsed_end(&elapsed);
+        imm_results_set(results, i, subseq, path, elapsed_seconds(&elapsed));
     }
     elapsed_end(&elapsed_total);
     imm_results_set_elapsed(results, elapsed_seconds(&elapsed_total));
