@@ -11,17 +11,17 @@ imm_float perf_multi_thread_viterbi(double* seconds, uint16_t ncore_nodes, uint1
 
 int main(void)
 {
-    imm_float const logliks[] = {
-        -394.3122885464,    -3943.1228854637,   -7886.2457709276,   -11829.3686563895,
-        -15772.4915418512,  -19715.6144273129,  -23658.7373127746,  -27601.8601982363,
-        -31544.9830836981,  -35488.1059691598,  -39431.2288546215,  -1681.8626184936,
-        -16818.6261849329,  -33637.2523698614,  -50455.8785547899,  -67274.5047397263,
-        -84093.1309247308,  -100911.7571097354, -117730.3832947399, -134549.0094797444,
-        -151367.6356647490, -168186.2618497535, -3291.3005309278,   -32913.0053092664,
-        -65826.0106185297,  -98739.0159279405,  -131652.0212373513, -164565.0265467621,
-        -197478.0318561729, -230391.0371655837, -263304.0424749735, -296217.0477837892,
-        -329130.0530926048,
-    };
+    /* imm_float const logliks[] = { */
+    /*     -394.3122885464,    -3943.1228854637,   -7886.2457709276,   -11829.3686563895, */
+    /*     -15772.4915418512,  -19715.6144273129,  -23658.7373127746,  -27601.8601982363, */
+    /*     -31544.9830836981,  -35488.1059691598,  -39431.2288546215,  -1681.8626184936, */
+    /*     -16818.6261849329,  -33637.2523698614,  -50455.8785547899,  -67274.5047397263, */
+    /*     -84093.1309247308,  -100911.7571097354, -117730.3832947399, -134549.0094797444, */
+    /*     -151367.6356647490, -168186.2618497535, -3291.3005309278,   -32913.0053092664, */
+    /*     -65826.0106185297,  -98739.0159279405,  -131652.0212373513, -164565.0265467621, */
+    /*     -197478.0318561729, -230391.0371655837, -263304.0424749735, -296217.0477837892, */
+    /*     -329130.0530926048, */
+    /* }; */
 
     printf("ncore_nodes,seq_length,median,std_err_mean,score,perf_name\n");
 
@@ -147,9 +147,10 @@ imm_float perf_multi_thread_viterbi(imm_float* seconds, uint16_t ncore_nodes,
     struct imm_seq const* seq = imm_seq_create(str, abc);
     struct imm_dp const*  dp = imm_hmm_create_dp(hmm, imm_mute_state_super(end));
 
-    imm_float loglik = 0.0;
+    imm_float           loglik = 0.0;
+    struct imm_dp_task* task = imm_dp_task_create(dp);
     for (unsigned i = 0; i < NSAMPLES; ++i) {
-        struct imm_results const* results = imm_dp_viterbi(dp, seq, 2 * ncore_nodes);
+        struct imm_results const* results = imm_dp_viterbi(dp, task, seq, 2 * ncore_nodes);
         /* cass_cond(imm_results_size(results) == 1); */
         /* struct imm_result const* r = imm_results_get(results, 0); */
         /* struct imm_subseq        subseq = imm_result_subseq(r); */
@@ -175,6 +176,7 @@ imm_float perf_multi_thread_viterbi(imm_float* seconds, uint16_t ncore_nodes,
     imm_hmm_destroy(hmm);
     imm_dp_destroy(dp);
     imm_seq_destroy(seq);
+    imm_dp_task_destroy(task);
     free((void*)str);
 
     return loglik;

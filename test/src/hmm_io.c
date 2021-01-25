@@ -32,7 +32,8 @@ void test_hmm_write_io_two_states(void)
 
     struct imm_dp const* dp = imm_hmm_create_dp(hmm, imm_normal_state_super(state1));
 
-    struct imm_results const* results = imm_dp_viterbi(dp, C, 0);
+    struct imm_dp_task* task = imm_dp_task_create(dp);
+    struct imm_results const* results = imm_dp_viterbi(dp, task, C, 0);
     cass_cond(results != NULL);
     cass_equal_int(imm_results_size(results), 1);
     struct imm_path const* path = imm_result_path(imm_results_get(results, 0));
@@ -61,6 +62,7 @@ void test_hmm_write_io_two_states(void)
     imm_normal_state_destroy(state1);
     imm_abc_destroy(abc);
     imm_seq_destroy(C);
+    imm_dp_task_destroy(task);
 
     struct imm_input* input = imm_input_create(TMPDIR "/two_states.imm");
     cass_cond(input != NULL);
@@ -76,7 +78,8 @@ void test_hmm_write_io_two_states(void)
     dp = imm_model_dp(model);
     C = imm_seq_create("C", abc);
 
-    results = imm_dp_viterbi(dp, C, 0);
+    task = imm_dp_task_create(dp);
+    results = imm_dp_viterbi(dp, task, C, 0);
     cass_cond(results != NULL);
     cass_equal_int(imm_results_size(results), 1);
     r = imm_results_get(results, 0);
@@ -101,6 +104,7 @@ void test_hmm_write_io_two_states(void)
     for (uint16_t i = 0; i < imm_model_nstates(model); ++i)
         imm_state_destroy(imm_model_state(model, i));
 
+    imm_dp_task_destroy(task);
     imm_seq_destroy(C);
     imm_abc_destroy(abc);
     imm_hmm_destroy(hmm);
@@ -116,12 +120,10 @@ void test_hmm_write_io_two_states(void)
     abc = imm_model_abc(model);
     hmm = imm_model_hmm(model);
     dp = imm_model_dp(model);
-    C = imm_seq_create("C", abc);
 
     for (uint16_t i = 0; i < imm_model_nstates(model); ++i)
         imm_state_destroy(imm_model_state(model, i));
 
-    imm_seq_destroy(C);
     imm_abc_destroy(abc);
     imm_hmm_destroy(hmm);
     imm_dp_destroy(dp);

@@ -18,7 +18,7 @@ void imm_dp_task_destroy(struct imm_dp_task const* task)
     eseq_destroy(task->eseq);
 }
 
-void imm_dp_task_setup(struct imm_dp_task* task, struct imm_seq const* seq)
+void dp_task_setup(struct imm_dp_task* task, struct imm_seq const* seq)
 {
     eseq_setup(task->eseq, seq);
     dp_matrix_setup(task->matrix, task->eseq);

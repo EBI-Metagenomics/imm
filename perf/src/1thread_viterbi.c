@@ -146,9 +146,10 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
     struct imm_seq const* seq = imm_seq_create(str, abc);
     struct imm_dp const*  dp = imm_hmm_create_dp(hmm, imm_mute_state_super(end));
 
-    imm_float loglik = 0.0;
+    imm_float           loglik = 0.0;
+    struct imm_dp_task* task = imm_dp_task_create(dp);
     for (unsigned i = 0; i < NSAMPLES; ++i) {
-        struct imm_results const* results = imm_dp_viterbi(dp, seq, 0);
+        struct imm_results const* results = imm_dp_viterbi(dp, task, seq, 0);
         cass_cond(imm_results_size(results) == 1);
         struct imm_result const* r = imm_results_get(results, 0);
         struct imm_subseq        subseq = imm_result_subseq(r);
@@ -174,6 +175,7 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
     imm_hmm_destroy(hmm);
     imm_dp_destroy(dp);
     imm_seq_destroy(seq);
+    imm_dp_task_destroy(task);
     free((void*)str);
 
     return loglik;

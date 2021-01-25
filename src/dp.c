@@ -67,8 +67,8 @@ void imm_dp_destroy(struct imm_dp const* dp)
     free_c(dp);
 }
 
-struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq const* seq,
-                                         uint16_t window_length)
+struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_dp_task* task,
+                                         struct imm_seq const* seq, uint16_t window_length)
 {
     if (seq_code_abc(dp->seq_code) != imm_seq_get_abc(seq)) {
         imm_error("dp and seq must have the same alphabet");
@@ -93,13 +93,11 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
 
     struct elapsed elapsed_total = elapsed_init();
     elapsed_start(&elapsed_total);
-    /* FIXME: receive it instead of creating it here */
-    struct imm_dp_task* task = imm_dp_task_create(dp);
 
     for (uint_fast16_t i = 0; i < nwindows; ++i) {
         struct imm_subseq const subseq = imm_window_get(window, i);
 
-        imm_dp_task_setup(task, imm_subseq_cast(&subseq));
+        dp_task_setup(task, imm_subseq_cast(&subseq));
 
         struct imm_path* path = imm_path_create();
         struct elapsed   elapsed = elapsed_init();
@@ -111,7 +109,6 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_seq
     elapsed_end(&elapsed_total);
     imm_results_set_elapsed(results, elapsed_seconds(&elapsed_total));
     imm_window_destroy(window);
-    imm_dp_task_destroy(task);
 
     return results;
 }
