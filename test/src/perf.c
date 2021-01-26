@@ -147,9 +147,10 @@ void test_perf_viterbi(void)
 
     struct imm_seq const* seq = imm_seq_create(str, abc);
     elapsed_start(&elapsed);
-    struct imm_dp const*      dp = imm_hmm_create_dp(hmm, imm_mute_state_super(end));
-    struct imm_dp_task*       task = imm_dp_task_create(dp);
-    struct imm_results const* results = imm_dp_viterbi(dp, task, seq, 0);
+    struct imm_dp const* dp = imm_hmm_create_dp(hmm, imm_mute_state_super(end));
+    struct imm_dp_task*  task = imm_dp_task_create(dp);
+    imm_dp_task_setup(task, seq, 0);
+    struct imm_results const* results = imm_dp_viterbi(dp, task);
     elapsed_end(&elapsed);
 
     cass_cond(imm_results_size(results) == 1);
@@ -160,7 +161,7 @@ void test_perf_viterbi(void)
     cass_close(score, -65826.0106185297);
     imm_results_destroy(results);
 
-    results = imm_dp_viterbi(dp, task, seq, 0);
+    results = imm_dp_viterbi(dp, task);
     r = imm_results_get(results, 0);
     subseq = imm_result_subseq(r);
     score = imm_hmm_likelihood(hmm, imm_subseq_cast(&subseq), imm_result_path(r));
@@ -168,7 +169,7 @@ void test_perf_viterbi(void)
     cass_close(score, -65826.0106185297);
     imm_results_destroy(results);
 
-    results = imm_dp_viterbi(dp, task, seq, 0);
+    results = imm_dp_viterbi(dp, task);
     r = imm_results_get(results, 0);
     subseq = imm_result_subseq(r);
     score = imm_hmm_likelihood(hmm, imm_subseq_cast(&subseq), imm_result_path(r));
@@ -216,7 +217,8 @@ void test_perf_viterbi(void)
 
     seq = imm_seq_create(str, abc);
     task = imm_dp_task_create(dp);
-    results = imm_dp_viterbi(dp, task, seq, 0);
+    imm_dp_task_setup(task, seq, 0);
+    results = imm_dp_viterbi(dp, task);
     r = imm_results_get(results, 0);
     subseq = imm_result_subseq(r);
     score = imm_hmm_likelihood(hmm, imm_subseq_cast(&subseq), imm_result_path(r));

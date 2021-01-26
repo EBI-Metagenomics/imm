@@ -151,7 +151,8 @@ void test_parallel(void)
     struct imm_seq const* seq = imm_seq_create(str, abc);
     struct imm_dp const*  dp = imm_hmm_create_dp(hmm, imm_normal_state_super(end));
     struct imm_dp_task*   task = imm_dp_task_create(dp);
-    struct imm_results const* results = imm_dp_viterbi(dp, task, seq, 50);
+    imm_dp_task_setup(task, seq, 50);
+    struct imm_results const* results = imm_dp_viterbi(dp, task);
 
     cass_cond(imm_results_size(results) == 79);
 

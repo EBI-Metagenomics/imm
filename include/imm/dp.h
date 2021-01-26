@@ -14,8 +14,7 @@ struct imm_seq;
 struct imm_state;
 
 IMM_API void                      imm_dp_destroy(struct imm_dp const* dp);
-IMM_API struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_dp_task* task,
-                                                 struct imm_seq const* seq, uint16_t window_length);
+IMM_API struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_dp_task* task);
 IMM_API int                       imm_dp_change_trans(struct imm_dp* dp, struct imm_hmm* hmm,
                                                       struct imm_state const* src_state,
                                                       struct imm_state const* tgt_state, imm_float lprob);

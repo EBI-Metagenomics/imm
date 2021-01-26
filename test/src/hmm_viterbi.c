@@ -1187,7 +1187,8 @@ imm_float single_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq,
     }
 
     struct imm_dp_task* task = imm_dp_task_create(dp);
-    struct imm_results const* results = imm_dp_viterbi(dp, task, seq, 0);
+    imm_dp_task_setup(task, seq, 0);
+    struct imm_results const* results = imm_dp_viterbi(dp, task);
     if (results == NULL) {
         *path = imm_path_create();
         imm_dp_destroy(dp);

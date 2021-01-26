@@ -67,29 +67,29 @@ void imm_dp_destroy(struct imm_dp const* dp)
     free_c(dp);
 }
 
-struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_dp_task* task,
-                                         struct imm_seq const* seq, uint16_t window_length)
+struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_dp_task* task)
 {
-    if (seq_code_abc(dp->seq_code) != imm_seq_get_abc(seq)) {
+    if (seq_code_abc(dp->seq_code) != imm_seq_get_abc(task->root_seq)) {
         imm_error("dp and seq must have the same alphabet");
         return NULL;
     }
 
     struct imm_state const* end_state =
         model_state_get_state(dp->mstates[dp->state_table->end_state]);
-    if (imm_seq_length(seq) < imm_state_min_seq(end_state)) {
+    if (imm_seq_length(task->root_seq) < imm_state_min_seq(end_state)) {
         imm_error("sequence is shorter than end_state's lower bound");
         return NULL;
     }
 
     /* TODO: setup windowing if seq length is too large */
-    IMM_BUG(imm_seq_length(seq) > IMM_WINDOW_MAX_LEN);
+    IMM_BUG(imm_seq_length(task->root_seq) > IMM_WINDOW_MAX_LEN);
+    uint16_t window_length = task->window_length;
     if (window_length == 0)
-        window_length = (uint16_t)imm_seq_length(seq);
+        window_length = (uint16_t)imm_seq_length(task->root_seq);
 
-    struct imm_window const* window = imm_window_create(seq, window_length);
+    struct imm_window const* window = imm_window_create(task->root_seq, window_length);
     uint_fast16_t            nwindows = imm_window_size(window);
-    struct imm_results*      results = imm_results_create(seq, nwindows);
+    struct imm_results*      results = imm_results_create(task->root_seq, nwindows);
 
     struct elapsed elapsed_total = elapsed_init();
     elapsed_start(&elapsed_total);
