@@ -32,6 +32,7 @@ extern "C"
 #include "imm/step.h"
 #include "imm/subseq.h"
 #include "imm/table_state.h"
+#include "imm/vec.h"
 #include "imm/window.h"
 
 #ifdef __cplusplus
