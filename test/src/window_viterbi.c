@@ -1,6 +1,6 @@
 #include "cass/cass.h"
+#include "elapsed/elapsed.h"
 #include "imm/imm.h"
-#include "thread.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -13,11 +13,11 @@ struct model
     struct imm_normal_state const* end;
 };
 
-void test_parallel(void);
+void test_window_viterbi(void);
 
 int main(void)
 {
-    test_parallel();
+    test_window_viterbi();
     return cass_status();
 }
 
@@ -26,8 +26,14 @@ static void             destroy_model(struct model model);
 static char*            fmt_name(char* restrict buffer, char const* name, int i);
 static inline imm_float zero(void) { return imm_lprob_zero(); }
 
-void test_parallel(void)
+void test_window_viterbi(void)
 {
+    struct model model = create_model();
+
+    struct elapsed elapsed = elapsed_init();
+
+    struct imm_path* path = imm_path_create();
+
     char const str[] = "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
                        "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
                        "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
@@ -70,45 +76,75 @@ void test_parallel(void)
                        "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMME";
     cass_cond(strlen(str) == 2000);
 
-    unsigned ntasks = thread_max_size();
-    printf("Number of tasks: %u\n", ntasks);
+    elapsed_start(&elapsed);
+    struct imm_seq const* seq = imm_seq_create(str, model.abc);
+    struct imm_dp const*  dp = imm_hmm_create_dp(model.hmm, imm_normal_state_super(model.end));
+    struct imm_dp_task*   task = imm_dp_task_create(dp);
+    imm_dp_task_setup(task, seq, 50);
+    struct imm_results const* results = imm_dp_viterbi(dp, task);
 
-    struct model         model = create_model();
-    struct imm_dp const* dp = imm_hmm_create_dp(model.hmm, imm_normal_state_super(model.end));
+    cass_cond(imm_results_size(results) == 79);
 
-    struct imm_seq const** seqs = malloc(ntasks * sizeof(*seqs));
-    struct imm_dp_task**   tasks = malloc(ntasks * sizeof(*tasks));
-    for (unsigned i = 0; i < ntasks; ++i) {
-        seqs[i] = imm_seq_create(str, model.abc);
-        tasks[i] = imm_dp_task_create(dp);
-    }
+    struct imm_result const* result = imm_results_get(results, 0);
+    struct imm_subseq        subseq = imm_result_subseq(result);
+    struct imm_seq const*    s = imm_subseq_cast(&subseq);
+    imm_float                score = imm_hmm_likelihood(model.hmm, s, imm_result_path(result));
+    cass_close(score, -1778.8892020572);
+    cass_cond(strncmp(imm_seq_string(s), "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM",
+                      imm_seq_length(s)) == 0);
 
-#pragma omp parallel for
-    for (unsigned i = 0; i < ntasks; ++i) {
-        struct imm_dp_task* task = tasks[thread_id()];
-        imm_dp_task_setup(task, seqs[i], 0);
-        struct imm_results const* results = imm_dp_viterbi(dp, task);
+    result = imm_results_get(results, 1);
+    subseq = imm_result_subseq(result);
+    s = imm_subseq_cast(&subseq);
+    score = imm_hmm_likelihood(model.hmm, s, imm_result_path(result));
+    cass_cond(!imm_lprob_is_valid(score));
+    cass_cond(strncmp(imm_seq_string(s), "MIMMMMMMMMMIIMIMIMIMIMIIMIIIMIMIMIMMMMMMIMMIMIMIMI",
+                      imm_seq_length(s)) == 0);
 
-        struct imm_result const* r = imm_results_get(results, 0);
-        struct imm_subseq        subseq = imm_result_subseq(r);
-        struct imm_path const*   p = imm_result_path(r);
-        imm_float                score = imm_hmm_likelihood(model.hmm, imm_subseq_cast(&subseq), p);
-        cass_cond(imm_lprob_is_valid(score));
-        cass_cond(!imm_lprob_is_zero(score));
-        cass_close(score, -10758.9710647332);
-        cass_cond(imm_results_size(results) == 1);
-        imm_results_destroy(results);
-    }
+    result = imm_results_get(results, 2);
+    subseq = imm_result_subseq(result);
+    s = imm_subseq_cast(&subseq);
+    score = imm_hmm_likelihood(model.hmm, s, imm_result_path(result));
+    cass_cond(!imm_lprob_is_valid(score));
+    cass_cond(strncmp(imm_seq_string(s), "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ",
+                      imm_seq_length(s)) == 0);
 
-    for (unsigned i = 0; i < ntasks; ++i) {
-        imm_seq_destroy(seqs[i]);
-        imm_dp_task_destroy(tasks[i]);
-    }
+    result = imm_results_get(results, 3);
+    subseq = imm_result_subseq(result);
+    s = imm_subseq_cast(&subseq);
+    score = imm_hmm_likelihood(model.hmm, s, imm_result_path(result));
+    cass_cond(!imm_lprob_is_valid(score));
+    cass_cond(strncmp(imm_seq_string(s), "IMIMMIMIMIMIMIMMMMIMMIMEJBMIIMIIMMIMMMIMEJBMIIMIIM",
+                      imm_seq_length(s)) == 0);
 
+    result = imm_results_get(results, 4);
+    subseq = imm_result_subseq(result);
+    s = imm_subseq_cast(&subseq);
+    score = imm_hmm_likelihood(model.hmm, s, imm_result_path(result));
+    cass_close(score, -1778.8892020572);
+    cass_cond(strncmp(imm_seq_string(s), "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM",
+                      imm_seq_length(s)) == 0);
+
+    result = imm_results_get(results, 8);
+    subseq = imm_result_subseq(result);
+    s = imm_subseq_cast(&subseq);
+    score = imm_hmm_likelihood(model.hmm, s, imm_result_path(result));
+    cass_close(score, -1778.8892020572);
+    cass_cond(strncmp(imm_seq_string(s), "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM",
+                      imm_seq_length(s)) == 0);
+
+    elapsed_end(&elapsed);
+    imm_path_destroy(path);
+    imm_seq_destroy(seq);
+    imm_dp_task_destroy(task);
+
+#ifdef NDEBUG
+    cass_cond(elapsed_seconds(&elapsed) < 5.0);
+#endif
+
+    imm_results_destroy(results);
     imm_dp_destroy(dp);
     destroy_model(model);
-    free(seqs);
-    free(tasks);
 }
 
 static char* fmt_name(char* restrict buffer, char const* name, int i)
