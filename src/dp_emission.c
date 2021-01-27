@@ -30,10 +30,10 @@ struct dp_emission const* dp_emission_create(struct seq_code const*           se
     emiss_tbl->offset = malloc(sizeof(*emiss_tbl->offset) * offset_size(nstates));
     emiss_tbl->offset[0] = 0;
 
-    uint_fast32_t size =
-        seq_code_size(seq_code, imm_state_min_seq(model_state_get_state(mstates[0])));
+    uint8_t       min = imm_state_min_seq(model_state_get_state(mstates[0]));
+    uint_fast32_t size = seq_code_size(seq_code, min);
     for (uint_fast16_t i = 1; i < nstates; ++i) {
-        emiss_tbl->offset[i] = (uint_fast32_t)size;
+        emiss_tbl->offset[i] = (uint32_t)size;
         size += seq_code_size(seq_code, imm_state_min_seq(model_state_get_state(mstates[i])));
     }
     emiss_tbl->offset[nstates] = (uint32_t)size;
@@ -143,7 +143,7 @@ void dp_emission_scores_dump(struct dp_emission const* emission, uint_fast16_t n
 
 int dp_emission_write(struct dp_emission const* emission, uint_fast16_t nstates, FILE* stream)
 {
-    struct dp_emission_chunk chunk = {.score_size = (uint_fast32_t)score_size(emission, nstates),
+    struct dp_emission_chunk chunk = {.score_size = (uint32_t)score_size(emission, nstates),
                                       .score = emission->score,
                                       .offset_size = (uint16_t)offset_size(nstates),
                                       .offset = emission->offset};

@@ -89,7 +89,7 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_dp_
 
     struct imm_window const* window = imm_window_create(task->root_seq, window_length);
     uint_fast16_t            nwindows = imm_window_size(window);
-    struct imm_results*      results = imm_results_create(task->root_seq, nwindows);
+    struct imm_results*      results = imm_results_create(task->root_seq, (uint16_t)nwindows);
 
     struct elapsed elapsed_total = elapsed_init();
     elapsed_start(&elapsed_total);

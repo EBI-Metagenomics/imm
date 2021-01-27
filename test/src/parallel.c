@@ -83,10 +83,12 @@ void test_parallel(void)
         tasks[i] = imm_dp_task_create(dp);
     }
 
+    unsigned num_seqs = 40;
+
 #pragma omp parallel for
-    for (unsigned i = 0; i < ntasks; ++i) {
+    for (unsigned i = 0; i < num_seqs; ++i) {
         struct imm_dp_task* task = tasks[thread_id()];
-        imm_dp_task_setup(task, seqs[i], 0);
+        imm_dp_task_setup(task, seqs[i % ntasks], 0);
         struct imm_results const* results = imm_dp_viterbi(dp, task);
 
         struct imm_result const* r = imm_results_get(results, 0);
