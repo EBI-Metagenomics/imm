@@ -14,6 +14,8 @@ function(imm_add_test name)
         COMMAND ${CMAKE_COMMAND} -E make_directory ${TMPDIR}
     )
     target_compile_definitions(test_${name} PUBLIC "TMPDIR=\"${TMPDIR}\"")
+    target_link_libraries(test_${name} PRIVATE $<$<BOOL:${OpenMP_C_FOUND}>:OpenMP::OpenMP_C>)
+    target_compile_definitions(test_${name} PRIVATE $<$<BOOL:${OpenMP_C_FOUND}>:OPENMP>)
 endfunction()
 
 imm_add_test(abc)
