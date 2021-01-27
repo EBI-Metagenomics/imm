@@ -94,7 +94,7 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_dp_
     struct elapsed elapsed_total = elapsed_init();
     elapsed_start(&elapsed_total);
 
-    for (uint_fast16_t i = 0; i < nwindows; ++i) {
+    for (uint16_t i = 0; i < nwindows; ++i) {
         struct imm_subseq const subseq = imm_window_get(window, i);
 
         dp_task_setup(task, imm_subseq_cast(&subseq));

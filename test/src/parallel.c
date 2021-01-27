@@ -83,7 +83,7 @@ void test_parallel(void)
         tasks[i] = imm_dp_task_create(dp);
     }
 
-    unsigned num_seqs = 40;
+    unsigned num_seqs = 80;
 
 #pragma omp parallel for
     for (unsigned i = 0; i < num_seqs; ++i) {
