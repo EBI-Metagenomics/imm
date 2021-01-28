@@ -2,7 +2,7 @@ add_custom_target(all_tests)
 find_package(cass REQUIRED)
 
 function(imm_add_test name)
-    add_executable(test_${name} src/${name}.c)
+    add_executable(test_${name} src/${name}.c src/model1.c src/model2.c)
     add_dependencies(all_tests test_${name})
     target_link_libraries(test_${name} PRIVATE IMM::imm)
     target_link_libraries(test_${name} PUBLIC CASS::cass)
