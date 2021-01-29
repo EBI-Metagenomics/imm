@@ -21,23 +21,15 @@ int main(void)
 
     cass_cond(imm_results_size(results) == 79);
 
-    check(model, results, 0, -1778.8892020572,
-          "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM");
+    imm_float desired = -1778.8892020572;
+    imm_float invalid = imm_lprob_invalid();
 
-    check(model, results, 1, imm_lprob_invalid(),
-          "MIMMMMMMMMMIIMIMIMIMIMIIMIIIMIMIMIMMMMMMIMMIMIMIMI");
-
-    check(model, results, 2, imm_lprob_invalid(),
-          "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ");
-
-    check(model, results, 3, imm_lprob_invalid(),
-          "IMIMMIMIMIMIMIMMMMIMMIMEJBMIIMIIMMIMMMIMEJBMIIMIIM");
-
-    check(model, results, 4, -1778.8892020572,
-          "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM");
-
-    check(model, results, 8, -1778.8892020572,
-          "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM");
+    check(model, results, 0, desired, "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM");
+    check(model, results, 1, invalid, "MIMMMMMMMMMIIMIMIMIMIMIIMIIIMIMIMIMMMMMMIMMIMIMIMI");
+    check(model, results, 2, invalid, "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ");
+    check(model, results, 3, invalid, "IMIMMIMIMIMIMIMMMMIMMIMEJBMIIMIIMMIMMMIMEJBMIIMIIM");
+    check(model, results, 4, desired, "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM");
+    check(model, results, 8, desired, "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM");
 
     imm_seq_destroy(seq);
     imm_dp_task_destroy(task);
