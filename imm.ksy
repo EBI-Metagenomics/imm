@@ -77,7 +77,7 @@ types:
         type: u1
         enum: state_type
       - id: name_length
-        type: u2
+        type: u1
       - id: name
         type: str
         encoding: ASCII

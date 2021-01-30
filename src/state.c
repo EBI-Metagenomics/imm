@@ -9,8 +9,8 @@
 
 struct state_chunk
 {
-    uint16_t name_length;
-    char*    name;
+    uint8_t name_length;
+    char*   name;
 };
 
 struct imm_state const* imm_state_create(char const* name, struct imm_abc const* abc,
@@ -69,7 +69,7 @@ struct imm_state* __imm_state_read(FILE* stream, struct imm_abc const* abc)
 
 int __imm_state_write(struct imm_state const* state, FILE* stream)
 {
-    struct state_chunk chunk = {.name_length = cast_zu_u16(strlen(imm_state_get_name(state))),
+    struct state_chunk chunk = {.name_length = cast_zu_u8(strlen(imm_state_get_name(state))),
                                 .name = (char*)imm_state_get_name(state)};
 
     if (fwrite(&chunk.name_length, sizeof(chunk.name_length), 1, stream) < 1) {
