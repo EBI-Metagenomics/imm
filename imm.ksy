@@ -45,13 +45,13 @@ types:
   hmm:
     seq:
       - id: nstates
-        type: u4
+        type: u2
       - id: states
         type: state
         repeat: expr
         repeat-expr: nstates
       - id: ntransitions
-        type: u4
+        type: u2
       - id: transitions
         type: transition
         repeat: expr
@@ -72,7 +72,7 @@ types:
   state:
     seq:
       - id: start_lprob
-        type: f8
+        type: f4
       - id: state_type
         type: u1
         enum: state_type
@@ -103,11 +103,11 @@ types:
   transition:
     seq:
       - id: source_state
-        type: u4
+        type: u2
       - id: target_state
-        type: u4
+        type: u2
       - id: lprob
-        type: f8
+        type: f4
   dp:
     seq:
       - id: seq_code
@@ -125,21 +125,21 @@ types:
       - id: max_seq
         type: u1
       - id: offset
-        type: u4
+        type: u2
         repeat: expr
         repeat-expr: max_seq - min_seq + 1
       - id: stride
-        type: u4
+        type: u2
         repeat: expr
         repeat-expr: max_seq
       - id: size
-        type: u4
+        type: u2
   dp_emission:
     seq:
       - id: score_size
         type: u4
       - id: score
-        type: f8
+        type: f4
         repeat: expr
         repeat-expr: score_size
       - id: offset_size
@@ -151,25 +151,25 @@ types:
   dp_trans_table:
     seq:
       - id: ntrans
-        type: u4
+        type: u2
       - id: score
-        type: f8
+        type: f4
         repeat: expr
         repeat-expr: ntrans
       - id: source_state
-        type: u4
+        type: u2
         repeat: expr
         repeat-expr: ntrans
       - id: offset_size
-        type: u4
+        type: u2
       - id: offset
-        type: u4
+        type: u2
         repeat: expr
         repeat-expr: offset_size
   dp_state_table:
     seq:
       - id: nstates
-        type: u4
+        type: u2
       - id: min_seq
         type: u1
         repeat: expr
@@ -179,8 +179,8 @@ types:
         repeat: expr
         repeat-expr: nstates
       - id: start_lprob
-        type: f8
+        type: f4
         repeat: expr
         repeat-expr: nstates
       - id: end_state
-        type: u4
+        type: u2

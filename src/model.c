@@ -62,6 +62,12 @@ struct imm_model const* imm_model_read(FILE* stream)
         goto err;
     }
 
+    uint8_t nhmms = 0;
+    if (fread(&nhmms, sizeof(nhmms), 1, stream) < 1) {
+        imm_error("could not read nhmms");
+        goto err;
+    }
+
     if (__imm_model_read_hmm(model, stream)) {
         imm_error("could not read hmm");
         goto err;
@@ -88,6 +94,12 @@ int imm_model_write(struct imm_model const* model, FILE* stream)
 {
     if (write_abc(model, stream)) {
         imm_error("could not write abc");
+        return 1;
+    }
+
+    uint8_t nhmms = 1;
+    if (fwrite(&nhmms, sizeof(nhmms), 1, stream) < 1) {
+        imm_error("could not write nhmms");
         return 1;
     }
 
