@@ -103,10 +103,10 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_dp_
         elapsed_start(&elapsed);
         viterbi(dp, task, path);
         elapsed_end(&elapsed);
-        imm_results_set(results, i, subseq, path, elapsed_seconds(&elapsed));
+        imm_results_set(results, i, subseq, path, (imm_float)elapsed_seconds(&elapsed));
     }
     elapsed_end(&elapsed_total);
-    imm_results_set_elapsed(results, elapsed_seconds(&elapsed_total));
+    imm_results_set_elapsed(results, (imm_float)elapsed_seconds(&elapsed_total));
     imm_window_destroy(window);
 
     return results;

@@ -13,7 +13,7 @@ void test_path(void)
 {
     struct imm_abc const* abc = imm_abc_create("ACGT", '*');
 
-    imm_float                      lprobs[] = {log(0.25), log(0.25), log(0.5), imm_lprob_zero()};
+    imm_float lprobs[] = {logf(0.25f), logf(0.25f), logf(0.5f), imm_lprob_zero()};
     struct imm_normal_state const* state0 = imm_normal_state_create("State0", abc, lprobs);
     struct imm_normal_state const* state1 = imm_normal_state_create("State1", abc, lprobs);
 

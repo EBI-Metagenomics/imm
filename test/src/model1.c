@@ -25,19 +25,19 @@ struct model1 create_model1(void)
     m.hmm = hmm;
 
     struct imm_mute_state const* start = imm_mute_state_create("START", abc);
-    imm_hmm_add_state(hmm, mute_super(start), log(1.0));
+    imm_hmm_add_state(hmm, mute_super(start), logf(1.0f));
     imm_vecp_append(m.mute_states, start);
 
-    imm_float end_lprobs[] = {log(0.05), log(0.05), log(0.05), log(0.05), log(0.05)};
+    imm_float end_lprobs[] = {logf(0.05f), logf(0.05f), logf(0.05f), logf(0.05f), logf(0.05f)};
     struct imm_normal_state const* end = imm_normal_state_create("END", abc, end_lprobs);
     imm_hmm_add_state(hmm, normal_super(end), zero());
     m.end = end;
 
-    imm_float B_lprobs[] = {log(1.0), zero(), zero(), zero(), zero()};
-    imm_float E_lprobs[] = {zero(), zero(), zero(), log(1.0), zero()};
-    imm_float J_lprobs[] = {zero(), zero(), zero(), zero(), log(1.0)};
-    imm_float M_lprobs[] = {zero(), log(1.0), zero(), zero(), zero()};
-    imm_float I_lprobs[] = {zero(), zero(), log(1.0), zero(), zero()};
+    imm_float B_lprobs[] = {logf(1.0f), zero(), zero(), zero(), zero()};
+    imm_float E_lprobs[] = {zero(), zero(), zero(), logf(1.0f), zero()};
+    imm_float J_lprobs[] = {zero(), zero(), zero(), zero(), logf(1.0f)};
+    imm_float M_lprobs[] = {zero(), logf(1.0f), zero(), zero(), zero()};
+    imm_float I_lprobs[] = {zero(), zero(), logf(1.0f), zero(), zero()};
 
     struct imm_normal_state const* B = imm_normal_state_create("B", abc, B_lprobs);
     imm_hmm_add_state(hmm, normal_super(B), zero());
@@ -49,14 +49,14 @@ struct model1 create_model1(void)
     imm_hmm_add_state(hmm, normal_super(J), zero());
     imm_vecp_append(m.normal_states, J);
 
-    imm_hmm_set_trans(hmm, mute_super(start), normal_super(B), log(0.2));
-    imm_hmm_set_trans(hmm, normal_super(B), normal_super(B), log(0.2));
-    imm_hmm_set_trans(hmm, normal_super(E), normal_super(E), log(0.2));
-    imm_hmm_set_trans(hmm, normal_super(J), normal_super(J), log(0.2));
-    imm_hmm_set_trans(hmm, normal_super(E), normal_super(J), log(0.2));
-    imm_hmm_set_trans(hmm, normal_super(J), normal_super(B), log(0.2));
-    imm_hmm_set_trans(hmm, normal_super(E), normal_super(end), log(0.2));
-    imm_hmm_set_trans(hmm, normal_super(end), normal_super(end), log(0.2));
+    imm_hmm_set_trans(hmm, mute_super(start), normal_super(B), logf(0.2f));
+    imm_hmm_set_trans(hmm, normal_super(B), normal_super(B), logf(0.2f));
+    imm_hmm_set_trans(hmm, normal_super(E), normal_super(E), logf(0.2f));
+    imm_hmm_set_trans(hmm, normal_super(J), normal_super(J), logf(0.2f));
+    imm_hmm_set_trans(hmm, normal_super(E), normal_super(J), logf(0.2f));
+    imm_hmm_set_trans(hmm, normal_super(J), normal_super(B), logf(0.2f));
+    imm_hmm_set_trans(hmm, normal_super(E), normal_super(end), logf(0.2f));
+    imm_hmm_set_trans(hmm, normal_super(end), normal_super(end), logf(0.2f));
 
     struct imm_normal_state const* M[ncore_nodes];
     struct imm_normal_state const* I[ncore_nodes];
@@ -76,24 +76,24 @@ struct model1 create_model1(void)
         imm_vecp_append(m.normal_states, D[i]);
 
         if (i == 0)
-            imm_hmm_set_trans(hmm, normal_super(B), normal_super(M[0]), log(0.2));
+            imm_hmm_set_trans(hmm, normal_super(B), normal_super(M[0]), logf(0.2f));
 
-        imm_hmm_set_trans(hmm, normal_super(M[i]), normal_super(I[i]), log(0.2));
-        imm_hmm_set_trans(hmm, normal_super(I[i]), normal_super(I[i]), log(0.2));
+        imm_hmm_set_trans(hmm, normal_super(M[i]), normal_super(I[i]), logf(0.2f));
+        imm_hmm_set_trans(hmm, normal_super(I[i]), normal_super(I[i]), logf(0.2f));
 
         if (i > 0) {
-            imm_hmm_set_trans(hmm, normal_super(M[i - 1]), normal_super(M[i]), log(0.2));
-            imm_hmm_set_trans(hmm, mute_super(D[i - 1]), normal_super(M[i]), log(0.2));
-            imm_hmm_set_trans(hmm, normal_super(I[i - 1]), normal_super(M[i]), log(0.2));
+            imm_hmm_set_trans(hmm, normal_super(M[i - 1]), normal_super(M[i]), logf(0.2f));
+            imm_hmm_set_trans(hmm, mute_super(D[i - 1]), normal_super(M[i]), logf(0.2f));
+            imm_hmm_set_trans(hmm, normal_super(I[i - 1]), normal_super(M[i]), logf(0.2f));
 
-            imm_hmm_set_trans(hmm, normal_super(M[i - 1]), mute_super(D[i]), log(0.2));
-            imm_hmm_set_trans(hmm, mute_super(D[i - 1]), mute_super(D[i]), log(0.2));
+            imm_hmm_set_trans(hmm, normal_super(M[i - 1]), mute_super(D[i]), logf(0.2f));
+            imm_hmm_set_trans(hmm, mute_super(D[i - 1]), mute_super(D[i]), logf(0.2f));
         }
 
         if (i == ncore_nodes - 1) {
-            imm_hmm_set_trans(hmm, normal_super(M[i]), normal_super(E), log(0.2));
-            imm_hmm_set_trans(hmm, mute_super(D[i]), normal_super(E), log(0.2));
-            imm_hmm_set_trans(hmm, normal_super(I[i]), normal_super(E), log(0.2));
+            imm_hmm_set_trans(hmm, normal_super(M[i]), normal_super(E), logf(0.2f));
+            imm_hmm_set_trans(hmm, mute_super(D[i]), normal_super(E), logf(0.2f));
+            imm_hmm_set_trans(hmm, normal_super(I[i]), normal_super(E), logf(0.2f));
         }
     }
 

@@ -96,7 +96,7 @@ types:
       - id: lprobs_size
         type: u1
       - id: lprobs
-        type: f8
+        type: f4
         repeat: expr
         repeat-expr: lprobs_size
   table_state: {}

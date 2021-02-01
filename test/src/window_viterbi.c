@@ -4,7 +4,7 @@
 #include "model1.h"
 
 static void check(struct model1 model, struct imm_results const* results, uint16_t i,
-                  imm_float desired_score, char const* desired_str);
+                  double desired_score, char const* desired_str);
 
 int main(void)
 {
@@ -21,8 +21,8 @@ int main(void)
 
     cass_cond(imm_results_size(results) == 79);
 
-    imm_float desired = -1778.8892020572;
-    imm_float invalid = imm_lprob_invalid();
+    double desired = -1778.8892345428;
+    double invalid = imm_lprob_invalid();
 
     check(model, results, 0, desired, "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM");
     check(model, results, 1, invalid, "MIMMMMMMMMMIIMIMIMIMIMIIMIIIMIMIMIMMMMMMIMMIMIMIMI");
@@ -42,7 +42,7 @@ int main(void)
 }
 
 static void check(struct model1 model, struct imm_results const* results, uint16_t i,
-                  imm_float desired_score, char const* desired_str)
+                  double desired_score, char const* desired_str)
 {
     struct imm_result const* result = imm_results_get(results, i);
     struct imm_subseq        subseq = imm_result_subseq(result);

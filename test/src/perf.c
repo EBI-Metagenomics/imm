@@ -37,7 +37,7 @@ void test_perf_viterbi(void)
     imm_float score = imm_hmm_likelihood(model.hmm, imm_subseq_cast(&subseq), imm_result_path(r));
     cass_cond(imm_lprob_is_valid(score));
     cass_cond(!imm_lprob_is_zero(score));
-    cass_close(score, -65826.0106185297);
+    cass_close(score, -65826.0118484497);
     imm_results_destroy(results);
 
     imm_dp_destroy(dp);
@@ -86,7 +86,7 @@ void test_perf_viterbi_input(void)
     imm_float score = imm_hmm_likelihood(hmm, imm_subseq_cast(&subseq), imm_result_path(r));
     cass_cond(imm_lprob_is_valid(score));
     cass_cond(!imm_lprob_is_zero(score));
-    cass_close2(score, -65826.0106185297, 1e-07, 0.0);
+    cass_close(score, -65826.0106185297);
     imm_results_destroy(results);
 
     for (uint16_t i = 0; i < imm_model_nstates(imodel); ++i)

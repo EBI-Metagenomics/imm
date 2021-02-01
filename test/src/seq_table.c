@@ -24,7 +24,7 @@ void test_seq_table(void)
     imm_seq_destroy(seq);
 
     seq = imm_seq_create("GG", abc);
-    cass_cond(imm_seq_table_add(table, seq, log(0.5)) == 0);
+    cass_cond(imm_seq_table_add(table, seq, (imm_float)log(0.5)) == 0);
     cass_close(imm_seq_table_lprob(table, seq), log(0.5));
     imm_seq_destroy(seq);
 
@@ -33,7 +33,7 @@ void test_seq_table(void)
     imm_seq_destroy(seq);
 
     seq = imm_seq_create("", abc);
-    cass_cond(imm_seq_table_add(table, seq, log(0.1)) == 0);
+    cass_cond(imm_seq_table_add(table, seq, (imm_float)log(0.1)) == 0);
     cass_close(imm_seq_table_lprob(table, seq), log(0.1));
     imm_seq_destroy(seq);
 

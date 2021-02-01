@@ -32,17 +32,17 @@ void test_hmm_likelihood_single_state(void)
     struct imm_seq const* AG = imm_seq_create("AG", abc);
     struct imm_seq const* AA = imm_seq_create("AA", abc);
 
-    imm_float lprobs[] = {log(0.25), log(0.25), log(0.5), zero()};
+    imm_float lprobs[] = {logf(0.25f), logf(0.25f), logf(0.5f), zero()};
 
     struct imm_normal_state const* state = imm_normal_state_create("State0", abc, lprobs);
     struct imm_hmm*                hmm = imm_hmm_create(abc);
 
-    imm_hmm_add_state(hmm, imm_normal_state_super(state), log(0.5));
+    imm_hmm_add_state(hmm, imm_normal_state_super(state), logf(0.5f));
     cass_cond(imm_hmm_normalize(hmm) == 0);
 
     struct imm_path* path = imm_path_create();
     imm_path_append(path, imm_step_create(imm_normal_state_super(state), 1));
-    cass_close(imm_hmm_likelihood(hmm, A, path), -1.386294361120);
+    cass_close(imm_hmm_likelihood(hmm, A, path), -1.3862943649);
     imm_path_destroy(path);
 
     path = imm_path_create();
@@ -73,19 +73,19 @@ void test_hmm_likelihood_single_state(void)
                                 zero()) == 0);
     cass_cond(imm_hmm_normalize(hmm) == 0);
     cass_cond(imm_hmm_set_trans(hmm, imm_normal_state_super(state), imm_normal_state_super(state),
-                                log(0.5)) == 0);
+                                logf(0.5f)) == 0);
 
     path = imm_path_create();
     imm_path_append(path, imm_step_create(imm_normal_state_super(state), 1));
     imm_path_append(path, imm_step_create(imm_normal_state_super(state), 1));
-    cass_close(imm_hmm_likelihood(hmm, AA, path), -3.465735902800);
+    cass_close(imm_hmm_likelihood(hmm, AA, path), -3.4657359123);
     imm_path_destroy(path);
 
     cass_cond(imm_hmm_normalize(hmm) == 0);
     path = imm_path_create();
     imm_path_append(path, imm_step_create(imm_normal_state_super(state), 1));
     imm_path_append(path, imm_step_create(imm_normal_state_super(state), 1));
-    cass_close(imm_hmm_likelihood(hmm, AA, path), -2.772588722240);
+    cass_close(imm_hmm_likelihood(hmm, AA, path), -2.7725887299);
     imm_path_destroy(path);
 
     imm_hmm_destroy(hmm);
@@ -106,25 +106,25 @@ void test_hmm_likelihood_two_states(void)
     struct imm_seq const* GT = imm_seq_create("GT", abc);
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
-    imm_float                      lprobs0[] = {log(0.25), log(0.25), log(0.5), zero()};
+    imm_float                      lprobs0[] = {logf(0.25f), logf(0.25f), logf(0.5f), zero()};
     struct imm_normal_state const* state0 = imm_normal_state_create("State0", abc, lprobs0);
 
-    imm_float                      lprobs1[] = {log(0.5), log(0.25), log(0.5), log(1.0)};
+    imm_float                      lprobs1[] = {logf(0.5f), logf(0.25f), logf(0.5f), logf(1.0)};
     struct imm_normal_state const* state1 = imm_normal_state_create("State1", abc, lprobs1);
 
-    imm_hmm_add_state(hmm, imm_normal_state_super(state0), log(1.0));
+    imm_hmm_add_state(hmm, imm_normal_state_super(state0), logf(1.0));
     imm_hmm_add_state(hmm, imm_normal_state_super(state1), zero());
 
     imm_hmm_set_trans(hmm, imm_normal_state_super(state0), imm_normal_state_super(state0),
-                      log(0.1));
+                      logf(0.1f));
     imm_hmm_set_trans(hmm, imm_normal_state_super(state0), imm_normal_state_super(state1),
-                      log(0.2));
+                      logf(0.2f));
     imm_hmm_set_trans(hmm, imm_normal_state_super(state1), imm_normal_state_super(state1),
-                      log(1.0));
+                      logf(1.0f));
 
     struct imm_path* path = imm_path_create();
     imm_path_append(path, imm_step_create(imm_normal_state_super(state0), 1));
-    cass_close(imm_hmm_likelihood(hmm, A, path), -1.3862943611);
+    cass_close(imm_hmm_likelihood(hmm, A, path), -1.3862943649);
     imm_path_destroy(path);
 
     path = imm_path_create();
@@ -141,13 +141,13 @@ void test_hmm_likelihood_two_states(void)
 
     path = imm_path_create();
     imm_path_append(path, imm_step_create(imm_normal_state_super(state0), 1));
-    cass_close(imm_hmm_likelihood(hmm, G, path), -0.6931471806);
+    cass_close(imm_hmm_likelihood(hmm, G, path), -0.6931471825);
     imm_path_destroy(path);
 
     path = imm_path_create();
     imm_path_append(path, imm_step_create(imm_normal_state_super(state0), 1));
     imm_path_append(path, imm_step_create(imm_normal_state_super(state1), 1));
-    cass_close(imm_hmm_likelihood(hmm, GT, path), -1.0986122887);
+    cass_close(imm_hmm_likelihood(hmm, GT, path), -1.0986122899);
     imm_path_destroy(path);
 
     imm_hmm_destroy(hmm);
@@ -172,9 +172,9 @@ void test_hmm_likelihood_mute_state(void)
 
     struct imm_mute_state const* state = imm_mute_state_create("State0", abc);
 
-    imm_hmm_add_state(hmm, imm_mute_state_super(state), log(1.0));
+    imm_hmm_add_state(hmm, imm_mute_state_super(state), logf(1.0));
 
-    imm_hmm_set_trans(hmm, imm_mute_state_super(state), imm_mute_state_super(state), log(0.1));
+    imm_hmm_set_trans(hmm, imm_mute_state_super(state), imm_mute_state_super(state), logf(0.1f));
 
     struct imm_path* path = imm_path_create();
     cass_cond(!is_valid(imm_hmm_likelihood(hmm, A, path)));
@@ -190,7 +190,7 @@ void test_hmm_likelihood_mute_state(void)
 
     path = imm_path_create();
     imm_path_append(path, imm_step_create(imm_mute_state_super(state), 0));
-    cass_close(imm_hmm_likelihood(hmm, EMPTY, path), 0.0);
+    cass_close(imm_hmm_likelihood(hmm, EMPTY, path), 0.0f);
     imm_path_destroy(path);
 
     path = imm_path_create();
@@ -220,15 +220,15 @@ void test_hmm_likelihood_two_mute_states(void)
     struct imm_mute_state const* S0 = imm_mute_state_create("S0", abc);
     struct imm_mute_state const* S1 = imm_mute_state_create("S1", abc);
 
-    imm_hmm_add_state(hmm, imm_mute_state_super(S0), 0.0);
+    imm_hmm_add_state(hmm, imm_mute_state_super(S0), 0.0f);
     imm_hmm_add_state(hmm, imm_mute_state_super(S1), zero());
 
-    imm_hmm_set_trans(hmm, imm_mute_state_super(S0), imm_mute_state_super(S1), 0.0);
+    imm_hmm_set_trans(hmm, imm_mute_state_super(S0), imm_mute_state_super(S1), 0.0f);
 
     struct imm_path* path = imm_path_create();
     imm_path_append(path, imm_step_create(imm_mute_state_super(S0), 0));
     imm_path_append(path, imm_step_create(imm_mute_state_super(S1), 0));
-    cass_close(imm_hmm_likelihood(hmm, EMPTY, path), 0.0);
+    cass_close(imm_hmm_likelihood(hmm, EMPTY, path), 0.0f);
     imm_path_destroy(path);
 
     imm_hmm_destroy(hmm);
@@ -245,22 +245,22 @@ void test_hmm_likelihood_invalid(void)
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
     struct imm_mute_state const* S = imm_mute_state_create("S", abc);
-    imm_hmm_add_state(hmm, imm_mute_state_super(S), 0.0);
+    imm_hmm_add_state(hmm, imm_mute_state_super(S), 0.0f);
 
     struct imm_mute_state const* M1 = imm_mute_state_create("M1", abc);
     imm_hmm_add_state(hmm, imm_mute_state_super(M1), zero());
 
-    imm_float const                lprobs[] = {log(0.8), log(0.2)};
+    imm_float const                lprobs[] = {logf(0.8f), logf(0.2f)};
     struct imm_normal_state const* M2 = imm_normal_state_create("M2", abc, lprobs);
     imm_hmm_add_state(hmm, imm_normal_state_super(M2), zero());
 
     struct imm_mute_state const* E = imm_mute_state_create("E", abc);
     imm_hmm_add_state(hmm, imm_mute_state_super(E), zero());
 
-    imm_hmm_set_trans(hmm, imm_mute_state_super(S), imm_mute_state_super(M1), 0.0);
-    imm_hmm_set_trans(hmm, imm_mute_state_super(M1), imm_normal_state_super(M2), 0.0);
-    imm_hmm_set_trans(hmm, imm_normal_state_super(M2), imm_mute_state_super(E), 0.0);
-    imm_hmm_set_trans(hmm, imm_mute_state_super(E), imm_mute_state_super(E), 0.0);
+    imm_hmm_set_trans(hmm, imm_mute_state_super(S), imm_mute_state_super(M1), 0.0f);
+    imm_hmm_set_trans(hmm, imm_mute_state_super(M1), imm_normal_state_super(M2), 0.0f);
+    imm_hmm_set_trans(hmm, imm_normal_state_super(M2), imm_mute_state_super(E), 0.0f);
+    imm_hmm_set_trans(hmm, imm_mute_state_super(E), imm_mute_state_super(E), 0.0f);
 
     imm_hmm_normalize(hmm);
 
