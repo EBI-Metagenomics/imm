@@ -5,7 +5,6 @@ function(imm_add_perf name)
 endfunction()
 
 imm_add_perf(1thread_viterbi)
-imm_add_perf(multi_thread_viterbi)
 
 file(COPY run-perf DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 file(COPY show-perf DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")

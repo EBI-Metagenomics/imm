@@ -22,10 +22,6 @@ endif()
 
 find_package(logaddexp REQUIRED)
 find_package(elapsed REQUIRED)
-option(OPENMP "Enable OpenMP" On)
-if(OPENMP)
-    find_package(OpenMP)
-endif()
 
 add_library(imm
     src/abc.c
@@ -100,13 +96,11 @@ target_include_directories(imm
 )
 target_link_libraries(imm PUBLIC LOGADDEXP::logaddexp)
 target_link_libraries(imm PUBLIC ELAPSED::elapsed)
-target_link_libraries(imm PRIVATE $<$<BOOL:${OpenMP_C_FOUND}>:OpenMP::OpenMP_C>)
 set_target_properties(imm PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
 target_compile_features(imm PRIVATE c_std_11)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRECATE>)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:__extension__>)
-target_compile_definitions(imm PRIVATE $<$<BOOL:${OpenMP_C_FOUND}>:OPENMP>)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${IMM_DOUBLE_PRECISION}>:IMM_DOUBLE_PRECISION>)
 target_compile_options(imm PRIVATE ${WARNING_FLAGS})
 target_compile_options(imm PRIVATE "-fverbose-asm")

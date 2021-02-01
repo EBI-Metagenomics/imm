@@ -28,7 +28,6 @@
 #include "score.h"
 #include "seq_code.h"
 #include "state_idx.h"
-#include "thread.h"
 #include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
