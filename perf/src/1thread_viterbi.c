@@ -7,20 +7,30 @@
 
 #define NSAMPLES 100
 
+#define LOG(x) ((imm_float)log((x)))
+
+#ifdef IMM_DOUBLE_PRECISION
+#define CLOSE(x, y) cass_close2(x, y, 1e-9, 0.0)
+#else
+#define CLOSE(x, y) cass_close2(x, y, 1e-2, 0.0)
+#endif
+
 imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_t seq_100length);
 
 int main(void)
 {
     imm_float const logliks[] = {
-        -394.3122885464f,    -3943.1228854637f,   -7886.2457709276f,   -11829.3686563895f,
-        -15772.4915418512f,  -19715.6144273129f,  -23658.7373127746f,  -27601.8601982363f,
-        -31544.9830836981f,  -35488.1059691598f,  -39431.2288546215f,  -1681.8626184936f,
-        -16818.6261849329f,  -33637.2523698614f,  -50455.8785547899f,  -67274.5047397263f,
-        -84093.1309247308f,  -100911.7571097354f, -117730.3832947399f, -134549.0094797444f,
-        -151367.6356647490f, -168186.2618497535f, -3291.3005309278f,   -32913.0053092664f,
-        -65826.0106185297f,  -98739.0159279405f,  -131652.0212373513f, -164565.0265467621f,
-        -197478.0318561729f, -230391.0371655837f, -263304.0424749735f, -296217.0477837892f,
-        -329130.0530926048f,
+        (imm_float)-394.3122885464,    (imm_float)-3943.1228854637,   (imm_float)-7886.2457709276,
+        (imm_float)-11829.3686563895,  (imm_float)-15772.4915418512,  (imm_float)-19715.6144273129,
+        (imm_float)-23658.7373127746,  (imm_float)-27601.8601982363,  (imm_float)-31544.9830836981,
+        (imm_float)-35488.1059691598,  (imm_float)-39431.2288546215,  (imm_float)-1681.8626184936,
+        (imm_float)-16818.6261849329,  (imm_float)-33637.2523698614,  (imm_float)-50455.8785547899,
+        (imm_float)-67274.5047397263,  (imm_float)-84093.1309247308,  (imm_float)-100911.7571097354,
+        (imm_float)-117730.3832947399, (imm_float)-134549.0094797444, (imm_float)-151367.6356647490,
+        (imm_float)-168186.2618497535, (imm_float)-3291.3005309278,   (imm_float)-32913.0053092664,
+        (imm_float)-65826.0106185297,  (imm_float)-98739.0159279405,  (imm_float)-131652.0212373513,
+        (imm_float)-164565.0265467621, (imm_float)-197478.0318561729, (imm_float)-230391.0371655837,
+        (imm_float)-263304.0424749735, (imm_float)-296217.0477837892, (imm_float)-329130.0530926048,
     };
 
     printf("ncore_nodes,seq_length,median,std_err_mean,score,perf_name\n");
@@ -32,7 +42,7 @@ int main(void)
             uint16_t  len = seq_100len[j];
             imm_float seconds[NSAMPLES] = {0.};
             imm_float loglik = perf_1thread_viterbi(seconds, ncore_nodes[i], len);
-            cass_close(loglik, logliks[i * IMM_ARRAY_SIZE(seq_100len) + j]);
+            CLOSE(loglik, logliks[i * IMM_ARRAY_SIZE(seq_100len) + j]);
             struct stats stats = compute_stats(seconds, NSAMPLES);
             char const   fmt[] = "%d,%d,%.6f,%.6f,%.6f,1thread_viterbi\n";
             printf(fmt, ncore_nodes[i], len * 100, stats.median, stats.sem, loglik);
@@ -56,16 +66,16 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
     struct imm_mute_state const* start = imm_mute_state_create("START", abc);
-    imm_hmm_add_state(hmm, imm_mute_state_super(start), logf(1.0));
+    imm_hmm_add_state(hmm, imm_mute_state_super(start), LOG(1.0));
 
     struct imm_mute_state const* end = imm_mute_state_create("END", abc);
     imm_hmm_add_state(hmm, imm_mute_state_super(end), zero());
 
-    imm_float B_lprobs[] = {logf(1.0), zero(), zero(), zero(), zero()};
-    imm_float E_lprobs[] = {zero(), zero(), zero(), logf(1.0), zero()};
-    imm_float J_lprobs[] = {zero(), zero(), zero(), zero(), logf(1.0)};
-    imm_float M_lprobs[] = {zero(), logf(1.0), zero(), zero(), zero()};
-    imm_float I_lprobs[] = {zero(), zero(), logf(1.0), zero(), zero()};
+    imm_float B_lprobs[] = {LOG(1.0), zero(), zero(), zero(), zero()};
+    imm_float E_lprobs[] = {zero(), zero(), zero(), LOG(1.0), zero()};
+    imm_float J_lprobs[] = {zero(), zero(), zero(), zero(), LOG(1.0)};
+    imm_float M_lprobs[] = {zero(), LOG(1.0), zero(), zero(), zero()};
+    imm_float I_lprobs[] = {zero(), zero(), LOG(1.0), zero(), zero()};
 
     struct imm_normal_state const* B = imm_normal_state_create("B", abc, B_lprobs);
     imm_hmm_add_state(hmm, imm_normal_state_super(B), zero());
@@ -74,13 +84,13 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
     struct imm_normal_state const* J = imm_normal_state_create("J", abc, J_lprobs);
     imm_hmm_add_state(hmm, imm_normal_state_super(J), zero());
 
-    imm_hmm_set_trans(hmm, imm_mute_state_super(start), imm_normal_state_super(B), logf(0.2f));
-    imm_hmm_set_trans(hmm, imm_normal_state_super(B), imm_normal_state_super(B), logf(0.2f));
-    imm_hmm_set_trans(hmm, imm_normal_state_super(E), imm_normal_state_super(E), logf(0.2f));
-    imm_hmm_set_trans(hmm, imm_normal_state_super(J), imm_normal_state_super(J), logf(0.2f));
-    imm_hmm_set_trans(hmm, imm_normal_state_super(E), imm_normal_state_super(J), logf(0.2f));
-    imm_hmm_set_trans(hmm, imm_normal_state_super(J), imm_normal_state_super(B), logf(0.2f));
-    imm_hmm_set_trans(hmm, imm_normal_state_super(E), imm_mute_state_super(end), logf(0.2f));
+    imm_hmm_set_trans(hmm, imm_mute_state_super(start), imm_normal_state_super(B), LOG(0.2));
+    imm_hmm_set_trans(hmm, imm_normal_state_super(B), imm_normal_state_super(B), LOG(0.2));
+    imm_hmm_set_trans(hmm, imm_normal_state_super(E), imm_normal_state_super(E), LOG(0.2));
+    imm_hmm_set_trans(hmm, imm_normal_state_super(J), imm_normal_state_super(J), LOG(0.2));
+    imm_hmm_set_trans(hmm, imm_normal_state_super(E), imm_normal_state_super(J), LOG(0.2));
+    imm_hmm_set_trans(hmm, imm_normal_state_super(J), imm_normal_state_super(B), LOG(0.2));
+    imm_hmm_set_trans(hmm, imm_normal_state_super(E), imm_mute_state_super(end), LOG(0.2));
 
     struct imm_normal_state const* M[ncore_nodes];
     struct imm_normal_state const* I[ncore_nodes];
@@ -98,33 +108,33 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
 
         if (i == 0)
             imm_hmm_set_trans(hmm, imm_normal_state_super(B), imm_normal_state_super(M[0]),
-                              logf(0.2f));
+                              LOG(0.2));
 
         imm_hmm_set_trans(hmm, imm_normal_state_super(M[i]), imm_normal_state_super(I[i]),
-                          logf(0.2f));
+                          LOG(0.2));
         imm_hmm_set_trans(hmm, imm_normal_state_super(I[i]), imm_normal_state_super(I[i]),
-                          logf(0.2f));
+                          LOG(0.2));
 
         if (i > 0) {
             imm_hmm_set_trans(hmm, imm_normal_state_super(M[i - 1]), imm_normal_state_super(M[i]),
-                              logf(0.2f));
+                              LOG(0.2));
             imm_hmm_set_trans(hmm, imm_mute_state_super(D[i - 1]), imm_normal_state_super(M[i]),
-                              logf(0.2f));
+                              LOG(0.2));
             imm_hmm_set_trans(hmm, imm_normal_state_super(I[i - 1]), imm_normal_state_super(M[i]),
-                              logf(0.2f));
+                              LOG(0.2));
 
             imm_hmm_set_trans(hmm, imm_normal_state_super(M[i - 1]), imm_mute_state_super(D[i]),
-                              logf(0.2f));
+                              LOG(0.2));
             imm_hmm_set_trans(hmm, imm_mute_state_super(D[i - 1]), imm_mute_state_super(D[i]),
-                              logf(0.2f));
+                              LOG(0.2));
         }
 
         if (i == ncore_nodes - 1) {
             imm_hmm_set_trans(hmm, imm_normal_state_super(M[i]), imm_normal_state_super(E),
-                              logf(0.2f));
-            imm_hmm_set_trans(hmm, imm_mute_state_super(D[i]), imm_normal_state_super(E), logf(0.2f));
+                              LOG(0.2));
+            imm_hmm_set_trans(hmm, imm_mute_state_super(D[i]), imm_normal_state_super(E), LOG(0.2));
             imm_hmm_set_trans(hmm, imm_normal_state_super(I[i]), imm_normal_state_super(E),
-                              logf(0.2f));
+                              LOG(0.2));
         }
     }
     char* str = malloc(sizeof(*str) * (unsigned)(100 * seq_100length + 1));
