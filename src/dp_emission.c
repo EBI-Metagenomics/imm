@@ -6,16 +6,15 @@
 #include "imm/seq.h"
 #include "imm/state.h"
 #include "model_state.h"
-#include "score.h"
 #include "seq_code.h"
 #include <stdlib.h>
 
 struct dp_emission_chunk
 {
-    uint32_t  score_size;
-    score_t*  score;
-    uint32_t  offset_size;
-    uint32_t* offset;
+    uint32_t   score_size;
+    imm_float* score;
+    uint32_t   offset_size;
+    uint32_t*  offset;
 };
 
 static inline uint_fast16_t offset_size(uint_fast16_t nstates) { return nstates + 1; }
@@ -58,7 +57,8 @@ struct dp_emission const* dp_emission_create(struct seq_code const*           se
                 struct imm_seq seq = IMM_SEQ(abc, item, len);
                 uint_fast16_t  j = seq_code_encode(seq_code, &seq);
                 j -= seq_code_offset(seq_code, min_seq);
-                score_t score = (score_t)imm_state_lprob(model_state_get_state(mstates[i]), &seq);
+                imm_float score =
+                    (imm_float)imm_state_lprob(model_state_get_state(mstates[i]), &seq);
                 emiss_tbl->score[emiss_tbl->offset[i] + j] = score;
             }
         }

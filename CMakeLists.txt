@@ -101,10 +101,10 @@ set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
 target_compile_features(imm PRIVATE c_std_11)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRECATE>)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:__extension__>)
-target_compile_definitions(imm PRIVATE $<$<BOOL:${IMM_DOUBLE_PRECISION}>:IMM_DOUBLE_PRECISION>)
 target_compile_options(imm PRIVATE ${WARNING_FLAGS})
 target_compile_options(imm PRIVATE "-fverbose-asm")
 target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/imm/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/imm/config.h @ONLY)
 
 include(CheckCSourceCompiles)
 check_c_source_compiles(
@@ -130,7 +130,9 @@ install(TARGETS imm EXPORT imm-targets
     PUBLIC_HEADER DESTINATION include
 )
 install(DIRECTORY include/ DESTINATION include)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/imm/export.h
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/imm/export.h
+    ${CMAKE_CURRENT_BINARY_DIR}/imm/config.h
     DESTINATION include/imm
 )
 install(EXPORT imm-targets

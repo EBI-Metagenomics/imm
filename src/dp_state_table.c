@@ -3,23 +3,22 @@
 #include "free.h"
 #include "imm/state.h"
 #include "model_state.h"
-#include "score.h"
 #include "state_idx.h"
 #include <stdlib.h>
 
 struct dp_state_table_chunk
 {
-    uint16_t nstates;
-    uint8_t* min_seq;
-    uint8_t* max_seq;
-    score_t* start_lprob;
-    uint16_t end_state;
+    uint16_t   nstates;
+    uint8_t*   min_seq;
+    uint8_t*   max_seq;
+    imm_float* start_lprob;
+    uint16_t   end_state;
 };
 
 struct dp_state_table const* dp_state_table_create(struct model_state const* const* mstates,
-                                                   uint_fast16_t               nstates,
-                                                   struct imm_state const*     end_state,
-                                                   struct state_idx*           state_idx)
+                                                   uint_fast16_t                    nstates,
+                                                   struct imm_state const*          end_state,
+                                                   struct state_idx*                state_idx)
 {
     struct dp_state_table* table = malloc(sizeof(*table));
 
@@ -33,7 +32,7 @@ struct dp_state_table const* dp_state_table_create(struct model_state const* con
         state_idx_add(state_idx, model_state_get_state(mstates[i]), i);
         table->min_seq[i] = imm_state_min_seq(model_state_get_state(mstates[i]));
         table->max_seq[i] = imm_state_max_seq(model_state_get_state(mstates[i]));
-        table->start_lprob[i] = (score_t)model_state_get_start(mstates[i]);
+        table->start_lprob[i] = (imm_float)model_state_get_start(mstates[i]);
     }
 
     table->end_state = (uint16_t)state_idx_find(state_idx, end_state);

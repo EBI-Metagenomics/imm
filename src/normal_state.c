@@ -30,11 +30,13 @@ static struct imm_state_vtable const __vtable = {destroy, lprob, max_seq, min_se
 struct imm_normal_state const* imm_normal_state_create(char const* name, struct imm_abc const* abc,
                                                        imm_float const* lprobs)
 {
-    struct imm_normal_state* state = malloc(sizeof(struct imm_normal_state));
+    struct imm_normal_state* state = malloc(sizeof(*state));
 
     size_t len = imm_abc_length(abc);
     state->lprobs = malloc(sizeof(*state->lprobs) * len);
     memcpy(state->lprobs, lprobs, sizeof(*state->lprobs) * len);
+    printf("%.10f %.10f %.10f %.10f\n", lprobs[0], lprobs[1], lprobs[2], lprobs[3]);
+    printf("%.10f %.10f %.10f %.10f\n", state->lprobs[0], state->lprobs[1], state->lprobs[2], state->lprobs[3]);
 
     state->super = imm_state_create(name, abc, __vtable, state);
     return state;
