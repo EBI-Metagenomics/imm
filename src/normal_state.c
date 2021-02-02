@@ -35,8 +35,6 @@ struct imm_normal_state const* imm_normal_state_create(char const* name, struct 
     size_t len = imm_abc_length(abc);
     state->lprobs = malloc(sizeof(*state->lprobs) * len);
     memcpy(state->lprobs, lprobs, sizeof(*state->lprobs) * len);
-    printf("%.10f %.10f %.10f %.10f\n", lprobs[0], lprobs[1], lprobs[2], lprobs[3]);
-    printf("%.10f %.10f %.10f %.10f\n", state->lprobs[0], state->lprobs[1], state->lprobs[2], state->lprobs[3]);
 
     state->super = imm_state_create(name, abc, __vtable, state);
     return state;
