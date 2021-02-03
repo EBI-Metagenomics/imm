@@ -1,0 +1,100 @@
+The file format is formally defined in imm.ksy. We here provide a visual description of it.
+
+The file is a sequence of blocks:
+
+    |-------------|-|-----------------------------------|
+    |             | | block_type: uint8_t (0x00)        |
+    | Block 0     | | body: non-empty sequence of bytes |
+    |             | |                                   |
+    |-------------|-|-----------------------------------|
+    |             | | block_type: uint8_t (0x00)        |
+    | Block 1     | | body: non-empty sequence of bytes |
+    |             | |                                   |
+    |-------------|-|-----------------------------------|
+    ...
+    |-------------|-|-----------------------------------|
+    |             | | block_type: uint8_t (0xff)        |
+    | Block n-1   | | body: empty sequence of bytes     |
+    |             | |                                   |
+    |-------------|-|-----------------------------------|
+
+A block has a type defined by the block_type field: model (0x00) or end_of_file (0xff). The only
+block to have type end_of_file is the Block n-1 to the stream of bytes.
+
+The body of a model block contains the following chunk:
+
+     model_block                              abc
+    |--------------------------------------| |---------------------------|
+    | abc: abc                             | | nsymbols: uint8_t         |
+    |                                      | | symbols: char[nsymbols+1] |
+    |                                      | | any_symbol: char          |
+    |--------------------------------------| |---------------------------|
+    | nhmm_blocks: uint8_t                 |
+    | hmm_block: hmm_block[nhmm_blocks]    |
+    |--------------------------------------|
+
+A hmm_block has the following fields:
+
+     hmm_block                                            state
+    |---------------|-|---------------------------|  /---|---------------------------|
+    | hmm: hmm      | | nstates: uint16_t         | /    | start_lprob: float        |
+    |               | |---------------------------|/     | state_type: uint8_t       |
+    |               | | State 0                   |      | name_length: uint8_t      |
+    |               | |---------------------------|\     | name: char[name_length+1] |
+    |               | | State 1                   | \    | body: sequence of bytes   |
+    |               | |---------------------------|  \---|---------------------------|
+    |               | ...
+    |               | |---------------------------|
+    |               | | State nstates-1           |
+    |               | |---------------------------|      transition
+    |               | | ntransitions: uint16_t    | /---|----------------------------|
+    |               | |---------------------------|/    | source_state: uint16_t     |
+    |               | | Transition 0              |     | target_state: uint16_t     |
+    |               | |---------------------------|\    | lprob: float               |
+    |               | | Transition 1              | \---|----------------------------|
+    |               | |---------------------------|
+    |               | ...                                        seq_code
+    |               | |---------------------------|             |-------------------------------------|
+    |               | | Transition ntransitions-1 |             | min_seq: uint8_t                    |
+    |---------------|-|---------------------------|             | max_seq: uint8_t                    |
+    | dp: dp        | | seq_code                  |-------------| offset: uint16_t[max_seq-min_seq+1] |
+    |               | |---------------------------|             | stride: uint16_t[max_seq]           |
+    |               | | dp_emission               |---\         | size: uint16_t                      |
+    |               | |---------------------------|    \        |-------------------------------------|
+    |               | | dp_trans_table            |--\  \
+    |               | |---------------------------|   \  \       dp_emission
+    |               | | dp_state_table            |-\  \  \     |-------------------------------------|
+    |---------------|-|---------------------------|  \  \  \    | score_size: uint32_t                |
+                                                      \  \  \---| score: float[score_size]            |
+                                                       \  \     | offset_size: uint32_t               |
+                                                       |  |     | offset: uint32_t[offset_size]       |
+                                                       |  |     |-------------------------------------|
+                                                       |  |
+                                                       |  |      dp_trans_table
+                                                       |  |     |-------------------------------------|
+                                                       |  |     | ntrans: uint16_t                    |
+                                                       |  |     | score: float[ntrans]                |
+                                                       |  \-----| source_state: uint16_t[ntrans]      |
+                                                       |        | offset_size: uint16_t               |
+                                                       |        | offset: uint16_t[offset_size]       |
+                                                       |        |-------------------------------------|
+                                                       |
+                                                       |         dp_state_table
+                                                       |        |-------------------------------------|
+                                                       |        | nstates: uint16_t                   |
+                                                       |        | min_seq: uint8_t[nstates]           |
+                                                       \--------| max_seq: uint8_t[nstates]           |
+                                                                | start_lprob: float[nstates]         |
+                                                                | end_state: uint16_t                 |
+                                                                |-------------------------------------|
+
+The state_type field of a state chunk will have one of three values, each
+representing a different state type: mute (0x00), normal (0x01), and table
+(0x02). Additional state data is stored in the body field, and are defined as
+follows:
+
+     mute_state                      normal_state                   table_state
+    |----------------------------|  |----------------------------| |----------------------------|
+    | empty                      |  | lprobs_size: uint8_t       | | undefined                  |
+    |----------------------------|  | lprobs: float[lprobs_size] | |----------------------------|
+                                    |----------------------------|
