@@ -53,40 +53,40 @@ A hmm_block has the following fields:
     |               | |---------------------------|\    | lprob: float               |
     |               | | Transition 1              | \---|----------------------------|
     |               | |---------------------------|
-    |               | ...                                        seq_code
-    |               | |---------------------------|             |-------------------------------------|
-    |               | | Transition ntransitions-1 |             | min_seq: uint8_t                    |
-    |---------------|-|---------------------------|             | max_seq: uint8_t                    |
-    | dp: dp        | | seq_code                  |-------------| offset: uint16_t[max_seq-min_seq+1] |
-    |               | |---------------------------|             | stride: uint16_t[max_seq]           |
-    |               | | dp_emission               |---\         | size: uint16_t                      |
-    |               | |---------------------------|    \        |-------------------------------------|
-    |               | | dp_trans_table            |--\  \
-    |               | |---------------------------|   \  \       dp_emission
-    |               | | dp_state_table            |-\  \  \     |-------------------------------------|
-    |---------------|-|---------------------------|  \  \  \    | score_size: uint32_t                |
-                                                      \  \  \---| score: float[score_size]            |
-                                                       \  \     | offset_size: uint32_t               |
-                                                       |  |     | offset: uint32_t[offset_size]       |
-                                                       |  |     |-------------------------------------|
+    |               | ...                                     seq_code
+    |               | |---------------------------|          |-------------------------------------|
+    |               | | Transition ntransitions-1 |          | min_seq: uint8_t                    |
+    |---------------|-|---------------------------|          | max_seq: uint8_t                    |
+    | dp: dp        | | seq_code                  |----------| offset: uint16_t[max_seq-min_seq+1] |
+    |               | |---------------------------|          | stride: uint16_t[max_seq]           |
+    |               | | dp_emission               |--\       | size: uint16_t                      |
+    |               | |---------------------------|   \      |-------------------------------------|
+    |               | | dp_trans_table            |--\ \
+    |               | |---------------------------|   \ \     dp_emission
+    |               | | dp_state_table            |--\ \ \   |-------------------------------------|
+    |---------------|-|---------------------------|   \ \ \  | score_size: uint32_t                |
+                                                       \ \ \-| score: float[score_size]            |
+                                                       |  \  | offset_size: uint32_t               |
+                                                       |  |  | offset: uint32_t[offset_size]       |
+                                                       |  |  |-------------------------------------|
                                                        |  |
-                                                       |  |      dp_trans_table
-                                                       |  |     |-------------------------------------|
-                                                       |  |     | ntrans: uint16_t                    |
-                                                       |  |     | score: float[ntrans]                |
-                                                       |  \-----| source_state: uint16_t[ntrans]      |
-                                                       |        | offset_size: uint16_t               |
-                                                       |        | offset: uint16_t[offset_size]       |
-                                                       |        |-------------------------------------|
+                                                       |  |   dp_trans_table
+                                                       |  |  |-------------------------------------|
+                                                       |  |  | ntrans: uint16_t                    |
+                                                       |  |  | score: float[ntrans]                |
+                                                       |  \--| source_state: uint16_t[ntrans]      |
+                                                       |     | offset_size: uint16_t               |
+                                                       |     | offset: uint16_t[offset_size]       |
+                                                       |     |-------------------------------------|
                                                        |
-                                                       |         dp_state_table
-                                                       |        |-------------------------------------|
-                                                       |        | nstates: uint16_t                   |
-                                                       |        | min_seq: uint8_t[nstates]           |
-                                                       \--------| max_seq: uint8_t[nstates]           |
-                                                                | start_lprob: float[nstates]         |
-                                                                | end_state: uint16_t                 |
-                                                                |-------------------------------------|
+                                                       |      dp_state_table
+                                                       |     |-------------------------------------|
+                                                       |     | nstates: uint16_t                   |
+                                                       |     | min_seq: uint8_t[nstates]           |
+                                                       \-----| max_seq: uint8_t[nstates]           |
+                                                             | start_lprob: float[nstates]         |
+                                                             | end_state: uint16_t                 |
+                                                             |-------------------------------------|
 
 The state_type field of a state chunk will have one of three values, each
 representing a different state type: mute (0x00), normal (0x01), and table
