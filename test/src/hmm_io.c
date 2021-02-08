@@ -43,9 +43,9 @@ void test_hmm_write_io_two_states(void)
     struct imm_result const* r = imm_results_get(results, 0);
     struct imm_subseq        subseq = imm_result_subseq(r);
     struct imm_seq const*    s = imm_subseq_cast(&subseq);
-    imm_float                score = imm_hmm_likelihood(hmm, s, imm_result_path(r));
+    imm_float                score = imm_hmm_loglikelihood(hmm, s, imm_result_path(r));
     CLOSE(score, imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
-    CLOSE(imm_hmm_likelihood(hmm, C, path), imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
+    CLOSE(imm_hmm_loglikelihood(hmm, C, path), imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
     imm_results_destroy(results);
 
     struct imm_output* output = imm_output_create(TMPDIR "/two_states.imm");
@@ -89,9 +89,9 @@ void test_hmm_write_io_two_states(void)
     subseq = imm_result_subseq(r);
     s = imm_subseq_cast(&subseq);
     path = imm_result_path(r);
-    score = imm_hmm_likelihood(hmm, s, imm_result_path(r));
+    score = imm_hmm_loglikelihood(hmm, s, imm_result_path(r));
     CLOSE(score, imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
-    CLOSE(imm_hmm_likelihood(hmm, C, path), imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
+    CLOSE(imm_hmm_loglikelihood(hmm, C, path), imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
     imm_results_destroy(results);
 
     for (uint16_t i = 0; i < imm_model_nstates(model); ++i) {

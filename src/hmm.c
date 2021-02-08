@@ -115,7 +115,7 @@ imm_float imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* s
     return model_trans_get_lprob(model_trans_table_get(table, i));
 }
 
-imm_float imm_hmm_likelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
+imm_float imm_hmm_loglikelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
                              struct imm_path const* path)
 {
     if (hmm->abc != imm_seq_get_abc(seq)) {

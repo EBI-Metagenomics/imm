@@ -34,7 +34,7 @@ void test_perf_viterbi(void)
     cass_cond(imm_results_size(results) == 1);
     struct imm_result const* r = imm_results_get(results, 0);
     struct imm_subseq        subseq = imm_result_subseq(r);
-    imm_float score = imm_hmm_likelihood(model.hmm, imm_subseq_cast(&subseq), imm_result_path(r));
+    imm_float score = imm_hmm_loglikelihood(model.hmm, imm_subseq_cast(&subseq), imm_result_path(r));
     cass_cond(imm_lprob_is_valid(score));
     cass_cond(!imm_lprob_is_zero(score));
     cass_close(score, -65826.0118484497);
@@ -83,7 +83,7 @@ void test_perf_viterbi_input(void)
     struct imm_results const* results = imm_dp_viterbi(dp, task);
     struct imm_result const*  r = imm_results_get(results, 0);
     struct imm_subseq         subseq = imm_result_subseq(r);
-    imm_float score = imm_hmm_likelihood(hmm, imm_subseq_cast(&subseq), imm_result_path(r));
+    imm_float score = imm_hmm_loglikelihood(hmm, imm_subseq_cast(&subseq), imm_result_path(r));
     cass_cond(imm_lprob_is_valid(score));
     cass_cond(!imm_lprob_is_zero(score));
     cass_close(score, -65826.0118484497);

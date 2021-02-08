@@ -47,7 +47,7 @@ static void check(struct model1 model, struct imm_results const* results, uint16
     struct imm_result const* result = imm_results_get(results, i);
     struct imm_subseq        subseq = imm_result_subseq(result);
     struct imm_seq const*    s = imm_subseq_cast(&subseq);
-    imm_float                score = imm_hmm_likelihood(model.hmm, s, imm_result_path(result));
+    imm_float                score = imm_hmm_loglikelihood(model.hmm, s, imm_result_path(result));
     cass_close(score, desired_score);
     cass_cond(strncmp(imm_seq_string(s), desired_str, imm_seq_length(s)) == 0);
 }

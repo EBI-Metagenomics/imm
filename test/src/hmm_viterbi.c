@@ -53,21 +53,21 @@ void test_hmm_viterbi_one_mute_state(void)
 
     struct imm_path* path = NULL;
     CLOSE(single_viterbi(hmm, EMPTY, imm_mute_state_super(state), &path), logf(0.5f));
-    CLOSE(imm_hmm_likelihood(hmm, EMPTY, path), logf(0.5f));
+    CLOSE(imm_hmm_loglikelihood(hmm, EMPTY, path), logf(0.5f));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, C, imm_mute_state_super(state), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, C, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, C, path)));
     imm_path_destroy(path);
 
     imm_hmm_set_start(hmm, imm_mute_state_super(state), imm_lprob_zero());
 
     cass_cond(!is_valid(single_viterbi(hmm, EMPTY, imm_mute_state_super(state), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, EMPTY, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, EMPTY, path)));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, C, imm_mute_state_super(state), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, C, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, C, path)));
     imm_path_destroy(path);
 
     imm_hmm_destroy(hmm);
@@ -91,27 +91,27 @@ void test_hmm_viterbi_two_mute_states(void)
 
     struct imm_path* path = NULL;
     CLOSE(single_viterbi(hmm, EMPTY, imm_mute_state_super(state0), &path), logf(0.5f));
-    CLOSE(imm_hmm_likelihood(hmm, EMPTY, path), logf(0.5f));
+    CLOSE(imm_hmm_loglikelihood(hmm, EMPTY, path), logf(0.5f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, EMPTY, imm_mute_state_super(state1), &path), logf(0.1f));
-    CLOSE(imm_hmm_likelihood(hmm, EMPTY, path), logf(0.1f));
+    CLOSE(imm_hmm_loglikelihood(hmm, EMPTY, path), logf(0.1f));
     imm_path_destroy(path);
 
     imm_hmm_set_start(hmm, imm_mute_state_super(state1), imm_lprob_zero());
 
     CLOSE(single_viterbi(hmm, EMPTY, imm_mute_state_super(state0), &path), logf(0.5f));
-    CLOSE(imm_hmm_likelihood(hmm, EMPTY, path), logf(0.5f));
+    CLOSE(imm_hmm_loglikelihood(hmm, EMPTY, path), logf(0.5f));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, EMPTY, imm_mute_state_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, EMPTY, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, EMPTY, path)));
     imm_path_destroy(path);
 
     imm_hmm_set_trans(hmm, imm_mute_state_super(state0), imm_mute_state_super(state1), logf(0.1f));
 
     CLOSE(single_viterbi(hmm, EMPTY, imm_mute_state_super(state1), &path), logf(0.5f) + logf(0.1f));
-    CLOSE(imm_hmm_likelihood(hmm, EMPTY, path), logf(0.5f) + logf(0.1f));
+    CLOSE(imm_hmm_loglikelihood(hmm, EMPTY, path), logf(0.5f) + logf(0.1f));
     imm_path_destroy(path);
 
     imm_hmm_destroy(hmm);
@@ -139,11 +139,11 @@ void test_hmm_viterbi_mute_cycle(void)
 
     struct imm_path* path = NULL;
     cass_cond(!is_valid(single_viterbi(hmm, EMPTY, imm_mute_state_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, EMPTY, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, EMPTY, path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, EMPTY, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, EMPTY, path)));
     imm_path_destroy(path);
 
     imm_hmm_destroy(hmm);
@@ -171,49 +171,49 @@ void test_hmm_viterbi_one_normal_state(void)
 
     struct imm_path* path = NULL;
     cass_cond(!is_valid(single_viterbi(hmm, EMPTY, imm_normal_state_super(state), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, EMPTY, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, EMPTY, path)));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, A, imm_normal_state_super(state), &path), logf(0.1f) + logf(0.25f));
-    CLOSE(imm_hmm_likelihood(hmm, A, path), logf(0.1f) + logf(0.25f));
+    CLOSE(imm_hmm_loglikelihood(hmm, A, path), logf(0.1f) + logf(0.25f));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, T, imm_normal_state_super(state), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, T, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, T, path)));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, AC, imm_normal_state_super(state), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, AC, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, AC, path)));
     imm_path_destroy(path);
 
     imm_hmm_set_trans(hmm, imm_normal_state_super(state), imm_normal_state_super(state),
                       logf(0.1f));
 
     CLOSE(single_viterbi(hmm, A, imm_normal_state_super(state), &path), logf(0.1f) + logf(0.25f));
-    CLOSE(imm_hmm_likelihood(hmm, A, path), logf(0.1f) + logf(0.25f));
+    CLOSE(imm_hmm_loglikelihood(hmm, A, path), logf(0.1f) + logf(0.25f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, AA, imm_normal_state_super(state), &path),
           2 * logf(0.1f) + 2 * logf(0.25f));
-    CLOSE(imm_hmm_likelihood(hmm, AA, path), 2 * logf(0.1f) + 2 * logf(0.25f));
+    CLOSE(imm_hmm_loglikelihood(hmm, AA, path), 2 * logf(0.1f) + 2 * logf(0.25f));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, ACT, imm_normal_state_super(state), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, ACT, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, ACT, path)));
     imm_path_destroy(path);
 
     imm_hmm_normalize(hmm);
 
     CLOSE(single_viterbi(hmm, A, imm_normal_state_super(state), &path), logf(0.25f));
-    CLOSE(imm_hmm_likelihood(hmm, A, path), logf(0.25f));
+    CLOSE(imm_hmm_loglikelihood(hmm, A, path), logf(0.25f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, AA, imm_normal_state_super(state), &path), 2 * logf(0.25f));
-    CLOSE(imm_hmm_likelihood(hmm, AA, path), 2 * logf(0.25f));
+    CLOSE(imm_hmm_loglikelihood(hmm, AA, path), 2 * logf(0.25f));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, ACT, imm_normal_state_super(state), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, ACT, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, ACT, path)));
     imm_path_destroy(path);
 
     imm_hmm_destroy(hmm);
@@ -252,28 +252,28 @@ void test_hmm_viterbi_two_normal_states(void)
 
     struct imm_path* path = NULL;
     cass_cond(!is_valid(single_viterbi(hmm, EMPTY, imm_normal_state_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, EMPTY, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, EMPTY, path)));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, A, imm_normal_state_super(state0), &path), logf(0.1f) + logf(0.25f));
-    CLOSE(imm_hmm_likelihood(hmm, A, path), logf(0.1f) + logf(0.25f));
+    CLOSE(imm_hmm_loglikelihood(hmm, A, path), logf(0.1f) + logf(0.25f));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, T, imm_normal_state_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, T, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, T, path)));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, AC, imm_normal_state_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, AC, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, AC, path)));
     imm_path_destroy(path);
 
     imm_float desired = logf(0.1f) + logf(0.25f) + logf(0.3f) + logf(0.5f);
     CLOSE(single_viterbi(hmm, AT, imm_normal_state_super(state1), &path), desired);
-    CLOSE(imm_hmm_likelihood(hmm, AT, path), desired);
+    CLOSE(imm_hmm_loglikelihood(hmm, AT, path), desired);
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, ATT, imm_normal_state_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, ATT, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, ATT, path)));
     imm_path_destroy(path);
 
     imm_hmm_set_trans(hmm, imm_normal_state_super(state1), imm_normal_state_super(state1),
@@ -281,14 +281,14 @@ void test_hmm_viterbi_two_normal_states(void)
 
     desired = logf(0.2f) + logf(0.25f) + 4 * logf(0.5f);
     CLOSE(single_viterbi(hmm, ATT, imm_normal_state_super(state1), &path), desired);
-    CLOSE(imm_hmm_likelihood(hmm, ATT, path), desired);
+    CLOSE(imm_hmm_loglikelihood(hmm, ATT, path), desired);
     imm_path_destroy(path);
 
     imm_hmm_set_start(hmm, imm_normal_state_super(state1), imm_lprob_zero());
 
     desired = logf(0.1f) + logf(0.25f) + logf(0.3f) + 3 * logf(0.5f);
     CLOSE(single_viterbi(hmm, ATT, imm_normal_state_super(state1), &path), desired);
-    CLOSE(imm_hmm_likelihood(hmm, ATT, path), desired);
+    CLOSE(imm_hmm_loglikelihood(hmm, ATT, path), desired);
     imm_path_destroy(path);
 
     imm_hmm_destroy(hmm);
@@ -336,47 +336,47 @@ void test_hmm_viterbi_normal_states(void)
 
     struct imm_path* path = NULL;
     cass_cond(!is_valid(single_viterbi(hmm, EMPTY, imm_normal_state_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, EMPTY, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, EMPTY, path)));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, EMPTY, imm_normal_state_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, EMPTY, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, EMPTY, path)));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, A, imm_normal_state_super(state0), &path), -1.386294361120);
 
-    CLOSE(imm_hmm_likelihood(hmm, A, path), -1.386294361120);
+    CLOSE(imm_hmm_loglikelihood(hmm, A, path), -1.386294361120);
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, A, imm_normal_state_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, A, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, A, path)));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, AG, imm_normal_state_super(state0), &path), -3.178053830348);
 
-    CLOSE(imm_hmm_likelihood(hmm, AG, path), -3.178053830348);
+    CLOSE(imm_hmm_loglikelihood(hmm, AG, path), -3.178053830348);
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, AG, imm_normal_state_super(state1), &path), -3.295836866004);
 
-    CLOSE(imm_hmm_likelihood(hmm, AG, path), -3.295836866004);
+    CLOSE(imm_hmm_loglikelihood(hmm, AG, path), -3.295836866004);
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, AGT, imm_normal_state_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, AGT, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, AGT, path)));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, AGT, imm_normal_state_super(state1), &path), -4.106767082221);
 
-    CLOSE(imm_hmm_likelihood(hmm, AGT, path), -4.106767082221);
+    CLOSE(imm_hmm_loglikelihood(hmm, AGT, path), -4.106767082221);
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, AGTC, imm_normal_state_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, AGTC, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, AGTC, path)));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, AGTC, imm_normal_state_super(state1), &path), -6.303991659557);
-    CLOSE(imm_hmm_likelihood(hmm, AGTC, path), -6.303991659557);
+    CLOSE(imm_hmm_loglikelihood(hmm, AGTC, path), -6.303991659557);
     imm_path_destroy(path);
 
     imm_hmm_set_trans(hmm, imm_normal_state_super(state0), imm_normal_state_super(state0), zero());
@@ -388,105 +388,105 @@ void test_hmm_viterbi_normal_states(void)
     imm_hmm_set_start(hmm, imm_normal_state_super(state1), zero());
 
     cass_cond(!is_valid(single_viterbi(hmm, EMPTY, imm_normal_state_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, EMPTY, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, EMPTY, path)));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, EMPTY, imm_normal_state_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, EMPTY, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, EMPTY, path)));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, A, imm_normal_state_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, A, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, A, path)));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, A, imm_normal_state_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, A, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, A, path)));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, AA, imm_normal_state_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, AA, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, AA, path)));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, AA, imm_normal_state_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, AA, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, AA, path)));
     imm_path_destroy(path);
 
     imm_hmm_set_start(hmm, imm_normal_state_super(state0), 0.0);
 
     cass_cond(!is_valid(single_viterbi(hmm, EMPTY, imm_normal_state_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, EMPTY, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, EMPTY, path)));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, EMPTY, imm_normal_state_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, EMPTY, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, EMPTY, path)));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, A, imm_normal_state_super(state0), &path), logf(0.25f));
-    CLOSE(imm_hmm_likelihood(hmm, A, path), logf(0.25f));
+    CLOSE(imm_hmm_loglikelihood(hmm, A, path), logf(0.25f));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, A, imm_normal_state_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, A, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, A, path)));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, AA, imm_normal_state_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, AA, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, AA, path)));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, AA, imm_normal_state_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, AA, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, AA, path)));
     imm_path_destroy(path);
 
     imm_hmm_set_trans(hmm, imm_normal_state_super(state0), imm_normal_state_super(state0),
                       logf(0.9f));
 
     cass_cond(!is_valid(single_viterbi(hmm, EMPTY, imm_normal_state_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, EMPTY, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, EMPTY, path)));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, EMPTY, imm_normal_state_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, EMPTY, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, EMPTY, path)));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, A, imm_normal_state_super(state0), &path), logf(0.25f));
-    CLOSE(imm_hmm_likelihood(hmm, A, path), logf(0.25f));
+    CLOSE(imm_hmm_loglikelihood(hmm, A, path), logf(0.25f));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, A, imm_normal_state_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, A, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, A, path)));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, AA, imm_normal_state_super(state0), &path),
           2 * logf(0.25f) + logf(0.9f));
-    CLOSE(imm_hmm_likelihood(hmm, AA, path), 2 * logf(0.25f) + logf(0.9f));
+    CLOSE(imm_hmm_loglikelihood(hmm, AA, path), 2 * logf(0.25f) + logf(0.9f));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, AA, imm_normal_state_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, AA, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, AA, path)));
     imm_path_destroy(path);
 
     imm_hmm_set_trans(hmm, imm_normal_state_super(state0), imm_normal_state_super(state1),
                       logf(0.2f));
 
     cass_cond(!is_valid(single_viterbi(hmm, EMPTY, imm_normal_state_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, EMPTY, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, EMPTY, path)));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, EMPTY, imm_normal_state_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, EMPTY, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, EMPTY, path)));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, A, imm_normal_state_super(state0), &path), logf(0.25f));
-    CLOSE(imm_hmm_likelihood(hmm, A, path), logf(0.25f));
+    CLOSE(imm_hmm_loglikelihood(hmm, A, path), logf(0.25f));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, A, imm_normal_state_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, A, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, A, path)));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, AA, imm_normal_state_super(state0), &path),
           2 * logf(0.25f) + logf(0.9f));
-    CLOSE(imm_hmm_likelihood(hmm, AA, path), 2 * logf(0.25f) + logf(0.9f));
+    CLOSE(imm_hmm_loglikelihood(hmm, AA, path), 2 * logf(0.25f) + logf(0.9f));
     imm_path_destroy(path);
 
     imm_hmm_destroy(hmm);
@@ -539,72 +539,72 @@ void test_hmm_viterbi_profile1(void)
     struct imm_path* path = NULL;
     CLOSE(single_viterbi(hmm, EMPTY, imm_mute_state_super(end), &path), logf(0.1f) + logf(1.0f));
 
-    CLOSE(imm_hmm_likelihood(hmm, EMPTY, path), logf(0.1f) + logf(1.0));
+    CLOSE(imm_hmm_loglikelihood(hmm, EMPTY, path), logf(0.1f) + logf(1.0));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, EMPTY, imm_mute_state_super(D0), &path), logf(0.1f));
-    CLOSE(imm_hmm_likelihood(hmm, EMPTY, path), logf(0.1f));
+    CLOSE(imm_hmm_loglikelihood(hmm, EMPTY, path), logf(0.1f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, EMPTY, imm_mute_state_super(start), &path), logf(1.0));
-    CLOSE(imm_hmm_likelihood(hmm, EMPTY, path), logf(1.0));
+    CLOSE(imm_hmm_loglikelihood(hmm, EMPTY, path), logf(1.0));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, EMPTY, imm_normal_state_super(M0), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, EMPTY, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, EMPTY, path)));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, A, imm_mute_state_super(start), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, A, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, A, path)));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, A, imm_mute_state_super(D0), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, A, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, A, path)));
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, A, imm_normal_state_super(I0), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, A, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, A, path)));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, A, imm_normal_state_super(M0), &path), logf(0.5f) + logf(0.4f));
 
-    CLOSE(imm_hmm_likelihood(hmm, A, path), logf(0.5f) + logf(0.4f));
+    CLOSE(imm_hmm_loglikelihood(hmm, A, path), logf(0.5f) + logf(0.4f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, A, imm_mute_state_super(end), &path),
           logf(0.5f) + logf(0.4f) + logf(0.8f));
-    CLOSE(imm_hmm_likelihood(hmm, A, path), logf(0.5f) + logf(0.4f) + logf(0.8f));
+    CLOSE(imm_hmm_loglikelihood(hmm, A, path), logf(0.5f) + logf(0.4f) + logf(0.8f));
 
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, B, imm_normal_state_super(M0), &path), logf(0.5f) + logf(0.2f));
 
-    CLOSE(imm_hmm_likelihood(hmm, B, path), logf(0.5f) + logf(0.2f));
+    CLOSE(imm_hmm_loglikelihood(hmm, B, path), logf(0.5f) + logf(0.2f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, B, imm_mute_state_super(end), &path),
           logf(0.5f) + logf(0.2f) + logf(0.8f));
-    CLOSE(imm_hmm_likelihood(hmm, B, path), logf(0.5f) + logf(0.2f) + logf(0.8f));
+    CLOSE(imm_hmm_loglikelihood(hmm, B, path), logf(0.5f) + logf(0.2f) + logf(0.8f));
 
     imm_path_destroy(path);
 
     cass_cond(!is_valid(single_viterbi(hmm, AA, imm_normal_state_super(M0), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, AA, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, AA, path)));
     imm_path_destroy(path);
 
     imm_float desired = logf(0.5f) + logf(0.4f) + logf(0.1f) + logf(0.5f);
     CLOSE(single_viterbi(hmm, AA, imm_mute_state_super(end), &path), desired);
-    CLOSE(imm_hmm_likelihood(hmm, AA, path), desired);
+    CLOSE(imm_hmm_loglikelihood(hmm, AA, path), desired);
     imm_path_destroy(path);
 
     desired = logf(0.5f) + logf(0.4f) + logf(0.1f) + logf(0.5f);
     CLOSE(single_viterbi(hmm, AA, imm_mute_state_super(end), &path), desired);
-    CLOSE(imm_hmm_likelihood(hmm, AA, path), desired);
+    CLOSE(imm_hmm_loglikelihood(hmm, AA, path), desired);
     imm_path_destroy(path);
 
     desired = logf(0.5f) + logf(0.4f) + logf(0.1f) + logf(0.2f) + 2 * logf(0.5f);
     CLOSE(single_viterbi(hmm, AAB, imm_mute_state_super(end), &path), desired);
-    CLOSE(imm_hmm_likelihood(hmm, AAB, path), desired);
+    CLOSE(imm_hmm_loglikelihood(hmm, AAB, path), desired);
     imm_path_destroy(path);
 
     imm_hmm_destroy(hmm);
@@ -695,82 +695,82 @@ void test_hmm_viterbi_profile2(void)
 
     struct imm_path* path = NULL;
     CLOSE(single_viterbi(hmm, A, imm_normal_state_super(M2), &path), logf(0.05f));
-    CLOSE(imm_hmm_likelihood(hmm, A, path), logf(0.05f));
+    CLOSE(imm_hmm_loglikelihood(hmm, A, path), logf(0.05f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, B, imm_normal_state_super(M2), &path), logf(0.05f));
-    CLOSE(imm_hmm_likelihood(hmm, B, path), logf(0.05f));
+    CLOSE(imm_hmm_loglikelihood(hmm, B, path), logf(0.05f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, C, imm_normal_state_super(M2), &path), logf(0.05f));
-    CLOSE(imm_hmm_likelihood(hmm, C, path), logf(0.05f));
+    CLOSE(imm_hmm_loglikelihood(hmm, C, path), logf(0.05f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, D, imm_normal_state_super(M2), &path), logf(0.05f));
-    CLOSE(imm_hmm_likelihood(hmm, D, path), logf(0.05f));
+    CLOSE(imm_hmm_loglikelihood(hmm, D, path), logf(0.05f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, A, imm_mute_state_super(end), &path), logf(0.6f));
-    CLOSE(imm_hmm_likelihood(hmm, A, path), logf(0.6f));
+    CLOSE(imm_hmm_loglikelihood(hmm, A, path), logf(0.6f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, B, imm_mute_state_super(end), &path), logf(0.05f));
-    CLOSE(imm_hmm_likelihood(hmm, B, path), logf(0.05f));
+    CLOSE(imm_hmm_loglikelihood(hmm, B, path), logf(0.05f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, C, imm_mute_state_super(end), &path), logf(0.6f));
-    CLOSE(imm_hmm_likelihood(hmm, C, path), logf(0.6f));
+    CLOSE(imm_hmm_loglikelihood(hmm, C, path), logf(0.6f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, D, imm_mute_state_super(end), &path), logf(0.05f));
-    CLOSE(imm_hmm_likelihood(hmm, D, path), logf(0.05f));
+    CLOSE(imm_hmm_loglikelihood(hmm, D, path), logf(0.05f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, A, imm_normal_state_super(M1), &path), logf(0.6f));
-    CLOSE(imm_hmm_likelihood(hmm, A, path), logf(0.6f));
+    CLOSE(imm_hmm_loglikelihood(hmm, A, path), logf(0.6f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, C, imm_normal_state_super(M1), &path), logf(0.4f));
-    CLOSE(imm_hmm_likelihood(hmm, C, path), logf(0.4f));
+    CLOSE(imm_hmm_loglikelihood(hmm, C, path), logf(0.4f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, CA, imm_mute_state_super(end), &path), 2 * logf(0.6f));
-    CLOSE(imm_hmm_likelihood(hmm, CA, path), 2 * logf(0.6f));
+    CLOSE(imm_hmm_loglikelihood(hmm, CA, path), 2 * logf(0.6f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, CD, imm_normal_state_super(I0), &path),
           logf(0.6f) + logf(0.2f) + logf(0.7f));
-    CLOSE(imm_hmm_likelihood(hmm, CD, path), logf(0.6f) + logf(0.2f) + logf(0.7f));
+    CLOSE(imm_hmm_loglikelihood(hmm, CD, path), logf(0.6f) + logf(0.2f) + logf(0.7f));
     imm_path_destroy(path);
 
     imm_float desired = logf(0.6f) + logf(0.2f) + 3 * logf(0.7f) + 3 * logf(0.5f) + logf(0.6f);
     CLOSE(single_viterbi(hmm, CDDDA, imm_mute_state_super(end), &path), desired);
-    CLOSE(imm_hmm_likelihood(hmm, CDDDA, path), desired);
+    CLOSE(imm_hmm_loglikelihood(hmm, CDDDA, path), desired);
     imm_path_destroy(path);
 
     desired = logf(0.6f) + logf(0.2f) + 3 * logf(0.7f) + 3 * logf(0.5f) + logf(0.6f) + logf(0.05f);
     CLOSE(single_viterbi(hmm, CDDDAB, imm_mute_state_super(end), &path), desired);
-    CLOSE(imm_hmm_likelihood(hmm, CDDDAB, path), desired);
+    CLOSE(imm_hmm_loglikelihood(hmm, CDDDAB, path), desired);
     imm_path_destroy(path);
 
     desired = logf(0.6f) + logf(0.2f) + 3 * logf(0.7f) + 3 * logf(0.5f) + logf(0.6f) + logf(0.2f) +
               logf(0.1f) + logf(0.5f) + logf(0.05f);
     CLOSE(single_viterbi(hmm, CDDDABA, imm_normal_state_super(M2), &path), desired);
-    CLOSE(imm_hmm_likelihood(hmm, CDDDABA, path), desired);
+    CLOSE(imm_hmm_loglikelihood(hmm, CDDDABA, path), desired);
     imm_path_destroy(path);
 
     desired =
         logf(0.6f) + logf(0.2f) + 5 * logf(0.5f) + 3 * logf(0.7f) + 2 * logf(0.1f) + logf(0.6f);
 
     CLOSE(single_viterbi(hmm, CDDDABA, imm_normal_state_super(M1), &path), desired);
-    CLOSE(imm_hmm_likelihood(hmm, CDDDABA, path), desired);
+    CLOSE(imm_hmm_loglikelihood(hmm, CDDDABA, path), desired);
     imm_path_destroy(path);
 
     desired =
         logf(0.6f) + logf(0.2f) + 5 * logf(0.5f) + 3 * logf(0.7f) + 2 * logf(0.1f) + logf(0.6f);
 
     CLOSE(single_viterbi(hmm, CDDDABA, imm_mute_state_super(end), &path), desired);
-    CLOSE(imm_hmm_likelihood(hmm, CDDDABA, path), desired);
+    CLOSE(imm_hmm_loglikelihood(hmm, CDDDABA, path), desired);
     imm_path_destroy(path);
 
     imm_hmm_destroy(hmm);
@@ -825,21 +825,21 @@ void test_hmm_viterbi_profile_delete(void)
 
     struct imm_path* path = NULL;
     CLOSE(single_viterbi(hmm, A, imm_normal_state_super(N0), &path), logf(0.5f));
-    CLOSE(imm_hmm_likelihood(hmm, A, path), logf(0.5f));
+    CLOSE(imm_hmm_loglikelihood(hmm, A, path), logf(0.5f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, A, imm_mute_state_super(M), &path), 2 * logf(0.5f));
-    CLOSE(imm_hmm_likelihood(hmm, A, path), 2 * logf(0.5f));
+    CLOSE(imm_hmm_loglikelihood(hmm, A, path), 2 * logf(0.5f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, AB, imm_normal_state_super(N2), &path), 4 * logf(0.5f));
-    CLOSE(imm_hmm_likelihood(hmm, AB, path), 4 * logf(0.5f));
+    CLOSE(imm_hmm_loglikelihood(hmm, AB, path), 4 * logf(0.5f));
     imm_path_destroy(path);
 
     cass_cond(imm_hmm_del_state(hmm, imm_normal_state_super(N2)) == 0);
 
     CLOSE(single_viterbi(hmm, A, imm_mute_state_super(M), &path), 2 * logf(0.5f));
-    CLOSE(imm_hmm_likelihood(hmm, A, path), 2 * logf(0.5f));
+    CLOSE(imm_hmm_loglikelihood(hmm, A, path), 2 * logf(0.5f));
     imm_path_destroy(path);
 
     imm_hmm_destroy(hmm);
@@ -940,66 +940,66 @@ void test_hmm_viterbi_global_profile(void)
 
     struct imm_path* path = NULL;
     cass_cond(!is_valid(single_viterbi(hmm, C, imm_mute_state_super(start), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, C, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, C, path)));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, C, imm_normal_state_super(B), &path), 0);
-    CLOSE(imm_hmm_likelihood(hmm, C, path), 0);
+    CLOSE(imm_hmm_loglikelihood(hmm, C, path), 0);
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, CC, imm_normal_state_super(B), &path), 0);
-    CLOSE(imm_hmm_likelihood(hmm, CC, path), 0);
+    CLOSE(imm_hmm_loglikelihood(hmm, CC, path), 0);
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, CCC, imm_normal_state_super(B), &path), 0);
-    CLOSE(imm_hmm_likelihood(hmm, CCC, path), 0);
+    CLOSE(imm_hmm_loglikelihood(hmm, CCC, path), 0);
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, CCA, imm_normal_state_super(B), &path), logf(0.01f));
-    CLOSE(imm_hmm_likelihood(hmm, CCA, path), logf(0.01f));
+    CLOSE(imm_hmm_loglikelihood(hmm, CCA, path), logf(0.01f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, CCA, imm_normal_state_super(M0), &path), logf(0.9f));
-    CLOSE(imm_hmm_likelihood(hmm, CCA, path), logf(0.9f));
+    CLOSE(imm_hmm_loglikelihood(hmm, CCA, path), logf(0.9f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, CCAB, imm_normal_state_super(M1), &path), 2 * logf(0.9f));
-    CLOSE(imm_hmm_likelihood(hmm, CCAB, path), 2 * logf(0.9f));
+    CLOSE(imm_hmm_loglikelihood(hmm, CCAB, path), 2 * logf(0.9f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, CCAB, imm_normal_state_super(I0), &path), logf(0.9f * 0.5f * 0.1f));
-    CLOSE(imm_hmm_likelihood(hmm, CCAB, path), logf(0.9f * 0.5f * 0.1f));
+    CLOSE(imm_hmm_loglikelihood(hmm, CCAB, path), logf(0.9f * 0.5f * 0.1f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, CCABB, imm_normal_state_super(I0), &path),
           logf(0.9f) + 2 * (logf(0.05f)));
-    CLOSE(imm_hmm_likelihood(hmm, CCABB, path), logf(0.9f) + 2 * (logf(0.05f)));
+    CLOSE(imm_hmm_loglikelihood(hmm, CCABB, path), logf(0.9f) + 2 * (logf(0.05f)));
 
     imm_path_destroy(path);
 
     imm_float desired = logf(0.9f) + logf(0.5f) + logf(0.1f) + logf(0.5f) + logf(0.01f);
     CLOSE(single_viterbi(hmm, CCABA, imm_normal_state_super(M1), &path), desired);
-    CLOSE(imm_hmm_likelihood(hmm, CCABA, path), desired);
+    CLOSE(imm_hmm_loglikelihood(hmm, CCABA, path), desired);
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, AA, imm_mute_state_super(D1), &path), logf(0.01f) + logf(0.9f));
 
-    CLOSE(imm_hmm_likelihood(hmm, AA, path), logf(0.01f) + logf(0.9f));
+    CLOSE(imm_hmm_loglikelihood(hmm, AA, path), logf(0.01f) + logf(0.9f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, AA, imm_mute_state_super(D2), &path), logf(0.01f) + logf(0.9f));
 
-    CLOSE(imm_hmm_likelihood(hmm, AA, path), logf(0.01f) + logf(0.9f));
+    CLOSE(imm_hmm_loglikelihood(hmm, AA, path), logf(0.01f) + logf(0.9f));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, AA, imm_mute_state_super(E), &path), logf(0.01f) + logf(0.9f));
 
-    CLOSE(imm_hmm_likelihood(hmm, AA, path), logf(0.01f) + logf(0.9f));
+    CLOSE(imm_hmm_loglikelihood(hmm, AA, path), logf(0.01f) + logf(0.9f));
     imm_path_destroy(path);
 
     desired = logf(0.01f) + logf(0.9f) + logf(0.5f);
     CLOSE(single_viterbi(hmm, AAB, imm_normal_state_super(M2), &path), desired);
-    CLOSE(imm_hmm_likelihood(hmm, AAB, path), desired);
+    CLOSE(imm_hmm_loglikelihood(hmm, AAB, path), desired);
     imm_path_destroy(path);
 
     imm_hmm_destroy(hmm);
@@ -1093,27 +1093,27 @@ void test_hmm_viterbi_table_states(void)
 
     struct imm_path* path = NULL;
     cass_cond(!is_valid(single_viterbi(hmm, TATX, imm_mute_state_super(E), &path)));
-    cass_cond(!is_valid(imm_hmm_likelihood(hmm, TATX, path)));
+    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, TATX, path)));
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, TATA, imm_normal_state_super(N1), &path), -6.502290170873972);
-    CLOSE(imm_hmm_likelihood(hmm, TATA, path), -6.502290170873972);
+    CLOSE(imm_hmm_loglikelihood(hmm, TATA, path), -6.502290170873972);
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, TATA, imm_mute_state_super(E), &path), -6.502290170873972);
-    CLOSE(imm_hmm_likelihood(hmm, TATA, path), -6.502290170873972);
+    CLOSE(imm_hmm_loglikelihood(hmm, TATA, path), -6.502290170873972);
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, TATTX, imm_normal_state_super(Z), &path), -7.195437351433918);
-    CLOSE(imm_hmm_likelihood(hmm, TATTX, path), -7.195437351433918);
+    CLOSE(imm_hmm_loglikelihood(hmm, TATTX, path), -7.195437351433918);
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, TATTXX, imm_normal_state_super(Z), &path), -6.502290170873972);
-    CLOSE(imm_hmm_likelihood(hmm, TATTXX, path), -6.502290170873972);
+    CLOSE(imm_hmm_loglikelihood(hmm, TATTXX, path), -6.502290170873972);
     imm_path_destroy(path);
 
     CLOSE(single_viterbi(hmm, CAXCA, imm_mute_state_super(E), &path), -11.800607537422009);
-    CLOSE(imm_hmm_likelihood(hmm, CAXCA, path), -11.800607537422009);
+    CLOSE(imm_hmm_loglikelihood(hmm, CAXCA, path), -11.800607537422009);
     imm_path_destroy(path);
 
     imm_hmm_destroy(hmm);
@@ -1207,7 +1207,7 @@ imm_float single_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq,
 
     struct imm_subseq     subseq = imm_result_subseq(r);
     struct imm_seq const* s = imm_subseq_cast(&subseq);
-    imm_float             score = imm_hmm_likelihood(hmm, s, imm_result_path(r));
+    imm_float             score = imm_hmm_loglikelihood(hmm, s, imm_result_path(r));
     imm_results_destroy(results);
     imm_dp_destroy(dp);
     imm_dp_task_destroy(task);
