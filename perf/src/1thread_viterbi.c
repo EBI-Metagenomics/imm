@@ -7,8 +7,6 @@
 
 #define NSAMPLES 100
 
-#define LOG(x) ((imm_float)log((x)))
-
 #ifdef IMM_DOUBLE_PRECISION
 #define CLOSE(x, y) cass_close2(x, y, 1e-9, 0.0)
 #else
@@ -66,16 +64,16 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
     struct imm_mute_state const* start = imm_mute_state_create("START", abc);
-    imm_hmm_add_state(hmm, imm_mute_state_super(start), LOG(1.0));
+    imm_hmm_add_state(hmm, imm_mute_state_super(start), imm_log(1.0));
 
     struct imm_mute_state const* end = imm_mute_state_create("END", abc);
     imm_hmm_add_state(hmm, imm_mute_state_super(end), zero());
 
-    imm_float B_lprobs[] = {LOG(1.0), zero(), zero(), zero(), zero()};
-    imm_float E_lprobs[] = {zero(), zero(), zero(), LOG(1.0), zero()};
-    imm_float J_lprobs[] = {zero(), zero(), zero(), zero(), LOG(1.0)};
-    imm_float M_lprobs[] = {zero(), LOG(1.0), zero(), zero(), zero()};
-    imm_float I_lprobs[] = {zero(), zero(), LOG(1.0), zero(), zero()};
+    imm_float B_lprobs[] = {imm_log(1.0), zero(), zero(), zero(), zero()};
+    imm_float E_lprobs[] = {zero(), zero(), zero(), imm_log(1.0), zero()};
+    imm_float J_lprobs[] = {zero(), zero(), zero(), zero(), imm_log(1.0)};
+    imm_float M_lprobs[] = {zero(), imm_log(1.0), zero(), zero(), zero()};
+    imm_float I_lprobs[] = {zero(), zero(), imm_log(1.0), zero(), zero()};
 
     struct imm_normal_state const* B = imm_normal_state_create("B", abc, B_lprobs);
     imm_hmm_add_state(hmm, imm_normal_state_super(B), zero());
@@ -84,13 +82,13 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
     struct imm_normal_state const* J = imm_normal_state_create("J", abc, J_lprobs);
     imm_hmm_add_state(hmm, imm_normal_state_super(J), zero());
 
-    imm_hmm_set_trans(hmm, imm_mute_state_super(start), imm_normal_state_super(B), LOG(0.2));
-    imm_hmm_set_trans(hmm, imm_normal_state_super(B), imm_normal_state_super(B), LOG(0.2));
-    imm_hmm_set_trans(hmm, imm_normal_state_super(E), imm_normal_state_super(E), LOG(0.2));
-    imm_hmm_set_trans(hmm, imm_normal_state_super(J), imm_normal_state_super(J), LOG(0.2));
-    imm_hmm_set_trans(hmm, imm_normal_state_super(E), imm_normal_state_super(J), LOG(0.2));
-    imm_hmm_set_trans(hmm, imm_normal_state_super(J), imm_normal_state_super(B), LOG(0.2));
-    imm_hmm_set_trans(hmm, imm_normal_state_super(E), imm_mute_state_super(end), LOG(0.2));
+    imm_hmm_set_trans(hmm, imm_mute_state_super(start), imm_normal_state_super(B), imm_log(0.2));
+    imm_hmm_set_trans(hmm, imm_normal_state_super(B), imm_normal_state_super(B), imm_log(0.2));
+    imm_hmm_set_trans(hmm, imm_normal_state_super(E), imm_normal_state_super(E), imm_log(0.2));
+    imm_hmm_set_trans(hmm, imm_normal_state_super(J), imm_normal_state_super(J), imm_log(0.2));
+    imm_hmm_set_trans(hmm, imm_normal_state_super(E), imm_normal_state_super(J), imm_log(0.2));
+    imm_hmm_set_trans(hmm, imm_normal_state_super(J), imm_normal_state_super(B), imm_log(0.2));
+    imm_hmm_set_trans(hmm, imm_normal_state_super(E), imm_mute_state_super(end), imm_log(0.2));
 
     struct imm_normal_state const* M[ncore_nodes];
     struct imm_normal_state const* I[ncore_nodes];
@@ -108,33 +106,34 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
 
         if (i == 0)
             imm_hmm_set_trans(hmm, imm_normal_state_super(B), imm_normal_state_super(M[0]),
-                              LOG(0.2));
+                              imm_log(0.2));
 
         imm_hmm_set_trans(hmm, imm_normal_state_super(M[i]), imm_normal_state_super(I[i]),
-                          LOG(0.2));
+                          imm_log(0.2));
         imm_hmm_set_trans(hmm, imm_normal_state_super(I[i]), imm_normal_state_super(I[i]),
-                          LOG(0.2));
+                          imm_log(0.2));
 
         if (i > 0) {
             imm_hmm_set_trans(hmm, imm_normal_state_super(M[i - 1]), imm_normal_state_super(M[i]),
-                              LOG(0.2));
+                              imm_log(0.2));
             imm_hmm_set_trans(hmm, imm_mute_state_super(D[i - 1]), imm_normal_state_super(M[i]),
-                              LOG(0.2));
+                              imm_log(0.2));
             imm_hmm_set_trans(hmm, imm_normal_state_super(I[i - 1]), imm_normal_state_super(M[i]),
-                              LOG(0.2));
+                              imm_log(0.2));
 
             imm_hmm_set_trans(hmm, imm_normal_state_super(M[i - 1]), imm_mute_state_super(D[i]),
-                              LOG(0.2));
+                              imm_log(0.2));
             imm_hmm_set_trans(hmm, imm_mute_state_super(D[i - 1]), imm_mute_state_super(D[i]),
-                              LOG(0.2));
+                              imm_log(0.2));
         }
 
         if (i == ncore_nodes - 1) {
             imm_hmm_set_trans(hmm, imm_normal_state_super(M[i]), imm_normal_state_super(E),
-                              LOG(0.2));
-            imm_hmm_set_trans(hmm, imm_mute_state_super(D[i]), imm_normal_state_super(E), LOG(0.2));
+                              imm_log(0.2));
+            imm_hmm_set_trans(hmm, imm_mute_state_super(D[i]), imm_normal_state_super(E),
+                              imm_log(0.2));
             imm_hmm_set_trans(hmm, imm_normal_state_super(I[i]), imm_normal_state_super(E),
-                              LOG(0.2));
+                              imm_log(0.2));
         }
     }
     char* str = malloc(sizeof(*str) * (unsigned)(100 * seq_100length + 1));

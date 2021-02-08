@@ -2,7 +2,6 @@
 #define PERF_STATS_H
 
 #include "imm/float.h"
-#include <math.h>
 #include <stdlib.h>
 
 static inline imm_float __mean(imm_float const* arr, unsigned n);

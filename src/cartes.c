@@ -1,4 +1,4 @@
-#include "cartes.h"
+#include "imm/cartes.h"
 #include "free.h"
 #include "imath.h"
 #include "imm/bug.h"
@@ -16,7 +16,7 @@ struct imm_cartes
     unsigned    nitems;
 };
 
-struct imm_cartes* imm_cartes_create(char const* set, unsigned set_size, unsigned max_times)
+struct imm_cartes* imm_cartes_create(char const* set, uint16_t set_size, uint16_t max_times)
 {
     struct imm_cartes* cartes = malloc(sizeof(*cartes));
 
@@ -52,12 +52,12 @@ char const* imm_cartes_next(struct imm_cartes* cartes)
     return item;
 }
 
-void imm_cartes_setup(struct imm_cartes* cartes, unsigned times)
+void imm_cartes_setup(struct imm_cartes* cartes, uint16_t times)
 {
     cartes->times = times;
     cartes->item[times] = '\0';
     cartes->iter_idx = 0;
     unsigned long nitems = ipow(cartes->set_size, times);
-    IMM_BUG(nitems > UINT_MAX);
-    cartes->nitems = (unsigned)nitems;
+    IMM_BUG(nitems > UINT16_MAX);
+    cartes->nitems = (uint16_t)nitems;
 }

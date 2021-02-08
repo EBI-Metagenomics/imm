@@ -4,7 +4,6 @@
 #include "imm/float.h"
 #include "imm/report.h"
 #include "logaddexp/logaddexp.h"
-#include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
 
