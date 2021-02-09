@@ -25,7 +25,7 @@ find_package(elapsed REQUIRED)
 
 add_library(imm
     src/abc.c
-    src/abc_table.c
+    src/abc_lprob.c
     src/cartes.c
     src/dp.c
     src/dp_emission.c
