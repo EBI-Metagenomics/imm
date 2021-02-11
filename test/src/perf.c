@@ -71,8 +71,9 @@ void test_perf_viterbi_input(void)
     cass_equal_int(imm_input_destroy(input), 0);
 
     struct imm_abc const* abc = imm_model_abc(imodel);
-    struct imm_hmm const* hmm = imm_model_hmm(imodel);
-    struct imm_dp const*  dp = imm_model_dp(imodel);
+    struct imm_hmm_block const* block = imm_model_get_hmm_block(imodel, 0);
+    struct imm_hmm const* hmm = imm_hmm_block_hmm(block);
+    struct imm_dp const*  dp = imm_hmm_block_dp(block);
 
     char const* str = get_model2_str();
     cass_cond(strlen(str) == 2000);
@@ -89,8 +90,8 @@ void test_perf_viterbi_input(void)
     cass_close(score, -65826.0118484497);
     imm_results_destroy(results);
 
-    for (uint16_t i = 0; i < imm_model_nstates(imodel); ++i)
-        imm_state_destroy(imm_model_state(imodel, i));
+    for (uint16_t i = 0; i < imm_hmm_block_nstates(block); ++i)
+        imm_state_destroy(imm_hmm_block_state(block, i));
 
     imm_dp_destroy(dp);
     imm_model_destroy(imodel);

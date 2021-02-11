@@ -1,15 +1,27 @@
 #include "hmm_block.h"
 #include "dp.h"
-#include "imm/dp.h"
 #include "dp_emission.h"
 #include "dp_state_table.h"
 #include "dp_trans_table.h"
 #include "free.h"
 #include "hmm.h"
+#include "imm/dp.h"
 #include "imm/hmm.h"
+#include "imm/hmm_block.h"
 #include "model_state.h"
 #include "seq_code.h"
 #include <stdlib.h>
+
+struct imm_dp const* imm_hmm_block_dp(struct imm_hmm_block const* block) { return block->dp; }
+
+struct imm_hmm* imm_hmm_block_hmm(struct imm_hmm_block const* block) { return block->hmm; }
+
+uint16_t imm_hmm_block_nstates(struct imm_hmm_block const* block) { return block->nstates; }
+
+struct imm_state const* imm_hmm_block_state(struct imm_hmm_block const* block, uint16_t i)
+{
+    return block->states[i];
+}
 
 struct imm_hmm_block* hmm_block_new(void)
 {

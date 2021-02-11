@@ -72,12 +72,15 @@ void test_hmm_write_io_two_states(void)
     model = imm_input_read(input);
     cass_cond(!imm_input_eof(input));
     cass_cond(model != NULL);
+    cass_equal_int(imm_model_nhmm_blocks(model), 1);
 
-    cass_equal_uint64(imm_model_nstates(model), 2);
+    struct imm_hmm_block* block = imm_model_get_hmm_block(model, 0);
+    cass_cond(block != NULL);
+    cass_equal_uint64(imm_hmm_block_nstates(block), 2);
 
     abc = imm_model_abc(model);
-    hmm = imm_model_hmm(model);
-    dp = imm_model_dp(model);
+    hmm = imm_hmm_block_hmm(block);
+    dp = imm_hmm_block_dp(block);
     C = imm_seq_create("C", abc);
 
     task = imm_dp_task_create(dp);
@@ -94,8 +97,8 @@ void test_hmm_write_io_two_states(void)
     CLOSE(imm_hmm_loglikelihood(hmm, C, path), imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
     imm_results_destroy(results);
 
-    for (uint16_t i = 0; i < imm_model_nstates(model); ++i) {
-        struct imm_state const* state = imm_model_state(model, i);
+    for (uint16_t i = 0; i < imm_hmm_block_nstates(block); ++i) {
+        struct imm_state const* state = imm_hmm_block_state(block, i);
 
         if (imm_state_type_id(state) == IMM_MUTE_STATE_TYPE_ID) {
             cass_cond(strcmp(imm_state_get_name(state), "state0") == 0);
@@ -104,8 +107,8 @@ void test_hmm_write_io_two_states(void)
         }
     }
 
-    for (uint16_t i = 0; i < imm_model_nstates(model); ++i)
-        imm_state_destroy(imm_model_state(model, i));
+    for (uint16_t i = 0; i < imm_hmm_block_nstates(block); ++i)
+        imm_state_destroy(imm_hmm_block_state(block, i));
 
     imm_dp_task_destroy(task);
     imm_seq_destroy(C);
@@ -120,12 +123,16 @@ void test_hmm_write_io_two_states(void)
     cass_cond(imm_input_eof(input));
     cass_equal_int(imm_input_destroy(input), 0);
 
-    abc = imm_model_abc(model);
-    hmm = imm_model_hmm(model);
-    dp = imm_model_dp(model);
+    cass_equal_int(imm_model_nhmm_blocks(model), 1);
+    block = imm_model_get_hmm_block(model, 0);
+    cass_cond(block != NULL);
 
-    for (uint16_t i = 0; i < imm_model_nstates(model); ++i)
-        imm_state_destroy(imm_model_state(model, i));
+    abc = imm_model_abc(model);
+    hmm = imm_hmm_block_hmm(block);
+    dp = imm_hmm_block_dp(block);
+
+    for (uint16_t i = 0; i < imm_hmm_block_nstates(block); ++i)
+        imm_state_destroy(imm_hmm_block_state(block, i));
 
     imm_abc_destroy(abc);
     imm_hmm_destroy(hmm);
@@ -180,10 +187,10 @@ void test_hmm_write_io_two_hmms(void)
 
     struct imm_output* output = imm_output_create(TMPDIR "/two_hmms.imm");
     cass_cond(output != NULL);
-    struct imm_model* model = imm_model_create(hmm0, dp0);
-    imm_model_append_hmm(model, hmm1, dp1);
-    cass_equal_int(imm_output_write(output, model), 0);
-    imm_model_destroy(model);
+    struct imm_model* m = imm_model_create(hmm0, dp0);
+    imm_model_append_hmm_block(m, hmm1, dp1);
+    cass_equal_int(imm_output_write(output, m), 0);
+    imm_model_destroy(m);
 
     imm_dp_destroy(dp0);
     imm_dp_destroy(dp1);
@@ -200,15 +207,17 @@ void test_hmm_write_io_two_hmms(void)
     struct imm_input* input = imm_input_create(TMPDIR "/two_hmms.imm");
     cass_cond(input != NULL);
     cass_cond(!imm_input_eof(input));
-    model = imm_input_read(input);
+    struct imm_model const* model = imm_input_read(input);
     cass_cond(!imm_input_eof(input));
     cass_cond(model != NULL);
 
-    cass_equal_uint64(imm_model_nstates(model), 2);
+    struct imm_hmm_block* block = imm_model_get_hmm_block(model, 0);
+    cass_cond(block != NULL);
+    cass_equal_uint32(imm_hmm_block_nstates(block), 2);
 
     abc = imm_model_abc(model);
-    hmm0 = imm_model_hmm(model);
-    dp0 = imm_model_dp(model);
+    hmm0 = imm_hmm_block_hmm(block);
+    dp0 = imm_hmm_block_dp(block);
     C = imm_seq_create("C", abc);
 
     task0 = imm_dp_task_create(dp0);
@@ -225,8 +234,8 @@ void test_hmm_write_io_two_hmms(void)
     CLOSE(imm_hmm_loglikelihood(hmm0, C, path), imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
     imm_results_destroy(results);
 
-    for (uint16_t i = 0; i < imm_model_nstates(model); ++i) {
-        struct imm_state const* state = imm_model_state(model, i);
+    for (uint16_t i = 0; i < imm_hmm_block_nstates(block); ++i) {
+        struct imm_state const* state = imm_hmm_block_state(block, i);
 
         if (imm_state_type_id(state) == IMM_MUTE_STATE_TYPE_ID) {
             cass_cond(strcmp(imm_state_get_name(state), "hmm0_state0") == 0);
@@ -235,8 +244,8 @@ void test_hmm_write_io_two_hmms(void)
         }
     }
 
-    for (uint16_t i = 0; i < imm_model_nstates(model); ++i)
-        imm_state_destroy(imm_model_state(model, i));
+    for (uint16_t i = 0; i < imm_hmm_block_nstates(block); ++i)
+        imm_state_destroy(imm_hmm_block_state(block, i));
 
     imm_dp_task_destroy(task0);
     imm_seq_destroy(C);
@@ -252,11 +261,11 @@ void test_hmm_write_io_two_hmms(void)
     cass_equal_int(imm_input_destroy(input), 0);
 
     abc = imm_model_abc(model);
-    hmm0 = imm_model_hmm(model);
-    dp0 = imm_model_dp(model);
+    hmm0 = imm_hmm_block_hmm(block);
+    dp0 = imm_hmm_block_dp(block);
 
-    for (uint16_t i = 0; i < imm_model_nstates(model); ++i)
-        imm_state_destroy(imm_model_state(model, i));
+    for (uint16_t i = 0; i < imm_hmm_block_nstates(block); ++i)
+        imm_state_destroy(imm_hmm_block_state(block, i));
 
     imm_abc_destroy(abc);
     imm_hmm_destroy(hmm0);

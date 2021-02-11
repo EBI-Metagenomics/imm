@@ -53,24 +53,6 @@ void imm_model_destroy(struct imm_model const* model)
     free_c(model);
 }
 
-struct imm_dp const* imm_model_dp(struct imm_model const* model)
-{
-    struct imm_hmm_block* block = (void*)imm_vecp_get(model->hmm_blocks, 0);
-    return block->dp;
-}
-
-struct imm_hmm* imm_model_hmm(struct imm_model const* model)
-{
-    struct imm_hmm_block* block = (void*)imm_vecp_get(model->hmm_blocks, 0);
-    return block->hmm;
-}
-
-uint16_t imm_model_nstates(struct imm_model const* model)
-{
-    struct imm_hmm_block* block = (void*)imm_vecp_get(model->hmm_blocks, 0);
-    return block->nstates;
-}
-
 struct imm_model const* imm_model_read(FILE* stream)
 {
     struct imm_model* model =
@@ -107,12 +89,6 @@ err:
     return NULL;
 }
 
-struct imm_state const* imm_model_state(struct imm_model const* model, uint16_t i)
-{
-    struct imm_hmm_block* block = (void*)imm_vecp_get(model->hmm_blocks, 0);
-    return block->states[i];
-}
-
 int imm_model_write(struct imm_model const* model, FILE* stream)
 {
     if (write_abc(model, stream)) {
@@ -146,15 +122,26 @@ struct imm_model* __imm_model_create(struct imm_hmm* hmm, struct imm_dp const* d
     struct imm_model* model =
         __imm_model_new(read_state, read_state_args, write_state, write_state_args);
     model->abc = hmm_abc(hmm);
-    imm_model_append_hmm(model, hmm, dp);
+    imm_model_append_hmm_block(model, hmm, dp);
     return model;
 }
 
-void imm_model_append_hmm(struct imm_model* model, struct imm_hmm* hmm, struct imm_dp const* dp)
+void imm_model_append_hmm_block(struct imm_model* model, struct imm_hmm* hmm,
+                                struct imm_dp const* dp)
 {
     IMM_BUG(model->abc != hmm_abc(hmm));
     struct imm_hmm_block* block = hmm_block_create(hmm, dp);
     imm_vecp_append(model->hmm_blocks, block);
+}
+
+struct imm_hmm_block* imm_model_get_hmm_block(struct imm_model const* model, uint8_t i)
+{
+    return (void*)imm_vecp_get(model->hmm_blocks, i);
+}
+
+uint8_t imm_model_nhmm_blocks(struct imm_model const* model)
+{
+    return (uint8_t)imm_vecp_length(model->hmm_blocks);
 }
 
 struct imm_model* __imm_model_new(imm_model_read_state_cb read_state, void* read_state_args,
