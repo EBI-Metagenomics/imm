@@ -79,11 +79,9 @@ struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_dp_
         return NULL;
     }
 
-    /* TODO: setup windowing if seq length is too large */
-    IMM_BUG(imm_seq_length(task->root_seq) > IMM_WINDOW_MAX_LEN);
     uint16_t window_length = task->window_length;
     if (window_length == 0)
-        window_length = (uint16_t)imm_seq_length(task->root_seq);
+        window_length = (uint16_t)MIN(imm_seq_length(task->root_seq), IMM_WINDOW_MAX_LEN);
 
     struct imm_window const* window = imm_window_create(task->root_seq, window_length);
     uint_fast16_t            nwindows = imm_window_size(window);
