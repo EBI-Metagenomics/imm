@@ -8,6 +8,7 @@
 #include "hmm_block.h"
 #include "imm/abc.h"
 #include "imm/abc_types.h"
+#include "imm/bug.h"
 #include "imm/dp.h"
 #include "imm/hmm.h"
 #include "imm/mute_state.h"
@@ -21,7 +22,6 @@
 #include "model_trans.h"
 #include "model_trans_table.h"
 #include "seq_code.h"
-#include "imm/bug.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -45,29 +45,30 @@ struct imm_model* imm_model_create(struct imm_hmm* hmm, struct imm_dp const* dp)
 
 void imm_model_destroy(struct imm_model const* model)
 {
-    struct list_head *entry = NULL, *tmp = NULL;
-    list_for_each_safe (entry, tmp, &model->hmm_blocks) {
-        struct imm_hmm_block const* block = list_entry(entry, struct imm_hmm_block, list_entry);
-        list_del(entry);
+    for (size_t i = 0; i < imm_vecp_length(model->hmm_blocks); ++i) {
+        struct imm_hmm_block* block = (void*)imm_vecp_get(model->hmm_blocks, i);
         hmm_block_destroy(block);
     }
+    imm_vecp_destroy(model->hmm_blocks);
     free_c(model);
 }
 
 struct imm_dp const* imm_model_dp(struct imm_model const* model)
 {
-    return list_first_entry(&model->hmm_blocks, struct imm_hmm_block, list_entry)->dp;
+    struct imm_hmm_block* block = (void*)imm_vecp_get(model->hmm_blocks, 0);
+    return block->dp;
 }
 
 struct imm_hmm* imm_model_hmm(struct imm_model const* model)
 {
-
-    return list_first_entry(&model->hmm_blocks, struct imm_hmm_block, list_entry)->hmm;
+    struct imm_hmm_block* block = (void*)imm_vecp_get(model->hmm_blocks, 0);
+    return block->hmm;
 }
 
 uint16_t imm_model_nstates(struct imm_model const* model)
 {
-    return list_first_entry(&model->hmm_blocks, struct imm_hmm_block, list_entry)->nstates;
+    struct imm_hmm_block* block = (void*)imm_vecp_get(model->hmm_blocks, 0);
+    return block->nstates;
 }
 
 struct imm_model const* imm_model_read(FILE* stream)
@@ -87,7 +88,7 @@ struct imm_model const* imm_model_read(FILE* stream)
     }
 
     struct imm_hmm_block* block = hmm_block_new();
-    list_add(&block->list_entry, &model->hmm_blocks);
+    imm_vecp_append(model->hmm_blocks, block);
 
     if (__imm_model_read_hmm(model, block, stream)) {
         imm_error("could not read hmm");
@@ -108,7 +109,8 @@ err:
 
 struct imm_state const* imm_model_state(struct imm_model const* model, uint16_t i)
 {
-    return list_first_entry(&model->hmm_blocks, struct imm_hmm_block, list_entry)->states[i];
+    struct imm_hmm_block* block = (void*)imm_vecp_get(model->hmm_blocks, 0);
+    return block->states[i];
 }
 
 int imm_model_write(struct imm_model const* model, FILE* stream)
@@ -152,7 +154,7 @@ void imm_model_append_hmm(struct imm_model* model, struct imm_hmm* hmm, struct i
 {
     IMM_BUG(model->abc != hmm_abc(hmm));
     struct imm_hmm_block* block = hmm_block_create(hmm, dp);
-    list_add_tail(&block->list_entry, &model->hmm_blocks);
+    imm_vecp_append(model->hmm_blocks, block);
 }
 
 struct imm_model* __imm_model_new(imm_model_read_state_cb read_state, void* read_state_args,
@@ -160,7 +162,7 @@ struct imm_model* __imm_model_new(imm_model_read_state_cb read_state, void* read
 {
     struct imm_model* model = malloc(sizeof(*model));
     model->abc = NULL;
-    INIT_LIST_HEAD(&model->hmm_blocks);
+    model->hmm_blocks = imm_vecp_create();
     model->read_state = read_state;
     model->read_state_args = read_state_args;
     model->write_state = write_state;
@@ -260,8 +262,7 @@ void __imm_model_set_abc(struct imm_model* model, struct imm_abc const* abc) { m
 
 int __imm_model_write_dp(struct imm_model const* model, FILE* stream)
 {
-    struct imm_hmm_block const* block =
-        list_first_entry(&model->hmm_blocks, struct imm_hmm_block, list_entry);
+    struct imm_hmm_block* block = (void*)imm_vecp_get(model->hmm_blocks, 0);
 
     if (seq_code_write(block->seq_code, stream)) {
         imm_error("could not write seq_code");
@@ -288,8 +289,7 @@ int __imm_model_write_dp(struct imm_model const* model, FILE* stream)
 
 int __imm_model_write_hmm(struct imm_model const* model, FILE* stream)
 {
-    struct imm_hmm_block const* block =
-        list_first_entry(&model->hmm_blocks, struct imm_hmm_block, list_entry);
+    struct imm_hmm_block* block = (void*)imm_vecp_get(model->hmm_blocks, 0);
 
     if (write_mstates(model, stream, (struct model_state const* const*)block->mstates,
                       block->nstates)) {
@@ -364,8 +364,9 @@ void __imm_model_deep_destroy(struct imm_model const* model)
     if (model->abc)
         imm_abc_destroy(model->abc);
 
-    hmm_block_deep_destroy(list_first_entry(&model->hmm_blocks, struct imm_hmm_block, list_entry));
-    free_c(list_first_entry(&model->hmm_blocks, struct imm_hmm_block, list_entry));
+    struct imm_hmm_block* block = (void*)imm_vecp_get(model->hmm_blocks, 0);
+    hmm_block_deep_destroy(block);
+    imm_vecp_destroy(model->hmm_blocks);
 
     free_c(model);
 }
