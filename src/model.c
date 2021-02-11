@@ -21,6 +21,7 @@
 #include "model_trans.h"
 #include "model_trans_table.h"
 #include "seq_code.h"
+#include "imm/bug.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -149,6 +150,7 @@ struct imm_model* __imm_model_create(struct imm_hmm* hmm, struct imm_dp const* d
 
 void imm_model_append_hmm(struct imm_model* model, struct imm_hmm* hmm, struct imm_dp const* dp)
 {
+    IMM_BUG(model->abc != hmm_abc(hmm));
     struct imm_hmm_block* block = hmm_block_create(hmm, dp);
     list_add_tail(&block->list_entry, &model->hmm_blocks);
 }
