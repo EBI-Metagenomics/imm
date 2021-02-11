@@ -7,6 +7,7 @@
 #include "dp_trans_table.h"
 #include "elapsed/elapsed.h"
 #include "free.h"
+#include "hmm_block.h"
 #include "imm/bug.h"
 #include "imm/dp.h"
 #include "imm/dp_task.h"
@@ -153,21 +154,21 @@ struct imm_dp* dp_create(struct imm_abc const* abc, struct model_state const** m
     return dp;
 }
 
-void dp_create_from_model(struct imm_model* model)
+void dp_create_from_model(struct imm_model* model, struct imm_hmm_block* block)
 {
     struct imm_dp* dp = malloc(sizeof(*dp));
 
-    dp->mstates = (struct model_state const**)model->mstates;
-    dp->seq_code = model->seq_code;
-    dp->emission = model->emission;
-    dp->trans_table = model->trans_table;
-    dp->state_table = model->state_table;
+    dp->mstates = (struct model_state const**)block->mstates;
+    dp->seq_code = block->seq_code;
+    dp->emission = block->emission;
+    dp->trans_table = block->trans_table;
+    dp->state_table = block->state_table;
 
     dp->state_idx = state_idx_create();
     for (uint16_t i = 0; i < dp_state_table_nstates(dp->state_table); ++i)
         state_idx_add(dp->state_idx, dp->mstates[i]->state, i);
 
-    model->dp = dp;
+    block->dp = dp;
 }
 
 struct dp_emission const* dp_get_emission(struct imm_dp const* dp) { return dp->emission; }

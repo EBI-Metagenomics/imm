@@ -9,6 +9,7 @@ struct imm_abc;
 struct imm_dp;
 struct imm_hmm;
 struct imm_model;
+struct imm_hmm_block;
 
 typedef struct imm_state const* (*imm_model_read_state_cb)(struct imm_model const* model,
                                                            FILE* stream, void* args);
@@ -17,6 +18,8 @@ typedef int (*imm_model_write_state_cb)(struct imm_model const* model, FILE* str
 
 IMM_API struct imm_abc const*   imm_model_abc(struct imm_model const* model);
 IMM_API struct imm_model*       imm_model_create(struct imm_hmm* hmm, struct imm_dp const* dp);
+IMM_API void                    imm_model_append_hmm(struct imm_model* model, struct imm_hmm* hmm,
+                                                     struct imm_dp const* dp);
 IMM_API void                    imm_model_destroy(struct imm_model const* model);
 IMM_API struct imm_dp const*    imm_model_dp(struct imm_model const* model);
 IMM_API struct imm_hmm*         imm_model_hmm(struct imm_model const* model);
@@ -34,8 +37,9 @@ IMM_API void              __imm_model_deep_destroy(struct imm_model const* model
 IMM_API struct imm_model* __imm_model_new(imm_model_read_state_cb read_state, void* read_state_args,
                                           imm_model_write_state_cb write_state,
                                           void*                    write_state_args);
-IMM_API int               __imm_model_read_dp(struct imm_model* model, FILE* stream);
-IMM_API int               __imm_model_read_hmm(struct imm_model* model, FILE* stream);
+IMM_API int __imm_model_read_dp(struct imm_model* model, struct imm_hmm_block* block, FILE* stream);
+IMM_API int __imm_model_read_hmm(struct imm_model* model, struct imm_hmm_block* block,
+                                 FILE* stream);
 IMM_API struct imm_state const* __imm_model_read_state(struct imm_model const* model, FILE* stream,
                                                        void* args);
 IMM_API void __imm_model_set_abc(struct imm_model* model, struct imm_abc const* abc);
