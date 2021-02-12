@@ -89,6 +89,7 @@ void test_perf_viterbi_input(void)
     cass_cond(!imm_lprob_is_zero(score));
     cass_close(score, -65826.0118484497);
     imm_results_destroy(results);
+    imm_dp_task_destroy(task);
 
     for (uint16_t i = 0; i < imm_hmm_block_nstates(block); ++i)
         imm_state_destroy(imm_hmm_block_state(block, i));

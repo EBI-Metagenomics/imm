@@ -225,6 +225,7 @@ void test_hmm_write_io_two_hmms(void)
     cass_cond(!imm_input_eof(input));
     struct imm_model const* model = imm_input_read(input);
     cass_cond(!imm_input_eof(input));
+    imm_input_destroy(input);
     cass_cond(model != NULL);
 
     struct imm_hmm_block* block0 = imm_model_get_hmm_block(model, 0);
