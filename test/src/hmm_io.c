@@ -227,13 +227,19 @@ void test_hmm_write_io_two_hmms(void)
     cass_cond(!imm_input_eof(input));
     cass_cond(model != NULL);
 
-    struct imm_hmm_block* block = imm_model_get_hmm_block(model, 0);
-    cass_cond(block != NULL);
-    cass_equal_uint32(imm_hmm_block_nstates(block), 2);
+    struct imm_hmm_block* block0 = imm_model_get_hmm_block(model, 0);
+    cass_cond(block0 != NULL);
+    cass_equal_uint32(imm_hmm_block_nstates(block0), 2);
+
+    struct imm_hmm_block* block1 = imm_model_get_hmm_block(model, 1);
+    cass_cond(block1 != NULL);
+    cass_equal_uint32(imm_hmm_block_nstates(block1), 2);
 
     abc = imm_model_abc(model);
-    hmm0 = imm_hmm_block_hmm(block);
-    dp0 = imm_hmm_block_dp(block);
+    hmm0 = imm_hmm_block_hmm(block0);
+    dp0 = imm_hmm_block_dp(block0);
+    hmm1 = imm_hmm_block_hmm(block1);
+    dp1 = imm_hmm_block_dp(block1);
     C = imm_seq_create("C", abc);
 
     task0 = imm_dp_task_create(dp0);
@@ -250,8 +256,8 @@ void test_hmm_write_io_two_hmms(void)
     CLOSE(imm_hmm_loglikelihood(hmm0, C, path), imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
     imm_results_destroy(results);
 
-    for (uint16_t i = 0; i < imm_hmm_block_nstates(block); ++i) {
-        struct imm_state const* state = imm_hmm_block_state(block, i);
+    for (uint16_t i = 0; i < imm_hmm_block_nstates(block0); ++i) {
+        struct imm_state const* state = imm_hmm_block_state(block0, i);
 
         if (imm_state_type_id(state) == IMM_MUTE_STATE_TYPE_ID) {
             cass_cond(strcmp(imm_state_get_name(state), "hmm0_state0") == 0);
@@ -260,13 +266,43 @@ void test_hmm_write_io_two_hmms(void)
         }
     }
 
-    for (uint16_t i = 0; i < imm_hmm_block_nstates(block); ++i)
-        imm_state_destroy(imm_hmm_block_state(block, i));
+    for (uint16_t i = 0; i < imm_hmm_block_nstates(block0); ++i)
+        imm_state_destroy(imm_hmm_block_state(block0, i));
+
+    task1 = imm_dp_task_create(dp1);
+    imm_dp_task_setup(task1, C, 0);
+    results = imm_dp_viterbi(dp1, task1);
+    cass_cond(results != NULL);
+    cass_equal_int(imm_results_size(results), 1);
+    r = imm_results_get(results, 0);
+    subseq = imm_result_subseq(r);
+    s = imm_subseq_cast(&subseq);
+    path = imm_result_path(r);
+    score = imm_hmm_loglikelihood(hmm1, s, imm_result_path(r));
+    CLOSE(score, imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
+    CLOSE(imm_hmm_loglikelihood(hmm1, C, path), imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
+    imm_results_destroy(results);
+
+    for (uint16_t i = 0; i < imm_hmm_block_nstates(block1); ++i) {
+        struct imm_state const* state = imm_hmm_block_state(block1, i);
+
+        if (imm_state_type_id(state) == IMM_MUTE_STATE_TYPE_ID) {
+            cass_cond(strcmp(imm_state_get_name(state), "hmm1_state0") == 0);
+        } else if (imm_state_type_id(state) == IMM_NORMAL_STATE_TYPE_ID) {
+            cass_cond(strcmp(imm_state_get_name(state), "hmm1_state1") == 0);
+        }
+    }
+
+    for (uint16_t i = 0; i < imm_hmm_block_nstates(block1); ++i)
+        imm_state_destroy(imm_hmm_block_state(block1, i));
 
     imm_dp_task_destroy(task0);
+    imm_dp_task_destroy(task1);
     imm_seq_destroy(C);
     imm_abc_destroy(abc);
     imm_hmm_destroy(hmm0);
     imm_dp_destroy(dp0);
+    imm_hmm_destroy(hmm1);
+    imm_dp_destroy(dp1);
     imm_model_destroy(model);
 }
