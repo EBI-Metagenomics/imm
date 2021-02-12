@@ -45,7 +45,7 @@ struct imm_model* imm_model_create(struct imm_hmm* hmm, struct imm_dp const* dp)
 
 void imm_model_destroy(struct imm_model const* model)
 {
-    for (size_t i = 0; i < imm_vecp_length(model->hmm_blocks); ++i) {
+    for (size_t i = 0; i < imm_model_nhmm_blocks(model); ++i) {
         struct imm_hmm_block* block = (void*)imm_vecp_get(model->hmm_blocks, i);
         hmm_block_destroy(block);
     }
@@ -69,17 +69,20 @@ struct imm_model const* imm_model_read(FILE* stream)
         goto err;
     }
 
-    struct imm_hmm_block* block = hmm_block_new();
-    imm_vecp_append(model->hmm_blocks, block);
+    for (uint8_t i = 0; i < nhmms; ++i) {
 
-    if (__imm_model_read_hmm(model, block, stream)) {
-        imm_error("could not read hmm");
-        goto err;
-    }
+        struct imm_hmm_block* block = hmm_block_new();
+        imm_vecp_append(model->hmm_blocks, block);
 
-    if (__imm_model_read_dp(model, block, stream)) {
-        imm_error("could not read dp");
-        goto err;
+        if (__imm_model_read_hmm(model, block, stream)) {
+            imm_error("could not read hmm");
+            goto err;
+        }
+
+        if (__imm_model_read_dp(model, block, stream)) {
+            imm_error("could not read dp");
+            goto err;
+        }
     }
 
     return model;
@@ -96,20 +99,24 @@ int imm_model_write(struct imm_model const* model, FILE* stream)
         return 1;
     }
 
-    uint8_t nhmms = 1;
+    uint8_t nhmms = imm_model_nhmm_blocks(model);
     if (fwrite(&nhmms, sizeof(nhmms), 1, stream) < 1) {
         imm_error("could not write nhmms");
         return 1;
     }
 
-    if (__imm_model_write_hmm(model, stream)) {
-        imm_error("could not write hmm");
-        return 1;
-    }
+    for (uint8_t i = 0; i < nhmms; ++i) {
 
-    if (__imm_model_write_dp(model, stream)) {
-        imm_error("could not write dp");
-        return 1;
+        struct imm_hmm_block* block = (void*)imm_vecp_get(model->hmm_blocks, i);
+        if (__imm_model_write_hmm(model, block, stream)) {
+            imm_error("could not write hmm");
+            return 1;
+        }
+
+        if (__imm_model_write_dp(model, block, stream)) {
+            imm_error("could not write dp");
+            return 1;
+        }
     }
 
     return 0;
@@ -247,10 +254,9 @@ struct imm_state const* __imm_model_read_state(struct imm_model const* model, FI
 
 void __imm_model_set_abc(struct imm_model* model, struct imm_abc const* abc) { model->abc = abc; }
 
-int __imm_model_write_dp(struct imm_model const* model, FILE* stream)
+int __imm_model_write_dp(struct imm_model const* model, struct imm_hmm_block const* block,
+                         FILE* stream)
 {
-    struct imm_hmm_block* block = (void*)imm_vecp_get(model->hmm_blocks, 0);
-
     if (seq_code_write(block->seq_code, stream)) {
         imm_error("could not write seq_code");
         return 1;
@@ -274,10 +280,9 @@ int __imm_model_write_dp(struct imm_model const* model, FILE* stream)
     return 0;
 }
 
-int __imm_model_write_hmm(struct imm_model const* model, FILE* stream)
+int __imm_model_write_hmm(struct imm_model const* model, struct imm_hmm_block const* block,
+                          FILE* stream)
 {
-    struct imm_hmm_block* block = (void*)imm_vecp_get(model->hmm_blocks, 0);
-
     if (write_mstates(model, stream, (struct model_state const* const*)block->mstates,
                       block->nstates)) {
         imm_error("could not write states");
@@ -351,10 +356,11 @@ void __imm_model_deep_destroy(struct imm_model const* model)
     if (model->abc)
         imm_abc_destroy(model->abc);
 
-    struct imm_hmm_block* block = (void*)imm_vecp_get(model->hmm_blocks, 0);
-    hmm_block_deep_destroy(block);
+    for (uint8_t i = 0; i < imm_model_nhmm_blocks(model); ++i) {
+        struct imm_hmm_block* block = (void*)imm_vecp_get(model->hmm_blocks, 0);
+        hmm_block_deep_destroy(block);
+    }
     imm_vecp_destroy(model->hmm_blocks);
-
     free_c(model);
 }
 

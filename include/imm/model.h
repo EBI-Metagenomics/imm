@@ -41,8 +41,10 @@ IMM_API int __imm_model_read_hmm(struct imm_model* model, struct imm_hmm_block* 
 IMM_API struct imm_state const* __imm_model_read_state(struct imm_model const* model, FILE* stream,
                                                        void* args);
 IMM_API void __imm_model_set_abc(struct imm_model* model, struct imm_abc const* abc);
-IMM_API int  __imm_model_write_dp(struct imm_model const* model, FILE* stream);
-IMM_API int  __imm_model_write_hmm(struct imm_model const* model, FILE* stream);
+IMM_API int  __imm_model_write_dp(struct imm_model const* model, struct imm_hmm_block const* block,
+                                  FILE* stream);
+IMM_API int  __imm_model_write_hmm(struct imm_model const* model, struct imm_hmm_block const* block,
+                                   FILE* stream);
 IMM_API int  __imm_model_write_state(struct imm_model const* model, FILE* stream,
                                      struct imm_state const* state, void* args);
 
