@@ -279,8 +279,8 @@ void test_hmm_write_io_two_hmms(void)
     s = imm_subseq_cast(&subseq);
     path = imm_result_path(r);
     score = imm_hmm_loglikelihood(hmm1, s, imm_result_path(r));
-    CLOSE(score, imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
-    CLOSE(imm_hmm_loglikelihood(hmm1, C, path), imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
+    CLOSE(score, imm_log(0.05f) + imm_log(0.1f) + imm_log(0.9f));
+    CLOSE(imm_hmm_loglikelihood(hmm1, C, path), imm_log(0.05f) + imm_log(0.1f) + imm_log(0.9f));
     imm_results_destroy(results);
 
     for (uint16_t i = 0; i < imm_hmm_block_nstates(block1); ++i) {
