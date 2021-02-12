@@ -24,6 +24,7 @@ void imm_dp_task_destroy(struct imm_dp_task const* task)
 {
     dp_matrix_destroy(task->matrix);
     eseq_destroy(task->eseq);
+    free_c(task);
 }
 
 void dp_task_setup(struct imm_dp_task* task, struct imm_seq const* seq)
