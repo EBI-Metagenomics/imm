@@ -53,8 +53,8 @@ void test_perf_viterbi_output(void)
     cass_cond(output != NULL);
 
     struct imm_dp const* dp = imm_hmm_create_dp(model.hmm, imm_mute_state_super(model.end));
-    struct imm_model*    imodel = imm_model_create();
-    imm_model_append_hmm_block(imodel, model.hmm, dp);
+    struct imm_model*    imodel = imm_model_create(model.abc);
+    imm_model_append_hmm_block(imodel, imm_hmm_block_create(model.hmm, dp));
 
     cass_equal(imm_output_write(output, imodel), 0);
     imm_model_destroy(imodel);

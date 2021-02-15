@@ -23,7 +23,6 @@ struct imm_hmm_block
     struct imm_dp const*         dp;
 };
 
-struct imm_hmm_block*       hmm_block_create(struct imm_hmm* hmm, struct imm_dp const* dp);
 void                        hmm_block_destroy(struct imm_hmm_block const* block);
 void                        hmm_block_deep_destroy(struct imm_hmm_block const* block);
 struct imm_hmm_block*       hmm_block_new(void);

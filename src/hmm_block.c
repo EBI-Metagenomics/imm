@@ -53,7 +53,7 @@ struct imm_hmm_block* hmm_block_new(void)
     return block;
 }
 
-struct imm_hmm_block* hmm_block_create(struct imm_hmm* hmm, struct imm_dp const* dp)
+struct imm_hmm_block* imm_hmm_block_create(struct imm_hmm* hmm, struct imm_dp const* dp)
 {
     struct imm_hmm_block* block = hmm_block_new();
     block->hmm = hmm;

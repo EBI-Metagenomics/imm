@@ -51,12 +51,12 @@ void test_hmm_write_io_two_states(void)
 
     struct imm_output* output = imm_output_create(TMPDIR "/two_states.imm");
     cass_cond(output != NULL);
-    struct imm_model* m = imm_model_create();
-    imm_model_append_hmm_block(m, hmm, dp);
+    struct imm_model* m = imm_model_create(abc);
+    imm_model_append_hmm_block(m, imm_hmm_block_create(hmm, dp));
     cass_equal(imm_output_write(output, m), 0);
     imm_model_destroy(m);
-    m = imm_model_create();
-    imm_model_append_hmm_block(m, hmm, dp);
+    m = imm_model_create(abc);
+    imm_model_append_hmm_block(m, imm_hmm_block_create(hmm, dp));
     cass_equal(imm_output_write(output, m), 0);
     imm_model_destroy(m);
     cass_equal(imm_output_destroy(output), 0);
@@ -203,9 +203,9 @@ void test_hmm_write_io_two_hmms(void)
 
     struct imm_output* output = imm_output_create(TMPDIR "/two_hmms.imm");
     cass_cond(output != NULL);
-    struct imm_model* m = imm_model_create();
-    imm_model_append_hmm_block(m, hmm0, dp0);
-    imm_model_append_hmm_block(m, hmm1, dp1);
+    struct imm_model* m = imm_model_create(abc);
+    imm_model_append_hmm_block(m, imm_hmm_block_create(hmm0, dp0));
+    imm_model_append_hmm_block(m, imm_hmm_block_create(hmm1, dp1));
     cass_equal(imm_output_write(output, m), 0);
     imm_model_destroy(m);
     cass_equal(imm_output_destroy(output), 0);

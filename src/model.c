@@ -26,18 +26,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int                     read_abc(struct imm_model* model, FILE* stream);
 static int                     write_abc(struct imm_model const* model, FILE* stream);
-static struct imm_state const* read_state(struct imm_model * model, FILE* stream);
+static struct imm_state const* read_state(struct imm_model* model, FILE* stream);
 static int write_state(struct imm_model const* model, FILE* stream, struct imm_state const* state);
 static int write_mstate(struct imm_model const* model, FILE* stream,
                         struct model_state const* mstate);
 
 struct imm_abc const* imm_model_abc(struct imm_model const* model) { return model->abc; }
 
-struct imm_model* imm_model_create(void)
+struct imm_model* imm_model_create(struct imm_abc const* abc)
 {
-    return __imm_model_create((struct imm_model_vtable){read_state, write_state}, NULL);
+    return __imm_model_create(abc, (struct imm_model_vtable){read_state, write_state}, NULL);
 }
 
 void* __imm_model_derived(struct imm_model* model) { return model->derived; }
@@ -54,15 +53,21 @@ void imm_model_destroy(struct imm_model const* model)
     free_c(model);
 }
 
+void imm_model_free(struct imm_model const* model)
+{
+    imm_vecp_destroy(model->hmm_blocks);
+    free_c(model);
+}
+
 struct imm_model const* imm_model_read(FILE* stream)
 {
-    struct imm_model* model =
-        __imm_model_create((struct imm_model_vtable){read_state, write_state}, NULL);
-
-    if (read_abc(model, stream)) {
+    struct imm_abc const* abc = imm_abc_read(stream);
+    if (!abc) {
         imm_error("could not read abc");
         goto err;
     }
+    struct imm_model* model =
+        __imm_model_create(abc, (struct imm_model_vtable){read_state, write_state}, NULL);
 
     if (__imm_model_read_hmm_blocks(model, stream))
         goto err;
@@ -123,23 +128,20 @@ int __imm_model_write_hmm_blocks(struct imm_model const* model, FILE* stream)
     return 0;
 }
 
-struct imm_model* __imm_model_create(struct imm_model_vtable vtable, void* derived)
+struct imm_model* __imm_model_create(struct imm_abc const* abc, struct imm_model_vtable vtable,
+                                     void* derived)
 {
     struct imm_model* model = malloc(sizeof(*model));
-    model->abc = NULL;
+    model->abc = abc;
     model->hmm_blocks = imm_vecp_create();
     model->vtable = vtable;
     model->derived = derived;
     return model;
 }
 
-void imm_model_append_hmm_block(struct imm_model* model, struct imm_hmm* hmm,
-                                struct imm_dp const* dp)
+void imm_model_append_hmm_block(struct imm_model* model, struct imm_hmm_block* block)
 {
-    if (model->abc == NULL)
-        model->abc = hmm_abc(hmm);
-    IMM_BUG(model->abc != hmm_abc(hmm));
-    struct imm_hmm_block* block = hmm_block_create(hmm, dp);
+    IMM_BUG(model->abc != hmm_abc(block->hmm));
     imm_vecp_append(model->hmm_blocks, block);
 }
 
@@ -153,7 +155,7 @@ uint8_t imm_model_nhmm_blocks(struct imm_model const* model)
     return (uint8_t)imm_vecp_length(model->hmm_blocks);
 }
 
-static struct imm_state const* read_state(struct imm_model * model, FILE* stream)
+static struct imm_state const* read_state(struct imm_model* model, FILE* stream)
 {
     struct imm_state const* state = NULL;
     uint8_t                 type_id = 0;
@@ -222,15 +224,6 @@ void __imm_model_deep_destroy(struct imm_model const* model)
     }
     imm_vecp_destroy(model->hmm_blocks);
     free_c(model);
-}
-
-static int read_abc(struct imm_model* model, FILE* stream)
-{
-    if (!(model->abc = imm_abc_read(stream))) {
-        imm_error("could not read abc");
-        return 1;
-    }
-    return 0;
 }
 
 static int write_abc(struct imm_model const* model, FILE* stream)
