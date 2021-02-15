@@ -28,7 +28,7 @@
 
 static int                     read_abc(struct imm_model* model, FILE* stream);
 static int                     write_abc(struct imm_model const* model, FILE* stream);
-static struct imm_state const* read_state(struct imm_model const* model, FILE* stream);
+static struct imm_state const* read_state(struct imm_model * model, FILE* stream);
 static int write_state(struct imm_model const* model, FILE* stream, struct imm_state const* state);
 static int write_mstate(struct imm_model const* model, FILE* stream,
                         struct model_state const* mstate);
@@ -41,6 +41,8 @@ struct imm_model* imm_model_create(void)
 }
 
 void* __imm_model_derived(struct imm_model* model) { return model->derived; }
+
+void const* __imm_model_derived_c(struct imm_model const* model) { return model->derived; }
 
 void imm_model_destroy(struct imm_model const* model)
 {
@@ -151,7 +153,7 @@ uint8_t imm_model_nhmm_blocks(struct imm_model const* model)
     return (uint8_t)imm_vecp_length(model->hmm_blocks);
 }
 
-static struct imm_state const* read_state(struct imm_model const* model, FILE* stream)
+static struct imm_state const* read_state(struct imm_model * model, FILE* stream)
 {
     struct imm_state const* state = NULL;
     uint8_t                 type_id = 0;
