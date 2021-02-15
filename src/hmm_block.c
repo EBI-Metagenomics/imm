@@ -287,7 +287,7 @@ static struct model_state** read_mstates(struct imm_model* model, struct imm_hmm
             goto err;
         }
 
-        struct imm_state const* state = model->read_state(model, stream, model->read_state_args);
+        struct imm_state const* state = model->vtable.read_state(model, stream);
         if (!state) {
             imm_error("could not read state");
             goto err;

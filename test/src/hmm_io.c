@@ -38,7 +38,7 @@ void test_hmm_write_io_two_states(void)
     imm_dp_task_setup(task, C, 0);
     struct imm_results const* results = imm_dp_viterbi(dp, task);
     cass_cond(results != NULL);
-    cass_equal_int(imm_results_size(results), 1);
+    cass_equal(imm_results_size(results), 1);
     struct imm_path const* path = imm_result_path(imm_results_get(results, 0));
 
     struct imm_result const* r = imm_results_get(results, 0);
@@ -51,13 +51,15 @@ void test_hmm_write_io_two_states(void)
 
     struct imm_output* output = imm_output_create(TMPDIR "/two_states.imm");
     cass_cond(output != NULL);
-    struct imm_model const* model = imm_model_create(hmm, dp);
-    cass_equal_int(imm_output_write(output, model), 0);
-    imm_model_destroy(model);
-    model = imm_model_create(hmm, dp);
-    cass_equal_int(imm_output_write(output, model), 0);
-    imm_model_destroy(model);
-    cass_equal_int(imm_output_destroy(output), 0);
+    struct imm_model* m = imm_model_create();
+    imm_model_append_hmm_block(m, hmm, dp);
+    cass_equal(imm_output_write(output, m), 0);
+    imm_model_destroy(m);
+    m = imm_model_create();
+    imm_model_append_hmm_block(m, hmm, dp);
+    cass_equal(imm_output_write(output, m), 0);
+    imm_model_destroy(m);
+    cass_equal(imm_output_destroy(output), 0);
 
     imm_dp_destroy(dp);
     imm_hmm_destroy(hmm);
@@ -70,10 +72,10 @@ void test_hmm_write_io_two_states(void)
     struct imm_input* input = imm_input_create(TMPDIR "/two_states.imm");
     cass_cond(input != NULL);
     cass_cond(!imm_input_eof(input));
-    model = imm_input_read(input);
+    struct imm_model const* model = imm_input_read(input);
     cass_cond(!imm_input_eof(input));
     cass_cond(model != NULL);
-    cass_equal_int(imm_model_nhmm_blocks(model), 1);
+    cass_equal(imm_model_nhmm_blocks(model), 1);
 
     struct imm_hmm_block* block = imm_model_get_hmm_block(model, 0);
     cass_cond(block != NULL);
@@ -88,7 +90,7 @@ void test_hmm_write_io_two_states(void)
     imm_dp_task_setup(task, C, 0);
     results = imm_dp_viterbi(dp, task);
     cass_cond(results != NULL);
-    cass_equal_int(imm_results_size(results), 1);
+    cass_equal(imm_results_size(results), 1);
     r = imm_results_get(results, 0);
     subseq = imm_result_subseq(r);
     s = imm_subseq_cast(&subseq);
@@ -122,9 +124,9 @@ void test_hmm_write_io_two_states(void)
     cass_cond(model != NULL);
     cass_cond(imm_input_read(input) == NULL);
     cass_cond(imm_input_eof(input));
-    cass_equal_int(imm_input_destroy(input), 0);
+    cass_equal(imm_input_destroy(input), 0);
 
-    cass_equal_int(imm_model_nhmm_blocks(model), 1);
+    cass_equal(imm_model_nhmm_blocks(model), 1);
     block = imm_model_get_hmm_block(model, 0);
     cass_cond(block != NULL);
 
@@ -175,8 +177,8 @@ void test_hmm_write_io_two_hmms(void)
     imm_dp_task_setup(task0, C, 0);
     struct imm_results const* results = imm_dp_viterbi(dp0, task0);
     cass_cond(results != NULL);
-    cass_equal_int(imm_results_size(results), 1);
-    struct imm_path const* path = imm_result_path(imm_results_get(results, 0));
+    cass_equal(imm_results_size(results), 1);
+    struct imm_path const*   path = imm_result_path(imm_results_get(results, 0));
     struct imm_result const* r = imm_results_get(results, 0);
     struct imm_subseq        subseq = imm_result_subseq(r);
     struct imm_seq const*    s = imm_subseq_cast(&subseq);
@@ -189,7 +191,7 @@ void test_hmm_write_io_two_hmms(void)
     imm_dp_task_setup(task1, C, 0);
     results = imm_dp_viterbi(dp1, task1);
     cass_cond(results != NULL);
-    cass_equal_int(imm_results_size(results), 1);
+    cass_equal(imm_results_size(results), 1);
     path = imm_result_path(imm_results_get(results, 0));
     r = imm_results_get(results, 0);
     subseq = imm_result_subseq(r);
@@ -201,11 +203,12 @@ void test_hmm_write_io_two_hmms(void)
 
     struct imm_output* output = imm_output_create(TMPDIR "/two_hmms.imm");
     cass_cond(output != NULL);
-    struct imm_model* m = imm_model_create(hmm0, dp0);
+    struct imm_model* m = imm_model_create();
+    imm_model_append_hmm_block(m, hmm0, dp0);
     imm_model_append_hmm_block(m, hmm1, dp1);
-    cass_equal_int(imm_output_write(output, m), 0);
+    cass_equal(imm_output_write(output, m), 0);
     imm_model_destroy(m);
-    cass_equal_int(imm_output_destroy(output), 0);
+    cass_equal(imm_output_destroy(output), 0);
 
     imm_dp_destroy(dp0);
     imm_dp_destroy(dp1);
@@ -230,11 +233,11 @@ void test_hmm_write_io_two_hmms(void)
 
     struct imm_hmm_block* block0 = imm_model_get_hmm_block(model, 0);
     cass_cond(block0 != NULL);
-    cass_equal_uint32(imm_hmm_block_nstates(block0), 2);
+    cass_equal(imm_hmm_block_nstates(block0), 2);
 
     struct imm_hmm_block* block1 = imm_model_get_hmm_block(model, 1);
     cass_cond(block1 != NULL);
-    cass_equal_uint32(imm_hmm_block_nstates(block1), 2);
+    cass_equal(imm_hmm_block_nstates(block1), 2);
 
     abc = imm_model_abc(model);
     hmm0 = imm_hmm_block_hmm(block0);
@@ -247,7 +250,7 @@ void test_hmm_write_io_two_hmms(void)
     imm_dp_task_setup(task0, C, 0);
     results = imm_dp_viterbi(dp0, task0);
     cass_cond(results != NULL);
-    cass_equal_int(imm_results_size(results), 1);
+    cass_equal(imm_results_size(results), 1);
     r = imm_results_get(results, 0);
     subseq = imm_result_subseq(r);
     s = imm_subseq_cast(&subseq);
@@ -274,7 +277,7 @@ void test_hmm_write_io_two_hmms(void)
     imm_dp_task_setup(task1, C, 0);
     results = imm_dp_viterbi(dp1, task1);
     cass_cond(results != NULL);
-    cass_equal_int(imm_results_size(results), 1);
+    cass_equal(imm_results_size(results), 1);
     r = imm_results_get(results, 0);
     subseq = imm_result_subseq(r);
     s = imm_subseq_cast(&subseq);

@@ -34,7 +34,8 @@ void test_perf_viterbi(void)
     cass_cond(imm_results_size(results) == 1);
     struct imm_result const* r = imm_results_get(results, 0);
     struct imm_subseq        subseq = imm_result_subseq(r);
-    imm_float score = imm_hmm_loglikelihood(model.hmm, imm_subseq_cast(&subseq), imm_result_path(r));
+    imm_float                score =
+        imm_hmm_loglikelihood(model.hmm, imm_subseq_cast(&subseq), imm_result_path(r));
     cass_cond(imm_lprob_is_valid(score));
     cass_cond(!imm_lprob_is_zero(score));
     cass_close(score, -65826.0118484497);
@@ -51,12 +52,13 @@ void test_perf_viterbi_output(void)
     struct imm_output* output = imm_output_create(TMPDIR "/perf.imm");
     cass_cond(output != NULL);
 
-    struct imm_dp const*    dp = imm_hmm_create_dp(model.hmm, imm_mute_state_super(model.end));
-    struct imm_model const* imodel = imm_model_create(model.hmm, dp);
+    struct imm_dp const* dp = imm_hmm_create_dp(model.hmm, imm_mute_state_super(model.end));
+    struct imm_model*    imodel = imm_model_create();
+    imm_model_append_hmm_block(imodel, model.hmm, dp);
 
-    cass_equal_int(imm_output_write(output, imodel), 0);
+    cass_equal(imm_output_write(output, imodel), 0);
     imm_model_destroy(imodel);
-    cass_equal_int(imm_output_destroy(output), 0);
+    cass_equal(imm_output_destroy(output), 0);
 
     imm_dp_destroy(dp);
     destroy_model2(model);
@@ -68,12 +70,12 @@ void test_perf_viterbi_input(void)
     cass_cond(input != NULL);
     struct imm_model const* imodel = imm_input_read(input);
     cass_cond(imodel != NULL);
-    cass_equal_int(imm_input_destroy(input), 0);
+    cass_equal(imm_input_destroy(input), 0);
 
-    struct imm_abc const* abc = imm_model_abc(imodel);
+    struct imm_abc const*       abc = imm_model_abc(imodel);
     struct imm_hmm_block const* block = imm_model_get_hmm_block(imodel, 0);
-    struct imm_hmm const* hmm = imm_hmm_block_hmm(block);
-    struct imm_dp const*  dp = imm_hmm_block_dp(block);
+    struct imm_hmm const*       hmm = imm_hmm_block_hmm(block);
+    struct imm_dp const*        dp = imm_hmm_block_dp(block);
 
     char const* str = get_model2_str();
     cass_cond(strlen(str) == 2000);

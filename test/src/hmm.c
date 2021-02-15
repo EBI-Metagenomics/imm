@@ -80,16 +80,16 @@ void test_hmm_wrong_states(void)
     struct imm_mute_state const* state1 = imm_mute_state_create("state0", abc);
 
     imm_hmm_add_state(hmm, imm_mute_state_super(state0), logf(0.5f));
-    cass_equal_int(imm_hmm_set_start(hmm, imm_mute_state_super(state1), logf(0.3f)), 1);
-    cass_equal_int(imm_hmm_set_trans(hmm, imm_mute_state_super(state0),
+    cass_equal(imm_hmm_set_start(hmm, imm_mute_state_super(state1), logf(0.3f)), 1);
+    cass_equal(imm_hmm_set_trans(hmm, imm_mute_state_super(state0),
                                      imm_mute_state_super(state1), logf(0.3f)),
                    1);
-    cass_equal_int(imm_hmm_set_trans(hmm, imm_mute_state_super(state1),
+    cass_equal(imm_hmm_set_trans(hmm, imm_mute_state_super(state1),
                                      imm_mute_state_super(state0), logf(0.3f)),
                    1);
     cass_cond(imm_hmm_create_dp(hmm, imm_mute_state_super(state1)) == NULL);
-    cass_equal_int(imm_hmm_normalize_trans(hmm, imm_mute_state_super(state1)), 1);
-    cass_equal_int(imm_hmm_normalize_trans(hmm, imm_mute_state_super(state0)), 0);
+    cass_equal(imm_hmm_normalize_trans(hmm, imm_mute_state_super(state1)), 1);
+    cass_equal(imm_hmm_normalize_trans(hmm, imm_mute_state_super(state0)), 0);
 
     imm_hmm_destroy(hmm);
     imm_mute_state_destroy(state0);

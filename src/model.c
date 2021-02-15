@@ -26,17 +26,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int read_abc(struct imm_model* model, FILE* stream);
-static int write_abc(struct imm_model const* model, FILE* stream);
+static int                     read_abc(struct imm_model* model, FILE* stream);
+static int                     write_abc(struct imm_model const* model, FILE* stream);
+static struct imm_state const* read_state(struct imm_model const* model, FILE* stream);
+static int write_state(struct imm_model const* model, FILE* stream, struct imm_state const* state);
 static int write_mstate(struct imm_model const* model, FILE* stream,
                         struct model_state const* mstate);
 
 struct imm_abc const* imm_model_abc(struct imm_model const* model) { return model->abc; }
 
-struct imm_model* imm_model_create(struct imm_hmm* hmm, struct imm_dp const* dp)
+struct imm_model* imm_model_create(void)
 {
-    return __imm_model_create(hmm, dp, __imm_model_read_state, NULL, __imm_model_write_state, NULL);
+    return __imm_model_create((struct imm_model_vtable){read_state, write_state}, NULL);
 }
+
+void* __imm_model_derived(struct imm_model* model) { return model->derived; }
 
 void imm_model_destroy(struct imm_model const* model)
 {
@@ -51,7 +55,7 @@ void imm_model_destroy(struct imm_model const* model)
 struct imm_model const* imm_model_read(FILE* stream)
 {
     struct imm_model* model =
-        __imm_model_new(__imm_model_read_state, NULL, __imm_model_write_state, NULL);
+        __imm_model_create((struct imm_model_vtable){read_state, write_state}, NULL);
 
     if (read_abc(model, stream)) {
         imm_error("could not read abc");
@@ -117,20 +121,21 @@ int __imm_model_write_hmm_blocks(struct imm_model const* model, FILE* stream)
     return 0;
 }
 
-struct imm_model* __imm_model_create(struct imm_hmm* hmm, struct imm_dp const* dp,
-                                     imm_model_read_state_cb read_state, void* read_state_args,
-                                     imm_model_write_state_cb write_state, void* write_state_args)
+struct imm_model* __imm_model_create(struct imm_model_vtable vtable, void* derived)
 {
-    struct imm_model* model =
-        __imm_model_new(read_state, read_state_args, write_state, write_state_args);
-    model->abc = hmm_abc(hmm);
-    imm_model_append_hmm_block(model, hmm, dp);
+    struct imm_model* model = malloc(sizeof(*model));
+    model->abc = NULL;
+    model->hmm_blocks = imm_vecp_create();
+    model->vtable = vtable;
+    model->derived = derived;
     return model;
 }
 
 void imm_model_append_hmm_block(struct imm_model* model, struct imm_hmm* hmm,
                                 struct imm_dp const* dp)
 {
+    if (model->abc == NULL)
+        model->abc = hmm_abc(hmm);
     IMM_BUG(model->abc != hmm_abc(hmm));
     struct imm_hmm_block* block = hmm_block_create(hmm, dp);
     imm_vecp_append(model->hmm_blocks, block);
@@ -146,21 +151,7 @@ uint8_t imm_model_nhmm_blocks(struct imm_model const* model)
     return (uint8_t)imm_vecp_length(model->hmm_blocks);
 }
 
-struct imm_model* __imm_model_new(imm_model_read_state_cb read_state, void* read_state_args,
-                                  imm_model_write_state_cb write_state, void* write_state_args)
-{
-    struct imm_model* model = malloc(sizeof(*model));
-    model->abc = NULL;
-    model->hmm_blocks = imm_vecp_create();
-    model->read_state = read_state;
-    model->read_state_args = read_state_args;
-    model->write_state = write_state;
-    model->write_state_args = write_state_args;
-    return model;
-}
-
-struct imm_state const* __imm_model_read_state(struct imm_model const* model, FILE* stream,
-                                               void* args)
+static struct imm_state const* read_state(struct imm_model const* model, FILE* stream)
 {
     struct imm_state const* state = NULL;
     uint8_t                 type_id = 0;
@@ -192,8 +183,7 @@ struct imm_state const* __imm_model_read_state(struct imm_model const* model, FI
 
 void __imm_model_set_abc(struct imm_model* model, struct imm_abc const* abc) { model->abc = abc; }
 
-int __imm_model_write_state(struct imm_model const* model, FILE* stream,
-                            struct imm_state const* state, void* args)
+static int write_state(struct imm_model const* model, FILE* stream, struct imm_state const* state)
 {
     uint8_t type_id = imm_state_type_id(state);
     if (fwrite(&type_id, sizeof(type_id), 1, stream) < 1) {
@@ -263,7 +253,7 @@ static int write_mstate(struct imm_model const* model, FILE* stream,
         return 1;
     }
 
-    if (model->write_state(model, stream, state, model->write_state_args)) {
+    if (model->vtable.write_state(model, stream, state)) {
         imm_error("could not write state");
         return 1;
     }
