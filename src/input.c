@@ -2,7 +2,7 @@
 #include "free.h"
 #include "imm/io.h"
 #include "imm/report.h"
-#include "model.h"
+#include "profile.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -15,7 +15,7 @@ struct imm_input
     bool closed;
 };
 
-static struct imm_model const* read_model(struct imm_input* input, uint8_t block_type);
+static struct imm_profile const* read_model(struct imm_input* input, uint8_t block_type);
 
 int imm_input_close(struct imm_input* input)
 {
@@ -60,7 +60,7 @@ int imm_input_destroy(struct imm_input* input)
 
 bool imm_input_eof(struct imm_input const* input) { return input->eof; }
 
-struct imm_model const* imm_input_read(struct imm_input* input)
+struct imm_profile const* imm_input_read(struct imm_input* input)
 {
     uint8_t block_type = 0x00;
 
@@ -72,7 +72,7 @@ struct imm_model const* imm_input_read(struct imm_input* input)
     return read_model(input, block_type);
 }
 
-static struct imm_model const* read_model(struct imm_input* input, uint8_t block_type)
+static struct imm_profile const* read_model(struct imm_input* input, uint8_t block_type)
 {
     if (block_type == IMM_IO_BLOCK_EOF) {
         input->eof = true;
@@ -84,8 +84,8 @@ static struct imm_model const* read_model(struct imm_input* input, uint8_t block
         return NULL;
     }
 
-    struct imm_model const* model = NULL;
-    if (!(model = imm_model_read(input->stream))) {
+    struct imm_profile const* model = NULL;
+    if (!(model = imm_profile_read(input->stream))) {
         imm_error("failed to read file %s", input->filepath);
         return NULL;
     }

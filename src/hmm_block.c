@@ -6,18 +6,18 @@
 #include "free.h"
 #include "hmm.h"
 #include "imm/imm.h"
-#include "model.h"
+#include "profile.h"
 #include "model_state.h"
 #include "model_trans.h"
 #include "model_trans_table.h"
 #include "seq_code.h"
 #include <stdlib.h>
 
-static int                  write_dp(struct imm_model const* model, struct imm_hmm_block const* block, FILE* stream);
-static int                  write_hmm(struct imm_model const* model, struct imm_hmm_block const* block, FILE* stream);
-static int                  read_dp(struct imm_model* model, struct imm_hmm_block* block, FILE* stream);
-static int                  read_hmm(struct imm_model* model, struct imm_hmm_block* block, FILE* stream);
-static struct model_state** read_mstates(struct imm_model* model, struct imm_hmm_block* block, FILE* stream);
+static int                  write_dp(struct imm_profile const* model, struct imm_hmm_block const* block, FILE* stream);
+static int                  write_hmm(struct imm_profile const* model, struct imm_hmm_block const* block, FILE* stream);
+static int                  read_dp(struct imm_profile* model, struct imm_hmm_block* block, FILE* stream);
+static int                  read_hmm(struct imm_profile* model, struct imm_hmm_block* block, FILE* stream);
+static struct model_state** read_mstates(struct imm_profile* model, struct imm_hmm_block* block, FILE* stream);
 static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct model_state* const* const mstates);
 
 struct imm_dp const* imm_hmm_block_dp(struct imm_hmm_block const* block) { return block->dp; }
@@ -95,7 +95,7 @@ void hmm_block_deep_destroy(struct imm_hmm_block const* block)
         imm_dp_destroy(block->dp);
 }
 
-struct imm_hmm_block const* hmm_block_read(struct imm_model* model, FILE* stream)
+struct imm_hmm_block const* hmm_block_read(struct imm_profile* model, FILE* stream)
 {
     struct imm_hmm_block* block = hmm_block_new();
 
@@ -115,7 +115,7 @@ err:
     return NULL;
 }
 
-int hmm_block_write(struct imm_model const* model, struct imm_hmm_block const* block, FILE* stream)
+int hmm_block_write(struct imm_profile const* model, struct imm_hmm_block const* block, FILE* stream)
 {
     if (write_hmm(model, block, stream)) {
         imm_error("could not write hmm");
@@ -130,7 +130,7 @@ int hmm_block_write(struct imm_model const* model, struct imm_hmm_block const* b
     return 0;
 }
 
-static int write_dp(struct imm_model const* model, struct imm_hmm_block const* block, FILE* stream)
+static int write_dp(struct imm_profile const* model, struct imm_hmm_block const* block, FILE* stream)
 {
     if (seq_code_write(block->seq_code, stream)) {
         imm_error("could not write seq_code");
@@ -155,7 +155,7 @@ static int write_dp(struct imm_model const* model, struct imm_hmm_block const* b
     return 0;
 }
 
-int write_hmm(struct imm_model const* model, struct imm_hmm_block const* block, FILE* stream)
+int write_hmm(struct imm_profile const* model, struct imm_hmm_block const* block, FILE* stream)
 {
     if (write_mstates(model, stream, (struct model_state const* const*)block->mstates, block->nstates)) {
         imm_error("could not write states");
@@ -196,7 +196,7 @@ int write_hmm(struct imm_model const* model, struct imm_hmm_block const* block, 
     return 0;
 }
 
-static int read_dp(struct imm_model* model, struct imm_hmm_block* block, FILE* stream)
+static int read_dp(struct imm_profile* model, struct imm_hmm_block* block, FILE* stream)
 {
     if (!(block->seq_code = seq_code_read(stream, model->abc))) {
         imm_error("could not read seq_code");
@@ -223,7 +223,7 @@ static int read_dp(struct imm_model* model, struct imm_hmm_block* block, FILE* s
     return 0;
 }
 
-static int read_hmm(struct imm_model* model, struct imm_hmm_block* block, FILE* stream)
+static int read_hmm(struct imm_profile* model, struct imm_hmm_block* block, FILE* stream)
 {
     block->hmm = imm_hmm_create(model->abc);
 
@@ -253,7 +253,7 @@ err:
     return 1;
 }
 
-static struct model_state** read_mstates(struct imm_model* model, struct imm_hmm_block* block, FILE* stream)
+static struct model_state** read_mstates(struct imm_profile* model, struct imm_hmm_block* block, FILE* stream)
 {
     struct model_state** mstates = NULL;
 

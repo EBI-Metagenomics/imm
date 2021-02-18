@@ -37,7 +37,6 @@ add_library(imm
     src/hmm.c
     src/hmm_block.c
     src/input.c
-    src/model.c
     src/model_state.c
     src/model_state_sort.c
     src/model_state_table.c
@@ -47,6 +46,7 @@ add_library(imm
     src/normal_state.c
     src/output.c
     src/path.c
+    src/profile.c
     src/report.c
     src/results.c
     src/seq.c

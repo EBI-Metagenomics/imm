@@ -93,7 +93,7 @@ struct imm_state const* imm_normal_state_super(struct imm_normal_state const* st
     return state->super;
 }
 
-int imm_normal_state_write(struct imm_state const* state, struct imm_model const* model,
+int imm_normal_state_write(struct imm_state const* state, struct imm_profile const* model,
                            FILE* stream)
 {
     if (__imm_state_write(state, stream))

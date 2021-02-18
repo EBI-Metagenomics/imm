@@ -1,7 +1,7 @@
 #ifndef HMM_BLOCK_H
 #define HMM_BLOCK_H
 
-#include "imm/model.h"
+#include "imm/profile.h"
 #include <inttypes.h>
 
 struct dp_emission;
@@ -26,7 +26,7 @@ struct imm_hmm_block
 void                        hmm_block_destroy(struct imm_hmm_block const* block);
 void                        hmm_block_deep_destroy(struct imm_hmm_block const* block);
 struct imm_hmm_block*       hmm_block_new(void);
-struct imm_hmm_block const* hmm_block_read(struct imm_model* model, FILE* stream);
-int hmm_block_write(struct imm_model const* model, struct imm_hmm_block const* block, FILE* stream);
+struct imm_hmm_block const* hmm_block_read(struct imm_profile* model, FILE* stream);
+int hmm_block_write(struct imm_profile const* model, struct imm_hmm_block const* block, FILE* stream);
 
 #endif

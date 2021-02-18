@@ -2,7 +2,7 @@
 #include "free.h"
 #include "imm/io.h"
 #include "imm/report.h"
-#include "model.h"
+#include "profile.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -60,7 +60,7 @@ int imm_output_destroy(struct imm_output* output)
     return errno;
 }
 
-int imm_output_write(struct imm_output* output, struct imm_model const* model)
+int imm_output_write(struct imm_output* output, struct imm_profile const* model)
 {
     uint8_t block_type = IMM_IO_BLOCK_MODEL;
 
@@ -69,7 +69,7 @@ int imm_output_write(struct imm_output* output, struct imm_model const* model)
         return 1;
     }
 
-    if (imm_model_write(model, output->stream)) {
+    if (imm_profile_write(model, output->stream)) {
         imm_error("could not write imm model");
         return 1;
     }

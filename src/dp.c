@@ -10,7 +10,7 @@
 #include "hmm_block.h"
 #include "imm/imm.h"
 #include "minmax.h"
-#include "model.h"
+#include "profile.h"
 #include "model_state.h"
 #include "model_trans.h"
 #include "model_trans_table.h"
@@ -141,7 +141,7 @@ struct imm_dp* dp_create(struct imm_abc const* abc, struct model_state const** m
     return dp;
 }
 
-void dp_create_from_model(struct imm_model* model, struct imm_hmm_block* block)
+void dp_create_from_model(struct imm_profile* model, struct imm_hmm_block* block)
 {
     struct imm_dp* dp = malloc(sizeof(*dp));
 

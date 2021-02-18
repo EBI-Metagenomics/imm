@@ -16,7 +16,7 @@
  */
 
 struct imm_abc;
-struct imm_model;
+struct imm_profile;
 struct imm_state;
 
 struct imm_state_vtable
