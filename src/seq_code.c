@@ -2,11 +2,8 @@
 #include "cast.h"
 #include "eseq.h"
 #include "free.h"
-#include "imath.h"
-#include "imm/abc.h"
-#include "imm/bug.h"
-#include "imm/seq.h"
-#include "imm/subseq.h"
+#include "imm/imm.h"
+#include "ipow.h"
 #include "matrix.h"
 #include <limits.h>
 #include <stdint.h>
@@ -22,13 +19,9 @@ struct seq_code_chunk
 };
 
 static inline uint_fast8_t offset_size(struct seq_code const* seq_code);
-static inline uint_fast8_t stride_size(struct seq_code const* seq_code)
-{
-    return seq_code->max_seq;
-}
+static inline uint_fast8_t stride_size(struct seq_code const* seq_code) { return seq_code->max_seq; }
 
-struct seq_code const* seq_code_create(struct imm_abc const* abc, uint_fast8_t min_seq,
-                                       uint_fast8_t max_seq)
+struct seq_code const* seq_code_create(struct imm_abc const* abc, uint_fast8_t min_seq, uint_fast8_t max_seq)
 {
     IMM_BUG(min_seq > max_seq);
     struct seq_code* seq_code = malloc(sizeof(*seq_code));
@@ -111,14 +104,12 @@ int seq_code_write(struct seq_code const* seq_code, FILE* stream)
         return 1;
     }
 
-    if (fwrite(chunk.offset, sizeof(*chunk.offset), offset_size(seq_code), stream) <
-        offset_size(seq_code)) {
+    if (fwrite(chunk.offset, sizeof(*chunk.offset), offset_size(seq_code), stream) < offset_size(seq_code)) {
         imm_error("could not write offset");
         return 1;
     }
 
-    if (fwrite(chunk.stride, sizeof(*chunk.stride), stride_size(seq_code), stream) <
-        stride_size(seq_code)) {
+    if (fwrite(chunk.stride, sizeof(*chunk.stride), stride_size(seq_code), stream) < stride_size(seq_code)) {
         imm_error("could not write stride");
         return 1;
     }
@@ -133,8 +124,7 @@ int seq_code_write(struct seq_code const* seq_code, FILE* stream)
 
 struct seq_code const* seq_code_read(FILE* stream, struct imm_abc const* abc)
 {
-    struct seq_code_chunk chunk = {
-        .min_seq = 0, .max_seq = 0, .offset = NULL, .stride = NULL, .size = 0};
+    struct seq_code_chunk chunk = {.min_seq = 0, .max_seq = 0, .offset = NULL, .stride = NULL, .size = 0};
 
     struct seq_code* seq_code = malloc(sizeof(*seq_code));
     seq_code->offset = NULL;
@@ -157,16 +147,14 @@ struct seq_code const* seq_code_read(FILE* stream, struct imm_abc const* abc)
 
     chunk.offset = malloc(sizeof(*chunk.offset) * offset_size(seq_code));
 
-    if (fread(chunk.offset, sizeof(*chunk.offset), offset_size(seq_code), stream) <
-        offset_size(seq_code)) {
+    if (fread(chunk.offset, sizeof(*chunk.offset), offset_size(seq_code), stream) < offset_size(seq_code)) {
         imm_error("could not read offset");
         goto err;
     }
 
     chunk.stride = malloc(sizeof(*chunk.stride) * offset_size(seq_code));
 
-    if (fread(chunk.stride, sizeof(*chunk.stride), stride_size(seq_code), stream) <
-        stride_size(seq_code)) {
+    if (fread(chunk.stride, sizeof(*chunk.stride), stride_size(seq_code), stream) < stride_size(seq_code)) {
         imm_error("could not read stride");
         goto err;
     }

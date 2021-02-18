@@ -8,7 +8,6 @@
 struct imm_dp;
 struct imm_hmm;
 struct imm_hmm_block;
-struct imm_model;
 
 IMM_API struct imm_hmm_block*   imm_hmm_block_create(struct imm_hmm* hmm, struct imm_dp const* dp);
 IMM_API struct imm_dp const*    imm_hmm_block_dp(struct imm_hmm_block const* block);

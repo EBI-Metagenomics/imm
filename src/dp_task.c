@@ -1,7 +1,7 @@
-#include "imm/dp_task.h"
+#include "dp_task.h"
 #include "dp.h"
 #include "dp_matrix.h"
-#include "dp_task.h"
+#include "imm/imm.h"
 #include <stdlib.h>
 
 struct imm_dp_task* imm_dp_task_create(struct imm_dp const* dp)
@@ -27,8 +27,8 @@ void imm_dp_task_destroy(struct imm_dp_task const* task)
     free_c(task);
 }
 
-void dp_task_setup(struct imm_dp_task* task, struct imm_seq const* seq)
+void dp_task_set_subseq(struct imm_dp_task* task, struct imm_subseq const* subseq)
 {
-    eseq_setup(task->eseq, seq);
+    eseq_setup(task->eseq, imm_subseq_cast(subseq));
     dp_matrix_setup(task->matrix, task->eseq);
 }

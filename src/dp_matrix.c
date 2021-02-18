@@ -1,5 +1,4 @@
 #include "dp_matrix.h"
-#include "imath.h"
 #include "imm/seq.h"
 
 struct dp_matrix* dp_matrix_create(struct dp_state_table const* states)

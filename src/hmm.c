@@ -1,18 +1,9 @@
-#include "imm/hmm.h"
+#include "hmm.h"
 #include "dp.h"
 #include "dp_state_table.h"
 #include "dp_trans_table.h"
 #include "free.h"
-#include "hmm.h"
-#include "imm/abc.h"
-#include "imm/bug.h"
-#include "imm/io.h"
-#include "imm/lprob.h"
-#include "imm/path.h"
-#include "imm/report.h"
-#include "imm/state.h"
-#include "imm/step.h"
-#include "imm/subseq.h"
+#include "imm/imm.h"
 #include "minmax.h"
 #include "model_state.h"
 #include "model_state_sort.h"
@@ -90,6 +81,16 @@ void imm_hmm_destroy(struct imm_hmm const* hmm)
     free_c(hmm);
 }
 
+imm_float imm_hmm_get_start(struct imm_hmm const* hmm, struct imm_state const* state)
+{
+    unsigned long i = model_state_table_find(hmm->table, state);
+    if (i == model_state_table_end(hmm->table)) {
+        imm_error("state not found");
+        return imm_lprob_invalid();
+    }
+    return model_state_get_start(model_state_table_get(hmm->table, i));
+}
+
 imm_float imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* src_state,
                             struct imm_state const* tgt_state)
 {
@@ -105,9 +106,8 @@ imm_float imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* s
         return imm_lprob_invalid();
     }
 
-    struct model_trans_table const* table =
-        model_state_get_mtrans_table(model_state_table_get(hmm->table, src));
-    unsigned long i = model_trans_table_find(table, tgt_state);
+    struct model_trans_table const* table = model_state_get_mtrans_table(model_state_table_get(hmm->table, src));
+    unsigned long                   i = model_trans_table_find(table, tgt_state);
 
     if (i == model_trans_table_end(table))
         return imm_lprob_zero();
@@ -115,8 +115,7 @@ imm_float imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* s
     return model_trans_get_lprob(model_trans_table_get(table, i));
 }
 
-imm_float imm_hmm_loglikelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
-                             struct imm_path const* path)
+imm_float imm_hmm_loglikelihood(struct imm_hmm const* hmm, struct imm_seq const* seq, struct imm_path const* path)
 {
     if (hmm->abc != imm_seq_get_abc(seq)) {
         imm_error("hmm and seq must have the same alphabet");
@@ -139,8 +138,7 @@ imm_float imm_hmm_loglikelihood(struct imm_hmm const* hmm, struct imm_seq const*
     unsigned start = 0;
     IMM_SUBSEQ(subseq, seq, start, step_len);
 
-    imm_float lprob =
-        get_start_lprob(hmm, state) + imm_state_lprob(state, imm_subseq_cast(&subseq));
+    imm_float lprob = get_start_lprob(hmm, state) + imm_state_lprob(state, imm_subseq_cast(&subseq));
 
     struct imm_state const* prev_state = NULL;
 
@@ -251,16 +249,6 @@ int imm_hmm_normalize_trans(struct imm_hmm* hmm, struct imm_state const* src_sta
     return normalize_transitions(model_state_table_get(hmm->table, i));
 }
 
-imm_float imm_hmm_get_start(struct imm_hmm const* hmm, struct imm_state const* state)
-{
-    unsigned long i = model_state_table_find(hmm->table, state);
-    if (i == model_state_table_end(hmm->table)) {
-        imm_error("state not found");
-        return imm_lprob_invalid();
-    }
-    return model_state_get_start(model_state_table_get(hmm->table, i));
-}
-
 int imm_hmm_set_start(struct imm_hmm* hmm, struct imm_state const* state, imm_float lprob)
 {
     unsigned long i = model_state_table_find(hmm->table, state);
@@ -273,8 +261,8 @@ int imm_hmm_set_start(struct imm_hmm* hmm, struct imm_state const* state, imm_fl
     return 0;
 }
 
-int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state,
-                      struct imm_state const* tgt_state, imm_float lprob)
+int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state, struct imm_state const* tgt_state,
+                      imm_float lprob)
 {
     unsigned long src = model_state_table_find(hmm->table, src_state);
     if (src == model_state_table_end(hmm->table)) {
@@ -293,8 +281,7 @@ int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state,
         return 1;
     }
 
-    struct model_trans_table* table =
-        model_state_get_mtrans_table(model_state_table_get(hmm->table, src));
+    struct model_trans_table* table = model_state_get_mtrans_table(model_state_table_get(hmm->table, src));
 
     unsigned long i = model_trans_table_find(table, tgt_state);
     if (i == model_trans_table_end(table)) {
@@ -312,10 +299,7 @@ int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state,
 
 struct imm_abc const* hmm_abc(struct imm_hmm const* hmm) { return hmm->abc; }
 
-void hmm_add_mstate(struct imm_hmm* hmm, struct model_state* mstate)
-{
-    model_state_table_add(hmm->table, mstate);
-}
+void hmm_add_mstate(struct imm_hmm* hmm, struct model_state* mstate) { model_state_table_add(hmm->table, mstate); }
 
 struct model_state const* const* hmm_get_mstates(struct imm_hmm const* hmm, struct imm_dp const* dp)
 {

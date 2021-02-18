@@ -5,11 +5,7 @@
 #include "dp_trans_table.h"
 #include "free.h"
 #include "hmm.h"
-#include "imm/dp.h"
-#include "imm/hmm.h"
-#include "imm/hmm_block.h"
-#include "imm/model.h"
-#include "imm/report.h"
+#include "imm/imm.h"
 #include "model.h"
 #include "model_state.h"
 #include "model_trans.h"
@@ -17,15 +13,12 @@
 #include "seq_code.h"
 #include <stdlib.h>
 
-static int write_dp(struct imm_model const* model, struct imm_hmm_block const* block, FILE* stream);
-static int write_hmm(struct imm_model const* model, struct imm_hmm_block const* block,
-                     FILE* stream);
-static int read_dp(struct imm_model* model, struct imm_hmm_block* block, FILE* stream);
-static int read_hmm(struct imm_model* model, struct imm_hmm_block* block, FILE* stream);
-static struct model_state** read_mstates(struct imm_model* model, struct imm_hmm_block* block,
-                                         FILE* stream);
-static int                  read_transitions(FILE* stream, struct imm_hmm* hmm,
-                                             struct model_state* const* const mstates);
+static int                  write_dp(struct imm_model const* model, struct imm_hmm_block const* block, FILE* stream);
+static int                  write_hmm(struct imm_model const* model, struct imm_hmm_block const* block, FILE* stream);
+static int                  read_dp(struct imm_model* model, struct imm_hmm_block* block, FILE* stream);
+static int                  read_hmm(struct imm_model* model, struct imm_hmm_block* block, FILE* stream);
+static struct model_state** read_mstates(struct imm_model* model, struct imm_hmm_block* block, FILE* stream);
+static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct model_state* const* const mstates);
 
 struct imm_dp const* imm_hmm_block_dp(struct imm_hmm_block const* block) { return block->dp; }
 
@@ -33,10 +26,7 @@ struct imm_hmm* imm_hmm_block_hmm(struct imm_hmm_block const* block) { return bl
 
 uint16_t imm_hmm_block_nstates(struct imm_hmm_block const* block) { return block->nstates; }
 
-struct imm_state const* imm_hmm_block_state(struct imm_hmm_block const* block, uint16_t i)
-{
-    return block->states[i];
-}
+struct imm_state const* imm_hmm_block_state(struct imm_hmm_block const* block, uint16_t i) { return block->states[i]; }
 
 struct imm_hmm_block* hmm_block_new(void)
 {
@@ -167,8 +157,7 @@ static int write_dp(struct imm_model const* model, struct imm_hmm_block const* b
 
 int write_hmm(struct imm_model const* model, struct imm_hmm_block const* block, FILE* stream)
 {
-    if (write_mstates(model, stream, (struct model_state const* const*)block->mstates,
-                      block->nstates)) {
+    if (write_mstates(model, stream, (struct model_state const* const*)block->mstates, block->nstates)) {
         imm_error("could not write states");
         return 1;
     }
@@ -184,8 +173,7 @@ int write_hmm(struct imm_model const* model, struct imm_hmm_block const* block, 
         uint_fast16_t n = dp_trans_table_ntrans(block->trans_table, tgt_state);
         for (uint_fast16_t trans = 0; trans < n; ++trans) {
 
-            uint16_t src_state =
-                (uint16_t)dp_trans_table_source_state(block->trans_table, tgt_state, trans);
+            uint16_t  src_state = (uint16_t)dp_trans_table_source_state(block->trans_table, tgt_state, trans);
             imm_float score = dp_trans_table_score(block->trans_table, tgt_state, trans);
 
             if (fwrite(&src_state, sizeof(src_state), 1, stream) < 1) {
@@ -265,8 +253,7 @@ err:
     return 1;
 }
 
-static struct model_state** read_mstates(struct imm_model* model, struct imm_hmm_block* block,
-                                         FILE* stream)
+static struct model_state** read_mstates(struct imm_model* model, struct imm_hmm_block* block, FILE* stream)
 {
     struct model_state** mstates = NULL;
 
@@ -311,8 +298,7 @@ err:
     return NULL;
 }
 
-static int read_transitions(FILE* stream, struct imm_hmm* hmm,
-                            struct model_state* const* const mstates)
+static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct model_state* const* const mstates)
 {
     uint16_t ntrans = 0;
 

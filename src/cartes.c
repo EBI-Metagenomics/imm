@@ -1,10 +1,6 @@
-#include "imm/cartes.h"
+#include "imm/imm.h"
 #include "free.h"
-#include "imath.h"
-#include "imm/bug.h"
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "ipow.h"
 
 struct imm_cartes
 {

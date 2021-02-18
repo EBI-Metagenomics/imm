@@ -1,8 +1,5 @@
-#include "imm/abc.h"
-#include "cast.h"
 #include "free.h"
-#include "imm/abc_types.h"
-#include "imm/report.h"
+#include "imm/imm.h"
 #include <string.h>
 
 struct abc_chunk
@@ -12,8 +9,7 @@ struct abc_chunk
     char    any_symbol;
 };
 
-static struct imm_abc_vtable const __vtable = {__imm_abc_type_id, __imm_abc_write,
-                                               __imm_abc_destroy, __imm_abc_clone};
+static struct imm_abc_vtable const __vtable = {__imm_abc_type_id, __imm_abc_write, __imm_abc_destroy, __imm_abc_clone};
 
 struct imm_abc const* imm_abc_clone(struct imm_abc const* abc) { return abc->vtable.clone(abc); }
 
@@ -74,10 +70,7 @@ enum imm_symbol_type imm_abc_symbol_type(struct imm_abc const* abc, char symbol_
     return IMM_SYMBOL_UNKNOWN;
 }
 
-int imm_abc_write(struct imm_abc const* abc, FILE* stream)
-{
-    return abc->vtable.write(abc, stream);
-}
+int imm_abc_write(struct imm_abc const* abc, FILE* stream) { return abc->vtable.write(abc, stream); }
 
 struct imm_abc const* __imm_abc_clone(struct imm_abc const* abc)
 {
@@ -111,7 +104,12 @@ struct imm_abc* __imm_abc_create(char const* symbols, char any_symbol, void* der
         return NULL;
     }
 
-    abc->length = cast_zu_u8(strlen(symbols));
+    size_t len = strlen(symbols);
+    if (len > UINT8_MAX) {
+        imm_error("symbols is too long");
+        return NULL;
+    }
+    abc->length = (uint8_t)len;
     for (uint8_t i = 0; i < abc->length; ++i) {
         if (symbols[i] == any_symbol) {
             imm_error("any_symbol cannot be in the alphabet");
@@ -120,8 +118,7 @@ struct imm_abc* __imm_abc_create(char const* symbols, char any_symbol, void* der
         }
 
         if (symbols[i] < IMM_FIRST_CHAR || symbols[i] > IMM_LAST_CHAR) {
-            imm_error("alphabet symbol is outside the range [%c, %c] ", IMM_FIRST_CHAR,
-                      IMM_LAST_CHAR);
+            imm_error("alphabet symbol is outside the range [%c, %c] ", IMM_FIRST_CHAR, IMM_LAST_CHAR);
             free_c(abc);
             return NULL;
         }
@@ -152,9 +149,8 @@ uint8_t __imm_abc_type_id(struct imm_abc const* abc) { return IMM_ABC_TYPE_ID; }
 
 int __imm_abc_write(struct imm_abc const* abc, FILE* stream)
 {
-    struct abc_chunk chunk = {.nsymbols = cast_zu_u8(strlen(abc->symbols)),
-                              .symbols = (char*)abc->symbols,
-                              .any_symbol = abc->any_symbol};
+    struct abc_chunk chunk = {
+        .nsymbols = (uint8_t)strlen(abc->symbols), .symbols = (char*)abc->symbols, .any_symbol = abc->any_symbol};
 
     if (fwrite(&chunk.nsymbols, sizeof(chunk.nsymbols), 1, stream) < 1) {
         imm_error("could not write nsymbols");
