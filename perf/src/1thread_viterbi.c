@@ -105,35 +105,24 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
         imm_hmm_add_state(hmm, imm_mute_state_super(D[i]), zero());
 
         if (i == 0)
-            imm_hmm_set_trans(hmm, imm_normal_state_super(B), imm_normal_state_super(M[0]),
-                              imm_log(0.2));
+            imm_hmm_set_trans(hmm, imm_normal_state_super(B), imm_normal_state_super(M[0]), imm_log(0.2));
 
-        imm_hmm_set_trans(hmm, imm_normal_state_super(M[i]), imm_normal_state_super(I[i]),
-                          imm_log(0.2));
-        imm_hmm_set_trans(hmm, imm_normal_state_super(I[i]), imm_normal_state_super(I[i]),
-                          imm_log(0.2));
+        imm_hmm_set_trans(hmm, imm_normal_state_super(M[i]), imm_normal_state_super(I[i]), imm_log(0.2));
+        imm_hmm_set_trans(hmm, imm_normal_state_super(I[i]), imm_normal_state_super(I[i]), imm_log(0.2));
 
         if (i > 0) {
-            imm_hmm_set_trans(hmm, imm_normal_state_super(M[i - 1]), imm_normal_state_super(M[i]),
-                              imm_log(0.2));
-            imm_hmm_set_trans(hmm, imm_mute_state_super(D[i - 1]), imm_normal_state_super(M[i]),
-                              imm_log(0.2));
-            imm_hmm_set_trans(hmm, imm_normal_state_super(I[i - 1]), imm_normal_state_super(M[i]),
-                              imm_log(0.2));
+            imm_hmm_set_trans(hmm, imm_normal_state_super(M[i - 1]), imm_normal_state_super(M[i]), imm_log(0.2));
+            imm_hmm_set_trans(hmm, imm_mute_state_super(D[i - 1]), imm_normal_state_super(M[i]), imm_log(0.2));
+            imm_hmm_set_trans(hmm, imm_normal_state_super(I[i - 1]), imm_normal_state_super(M[i]), imm_log(0.2));
 
-            imm_hmm_set_trans(hmm, imm_normal_state_super(M[i - 1]), imm_mute_state_super(D[i]),
-                              imm_log(0.2));
-            imm_hmm_set_trans(hmm, imm_mute_state_super(D[i - 1]), imm_mute_state_super(D[i]),
-                              imm_log(0.2));
+            imm_hmm_set_trans(hmm, imm_normal_state_super(M[i - 1]), imm_mute_state_super(D[i]), imm_log(0.2));
+            imm_hmm_set_trans(hmm, imm_mute_state_super(D[i - 1]), imm_mute_state_super(D[i]), imm_log(0.2));
         }
 
         if (i == ncore_nodes - 1) {
-            imm_hmm_set_trans(hmm, imm_normal_state_super(M[i]), imm_normal_state_super(E),
-                              imm_log(0.2));
-            imm_hmm_set_trans(hmm, imm_mute_state_super(D[i]), imm_normal_state_super(E),
-                              imm_log(0.2));
-            imm_hmm_set_trans(hmm, imm_normal_state_super(I[i]), imm_normal_state_super(E),
-                              imm_log(0.2));
+            imm_hmm_set_trans(hmm, imm_normal_state_super(M[i]), imm_normal_state_super(E), imm_log(0.2));
+            imm_hmm_set_trans(hmm, imm_mute_state_super(D[i]), imm_normal_state_super(E), imm_log(0.2));
+            imm_hmm_set_trans(hmm, imm_normal_state_super(I[i]), imm_normal_state_super(E), imm_log(0.2));
         }
     }
     char* str = malloc(sizeof(*str) * (unsigned)(100 * seq_100length + 1));
