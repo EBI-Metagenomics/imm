@@ -9,6 +9,6 @@ struct imm_output;
 IMM_API int                imm_output_close(struct imm_output* output);
 IMM_API struct imm_output* imm_output_create(char const* filepath);
 IMM_API int                imm_output_destroy(struct imm_output* output);
-IMM_API int                imm_output_write(struct imm_output* output, struct imm_profile const* model);
+IMM_API int                imm_output_write(struct imm_output* output, struct imm_profile const* prof);
 
 #endif
