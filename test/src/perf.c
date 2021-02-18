@@ -68,12 +68,12 @@ void test_perf_viterbi_input(void)
 {
     struct imm_input* input = imm_input_create(TMPDIR "/perf.imm");
     cass_cond(input != NULL);
-    struct imm_profile const* imodel = imm_input_read(input);
-    cass_cond(imodel != NULL);
+    struct imm_profile const* prof = imm_input_read(input);
+    cass_cond(prof != NULL);
     cass_equal(imm_input_destroy(input), 0);
 
-    struct imm_abc const*       abc = imm_profile_abc(imodel);
-    struct imm_hmm_block const* block = imm_profile_get_hmm_block(imodel, 0);
+    struct imm_abc const*       abc = imm_profile_abc(prof);
+    struct imm_hmm_block const* block = imm_profile_get_hmm_block(prof, 0);
     struct imm_hmm const*       hmm = imm_hmm_block_hmm(block);
     struct imm_dp const*        dp = imm_hmm_block_dp(block);
 
@@ -97,7 +97,7 @@ void test_perf_viterbi_input(void)
         imm_state_destroy(imm_hmm_block_state(block, i));
 
     imm_dp_destroy(dp);
-    imm_profile_destroy(imodel);
+    imm_profile_destroy(prof);
     imm_abc_destroy(abc);
     imm_hmm_destroy(hmm);
     imm_seq_destroy(seq);

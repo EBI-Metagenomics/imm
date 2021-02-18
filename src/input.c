@@ -84,10 +84,10 @@ static struct imm_profile const* read_model(struct imm_input* input, uint8_t blo
         return NULL;
     }
 
-    struct imm_profile const* model = NULL;
-    if (!(model = imm_profile_read(input->stream))) {
+    struct imm_profile const* prof = NULL;
+    if (!(prof = imm_profile_read(input->stream))) {
         imm_error("failed to read file %s", input->filepath);
         return NULL;
     }
-    return model;
+    return prof;
 }

@@ -23,14 +23,13 @@ void test_hmm_write_io_two_states(void)
 
     struct imm_mute_state const* state0 = imm_mute_state_create("state0", abc);
 
-    imm_float lprobs1[] = {imm_log(0.25f), imm_log(0.25f), imm_log(0.5), zero()};
+    imm_float                      lprobs1[] = {imm_log(0.25f), imm_log(0.25f), imm_log(0.5), zero()};
     struct imm_normal_state const* state1 = imm_normal_state_create("state1", abc, lprobs1);
 
     imm_hmm_add_state(hmm, imm_mute_state_super(state0), imm_log(0.5));
     imm_hmm_set_start(hmm, imm_mute_state_super(state0), imm_log(0.1f));
     imm_hmm_add_state(hmm, imm_normal_state_super(state1), imm_log(0.001f));
-    imm_hmm_set_trans(hmm, imm_mute_state_super(state0), imm_normal_state_super(state1),
-                      imm_log(0.9f));
+    imm_hmm_set_trans(hmm, imm_mute_state_super(state0), imm_normal_state_super(state1), imm_log(0.9f));
 
     struct imm_dp const* dp = imm_hmm_create_dp(hmm, imm_normal_state_super(state1));
 
@@ -51,14 +50,14 @@ void test_hmm_write_io_two_states(void)
 
     struct imm_output* output = imm_output_create(TMPDIR "/two_states.imm");
     cass_cond(output != NULL);
-    struct imm_profile* m = imm_profile_create(abc);
-    imm_profile_append_hmm_block(m, imm_hmm_block_create(hmm, dp));
-    cass_equal(imm_output_write(output, m), 0);
-    imm_profile_destroy(m);
-    m = imm_profile_create(abc);
-    imm_profile_append_hmm_block(m, imm_hmm_block_create(hmm, dp));
-    cass_equal(imm_output_write(output, m), 0);
-    imm_profile_destroy(m);
+    struct imm_profile* p = imm_profile_create(abc);
+    imm_profile_append_hmm_block(p, imm_hmm_block_create(hmm, dp));
+    cass_equal(imm_output_write(output, p), 0);
+    imm_profile_destroy(p);
+    p = imm_profile_create(abc);
+    imm_profile_append_hmm_block(p, imm_hmm_block_create(hmm, dp));
+    cass_equal(imm_output_write(output, p), 0);
+    imm_profile_destroy(p);
     cass_equal(imm_output_destroy(output), 0);
 
     imm_dp_destroy(dp);
@@ -72,16 +71,16 @@ void test_hmm_write_io_two_states(void)
     struct imm_input* input = imm_input_create(TMPDIR "/two_states.imm");
     cass_cond(input != NULL);
     cass_cond(!imm_input_eof(input));
-    struct imm_profile const* model = imm_input_read(input);
+    struct imm_profile const* prof = imm_input_read(input);
     cass_cond(!imm_input_eof(input));
-    cass_cond(model != NULL);
-    cass_equal(imm_profile_nhmm_blocks(model), 1);
+    cass_cond(prof != NULL);
+    cass_equal(imm_profile_nhmm_blocks(prof), 1);
 
-    struct imm_hmm_block* block = imm_profile_get_hmm_block(model, 0);
+    struct imm_hmm_block* block = imm_profile_get_hmm_block(prof, 0);
     cass_cond(block != NULL);
     cass_equal_uint64(imm_hmm_block_nstates(block), 2);
 
-    abc = imm_profile_abc(model);
+    abc = imm_profile_abc(prof);
     hmm = imm_hmm_block_hmm(block);
     dp = imm_hmm_block_dp(block);
     C = imm_seq_create("C", abc);
@@ -118,19 +117,19 @@ void test_hmm_write_io_two_states(void)
     imm_abc_destroy(abc);
     imm_hmm_destroy(hmm);
     imm_dp_destroy(dp);
-    imm_profile_destroy(model);
+    imm_profile_destroy(prof);
 
-    model = imm_input_read(input);
-    cass_cond(model != NULL);
+    prof = imm_input_read(input);
+    cass_cond(prof != NULL);
     cass_cond(imm_input_read(input) == NULL);
     cass_cond(imm_input_eof(input));
     cass_equal(imm_input_destroy(input), 0);
 
-    cass_equal(imm_profile_nhmm_blocks(model), 1);
-    block = imm_profile_get_hmm_block(model, 0);
+    cass_equal(imm_profile_nhmm_blocks(prof), 1);
+    block = imm_profile_get_hmm_block(prof, 0);
     cass_cond(block != NULL);
 
-    abc = imm_profile_abc(model);
+    abc = imm_profile_abc(prof);
     hmm = imm_hmm_block_hmm(block);
     dp = imm_hmm_block_dp(block);
 
@@ -140,7 +139,7 @@ void test_hmm_write_io_two_states(void)
     imm_abc_destroy(abc);
     imm_hmm_destroy(hmm);
     imm_dp_destroy(dp);
-    imm_profile_destroy(model);
+    imm_profile_destroy(prof);
 }
 
 void test_hmm_write_io_two_hmms(void)
@@ -150,25 +149,21 @@ void test_hmm_write_io_two_hmms(void)
     struct imm_hmm*       hmm0 = imm_hmm_create(abc);
     struct imm_hmm*       hmm1 = imm_hmm_create(abc);
 
-    struct imm_mute_state const* hmm0_state0 = imm_mute_state_create("hmm0_state0", abc);
-    imm_float hmm0_lprobs[] = {imm_log(0.25f), imm_log(0.25f), imm_log(0.5), zero()};
-    struct imm_normal_state const* hmm0_state1 =
-        imm_normal_state_create("hmm0_state1", abc, hmm0_lprobs);
+    struct imm_mute_state const*   hmm0_state0 = imm_mute_state_create("hmm0_state0", abc);
+    imm_float                      hmm0_lprobs[] = {imm_log(0.25f), imm_log(0.25f), imm_log(0.5), zero()};
+    struct imm_normal_state const* hmm0_state1 = imm_normal_state_create("hmm0_state1", abc, hmm0_lprobs);
     imm_hmm_add_state(hmm0, imm_mute_state_super(hmm0_state0), imm_log(0.5));
     imm_hmm_set_start(hmm0, imm_mute_state_super(hmm0_state0), imm_log(0.1f));
     imm_hmm_add_state(hmm0, imm_normal_state_super(hmm0_state1), imm_log(0.001f));
-    imm_hmm_set_trans(hmm0, imm_mute_state_super(hmm0_state0), imm_normal_state_super(hmm0_state1),
-                      imm_log(0.9f));
+    imm_hmm_set_trans(hmm0, imm_mute_state_super(hmm0_state0), imm_normal_state_super(hmm0_state1), imm_log(0.9f));
 
-    struct imm_mute_state const* hmm1_state0 = imm_mute_state_create("hmm1_state0", abc);
-    imm_float hmm1_lprobs[] = {imm_log(0.05f), imm_log(0.05f), imm_log(0.1), zero()};
-    struct imm_normal_state const* hmm1_state1 =
-        imm_normal_state_create("hmm1_state1", abc, hmm1_lprobs);
+    struct imm_mute_state const*   hmm1_state0 = imm_mute_state_create("hmm1_state0", abc);
+    imm_float                      hmm1_lprobs[] = {imm_log(0.05f), imm_log(0.05f), imm_log(0.1), zero()};
+    struct imm_normal_state const* hmm1_state1 = imm_normal_state_create("hmm1_state1", abc, hmm1_lprobs);
     imm_hmm_add_state(hmm1, imm_mute_state_super(hmm1_state0), imm_log(0.5));
     imm_hmm_set_start(hmm1, imm_mute_state_super(hmm1_state0), imm_log(0.1f));
     imm_hmm_add_state(hmm1, imm_normal_state_super(hmm1_state1), imm_log(0.01f));
-    imm_hmm_set_trans(hmm1, imm_mute_state_super(hmm1_state0), imm_normal_state_super(hmm1_state1),
-                      imm_log(0.9f));
+    imm_hmm_set_trans(hmm1, imm_mute_state_super(hmm1_state0), imm_normal_state_super(hmm1_state1), imm_log(0.9f));
 
     struct imm_dp const* dp0 = imm_hmm_create_dp(hmm0, imm_normal_state_super(hmm0_state1));
     struct imm_dp const* dp1 = imm_hmm_create_dp(hmm1, imm_normal_state_super(hmm1_state1));
@@ -203,11 +198,11 @@ void test_hmm_write_io_two_hmms(void)
 
     struct imm_output* output = imm_output_create(TMPDIR "/two_hmms.imm");
     cass_cond(output != NULL);
-    struct imm_profile* m = imm_profile_create(abc);
-    imm_profile_append_hmm_block(m, imm_hmm_block_create(hmm0, dp0));
-    imm_profile_append_hmm_block(m, imm_hmm_block_create(hmm1, dp1));
-    cass_equal(imm_output_write(output, m), 0);
-    imm_profile_destroy(m);
+    struct imm_profile* p = imm_profile_create(abc);
+    imm_profile_append_hmm_block(p, imm_hmm_block_create(hmm0, dp0));
+    imm_profile_append_hmm_block(p, imm_hmm_block_create(hmm1, dp1));
+    cass_equal(imm_output_write(output, p), 0);
+    imm_profile_destroy(p);
     cass_equal(imm_output_destroy(output), 0);
 
     imm_dp_destroy(dp0);
@@ -226,20 +221,20 @@ void test_hmm_write_io_two_hmms(void)
     struct imm_input* input = imm_input_create(TMPDIR "/two_hmms.imm");
     cass_cond(input != NULL);
     cass_cond(!imm_input_eof(input));
-    struct imm_profile const* model = imm_input_read(input);
+    struct imm_profile const* prof = imm_input_read(input);
     cass_cond(!imm_input_eof(input));
     imm_input_destroy(input);
-    cass_cond(model != NULL);
+    cass_cond(prof != NULL);
 
-    struct imm_hmm_block* block0 = imm_profile_get_hmm_block(model, 0);
+    struct imm_hmm_block* block0 = imm_profile_get_hmm_block(prof, 0);
     cass_cond(block0 != NULL);
     cass_equal(imm_hmm_block_nstates(block0), 2);
 
-    struct imm_hmm_block* block1 = imm_profile_get_hmm_block(model, 1);
+    struct imm_hmm_block* block1 = imm_profile_get_hmm_block(prof, 1);
     cass_cond(block1 != NULL);
     cass_equal(imm_hmm_block_nstates(block1), 2);
 
-    abc = imm_profile_abc(model);
+    abc = imm_profile_abc(prof);
     hmm0 = imm_hmm_block_hmm(block0);
     dp0 = imm_hmm_block_dp(block0);
     hmm1 = imm_hmm_block_hmm(block1);
@@ -308,5 +303,5 @@ void test_hmm_write_io_two_hmms(void)
     imm_dp_destroy(dp0);
     imm_hmm_destroy(hmm1);
     imm_dp_destroy(dp1);
-    imm_profile_destroy(model);
+    imm_profile_destroy(prof);
 }
