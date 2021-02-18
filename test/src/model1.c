@@ -102,12 +102,12 @@ struct model1 create_model1(void)
 
 void destroy_model1(struct model1 model)
 {
-    for (size_t i = 0; i < imm_vecp_length(model.mute_states); ++i) {
+    for (size_t i = 0; i < imm_vecp_size(model.mute_states); ++i) {
         struct imm_mute_state const* s = imm_vecp_get(model.mute_states, i);
         imm_mute_state_destroy(s);
     }
 
-    for (size_t i = 0; i < imm_vecp_length(model.normal_states); ++i) {
+    for (size_t i = 0; i < imm_vecp_size(model.normal_states); ++i) {
         struct imm_normal_state const* s = imm_vecp_get(model.normal_states, i);
         imm_normal_state_destroy(s);
     }

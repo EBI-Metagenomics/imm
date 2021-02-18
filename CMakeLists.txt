@@ -35,8 +35,8 @@ add_library(imm
     src/dp_trans_table.c
     src/eseq.c
     src/hmm.c
-    src/hmm_block.c
     src/input.c
+    src/model.c
     src/model_state.c
     src/model_state_sort.c
     src/model_state_table.c

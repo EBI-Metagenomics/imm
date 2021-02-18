@@ -1,7 +1,5 @@
-#include "imm/input.h"
 #include "free.h"
-#include "imm/io.h"
-#include "imm/report.h"
+#include "imm/imm.h"
 #include "profile.h"
 #include <stdlib.h>
 #include <string.h>
@@ -15,7 +13,7 @@ struct imm_input
     bool closed;
 };
 
-static struct imm_profile const* read_model(struct imm_input* input, uint8_t block_type);
+static struct imm_profile const* read_profile(struct imm_input* input, uint8_t block_type);
 
 int imm_input_close(struct imm_input* input)
 {
@@ -69,10 +67,10 @@ struct imm_profile const* imm_input_read(struct imm_input* input)
         return NULL;
     }
 
-    return read_model(input, block_type);
+    return read_profile(input, block_type);
 }
 
-static struct imm_profile const* read_model(struct imm_input* input, uint8_t block_type)
+static struct imm_profile const* read_profile(struct imm_input* input, uint8_t block_type)
 {
     if (block_type == IMM_IO_BLOCK_EOF) {
         input->eof = true;

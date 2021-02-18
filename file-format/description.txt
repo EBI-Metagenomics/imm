@@ -18,24 +18,24 @@ The file is a sequence of blocks:
     |             | |                                   |
     |-------------|-|-----------------------------------|
 
-A block has a type defined by the block_type field: model (0x00) or end_of_file (0xff). The only
+A block has a type defined by the block_type field: profile (0x00) or end_of_file (0xff). The only
 block to have type end_of_file is the Block n-1 to the stream of bytes.
 
-The body of a model block contains the following chunk:
+The body of a profile block contains the following chunk:
 
-     model_block                              abc
+     profile_block                            abc
     |--------------------------------------| |---------------------------|
     | abc: abc                             | | nsymbols: uint8_t         |
     |                                      | | symbols: char[nsymbols+1] |
     |                                      | | any_symbol: char          |
     |--------------------------------------| |---------------------------|
-    | nhmm_blocks: uint8_t                 |
-    | hmm_block: hmm_block[nhmm_blocks]    |
+    | nmodels: uint8_t                     |
+    | model: model[nmodels]                |
     |--------------------------------------|
 
-A hmm_block has the following fields:
+A model has the following fields:
 
-     hmm_block                                            state
+     model                                                state
     |---------------|-|---------------------------|  /---|---------------------------|
     | hmm: hmm      | | nstates: uint16_t         | /    | start_lprob: float        |
     |               | |---------------------------|/     | state_type: uint8_t       |

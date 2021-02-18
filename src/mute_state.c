@@ -1,8 +1,5 @@
-#include "imm/mute_state.h"
 #include "free.h"
-#include "imm/lprob.h"
-#include "imm/state.h"
-#include "imm/state_types.h"
+#include "imm/imm.h"
 #include <stdlib.h>
 
 struct imm_mute_state
@@ -12,9 +9,9 @@ struct imm_mute_state
 
 static void      destroy(struct imm_state const* state);
 static imm_float lprob(struct imm_state const* state, struct imm_seq const* seq);
-static uint8_t   max_seq(struct imm_state const* state);
-static uint8_t   min_seq(struct imm_state const* state);
-static uint8_t   type_id(struct imm_state const* state);
+static uint8_t   max_seq(struct imm_state const* state) { return 0; }
+static uint8_t   min_seq(struct imm_state const* state) { return 0; }
+static uint8_t   type_id(struct imm_state const* state) { return IMM_MUTE_STATE_TYPE_ID; }
 
 static struct imm_state_vtable const __vtable = {destroy, lprob, max_seq, min_seq, type_id};
 
@@ -35,10 +32,7 @@ struct imm_mute_state const* imm_mute_state_derived(struct imm_state const* stat
     return __imm_state_derived(state);
 }
 
-void imm_mute_state_destroy(struct imm_mute_state const* state)
-{
-    state->super->vtable.destroy(state->super);
-}
+void imm_mute_state_destroy(struct imm_mute_state const* state) { state->super->vtable.destroy(state->super); }
 
 struct imm_state const* imm_mute_state_read(FILE* stream, struct imm_abc const* abc)
 {
@@ -56,10 +50,7 @@ struct imm_state const* imm_mute_state_read(FILE* stream, struct imm_abc const* 
     return state;
 }
 
-struct imm_state const* imm_mute_state_super(struct imm_mute_state const* state)
-{
-    return state->super;
-}
+struct imm_state const* imm_mute_state_super(struct imm_mute_state const* state) { return state->super; }
 
 int imm_mute_state_write(struct imm_state const* state, struct imm_profile const* model, FILE* stream)
 {
@@ -78,9 +69,3 @@ static imm_float lprob(struct imm_state const* state, struct imm_seq const* seq)
         return (imm_float)0.;
     return imm_lprob_zero();
 }
-
-static uint8_t max_seq(struct imm_state const* state) { return 0; }
-
-static uint8_t min_seq(struct imm_state const* state) { return 0; }
-
-static uint8_t type_id(struct imm_state const* state) { return IMM_MUTE_STATE_TYPE_ID; }

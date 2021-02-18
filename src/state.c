@@ -1,9 +1,5 @@
-#include "imm/state.h"
-#include "ascii.h"
-#include "cast.h"
 #include "free.h"
-#include "imm/abc.h"
-#include "imm/report.h"
+#include "imm/imm.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -13,8 +9,10 @@ struct state_chunk
     char*   name;
 };
 
-struct imm_state const* imm_state_create(char const* name, struct imm_abc const* abc,
-                                         struct imm_state_vtable vtable, void* derived)
+static inline int ascii_is_std(char const* str, size_t len);
+
+struct imm_state const* imm_state_create(char const* name, struct imm_abc const* abc, struct imm_state_vtable vtable,
+                                         void* derived)
 {
     if (imm_abc_length(abc) == 0) {
         imm_error("empty alphabet");
@@ -69,7 +67,7 @@ struct imm_state* __imm_state_read(FILE* stream, struct imm_abc const* abc)
 
 int __imm_state_write(struct imm_state const* state, FILE* stream)
 {
-    struct state_chunk chunk = {.name_length = cast_zu_u8(strlen(imm_state_get_name(state))),
+    struct state_chunk chunk = {.name_length = (uint8_t)strlen(imm_state_get_name(state)),
                                 .name = (char*)imm_state_get_name(state)};
 
     if (fwrite(&chunk.name_length, sizeof(chunk.name_length), 1, stream) < 1) {
@@ -84,4 +82,14 @@ int __imm_state_write(struct imm_state const* state, FILE* stream)
     }
 
     return 0;
+}
+
+static inline int ascii_is_std(char const* str, size_t len)
+{
+    for (size_t i = 0; i < len; ++i) {
+        signed int const a = str[i];
+        if (a < 0)
+            return 0;
+    }
+    return 1;
 }

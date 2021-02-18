@@ -1,9 +1,8 @@
-#include "imm/output.h"
 #include "free.h"
-#include "imm/io.h"
-#include "imm/report.h"
+#include "imm/imm.h"
 #include "profile.h"
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 

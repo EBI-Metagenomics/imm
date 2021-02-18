@@ -1,7 +1,5 @@
-#include "imm/results.h"
 #include "free.h"
-#include "imm/path.h"
-#include "imm/subseq.h"
+#include "imm/imm.h"
 #include <stdlib.h>
 
 struct imm_result
@@ -60,18 +58,15 @@ struct imm_result const* imm_results_get(struct imm_results const* results, uint
     return results->result[idx];
 }
 
-void imm_results_set(struct imm_results* results, uint16_t idx, struct imm_subseq subseq,
-                     struct imm_path const* path, imm_float seconds)
+void imm_results_set(struct imm_results* results, uint16_t idx, struct imm_subseq subseq, struct imm_path const* path,
+                     imm_float seconds)
 {
     results->result[idx]->path = path;
     results->result[idx]->subseq = subseq;
     results->result[idx]->seconds = seconds;
 }
 
-void imm_results_set_elapsed(struct imm_results* results, imm_float seconds)
-{
-    results->seconds = seconds;
-}
+void imm_results_set_elapsed(struct imm_results* results, imm_float seconds) { results->seconds = seconds; }
 
 imm_float imm_results_seconds(struct imm_results const* results) { return results->seconds; }
 

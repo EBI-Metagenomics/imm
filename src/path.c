@@ -1,6 +1,5 @@
-#include "imm/path.h"
 #include "free.h"
-#include "imm/step.h"
+#include "imm/imm.h"
 #include "list.h"
 #include "step.h"
 
@@ -9,10 +8,7 @@ struct imm_path
     struct list_head steps;
 };
 
-void imm_path_append(struct imm_path* path, struct imm_step* step)
-{
-    list_add_tail(&step->list_entry, &path->steps);
-}
+void imm_path_append(struct imm_path* path, struct imm_step* step) { list_add_tail(&step->list_entry, &path->steps); }
 
 struct imm_path* imm_path_clone(struct imm_path const* path)
 {
@@ -63,7 +59,4 @@ struct imm_step const* imm_path_next(struct imm_path const* path, struct imm_ste
     return NULL;
 }
 
-void imm_path_prepend(struct imm_path* path, struct imm_step* step)
-{
-    list_add(&step->list_entry, &path->steps);
-}
+void imm_path_prepend(struct imm_path* path, struct imm_step* step) { list_add(&step->list_entry, &path->steps); }

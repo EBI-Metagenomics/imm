@@ -1,7 +1,6 @@
 #include "state_idx.h"
 #include "free.h"
-#include "imm/bug.h"
-#include "imm/report.h"
+#include "imm/imm.h"
 #include "khash_ptr.h"
 
 struct item

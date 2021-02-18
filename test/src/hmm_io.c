@@ -51,11 +51,11 @@ void test_hmm_write_io_two_states(void)
     struct imm_output* output = imm_output_create(TMPDIR "/two_states.imm");
     cass_cond(output != NULL);
     struct imm_profile* p = imm_profile_create(abc);
-    imm_profile_append_hmm_block(p, imm_hmm_block_create(hmm, dp));
+    imm_profile_append_model(p, imm_model_create(hmm, dp));
     cass_equal(imm_output_write(output, p), 0);
     imm_profile_destroy(p);
     p = imm_profile_create(abc);
-    imm_profile_append_hmm_block(p, imm_hmm_block_create(hmm, dp));
+    imm_profile_append_model(p, imm_model_create(hmm, dp));
     cass_equal(imm_output_write(output, p), 0);
     imm_profile_destroy(p);
     cass_equal(imm_output_destroy(output), 0);
@@ -74,15 +74,15 @@ void test_hmm_write_io_two_states(void)
     struct imm_profile const* prof = imm_input_read(input);
     cass_cond(!imm_input_eof(input));
     cass_cond(prof != NULL);
-    cass_equal(imm_profile_nhmm_blocks(prof), 1);
+    cass_equal(imm_profile_nmodels(prof), 1);
 
-    struct imm_hmm_block* block = imm_profile_get_hmm_block(prof, 0);
-    cass_cond(block != NULL);
-    cass_equal_uint64(imm_hmm_block_nstates(block), 2);
+    struct imm_model* model = imm_profile_get_model(prof, 0);
+    cass_cond(model != NULL);
+    cass_equal_uint64(imm_model_nstates(model), 2);
 
     abc = imm_profile_abc(prof);
-    hmm = imm_hmm_block_hmm(block);
-    dp = imm_hmm_block_dp(block);
+    hmm = imm_model_hmm(model);
+    dp = imm_model_dp(model);
     C = imm_seq_create("C", abc);
 
     task = imm_dp_task_create(dp);
@@ -99,8 +99,8 @@ void test_hmm_write_io_two_states(void)
     CLOSE(imm_hmm_loglikelihood(hmm, C, path), imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
     imm_results_destroy(results);
 
-    for (uint16_t i = 0; i < imm_hmm_block_nstates(block); ++i) {
-        struct imm_state const* state = imm_hmm_block_state(block, i);
+    for (uint16_t i = 0; i < imm_model_nstates(model); ++i) {
+        struct imm_state const* state = imm_model_state(model, i);
 
         if (imm_state_type_id(state) == IMM_MUTE_STATE_TYPE_ID) {
             cass_cond(strcmp(imm_state_get_name(state), "state0") == 0);
@@ -109,8 +109,8 @@ void test_hmm_write_io_two_states(void)
         }
     }
 
-    for (uint16_t i = 0; i < imm_hmm_block_nstates(block); ++i)
-        imm_state_destroy(imm_hmm_block_state(block, i));
+    for (uint16_t i = 0; i < imm_model_nstates(model); ++i)
+        imm_state_destroy(imm_model_state(model, i));
 
     imm_dp_task_destroy(task);
     imm_seq_destroy(C);
@@ -125,16 +125,16 @@ void test_hmm_write_io_two_states(void)
     cass_cond(imm_input_eof(input));
     cass_equal(imm_input_destroy(input), 0);
 
-    cass_equal(imm_profile_nhmm_blocks(prof), 1);
-    block = imm_profile_get_hmm_block(prof, 0);
-    cass_cond(block != NULL);
+    cass_equal(imm_profile_nmodels(prof), 1);
+    model = imm_profile_get_model(prof, 0);
+    cass_cond(model != NULL);
 
     abc = imm_profile_abc(prof);
-    hmm = imm_hmm_block_hmm(block);
-    dp = imm_hmm_block_dp(block);
+    hmm = imm_model_hmm(model);
+    dp = imm_model_dp(model);
 
-    for (uint16_t i = 0; i < imm_hmm_block_nstates(block); ++i)
-        imm_state_destroy(imm_hmm_block_state(block, i));
+    for (uint16_t i = 0; i < imm_model_nstates(model); ++i)
+        imm_state_destroy(imm_model_state(model, i));
 
     imm_abc_destroy(abc);
     imm_hmm_destroy(hmm);
@@ -199,8 +199,8 @@ void test_hmm_write_io_two_hmms(void)
     struct imm_output* output = imm_output_create(TMPDIR "/two_hmms.imm");
     cass_cond(output != NULL);
     struct imm_profile* p = imm_profile_create(abc);
-    imm_profile_append_hmm_block(p, imm_hmm_block_create(hmm0, dp0));
-    imm_profile_append_hmm_block(p, imm_hmm_block_create(hmm1, dp1));
+    imm_profile_append_model(p, imm_model_create(hmm0, dp0));
+    imm_profile_append_model(p, imm_model_create(hmm1, dp1));
     cass_equal(imm_output_write(output, p), 0);
     imm_profile_destroy(p);
     cass_equal(imm_output_destroy(output), 0);
@@ -226,19 +226,19 @@ void test_hmm_write_io_two_hmms(void)
     imm_input_destroy(input);
     cass_cond(prof != NULL);
 
-    struct imm_hmm_block* block0 = imm_profile_get_hmm_block(prof, 0);
-    cass_cond(block0 != NULL);
-    cass_equal(imm_hmm_block_nstates(block0), 2);
+    struct imm_model* model0 = imm_profile_get_model(prof, 0);
+    cass_cond(model0 != NULL);
+    cass_equal(imm_model_nstates(model0), 2);
 
-    struct imm_hmm_block* block1 = imm_profile_get_hmm_block(prof, 1);
-    cass_cond(block1 != NULL);
-    cass_equal(imm_hmm_block_nstates(block1), 2);
+    struct imm_model* model1 = imm_profile_get_model(prof, 1);
+    cass_cond(model1 != NULL);
+    cass_equal(imm_model_nstates(model1), 2);
 
     abc = imm_profile_abc(prof);
-    hmm0 = imm_hmm_block_hmm(block0);
-    dp0 = imm_hmm_block_dp(block0);
-    hmm1 = imm_hmm_block_hmm(block1);
-    dp1 = imm_hmm_block_dp(block1);
+    hmm0 = imm_model_hmm(model0);
+    dp0 = imm_model_dp(model0);
+    hmm1 = imm_model_hmm(model1);
+    dp1 = imm_model_dp(model1);
     C = imm_seq_create("C", abc);
 
     task0 = imm_dp_task_create(dp0);
@@ -255,8 +255,8 @@ void test_hmm_write_io_two_hmms(void)
     CLOSE(imm_hmm_loglikelihood(hmm0, C, path), imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
     imm_results_destroy(results);
 
-    for (uint16_t i = 0; i < imm_hmm_block_nstates(block0); ++i) {
-        struct imm_state const* state = imm_hmm_block_state(block0, i);
+    for (uint16_t i = 0; i < imm_model_nstates(model0); ++i) {
+        struct imm_state const* state = imm_model_state(model0, i);
 
         if (imm_state_type_id(state) == IMM_MUTE_STATE_TYPE_ID) {
             cass_cond(strcmp(imm_state_get_name(state), "hmm0_state0") == 0);
@@ -265,8 +265,8 @@ void test_hmm_write_io_two_hmms(void)
         }
     }
 
-    for (uint16_t i = 0; i < imm_hmm_block_nstates(block0); ++i)
-        imm_state_destroy(imm_hmm_block_state(block0, i));
+    for (uint16_t i = 0; i < imm_model_nstates(model0); ++i)
+        imm_state_destroy(imm_model_state(model0, i));
 
     task1 = imm_dp_task_create(dp1);
     imm_dp_task_setup(task1, C, 0);
@@ -282,8 +282,8 @@ void test_hmm_write_io_two_hmms(void)
     CLOSE(imm_hmm_loglikelihood(hmm1, C, path), imm_log(0.05f) + imm_log(0.1f) + imm_log(0.9f));
     imm_results_destroy(results);
 
-    for (uint16_t i = 0; i < imm_hmm_block_nstates(block1); ++i) {
-        struct imm_state const* state = imm_hmm_block_state(block1, i);
+    for (uint16_t i = 0; i < imm_model_nstates(model1); ++i) {
+        struct imm_state const* state = imm_model_state(model1, i);
 
         if (imm_state_type_id(state) == IMM_MUTE_STATE_TYPE_ID) {
             cass_cond(strcmp(imm_state_get_name(state), "hmm1_state0") == 0);
@@ -292,8 +292,8 @@ void test_hmm_write_io_two_hmms(void)
         }
     }
 
-    for (uint16_t i = 0; i < imm_hmm_block_nstates(block1); ++i)
-        imm_state_destroy(imm_hmm_block_state(block1, i));
+    for (uint16_t i = 0; i < imm_model_nstates(model1); ++i)
+        imm_state_destroy(imm_model_state(model1, i));
 
     imm_dp_task_destroy(task0);
     imm_dp_task_destroy(task1);

@@ -13,7 +13,7 @@ enums:
     0x01: normal
     0x02: table
   block_type:
-    0x00: model
+    0x00: profile
     0xff: end_of_file
 types:
   block:
@@ -25,18 +25,18 @@ types:
         type:
           switch-on: block_type
           cases:
-            'block_type::model': model
-  model:
+            'block_type::profile': profile
+  profile:
     seq:
       - id: abc
         type: abc
-      - id: nhmm_blocks
+      - id: nmodels
         type: u1
-      - id: hmm_block
-        type: hmm_block
+      - id: model
+        type: model
         repeat: expr
-        repeat-expr: nhmm_blocks
-  hmm_block:
+        repeat-expr: nmodels
+  model:
     seq:
       - id: hmm
         type: hmm

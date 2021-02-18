@@ -2,7 +2,6 @@
 #define IMM_OUTPUT_H
 
 #include "imm/export.h"
-#include <stdio.h>
 
 struct imm_profile;
 struct imm_output;

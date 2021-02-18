@@ -1,5 +1,4 @@
 #include "seq_code.h"
-#include "cast.h"
 #include "eseq.h"
 #include "free.h"
 #include "imm/imm.h"
@@ -51,8 +50,9 @@ struct seq_code const* seq_code_create(struct imm_abc const* abc, uint_fast8_t m
     }
 
     unsigned long ncombs = ipow(imm_abc_length(abc), max_seq);
+    IMM_BUG(ncombs > UINT16_MAX);
 
-    seq_code->size = seq_code->offset[max_seq - min_seq] + cast_ul_u16(ncombs);
+    seq_code->size = seq_code->offset[max_seq - min_seq] + (uint16_t)ncombs;
 
     return seq_code;
 }

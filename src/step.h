@@ -1,8 +1,10 @@
 #ifndef STEP_H
 #define STEP_H
 
-#include "free.h"
 #include "list.h"
+#include <stdint.h>
+
+struct imm_state;
 
 struct imm_step
 {

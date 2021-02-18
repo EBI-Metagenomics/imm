@@ -11,26 +11,19 @@ struct imm_subseq
     struct imm_seq        seq;
 };
 
-#define IMM_SUBSEQ(name, seq, start, length)                                                       \
-    struct imm_subseq name = imm_subseq_init(&(name), seq, start, length)
+#define IMM_SUBSEQ(name, seq, start, length) struct imm_subseq name = imm_subseq_init(&(name), seq, start, length)
 
 static inline struct imm_seq const* imm_subseq_cast(struct imm_subseq const* subseq);
-static inline struct imm_subseq     imm_subseq_init(struct imm_subseq*    subseq,
-                                                    struct imm_seq const* seq, uint32_t start,
-                                                    uint32_t length);
-static inline uint32_t              imm_subseq_length(struct imm_subseq const* subseq);
-static inline void imm_subseq_set(struct imm_subseq* subseq, uint32_t start, uint32_t length);
-static inline struct imm_subseq imm_subseq_slice(struct imm_seq const* seq, uint32_t start,
-                                                 uint32_t length);
+static inline struct imm_subseq imm_subseq_init(struct imm_subseq* subseq, struct imm_seq const* seq, uint32_t start,
+                                                uint32_t length);
+static inline uint32_t          imm_subseq_length(struct imm_subseq const* subseq);
+static inline void              imm_subseq_set(struct imm_subseq* subseq, uint32_t start, uint32_t length);
+static inline struct imm_subseq imm_subseq_slice(struct imm_seq const* seq, uint32_t start, uint32_t length);
 static inline uint32_t          imm_subseq_start(struct imm_subseq const* subseq);
 
-static inline struct imm_seq const* imm_subseq_cast(struct imm_subseq const* subseq)
-{
-    return &subseq->seq;
-}
+static inline struct imm_seq const* imm_subseq_cast(struct imm_subseq const* subseq) { return &subseq->seq; }
 
-static inline struct imm_subseq imm_subseq_init(struct imm_subseq*    subseq,
-                                                struct imm_seq const* seq, uint32_t start,
+static inline struct imm_subseq imm_subseq_init(struct imm_subseq* subseq, struct imm_seq const* seq, uint32_t start,
                                                 uint32_t length)
 {
     subseq->super = seq;
@@ -40,10 +33,7 @@ static inline struct imm_subseq imm_subseq_init(struct imm_subseq*    subseq,
     return *subseq;
 }
 
-static inline uint32_t imm_subseq_length(struct imm_subseq const* subseq)
-{
-    return subseq->seq.length;
-}
+static inline uint32_t imm_subseq_length(struct imm_subseq const* subseq) { return subseq->seq.length; }
 
 static inline void imm_subseq_set(struct imm_subseq* subseq, uint32_t start, uint32_t length)
 {
@@ -51,8 +41,7 @@ static inline void imm_subseq_set(struct imm_subseq* subseq, uint32_t start, uin
     subseq->seq.length = length;
 }
 
-static inline struct imm_subseq imm_subseq_slice(struct imm_seq const* seq, uint32_t start,
-                                                 uint32_t length)
+static inline struct imm_subseq imm_subseq_slice(struct imm_seq const* seq, uint32_t start, uint32_t length)
 {
     IMM_SUBSEQ(subseq, seq, start, length);
     return subseq;

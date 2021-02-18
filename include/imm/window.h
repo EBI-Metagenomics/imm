@@ -2,7 +2,6 @@
 #define IMM_WINDOW_H
 
 #include "imm/export.h"
-#include <stdbool.h>
 #include <stdint.h>
 
 struct imm_seq;

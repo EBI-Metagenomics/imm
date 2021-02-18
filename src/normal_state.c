@@ -1,9 +1,5 @@
-#include "imm/normal_state.h"
 #include "free.h"
-#include "imm/abc.h"
-#include "imm/lprob.h"
-#include "imm/state.h"
-#include "imm/state_types.h"
+#include "imm/imm.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -21,9 +17,9 @@ struct normal_state_chunk
 
 static void      destroy(struct imm_state const* state);
 static imm_float lprob(struct imm_state const* state, struct imm_seq const* seq);
-static uint8_t   max_seq(struct imm_state const* state);
-static uint8_t   min_seq(struct imm_state const* state);
-static uint8_t   type_id(struct imm_state const* state);
+static uint8_t   min_seq(struct imm_state const* state) { return 1; }
+static uint8_t   max_seq(struct imm_state const* state) { return 1; }
+static uint8_t   type_id(struct imm_state const* state) { return IMM_NORMAL_STATE_TYPE_ID; }
 
 static struct imm_state_vtable const __vtable = {destroy, lprob, max_seq, min_seq, type_id};
 
@@ -49,10 +45,7 @@ struct imm_normal_state const* imm_normal_state_derived(struct imm_state const* 
     return __imm_state_derived(state);
 }
 
-void imm_normal_state_destroy(struct imm_normal_state const* state)
-{
-    state->super->vtable.destroy(state->super);
-}
+void imm_normal_state_destroy(struct imm_normal_state const* state) { state->super->vtable.destroy(state->super); }
 
 struct imm_state const* imm_normal_state_read(FILE* stream, struct imm_abc const* abc)
 {
@@ -88,13 +81,9 @@ struct imm_state const* imm_normal_state_read(FILE* stream, struct imm_abc const
     return state;
 }
 
-struct imm_state const* imm_normal_state_super(struct imm_normal_state const* state)
-{
-    return state->super;
-}
+struct imm_state const* imm_normal_state_super(struct imm_normal_state const* state) { return state->super; }
 
-int imm_normal_state_write(struct imm_state const* state, struct imm_profile const* model,
-                           FILE* stream)
+int imm_normal_state_write(struct imm_state const* state, struct imm_profile const* model, FILE* stream)
 {
     if (__imm_state_write(state, stream))
         return 1;
@@ -111,8 +100,7 @@ int imm_normal_state_write(struct imm_state const* state, struct imm_profile con
         return 1;
     }
 
-    if (fwrite(chunk.lprobs, sizeof(*chunk.lprobs), chunk.lprobs_size, stream) <
-        chunk.lprobs_size) {
+    if (fwrite(chunk.lprobs, sizeof(*chunk.lprobs), chunk.lprobs_size, stream) < chunk.lprobs_size) {
         imm_error("could not write lprobs");
         return 1;
     }
@@ -139,9 +127,3 @@ static imm_float lprob(struct imm_state const* state, struct imm_seq const* seq)
     }
     return imm_lprob_zero();
 }
-
-static uint8_t min_seq(struct imm_state const* state) { return 1; }
-
-static uint8_t max_seq(struct imm_state const* state) { return 1; }
-
-static uint8_t type_id(struct imm_state const* state) { return IMM_NORMAL_STATE_TYPE_ID; }

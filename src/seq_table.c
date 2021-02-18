@@ -1,9 +1,5 @@
-#include "imm/seq_table.h"
-#include "cast.h"
 #include "free.h"
-#include "imm//bug.h"
-#include "imm/lprob.h"
-#include "imm/report.h"
+#include "imm/imm.h"
 #include "khash_seq.h"
 #include "minmax.h"
 
@@ -47,8 +43,10 @@ int imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const* seq, im
     kh_key(table->emission_table, iter) = emiss->seq;
     kh_val(table->emission_table, iter) = emiss;
 
-    table->min_seq = (uint8_t)MIN(table->min_seq, cast_u_u8(imm_seq_length(seq)));
-    table->max_seq = (uint8_t)MAX(table->max_seq, cast_u_u8(imm_seq_length(seq)));
+    uint32_t len = imm_seq_length(seq);
+    IMM_BUG(len > UINT8_MAX);
+    table->min_seq = (uint8_t)MIN(table->min_seq, len);
+    table->max_seq = (uint8_t)MAX(table->max_seq, len);
 
     return 0;
 }

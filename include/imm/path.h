@@ -12,8 +12,7 @@ IMM_API struct imm_path*       imm_path_create(void);
 IMM_API void                   imm_path_destroy(struct imm_path const* path);
 IMM_API struct imm_step const* imm_path_first(struct imm_path const* path);
 IMM_API void                   imm_path_free(struct imm_path const* path);
-IMM_API struct imm_step const* imm_path_next(struct imm_path const* path,
-                                             struct imm_step const* step);
+IMM_API struct imm_step const* imm_path_next(struct imm_path const* path, struct imm_step const* step);
 IMM_API void                   imm_path_prepend(struct imm_path* path, struct imm_step* step);
 
 #endif

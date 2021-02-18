@@ -34,8 +34,7 @@ void test_perf_viterbi(void)
     cass_cond(imm_results_size(results) == 1);
     struct imm_result const* r = imm_results_get(results, 0);
     struct imm_subseq        subseq = imm_result_subseq(r);
-    imm_float                score =
-        imm_hmm_loglikelihood(model.hmm, imm_subseq_cast(&subseq), imm_result_path(r));
+    imm_float                score = imm_hmm_loglikelihood(model.hmm, imm_subseq_cast(&subseq), imm_result_path(r));
     cass_cond(imm_lprob_is_valid(score));
     cass_cond(!imm_lprob_is_zero(score));
     cass_close(score, -65826.0118484497);
@@ -53,8 +52,8 @@ void test_perf_viterbi_output(void)
     cass_cond(output != NULL);
 
     struct imm_dp const* dp = imm_hmm_create_dp(model.hmm, imm_mute_state_super(model.end));
-    struct imm_profile*    imodel = imm_profile_create(model.abc);
-    imm_profile_append_hmm_block(imodel, imm_hmm_block_create(model.hmm, dp));
+    struct imm_profile*  imodel = imm_profile_create(model.abc);
+    imm_profile_append_model(imodel, imm_model_create(model.hmm, dp));
 
     cass_equal(imm_output_write(output, imodel), 0);
     imm_profile_destroy(imodel);
@@ -72,10 +71,10 @@ void test_perf_viterbi_input(void)
     cass_cond(prof != NULL);
     cass_equal(imm_input_destroy(input), 0);
 
-    struct imm_abc const*       abc = imm_profile_abc(prof);
-    struct imm_hmm_block const* block = imm_profile_get_hmm_block(prof, 0);
-    struct imm_hmm const*       hmm = imm_hmm_block_hmm(block);
-    struct imm_dp const*        dp = imm_hmm_block_dp(block);
+    struct imm_abc const*   abc = imm_profile_abc(prof);
+    struct imm_model const* model = imm_profile_get_model(prof, 0);
+    struct imm_hmm const*   hmm = imm_model_hmm(model);
+    struct imm_dp const*    dp = imm_model_dp(model);
 
     char const* str = get_model2_str();
     cass_cond(strlen(str) == 2000);
@@ -86,15 +85,15 @@ void test_perf_viterbi_input(void)
     struct imm_results const* results = imm_dp_viterbi(dp, task);
     struct imm_result const*  r = imm_results_get(results, 0);
     struct imm_subseq         subseq = imm_result_subseq(r);
-    imm_float score = imm_hmm_loglikelihood(hmm, imm_subseq_cast(&subseq), imm_result_path(r));
+    imm_float                 score = imm_hmm_loglikelihood(hmm, imm_subseq_cast(&subseq), imm_result_path(r));
     cass_cond(imm_lprob_is_valid(score));
     cass_cond(!imm_lprob_is_zero(score));
     cass_close(score, -65826.0118484497);
     imm_results_destroy(results);
     imm_dp_task_destroy(task);
 
-    for (uint16_t i = 0; i < imm_hmm_block_nstates(block); ++i)
-        imm_state_destroy(imm_hmm_block_state(block, i));
+    for (uint16_t i = 0; i < imm_model_nstates(model); ++i)
+        imm_state_destroy(imm_model_state(model, i));
 
     imm_dp_destroy(dp);
     imm_profile_destroy(prof);
