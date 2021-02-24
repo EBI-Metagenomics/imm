@@ -56,7 +56,7 @@ void test_perf_viterbi_output(void)
     imm_profile_append_model(imodel, imm_model_create(model.hmm, dp));
 
     cass_equal(imm_output_write(output, imodel), 0);
-    imm_profile_destroy(imodel);
+    imm_profile_destroy(imodel, false);
     cass_equal(imm_output_destroy(output), 0);
 
     imm_dp_destroy(dp);
@@ -96,7 +96,7 @@ void test_perf_viterbi_input(void)
         imm_state_destroy(imm_model_state(model, i));
 
     imm_dp_destroy(dp);
-    imm_profile_destroy(prof);
+    imm_profile_destroy(prof, false);
     imm_abc_destroy(abc);
     imm_hmm_destroy(hmm);
     imm_seq_destroy(seq);

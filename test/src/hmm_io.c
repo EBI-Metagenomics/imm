@@ -53,11 +53,11 @@ void test_hmm_write_io_two_states(void)
     struct imm_profile* p = imm_profile_create(abc);
     imm_profile_append_model(p, imm_model_create(hmm, dp));
     cass_equal(imm_output_write(output, p), 0);
-    imm_profile_destroy(p);
+    imm_profile_destroy(p, false);
     p = imm_profile_create(abc);
     imm_profile_append_model(p, imm_model_create(hmm, dp));
     cass_equal(imm_output_write(output, p), 0);
-    imm_profile_destroy(p);
+    imm_profile_destroy(p, false);
     cass_equal(imm_output_destroy(output), 0);
 
     imm_dp_destroy(dp);
@@ -109,15 +109,12 @@ void test_hmm_write_io_two_states(void)
         }
     }
 
-    for (uint16_t i = 0; i < imm_model_nstates(model); ++i)
-        imm_state_destroy(imm_model_state(model, i));
-
     imm_dp_task_destroy(task);
     imm_seq_destroy(C);
     imm_abc_destroy(abc);
     imm_hmm_destroy(hmm);
     imm_dp_destroy(dp);
-    imm_profile_destroy(prof);
+    imm_profile_destroy(prof, true);
 
     prof = imm_input_read(input);
     cass_cond(prof != NULL);
@@ -133,13 +130,10 @@ void test_hmm_write_io_two_states(void)
     hmm = imm_model_hmm(model);
     dp = imm_model_dp(model);
 
-    for (uint16_t i = 0; i < imm_model_nstates(model); ++i)
-        imm_state_destroy(imm_model_state(model, i));
-
     imm_abc_destroy(abc);
     imm_hmm_destroy(hmm);
     imm_dp_destroy(dp);
-    imm_profile_destroy(prof);
+    imm_profile_destroy(prof, true);
 }
 
 void test_hmm_write_io_two_hmms(void)
@@ -202,7 +196,7 @@ void test_hmm_write_io_two_hmms(void)
     imm_profile_append_model(p, imm_model_create(hmm0, dp0));
     imm_profile_append_model(p, imm_model_create(hmm1, dp1));
     cass_equal(imm_output_write(output, p), 0);
-    imm_profile_destroy(p);
+    imm_profile_destroy(p, false);
     cass_equal(imm_output_destroy(output), 0);
 
     imm_dp_destroy(dp0);
@@ -303,5 +297,5 @@ void test_hmm_write_io_two_hmms(void)
     imm_dp_destroy(dp0);
     imm_hmm_destroy(hmm1);
     imm_dp_destroy(dp1);
-    imm_profile_destroy(prof);
+    imm_profile_destroy(prof, false);
 }

@@ -2,6 +2,7 @@
 #define MODEL_H
 
 #include <inttypes.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 struct dp_emission;
@@ -25,7 +26,7 @@ struct imm_model
 };
 
 void                    model_deep_destroy(struct imm_model const* model);
-void                    model_destroy(struct imm_model const* model);
+void                    model_destroy(struct imm_model const* model, bool deep);
 struct imm_model const* model_read(struct imm_profile* prof, FILE* stream);
 struct imm_state const* model_read_state(struct imm_profile* prof, FILE* stream);
 int                     model_write(struct imm_profile const* prof, struct imm_model const* model, FILE* stream);

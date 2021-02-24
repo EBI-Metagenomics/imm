@@ -29,11 +29,11 @@ struct imm_profile* imm_profile_create(struct imm_abc const* abc)
     return __imm_profile_create(abc, (struct imm_profile_vtable){model_read_state, model_write_state}, NULL);
 }
 
-void imm_profile_destroy(struct imm_profile const* prof)
+void imm_profile_destroy(struct imm_profile const* prof, bool deep)
 {
     for (size_t i = 0; i < imm_profile_nmodels(prof); ++i) {
         struct imm_model* model = (void*)imm_vecp_get(prof->models, i);
-        model_destroy(model);
+        model_destroy(model, deep);
     }
     imm_vecp_destroy(prof->models);
     free_c(prof);

@@ -3,6 +3,7 @@
 
 #include "imm/export.h"
 #include <inttypes.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 struct imm_abc;
@@ -18,7 +19,7 @@ struct imm_profile_vtable
 IMM_API struct imm_abc const*     imm_profile_abc(struct imm_profile const* prof);
 IMM_API void                      imm_profile_append_model(struct imm_profile* prof, struct imm_model* model);
 IMM_API struct imm_profile*       imm_profile_create(struct imm_abc const* abc);
-IMM_API void                      imm_profile_destroy(struct imm_profile const* prof);
+IMM_API void                      imm_profile_destroy(struct imm_profile const* prof, bool deep);
 IMM_API void                      imm_profile_free(struct imm_profile const* prof);
 IMM_API struct imm_model*         imm_profile_get_model(struct imm_profile const* prof, uint8_t i);
 IMM_API uint8_t                   imm_profile_nmodels(struct imm_profile const* prof);
