@@ -111,9 +111,6 @@ void test_hmm_write_io_two_states(void)
 
     imm_dp_task_destroy(task);
     imm_seq_destroy(C);
-    imm_abc_destroy(abc);
-    imm_hmm_destroy(hmm);
-    imm_dp_destroy(dp);
     imm_profile_destroy(prof, true);
 
     prof = imm_input_read(input);
@@ -126,13 +123,6 @@ void test_hmm_write_io_two_states(void)
     model = imm_profile_get_model(prof, 0);
     cass_cond(model != NULL);
 
-    abc = imm_profile_abc(prof);
-    hmm = imm_model_hmm(model);
-    dp = imm_model_dp(model);
-
-    imm_abc_destroy(abc);
-    imm_hmm_destroy(hmm);
-    imm_dp_destroy(dp);
     imm_profile_destroy(prof, true);
 }
 

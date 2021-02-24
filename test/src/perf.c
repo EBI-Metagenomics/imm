@@ -91,13 +91,5 @@ void test_perf_viterbi_input(void)
     cass_close(score, -65826.0118484497);
     imm_results_destroy(results);
     imm_dp_task_destroy(task);
-
-    for (uint16_t i = 0; i < imm_model_nstates(model); ++i)
-        imm_state_destroy(imm_model_state(model, i));
-
-    imm_dp_destroy(dp);
-    imm_profile_destroy(prof, false);
-    imm_abc_destroy(abc);
-    imm_hmm_destroy(hmm);
-    imm_seq_destroy(seq);
+    imm_profile_destroy(prof, true);
 }

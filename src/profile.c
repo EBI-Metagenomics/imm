@@ -35,6 +35,8 @@ void imm_profile_destroy(struct imm_profile const* prof, bool deep)
         struct imm_model* model = (void*)imm_vecp_get(prof->models, i);
         model_destroy(model, deep);
     }
+    if (deep)
+        imm_abc_destroy(imm_profile_abc(prof));
     imm_vecp_destroy(prof->models);
     free_c(prof);
 }
