@@ -91,5 +91,6 @@ void test_perf_viterbi_input(void)
     cass_close(score, -65826.0118484497);
     imm_results_destroy(results);
     imm_dp_task_destroy(task);
+    imm_seq_destroy(seq);
     imm_profile_destroy(prof, true);
 }
