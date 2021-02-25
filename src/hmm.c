@@ -12,6 +12,7 @@
 #include "model_trans.h"
 #include "model_trans_table.h"
 #include "seq_code.h"
+#include "subseq.h"
 #include <stdlib.h>
 
 struct imm_hmm
@@ -136,10 +137,10 @@ imm_float imm_hmm_loglikelihood(struct imm_hmm const* hmm, struct imm_seq const*
     if (step_len > remain)
         goto length_mismatch;
 
-    uint_fast32_t start = 0;
-    IMM_SUBSEQ(subseq, seq, (uint32_t)start, (uint32_t)step_len);
+    uint_fast32_t  start = 0;
+    struct imm_seq subseq = SUBSEQ(seq, (uint32_t)start, (uint32_t)step_len);
 
-    imm_float lprob = get_start_lprob(hmm, state) + imm_state_lprob(state, imm_subseq_cast(&subseq));
+    imm_float lprob = get_start_lprob(hmm, state) + imm_state_lprob(state, &subseq);
 
     struct imm_state const* prev_state = NULL;
 
@@ -151,10 +152,10 @@ imm_float imm_hmm_loglikelihood(struct imm_hmm const* hmm, struct imm_seq const*
         if (step_len > remain)
             goto length_mismatch;
 
-        imm_subseq_set(&subseq, (uint32_t)start, (uint32_t)step_len);
+        subseq_set(&subseq, seq, (uint32_t)start, (uint32_t)step_len);
 
         lprob += imm_hmm_get_trans(hmm, prev_state, state);
-        lprob += imm_state_lprob(state, imm_subseq_cast(&subseq));
+        lprob += imm_state_lprob(state, &subseq);
 
         if (!imm_lprob_is_valid(lprob)) {
             imm_error("unexpected invalid floating-point number");
