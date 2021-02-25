@@ -14,6 +14,7 @@
 #include "model_trans.h"
 #include "model_trans_table.h"
 #include "profile.h"
+#include "result.h"
 #include "seq_code.h"
 #include "state_idx.h"
 
@@ -54,39 +55,29 @@ void imm_dp_destroy(struct imm_dp const* dp)
     free_c(dp);
 }
 
-struct imm_results const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_dp_task* task)
+struct imm_result const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_dp_task* task)
 {
-    if (seq_code_abc(dp->seq_code) != imm_seq_get_abc(task->root_seq)) {
+    if (seq_code_abc(dp->seq_code) != imm_seq_get_abc(task->seq)) {
         imm_error("dp and seq must have the same alphabet");
         return NULL;
     }
 
     struct imm_state const* end_state = model_state_get_state(dp->mstates[dp->state_table->end_state]);
-    if (imm_seq_length(task->root_seq) < imm_state_min_seq(end_state)) {
+    if (imm_seq_length(task->seq) < imm_state_min_seq(end_state)) {
         imm_error("sequence is shorter than end_state's lower bound");
         return NULL;
     }
 
-    struct imm_results* results = imm_results_create(task->root_seq, 1);
-
-    struct elapsed elapsed_total = elapsed_init();
-    elapsed_start(&elapsed_total);
-
-    /* struct imm_subseq const subseq = imm_window_get(window, 0); */
-    IMM_SUBSEQ(subseq, task->root_seq, 0, imm_seq_length(task->root_seq));
-
-    dp_task_set_subseq(task, &subseq);
+    struct imm_result* result = imm_result_create(task->seq);
 
     struct imm_path* path = imm_path_create();
     struct elapsed   elapsed = elapsed_init();
     elapsed_start(&elapsed);
     viterbi(dp, task, path);
     elapsed_end(&elapsed);
-    imm_results_set(results, 0, subseq, path, (imm_float)elapsed_seconds(&elapsed));
-    elapsed_end(&elapsed_total);
-    imm_results_set_elapsed(results, (imm_float)elapsed_seconds(&elapsed_total));
+    result_set(result, path, (imm_float)elapsed_seconds(&elapsed));
 
-    return results;
+    return result;
 }
 
 int imm_dp_change_trans(struct imm_dp* dp, struct imm_hmm* hmm, struct imm_state const* src_state,

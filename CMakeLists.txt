@@ -49,7 +49,7 @@ add_library(imm
     src/path.c
     src/profile.c
     src/report.c
-    src/results.c
+    src/result.c
     src/seq.c
     src/seq_code.c
     src/seq_table.c

@@ -6,16 +6,12 @@
 struct dp_matrix;
 struct eseq;
 struct imm_seq;
-struct imm_subseq;
 
 struct imm_dp_task
 {
     struct dp_matrix*     matrix;
     struct eseq*          eseq;
-    struct imm_seq const* root_seq;
-    uint32_t              window_length;
+    struct imm_seq const* seq;
 };
-
-void dp_task_set_subseq(struct imm_dp_task* task, struct imm_subseq const* subseq);
 
 #endif

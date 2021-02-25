@@ -35,18 +35,14 @@ void test_hmm_write_io_two_states(void)
 
     struct imm_dp_task* task = imm_dp_task_create(dp);
     imm_dp_task_setup(task, C);
-    struct imm_results const* results = imm_dp_viterbi(dp, task);
-    cass_cond(results != NULL);
-    cass_equal(imm_results_size(results), 1);
-    struct imm_path const* path = imm_result_path(imm_results_get(results, 0));
+    struct imm_result const* r = imm_dp_viterbi(dp, task);
+    cass_cond(r != NULL);
+    struct imm_path const* path = imm_result_path(r);
 
-    struct imm_result const* r = imm_results_get(results, 0);
-    struct imm_subseq        subseq = imm_result_subseq(r);
-    struct imm_seq const*    s = imm_subseq_cast(&subseq);
-    imm_float                score = imm_hmm_loglikelihood(hmm, s, imm_result_path(r));
+    imm_float score = imm_hmm_loglikelihood(hmm, C, imm_result_path(r));
     CLOSE(score, imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
     CLOSE(imm_hmm_loglikelihood(hmm, C, path), imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
-    imm_results_destroy(results);
+    imm_result_destroy(r);
 
     struct imm_output* output = imm_output_create(TMPDIR "/two_states.imm");
     cass_cond(output != NULL);
@@ -87,17 +83,13 @@ void test_hmm_write_io_two_states(void)
 
     task = imm_dp_task_create(dp);
     imm_dp_task_setup(task, C);
-    results = imm_dp_viterbi(dp, task);
-    cass_cond(results != NULL);
-    cass_equal(imm_results_size(results), 1);
-    r = imm_results_get(results, 0);
-    subseq = imm_result_subseq(r);
-    s = imm_subseq_cast(&subseq);
+    r = imm_dp_viterbi(dp, task);
+    cass_cond(r != NULL);
     path = imm_result_path(r);
-    score = imm_hmm_loglikelihood(hmm, s, imm_result_path(r));
+    score = imm_hmm_loglikelihood(hmm, C, imm_result_path(r));
     CLOSE(score, imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
     CLOSE(imm_hmm_loglikelihood(hmm, C, path), imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
-    imm_results_destroy(results);
+    imm_result_destroy(r);
 
     for (uint16_t i = 0; i < imm_model_nstates(model); ++i) {
         struct imm_state const* state = imm_model_state(model, i);
@@ -154,31 +146,23 @@ void test_hmm_write_io_two_hmms(void)
 
     struct imm_dp_task* task0 = imm_dp_task_create(dp0);
     imm_dp_task_setup(task0, C);
-    struct imm_results const* results = imm_dp_viterbi(dp0, task0);
-    cass_cond(results != NULL);
-    cass_equal(imm_results_size(results), 1);
-    struct imm_path const*   path = imm_result_path(imm_results_get(results, 0));
-    struct imm_result const* r = imm_results_get(results, 0);
-    struct imm_subseq        subseq = imm_result_subseq(r);
-    struct imm_seq const*    s = imm_subseq_cast(&subseq);
-    imm_float                score = imm_hmm_loglikelihood(hmm0, s, imm_result_path(r));
+    struct imm_result const* r = imm_dp_viterbi(dp0, task0);
+    cass_cond(r != NULL);
+    struct imm_path const* path = imm_result_path(r);
+    imm_float              score = imm_hmm_loglikelihood(hmm0, C, path);
     CLOSE(score, imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
     CLOSE(imm_hmm_loglikelihood(hmm0, C, path), imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
-    imm_results_destroy(results);
+    imm_result_destroy(r);
 
     struct imm_dp_task* task1 = imm_dp_task_create(dp1);
     imm_dp_task_setup(task1, C);
-    results = imm_dp_viterbi(dp1, task1);
-    cass_cond(results != NULL);
-    cass_equal(imm_results_size(results), 1);
-    path = imm_result_path(imm_results_get(results, 0));
-    r = imm_results_get(results, 0);
-    subseq = imm_result_subseq(r);
-    s = imm_subseq_cast(&subseq);
-    score = imm_hmm_loglikelihood(hmm1, s, imm_result_path(r));
+    r = imm_dp_viterbi(dp1, task1);
+    cass_cond(r != NULL);
+    path = imm_result_path(r);
+    score = imm_hmm_loglikelihood(hmm1, C, path);
     CLOSE(score, imm_log(0.05f) + imm_log(0.1f) + imm_log(0.9f));
     CLOSE(imm_hmm_loglikelihood(hmm1, C, path), imm_log(0.05f) + imm_log(0.1f) + imm_log(0.9f));
-    imm_results_destroy(results);
+    imm_result_destroy(r);
 
     struct imm_output* output = imm_output_create(TMPDIR "/two_hmms.imm");
     cass_cond(output != NULL);
@@ -227,17 +211,13 @@ void test_hmm_write_io_two_hmms(void)
 
     task0 = imm_dp_task_create(dp0);
     imm_dp_task_setup(task0, C);
-    results = imm_dp_viterbi(dp0, task0);
-    cass_cond(results != NULL);
-    cass_equal(imm_results_size(results), 1);
-    r = imm_results_get(results, 0);
-    subseq = imm_result_subseq(r);
-    s = imm_subseq_cast(&subseq);
+    r = imm_dp_viterbi(dp0, task0);
+    cass_cond(r != NULL);
     path = imm_result_path(r);
-    score = imm_hmm_loglikelihood(hmm0, s, imm_result_path(r));
+    score = imm_hmm_loglikelihood(hmm0, C, path);
     CLOSE(score, imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
     CLOSE(imm_hmm_loglikelihood(hmm0, C, path), imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
-    imm_results_destroy(results);
+    imm_result_destroy(r);
 
     for (uint16_t i = 0; i < imm_model_nstates(model0); ++i) {
         struct imm_state const* state = imm_model_state(model0, i);
@@ -254,17 +234,13 @@ void test_hmm_write_io_two_hmms(void)
 
     task1 = imm_dp_task_create(dp1);
     imm_dp_task_setup(task1, C);
-    results = imm_dp_viterbi(dp1, task1);
-    cass_cond(results != NULL);
-    cass_equal(imm_results_size(results), 1);
-    r = imm_results_get(results, 0);
-    subseq = imm_result_subseq(r);
-    s = imm_subseq_cast(&subseq);
+    r = imm_dp_viterbi(dp1, task1);
+    cass_cond(r != NULL);
     path = imm_result_path(r);
-    score = imm_hmm_loglikelihood(hmm1, s, imm_result_path(r));
+    score = imm_hmm_loglikelihood(hmm1, C, path);
     CLOSE(score, imm_log(0.05f) + imm_log(0.1f) + imm_log(0.9f));
     CLOSE(imm_hmm_loglikelihood(hmm1, C, path), imm_log(0.05f) + imm_log(0.1f) + imm_log(0.9f));
-    imm_results_destroy(results);
+    imm_result_destroy(r);
 
     for (uint16_t i = 0; i < imm_model_nstates(model1); ++i) {
         struct imm_state const* state = imm_model_state(model1, i);

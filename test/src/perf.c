@@ -28,17 +28,14 @@ void test_perf_viterbi(void)
     struct imm_seq const* seq = imm_seq_create(str, model.abc);
     struct imm_dp_task*   task = imm_dp_task_create(dp);
     imm_dp_task_setup(task, seq);
-    struct imm_results const* results = imm_dp_viterbi(dp, task);
+    struct imm_result const* r = imm_dp_viterbi(dp, task);
     imm_dp_task_destroy(task);
 
-    cass_cond(imm_results_size(results) == 1);
-    struct imm_result const* r = imm_results_get(results, 0);
-    struct imm_subseq        subseq = imm_result_subseq(r);
-    imm_float                score = imm_hmm_loglikelihood(model.hmm, imm_subseq_cast(&subseq), imm_result_path(r));
+    imm_float score = imm_hmm_loglikelihood(model.hmm, seq, imm_result_path(r));
     cass_cond(imm_lprob_is_valid(score));
     cass_cond(!imm_lprob_is_zero(score));
     cass_close(score, -65826.0118484497);
-    imm_results_destroy(results);
+    imm_result_destroy(r);
 
     imm_dp_destroy(dp);
     destroy_model2(model);
@@ -82,14 +79,12 @@ void test_perf_viterbi_input(void)
     struct imm_seq const* seq = imm_seq_create(str, abc);
     struct imm_dp_task*   task = imm_dp_task_create(dp);
     imm_dp_task_setup(task, seq);
-    struct imm_results const* results = imm_dp_viterbi(dp, task);
-    struct imm_result const*  r = imm_results_get(results, 0);
-    struct imm_subseq         subseq = imm_result_subseq(r);
-    imm_float                 score = imm_hmm_loglikelihood(hmm, imm_subseq_cast(&subseq), imm_result_path(r));
+    struct imm_result const* r = imm_dp_viterbi(dp, task);
+    imm_float                score = imm_hmm_loglikelihood(hmm, seq, imm_result_path(r));
     cass_cond(imm_lprob_is_valid(score));
     cass_cond(!imm_lprob_is_zero(score));
     cass_close(score, -65826.0118484497);
-    imm_results_destroy(results);
+    imm_result_destroy(r);
     imm_dp_task_destroy(task);
     imm_seq_destroy(seq);
     imm_profile_destroy(prof, true);

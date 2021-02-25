@@ -1176,21 +1176,18 @@ imm_float single_viterbi(struct imm_hmm const* hmm, struct imm_seq const* seq, s
 
     struct imm_dp_task* task = imm_dp_task_create(dp);
     imm_dp_task_setup(task, seq);
-    struct imm_results const* results = imm_dp_viterbi(dp, task);
+    struct imm_result const* r = imm_dp_viterbi(dp, task);
     imm_dp_task_destroy(task);
-    if (results == NULL) {
+    if (r == NULL) {
         *path = imm_path_create();
         imm_dp_destroy(dp);
         return imm_lprob_invalid();
     }
-    struct imm_result const* r = imm_results_get(results, 0);
 
     *path = imm_path_clone(imm_result_path(r));
 
-    struct imm_subseq     subseq = imm_result_subseq(r);
-    struct imm_seq const* s = imm_subseq_cast(&subseq);
-    imm_float             score = imm_hmm_loglikelihood(hmm, s, imm_result_path(r));
-    imm_results_destroy(results);
+    imm_float score = imm_hmm_loglikelihood(hmm, seq, *path);
+    imm_result_destroy(r);
     imm_dp_destroy(dp);
 
     return score;

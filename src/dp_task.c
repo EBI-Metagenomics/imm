@@ -9,15 +9,15 @@ struct imm_dp_task* imm_dp_task_create(struct imm_dp const* dp)
     struct imm_dp_task* task = malloc(sizeof(*task));
     task->matrix = dp_matrix_create(dp->state_table);
     task->eseq = seq_code_create_eseq(dp->seq_code);
-    task->root_seq = NULL;
-    task->window_length = 0;
+    task->seq = NULL;
     return task;
 }
 
 void imm_dp_task_setup(struct imm_dp_task* task, struct imm_seq const* seq)
 {
-    task->root_seq = seq;
-    task->window_length = imm_seq_length(seq);
+    task->seq = seq;
+    eseq_setup(task->eseq, seq);
+    dp_matrix_setup(task->matrix, task->eseq);
 }
 
 void imm_dp_task_destroy(struct imm_dp_task const* task)
@@ -25,10 +25,4 @@ void imm_dp_task_destroy(struct imm_dp_task const* task)
     dp_matrix_destroy(task->matrix);
     eseq_destroy(task->eseq);
     free_c(task);
-}
-
-void dp_task_set_subseq(struct imm_dp_task* task, struct imm_subseq const* subseq)
-{
-    eseq_setup(task->eseq, imm_subseq_cast(subseq));
-    dp_matrix_setup(task->matrix, task->eseq);
 }

@@ -148,15 +148,11 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
     struct imm_dp_task* task = imm_dp_task_create(dp);
     for (unsigned i = 0; i < NSAMPLES; ++i) {
         imm_dp_task_setup(task, seq);
-        struct imm_results const* results = imm_dp_viterbi(dp, task);
-        cass_cond(imm_results_size(results) == 1);
-        struct imm_result const* r = imm_results_get(results, 0);
-        struct imm_subseq        subseq = imm_result_subseq(r);
-        struct imm_seq const*    s = imm_subseq_cast(&subseq);
-        loglik = imm_hmm_loglikelihood(hmm, s, imm_result_path(r));
+        struct imm_result const* r = imm_dp_viterbi(dp, task);
+        loglik = imm_hmm_loglikelihood(hmm, seq, imm_result_path(r));
         cass_cond(is_valid(loglik) && !is_zero(loglik));
         seconds[i] = imm_result_seconds(r);
-        imm_results_destroy(results);
+        imm_result_destroy(r);
     }
 
     imm_mute_state_destroy(start);
