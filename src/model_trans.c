@@ -1,6 +1,6 @@
 #include "model_trans.h"
+#include "bug.h"
 #include "free.h"
-#include "imm/bug.h"
 
 struct model_trans
 {
@@ -18,15 +18,12 @@ struct model_trans* model_trans_create(struct imm_state const* state, imm_float 
 
 void model_trans_destroy(struct model_trans const* mtrans)
 {
-    IMM_BUG(mtrans == NULL);
+    BUG(mtrans == NULL);
     free_c(mtrans);
 }
 
 imm_float model_trans_get_lprob(struct model_trans const* mtrans) { return mtrans->lprob; }
 
-struct imm_state const* model_trans_get_state(struct model_trans const* mtrans)
-{
-    return mtrans->state;
-}
+struct imm_state const* model_trans_get_state(struct model_trans const* mtrans) { return mtrans->state; }
 
 void model_trans_set_lprob(struct model_trans* mtrans, imm_float lprob) { mtrans->lprob = lprob; }

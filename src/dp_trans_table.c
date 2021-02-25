@@ -1,7 +1,6 @@
 #include "dp_trans_table.h"
 #include "free.h"
-#include "imm/bug.h"
-#include "imm/lprob.h"
+#include "imm/imm.h"
 #include "list.h"
 #include "model_state.h"
 #include "model_trans.h"

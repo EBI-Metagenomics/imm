@@ -1,4 +1,5 @@
 #include "seq_code.h"
+#include "bug.h"
 #include "eseq.h"
 #include "free.h"
 #include "imm/imm.h"
@@ -22,7 +23,7 @@ static inline uint_fast8_t stride_size(struct seq_code const* seq_code) { return
 
 struct seq_code const* seq_code_create(struct imm_abc const* abc, uint_fast8_t min_seq, uint_fast8_t max_seq)
 {
-    IMM_BUG(min_seq > max_seq);
+    BUG(min_seq > max_seq);
     struct seq_code* seq_code = malloc(sizeof(*seq_code));
 
     seq_code->min_seq = min_seq;
@@ -50,7 +51,7 @@ struct seq_code const* seq_code_create(struct imm_abc const* abc, uint_fast8_t m
     }
 
     unsigned long ncombs = ipow(imm_abc_length(abc), max_seq);
-    IMM_BUG(ncombs > UINT16_MAX);
+    BUG(ncombs > UINT16_MAX);
 
     seq_code->size = seq_code->offset[max_seq - min_seq] + (uint16_t)ncombs;
 

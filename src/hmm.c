@@ -1,4 +1,5 @@
 #include "hmm.h"
+#include "bug.h"
 #include "dp.h"
 #include "dp_state_table.h"
 #include "dp_trans_table.h"
@@ -163,7 +164,7 @@ imm_float imm_hmm_loglikelihood(struct imm_hmm const* hmm, struct imm_seq const*
     enter:
         prev_state = state;
         start += step_len;
-        IMM_BUG(remain < step_len);
+        BUG(remain < step_len);
         remain -= step_len;
         step = imm_path_next(path, step);
     }

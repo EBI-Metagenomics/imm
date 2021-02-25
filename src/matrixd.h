@@ -3,7 +3,6 @@
 
 #include "make_matrix.h"
 
-/* Defines `struct matrixd` type. */
 MAKE_MATRIX_STRUCT(matrixd, double)
 MAKE_MATRIX_CREATE(matrixd, double)
 MAKE_MATRIX_GET(matrixd, double)

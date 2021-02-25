@@ -32,8 +32,7 @@ static inline uintptr_t reverse_bits(uintptr_t v);
 
 #define __ptr_hash_equal(a, b) ((a) == (b))
 
-#define KHASH_MAP_INIT_PTR(name, khval_t)                                                          \
-    KHASH_INIT(name, void const*, khval_t, 1, ptr_hash_func, __ptr_hash_equal)
+#define KHASH_MAP_INIT_PTR(name, khval_t) KHASH_INIT(name, void const*, khval_t, 1, ptr_hash_func, __ptr_hash_equal)
 
 static inline khint_t ptr_hash_func(void const* ptr)
 {

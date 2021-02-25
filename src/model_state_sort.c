@@ -1,9 +1,7 @@
 #include "model_state_sort.h"
+#include "bug.h"
 #include "free.h"
-#include "imm/bug.h"
-#include "imm/lprob.h"
-#include "imm/report.h"
-#include "imm/state.h"
+#include "imm/imm.h"
 #include "khash_ptr.h"
 #include "list.h"
 #include "model_state.h"
@@ -34,8 +32,8 @@ KHASH_MAP_INIT_PTR(node, struct node*)
 static int        check_mute_cycles(struct list_head* node_list);
 static int        check_mute_visit(struct node* node);
 static void       create_edges(struct list_head* node_list, khash_t(node) * table);
-static void       create_nodes(struct model_state const** mstates, uint32_t nstates,
-                               struct list_head* node_list, khash_t(node) * node_table);
+static void       create_nodes(struct model_state const** mstates, uint32_t nstates, struct list_head* node_list,
+                               khash_t(node) * node_table);
 static void       destroy_edges(struct list_head* edges);
 static void       destroy_node(struct node* node);
 static void       destroy_node_list(struct list_head* node_list);
@@ -128,7 +126,7 @@ static void create_edges(struct list_head* node_list, khash_t(node) * table)
             struct edge* edge = malloc(sizeof(*edge));
 
             khiter_t iter = kh_get(node, table, model_trans_get_state(t));
-            IMM_BUG(iter == kh_end(table));
+            BUG(iter == kh_end(table));
 
             edge->node = kh_val(table, iter);
             list_add(&edge->list_entry, &node->edge_list);
@@ -137,8 +135,8 @@ static void create_edges(struct list_head* node_list, khash_t(node) * table)
     }
 }
 
-static void create_nodes(struct model_state const** mstates, uint32_t nstates,
-                         struct list_head* node_list, khash_t(node) * node_table)
+static void create_nodes(struct model_state const** mstates, uint32_t nstates, struct list_head* node_list,
+                         khash_t(node) * node_table)
 {
     for (uint32_t i = 0; i < nstates; ++i) {
         struct model_state const* mstate = mstates[i];
@@ -156,7 +154,7 @@ static void create_nodes(struct model_state const** mstates, uint32_t nstates,
 
         int      ret = 0;
         khiter_t iter = kh_put(node, node_table, node->state, &ret);
-        IMM_BUG(ret == -1 || ret == 0);
+        BUG(ret == -1 || ret == 0);
         kh_key(node_table, iter) = node->state;
         kh_val(node_table, iter) = node;
     }

@@ -1,3 +1,4 @@
+#include "bug.h"
 #include "free.h"
 #include "imm/imm.h"
 #include "khash_seq.h"
@@ -30,7 +31,7 @@ int imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const* seq, im
 
     int      ret = 0;
     khiter_t iter = kh_put(emission, table->emission_table, seq, &ret);
-    IMM_BUG(ret == -1);
+    BUG(ret == -1);
     if (ret == 0) {
         imm_error("sequence already exist");
         return 1;
@@ -44,7 +45,7 @@ int imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const* seq, im
     kh_val(table->emission_table, iter) = emiss;
 
     uint32_t len = imm_seq_length(seq);
-    IMM_BUG(len > UINT8_MAX);
+    BUG(len > UINT8_MAX);
     table->min_seq = (uint8_t)MIN(table->min_seq, len);
     table->max_seq = (uint8_t)MAX(table->max_seq, len);
 
@@ -64,7 +65,7 @@ struct imm_seq_table* imm_seq_table_clone(struct imm_seq_table const* table)
     for (khiter_t i = kh_begin(emiss_tbl); i < kh_end(emiss_tbl); ++i) {
         if (kh_exist(emiss_tbl, i)) {
             struct emission const* e = kh_val(emiss_tbl, i);
-            IMM_BUG(imm_seq_table_add(new_table, e->seq, e->lprob) != 0);
+            BUG(imm_seq_table_add(new_table, e->seq, e->lprob) != 0);
         }
     }
     return new_table;

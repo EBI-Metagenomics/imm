@@ -1,4 +1,5 @@
 #include "dp.h"
+#include "bug.h"
 #include "compiler.h"
 #include "dp_emission.h"
 #include "dp_matrix.h"
@@ -104,7 +105,7 @@ int imm_dp_change_trans(struct imm_dp* dp, struct imm_hmm* hmm, struct imm_state
         return 1;
     }
 
-    IMM_BUG(imm_hmm_set_trans(hmm, src_state, tgt_state, lprob) != 0);
+    BUG(imm_hmm_set_trans(hmm, src_state, tgt_state, lprob) != 0);
 
     return 0;
 }

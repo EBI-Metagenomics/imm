@@ -1,10 +1,10 @@
-#ifndef IMM_BUG_H
-#define IMM_BUG_H
+#ifndef BUG_H
+#define BUG_H
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#define IMM_BUG(cond)                                                                                                  \
+#define BUG(cond)                                                                                                      \
     do {                                                                                                               \
         if (!(cond))                                                                                                   \
             break;                                                                                                     \

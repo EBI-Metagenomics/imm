@@ -1,6 +1,6 @@
 #include "dp_state_table.h"
 #include "free.h"
-#include "imm/state.h"
+#include "imm/imm.h"
 #include "model_state.h"
 #include "state_idx.h"
 #include <stdlib.h>
@@ -14,10 +14,8 @@ struct dp_state_table_chunk
     uint16_t   end_state;
 };
 
-struct dp_state_table const* dp_state_table_create(struct model_state const* const* mstates,
-                                                   uint_fast16_t                    nstates,
-                                                   struct imm_state const*          end_state,
-                                                   struct state_idx*                state_idx)
+struct dp_state_table const* dp_state_table_create(struct model_state const* const* mstates, uint_fast16_t nstates,
+                                                   struct imm_state const* end_state, struct state_idx* state_idx)
 {
     struct dp_state_table* table = malloc(sizeof(*table));
 
@@ -51,8 +49,8 @@ void dp_state_table_dump(struct dp_state_table const* state_tbl)
 {
     printf("state,min_seq,max_seq,start_lprob\n");
     for (uint16_t i = 0; i < state_tbl->nstates; ++i) {
-        printf("%" PRIu16 ",%" PRIu8 ",%" PRIu8 ",%f\n", i, state_tbl->min_seq[i],
-               state_tbl->max_seq[i], state_tbl->start_lprob[i]);
+        printf("%" PRIu16 ",%" PRIu8 ",%" PRIu8 ",%f\n", i, state_tbl->min_seq[i], state_tbl->max_seq[i],
+               state_tbl->start_lprob[i]);
     }
 }
 
@@ -82,8 +80,7 @@ struct dp_state_table* dp_state_table_read(FILE* stream)
         goto err;
     }
 
-    if (fread(chunk.start_lprob, sizeof(*chunk.start_lprob), chunk.nstates, stream) <
-        chunk.nstates) {
+    if (fread(chunk.start_lprob, sizeof(*chunk.start_lprob), chunk.nstates, stream) < chunk.nstates) {
         imm_error("could not read start_lprob");
         goto err;
     }
@@ -129,20 +126,17 @@ int dp_state_table_write(struct dp_state_table const* state_tbl, FILE* stream)
         return 1;
     }
 
-    if (fwrite(chunk.min_seq, sizeof(*chunk.min_seq), state_tbl->nstates, stream) <
-        state_tbl->nstates) {
+    if (fwrite(chunk.min_seq, sizeof(*chunk.min_seq), state_tbl->nstates, stream) < state_tbl->nstates) {
         imm_error("could not write min_seq");
         return 1;
     }
 
-    if (fwrite(chunk.max_seq, sizeof(*chunk.max_seq), state_tbl->nstates, stream) <
-        state_tbl->nstates) {
+    if (fwrite(chunk.max_seq, sizeof(*chunk.max_seq), state_tbl->nstates, stream) < state_tbl->nstates) {
         imm_error("could not write max_seq");
         return 1;
     }
 
-    if (fwrite(chunk.start_lprob, sizeof(*chunk.start_lprob), state_tbl->nstates, stream) <
-        state_tbl->nstates) {
+    if (fwrite(chunk.start_lprob, sizeof(*chunk.start_lprob), state_tbl->nstates, stream) < state_tbl->nstates) {
         imm_error("could not write start_lprob");
         return 1;
     }

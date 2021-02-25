@@ -12,10 +12,10 @@
  * @type:	the type of the container struct this is embedded in.
  * @member:	the name of the member within the struct.
  */
-#define container_of(ptr, type, member)                                                            \
-    __extension__({                                                                                \
-        const __typeof__(((type*)0)->member)* __mptr = (ptr);                                      \
-        (type*)((char*)__mptr - offsetof(type, member));                                           \
+#define container_of(ptr, type, member)                                                                                \
+    __extension__({                                                                                                    \
+        const __typeof__(((type*)0)->member)* __mptr = (ptr);                                                          \
+        (type*)((char*)__mptr - offsetof(type, member));                                                               \
     })
 
 struct list_head
@@ -23,9 +23,9 @@ struct list_head
     struct list_head *next, *prev;
 };
 
-#define LIST_HEAD_INIT(name)                                                                       \
-    {                                                                                              \
-        &(name), &(name)                                                                           \
+#define LIST_HEAD_INIT(name)                                                                                           \
+    {                                                                                                                  \
+        &(name), &(name)                                                                                               \
     }
 
 #define LIST_HEAD(name) struct list_head name = LIST_HEAD_INIT(name)
@@ -58,10 +58,7 @@ static inline void __list_add(struct list_head* new, struct list_head* prev, str
  * Insert a new entry after the specified head.
  * This is good for implementing stacks.
  */
-static inline void list_add(struct list_head* new, struct list_head* head)
-{
-    __list_add(new, head, head->next);
-}
+static inline void list_add(struct list_head* new, struct list_head* head) { __list_add(new, head, head->next); }
 
 /**
  * list_add_tail - add a new entry
@@ -71,10 +68,7 @@ static inline void list_add(struct list_head* new, struct list_head* head)
  * Insert a new entry before the specified head.
  * This is useful for implementing queues.
  */
-static inline void list_add_tail(struct list_head* new, struct list_head* head)
-{
-    __list_add(new, head->prev, head);
-}
+static inline void list_add_tail(struct list_head* new, struct list_head* head) { __list_add(new, head->prev, head); }
 
 /*
  * Delete a list entry by making the prev/next entries
@@ -158,11 +152,11 @@ static inline int list_empty(const struct list_head* head) { return head->next =
  *
  * Note that if the list is empty, it returns NULL.
  */
-#define list_first_entry_or_null(ptr, type, member)                                                \
-    __extension__({                                                                                \
-        const struct list_head* head__ = (ptr);                                                    \
-        const struct list_head* pos__ = head__->next;                                              \
-        pos__ != head__ ? list_entry(pos__, type, member) : NULL;                                  \
+#define list_first_entry_or_null(ptr, type, member)                                                                    \
+    __extension__({                                                                                                    \
+        const struct list_head* head__ = (ptr);                                                                        \
+        const struct list_head* pos__ = head__->next;                                                                  \
+        pos__ != head__ ? list_entry(pos__, type, member) : NULL;                                                      \
     })
 
 /** list_for_each	-	iterate over a list
@@ -177,8 +171,7 @@ static inline int list_empty(const struct list_head* head) { return head->next =
  * @n:		another &struct list_head to use as temporary storage
  * @head:	the head for your list.
  */
-#define list_for_each_safe(pos, n, head)                                                           \
-    for (pos = (head)->next, n = pos->next; pos != (head); pos = n, n = pos->next)
+#define list_for_each_safe(pos, n, head) for (pos = (head)->next, n = pos->next; pos != (head); pos = n, n = pos->next)
 
 /**
  * list_next_entry - get the next element in list
@@ -193,8 +186,8 @@ static inline int list_empty(const struct list_head* head) { return head->next =
  * @head:	the head for your list.
  * @member:	the name of the list_head within the struct.
  */
-#define list_for_each_entry(pos, head, member)                                                     \
-    for (pos = list_first_entry(head, __typeof__(*pos), member); &pos->member != (head);           \
+#define list_for_each_entry(pos, head, member)                                                                         \
+    for (pos = list_first_entry(head, __typeof__(*pos), member); &pos->member != (head);                               \
          pos = list_next_entry(pos, member))
 
 /**
@@ -205,8 +198,8 @@ static inline int list_empty(const struct list_head* head) { return head->next =
  * @head:	the head for your list.
  * @member:	the name of the list_head within the struct.
  */
-#define list_for_each_entry_safe(pos, n, head, member)                                             \
-    for (pos = list_first_entry(head, __typeof__(*pos), member), n = list_next_entry(pos, member); \
+#define list_for_each_entry_safe(pos, n, head, member)                                                                 \
+    for (pos = list_first_entry(head, __typeof__(*pos), member), n = list_next_entry(pos, member);                     \
          &pos->member != (head); pos = n, n = list_next_entry(n, member))
 
 #endif

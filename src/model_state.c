@@ -24,7 +24,4 @@ struct model_trans_table* model_state_get_mtrans_table(struct model_state const*
 
 imm_float model_state_get_start(struct model_state const* mstate) { return mstate->start_lprob; }
 
-void model_state_set_start(struct model_state* mstate, imm_float const lprob)
-{
-    mstate->start_lprob = lprob;
-}
+void model_state_set_start(struct model_state* mstate, imm_float const lprob) { mstate->start_lprob = lprob; }

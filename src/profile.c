@@ -1,4 +1,5 @@
 #include "profile.h"
+#include "bug.h"
 #include "dp.h"
 #include "dp_emission.h"
 #include "dp_state_table.h"
@@ -19,7 +20,7 @@ struct imm_abc const* imm_profile_abc(struct imm_profile const* prof) { return p
 
 void imm_profile_append_model(struct imm_profile* prof, struct imm_model* model)
 {
-    IMM_BUG(prof->abc != hmm_abc(model->hmm));
+    BUG(prof->abc != hmm_abc(model->hmm));
     imm_vecp_append(prof->models, model);
 }
 

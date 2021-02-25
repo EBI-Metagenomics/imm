@@ -1,7 +1,7 @@
 #ifndef MODEL_TRANS_H
 #define MODEL_TRANS_H
 
-#include "imm/float.h"
+#include "imm/imm.h"
 
 struct imm_state;
 struct model_trans;

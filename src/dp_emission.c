@@ -1,9 +1,6 @@
 #include "dp_emission.h"
 #include "free.h"
-#include "imm/abc.h"
-#include "imm/cartes.h"
-#include "imm/seq.h"
-#include "imm/state.h"
+#include "imm/imm.h"
 #include "model_state.h"
 #include "seq_code.h"
 #include <stdlib.h>

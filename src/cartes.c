@@ -1,3 +1,4 @@
+#include "bug.h"
 #include "free.h"
 #include "imm/imm.h"
 #include "ipow.h"
@@ -54,6 +55,6 @@ void imm_cartes_setup(struct imm_cartes* cartes, uint16_t times)
     cartes->item[times] = '\0';
     cartes->iter_idx = 0;
     unsigned long nitems = ipow(cartes->set_size, times);
-    IMM_BUG(nitems > UINT16_MAX);
+    BUG(nitems > UINT16_MAX);
     cartes->nitems = (uint16_t)nitems;
 }

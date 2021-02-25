@@ -1,8 +1,7 @@
 #include "model_trans_table.h"
+#include "bug.h"
 #include "free.h"
-#include "imm/bug.h"
-#include "imm/report.h"
-#include "imm/state.h"
+#include "imm/imm.h"
 #include "khash_ptr.h"
 #include "model_trans.h"
 
@@ -20,7 +19,7 @@ void model_trans_table_add(struct model_trans_table* table, struct model_trans* 
 {
     int      ret = 0;
     khiter_t i = kh_put(model_trans, table->ktable, model_trans_get_state(mtrans), &ret);
-    IMM_BUG(ret == -1 || ret == 0);
+    BUG(ret == -1 || ret == 0);
     kh_key(table->ktable, i) = model_trans_get_state(mtrans);
     kh_val(table->ktable, i) = mtrans;
 }
@@ -43,10 +42,7 @@ struct model_trans const** model_trans_table_array(struct model_trans_table cons
     return mtrans;
 }
 
-unsigned long model_trans_table_begin(struct model_trans_table const* table)
-{
-    return kh_begin(table->ktable);
-}
+unsigned long model_trans_table_begin(struct model_trans_table const* table) { return kh_begin(table->ktable); }
 
 struct model_trans_table* model_trans_table_create(void)
 {
@@ -75,18 +71,14 @@ void model_trans_table_destroy(struct model_trans_table* table)
     free_c(table);
 }
 
-unsigned long model_trans_table_end(struct model_trans_table const* table)
-{
-    return kh_end(table->ktable);
-}
+unsigned long model_trans_table_end(struct model_trans_table const* table) { return kh_end(table->ktable); }
 
 int model_trans_table_exist(struct model_trans_table const* table, unsigned long iter)
 {
     return kh_exist(table->ktable, (khiter_t)iter);
 }
 
-unsigned long model_trans_table_find(struct model_trans_table const* table,
-                                     struct imm_state const*         state)
+unsigned long model_trans_table_find(struct model_trans_table const* table, struct imm_state const* state)
 {
     return kh_get(model_trans, table->ktable, state);
 }
@@ -99,7 +91,7 @@ struct model_trans* model_trans_table_get(struct model_trans_table const* table,
 unsigned model_trans_table_size(struct model_trans_table const* table)
 {
     khint_t n = kh_size(table->ktable);
-    IMM_BUG(n > UINT_MAX);
+    BUG(n > UINT_MAX);
     return (unsigned)n;
 }
 

@@ -3,7 +3,6 @@
 
 #include "make_matrix.h"
 
-/* Defines `struct matrixu` type. */
 MAKE_MATRIX_STRUCT(matrixu, unsigned)
 MAKE_MATRIX_CREATE(matrixu, unsigned)
 MAKE_MATRIX_GET(matrixu, unsigned)

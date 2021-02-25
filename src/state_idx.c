@@ -1,4 +1,5 @@
 #include "state_idx.h"
+#include "bug.h"
 #include "free.h"
 #include "imm/imm.h"
 #include "khash_ptr.h"
@@ -20,7 +21,7 @@ void state_idx_add(struct state_idx* state_idx, struct imm_state const* state, u
 {
     int      ret = 0;
     khiter_t iter = kh_put(item, state_idx->table, state, &ret);
-    IMM_BUG(ret == -1 || ret == 0);
+    BUG(ret == -1 || ret == 0);
 
     struct item* item = malloc(sizeof(*item));
     item->state = state;
@@ -51,6 +52,6 @@ void state_idx_destroy(struct state_idx* state_idx)
 uint_fast16_t state_idx_find(struct state_idx const* state_idx, struct imm_state const* state)
 {
     khiter_t i = kh_get(item, state_idx->table, state);
-    IMM_BUG(i == kh_end(state_idx->table));
+    BUG(i == kh_end(state_idx->table));
     return (uint_fast16_t)kh_val(state_idx->table, i)->idx;
 }
