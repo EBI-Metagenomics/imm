@@ -58,7 +58,6 @@ add_library(imm
     src/step.c
     src/table_state.c
     src/vec.c
-    src/window.c
 )
 add_library(IMM::imm ALIAS imm)
 

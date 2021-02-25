@@ -147,7 +147,7 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
     imm_float           loglik = 0.0;
     struct imm_dp_task* task = imm_dp_task_create(dp);
     for (unsigned i = 0; i < NSAMPLES; ++i) {
-        imm_dp_task_setup(task, seq, 0);
+        imm_dp_task_setup(task, seq);
         struct imm_results const* results = imm_dp_viterbi(dp, task);
         cass_cond(imm_results_size(results) == 1);
         struct imm_result const* r = imm_results_get(results, 0);

@@ -34,7 +34,7 @@ void dp_matrix_destroy(struct dp_matrix const* matrix)
 
 void dp_matrix_setup(struct dp_matrix* matrix, struct eseq const* eseq)
 {
-    uint_fast16_t seq_len = eseq_length(eseq);
+    uint_fast32_t seq_len = eseq_length(eseq);
     matrixf_resize(matrix->score, seq_len + 1, matrixf_ncols(matrix->score));
     matrixu16_resize(matrix->prev_state, seq_len + 1, matrixu16_ncols(matrix->prev_state));
     matrixu8_resize(matrix->prev_seq_len, seq_len + 1, matrixu8_ncols(matrix->prev_seq_len));

@@ -22,7 +22,7 @@ struct imm_seq const* imm_seq_create(char const* string, struct imm_abc const* a
         return NULL;
     }
 
-    for (uint_fast32_t i = 0; i < length; ++i) {
+    for (size_t i = 0; i < length; ++i) {
         if (!imm_abc_has_symbol(abc, string[i]) && string[i] != imm_abc_any_symbol(abc)) {
             imm_error("symbol not found in the alphabet");
             return NULL;

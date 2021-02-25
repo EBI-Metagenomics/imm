@@ -128,15 +128,15 @@ imm_float imm_hmm_loglikelihood(struct imm_hmm const* hmm, struct imm_seq const*
         return imm_lprob_invalid();
     }
 
-    unsigned                step_len = imm_step_seq_len(step);
+    uint_fast8_t            step_len = imm_step_seq_len(step);
     struct imm_state const* state = imm_step_state(step);
 
-    unsigned remain = imm_seq_length(seq);
+    uint_fast32_t remain = imm_seq_length(seq);
     if (step_len > remain)
         goto length_mismatch;
 
-    unsigned start = 0;
-    IMM_SUBSEQ(subseq, seq, start, step_len);
+    uint_fast32_t start = 0;
+    IMM_SUBSEQ(subseq, seq, (uint32_t)start, (uint32_t)step_len);
 
     imm_float lprob = get_start_lprob(hmm, state) + imm_state_lprob(state, imm_subseq_cast(&subseq));
 
@@ -150,7 +150,7 @@ imm_float imm_hmm_loglikelihood(struct imm_hmm const* hmm, struct imm_seq const*
         if (step_len > remain)
             goto length_mismatch;
 
-        imm_subseq_set(&subseq, start, step_len);
+        imm_subseq_set(&subseq, (uint32_t)start, (uint32_t)step_len);
 
         lprob += imm_hmm_get_trans(hmm, prev_state, state);
         lprob += imm_state_lprob(state, imm_subseq_cast(&subseq));

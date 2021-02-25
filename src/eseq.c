@@ -12,7 +12,7 @@ void eseq_destroy(struct eseq const* eseq)
 void eseq_setup(struct eseq* eseq, struct imm_seq const* seq)
 {
     uint_fast32_t ncols = matrixu16_ncols(eseq->code);
-    matrixu16_resize(eseq->code, (uint_fast16_t)(imm_seq_length(seq) + 1), (uint_fast16_t)ncols);
+    matrixu16_resize(eseq->code, imm_seq_length(seq) + 1, ncols);
 
     for (uint_fast32_t i = 0; i <= imm_seq_length(seq); ++i) {
 
@@ -27,7 +27,7 @@ void eseq_setup(struct eseq* eseq, struct imm_seq const* seq)
             uint_fast16_t code = seq_code_encode(eseq->seq_code, imm_subseq_cast(&subseq));
             code -= seq_code_offset(eseq->seq_code, min_seq);
 
-            matrixu16_set(eseq->code, (uint_fast16_t)i, (uint_fast16_t)j, (uint16_t)code);
+            matrixu16_set(eseq->code, i, j, (uint16_t)code);
         }
     }
 }

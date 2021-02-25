@@ -34,7 +34,7 @@ void test_hmm_write_io_two_states(void)
     struct imm_dp const* dp = imm_hmm_create_dp(hmm, imm_normal_state_super(state1));
 
     struct imm_dp_task* task = imm_dp_task_create(dp);
-    imm_dp_task_setup(task, C, 0);
+    imm_dp_task_setup(task, C);
     struct imm_results const* results = imm_dp_viterbi(dp, task);
     cass_cond(results != NULL);
     cass_equal(imm_results_size(results), 1);
@@ -86,7 +86,7 @@ void test_hmm_write_io_two_states(void)
     C = imm_seq_create("C", abc);
 
     task = imm_dp_task_create(dp);
-    imm_dp_task_setup(task, C, 0);
+    imm_dp_task_setup(task, C);
     results = imm_dp_viterbi(dp, task);
     cass_cond(results != NULL);
     cass_equal(imm_results_size(results), 1);
@@ -153,7 +153,7 @@ void test_hmm_write_io_two_hmms(void)
     struct imm_dp const* dp1 = imm_hmm_create_dp(hmm1, imm_normal_state_super(hmm1_state1));
 
     struct imm_dp_task* task0 = imm_dp_task_create(dp0);
-    imm_dp_task_setup(task0, C, 0);
+    imm_dp_task_setup(task0, C);
     struct imm_results const* results = imm_dp_viterbi(dp0, task0);
     cass_cond(results != NULL);
     cass_equal(imm_results_size(results), 1);
@@ -167,7 +167,7 @@ void test_hmm_write_io_two_hmms(void)
     imm_results_destroy(results);
 
     struct imm_dp_task* task1 = imm_dp_task_create(dp1);
-    imm_dp_task_setup(task1, C, 0);
+    imm_dp_task_setup(task1, C);
     results = imm_dp_viterbi(dp1, task1);
     cass_cond(results != NULL);
     cass_equal(imm_results_size(results), 1);
@@ -226,7 +226,7 @@ void test_hmm_write_io_two_hmms(void)
     C = imm_seq_create("C", abc);
 
     task0 = imm_dp_task_create(dp0);
-    imm_dp_task_setup(task0, C, 0);
+    imm_dp_task_setup(task0, C);
     results = imm_dp_viterbi(dp0, task0);
     cass_cond(results != NULL);
     cass_equal(imm_results_size(results), 1);
@@ -253,7 +253,7 @@ void test_hmm_write_io_two_hmms(void)
         imm_state_destroy(imm_model_state(model0, i));
 
     task1 = imm_dp_task_create(dp1);
-    imm_dp_task_setup(task1, C, 0);
+    imm_dp_task_setup(task1, C);
     results = imm_dp_viterbi(dp1, task1);
     cass_cond(results != NULL);
     cass_equal(imm_results_size(results), 1);

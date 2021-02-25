@@ -10,7 +10,6 @@
 #include "model_state.h"
 #include "model_trans.h"
 #include "model_trans_table.h"
-#include "seq_code.h"
 #include <stdlib.h>
 #include <string.h>
 

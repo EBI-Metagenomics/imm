@@ -26,15 +26,14 @@ struct dp_trans_table_chunk
 };
 
 static uint_fast16_t        create_incoming_transitions(struct list_head*                incoming_trans,
-                                                        struct model_state const* const* mstates,
-                                                        uint_fast16_t                    nstates,
-                                                        struct state_idx const*          state_idx);
+                                                        struct model_state const* const* mstates, uint_fast16_t nstates,
+                                                        struct state_idx const* state_idx);
 static inline uint_fast16_t offset_size(uint_fast16_t nstates) { return nstates + 1; }
 static inline uint_fast16_t score_size(uint_fast16_t ntrans) { return ntrans; }
 static inline uint_fast16_t source_state_size(uint_fast16_t ntrans) { return ntrans; }
 
-int dp_trans_table_change(struct dp_trans_table* trans_tbl, uint_fast16_t src_state,
-                          uint_fast16_t tgt_state, imm_float lprob)
+int dp_trans_table_change(struct dp_trans_table* trans_tbl, uint_fast16_t src_state, uint_fast16_t tgt_state,
+                          imm_float lprob)
 {
     /* TODO: find a faster way to update the transition */
     for (uint_fast16_t i = 0; i < dp_trans_table_ntrans(trans_tbl, tgt_state); ++i) {
@@ -47,8 +46,8 @@ int dp_trans_table_change(struct dp_trans_table* trans_tbl, uint_fast16_t src_st
     return 1;
 }
 
-struct dp_trans_table* dp_trans_table_create(struct model_state const* const* mstates,
-                                             uint_fast16_t nstates, struct state_idx* state_idx)
+struct dp_trans_table* dp_trans_table_create(struct model_state const* const* mstates, uint_fast16_t nstates,
+                                             struct state_idx* state_idx)
 {
     struct list_head incoming_trans[nstates];
     for (uint_fast16_t i = 0; i < nstates; ++i)
@@ -131,16 +130,15 @@ struct dp_trans_table* dp_trans_table_read(FILE* stream)
 
     chunk.score = malloc(sizeof(*chunk.score) * score_size(chunk.ntrans));
 
-    if (fread(chunk.score, sizeof(*chunk.score), score_size(chunk.ntrans), stream) <
-        score_size(chunk.ntrans)) {
+    if (fread(chunk.score, sizeof(*chunk.score), score_size(chunk.ntrans), stream) < score_size(chunk.ntrans)) {
         imm_error("could not read score");
         goto err;
     }
 
     chunk.source_state = malloc(sizeof(*chunk.source_state) * source_state_size(chunk.ntrans));
 
-    if (fread(chunk.source_state, sizeof(*chunk.source_state), source_state_size(chunk.ntrans),
-              stream) < source_state_size(chunk.ntrans)) {
+    if (fread(chunk.source_state, sizeof(*chunk.source_state), source_state_size(chunk.ntrans), stream) <
+        source_state_size(chunk.ntrans)) {
         imm_error("could not read source_state");
         goto err;
     }
@@ -192,14 +190,13 @@ int dp_trans_table_write(struct dp_trans_table const* trans, uint_fast16_t nstat
         return 1;
     }
 
-    if (fwrite(chunk.score, sizeof(*chunk.score), score_size(trans->ntrans), stream) <
-        score_size(trans->ntrans)) {
+    if (fwrite(chunk.score, sizeof(*chunk.score), score_size(trans->ntrans), stream) < score_size(trans->ntrans)) {
         imm_error("could not write score");
         return 1;
     }
 
-    if (fwrite(chunk.source_state, sizeof(*chunk.source_state), source_state_size(trans->ntrans),
-               stream) < source_state_size(trans->ntrans)) {
+    if (fwrite(chunk.source_state, sizeof(*chunk.source_state), source_state_size(trans->ntrans), stream) <
+        source_state_size(trans->ntrans)) {
         imm_error("could not write source_state");
         return 1;
     }
@@ -209,8 +206,7 @@ int dp_trans_table_write(struct dp_trans_table const* trans, uint_fast16_t nstat
         return 1;
     }
 
-    if (fwrite(chunk.offset, sizeof(*chunk.offset), offset_size(nstates), stream) <
-        offset_size(nstates)) {
+    if (fwrite(chunk.offset, sizeof(*chunk.offset), offset_size(nstates), stream) < offset_size(nstates)) {
         imm_error("could not write offset");
         return 1;
     }
@@ -219,9 +215,8 @@ int dp_trans_table_write(struct dp_trans_table const* trans, uint_fast16_t nstat
 }
 
 static uint_fast16_t create_incoming_transitions(struct list_head*                incoming_trans,
-                                                 struct model_state const* const* mstates,
-                                                 uint_fast16_t                    nstates,
-                                                 struct state_idx const*          state_idx)
+                                                 struct model_state const* const* mstates, uint_fast16_t nstates,
+                                                 struct state_idx const* state_idx)
 {
     uint_fast16_t ntrans = 0;
     for (uint_fast16_t i = 0; i < nstates; ++i) {
