@@ -13,10 +13,7 @@ static inline struct imm_state const* mute_super(struct imm_mute_state const* st
 struct model2 create_model2(void)
 {
     int           ncore_nodes = 1000;
-    struct model2 m = {.hmm = NULL,
-                       .abc = NULL,
-                       .mute_states = imm_vecp_create(),
-                       .normal_states = imm_vecp_create()};
+    struct model2 m = {.hmm = NULL, .abc = NULL, .mute_states = imm_vecp_create(), .normal_states = imm_vecp_create()};
 
     struct imm_abc const* abc = imm_abc_create("BMIEJ", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);

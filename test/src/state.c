@@ -23,7 +23,7 @@ void test_normal_state(void)
     struct imm_seq const* G = imm_seq_create("G", abc);
     struct imm_seq const* T = imm_seq_create("T", abc);
 
-    imm_float lprobs[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5), imm_lprob_zero()};
+    imm_float                      lprobs[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5), imm_lprob_zero()};
     struct imm_normal_state const* state = imm_normal_state_create("State0", abc, lprobs);
 
     cass_cond(strcmp(imm_state_get_name(imm_normal_state_super(state)), "State0") == 0);
@@ -125,7 +125,7 @@ void test_state_destroy(void)
     struct imm_seq const* G = imm_seq_create("G", abc);
     struct imm_seq const* T = imm_seq_create("T", abc);
 
-    imm_float lprobs[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5), imm_lprob_zero()};
+    imm_float                      lprobs[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5), imm_lprob_zero()};
     struct imm_normal_state const* state = imm_normal_state_create("State0", abc, lprobs);
 
     cass_cond(strcmp(imm_state_get_name(imm_normal_state_super(state)), "State0") == 0);
