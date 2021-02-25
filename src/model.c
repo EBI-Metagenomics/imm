@@ -78,7 +78,7 @@ void model_deep_destroy(struct imm_model const* model)
         imm_dp_destroy(model->dp);
 }
 
-void model_destroy(struct imm_model const* model, bool deep)
+void imm_model_destroy(struct imm_model const* model, bool deep)
 {
     if (deep) {
         imm_hmm_destroy(imm_model_hmm(model));

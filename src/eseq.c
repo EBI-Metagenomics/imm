@@ -1,6 +1,6 @@
 #include "eseq.h"
 #include "free.h"
-#include "subseq.h"
+#include "imm/imm.h"
 
 void eseq_destroy(struct eseq const* eseq)
 {
@@ -21,7 +21,7 @@ void eseq_setup(struct eseq* eseq, struct imm_seq const* seq)
             if (i + length > imm_seq_length(seq))
                 continue;
 
-            struct imm_seq subseq = SUBSEQ(seq, (uint32_t)i, (uint32_t)length);
+            struct imm_seq subseq = IMM_SUBSEQ(seq, (uint32_t)i, (uint32_t)length);
             uint_fast8_t   min_seq = eseq->seq_code->min_seq;
             uint_fast16_t  code = seq_code_encode(eseq->seq_code, &subseq);
             code -= seq_code_offset(eseq->seq_code, min_seq);

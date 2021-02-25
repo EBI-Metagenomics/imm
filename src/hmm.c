@@ -12,7 +12,6 @@
 #include "model_trans.h"
 #include "model_trans_table.h"
 #include "seq_code.h"
-#include "subseq.h"
 #include <stdlib.h>
 
 struct imm_hmm
@@ -138,7 +137,7 @@ imm_float imm_hmm_loglikelihood(struct imm_hmm const* hmm, struct imm_seq const*
         goto length_mismatch;
 
     uint_fast32_t  start = 0;
-    struct imm_seq subseq = SUBSEQ(seq, (uint32_t)start, (uint32_t)step_len);
+    struct imm_seq subseq = IMM_SUBSEQ(seq, (uint32_t)start, (uint32_t)step_len);
 
     imm_float lprob = get_start_lprob(hmm, state) + imm_state_lprob(state, &subseq);
 
@@ -152,7 +151,7 @@ imm_float imm_hmm_loglikelihood(struct imm_hmm const* hmm, struct imm_seq const*
         if (step_len > remain)
             goto length_mismatch;
 
-        subseq_set(&subseq, seq, (uint32_t)start, (uint32_t)step_len);
+        imm_subseq_set(&subseq, seq, (uint32_t)start, (uint32_t)step_len);
 
         lprob += imm_hmm_get_trans(hmm, prev_state, state);
         lprob += imm_state_lprob(state, &subseq);

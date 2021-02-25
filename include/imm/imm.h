@@ -32,6 +32,7 @@ extern "C"
 #include "imm/state.h"
 #include "imm/state_types.h"
 #include "imm/step.h"
+#include "imm/subseq.h"
 #include "imm/table_state.h"
 #include "imm/vec.h"
 

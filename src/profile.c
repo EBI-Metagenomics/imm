@@ -33,7 +33,7 @@ void imm_profile_destroy(struct imm_profile const* prof, bool deep)
 {
     for (size_t i = 0; i < imm_profile_nmodels(prof); ++i) {
         struct imm_model* model = (void*)imm_vecp_get(prof->models, i);
-        model_destroy(model, deep);
+        imm_model_destroy(model, deep);
     }
     if (deep)
         imm_abc_destroy(imm_profile_abc(prof));
