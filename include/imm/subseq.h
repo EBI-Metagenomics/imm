@@ -11,6 +11,7 @@
 
 static inline void imm_subseq_set(struct imm_seq* subseq, struct imm_seq const* seq, uint32_t start, uint32_t length)
 {
+    subseq->abc = seq->abc;
     subseq->string = seq->string + start;
     subseq->length = length;
 }
