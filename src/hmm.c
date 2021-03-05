@@ -298,6 +298,22 @@ int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state, st
     return 0;
 }
 
+struct imm_state const** imm_hmm_states(struct imm_hmm* hmm, uint32_t* nstates)
+{
+    *nstates = model_state_table_size(hmm->table);
+    struct imm_state const** states = malloc(*nstates * sizeof(*states));
+
+    unsigned long i = 0;
+    size_t        j = 0;
+    model_state_table_for_each(i, hmm->table)
+    {
+        if (model_state_table_exist(hmm->table, i)) {
+            states[j++] = model_state_get_state(model_state_table_get(hmm->table, i));
+        }
+    }
+    return states;
+}
+
 struct imm_abc const* hmm_abc(struct imm_hmm const* hmm) { return hmm->abc; }
 
 void hmm_add_mstate(struct imm_hmm* hmm, struct model_state* mstate) { model_state_table_add(hmm->table, mstate); }

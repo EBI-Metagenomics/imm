@@ -3,6 +3,7 @@
 
 #include "imm/export.h"
 #include "imm/float.h"
+#include <stdint.h>
 
 struct imm_abc;
 struct imm_dp;
@@ -27,5 +28,7 @@ IMM_API int             imm_hmm_normalize_trans(struct imm_hmm* hmm, struct imm_
 IMM_API int             imm_hmm_set_start(struct imm_hmm* hmm, struct imm_state const* state, imm_float lprob);
 IMM_API int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state, struct imm_state const* tgt_state,
                               imm_float lprob);
+/* Temporary function for Deciphon */
+IMM_API struct imm_state const** imm_hmm_states(struct imm_hmm* hmm, uint32_t* nstates);
 
 #endif
