@@ -44,6 +44,8 @@ void imm_path_destroy(struct imm_path const* path)
     imm_path_free(path);
 }
 
+bool imm_path_empty(struct imm_path const* path) { return imm_path_first(path) == NULL; }
+
 struct imm_step const* imm_path_first(struct imm_path const* path)
 {
     return list_first_entry_or_null(&path->steps, struct imm_step, list_entry);
