@@ -43,7 +43,8 @@ struct imm_model* imm_model_create(struct imm_hmm* hmm, struct imm_dp const* dp)
     return model;
 }
 
-struct imm_dp const* imm_model_dp(struct imm_model const* model) { return model->dp; }
+/* TODO: remove this cast, implement imm_model_set_trans... */
+struct imm_dp* imm_model_dp(struct imm_model const* model) { return (struct imm_dp*)model->dp; }
 
 struct imm_hmm* imm_model_hmm(struct imm_model const* model) { return model->hmm; }
 
