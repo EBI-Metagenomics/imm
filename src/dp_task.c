@@ -24,7 +24,6 @@ void imm_dp_task_setup(struct imm_dp_task* task, struct imm_seq const* seq)
 {
     task->seq = seq;
     eseq_setup(task->eseq, seq);
-    dp_matrix_setup(task->matrix, task->eseq);
     cpath_setup(&task->cpath, imm_seq_length(seq) + 1);
 }
 
