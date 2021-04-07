@@ -313,7 +313,6 @@ static void viterbi_first_row(struct imm_dp const* dp, struct imm_dp_task* task,
         uint16_t           trans = 0;
         uint8_t            len = 0;
         struct final_score tscore = best_trans_score_first_row(dp, task->matrix, i, &trans, &len);
-        dp_matrix_set_prev_step(task->matrix, 0, i, tscore.state, tscore.seq_len);
         if (tscore.state != INVALID_STATE) {
             cpath_set_trans(&task->cpath, 0, i, trans);
             cpath_set_len(&task->cpath, 0, i, len);
@@ -339,7 +338,6 @@ static void viterbi_first_row_safe(struct imm_dp const* dp, struct imm_dp_task* 
         uint16_t           trans = 0;
         uint8_t            len = 0;
         struct final_score tscore = best_trans_score_first_row(dp, task->matrix, i, &trans, &len);
-        dp_matrix_set_prev_step(task->matrix, 0, i, tscore.state, tscore.seq_len);
         if (tscore.state != INVALID_STATE) {
             cpath_set_trans(&task->cpath, 0, i, trans);
             cpath_set_len(&task->cpath, 0, i, len);
@@ -364,36 +362,22 @@ static void viterbi_path(struct imm_dp const* dp, struct imm_dp_task const* task
     uint_fast32_t row = eseq_length(task->eseq);
     uint_fast16_t state = end_state;
     uint_fast8_t  seq_len = end_seq_len;
+    bool          valid = seq_len != INVALID_SEQ_LEN;
 
-    printf("-- viterbi_path: start\n");
-    printf("end_state(%lu) end_seq_len(%lu)\n", state, seq_len);
-    while (seq_len != INVALID_SEQ_LEN) {
-
+    while (valid) {
         struct imm_state const* s = model_state_get_state(dp->mstates[state]);
         struct imm_step*        new_step = imm_step_create(s, seq_len);
         imm_path_prepend(path, new_step);
         row -= seq_len;
-        uint16_t cstate = state;
-        dp_matrix_get_prev_step(task->matrix, row, state, &state, &seq_len);
 
-        unsigned long trans = cpath_get_trans(&task->cpath, row, cstate);
-        unsigned long len = cpath_get_len(&task->cpath, row, cstate);
-        if (dp_trans_table_ntrans(dp->trans_table, cstate) > 0) {
-            unsigned long src = dp_trans_table_source_state(dp->trans_table, cstate, trans);
-            uint_fast8_t  min_len = dp_state_table_min_seq(dp->state_table, src);
-            if (cpath_valid(&task->cpath, row, cstate)) {
-                printf("trans(%lu) src(%lu) len(%lu) seq_len(%lu)", trans, src, len, min_len + len);
-                BUG(src != state);
-                BUG(min_len + len != seq_len);
-            } else {
-                printf("invalid");
-            }
-        } else {
-            printf("len(%lu)", len);
+        valid = cpath_valid(&task->cpath, row, state);
+        if (valid) {
+            uint_fast16_t trans = (uint_fast16_t)cpath_get_trans(&task->cpath, row, state);
+            uint_fast8_t  len = (uint_fast8_t)cpath_get_len(&task->cpath, row, state);
+            state = dp_trans_table_source_state(dp->trans_table, state, trans);
+            seq_len = len + dp_state_table_min_seq(dp->state_table, state);
         }
-        printf(" : state(%lu) seq_len(%lu)\n", state, seq_len);
     }
-    printf("-- viterbi_path: end\n");
 }
 
 static void _viterbi(struct imm_dp const* dp, struct imm_dp_task* task, uint_fast32_t const start_row,
@@ -406,7 +390,6 @@ static void _viterbi(struct imm_dp const* dp, struct imm_dp_task* task, uint_fas
             uint16_t           trans = 0;
             uint8_t            len = 0;
             struct final_score tscore = best_trans_score(dp, task->matrix, i, r, &trans, &len);
-            dp_matrix_set_prev_step(task->matrix, r, i, tscore.state, tscore.seq_len);
             if (tscore.state != INVALID_STATE) {
                 cpath_set_trans(&task->cpath, r, i, trans);
                 cpath_set_len(&task->cpath, r, i, len);
@@ -435,7 +418,6 @@ static void _viterbi_safe(struct imm_dp const* dp, struct imm_dp_task* task, uin
             uint16_t           trans = 0;
             uint8_t            len = 0;
             struct final_score tscore = best_trans_score(dp, task->matrix, i, r, &trans, &len);
-            dp_matrix_set_prev_step(task->matrix, r, i, tscore.state, tscore.seq_len);
             if (tscore.state != INVALID_STATE) {
                 cpath_set_trans(&task->cpath, r, i, trans);
                 cpath_set_len(&task->cpath, r, i, len);
