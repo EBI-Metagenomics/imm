@@ -1,6 +1,7 @@
 #include "dp.h"
 #include "bug.h"
 #include "compiler.h"
+#include "cpath.h"
 #include "dp_emission.h"
 #include "dp_matrix.h"
 #include "dp_state_table.h"
@@ -9,7 +10,6 @@
 #include "elapsed/elapsed.h"
 #include "free.h"
 #include "imm/imm.h"
-#include "minmax.h"
 #include "model.h"
 #include "model_state.h"
 #include "model_trans.h"
@@ -18,6 +18,7 @@
 #include "result.h"
 #include "seq_code.h"
 #include "state_idx.h"
+#include "util/math.h"
 
 struct final_score
 {
@@ -27,9 +28,11 @@ struct final_score
 };
 
 static inline struct final_score best_trans_score(struct imm_dp const* dp, struct dp_matrix const* matrix,
-                                                  uint_fast16_t tgt_state, uint_fast32_t row);
+                                                  uint_fast16_t tgt_state, uint_fast32_t row, uint16_t* best_trans,
+                                                  uint8_t* best_len);
 static inline struct final_score best_trans_score_first_row(struct imm_dp const* dp, struct dp_matrix const* matrix,
-                                                            uint_fast16_t tgt_state);
+                                                            uint_fast16_t tgt_state, uint16_t* best_trans,
+                                                            uint8_t* best_len);
 static struct final_score        final_score(struct imm_dp const* dp, struct imm_dp_task* task);
 static uint_fast8_t              max_seq(struct model_state const* const* mstates, uint16_t nstates);
 static uint_fast8_t              min_seq(struct model_state const* const* mstates, uint16_t nstates);
@@ -153,11 +156,14 @@ struct dp_state_table const* dp_get_state_table(struct imm_dp const* dp) { retur
 struct dp_trans_table* dp_get_trans_table(struct imm_dp const* dp) { return dp->trans_table; }
 
 static inline struct final_score best_trans_score(struct imm_dp const* dp, struct dp_matrix const* matrix,
-                                                  uint_fast16_t tgt_state, uint_fast32_t row)
+                                                  uint_fast16_t tgt_state, uint_fast32_t row, uint16_t* best_trans,
+                                                  uint8_t* best_len)
 {
     imm_float     score = (imm_float)imm_lprob_zero();
     uint_fast16_t prev_state = INVALID_STATE;
     uint_fast8_t  prev_seq_len = INVALID_SEQ_LEN;
+    *best_trans = UINT16_MAX;
+    *best_len = UINT8_MAX;
 
     for (uint_fast16_t i = 0; i < dp_trans_table_ntrans(dp->trans_table, tgt_state); ++i) {
 
@@ -179,6 +185,8 @@ static inline struct final_score best_trans_score(struct imm_dp const* dp, struc
                 score = v;
                 prev_state = src_state;
                 prev_seq_len = len;
+                *best_trans = i;
+                *best_len = len - min_seq;
             }
         }
     }
@@ -187,11 +195,14 @@ static inline struct final_score best_trans_score(struct imm_dp const* dp, struc
 }
 
 static inline struct final_score best_trans_score_first_row(struct imm_dp const* dp, struct dp_matrix const* matrix,
-                                                            uint_fast16_t tgt_state)
+                                                            uint_fast16_t tgt_state, uint16_t* best_trans,
+                                                            uint8_t* best_len)
 {
     imm_float     score = (imm_float)imm_lprob_zero();
     uint_fast16_t prev_state = INVALID_STATE;
     uint_fast8_t  prev_seq_len = INVALID_SEQ_LEN;
+    *best_trans = UINT16_MAX;
+    *best_len = UINT8_MAX;
 
     for (uint_fast16_t i = 0; i < dp_trans_table_ntrans(dp->trans_table, tgt_state); ++i) {
 
@@ -209,6 +220,8 @@ static inline struct final_score best_trans_score_first_row(struct imm_dp const*
             score = v;
             prev_state = src_state;
             prev_seq_len = 0;
+            *best_trans = i;
+            *best_len = 0;
         }
     }
 
@@ -297,8 +310,19 @@ static void viterbi_first_row(struct imm_dp const* dp, struct imm_dp_task* task,
 {
     for (uint_fast16_t i = 0; i < dp_state_table_nstates(dp->state_table); ++i) {
 
-        struct final_score tscore = best_trans_score_first_row(dp, task->matrix, i);
+        uint16_t           trans = 0;
+        uint8_t            len = 0;
+        struct final_score tscore = best_trans_score_first_row(dp, task->matrix, i, &trans, &len);
         dp_matrix_set_prev_step(task->matrix, 0, i, tscore.state, tscore.seq_len);
+        if (tscore.state != INVALID_STATE) {
+            cpath_set_trans(&task->cpath, 0, i, trans);
+            cpath_set_len(&task->cpath, 0, i, len);
+            BUG(cpath_get_trans(&task->cpath, 0, i) != trans);
+            BUG(cpath_get_len(&task->cpath, 0, i) != len);
+        } else {
+            cpath_set_invalid(&task->cpath, 0, i);
+            BUG(cpath_valid(&task->cpath, 0, i));
+        }
 
         uint_fast8_t min_len = dp_state_table_min_seq(dp->state_table, i);
         uint_fast8_t max_len = (uint_fast8_t)MIN(dp_state_table_max_seq(dp->state_table, i), remain);
@@ -312,8 +336,19 @@ static void viterbi_first_row_safe(struct imm_dp const* dp, struct imm_dp_task* 
 {
     for (uint_fast16_t i = 0; i < dp_state_table_nstates(dp->state_table); ++i) {
 
-        struct final_score tscore = best_trans_score_first_row(dp, task->matrix, i);
+        uint16_t           trans = 0;
+        uint8_t            len = 0;
+        struct final_score tscore = best_trans_score_first_row(dp, task->matrix, i, &trans, &len);
         dp_matrix_set_prev_step(task->matrix, 0, i, tscore.state, tscore.seq_len);
+        if (tscore.state != INVALID_STATE) {
+            cpath_set_trans(&task->cpath, 0, i, trans);
+            cpath_set_len(&task->cpath, 0, i, len);
+            BUG(cpath_get_trans(&task->cpath, 0, i) != trans);
+            BUG(cpath_get_len(&task->cpath, 0, i) != len);
+        } else {
+            cpath_set_invalid(&task->cpath, 0, i);
+            BUG(cpath_valid(&task->cpath, 0, i));
+        }
 
         uint_fast8_t min_len = dp_state_table_min_seq(dp->state_table, i);
         uint_fast8_t max_len = dp_state_table_max_seq(dp->state_table, i);
@@ -330,13 +365,35 @@ static void viterbi_path(struct imm_dp const* dp, struct imm_dp_task const* task
     uint_fast16_t state = end_state;
     uint_fast8_t  seq_len = end_seq_len;
 
+    printf("-- viterbi_path: start\n");
+    printf("end_state(%lu) end_seq_len(%lu)\n", state, seq_len);
     while (seq_len != INVALID_SEQ_LEN) {
+
         struct imm_state const* s = model_state_get_state(dp->mstates[state]);
         struct imm_step*        new_step = imm_step_create(s, seq_len);
         imm_path_prepend(path, new_step);
         row -= seq_len;
+        uint16_t cstate = state;
         dp_matrix_get_prev_step(task->matrix, row, state, &state, &seq_len);
+
+        unsigned long trans = cpath_get_trans(&task->cpath, row, cstate);
+        unsigned long len = cpath_get_len(&task->cpath, row, cstate);
+        if (dp_trans_table_ntrans(dp->trans_table, cstate) > 0) {
+            unsigned long src = dp_trans_table_source_state(dp->trans_table, cstate, trans);
+            uint_fast8_t  min_len = dp_state_table_min_seq(dp->state_table, src);
+            if (cpath_valid(&task->cpath, row, cstate)) {
+                printf("trans(%lu) src(%lu) len(%lu) seq_len(%lu)", trans, src, len, min_len + len);
+                BUG(src != state);
+                BUG(min_len + len != seq_len);
+            } else {
+                printf("invalid");
+            }
+        } else {
+            printf("len(%lu)", len);
+        }
+        printf(" : state(%lu) seq_len(%lu)\n", state, seq_len);
     }
+    printf("-- viterbi_path: end\n");
 }
 
 static void _viterbi(struct imm_dp const* dp, struct imm_dp_task* task, uint_fast32_t const start_row,
@@ -346,8 +403,19 @@ static void _viterbi(struct imm_dp const* dp, struct imm_dp_task* task, uint_fas
 
         for (uint_fast16_t i = 0; i < dp_state_table_nstates(dp->state_table); ++i) {
 
-            struct final_score tscore = best_trans_score(dp, task->matrix, i, r);
+            uint16_t           trans = 0;
+            uint8_t            len = 0;
+            struct final_score tscore = best_trans_score(dp, task->matrix, i, r, &trans, &len);
             dp_matrix_set_prev_step(task->matrix, r, i, tscore.state, tscore.seq_len);
+            if (tscore.state != INVALID_STATE) {
+                cpath_set_trans(&task->cpath, r, i, trans);
+                cpath_set_len(&task->cpath, r, i, len);
+                BUG(cpath_get_trans(&task->cpath, r, i) != trans);
+                BUG(cpath_get_len(&task->cpath, r, i) != len);
+            } else {
+                cpath_set_invalid(&task->cpath, r, i);
+                BUG(cpath_valid(&task->cpath, r, i));
+            }
 
             uint_fast8_t min_len = dp_state_table_min_seq(dp->state_table, i);
             uint_fast8_t max_len = (uint_fast8_t)MIN(dp_state_table_max_seq(dp->state_table, i), stop_row - r);
@@ -364,8 +432,19 @@ static void _viterbi_safe(struct imm_dp const* dp, struct imm_dp_task* task, uin
 
         for (uint_fast16_t i = 0; i < dp_state_table_nstates(dp->state_table); ++i) {
 
-            struct final_score tscore = best_trans_score(dp, task->matrix, i, r);
+            uint16_t           trans = 0;
+            uint8_t            len = 0;
+            struct final_score tscore = best_trans_score(dp, task->matrix, i, r, &trans, &len);
             dp_matrix_set_prev_step(task->matrix, r, i, tscore.state, tscore.seq_len);
+            if (tscore.state != INVALID_STATE) {
+                cpath_set_trans(&task->cpath, r, i, trans);
+                cpath_set_len(&task->cpath, r, i, len);
+                BUG(cpath_get_trans(&task->cpath, r, i) != trans);
+                BUG(cpath_get_len(&task->cpath, r, i) != len);
+            } else {
+                cpath_set_invalid(&task->cpath, r, i);
+                BUG(cpath_valid(&task->cpath, r, i));
+            }
 
             uint_fast8_t min_len = dp_state_table_min_seq(dp->state_table, i);
             uint_fast8_t max_len = dp_state_table_max_seq(dp->state_table, i);

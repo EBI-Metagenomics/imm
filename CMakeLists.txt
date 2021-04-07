@@ -27,6 +27,7 @@ add_library(imm
     src/abc.c
     src/abc_lprob.c
     src/cartes.c
+    src/cpath.c
     src/dp.c
     src/dp_emission.c
     src/dp_matrix.c
