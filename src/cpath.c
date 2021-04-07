@@ -20,10 +20,10 @@ void cpath_init(struct cpath* path, struct dp_state_table const* state_tbl, stru
             depth = (uint_fast8_t)MAX(max_seq - min_seq, depth);
         }
         path->bits_state[tgt + 1] = path->bits_state[tgt];
-        /* Additional bit (if necessary) for invalid transition */
-        path->bits_trans[tgt] = (uint8_t)(bits_needed(dp_trans_table_ntrans(trans_tbl, tgt)) + 1);
+        path->bits_trans[tgt] = (uint8_t)bits_needed(dp_trans_table_ntrans(trans_tbl, tgt));
         path->bits_state[tgt + 1] += path->bits_trans[tgt];
-        path->bits_state[tgt + 1] += bits_needed(depth);
+        /* Additional bit (if necessary) for invalid transition or seq_len */
+        path->bits_state[tgt + 1] += bits_needed(depth + 1);
     }
     path->bitarr = NULL;
 }
@@ -36,7 +36,7 @@ void cpath_deinit(struct cpath const* path)
         free(path->bitarr);
 }
 
-void cpath_setup(struct cpath* path, uint32_t seq_len)
+void cpath_setup(struct cpath* path, uint32_t len)
 {
-    path->bitarr = bitarr_realloc(path->bitarr, path->bits_state[path->nstates] * (seq_len + 1));
+    path->bitarr = bitarr_realloc(path->bitarr, path->bits_state[path->nstates] * (len + 1));
 }
