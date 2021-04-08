@@ -38,5 +38,6 @@ void cpath_deinit(struct cpath const* path)
 
 void cpath_setup(struct cpath* path, uint32_t len)
 {
-    path->bitarr = bitarr_realloc(path->bitarr, path->bits_state[path->nstates] * (len + 1));
+    uint64_t size = (uint64_t)path->bits_state[path->nstates] * (uint64_t)len;
+    path->bitarr = bitarr_realloc(path->bitarr, size);
 }
