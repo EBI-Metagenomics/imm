@@ -21,9 +21,9 @@ void cpath_init(struct cpath* path, struct dp_state_table const* state_tbl, stru
         }
         path->bits_state[tgt + 1] = path->bits_state[tgt];
         path->bits_trans[tgt] = (uint8_t)bits_width((uint32_t)dp_trans_table_ntrans(trans_tbl, tgt));
-        path->bits_state[tgt + 1] += path->bits_trans[tgt];
+        path->bits_state[tgt + 1] = (uint16_t)(path->bits_state[tgt + 1] + path->bits_trans[tgt]);
         /* Additional bit (if necessary) for invalid transition or seq_len */
-        path->bits_state[tgt + 1] += bits_width((uint32_t)((unsigned)depth + 1));
+        path->bits_state[tgt + 1] = (uint16_t)(path->bits_state[tgt + 1] + bits_width((uint32_t)((unsigned)depth + 1)));
     }
     path->bitarr = NULL;
 }

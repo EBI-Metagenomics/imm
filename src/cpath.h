@@ -65,7 +65,7 @@ static inline void cpath_set_trans(struct cpath* cpath, uint_fast32_t row, uint_
     bitarr_set(cpath->bitarr, (unsigned long)trans, start, cpath->bits_trans[state]);
 }
 
-static inline uint8_t __bits_len(struct cpath const* cpath, unsigned row, uint_fast16_t state)
+static inline uint8_t __bits_len(struct cpath const* cpath, uint_fast32_t row, uint_fast16_t state)
 {
     return (uint8_t)(cpath->bits_state[state + 1] - cpath->bits_state[state] - cpath->bits_trans[state]);
 }
