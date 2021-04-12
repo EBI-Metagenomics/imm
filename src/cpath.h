@@ -11,7 +11,7 @@ struct dp_trans_table;
 struct cpath
 {
     unsigned long* bitarr;
-    uint16_t       nstates;
+    uint_fast16_t  nstates;
     uint16_t*      bits_state;
     uint8_t*       bits_trans;
 };
@@ -24,7 +24,7 @@ static inline unsigned long cpath_get_trans(struct cpath const* cpath, unsigned 
 static inline void          cpath_set_invalid(struct cpath* cpath, unsigned row, unsigned state);
 static inline void          cpath_set_len(struct cpath* cpath, unsigned row, unsigned state, unsigned long len);
 static inline void          cpath_set_trans(struct cpath* cpath, unsigned row, unsigned state, unsigned long trans);
-void                        cpath_setup(struct cpath* path, uint32_t len);
+void                        cpath_setup(struct cpath* path, uint_fast32_t len);
 
 static inline uint8_t  __bits_len(struct cpath const* cpath, unsigned row, unsigned state);
 static inline uint64_t __bits_start(struct cpath const* cpath, unsigned row, unsigned state);

@@ -947,8 +947,8 @@ void test_hmm_viterbi_global_profile(void)
     cass_close(imm_hmm_loglikelihood(hmm, CCAB, path), 2 * imm_log(0.9));
     imm_path_destroy(path);
 
-    cass_close(single_viterbi(hmm, CCAB, imm_normal_state_super(I0), &path), imm_log(0.9f * 0.5f * 0.1));
-    cass_close(imm_hmm_loglikelihood(hmm, CCAB, path), imm_log(0.9f * 0.5f * 0.1));
+    cass_close(single_viterbi(hmm, CCAB, imm_normal_state_super(I0), &path), imm_log(0.9 * 0.5 * 0.1));
+    cass_close(imm_hmm_loglikelihood(hmm, CCAB, path), imm_log(0.9 * 0.5 * 0.1));
     imm_path_destroy(path);
 
     cass_close(single_viterbi(hmm, CCABB, imm_normal_state_super(I0), &path), imm_log(0.9) + 2 * (imm_log(0.05)));

@@ -20,7 +20,7 @@ struct imm_cartes* imm_cartes_create(char const* set, uint16_t set_size, uint16_
     cartes->set_size = set_size;
     cartes->times = 0;
     cartes->iter_idx = 0;
-    cartes->item = malloc(sizeof(*cartes->item) * (max_times + 1));
+    cartes->item = malloc(sizeof(*cartes->item) * (unsigned)(max_times + 1));
     cartes->nitems = 0;
 
     return cartes;

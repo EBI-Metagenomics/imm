@@ -35,7 +35,7 @@ int dp_trans_table_write(struct dp_trans_table const* trans, uint_fast16_t nstat
 
 static inline uint_fast16_t dp_trans_table_ntrans(struct dp_trans_table const* trans_tbl, uint_fast16_t tgt_state)
 {
-    return trans_tbl->offset[tgt_state + 1] - trans_tbl->offset[tgt_state];
+    return (uint_fast16_t)(trans_tbl->offset[tgt_state + 1] - trans_tbl->offset[tgt_state]);
 }
 
 static inline imm_float dp_trans_table_score(struct dp_trans_table const* trans_tbl, uint_fast16_t tgt_state,

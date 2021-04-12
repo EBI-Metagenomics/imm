@@ -156,7 +156,7 @@ static inline struct final_score best_trans_score(struct imm_dp const* dp, struc
                                                   uint_fast16_t tgt_state, uint_fast32_t row, uint16_t* best_trans,
                                                   uint8_t* best_len)
 {
-    imm_float     score = (imm_float)imm_lprob_zero();
+    imm_float     score = imm_lprob_zero();
     uint_fast16_t prev_state = INVALID_STATE;
     uint_fast8_t  prev_seq_len = INVALID_SEQ_LEN;
     *best_trans = UINT16_MAX;
@@ -182,8 +182,8 @@ static inline struct final_score best_trans_score(struct imm_dp const* dp, struc
                 score = v;
                 prev_state = src_state;
                 prev_seq_len = len;
-                *best_trans = i;
-                *best_len = len - min_seq;
+                *best_trans = (uint16_t)i;
+                *best_len = (uint8_t)(len - min_seq);
             }
         }
     }
@@ -217,7 +217,7 @@ static inline struct final_score best_trans_score_first_row(struct imm_dp const*
             score = v;
             prev_state = src_state;
             prev_seq_len = 0;
-            *best_trans = i;
+            *best_trans = (uint16_t)i;
             *best_len = 0;
         }
     }

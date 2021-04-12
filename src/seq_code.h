@@ -40,12 +40,12 @@ static inline uint_fast8_t seq_code_min_seq(struct seq_code const* seq_code) { r
 
 static inline uint_fast16_t seq_code_offset(struct seq_code const* seq_code, uint_fast8_t min_seq)
 {
-    return seq_code->offset[min_seq - seq_code->min_seq];
+    return (uint_fast16_t)(seq_code->offset[min_seq - seq_code->min_seq]);
 }
 
 static inline uint_fast16_t seq_code_size(struct seq_code const* seq_code, uint_fast8_t min_seq)
 {
-    return seq_code->size - seq_code->offset[min_seq - seq_code->min_seq];
+    return (uint_fast16_t)(seq_code->size - seq_code->offset[min_seq - seq_code->min_seq]);
 }
 
 #endif

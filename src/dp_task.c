@@ -23,7 +23,7 @@ void imm_dp_task_setup(struct imm_dp_task* task, struct imm_seq const* seq)
 {
     task->seq = seq;
     eseq_setup(task->eseq, seq);
-    cpath_setup(&task->cpath, imm_seq_length(seq) + 1);
+    cpath_setup(&task->cpath, (unsigned)(imm_seq_length(seq) + 1));
 }
 
 void imm_dp_task_destroy(struct imm_dp_task const* task)

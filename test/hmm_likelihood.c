@@ -40,7 +40,7 @@ void test_hmm_likelihood_single_state(void)
 
     struct imm_path* path = imm_path_create();
     imm_path_append(path, imm_step_create(imm_normal_state_super(state), 1));
-    cass_close(imm_hmm_loglikelihood(hmm, A, path), -1.3862943649);
+    cass_close(imm_hmm_loglikelihood(hmm, A, path), -1.3862943611);
     imm_path_destroy(path);
 
     path = imm_path_create();
@@ -74,14 +74,14 @@ void test_hmm_likelihood_single_state(void)
     path = imm_path_create();
     imm_path_append(path, imm_step_create(imm_normal_state_super(state), 1));
     imm_path_append(path, imm_step_create(imm_normal_state_super(state), 1));
-    cass_close(imm_hmm_loglikelihood(hmm, AA, path), -3.4657359123);
+    cass_close(imm_hmm_loglikelihood(hmm, AA, path), -3.4657359028);
     imm_path_destroy(path);
 
     cass_cond(imm_hmm_normalize(hmm) == 0);
     path = imm_path_create();
     imm_path_append(path, imm_step_create(imm_normal_state_super(state), 1));
     imm_path_append(path, imm_step_create(imm_normal_state_super(state), 1));
-    cass_close(imm_hmm_loglikelihood(hmm, AA, path), -2.7725887299);
+    cass_close(imm_hmm_loglikelihood(hmm, AA, path), -2.7725887222);
     imm_path_destroy(path);
 
     imm_hmm_destroy(hmm);
@@ -117,7 +117,7 @@ void test_hmm_likelihood_two_states(void)
 
     struct imm_path* path = imm_path_create();
     imm_path_append(path, imm_step_create(imm_normal_state_super(state0), 1));
-    cass_close(imm_hmm_loglikelihood(hmm, A, path), -1.3862943649);
+    cass_close(imm_hmm_loglikelihood(hmm, A, path), -1.3862943611);
     imm_path_destroy(path);
 
     path = imm_path_create();
@@ -134,13 +134,13 @@ void test_hmm_likelihood_two_states(void)
 
     path = imm_path_create();
     imm_path_append(path, imm_step_create(imm_normal_state_super(state0), 1));
-    cass_close(imm_hmm_loglikelihood(hmm, G, path), -0.6931471825);
+    cass_close(imm_hmm_loglikelihood(hmm, G, path), -0.6931471806);
     imm_path_destroy(path);
 
     path = imm_path_create();
     imm_path_append(path, imm_step_create(imm_normal_state_super(state0), 1));
     imm_path_append(path, imm_step_create(imm_normal_state_super(state1), 1));
-    cass_close(imm_hmm_loglikelihood(hmm, GT, path), -1.0986122899);
+    cass_close(imm_hmm_loglikelihood(hmm, GT, path), -1.0986122887);
     imm_path_destroy(path);
 
     imm_hmm_destroy(hmm);
