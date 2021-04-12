@@ -37,7 +37,7 @@ struct seq_code const* seq_code_create(struct imm_abc const* abc, uint_fast8_t m
 
     if (max_seq > 1) {
         for (unsigned len = (unsigned)(max_seq - 2); 1 <= len + 1; --len)
-            seq_code->stride[len] = seq_code->stride[len + 1] * imm_abc_length(abc);
+            seq_code->stride[len] = (uint16_t)(seq_code->stride[len + 1] * imm_abc_length(abc));
     }
 
     seq_code->offset = malloc(sizeof(*seq_code->offset) * offset_size(seq_code));
@@ -45,13 +45,13 @@ struct seq_code const* seq_code_create(struct imm_abc const* abc, uint_fast8_t m
     for (unsigned len = (unsigned)(min_seq + 1); len <= max_seq; ++len) {
 
         unsigned i = len - min_seq;
-        seq_code->offset[i] = seq_code->offset[i - 1] + seq_code->stride[max_seq - (len - 1) - 1];
+        seq_code->offset[i] = (uint16_t)(seq_code->offset[i - 1] + seq_code->stride[max_seq - (len - 1) - 1]);
     }
 
     unsigned long ncombs = ipow(imm_abc_length(abc), max_seq);
     BUG(ncombs > UINT16_MAX);
 
-    seq_code->size = seq_code->offset[max_seq - min_seq] + (uint16_t)ncombs;
+    seq_code->size = (uint16_t)(seq_code->offset[max_seq - min_seq] + (uint16_t)ncombs);
 
     return seq_code;
 }
@@ -64,7 +64,7 @@ uint_fast16_t seq_code_encode(struct seq_code const* seq_code, struct imm_seq co
 
         uint_fast8_t j = imm_abc_symbol_idx(seq_code->abc, imm_seq_string(seq)[i]);
         uint_fast8_t offset = (uint_fast8_t)(seq_code->max_seq - len);
-        code += seq_code->stride[i + offset] * j;
+        code += (uint_fast16_t)(seq_code->stride[i + offset] * j);
     }
 
     return code;

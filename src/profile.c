@@ -56,12 +56,12 @@ uint8_t imm_profile_nmodels(struct imm_profile const* prof) { return (uint8_t)im
 struct imm_profile const* imm_profile_read(FILE* stream)
 {
     struct imm_abc const* abc = imm_abc_read(stream);
+    struct imm_profile*   prof = NULL;
     if (!abc) {
         imm_error("could not read abc");
         goto err;
     }
-    struct imm_profile* prof =
-        __imm_profile_create(abc, (struct imm_profile_vtable){model_read_state, model_write_state}, NULL);
+    prof = __imm_profile_create(abc, (struct imm_profile_vtable){model_read_state, model_write_state}, NULL);
 
     if (__imm_profile_read_models(prof, stream))
         goto err;
@@ -69,7 +69,8 @@ struct imm_profile const* imm_profile_read(FILE* stream)
     return prof;
 
 err:
-    __imm_profile_deep_destroy(prof);
+    if (prof)
+        __imm_profile_deep_destroy(prof);
     return NULL;
 }
 
