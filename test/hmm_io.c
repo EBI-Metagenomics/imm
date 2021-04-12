@@ -1,6 +1,5 @@
 #include "cass/cass.h"
 #include "imm/imm.h"
-#include <stdlib.h>
 
 void test_hmm_write_io_two_states(void);
 void test_hmm_write_io_two_hmms(void);

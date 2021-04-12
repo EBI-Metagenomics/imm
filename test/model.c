@@ -1,4 +1,4 @@
-#include "model2.h"
+#include "model.h"
 
 static inline imm_float zero(void) { return imm_lprob_zero(); }
 
@@ -17,10 +17,10 @@ static inline char* fmt(char* restrict buffer, char const* name, int i)
     return buffer;
 }
 
-struct model2 create_model2(void)
+struct model create_model(void)
 {
-    int           ncore_nodes = 1000;
-    struct model2 m = {.hmm = NULL, .abc = NULL, .mute_states = imm_vecp_create(), .normal_states = imm_vecp_create()};
+    int          ncore_nodes = 1000;
+    struct model m = {.hmm = NULL, .abc = NULL, .mute_states = imm_vecp_create(), .normal_states = imm_vecp_create()};
 
     struct imm_abc const* abc = imm_abc_create("BMIEJ", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
@@ -102,7 +102,7 @@ struct model2 create_model2(void)
     return m;
 }
 
-void destroy_model2(struct model2 model)
+void destroy_model(struct model model)
 {
     for (size_t i = 0; i < imm_vecp_size(model.mute_states); ++i) {
         struct imm_mute_state const* s = imm_vecp_get(model.mute_states, i);
@@ -121,7 +121,7 @@ void destroy_model2(struct model2 model)
     imm_vecp_destroy(model.normal_states);
 }
 
-char const* get_model2_str(void)
+char const* get_model_str(void)
 {
     static char const str[] = "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
                               "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"

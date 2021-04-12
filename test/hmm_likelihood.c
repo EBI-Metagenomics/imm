@@ -1,6 +1,5 @@
 #include "cass/cass.h"
 #include "imm/imm.h"
-#include <stdlib.h>
 
 void test_hmm_likelihood_single_state(void);
 void test_hmm_likelihood_two_states(void);

@@ -1,6 +1,6 @@
 #include "cass/cass.h"
 #include "imm/imm.h"
-#include "model2.h"
+#include "model.h"
 
 void test_perf_viterbi(void);
 void test_perf_viterbi_output(void);
@@ -16,10 +16,10 @@ int main(void)
 
 void test_perf_viterbi(void)
 {
-    char const* str = get_model2_str();
+    char const* str = get_model_str();
     cass_cond(strlen(str) == 2000);
 
-    struct model2        model = create_model2();
+    struct model         model = create_model();
     struct imm_dp const* dp = imm_hmm_create_dp(model.hmm, imm_mute_state_super(model.end));
 
     struct imm_seq const* seq = imm_seq_create(str, model.abc);
@@ -35,13 +35,13 @@ void test_perf_viterbi(void)
     imm_result_destroy(r);
 
     imm_dp_destroy(dp);
-    destroy_model2(model);
+    destroy_model(model);
     imm_seq_destroy(seq);
 }
 
 void test_perf_viterbi_output(void)
 {
-    struct model2      model = create_model2();
+    struct model       model = create_model();
     struct imm_output* output = imm_output_create(TMPDIR "/perf.imm");
     cass_cond(output != NULL);
 
@@ -54,7 +54,7 @@ void test_perf_viterbi_output(void)
     cass_equal(imm_output_destroy(output), 0);
 
     imm_dp_destroy(dp);
-    destroy_model2(model);
+    destroy_model(model);
 }
 
 void test_perf_viterbi_input(void)
@@ -70,7 +70,7 @@ void test_perf_viterbi_input(void)
     struct imm_hmm const*   hmm = imm_model_hmm(model);
     struct imm_dp const*    dp = imm_model_dp(model);
 
-    char const* str = get_model2_str();
+    char const* str = get_model_str();
     cass_cond(strlen(str) == 2000);
 
     struct imm_seq const* seq = imm_seq_create(str, abc);
