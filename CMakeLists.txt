@@ -86,7 +86,8 @@ endif()
 option(CI_BUILD "CI, extra flags will be set" OFF)
 
 if(CI_BUILD)
-  message(STATUS "CI build enabled")
+    message(STATUS "CI build enabled")
+    add_compile_options(-Werror)
 endif()
 
 option(CLANG_ASAN_UBSAN "Enable Clang address & undefined behavior sanitizer for nvim binary." OFF)
