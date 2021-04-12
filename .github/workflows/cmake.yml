@@ -30,7 +30,7 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/build
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DIMM_DOUBLE_PRECISION=${{matrix.double_precision}}
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCI_BUILD=ON -DIMM_DOUBLE_PRECISION=${{matrix.double_precision}}
 
     - name: Build
       working-directory: ${{runner.workspace}}/build
