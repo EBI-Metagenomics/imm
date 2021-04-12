@@ -1,7 +1,7 @@
 #ifndef KHASH_PTR_H
 #define KHASH_PTR_H
 
-#include "lib/khash.h"
+#include "khash.h"
 #include <assert.h>
 #include <stdint.h>
 

@@ -372,7 +372,7 @@ static void viterbi_path(struct imm_dp const* dp, struct imm_dp_task const* task
             uint_fast16_t trans = (uint_fast16_t)cpath_get_trans(&task->cpath, row, state);
             uint_fast8_t  len = (uint_fast8_t)cpath_get_len(&task->cpath, row, state);
             state = dp_trans_table_source_state(dp->trans_table, state, trans);
-            seq_len = len + dp_state_table_min_seq(dp->state_table, state);
+            seq_len = (uint_fast8_t)(len + dp_state_table_min_seq(dp->state_table, state));
         }
     }
 }

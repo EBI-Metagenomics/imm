@@ -2,7 +2,7 @@
 #define IMM_KHASH_SEQ_H
 
 #include "imm/imm.h"
-#include "lib/khash.h"
+#include "khash.h"
 #include "util.h"
 
 static inline int     seq_hash_equal(struct imm_seq const* a, struct imm_seq const* b);
