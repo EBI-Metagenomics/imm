@@ -1,5 +1,4 @@
 #include "dp_state_table.h"
-#include "free.h"
 #include "imm/imm.h"
 #include "model_state.h"
 #include "state_idx.h"
@@ -39,10 +38,10 @@ struct dp_state_table const* dp_state_table_create(struct model_state const* con
 
 void dp_state_table_destroy(struct dp_state_table const* state_tbl)
 {
-    free_c(state_tbl->min_seq);
-    free_c(state_tbl->max_seq);
-    free_c(state_tbl->start_lprob);
-    free_c(state_tbl);
+    free(state_tbl->min_seq);
+    free(state_tbl->max_seq);
+    free(state_tbl->start_lprob);
+    free((void*)state_tbl);
 }
 
 void dp_state_table_dump(struct dp_state_table const* state_tbl)
@@ -99,16 +98,16 @@ struct dp_state_table* dp_state_table_read(FILE* stream)
     return table;
 
 err:
-    free_c(table);
+    free(table);
 
     if (chunk.min_seq)
-        free_c(chunk.min_seq);
+        free(chunk.min_seq);
 
     if (chunk.max_seq)
-        free_c(chunk.max_seq);
+        free(chunk.max_seq);
 
     if (chunk.start_lprob)
-        free_c(chunk.start_lprob);
+        free(chunk.start_lprob);
 
     return NULL;
 }

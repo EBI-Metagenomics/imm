@@ -1,11 +1,10 @@
 #include "eseq.h"
-#include "free.h"
 #include "imm/imm.h"
 
 void eseq_destroy(struct eseq const* eseq)
 {
     matrixu16_destroy(eseq->code);
-    free_c(eseq);
+    free((void*)eseq);
 }
 
 void eseq_setup(struct eseq* eseq, struct imm_seq const* seq)

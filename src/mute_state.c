@@ -1,4 +1,3 @@
-#include "free.h"
 #include "imm/imm.h"
 #include <stdlib.h>
 
@@ -59,7 +58,7 @@ int imm_mute_state_write(struct imm_state const* state, struct imm_profile const
 
 static void destroy(struct imm_state const* state)
 {
-    free_c(__imm_state_derived(state));
+    free((void*)__imm_state_derived(state));
     __imm_state_destroy(state);
 }
 

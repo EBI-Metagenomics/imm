@@ -1,16 +1,15 @@
 #include "profile.h"
-#include "bug.h"
 #include "dp.h"
 #include "dp_emission.h"
 #include "dp_state_table.h"
 #include "dp_trans_table.h"
-#include "free.h"
 #include "hmm.h"
 #include "imm/imm.h"
 #include "model.h"
 #include "model_state.h"
 #include "model_trans.h"
 #include "model_trans_table.h"
+#include "util.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -38,13 +37,13 @@ void imm_profile_destroy(struct imm_profile const* prof, bool deep)
     if (deep)
         imm_abc_destroy(imm_profile_abc(prof));
     imm_vecp_destroy(prof->models);
-    free_c(prof);
+    free((void*)prof);
 }
 
 void imm_profile_free(struct imm_profile const* prof)
 {
     imm_vecp_destroy(prof->models);
-    free_c(prof);
+    free((void*)prof);
 }
 
 struct imm_model* imm_profile_get_model(struct imm_profile const* prof, uint8_t i)
@@ -107,7 +106,7 @@ void __imm_profile_deep_destroy(struct imm_profile const* prof)
         model_deep_destroy(model);
     }
     imm_vecp_destroy(prof->models);
-    free_c(prof);
+    free((void*)prof);
 }
 void* __imm_profile_derived(struct imm_profile* prof) { return prof->derived; }
 

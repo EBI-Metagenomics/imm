@@ -1,17 +1,15 @@
 #include "hmm.h"
-#include "bug.h"
 #include "dp.h"
 #include "dp_state_table.h"
 #include "dp_trans_table.h"
-#include "free.h"
 #include "imm/imm.h"
-#include "minmax.h"
 #include "model_state.h"
 #include "model_state_sort.h"
 #include "model_state_table.h"
 #include "model_trans.h"
 #include "model_trans_table.h"
 #include "seq_code.h"
+#include "util.h"
 #include <stdlib.h>
 
 struct imm_hmm
@@ -56,7 +54,7 @@ struct imm_dp* imm_hmm_create_dp(struct imm_hmm const* hmm, struct imm_state con
 
     if (model_state_topological_sort(mstates, model_state_table_size(hmm->table))) {
         imm_error("could not sort mstates");
-        free_c(mstates);
+        free(mstates);
         return NULL;
     }
     uint16_t nstates = (uint16_t)model_state_table_size(hmm->table);
@@ -79,7 +77,7 @@ int imm_hmm_del_state(struct imm_hmm* hmm, struct imm_state const* state)
 void imm_hmm_destroy(struct imm_hmm const* hmm)
 {
     model_state_table_destroy(hmm->table);
-    free_c(hmm);
+    free((void*)hmm);
 }
 
 imm_float imm_hmm_get_start(struct imm_hmm const* hmm, struct imm_state const* state)
@@ -223,7 +221,7 @@ int imm_hmm_normalize_start(struct imm_hmm* hmm)
 
     if (imm_lprob_normalize(lprobs, size)) {
         imm_error("no starting state is possible");
-        free_c(lprobs);
+        free(lprobs);
         return 1;
     }
 
@@ -235,7 +233,7 @@ int imm_hmm_normalize_start(struct imm_hmm* hmm)
             ++lprob;
         }
     }
-    free_c(lprobs);
+    free(lprobs);
 
     return 0;
 }
@@ -354,7 +352,7 @@ static int normalize_transitions(struct model_state* mstate)
 
     if (imm_lprob_normalize(lprobs, size)) {
         imm_error("could not normalize transitions");
-        free_c(lprobs);
+        free(lprobs);
         return 1;
     }
 
@@ -366,7 +364,7 @@ static int normalize_transitions(struct model_state* mstate)
             ++lprob;
         }
     }
-    free_c(lprobs);
+    free(lprobs);
 
     return 0;
 }

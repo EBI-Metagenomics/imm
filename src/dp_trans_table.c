@@ -1,5 +1,4 @@
 #include "dp_trans_table.h"
-#include "free.h"
 #include "imm/imm.h"
 #include "list.h"
 #include "model_state.h"
@@ -83,7 +82,7 @@ struct dp_trans_table* dp_trans_table_create(struct model_state const* const* ms
         struct incoming_trans* it = NULL;
         struct incoming_trans* tmp = NULL;
         list_for_each_entry_safe (it, tmp, incoming_trans + i, list_entry)
-            free_c(it);
+            free(it);
     }
 
     return tbl;
@@ -91,10 +90,10 @@ struct dp_trans_table* dp_trans_table_create(struct model_state const* const* ms
 
 void dp_trans_table_destroy(struct dp_trans_table const* trans_tbl)
 {
-    free_c(trans_tbl->score);
-    free_c(trans_tbl->source_state);
-    free_c(trans_tbl->offset);
-    free_c(trans_tbl);
+    free(trans_tbl->score);
+    free(trans_tbl->source_state);
+    free(trans_tbl->offset);
+    free((void*)trans_tbl);
 }
 
 void dp_trans_table_dump(struct dp_trans_table const* trans_tbl)
@@ -163,15 +162,15 @@ struct dp_trans_table* dp_trans_table_read(FILE* stream)
 
 err:
     if (chunk.score)
-        free_c(chunk.score);
+        free(chunk.score);
 
     if (chunk.source_state)
-        free_c(chunk.source_state);
+        free(chunk.source_state);
 
     if (chunk.offset)
-        free_c(chunk.offset);
+        free(chunk.offset);
 
-    free_c(trans_tbl);
+    free(trans_tbl);
 
     return NULL;
 }

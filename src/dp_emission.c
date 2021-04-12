@@ -1,5 +1,4 @@
 #include "dp_emission.h"
-#include "free.h"
 #include "imm/imm.h"
 #include "model_state.h"
 #include "seq_code.h"
@@ -63,9 +62,9 @@ struct dp_emission const* dp_emission_create(struct seq_code const* seq_code, st
 
 void dp_emission_destroy(struct dp_emission const* emission)
 {
-    free_c(emission->score);
-    free_c(emission->offset);
-    free_c(emission);
+    free(emission->score);
+    free(emission->offset);
+    free((void*)emission);
 }
 
 void dp_emission_offsets_dump(struct dp_emission const* emission, uint_fast16_t nstates)
@@ -115,12 +114,12 @@ struct dp_emission const* dp_emission_read(FILE* stream)
 
 err:
     if (chunk.score)
-        free_c(chunk.score);
+        free(chunk.score);
 
     if (chunk.offset)
-        free_c(chunk.offset);
+        free(chunk.offset);
 
-    free_c(emission);
+    free(emission);
 
     return NULL;
 }

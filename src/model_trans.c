@@ -1,6 +1,6 @@
 #include "model_trans.h"
-#include "bug.h"
-#include "free.h"
+#include "util.h"
+#include <stdlib.h>
 
 struct model_trans
 {
@@ -19,7 +19,7 @@ struct model_trans* model_trans_create(struct imm_state const* state, imm_float 
 void model_trans_destroy(struct model_trans const* mtrans)
 {
     BUG(mtrans == NULL);
-    free_c(mtrans);
+    free((void*)mtrans);
 }
 
 imm_float model_trans_get_lprob(struct model_trans const* mtrans) { return mtrans->lprob; }

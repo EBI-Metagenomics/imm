@@ -1,12 +1,11 @@
 #include "model_state_sort.h"
-#include "bug.h"
-#include "free.h"
 #include "imm/imm.h"
 #include "khash_ptr.h"
 #include "list.h"
 #include "model_state.h"
 #include "model_trans.h"
 #include "model_trans_table.h"
+#include "util.h"
 
 #define INITIAL_MARK 0
 #define TEMPORARY_MARK 1
@@ -74,7 +73,7 @@ int model_state_topological_sort(struct model_state const** mstates, uint32_t ns
     for (uint32_t i = 0; i < nstates; ++i)
         mstates[i] = mstate_arr[i];
 
-    free_c(mstate_arr);
+    free(mstate_arr);
     return 0;
 }
 
@@ -131,7 +130,7 @@ static void create_edges(struct list_head* node_list, khash_t(node) * table)
             edge->node = kh_val(table, iter);
             list_add(&edge->list_entry, &node->edge_list);
         }
-        free_c(mtrans);
+        free(mtrans);
     }
 }
 
@@ -167,14 +166,14 @@ static void destroy_edges(struct list_head* edges)
     struct edge *edge = NULL, *tmp = NULL;
     list_for_each_entry_safe (edge, tmp, edges, list_entry) {
         list_del(&edge->list_entry);
-        free_c(edge);
+        free(edge);
     }
 }
 
 static void destroy_node(struct node* node)
 {
     destroy_edges(&node->edge_list);
-    free_c(node);
+    free(node);
 }
 
 static void destroy_node_list(struct list_head* node_list)

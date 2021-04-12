@@ -4,8 +4,7 @@
 #include "dp_matrix.h"
 #include "dp_trans_table.h"
 #include "imm/imm.h"
-#include "util/bits.h"
-#include "util/math.h"
+#include "util.h"
 #include <stdlib.h>
 
 struct imm_dp_task* imm_dp_task_create(struct imm_dp const* dp)
@@ -32,5 +31,5 @@ void imm_dp_task_destroy(struct imm_dp_task const* task)
     dp_matrix_destroy(task->matrix);
     eseq_destroy(task->eseq);
     cpath_deinit(&task->cpath);
-    free_c(task);
+    free((void*)task);
 }

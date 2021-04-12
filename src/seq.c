@@ -1,8 +1,6 @@
-#include "imm/seq.h"
-#include "free.h"
-#include "imm/abc.h"
-#include "imm/report.h"
+#include "imm/imm.h"
 #include <limits.h>
+#include <stdlib.h>
 #include <string.h>
 
 struct imm_seq const* imm_seq_clone(struct imm_seq const* seq)
@@ -38,6 +36,6 @@ struct imm_seq const* imm_seq_create(char const* string, struct imm_abc const* a
 
 void imm_seq_destroy(struct imm_seq const* seq)
 {
-    free_c(seq->string);
-    free_c(seq);
+    free((void*)seq->string);
+    free((void*)seq);
 }

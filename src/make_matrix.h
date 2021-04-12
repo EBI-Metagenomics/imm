@@ -1,7 +1,6 @@
 #ifndef MAKE_MATRIX_H
 #define MAKE_MATRIX_H
 
-#include "free.h"
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -60,8 +59,8 @@
         if (!matrix)                                                                                                   \
             return;                                                                                                    \
                                                                                                                        \
-        free_c(matrix->data);                                                                                          \
-        free_c(matrix);                                                                                                \
+        free(matrix->data);                                                                                            \
+        free((void*)matrix);                                                                                           \
     }
 
 #define MAKE_MATRIX_NROWS(NAME)                                                                                        \

@@ -1,7 +1,7 @@
-#include "free.h"
 #include "imm/imm.h"
 #include "list.h"
 #include "step.h"
+#include <stdlib.h>
 
 struct imm_path
 {
@@ -51,7 +51,7 @@ struct imm_step const* imm_path_first(struct imm_path const* path)
     return list_first_entry_or_null(&path->steps, struct imm_step, list_entry);
 }
 
-void imm_path_free(struct imm_path const* path) { free_c(path); }
+void imm_path_free(struct imm_path const* path) { free((void*)path); }
 
 struct imm_step const* imm_path_next(struct imm_path const* path, struct imm_step const* step)
 {

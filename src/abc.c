@@ -1,5 +1,5 @@
-#include "free.h"
 #include "imm/imm.h"
+#include <stdlib.h>
 #include <string.h>
 
 struct abc_chunk
@@ -48,13 +48,13 @@ struct imm_abc* imm_abc_read(FILE* stream)
     }
 
     struct imm_abc* abc = __imm_abc_create(chunk.symbols, chunk.any_symbol, NULL);
-    free_c(chunk.symbols);
+    free((void*)chunk.symbols);
 
     return abc;
 
 err:
     if (chunk.symbols)
-        free_c(chunk.symbols);
+        free((void*)chunk.symbols);
 
     return NULL;
 }
@@ -100,7 +100,7 @@ struct imm_abc* __imm_abc_create(char const* symbols, char any_symbol, void* der
 
     if (strlen(symbols) > IMM_SYMBOL_IDX_SIZE) {
         imm_error("alphabet size cannot be larger than %zu", IMM_SYMBOL_IDX_SIZE);
-        free_c(abc);
+        free(abc);
         return NULL;
     }
 
@@ -113,20 +113,20 @@ struct imm_abc* __imm_abc_create(char const* symbols, char any_symbol, void* der
     for (uint8_t i = 0; i < abc->length; ++i) {
         if (symbols[i] == any_symbol) {
             imm_error("any_symbol cannot be in the alphabet");
-            free_c(abc);
+            free(abc);
             return NULL;
         }
 
         if (symbols[i] < IMM_FIRST_CHAR || symbols[i] > IMM_LAST_CHAR) {
             imm_error("alphabet symbol is outside the range [%c, %c] ", IMM_FIRST_CHAR, IMM_LAST_CHAR);
-            free_c(abc);
+            free(abc);
             return NULL;
         }
 
         size_t j = __imm_abc_index(symbols[i]);
         if (abc->symbol_idx[j] != IMM_ABC_INVALID_IDX) {
             imm_error("alphabet cannot have duplicated symbols");
-            free_c(abc);
+            free(abc);
             return NULL;
         }
         abc->symbol_idx[j] = i;
@@ -141,8 +141,8 @@ struct imm_abc* __imm_abc_create(char const* symbols, char any_symbol, void* der
 
 void __imm_abc_destroy(struct imm_abc const* abc)
 {
-    free_c(abc->symbols);
-    free_c(abc);
+    free((void*)abc->symbols);
+    free((void*)abc);
 }
 
 uint8_t __imm_abc_type_id(struct imm_abc const* abc) { return IMM_ABC_TYPE_ID; }

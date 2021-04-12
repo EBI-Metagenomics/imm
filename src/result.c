@@ -1,5 +1,4 @@
 #include "result.h"
-#include "free.h"
 #include <stdlib.h>
 
 struct imm_result
@@ -21,10 +20,10 @@ struct imm_result* imm_result_create(struct imm_seq const* seq)
 void imm_result_destroy(struct imm_result const* result)
 {
     imm_path_destroy(result->path);
-    free_c(result);
+    free((void*)result);
 }
 
-void imm_result_free(struct imm_result const* result) { free_c(result); }
+void imm_result_free(struct imm_result const* result) { free((void*)result); }
 
 struct imm_path const* imm_result_path(struct imm_result const* result) { return result->path; }
 

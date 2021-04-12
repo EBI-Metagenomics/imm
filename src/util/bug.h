@@ -1,16 +1,13 @@
-#ifndef BUG_H
-#define BUG_H
+#ifndef UTIL_BUG_H
+#define UTIL_BUG_H
 
-#include <stdio.h>
-#include <stdlib.h>
+void util_bug_print_exit(char const* file, char const* func, int line, char const* cond);
 
 #define BUG(cond)                                                                                                      \
     do {                                                                                                               \
         if (!(cond))                                                                                                   \
             break;                                                                                                     \
-        fprintf(stderr, "BUG: %s: %s: %d: %s\n", __FILE__, __func__, __LINE__, #cond);                                 \
-        fflush(stderr);                                                                                                \
-        exit(1);                                                                                                       \
+        util_bug_print_exit(__FILE__, __func__, __LINE__, #cond);                                                      \
     } while (0)
 
 #endif

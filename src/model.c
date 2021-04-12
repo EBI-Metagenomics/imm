@@ -3,7 +3,6 @@
 #include "dp_emission.h"
 #include "dp_state_table.h"
 #include "dp_trans_table.h"
-#include "free.h"
 #include "hmm.h"
 #include "imm/imm.h"
 #include "model_state.h"
@@ -58,10 +57,10 @@ void model_deep_destroy(struct imm_model const* model)
         imm_hmm_destroy(model->hmm);
 
     if (model->mstates)
-        free_c(model->mstates);
+        free(model->mstates);
 
     if (model->states)
-        free_c(model->states);
+        free(model->states);
 
     if (model->seq_code)
         seq_code_destroy(model->seq_code);
@@ -88,8 +87,8 @@ void imm_model_destroy(struct imm_model const* model, bool deep)
             imm_state_destroy(imm_model_state(model, i));
         }
     }
-    free_c(model->states);
-    free_c(model);
+    free(model->states);
+    free((void*)model);
 }
 
 struct imm_model const* model_read(struct imm_profile* prof, FILE* stream)
@@ -294,7 +293,7 @@ err:
                 model_state_destroy(mstates[i]);
         }
 
-        free_c(mstates);
+        free(mstates);
     }
 
     return NULL;

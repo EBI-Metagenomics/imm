@@ -1,7 +1,7 @@
 #ifndef DP_STATE_TABLE_H
 #define DP_STATE_TABLE_H
 
-#include "imm/float.h"
+#include "imm/imm.h"
 #include <inttypes.h>
 #include <stdio.h>
 

@@ -1,12 +1,11 @@
 #include "model_state_table.h"
-#include "bug.h"
-#include "free.h"
 #include "imm/imm.h"
 #include "khash_ptr.h"
 #include "model_state.h"
 #include "model_state_sort.h"
 #include "model_trans.h"
 #include "model_trans_table.h"
+#include "util.h"
 
 KHASH_MAP_INIT_PTR(model_state, struct model_state*)
 
@@ -81,7 +80,7 @@ void model_state_table_destroy(struct model_state_table* table)
     }
 
     kh_destroy(model_state, table->ktable);
-    free_c(table);
+    free(table);
 }
 
 unsigned long model_state_table_end(struct model_state_table const* table) { return kh_end(table->ktable); }

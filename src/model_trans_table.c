@@ -1,9 +1,8 @@
 #include "model_trans_table.h"
-#include "bug.h"
-#include "free.h"
 #include "imm/imm.h"
 #include "khash_ptr.h"
 #include "model_trans.h"
+#include "util.h"
 
 KHASH_MAP_INIT_PTR(model_trans, struct model_trans*)
 
@@ -68,7 +67,7 @@ void model_trans_table_destroy(struct model_trans_table* table)
     }
 
     kh_destroy(model_trans, table->ktable);
-    free_c(table);
+    free(table);
 }
 
 unsigned long model_trans_table_end(struct model_trans_table const* table) { return kh_end(table->ktable); }

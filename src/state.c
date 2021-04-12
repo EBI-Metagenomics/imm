@@ -1,4 +1,3 @@
-#include "free.h"
 #include "imm/imm.h"
 #include <stdlib.h>
 #include <string.h>
@@ -36,8 +35,8 @@ void imm_state_destroy(struct imm_state const* state) { state->vtable.destroy(st
 
 void __imm_state_destroy(struct imm_state const* state)
 {
-    free_c(state->name);
-    free_c(state);
+    free((void*)state->name);
+    free((void*)state);
 }
 
 struct imm_state* __imm_state_read(FILE* stream, struct imm_abc const* abc)
@@ -52,7 +51,7 @@ struct imm_state* __imm_state_read(FILE* stream, struct imm_abc const* abc)
 
     if (fread(chunk.name, sizeof(*chunk.name), (size_t)(chunk.name_length + 1), stream) <
         (size_t)(chunk.name_length + 1)) {
-        free_c(chunk.name);
+        free(chunk.name);
         return NULL;
     }
 

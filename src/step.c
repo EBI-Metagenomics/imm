@@ -1,6 +1,6 @@
 #include "step.h"
-#include "free.h"
 #include "imm/imm.h"
+#include <stdlib.h>
 
 struct imm_step* imm_step_clone(struct imm_step const* step)
 {
@@ -22,7 +22,7 @@ struct imm_step* imm_step_create(struct imm_state const* state, uint8_t seq_len)
     return step;
 }
 
-void imm_step_destroy(struct imm_step const* step) { free_c(step); }
+void imm_step_destroy(struct imm_step const* step) { free((void*)step); }
 
 uint8_t imm_step_seq_len(struct imm_step const* step) { return step->seq_len; }
 

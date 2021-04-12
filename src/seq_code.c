@@ -1,10 +1,8 @@
 #include "seq_code.h"
-#include "bug.h"
 #include "eseq.h"
-#include "free.h"
 #include "imm/imm.h"
-#include "ipow.h"
 #include "matrix.h"
+#include "util.h"
 #include <limits.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -82,9 +80,9 @@ struct eseq* seq_code_create_eseq(struct seq_code const* seq_code)
 
 void seq_code_destroy(struct seq_code const* seq_code)
 {
-    free_c(seq_code->offset);
-    free_c(seq_code->stride);
-    free_c(seq_code);
+    free(seq_code->offset);
+    free(seq_code->stride);
+    free((void*)seq_code);
 }
 
 int seq_code_write(struct seq_code const* seq_code, FILE* stream)
@@ -173,12 +171,12 @@ struct seq_code const* seq_code_read(FILE* stream, struct imm_abc const* abc)
 
 err:
     if (chunk.offset)
-        free_c(chunk.offset);
+        free(chunk.offset);
 
     if (chunk.stride)
-        free_c(chunk.stride);
+        free(chunk.stride);
 
-    free_c(seq_code);
+    free(seq_code);
 
     return NULL;
 }

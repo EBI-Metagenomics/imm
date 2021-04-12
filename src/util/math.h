@@ -6,4 +6,6 @@
 
 #define DIV_ROUND_UP(n, d) (((n) + (d)-1) / (d))
 
+unsigned long ipow(unsigned long base, unsigned exp);
+
 #endif

@@ -1,8 +1,6 @@
-#include "bug.h"
-#include "free.h"
 #include "imm/imm.h"
 #include "khash_seq.h"
-#include "minmax.h"
+#include "util.h"
 
 struct emission
 {
@@ -89,12 +87,12 @@ void imm_seq_table_destroy(struct imm_seq_table const* table)
         if (kh_exist(emiss_tbl, i)) {
             struct emission const* e = kh_val(emiss_tbl, i);
             imm_seq_destroy(e->seq);
-            free_c(e);
+            free((void*)e);
         }
     }
 
     kh_destroy(emission, emiss_tbl);
-    free_c(table);
+    free((void*)table);
 }
 
 imm_float imm_seq_table_lprob(struct imm_seq_table const* table, struct imm_seq const* seq)
@@ -132,7 +130,7 @@ int imm_seq_table_normalize(struct imm_seq_table* table)
     }
 
     if (imm_lprob_normalize(lprobs, len)) {
-        free_c(lprobs);
+        free(lprobs);
         return 1;
     }
 
@@ -144,6 +142,6 @@ int imm_seq_table_normalize(struct imm_seq_table* table)
         }
     }
 
-    free_c(lprobs);
+    free(lprobs);
     return 0;
 }

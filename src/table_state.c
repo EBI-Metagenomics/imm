@@ -1,4 +1,3 @@
-#include "free.h"
 #include "imm/imm.h"
 #include <stdlib.h>
 
@@ -48,7 +47,7 @@ static void destroy(struct imm_state const* state)
 {
     struct imm_table_state const* s = __imm_state_derived(state);
     imm_seq_table_destroy(s->table);
-    free_c(s);
+    free((void*)s);
     __imm_state_destroy(state);
 }
 

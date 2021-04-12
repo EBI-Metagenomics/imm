@@ -1,7 +1,6 @@
-#ifndef IPOW_H
-#define IPOW_H
+#include "util/math.h"
 
-static inline unsigned long ipow(unsigned long base, unsigned exp)
+unsigned long ipow(unsigned long base, unsigned exp)
 {
     unsigned long result = 1;
 
@@ -14,5 +13,3 @@ static inline unsigned long ipow(unsigned long base, unsigned exp)
 
     return result;
 }
-
-#endif

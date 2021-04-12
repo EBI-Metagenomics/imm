@@ -1,7 +1,6 @@
-#include "bug.h"
-#include "free.h"
 #include "imm/imm.h"
-#include "ipow.h"
+#include "util.h"
+#include <stdlib.h>
 
 struct imm_cartes
 {
@@ -29,8 +28,8 @@ struct imm_cartes* imm_cartes_create(char const* set, uint16_t set_size, uint16_
 
 void imm_cartes_destroy(struct imm_cartes const* cartes)
 {
-    free_c(cartes->item);
-    free_c(cartes);
+    free((void*)cartes->item);
+    free((void*)cartes);
 }
 
 char const* imm_cartes_next(struct imm_cartes* cartes)

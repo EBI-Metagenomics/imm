@@ -1,4 +1,3 @@
-#include "free.h"
 #include "imm/imm.h"
 #include "profile.h"
 #include <stdlib.h>
@@ -51,8 +50,8 @@ struct imm_input* imm_input_create(char const* filepath)
 int imm_input_destroy(struct imm_input* input)
 {
     int errno = imm_input_close(input);
-    free_c(input->filepath);
-    free_c(input);
+    free((void*)input->filepath);
+    free(input);
     return errno;
 }
 

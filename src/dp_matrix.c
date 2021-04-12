@@ -26,6 +26,6 @@ struct dp_matrix* dp_matrix_create(struct dp_state_table const* states)
 void dp_matrix_destroy(struct dp_matrix const* matrix)
 {
     matrixf_destroy(matrix->score);
-    free_c(matrix->state_col);
-    free_c(matrix);
+    free((void*)matrix->state_col);
+    free((void*)matrix);
 }

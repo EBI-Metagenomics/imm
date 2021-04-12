@@ -1,4 +1,3 @@
-#include "free.h"
 #include "imm/imm.h"
 #include "profile.h"
 #include <stdbool.h>
@@ -54,8 +53,8 @@ struct imm_output* imm_output_create(char const* filepath)
 int imm_output_destroy(struct imm_output* output)
 {
     int errno = imm_output_close(output);
-    free_c(output->filepath);
-    free_c(output);
+    free((void*)output->filepath);
+    free(output);
     return errno;
 }
 

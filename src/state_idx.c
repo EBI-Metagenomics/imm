@@ -1,8 +1,7 @@
 #include "state_idx.h"
-#include "bug.h"
-#include "free.h"
 #include "imm/imm.h"
 #include "khash_ptr.h"
+#include "util.h"
 
 struct item
 {
@@ -42,11 +41,11 @@ void state_idx_destroy(struct state_idx* state_idx)
 {
     for (khiter_t i = kh_begin(state_idx->table); i < kh_end(state_idx->table); ++i) {
         if (kh_exist(state_idx->table, i))
-            free_c(kh_val(state_idx->table, i));
+            free(kh_val(state_idx->table, i));
     }
 
     kh_destroy(item, state_idx->table);
-    free_c(state_idx);
+    free(state_idx);
 }
 
 uint_fast16_t state_idx_find(struct state_idx const* state_idx, struct imm_state const* state)

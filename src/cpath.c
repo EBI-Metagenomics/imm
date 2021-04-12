@@ -20,10 +20,10 @@ void cpath_init(struct cpath* path, struct dp_state_table const* state_tbl, stru
             depth = (uint_fast8_t)MAX(max_seq - min_seq, depth);
         }
         path->bits_state[tgt + 1] = path->bits_state[tgt];
-        path->bits_trans[tgt] = (uint8_t)bits_needed(dp_trans_table_ntrans(trans_tbl, tgt));
+        path->bits_trans[tgt] = (uint8_t)bits_width(dp_trans_table_ntrans(trans_tbl, tgt));
         path->bits_state[tgt + 1] += path->bits_trans[tgt];
         /* Additional bit (if necessary) for invalid transition or seq_len */
-        path->bits_state[tgt + 1] += bits_needed(depth + 1);
+        path->bits_state[tgt + 1] += bits_width(depth + 1);
     }
     path->bitarr = NULL;
 }

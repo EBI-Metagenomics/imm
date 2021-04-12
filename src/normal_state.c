@@ -1,4 +1,3 @@
-#include "free.h"
 #include "imm/imm.h"
 #include <stdlib.h>
 #include <string.h>
@@ -67,7 +66,7 @@ struct imm_state const* imm_normal_state_read(FILE* stream, struct imm_abc const
 
     if (fread(chunk.lprobs, sizeof(*chunk.lprobs), chunk.lprobs_size, stream) < chunk.lprobs_size) {
         imm_error("could not read lprobs");
-        free_c(chunk.lprobs);
+        free(chunk.lprobs);
         imm_state_destroy(state);
         return NULL;
     }
@@ -111,8 +110,8 @@ int imm_normal_state_write(struct imm_state const* state, struct imm_profile con
 static void destroy(struct imm_state const* state)
 {
     struct imm_normal_state const* s = __imm_state_derived(state);
-    free_c(s->lprobs);
-    free_c(s);
+    free(s->lprobs);
+    free((void*)s);
     __imm_state_destroy(state);
 }
 

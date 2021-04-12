@@ -58,6 +58,8 @@ add_library(imm
     src/state_idx.c
     src/step.c
     src/table_state.c
+    src/util/bug.c
+    src/util/math.c
     src/vec.c
 )
 add_library(IMM::imm ALIAS imm)

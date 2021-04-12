@@ -1,6 +1,4 @@
 #include "dp.h"
-#include "bug.h"
-#include "compiler.h"
 #include "cpath.h"
 #include "dp_emission.h"
 #include "dp_matrix.h"
@@ -8,7 +6,6 @@
 #include "dp_task.h"
 #include "dp_trans_table.h"
 #include "elapsed/elapsed.h"
-#include "free.h"
 #include "imm/imm.h"
 #include "model.h"
 #include "model_state.h"
@@ -18,7 +15,7 @@
 #include "result.h"
 #include "seq_code.h"
 #include "state_idx.h"
-#include "util/math.h"
+#include "util.h"
 
 struct final_score
 {
@@ -50,13 +47,13 @@ static void _viterbi_safe(struct imm_dp const* dp, struct imm_dp_task* task, uin
 
 void imm_dp_destroy(struct imm_dp const* dp)
 {
-    free_c(dp->mstates);
+    free((void*)dp->mstates);
     seq_code_destroy(dp->seq_code);
     state_idx_destroy(dp->state_idx);
     dp_emission_destroy(dp->emission);
     dp_trans_table_destroy(dp->trans_table);
     dp_state_table_destroy(dp->state_table);
-    free_c(dp);
+    free((void*)dp);
 }
 
 struct imm_result const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_dp_task* task)
