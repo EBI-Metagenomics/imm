@@ -23,8 +23,8 @@ static inline khint_t seq_hash_func(struct imm_seq const* seq)
 {
     const char* s = imm_seq_string(seq);
     khint_t     h = (khint_t)'\0';
-    for (unsigned i = 0; i < imm_seq_length(seq); ++i) {
-        h = (h << 5) - h + (khint_t)*s;
+    for (uint_fast32_t i = 0; i < imm_seq_length(seq); ++i) {
+        h = (h << 5) - h + (uint8_t)*s;
         ++s;
     }
     return h;
