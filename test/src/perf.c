@@ -1,9 +1,6 @@
 #include "cass/cass.h"
-#include "helper.h"
 #include "imm/imm.h"
 #include "model2.h"
-#include <stdio.h>
-#include <stdlib.h>
 
 void test_perf_viterbi(void);
 void test_perf_viterbi_output(void);

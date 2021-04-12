@@ -1,9 +1,6 @@
 #include "cass/cass.h"
-#include "helper.h"
 #include "imm/imm.h"
 #include <stdlib.h>
-
-#define CLOSE(a, b) cass_close2(a, b, 1e-6, 0.0)
 
 void test_hmm_write_io_two_states(void);
 void test_hmm_write_io_two_hmms(void);
@@ -15,6 +12,8 @@ int main(void)
     return cass_status();
 }
 
+static inline imm_float zero(void) { return imm_lprob_zero(); }
+
 void test_hmm_write_io_two_states(void)
 {
     struct imm_abc const* abc = imm_abc_create("ACGT", '*');
@@ -23,13 +22,13 @@ void test_hmm_write_io_two_states(void)
 
     struct imm_mute_state const* state0 = imm_mute_state_create("state0", abc);
 
-    imm_float                      lprobs1[] = {imm_log(0.25f), imm_log(0.25f), imm_log(0.5), zero()};
+    imm_float                      lprobs1[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5), zero()};
     struct imm_normal_state const* state1 = imm_normal_state_create("state1", abc, lprobs1);
 
     imm_hmm_add_state(hmm, imm_mute_state_super(state0), imm_log(0.5));
-    imm_hmm_set_start(hmm, imm_mute_state_super(state0), imm_log(0.1f));
-    imm_hmm_add_state(hmm, imm_normal_state_super(state1), imm_log(0.001f));
-    imm_hmm_set_trans(hmm, imm_mute_state_super(state0), imm_normal_state_super(state1), imm_log(0.9f));
+    imm_hmm_set_start(hmm, imm_mute_state_super(state0), imm_log(0.1));
+    imm_hmm_add_state(hmm, imm_normal_state_super(state1), imm_log(0.001));
+    imm_hmm_set_trans(hmm, imm_mute_state_super(state0), imm_normal_state_super(state1), imm_log(0.9));
 
     struct imm_dp const* dp = imm_hmm_create_dp(hmm, imm_normal_state_super(state1));
 
@@ -40,8 +39,8 @@ void test_hmm_write_io_two_states(void)
     struct imm_path const* path = imm_result_path(r);
 
     imm_float score = imm_hmm_loglikelihood(hmm, C, imm_result_path(r));
-    CLOSE(score, imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
-    CLOSE(imm_hmm_loglikelihood(hmm, C, path), imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
+    cass_close(score, imm_log(0.25) + imm_log(0.1) + imm_log(0.9));
+    cass_close(imm_hmm_loglikelihood(hmm, C, path), imm_log(0.25) + imm_log(0.1) + imm_log(0.9));
     imm_result_destroy(r);
 
     struct imm_output* output = imm_output_create(TMPDIR "/two_states.imm");
@@ -87,8 +86,8 @@ void test_hmm_write_io_two_states(void)
     cass_cond(r != NULL);
     path = imm_result_path(r);
     score = imm_hmm_loglikelihood(hmm, C, imm_result_path(r));
-    CLOSE(score, imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
-    CLOSE(imm_hmm_loglikelihood(hmm, C, path), imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
+    cass_close(score, imm_log(0.25) + imm_log(0.1) + imm_log(0.9));
+    cass_close(imm_hmm_loglikelihood(hmm, C, path), imm_log(0.25) + imm_log(0.1) + imm_log(0.9));
     imm_result_destroy(r);
 
     for (uint16_t i = 0; i < imm_model_nstates(model); ++i) {
@@ -126,20 +125,20 @@ void test_hmm_write_io_two_hmms(void)
     struct imm_hmm*       hmm1 = imm_hmm_create(abc);
 
     struct imm_mute_state const*   hmm0_state0 = imm_mute_state_create("hmm0_state0", abc);
-    imm_float                      hmm0_lprobs[] = {imm_log(0.25f), imm_log(0.25f), imm_log(0.5), zero()};
+    imm_float                      hmm0_lprobs[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5), zero()};
     struct imm_normal_state const* hmm0_state1 = imm_normal_state_create("hmm0_state1", abc, hmm0_lprobs);
     imm_hmm_add_state(hmm0, imm_mute_state_super(hmm0_state0), imm_log(0.5));
-    imm_hmm_set_start(hmm0, imm_mute_state_super(hmm0_state0), imm_log(0.1f));
-    imm_hmm_add_state(hmm0, imm_normal_state_super(hmm0_state1), imm_log(0.001f));
-    imm_hmm_set_trans(hmm0, imm_mute_state_super(hmm0_state0), imm_normal_state_super(hmm0_state1), imm_log(0.9f));
+    imm_hmm_set_start(hmm0, imm_mute_state_super(hmm0_state0), imm_log(0.1));
+    imm_hmm_add_state(hmm0, imm_normal_state_super(hmm0_state1), imm_log(0.001));
+    imm_hmm_set_trans(hmm0, imm_mute_state_super(hmm0_state0), imm_normal_state_super(hmm0_state1), imm_log(0.9));
 
     struct imm_mute_state const*   hmm1_state0 = imm_mute_state_create("hmm1_state0", abc);
-    imm_float                      hmm1_lprobs[] = {imm_log(0.05f), imm_log(0.05f), imm_log(0.1), zero()};
+    imm_float                      hmm1_lprobs[] = {imm_log(0.05), imm_log(0.05), imm_log(0.1), zero()};
     struct imm_normal_state const* hmm1_state1 = imm_normal_state_create("hmm1_state1", abc, hmm1_lprobs);
     imm_hmm_add_state(hmm1, imm_mute_state_super(hmm1_state0), imm_log(0.5));
-    imm_hmm_set_start(hmm1, imm_mute_state_super(hmm1_state0), imm_log(0.1f));
-    imm_hmm_add_state(hmm1, imm_normal_state_super(hmm1_state1), imm_log(0.01f));
-    imm_hmm_set_trans(hmm1, imm_mute_state_super(hmm1_state0), imm_normal_state_super(hmm1_state1), imm_log(0.9f));
+    imm_hmm_set_start(hmm1, imm_mute_state_super(hmm1_state0), imm_log(0.1));
+    imm_hmm_add_state(hmm1, imm_normal_state_super(hmm1_state1), imm_log(0.01));
+    imm_hmm_set_trans(hmm1, imm_mute_state_super(hmm1_state0), imm_normal_state_super(hmm1_state1), imm_log(0.9));
 
     struct imm_dp const* dp0 = imm_hmm_create_dp(hmm0, imm_normal_state_super(hmm0_state1));
     struct imm_dp const* dp1 = imm_hmm_create_dp(hmm1, imm_normal_state_super(hmm1_state1));
@@ -150,8 +149,8 @@ void test_hmm_write_io_two_hmms(void)
     cass_cond(r != NULL);
     struct imm_path const* path = imm_result_path(r);
     imm_float              score = imm_hmm_loglikelihood(hmm0, C, path);
-    CLOSE(score, imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
-    CLOSE(imm_hmm_loglikelihood(hmm0, C, path), imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
+    cass_close(score, imm_log(0.25) + imm_log(0.1) + imm_log(0.9));
+    cass_close(imm_hmm_loglikelihood(hmm0, C, path), imm_log(0.25) + imm_log(0.1) + imm_log(0.9));
     imm_result_destroy(r);
 
     struct imm_dp_task* task1 = imm_dp_task_create(dp1);
@@ -160,8 +159,8 @@ void test_hmm_write_io_two_hmms(void)
     cass_cond(r != NULL);
     path = imm_result_path(r);
     score = imm_hmm_loglikelihood(hmm1, C, path);
-    CLOSE(score, imm_log(0.05f) + imm_log(0.1f) + imm_log(0.9f));
-    CLOSE(imm_hmm_loglikelihood(hmm1, C, path), imm_log(0.05f) + imm_log(0.1f) + imm_log(0.9f));
+    cass_close(score, imm_log(0.05) + imm_log(0.1) + imm_log(0.9));
+    cass_close(imm_hmm_loglikelihood(hmm1, C, path), imm_log(0.05) + imm_log(0.1) + imm_log(0.9));
     imm_result_destroy(r);
 
     struct imm_output* output = imm_output_create(TMPDIR "/two_hmms.imm");
@@ -215,8 +214,8 @@ void test_hmm_write_io_two_hmms(void)
     cass_cond(r != NULL);
     path = imm_result_path(r);
     score = imm_hmm_loglikelihood(hmm0, C, path);
-    CLOSE(score, imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
-    CLOSE(imm_hmm_loglikelihood(hmm0, C, path), imm_log(0.25f) + imm_log(0.1f) + imm_log(0.9f));
+    cass_close(score, imm_log(0.25) + imm_log(0.1) + imm_log(0.9));
+    cass_close(imm_hmm_loglikelihood(hmm0, C, path), imm_log(0.25) + imm_log(0.1) + imm_log(0.9));
     imm_result_destroy(r);
 
     for (uint16_t i = 0; i < imm_model_nstates(model0); ++i) {
@@ -238,8 +237,8 @@ void test_hmm_write_io_two_hmms(void)
     cass_cond(r != NULL);
     path = imm_result_path(r);
     score = imm_hmm_loglikelihood(hmm1, C, path);
-    CLOSE(score, imm_log(0.05f) + imm_log(0.1f) + imm_log(0.9f));
-    CLOSE(imm_hmm_loglikelihood(hmm1, C, path), imm_log(0.05f) + imm_log(0.1f) + imm_log(0.9f));
+    cass_close(score, imm_log(0.05) + imm_log(0.1) + imm_log(0.9));
+    cass_close(imm_hmm_loglikelihood(hmm1, C, path), imm_log(0.05) + imm_log(0.1) + imm_log(0.9));
     imm_result_destroy(r);
 
     for (uint16_t i = 0; i < imm_model_nstates(model1); ++i) {
