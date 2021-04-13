@@ -1,4 +1,5 @@
 #include "imm/imm.h"
+#include "log.h"
 #include <limits.h>
 
 // Avoid fseek()'s 2GiB barrier with MSVC, macOS, *BSD, MinGW
@@ -34,10 +35,10 @@ typedef long OFF_T;
 int imm_file_seek(FILE* stream, int64_t offset, int origin)
 {
     if (offset > OFF_T_MAX)
-        imm_error("fseek overflow");
+        error("fseek overflow");
 
     if (offset < OFF_T_MIN)
-        imm_error("fseek underflow");
+        error("fseek underflow");
 
     return LONG_SEEK(stream, offset, origin);
 }

@@ -1,5 +1,6 @@
 #include "imm/imm.h"
 #include "khash_seq.h"
+#include "log.h"
 #include "util.h"
 
 struct emission
@@ -23,7 +24,7 @@ struct imm_abc const* imm_seq_table_abc(struct imm_seq_table const* table) { ret
 int imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const* seq, imm_float lprob)
 {
     if (table->abc != imm_seq_get_abc(seq)) {
-        imm_error("alphabets must be the same");
+        error("alphabets must be the same");
         return 1;
     }
 
@@ -31,7 +32,7 @@ int imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const* seq, im
     khiter_t iter = kh_put(emission, table->emission_table, seq, &ret);
     BUG(ret == -1);
     if (ret == 0) {
-        imm_error("sequence already exist");
+        error("sequence already exist");
         return 1;
     }
 
@@ -98,7 +99,7 @@ void imm_seq_table_destroy(struct imm_seq_table const* table)
 imm_float imm_seq_table_lprob(struct imm_seq_table const* table, struct imm_seq const* seq)
 {
     if (table->abc != imm_seq_get_abc(seq)) {
-        imm_error("alphabets must be the same");
+        error("alphabets must be the same");
         return imm_lprob_invalid();
     }
 

@@ -1,6 +1,7 @@
 #include "seq_code.h"
 #include "eseq.h"
 #include "imm/imm.h"
+#include "log.h"
 #include "matrix.h"
 #include "util.h"
 #include <limits.h>
@@ -94,27 +95,27 @@ int seq_code_write(struct seq_code const* seq_code, FILE* stream)
                                    .size = seq_code->size};
 
     if (fwrite(&chunk.min_seq, sizeof(chunk.min_seq), 1, stream) < 1) {
-        imm_error("could not write min_seq");
+        error("could not write min_seq");
         return 1;
     }
 
     if (fwrite(&chunk.max_seq, sizeof(chunk.max_seq), 1, stream) < 1) {
-        imm_error("could not write max_seq");
+        error("could not write max_seq");
         return 1;
     }
 
     if (fwrite(chunk.offset, sizeof(*chunk.offset), offset_size(seq_code), stream) < offset_size(seq_code)) {
-        imm_error("could not write offset");
+        error("could not write offset");
         return 1;
     }
 
     if (fwrite(chunk.stride, sizeof(*chunk.stride), stride_size(seq_code), stream) < stride_size(seq_code)) {
-        imm_error("could not write stride");
+        error("could not write stride");
         return 1;
     }
 
     if (fwrite(&chunk.size, sizeof(chunk.size), 1, stream) < 1) {
-        imm_error("could not write size");
+        error("could not write size");
         return 1;
     }
 
@@ -132,12 +133,12 @@ struct seq_code const* seq_code_read(FILE* stream, struct imm_abc const* abc)
     seq_code->abc = abc;
 
     if (fread(&chunk.min_seq, sizeof(chunk.min_seq), 1, stream) < 1) {
-        imm_error("could not read min_seq");
+        error("could not read min_seq");
         goto err;
     }
 
     if (fread(&chunk.max_seq, sizeof(chunk.max_seq), 1, stream) < 1) {
-        imm_error("could not read max_seq");
+        error("could not read max_seq");
         goto err;
     }
 
@@ -147,19 +148,19 @@ struct seq_code const* seq_code_read(FILE* stream, struct imm_abc const* abc)
     chunk.offset = malloc(sizeof(*chunk.offset) * offset_size(seq_code));
 
     if (fread(chunk.offset, sizeof(*chunk.offset), offset_size(seq_code), stream) < offset_size(seq_code)) {
-        imm_error("could not read offset");
+        error("could not read offset");
         goto err;
     }
 
     chunk.stride = malloc(sizeof(*chunk.stride) * offset_size(seq_code));
 
     if (fread(chunk.stride, sizeof(*chunk.stride), stride_size(seq_code), stream) < stride_size(seq_code)) {
-        imm_error("could not read stride");
+        error("could not read stride");
         goto err;
     }
 
     if (fread(&chunk.size, sizeof(chunk.size), 1, stream) < 1) {
-        imm_error("could not read size");
+        error("could not read size");
         goto err;
     }
 

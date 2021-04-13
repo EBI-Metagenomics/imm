@@ -7,6 +7,7 @@
 #include "dp_trans_table.h"
 #include "elapsed/elapsed.h"
 #include "imm/imm.h"
+#include "log.h"
 #include "model.h"
 #include "model_state.h"
 #include "model_trans.h"
@@ -59,13 +60,13 @@ void imm_dp_destroy(struct imm_dp const* dp)
 struct imm_result const* imm_dp_viterbi(struct imm_dp const* dp, struct imm_dp_task* task)
 {
     if (seq_code_abc(dp->seq_code) != imm_seq_get_abc(task->seq)) {
-        imm_error("dp and seq must have the same alphabet");
+        error("dp and seq must have the same alphabet");
         return NULL;
     }
 
     struct imm_state const* end_state = model_state_get_state(dp->mstates[dp->state_table->end_state]);
     if (imm_seq_length(task->seq) < imm_state_min_seq(end_state)) {
-        imm_error("sequence is shorter than end_state's lower bound");
+        error("sequence is shorter than end_state's lower bound");
         return NULL;
     }
 
@@ -85,13 +86,13 @@ int imm_dp_change_trans(struct imm_dp* dp, struct imm_hmm* hmm, struct imm_state
                         struct imm_state const* tgt_state, imm_float lprob)
 {
     if (!imm_lprob_is_valid(lprob)) {
-        imm_error("invalid lprob");
+        error("invalid lprob");
         return 1;
     }
 
     imm_float prev = imm_hmm_get_trans(hmm, src_state, tgt_state);
     if (!imm_lprob_is_valid(prev)) {
-        imm_error("transition does not exist");
+        error("transition does not exist");
         return 1;
     }
     if (imm_lprob_is_zero(prev) && imm_lprob_is_zero(lprob))
@@ -101,7 +102,7 @@ int imm_dp_change_trans(struct imm_dp* dp, struct imm_hmm* hmm, struct imm_state
     uint_fast16_t tgt = state_idx_find(dp->state_idx, tgt_state);
 
     if (dp_trans_table_change(dp->trans_table, src, tgt, (imm_float)lprob)) {
-        imm_error("dp transition not found");
+        error("dp transition not found");
         return 1;
     }
 

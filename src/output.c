@@ -1,4 +1,5 @@
 #include "imm/imm.h"
+#include "log.h"
 #include "profile.h"
 #include <stdbool.h>
 #include <stdio.h>
@@ -21,12 +22,12 @@ int imm_output_close(struct imm_output* output)
     int     errno = 0;
 
     if (fwrite(&block_type, sizeof(block_type), 1, output->stream) < 1) {
-        imm_error("could not write block type");
+        error("could not write block type");
         errno = 1;
     }
 
     if (fclose(output->stream)) {
-        imm_error("failed to close file %s", output->filepath);
+        error("failed to close file %s", output->filepath);
         errno = 1;
     }
 
@@ -38,7 +39,7 @@ struct imm_output* imm_output_create(char const* filepath)
 {
     FILE* stream = fopen(filepath, "w");
     if (!stream) {
-        imm_error("could not open file %s for writing", filepath);
+        error("could not open file %s for writing", filepath);
         return NULL;
     }
 
@@ -63,12 +64,12 @@ int imm_output_write(struct imm_output* output, struct imm_profile const* prof)
     uint8_t block_type = IMM_IO_BLOCK_MODEL;
 
     if (fwrite(&block_type, sizeof(block_type), 1, output->stream) < 1) {
-        imm_error("could not write block type");
+        error("could not write block type");
         return 1;
     }
 
     if (imm_profile_write(prof, output->stream)) {
-        imm_error("could not write imm model");
+        error("could not write imm model");
         return 1;
     }
     return 0;

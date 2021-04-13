@@ -1,4 +1,5 @@
 #include "imm/imm.h"
+#include "log.h"
 #include <stdlib.h>
 
 struct imm_mute_state
@@ -25,7 +26,7 @@ struct imm_mute_state const* imm_mute_state_create(char const* name, struct imm_
 struct imm_mute_state const* imm_mute_state_derived(struct imm_state const* state)
 {
     if (imm_state_type_id(state) != IMM_MUTE_STATE_TYPE_ID) {
-        imm_error("could not cast to mute_state");
+        error("could not cast to mute_state");
         return NULL;
     }
     return __imm_state_derived(state);
@@ -37,7 +38,7 @@ struct imm_state const* imm_mute_state_read(FILE* stream, struct imm_abc const* 
 {
     struct imm_state* state = __imm_state_read(stream, abc);
     if (!state) {
-        imm_error("could not read normal state");
+        error("could not read normal state");
         return NULL;
     }
 

@@ -3,6 +3,7 @@
 #include "dp_state_table.h"
 #include "dp_trans_table.h"
 #include "imm/imm.h"
+#include "log.h"
 #include "model_state.h"
 #include "model_state_sort.h"
 #include "model_state_table.h"
@@ -25,7 +26,7 @@ int imm_hmm_add_state(struct imm_hmm* hmm, struct imm_state const* state, imm_fl
 {
     unsigned long i = model_state_table_find(hmm->table, state);
     if (i != model_state_table_end(hmm->table)) {
-        imm_error("state already exists");
+        error("state already exists");
         return 1;
     }
 
@@ -46,14 +47,14 @@ struct imm_dp* imm_hmm_create_dp(struct imm_hmm const* hmm, struct imm_state con
 {
     unsigned long end = model_state_table_find(hmm->table, end_state);
     if (end == model_state_table_end(hmm->table)) {
-        imm_error("end_state not found");
+        error("end_state not found");
         return NULL;
     }
 
     struct model_state const** mstates = model_state_table_array(hmm->table);
 
     if (model_state_topological_sort(mstates, model_state_table_size(hmm->table))) {
-        imm_error("could not sort mstates");
+        error("could not sort mstates");
         free(mstates);
         return NULL;
     }
@@ -66,7 +67,7 @@ int imm_hmm_del_state(struct imm_hmm* hmm, struct imm_state const* state)
 {
     unsigned long i = model_state_table_find(hmm->table, state);
     if (i == model_state_table_end(hmm->table)) {
-        imm_error("state not found");
+        error("state not found");
         return 1;
     }
 
@@ -84,7 +85,7 @@ imm_float imm_hmm_get_start(struct imm_hmm const* hmm, struct imm_state const* s
 {
     unsigned long i = model_state_table_find(hmm->table, state);
     if (i == model_state_table_end(hmm->table)) {
-        imm_error("state not found");
+        error("state not found");
         return imm_lprob_invalid();
     }
     return model_state_get_start(model_state_table_get(hmm->table, i));
@@ -95,13 +96,13 @@ imm_float imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* s
 {
     unsigned long src = model_state_table_find(hmm->table, src_state);
     if (src == model_state_table_end(hmm->table)) {
-        imm_error("source state not found");
+        error("source state not found");
         return imm_lprob_invalid();
     }
 
     unsigned long tgt = model_state_table_find(hmm->table, tgt_state);
     if (tgt == model_state_table_end(hmm->table)) {
-        imm_error("destination state not found");
+        error("destination state not found");
         return imm_lprob_invalid();
     }
 
@@ -117,13 +118,13 @@ imm_float imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* s
 imm_float imm_hmm_loglikelihood(struct imm_hmm const* hmm, struct imm_seq const* seq, struct imm_path const* path)
 {
     if (hmm->abc != imm_seq_get_abc(seq)) {
-        imm_error("hmm and seq must have the same alphabet");
+        error("hmm and seq must have the same alphabet");
         return imm_lprob_invalid();
     }
 
     struct imm_step const* step = imm_path_first(path);
     if (!step) {
-        imm_error("path must have steps");
+        error("path must have steps");
         return imm_lprob_invalid();
     }
 
@@ -155,7 +156,7 @@ imm_float imm_hmm_loglikelihood(struct imm_hmm const* hmm, struct imm_seq const*
         lprob += imm_state_lprob(state, &subseq);
 
         if (!imm_lprob_is_valid(lprob)) {
-            imm_error("unexpected invalid floating-point number");
+            error("unexpected invalid floating-point number");
             goto err;
         }
 
@@ -167,14 +168,14 @@ imm_float imm_hmm_loglikelihood(struct imm_hmm const* hmm, struct imm_seq const*
         step = imm_path_next(path, step);
     }
     if (remain > 0) {
-        imm_error("sequence is longer than symbols emitted by path");
+        error("sequence is longer than symbols emitted by path");
         goto err;
     }
 
     return lprob;
 
 length_mismatch:
-    imm_error("path emitted more symbols than sequence");
+    error("path emitted more symbols than sequence");
 
 err:
     return imm_lprob_invalid();
@@ -197,7 +198,7 @@ int imm_hmm_normalize(struct imm_hmm* hmm)
     return 0;
 
 err:
-    imm_error("failed to normalize the hmm");
+    error("failed to normalize the hmm");
     return 1;
 }
 
@@ -220,7 +221,7 @@ int imm_hmm_normalize_start(struct imm_hmm* hmm)
     }
 
     if (imm_lprob_normalize(lprobs, size)) {
-        imm_error("no starting state is possible");
+        error("no starting state is possible");
         free(lprobs);
         return 1;
     }
@@ -242,7 +243,7 @@ int imm_hmm_normalize_trans(struct imm_hmm* hmm, struct imm_state const* src_sta
 {
     unsigned long i = model_state_table_find(hmm->table, src_state);
     if (i == model_state_table_end(hmm->table)) {
-        imm_error("source state not found");
+        error("source state not found");
         return 1;
     }
     return normalize_transitions(model_state_table_get(hmm->table, i));
@@ -252,7 +253,7 @@ int imm_hmm_set_start(struct imm_hmm* hmm, struct imm_state const* state, imm_fl
 {
     unsigned long i = model_state_table_find(hmm->table, state);
     if (i == model_state_table_end(hmm->table)) {
-        imm_error("state not found");
+        error("state not found");
         return 1;
     }
 
@@ -265,18 +266,18 @@ int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state, st
 {
     unsigned long src = model_state_table_find(hmm->table, src_state);
     if (src == model_state_table_end(hmm->table)) {
-        imm_error("source state not found");
+        error("source state not found");
         return 1;
     }
 
     unsigned long tgt = model_state_table_find(hmm->table, tgt_state);
     if (tgt == model_state_table_end(hmm->table)) {
-        imm_error("destination state not found");
+        error("destination state not found");
         return 1;
     }
 
     if (!imm_lprob_is_valid(lprob)) {
-        imm_error("transition probability is invalid");
+        error("transition probability is invalid");
         return 1;
     }
 
@@ -325,7 +326,7 @@ static imm_float get_start_lprob(struct imm_hmm const* hmm, struct imm_state con
 {
     unsigned long i = model_state_table_find(hmm->table, state);
     if (i == model_state_table_end(hmm->table)) {
-        imm_error("state not found");
+        error("state not found");
         return imm_lprob_invalid();
     }
     return model_state_get_start(model_state_table_get(hmm->table, i));
@@ -351,7 +352,7 @@ static int normalize_transitions(struct model_state* mstate)
     }
 
     if (imm_lprob_normalize(lprobs, size)) {
-        imm_error("could not normalize transitions");
+        error("could not normalize transitions");
         free(lprobs);
         return 1;
     }

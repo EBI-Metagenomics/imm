@@ -38,6 +38,7 @@ add_library(imm
     src/file.c
     src/hmm.c
     src/input.c
+    src/log.c
     src/model.c
     src/model_state.c
     src/model_state_sort.c
@@ -49,7 +50,6 @@ add_library(imm
     src/output.c
     src/path.c
     src/profile.c
-    src/report.c
     src/result.c
     src/seq.c
     src/seq_code.c
@@ -134,9 +134,9 @@ check_c_source_compiles(
         static void f(char const* err, ...) __attribute__((format(printf, 1, 2)));
         int main(void) {return 0;}
     "
-    HAVE_ATTR_FORMAT
+    HAVE_ATTR_FMT
 )
-target_compile_definitions(imm PRIVATE $<$<BOOL:${HAVE_ATTR_FORMAT}>:HAVE_ATTR_FORMAT>)
+target_compile_definitions(imm PRIVATE $<$<BOOL:${HAVE_ATTR_FMT}>:HAVE_ATTR_FMT>)
 
 include(CheckTypeSize)
 check_type_size("intptr_t" SIZEOF_INTPTR_T)

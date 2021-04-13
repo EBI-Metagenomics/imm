@@ -1,4 +1,5 @@
 #include "imm/imm.h"
+#include "log.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -14,12 +15,12 @@ struct imm_state const* imm_state_create(char const* name, struct imm_abc const*
                                          void* derived)
 {
     if (imm_abc_length(abc) == 0) {
-        imm_error("empty alphabet");
+        error("empty alphabet");
         return NULL;
     }
 
     if (!ascii_is_std(name, strlen(name))) {
-        imm_error("name must be a string of non-extended ASCII characters");
+        error("name must be a string of non-extended ASCII characters");
         return NULL;
     }
 
@@ -70,13 +71,13 @@ int __imm_state_write(struct imm_state const* state, FILE* stream)
                                 .name = (char*)imm_state_get_name(state)};
 
     if (fwrite(&chunk.name_length, sizeof(chunk.name_length), 1, stream) < 1) {
-        imm_error("could not write name_length");
+        error("could not write name_length");
         return 1;
     }
 
     if (fwrite(chunk.name, sizeof(*chunk.name), (size_t)(chunk.name_length + 1), stream) <
         (size_t)(chunk.name_length + 1)) {
-        imm_error("could not write name");
+        error("could not write name");
         return 1;
     }
 

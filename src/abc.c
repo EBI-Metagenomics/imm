@@ -1,4 +1,5 @@
 #include "imm/imm.h"
+#include "log.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -25,7 +26,7 @@ struct imm_abc* imm_abc_read(FILE* stream)
     struct abc_chunk chunk = {.nsymbols = 0, .symbols = NULL, .any_symbol = '\0'};
 
     if (fread(&chunk.nsymbols, sizeof(chunk.nsymbols), 1, stream) < 1) {
-        imm_error("could not read nsymbols");
+        error("could not read nsymbols");
         goto err;
     }
 
@@ -33,17 +34,17 @@ struct imm_abc* imm_abc_read(FILE* stream)
 
     if (fread(chunk.symbols, sizeof(*chunk.symbols), (size_t)(chunk.nsymbols + 1), stream) <
         (size_t)(chunk.nsymbols + 1)) {
-        imm_error("could not read symbols");
+        error("could not read symbols");
         goto err;
     }
 
     if (chunk.symbols[chunk.nsymbols] != '\0') {
-        imm_error("missing null character");
+        error("missing null character");
         goto err;
     }
 
     if (fread(&chunk.any_symbol, sizeof(chunk.any_symbol), 1, stream) < 1) {
-        imm_error("could not read any_symbol");
+        error("could not read any_symbol");
         goto err;
     }
 
@@ -89,7 +90,7 @@ struct imm_abc const* __imm_abc_clone(struct imm_abc const* abc)
 struct imm_abc* __imm_abc_create(char const* symbols, char any_symbol, void* derived)
 {
     if (any_symbol < IMM_FIRST_CHAR || any_symbol > IMM_LAST_CHAR) {
-        imm_error("any_symbol is outside the range [%c, %c] ", IMM_FIRST_CHAR, IMM_LAST_CHAR);
+        error("any_symbol is outside the range [%c, %c] ", IMM_FIRST_CHAR, IMM_LAST_CHAR);
         return NULL;
     }
     struct imm_abc* abc = malloc(sizeof(struct imm_abc));
@@ -99,33 +100,33 @@ struct imm_abc* __imm_abc_create(char const* symbols, char any_symbol, void* der
         abc->symbol_idx[i] = IMM_ABC_INVALID_IDX;
 
     if (strlen(symbols) > IMM_SYMBOL_IDX_SIZE) {
-        imm_error("alphabet size cannot be larger than %zu", IMM_SYMBOL_IDX_SIZE);
+        error("alphabet size cannot be larger than %zu", IMM_SYMBOL_IDX_SIZE);
         free(abc);
         return NULL;
     }
 
     size_t len = strlen(symbols);
     if (len > UINT8_MAX) {
-        imm_error("symbols is too long");
+        error("symbols is too long");
         return NULL;
     }
     abc->length = (uint8_t)len;
     for (uint8_t i = 0; i < abc->length; ++i) {
         if (symbols[i] == any_symbol) {
-            imm_error("any_symbol cannot be in the alphabet");
+            error("any_symbol cannot be in the alphabet");
             free(abc);
             return NULL;
         }
 
         if (symbols[i] < IMM_FIRST_CHAR || symbols[i] > IMM_LAST_CHAR) {
-            imm_error("alphabet symbol is outside the range [%c, %c] ", IMM_FIRST_CHAR, IMM_LAST_CHAR);
+            error("alphabet symbol is outside the range [%c, %c] ", IMM_FIRST_CHAR, IMM_LAST_CHAR);
             free(abc);
             return NULL;
         }
 
         size_t j = __imm_abc_index(symbols[i]);
         if (abc->symbol_idx[j] != IMM_ABC_INVALID_IDX) {
-            imm_error("alphabet cannot have duplicated symbols");
+            error("alphabet cannot have duplicated symbols");
             free(abc);
             return NULL;
         }
@@ -153,18 +154,18 @@ int __imm_abc_write(struct imm_abc const* abc, FILE* stream)
         .nsymbols = (uint8_t)strlen(abc->symbols), .symbols = (char*)abc->symbols, .any_symbol = abc->any_symbol};
 
     if (fwrite(&chunk.nsymbols, sizeof(chunk.nsymbols), 1, stream) < 1) {
-        imm_error("could not write nsymbols");
+        error("could not write nsymbols");
         return 1;
     }
 
     if (fwrite(chunk.symbols, sizeof(*chunk.symbols), (size_t)(chunk.nsymbols + 1), stream) <
         (size_t)(chunk.nsymbols + 1)) {
-        imm_error("could not write symbols");
+        error("could not write symbols");
         return 1;
     }
 
     if (fwrite(&chunk.any_symbol, sizeof(chunk.any_symbol), 1, stream) < 1) {
-        imm_error("could not write any_symbol");
+        error("could not write any_symbol");
         return 1;
     }
 

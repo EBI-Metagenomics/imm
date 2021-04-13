@@ -1,4 +1,5 @@
 #include "imm/imm.h"
+#include "log.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -38,7 +39,7 @@ struct imm_normal_state const* imm_normal_state_create(char const* name, struct 
 struct imm_normal_state const* imm_normal_state_derived(struct imm_state const* state)
 {
     if (imm_state_type_id(state) != IMM_NORMAL_STATE_TYPE_ID) {
-        imm_error("could not cast to normal_state");
+        error("could not cast to normal_state");
         return NULL;
     }
     return __imm_state_derived(state);
@@ -50,14 +51,14 @@ struct imm_state const* imm_normal_state_read(FILE* stream, struct imm_abc const
 {
     struct imm_state* state = __imm_state_read(stream, abc);
     if (!state) {
-        imm_error("could not read normal state");
+        error("could not read normal state");
         return NULL;
     }
 
     struct normal_state_chunk chunk = {.lprobs_size = 0, .lprobs = NULL};
 
     if (fread(&chunk.lprobs_size, sizeof(chunk.lprobs_size), 1, stream) < 1) {
-        imm_error("could not read lprobs_size");
+        error("could not read lprobs_size");
         imm_state_destroy(state);
         return NULL;
     }
@@ -65,7 +66,7 @@ struct imm_state const* imm_normal_state_read(FILE* stream, struct imm_abc const
     chunk.lprobs = malloc(sizeof(*chunk.lprobs) * chunk.lprobs_size);
 
     if (fread(chunk.lprobs, sizeof(*chunk.lprobs), chunk.lprobs_size, stream) < chunk.lprobs_size) {
-        imm_error("could not read lprobs");
+        error("could not read lprobs");
         free(chunk.lprobs);
         imm_state_destroy(state);
         return NULL;
@@ -95,12 +96,12 @@ int imm_normal_state_write(struct imm_state const* state, struct imm_profile con
     };
 
     if (fwrite(&chunk.lprobs_size, sizeof(chunk.lprobs_size), 1, stream) < 1) {
-        imm_error("could not write lprobs_size");
+        error("could not write lprobs_size");
         return 1;
     }
 
     if (fwrite(chunk.lprobs, sizeof(*chunk.lprobs), chunk.lprobs_size, stream) < chunk.lprobs_size) {
-        imm_error("could not write lprobs");
+        error("could not write lprobs");
         return 1;
     }
 

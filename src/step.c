@@ -1,5 +1,6 @@
 #include "step.h"
 #include "imm/imm.h"
+#include "log.h"
 #include <stdlib.h>
 
 struct imm_step* imm_step_clone(struct imm_step const* step)
@@ -13,7 +14,7 @@ struct imm_step* imm_step_clone(struct imm_step const* step)
 struct imm_step* imm_step_create(struct imm_state const* state, uint8_t seq_len)
 {
     if (seq_len < imm_state_min_seq(state) || imm_state_max_seq(state) < seq_len) {
-        imm_error("seq_len outside the state's range");
+        error("seq_len outside the state's range");
         return NULL;
     }
     struct imm_step* step = malloc(sizeof(*step));

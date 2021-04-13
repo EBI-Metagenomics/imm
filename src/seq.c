@@ -1,4 +1,5 @@
 #include "imm/imm.h"
+#include "log.h"
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,13 +17,13 @@ struct imm_seq const* imm_seq_create(char const* string, struct imm_abc const* a
 {
     size_t length = strlen(string);
     if (length > IMM_SEQ_MAX_LEN) {
-        imm_error("sequence is too long");
+        error("sequence is too long");
         return NULL;
     }
 
     for (size_t i = 0; i < length; ++i) {
         if (!imm_abc_has_symbol(abc, string[i]) && string[i] != imm_abc_any_symbol(abc)) {
-            imm_error("symbol not found in the alphabet");
+            error("symbol not found in the alphabet");
             return NULL;
         }
     }

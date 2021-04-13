@@ -2,6 +2,7 @@
 #include "imm/imm.h"
 #include "khash_ptr.h"
 #include "list.h"
+#include "log.h"
 #include "model_state.h"
 #include "model_trans.h"
 #include "model_trans_table.h"
@@ -53,7 +54,7 @@ int model_state_topological_sort(struct model_state const** mstates, uint32_t ns
     create_nodes(mstates, nstates, &node_list, node_table);
 
     if (check_mute_cycles(&node_list)) {
-        imm_error("mute cycles are not allowed");
+        error("mute cycles are not allowed");
         destroy_node_list(&node_list);
         kh_destroy(node, node_table);
         return 1;

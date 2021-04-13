@@ -1,4 +1,5 @@
 #include "imm/imm.h"
+#include "log.h"
 #include "profile.h"
 #include <stdlib.h>
 #include <string.h>
@@ -22,7 +23,7 @@ int imm_input_close(struct imm_input* input)
     int errno = 0;
 
     if (fclose(input->stream)) {
-        imm_error("failed to close file %s", input->filepath);
+        error("failed to close file %s", input->filepath);
         errno = 1;
     }
 
@@ -34,7 +35,7 @@ struct imm_input* imm_input_create(char const* filepath)
 {
     FILE* stream = fopen(filepath, "r");
     if (!stream) {
-        imm_error("could not open file %s for reading", filepath);
+        error("could not open file %s for reading", filepath);
         return NULL;
     }
 
@@ -62,7 +63,7 @@ struct imm_profile const* imm_input_read(struct imm_input* input)
     uint8_t block_type = 0x00;
 
     if (fread(&block_type, sizeof(block_type), 1, input->stream) < 1) {
-        imm_error("could not read block type");
+        error("could not read block type");
         return NULL;
     }
 
@@ -77,13 +78,13 @@ static struct imm_profile const* read_profile(struct imm_input* input, uint8_t b
     }
 
     if (block_type != IMM_IO_BLOCK_MODEL) {
-        imm_error("unknown block type");
+        error("unknown block type");
         return NULL;
     }
 
     struct imm_profile const* prof = NULL;
     if (!(prof = imm_profile_read(input->stream))) {
-        imm_error("failed to read file %s", input->filepath);
+        error("failed to read file %s", input->filepath);
         return NULL;
     }
     return prof;

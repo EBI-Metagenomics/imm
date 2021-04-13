@@ -5,6 +5,7 @@
 #include "dp_trans_table.h"
 #include "hmm.h"
 #include "imm/imm.h"
+#include "log.h"
 #include "model.h"
 #include "model_state.h"
 #include "model_trans.h"
@@ -58,7 +59,7 @@ struct imm_profile const* imm_profile_read(FILE* stream)
     struct imm_abc const* abc = imm_abc_read(stream);
     struct imm_profile*   prof = NULL;
     if (!abc) {
-        imm_error("could not read abc");
+        error("could not read abc");
         goto err;
     }
     prof = __imm_profile_create(abc, (struct imm_profile_vtable){model_read_state, model_write_state}, NULL);
@@ -77,7 +78,7 @@ err:
 int imm_profile_write(struct imm_profile const* prof, FILE* stream)
 {
     if (write_abc(prof, stream)) {
-        imm_error("could not write abc");
+        error("could not write abc");
         return 1;
     }
 
@@ -117,7 +118,7 @@ int __imm_profile_read_models(struct imm_profile* prof, FILE* stream)
 {
     uint8_t nhmms = 0;
     if (fread(&nhmms, sizeof(nhmms), 1, stream) < 1) {
-        imm_error("could not read nhmms");
+        error("could not read nhmms");
         return 1;
     }
 
@@ -136,7 +137,7 @@ int __imm_profile_write_models(struct imm_profile const* prof, FILE* stream)
 {
     uint8_t nhmms = imm_profile_nmodels(prof);
     if (fwrite(&nhmms, sizeof(nhmms), 1, stream) < 1) {
-        imm_error("could not write nhmms");
+        error("could not write nhmms");
         return 1;
     }
 
@@ -153,7 +154,7 @@ int __imm_profile_write_models(struct imm_profile const* prof, FILE* stream)
 static int write_abc(struct imm_profile const* prof, FILE* stream)
 {
     if (imm_abc_write(prof->abc, stream)) {
-        imm_error("could not write abc");
+        error("could not write abc");
         return 1;
     }
 

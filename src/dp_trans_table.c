@@ -1,6 +1,7 @@
 #include "dp_trans_table.h"
 #include "imm/imm.h"
 #include "list.h"
+#include "log.h"
 #include "model_state.h"
 #include "model_trans.h"
 #include "model_trans_table.h"
@@ -122,14 +123,14 @@ struct dp_trans_table* dp_trans_table_read(FILE* stream)
     struct dp_trans_table* trans_tbl = malloc(sizeof(*trans_tbl));
 
     if (fread(&chunk.ntrans, sizeof(chunk.ntrans), 1, stream) < 1) {
-        imm_error("could not read ntransitions");
+        error("could not read ntransitions");
         goto err;
     }
 
     chunk.score = malloc(sizeof(*chunk.score) * score_size(chunk.ntrans));
 
     if (fread(chunk.score, sizeof(*chunk.score), score_size(chunk.ntrans), stream) < score_size(chunk.ntrans)) {
-        imm_error("could not read score");
+        error("could not read score");
         goto err;
     }
 
@@ -137,19 +138,19 @@ struct dp_trans_table* dp_trans_table_read(FILE* stream)
 
     if (fread(chunk.source_state, sizeof(*chunk.source_state), source_state_size(chunk.ntrans), stream) <
         source_state_size(chunk.ntrans)) {
-        imm_error("could not read source_state");
+        error("could not read source_state");
         goto err;
     }
 
     if (fread(&chunk.offset_size, sizeof(chunk.offset_size), 1, stream) < 1) {
-        imm_error("could not read offset_size");
+        error("could not read offset_size");
         goto err;
     }
 
     chunk.offset = malloc(sizeof(*chunk.offset) * chunk.offset_size);
 
     if (fread(chunk.offset, sizeof(*chunk.offset), chunk.offset_size, stream) < chunk.offset_size) {
-        imm_error("could not read offset");
+        error("could not read offset");
         goto err;
     }
 
@@ -184,28 +185,28 @@ int dp_trans_table_write(struct dp_trans_table const* trans, uint_fast16_t nstat
                                          .offset = trans->offset};
 
     if (fwrite(&chunk.ntrans, sizeof(chunk.ntrans), 1, stream) < 1) {
-        imm_error("could not write ntransitions");
+        error("could not write ntransitions");
         return 1;
     }
 
     if (fwrite(chunk.score, sizeof(*chunk.score), score_size(trans->ntrans), stream) < score_size(trans->ntrans)) {
-        imm_error("could not write score");
+        error("could not write score");
         return 1;
     }
 
     if (fwrite(chunk.source_state, sizeof(*chunk.source_state), source_state_size(trans->ntrans), stream) <
         source_state_size(trans->ntrans)) {
-        imm_error("could not write source_state");
+        error("could not write source_state");
         return 1;
     }
 
     if (fwrite(&chunk.offset_size, sizeof(chunk.offset_size), 1, stream) < 1) {
-        imm_error("could not write offset_size");
+        error("could not write offset_size");
         return 1;
     }
 
     if (fwrite(chunk.offset, sizeof(*chunk.offset), offset_size(nstates), stream) < offset_size(nstates)) {
-        imm_error("could not write offset");
+        error("could not write offset");
         return 1;
     }
 

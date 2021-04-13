@@ -1,4 +1,5 @@
 #include "imm/imm.h"
+#include "log.h"
 #include <stdlib.h>
 
 struct imm_table_state
@@ -27,7 +28,7 @@ struct imm_table_state const* imm_table_state_create(char const* name, struct im
 struct imm_table_state const* imm_table_state_derived(struct imm_state const* state)
 {
     if (imm_state_type_id(state) != IMM_TABLE_STATE_TYPE_ID) {
-        imm_error("could not cast to table_state");
+        error("could not cast to table_state");
         return NULL;
     }
     return __imm_state_derived(state);
@@ -37,7 +38,7 @@ void imm_table_state_destroy(struct imm_table_state const* state) { state->super
 
 struct imm_state const* imm_table_state_read(FILE* stream, struct imm_abc const* abc)
 {
-    imm_die("imm_table_state_read not implemented");
+    error("imm_table_state_read not implemented");
     return NULL;
 }
 
@@ -53,7 +54,7 @@ static void destroy(struct imm_state const* state)
 
 int imm_table_state_write(struct imm_state const* state, struct imm_profile const* prof, FILE* stream)
 {
-    imm_die("table_state write is not implemented yet");
+    error("table_state write is not implemented yet");
     return 0;
 }
 
