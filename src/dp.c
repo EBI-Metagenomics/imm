@@ -118,7 +118,7 @@ struct imm_dp* dp_create(struct imm_abc const* abc, struct model_state const** m
     dp->mstates = mstates;
     dp->seq_code = seq_code_create(abc, min_seq(mstates, nstates), max_seq(mstates, nstates));
 
-    dp->state_idx = state_idx_create();
+    dp->state_idx = state_idx_create(nstates);
     dp->state_table = dp_state_table_create(mstates, nstates, end_state, dp->state_idx);
     dp->emission = dp_emission_create(dp->seq_code, mstates, nstates);
     dp->trans_table = dp_trans_table_create(mstates, nstates, dp->state_idx);
@@ -136,9 +136,9 @@ void dp_create_from_model(struct imm_model* model)
     dp->trans_table = model->trans_table;
     dp->state_table = model->state_table;
 
-    dp->state_idx = state_idx_create();
+    dp->state_idx = state_idx_create(dp_state_table_nstates(dp->state_table));
     for (uint16_t i = 0; i < dp_state_table_nstates(dp->state_table); ++i)
-        state_idx_add(dp->state_idx, dp->mstates[i]->state, i);
+        state_idx_add(dp->state_idx, dp->mstates[i]->state);
 
     model->dp = dp;
 }

@@ -131,9 +131,9 @@ void test_hmm_write_io_two_hmms(void)
     imm_hmm_add_state(hmm0, imm_normal_state_super(hmm0_state1), imm_log(0.001));
     imm_hmm_set_trans(hmm0, imm_mute_state_super(hmm0_state0), imm_normal_state_super(hmm0_state1), imm_log(0.9));
 
-    struct imm_mute_state const*   hmm1_state0 = imm_mute_state_create(2, "hmm1_state0", abc);
+    struct imm_mute_state const*   hmm1_state0 = imm_mute_state_create(2, NULL, abc);
     imm_float                      hmm1_lprobs[] = {imm_log(0.05), imm_log(0.05), imm_log(0.1), zero()};
-    struct imm_normal_state const* hmm1_state1 = imm_normal_state_create(3, "hmm1_state1", abc, hmm1_lprobs);
+    struct imm_normal_state const* hmm1_state1 = imm_normal_state_create(3, "", abc, hmm1_lprobs);
     imm_hmm_add_state(hmm1, imm_mute_state_super(hmm1_state0), imm_log(0.5));
     imm_hmm_set_start(hmm1, imm_mute_state_super(hmm1_state0), imm_log(0.1));
     imm_hmm_add_state(hmm1, imm_normal_state_super(hmm1_state1), imm_log(0.01));
@@ -246,10 +246,10 @@ void test_hmm_write_io_two_hmms(void)
         struct imm_state const* state = imm_model_state(model1, i);
 
         if (imm_state_type_id(state) == IMM_MUTE_STATE_TYPE_ID) {
-            cass_cond(strcmp(imm_state_name(state), "hmm1_state0") == 0);
+            cass_cond(strcmp(imm_state_name(state), "unnamed") == 0);
             cass_equal(imm_state_id(state), 2);
         } else if (imm_state_type_id(state) == IMM_NORMAL_STATE_TYPE_ID) {
-            cass_cond(strcmp(imm_state_name(state), "hmm1_state1") == 0);
+            cass_cond(strcmp(imm_state_name(state), "unnamed") == 0);
             cass_equal(imm_state_id(state), 3);
         }
     }

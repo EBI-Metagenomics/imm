@@ -5,6 +5,8 @@ static void default_print(struct imm_log_event event);
 static imm_log_callback log_callback = default_print;
 enum imm_log_level      log_level = IMM_LOG_WARN;
 
+static char const* msg[] = {[IMM_SUCCESS] = "success", [IMM_FAILURE] = "failure", [IMM_OUTOFMEM] = "out of memory"};
+
 void imm_log_setup(imm_log_callback cb, enum imm_log_level level)
 {
     log_callback = cb;
@@ -27,3 +29,5 @@ static void default_print(struct imm_log_event event)
     vfprintf(stderr, event.fmt, event.va);
     fputc('\n', stderr);
 }
+
+char const* explain(enum imm_error_code ecode) { return msg[ecode]; }

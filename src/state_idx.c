@@ -13,16 +13,19 @@ KHASH_MAP_INIT_PTR(item, struct item*)
 
 struct state_idx
 {
+    struct item* items;
+    struct item* curr_item;
     khash_t(item) * table;
 };
 
-void state_idx_add(struct state_idx* state_idx, struct imm_state const* state, uint_fast16_t idx)
+void state_idx_add(struct state_idx* state_idx, struct imm_state const* state)
 {
     int      ret = 0;
     khiter_t iter = kh_put(item, state_idx->table, state, &ret);
     BUG(ret == -1 || ret == 0);
 
-    struct item* item = malloc(sizeof(*item));
+    uint16_t     idx = (uint16_t)(state_idx->curr_item - state_idx->items);
+    struct item* item = state_idx->curr_item++;
     item->state = state;
     item->idx = idx;
 
@@ -30,21 +33,19 @@ void state_idx_add(struct state_idx* state_idx, struct imm_state const* state, u
     kh_val(state_idx->table, iter) = item;
 }
 
-struct state_idx* state_idx_create(void)
+struct state_idx* state_idx_create(uint16_t size)
 {
     struct state_idx* state_idx = malloc(sizeof(*state_idx));
+    state_idx->items = malloc(sizeof(*state_idx->items) * size);
+    state_idx->curr_item = state_idx->items;
     state_idx->table = kh_init(item);
     return state_idx;
 }
 
 void state_idx_destroy(struct state_idx* state_idx)
 {
-    for (khiter_t i = kh_begin(state_idx->table); i < kh_end(state_idx->table); ++i) {
-        if (kh_exist(state_idx->table, i))
-            free(kh_val(state_idx->table, i));
-    }
-
     kh_destroy(item, state_idx->table);
+    free(state_idx->items);
     free(state_idx);
 }
 

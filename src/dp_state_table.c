@@ -26,7 +26,7 @@ struct dp_state_table const* dp_state_table_create(struct model_state const* con
     table->start_lprob = malloc(sizeof(*table->start_lprob) * nstates);
 
     for (uint_fast16_t i = 0; i < nstates; ++i) {
-        state_idx_add(state_idx, model_state_get_state(mstates[i]), i);
+        state_idx_add(state_idx, model_state_get_state(mstates[i]));
         table->min_seq[i] = imm_state_min_seq(model_state_get_state(mstates[i]));
         table->max_seq[i] = imm_state_max_seq(model_state_get_state(mstates[i]));
         table->start_lprob[i] = (imm_float)model_state_get_start(mstates[i]);
