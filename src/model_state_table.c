@@ -5,7 +5,7 @@
 #include "model_state_sort.h"
 #include "model_trans.h"
 #include "model_trans_table.h"
-#include "util.h"
+#include "std.h"
 
 KHASH_MAP_INIT_PTR(model_state, struct model_state*)
 

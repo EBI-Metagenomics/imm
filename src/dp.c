@@ -16,7 +16,7 @@
 #include "result.h"
 #include "seq_code.h"
 #include "state_idx.h"
-#include "util.h"
+#include "std.h"
 
 struct final_score
 {

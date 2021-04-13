@@ -6,7 +6,7 @@
 #include "model_state.h"
 #include "model_trans.h"
 #include "model_trans_table.h"
-#include "util.h"
+#include "std.h"
 
 #define INITIAL_MARK 0
 #define TEMPORARY_MARK 1

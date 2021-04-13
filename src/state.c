@@ -32,6 +32,15 @@ struct imm_state const* imm_state_create(char const* name, struct imm_abc const*
     return s;
 }
 
+imm_float imm_state_lprob(struct imm_state const* state, struct imm_seq const* seq)
+{
+    if (state->abc != imm_seq_get_abc(seq)) {
+        error("alphabets must be the same");
+        return imm_lprob_invalid();
+    }
+    return state->vtable.lprob(state, seq);
+}
+
 void imm_state_destroy(struct imm_state const* state) { state->vtable.destroy(state); }
 
 void __imm_state_destroy(struct imm_state const* state)

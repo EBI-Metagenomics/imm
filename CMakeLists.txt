@@ -39,6 +39,7 @@ add_library(imm
     src/hmm.c
     src/input.c
     src/log.c
+    src/lprob.c
     src/model.c
     src/model_state.c
     src/model_state_sort.c
@@ -56,10 +57,10 @@ add_library(imm
     src/seq_table.c
     src/state.c
     src/state_idx.c
+    src/std/bug.c
+    src/std/math.c
     src/step.c
     src/table_state.c
-    src/util/bug.c
-    src/util/math.c
     src/vec.c
 )
 add_library(IMM::imm ALIAS imm)

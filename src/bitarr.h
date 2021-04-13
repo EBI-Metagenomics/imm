@@ -1,7 +1,7 @@
 #ifndef BITARR_H
 #define BITARR_H
 
-#include "util.h"
+#include "std.h"
 #include <stdlib.h>
 
 #define BITARR_LONG_START(bit) (bit / (sizeof(long) * BITS_PER_BYTE))

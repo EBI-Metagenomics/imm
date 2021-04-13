@@ -1,4 +1,5 @@
 #include "imm/imm.h"
+#include "log.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -11,3 +12,13 @@ struct imm_abc_lprob const* imm_abc_lprob_create(struct imm_abc const* abc, imm_
 }
 
 void imm_abc_lprob_destroy(struct imm_abc_lprob const* abc_lprob) { free((void*)abc_lprob); }
+
+imm_float imm_abc_lprob_get(struct imm_abc_lprob const* abc_lprob, char symbol)
+{
+    uint8_t idx = imm_abc_symbol_idx(abc_lprob->abc, symbol);
+    if (idx == IMM_ABC_INVALID_IDX) {
+        error("symbol not found");
+        return imm_lprob_invalid();
+    }
+    return abc_lprob->lprobs[idx];
+}

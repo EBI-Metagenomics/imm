@@ -1,5 +1,5 @@
-#ifndef UTIL_MATH_H
-#define UTIL_MATH_H
+#ifndef STD_MATH_H
+#define STD_MATH_H
 
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 #define MAX(x, y) ((x) > (y) ? (x) : (y))

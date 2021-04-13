@@ -1,8 +1,8 @@
-#include "util/bug.h"
+#include "std/bug.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-void util_bug_print_exit(char const* file, char const* func, int line, char const* cond)
+void std_bug_print_exit(char const* file, char const* func, int line, char const* cond)
 {
     fprintf(stderr, "BUG: %s: %s: %d: %s\n", file, func, line, cond);
     fflush(stderr);

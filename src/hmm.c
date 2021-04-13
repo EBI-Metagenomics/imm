@@ -10,7 +10,7 @@
 #include "model_trans.h"
 #include "model_trans_table.h"
 #include "seq_code.h"
-#include "util.h"
+#include "std.h"
 #include <stdlib.h>
 
 struct imm_hmm

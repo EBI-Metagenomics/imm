@@ -1,8 +1,8 @@
-#ifndef UTIL_BITS_H
-#define UTIL_BITS_H
+#ifndef STD_BITS_H
+#define STD_BITS_H
 
-#include "util/const.h"
-#include "util/math.h"
+#include "std/const.h"
+#include "std/math.h"
 #include <stdbool.h>
 #include <stdint.h>
 

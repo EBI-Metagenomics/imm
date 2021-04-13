@@ -4,7 +4,6 @@
 #include "imm/export.h"
 #include "imm/float.h"
 #include "imm/lprob.h"
-#include "imm/report.h"
 #include "imm/seq.h"
 #include <inttypes.h>
 #include <stdio.h>
@@ -42,7 +41,7 @@ IMM_API struct imm_state const*     imm_state_create(char const* name, struct im
 IMM_API void                        imm_state_destroy(struct imm_state const* state);
 static inline struct imm_abc const* imm_state_get_abc(struct imm_state const* state) { return state->abc; }
 static inline char const*           imm_state_get_name(struct imm_state const* state) { return state->name; }
-static inline imm_float             imm_state_lprob(struct imm_state const* state, struct imm_seq const* seq);
+IMM_API imm_float                   imm_state_lprob(struct imm_state const* state, struct imm_seq const* seq);
 static inline uint8_t imm_state_max_seq(struct imm_state const* state) { return state->vtable.max_seq(state); }
 static inline uint8_t imm_state_min_seq(struct imm_state const* state) { return state->vtable.min_seq(state); }
 static inline uint8_t imm_state_type_id(struct imm_state const* state) { return state->vtable.type_id(state); }
@@ -51,14 +50,5 @@ static inline void const* __imm_state_derived(struct imm_state const* state) { r
 IMM_API void              __imm_state_destroy(struct imm_state const* state);
 IMM_API struct imm_state* __imm_state_read(FILE* stream, struct imm_abc const* abc);
 IMM_API int               __imm_state_write(struct imm_state const* state, FILE* stream);
-
-static inline imm_float imm_state_lprob(struct imm_state const* state, struct imm_seq const* seq)
-{
-    if (state->abc != imm_seq_get_abc(seq)) {
-        imm_error("alphabets must be the same");
-        return imm_lprob_invalid();
-    }
-    return state->vtable.lprob(state, seq);
-}
 
 #endif
