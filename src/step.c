@@ -1,11 +1,11 @@
 #include "step.h"
 #include "imm/imm.h"
-#include "log.h"
+#include "std.h"
 #include <stdlib.h>
 
 struct imm_step* imm_step_clone(struct imm_step const* step)
 {
-    struct imm_step* new_step = malloc(sizeof(struct imm_step));
+    struct imm_step* new_step = xmalloc(sizeof(struct imm_step));
     new_step->state = step->state;
     new_step->seq_len = step->seq_len;
     return new_step;
@@ -17,7 +17,7 @@ struct imm_step* imm_step_create(struct imm_state const* state, uint8_t seq_len)
         error("seq_len outside the state's range");
         return NULL;
     }
-    struct imm_step* step = malloc(sizeof(*step));
+    struct imm_step* step = xmalloc(sizeof(*step));
     step->state = state;
     step->seq_len = seq_len;
     return step;

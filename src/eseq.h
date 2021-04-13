@@ -13,7 +13,7 @@ struct eseq
 void                        eseq_destroy(struct eseq const* eseq);
 static inline uint_fast16_t eseq_get(struct eseq const* eseq, uint_fast32_t position, uint_fast32_t length);
 static inline uint_fast32_t eseq_length(struct eseq const* eseq);
-void                        eseq_setup(struct eseq* eseq, struct imm_seq const* seq);
+int                         eseq_setup(struct eseq* eseq, struct imm_seq const* seq);
 
 static inline uint_fast16_t eseq_get(struct eseq const* eseq, uint_fast32_t position, uint_fast32_t length)
 {

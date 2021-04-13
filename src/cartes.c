@@ -14,15 +14,18 @@ struct imm_cartes
 
 struct imm_cartes* imm_cartes_create(char const* set, uint16_t set_size, uint16_t max_times)
 {
-    struct imm_cartes* cartes = malloc(sizeof(*cartes));
-
+    struct imm_cartes* cartes = xmalloc(sizeof(*cartes));
     cartes->set = set;
     cartes->set_size = set_size;
     cartes->times = 0;
     cartes->iter_idx = 0;
     cartes->item = malloc(sizeof(*cartes->item) * (unsigned)(max_times + 1));
+    if (!cartes->item) {
+        error("%s", explain(IMM_OUTOFMEM));
+        free(cartes);
+        return NULL;
+    }
     cartes->nitems = 0;
-
     return cartes;
 }
 

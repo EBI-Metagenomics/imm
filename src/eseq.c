@@ -1,5 +1,6 @@
 #include "eseq.h"
 #include "imm/imm.h"
+#include "std.h"
 
 void eseq_destroy(struct eseq const* eseq)
 {
@@ -7,10 +8,14 @@ void eseq_destroy(struct eseq const* eseq)
     free((void*)eseq);
 }
 
-void eseq_setup(struct eseq* eseq, struct imm_seq const* seq)
+int eseq_setup(struct eseq* eseq, struct imm_seq const* seq)
 {
     uint_fast32_t ncols = matrixu16_ncols(eseq->code);
-    matrixu16_resize(eseq->code, imm_seq_length(seq) + 1, ncols);
+    int           err = matrixu16_resize(eseq->code, imm_seq_length(seq) + 1, ncols);
+    if (err) {
+        error("%s", explain(IMM_OUTOFMEM));
+        return err;
+    }
 
     for (uint_fast32_t i = 0; i <= imm_seq_length(seq); ++i) {
 
@@ -28,4 +33,5 @@ void eseq_setup(struct eseq* eseq, struct imm_seq const* seq)
             matrixu16_set(eseq->code, i, j, (uint16_t)code);
         }
     }
+    return IMM_SUCCESS;
 }

@@ -1,10 +1,7 @@
 #include "imm/imm.h"
-#include "log.h"
 #include "profile.h"
-#include <stdbool.h>
-#include <stdio.h>
+#include "std.h"
 #include <stdlib.h>
-#include <string.h>
 
 struct imm_output
 {
@@ -43,9 +40,9 @@ struct imm_output* imm_output_create(char const* filepath)
         return NULL;
     }
 
-    struct imm_output* output = malloc(sizeof(*output));
+    struct imm_output* output = xmalloc(sizeof(*output));
     output->stream = stream;
-    output->filepath = strdup(filepath);
+    output->filepath = xstrdup(filepath);
     output->closed = false;
 
     return output;

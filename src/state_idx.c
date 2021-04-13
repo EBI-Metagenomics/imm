@@ -1,6 +1,7 @@
 #include "state_idx.h"
 #include "imm/imm.h"
 #include "khash_ptr.h"
+#include "log.h"
 #include "std.h"
 
 struct item
@@ -35,8 +36,13 @@ void state_idx_add(struct state_idx* state_idx, struct imm_state const* state)
 
 struct state_idx* state_idx_create(uint16_t size)
 {
-    struct state_idx* state_idx = malloc(sizeof(*state_idx));
+    struct state_idx* state_idx = xmalloc(sizeof(*state_idx));
     state_idx->items = malloc(sizeof(*state_idx->items) * size);
+    if (!state_idx->items) {
+        free(state_idx);
+        error("%s", explain(IMM_OUTOFMEM));
+        return NULL;
+    }
     state_idx->curr_item = state_idx->items;
     state_idx->table = kh_init(item);
     return state_idx;

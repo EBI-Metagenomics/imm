@@ -6,6 +6,7 @@ enum imm_error_code
     IMM_SUCCESS = 0,
     IMM_FAILURE,
     IMM_OUTOFMEM,
+    IMM_ILLEGALARG,
 };
 
 #endif

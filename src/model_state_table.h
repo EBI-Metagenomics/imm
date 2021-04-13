@@ -17,7 +17,7 @@ unsigned long              model_state_table_end(struct model_state_table const*
 int                        model_state_table_exist(struct model_state_table const* table, unsigned long iter);
 unsigned long              model_state_table_find(struct model_state_table const* table, struct imm_state const* state);
 struct model_state*        model_state_table_get(struct model_state_table const* table, unsigned long iter);
-uint32_t                   model_state_table_size(struct model_state_table const* table);
+uint16_t                   model_state_table_size(struct model_state_table const* table);
 
 /** iterate over buckets */
 #define model_state_table_for_each(iter, tbl)                                                                          \

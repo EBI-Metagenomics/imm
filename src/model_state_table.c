@@ -25,8 +25,8 @@ void model_state_table_add(struct model_state_table* table, struct model_state* 
 
 struct model_state const** model_state_table_array(struct model_state_table const* table)
 {
-    uint32_t                   size = model_state_table_size(table);
-    struct model_state const** mstates = malloc(sizeof(*mstates) * size);
+    uint16_t                   size = model_state_table_size(table);
+    struct model_state const** mstates = xmalloc(sizeof(*mstates) * size);
 
     struct model_state const** mstate = mstates;
     unsigned long              i = 0;
@@ -45,7 +45,7 @@ unsigned long model_state_table_begin(struct model_state_table const* table) { r
 
 struct model_state_table* model_state_table_create(void)
 {
-    struct model_state_table* mstate_table = malloc(sizeof(*mstate_table));
+    struct model_state_table* mstate_table = xmalloc(sizeof(*mstate_table));
     mstate_table->ktable = kh_init(model_state);
     return mstate_table;
 }
@@ -100,4 +100,4 @@ struct model_state* model_state_table_get(struct model_state_table const* table,
     return kh_val(table->ktable, (khiter_t)iter);
 }
 
-uint32_t model_state_table_size(struct model_state_table const* table) { return (uint32_t)kh_size(table->ktable); }
+uint16_t model_state_table_size(struct model_state_table const* table) { return (uint16_t)kh_size(table->ktable); }

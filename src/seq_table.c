@@ -1,6 +1,5 @@
 #include "imm/imm.h"
 #include "khash_seq.h"
-#include "log.h"
 #include "std.h"
 
 struct emission
@@ -25,7 +24,7 @@ int imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const* seq, im
 {
     if (table->abc != imm_seq_get_abc(seq)) {
         error("alphabets must be the same");
-        return 1;
+        return IMM_ILLEGALARG;
     }
 
     int      ret = 0;
@@ -33,11 +32,16 @@ int imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const* seq, im
     BUG(ret == -1);
     if (ret == 0) {
         error("sequence already exist");
-        return 1;
+        return IMM_ILLEGALARG;
     }
 
-    struct emission* emiss = malloc(sizeof(*emiss));
-    emiss->seq = imm_seq_clone(seq);
+    struct emission* emiss = xmalloc(sizeof(*emiss));
+    if (!(emiss->seq = imm_seq_clone(seq))) {
+        error("%s", explain(IMM_OUTOFMEM));
+        kh_del(emission, table->emission_table, iter);
+        free(emiss);
+        return IMM_OUTOFMEM;
+    }
     emiss->lprob = lprob;
 
     kh_key(table->emission_table, iter) = emiss->seq;
@@ -48,12 +52,12 @@ int imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const* seq, im
     table->min_seq = (uint8_t)MIN(table->min_seq, len);
     table->max_seq = (uint8_t)MAX(table->max_seq, len);
 
-    return 0;
+    return IMM_SUCCESS;
 }
 
 struct imm_seq_table* imm_seq_table_clone(struct imm_seq_table const* table)
 {
-    struct imm_seq_table* new_table = malloc(sizeof(*new_table));
+    struct imm_seq_table* new_table = xmalloc(sizeof(*new_table));
     new_table->abc = table->abc;
     new_table->min_seq = table->min_seq;
     new_table->max_seq = table->max_seq;

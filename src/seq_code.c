@@ -4,9 +4,7 @@
 #include "log.h"
 #include "matrix.h"
 #include "std.h"
-#include <limits.h>
 #include <stdint.h>
-#include <stdlib.h>
 
 struct seq_code_chunk
 {
@@ -17,13 +15,13 @@ struct seq_code_chunk
     uint16_t  size;
 };
 
-static inline uint_fast8_t offset_size(struct seq_code const* seq_code);
-static inline uint_fast8_t stride_size(struct seq_code const* seq_code) { return seq_code->max_seq; }
+static inline uint8_t offset_size(struct seq_code const* seq_code);
+static inline uint8_t stride_size(struct seq_code const* seq_code) { return seq_code->max_seq; }
 
 struct seq_code const* seq_code_create(struct imm_abc const* abc, uint_fast8_t min_seq, uint_fast8_t max_seq)
 {
     BUG(min_seq > max_seq);
-    struct seq_code* seq_code = malloc(sizeof(*seq_code));
+    struct seq_code* seq_code = xmalloc(sizeof(*seq_code));
 
     seq_code->min_seq = min_seq;
     seq_code->max_seq = max_seq;
@@ -32,7 +30,7 @@ struct seq_code const* seq_code_create(struct imm_abc const* abc, uint_fast8_t m
     if (max_seq == 0)
         seq_code->stride = NULL;
     else {
-        seq_code->stride = malloc(sizeof(*seq_code->stride) * stride_size(seq_code));
+        seq_code->stride = xmalloc(sizeof(*seq_code->stride) * stride_size(seq_code));
         seq_code->stride[max_seq - 1] = 1;
     }
 
@@ -41,7 +39,7 @@ struct seq_code const* seq_code_create(struct imm_abc const* abc, uint_fast8_t m
             seq_code->stride[len] = (uint16_t)(seq_code->stride[len + 1] * imm_abc_length(abc));
     }
 
-    seq_code->offset = malloc(sizeof(*seq_code->offset) * offset_size(seq_code));
+    seq_code->offset = xmalloc(sizeof(*seq_code->offset) * offset_size(seq_code));
     seq_code->offset[0] = 0;
     for (unsigned len = (unsigned)(min_seq + 1); len <= max_seq; ++len) {
 
@@ -73,9 +71,14 @@ uint_fast16_t seq_code_encode(struct seq_code const* seq_code, struct imm_seq co
 
 struct eseq* seq_code_create_eseq(struct seq_code const* seq_code)
 {
-    struct eseq* eseq = malloc(sizeof(*eseq));
+    struct eseq* eseq = xmalloc(sizeof(*eseq));
     eseq->seq_code = seq_code;
     eseq->code = matrixu16_create(1, (uint_fast16_t)(seq_code->max_seq - seq_code->min_seq + 1));
+    if (!eseq->code) {
+        error("%s", explain(IMM_OUTOFMEM));
+        free(eseq);
+        return NULL;
+    }
     return eseq;
 }
 
@@ -126,7 +129,7 @@ struct seq_code const* seq_code_read(FILE* stream, struct imm_abc const* abc)
 {
     struct seq_code_chunk chunk = {.min_seq = 0, .max_seq = 0, .offset = NULL, .stride = NULL, .size = 0};
 
-    struct seq_code* seq_code = malloc(sizeof(*seq_code));
+    struct seq_code* seq_code = xmalloc(sizeof(*seq_code));
     seq_code->offset = NULL;
     seq_code->stride = NULL;
     seq_code->size = 0;
@@ -145,14 +148,14 @@ struct seq_code const* seq_code_read(FILE* stream, struct imm_abc const* abc)
     seq_code->min_seq = chunk.min_seq;
     seq_code->max_seq = chunk.max_seq;
 
-    chunk.offset = malloc(sizeof(*chunk.offset) * offset_size(seq_code));
+    chunk.offset = xmalloc(sizeof(*chunk.offset) * offset_size(seq_code));
 
     if (fread(chunk.offset, sizeof(*chunk.offset), offset_size(seq_code), stream) < offset_size(seq_code)) {
         error("could not read offset");
         goto err;
     }
 
-    chunk.stride = malloc(sizeof(*chunk.stride) * offset_size(seq_code));
+    chunk.stride = xmalloc(sizeof(*chunk.stride) * offset_size(seq_code));
 
     if (fread(chunk.stride, sizeof(*chunk.stride), stride_size(seq_code), stream) < stride_size(seq_code)) {
         error("could not read stride");
@@ -182,7 +185,7 @@ err:
     return NULL;
 }
 
-static inline uint_fast8_t offset_size(struct seq_code const* seq_code)
+static inline uint8_t offset_size(struct seq_code const* seq_code)
 {
-    return (uint_fast8_t)(seq_code->max_seq - seq_code->min_seq + 1);
+    return (uint8_t)(seq_code->max_seq - seq_code->min_seq + 1);
 }

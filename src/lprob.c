@@ -1,18 +1,18 @@
 #include "imm/imm.h"
-#include "log.h"
+#include "std.h"
 
 int imm_lprob_normalize(imm_float* arr, size_t len)
 {
     imm_float lnorm = imm_lprob_sum(arr, len);
     if (!isfinite(lnorm)) {
-        error("non-finite normalization denominator");
-        return 1;
+        error("%s: non-finite normalization denominator", explain(IMM_ILLEGALARG));
+        return IMM_ILLEGALARG;
     }
 
     for (size_t i = 0; i < len; ++i)
         arr[i] -= lnorm;
 
-    return 0;
+    return IMM_SUCCESS;
 }
 
 imm_float imm_lprob_sum(imm_float const* arr, size_t len)

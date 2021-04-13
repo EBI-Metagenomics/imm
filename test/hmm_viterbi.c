@@ -1055,8 +1055,10 @@ void test_hmm_viterbi_table_states(void)
     imm_hmm_add_state(hmm, imm_mute_state_super(E), zero());
     imm_hmm_add_state(hmm, imm_normal_state_super(Z), zero());
 
-    cass_cond(imm_hmm_set_trans(hmm, imm_mute_state_super(S), imm_table_state_super(T), imm_lprob_invalid()) == 1);
-    cass_cond(imm_hmm_set_trans(hmm, imm_mute_state_super(S), imm_table_state_super(T), imm_lprob_invalid()) == 1);
+    cass_cond(imm_hmm_set_trans(hmm, imm_mute_state_super(S), imm_table_state_super(T), imm_lprob_invalid()) ==
+              IMM_ILLEGALARG);
+    cass_cond(imm_hmm_set_trans(hmm, imm_mute_state_super(S), imm_table_state_super(T), imm_lprob_invalid()) ==
+              IMM_ILLEGALARG);
 
     imm_hmm_set_trans(hmm, imm_mute_state_super(S), imm_table_state_super(T), imm_log(1.0));
     imm_hmm_set_trans(hmm, imm_table_state_super(T), imm_mute_state_super(D), imm_log(0.1));

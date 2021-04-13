@@ -1,5 +1,5 @@
 #include "imm/imm.h"
-#include "log.h"
+#include "std.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -27,13 +27,9 @@ struct imm_state const* imm_state_create(uint16_t id, char const* name, struct i
         return NULL;
     }
 
-    struct imm_state* s = malloc(sizeof(*s));
-    if (!s) {
-        error("%s", explain(IMM_OUTOFMEM));
-        return NULL;
-    }
+    struct imm_state* s = xmalloc(sizeof(*s));
     s->id = id;
-    s->name = name && *name != '\0' ? strdup(name) : NULL;
+    s->name = name && *name != '\0' ? xstrdup(name) : NULL;
     s->abc = abc;
     s->vtable = vtable;
     s->derived = derived;
@@ -84,11 +80,7 @@ struct imm_state* __imm_state_read(FILE* stream, struct imm_abc const* abc)
         }
     }
 
-    struct imm_state* state = malloc(sizeof(*state));
-    if (!state) {
-        error("%s", explain(IMM_OUTOFMEM));
-        return NULL;
-    }
+    struct imm_state* state = xmalloc(sizeof(*state));
     state->id = chunk.id;
     state->name = chunk.name;
     state->abc = abc;

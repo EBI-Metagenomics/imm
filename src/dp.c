@@ -7,7 +7,6 @@
 #include "dp_trans_table.h"
 #include "elapsed/elapsed.h"
 #include "imm/imm.h"
-#include "log.h"
 #include "model.h"
 #include "model_state.h"
 #include "model_trans.h"
@@ -114,21 +113,55 @@ int imm_dp_change_trans(struct imm_dp* dp, struct imm_hmm* hmm, struct imm_state
 struct imm_dp* dp_create(struct imm_abc const* abc, struct model_state const** mstates, uint16_t nstates,
                          struct imm_state const* end_state)
 {
-    struct imm_dp* dp = malloc(sizeof(*dp));
+    struct imm_dp* dp = xmalloc(sizeof(*dp));
     dp->mstates = mstates;
     dp->seq_code = seq_code_create(abc, min_seq(mstates, nstates), max_seq(mstates, nstates));
+    BUG(!dp->seq_code);
+
+    dp->state_idx = NULL;
+    dp->state_table = NULL;
+    dp->emission = NULL;
+    dp->trans_table = NULL;
 
     dp->state_idx = state_idx_create(nstates);
+    if (!dp->state_idx)
+        goto err;
+
     dp->state_table = dp_state_table_create(mstates, nstates, end_state, dp->state_idx);
+    if (!dp->state_table)
+        goto err;
+
     dp->emission = dp_emission_create(dp->seq_code, mstates, nstates);
+    if (!dp->emission)
+        goto err;
+
     dp->trans_table = dp_trans_table_create(mstates, nstates, dp->state_idx);
+    if (!dp->trans_table)
+        goto err;
 
     return dp;
+
+err:
+    if (!dp->trans_table)
+        dp_trans_table_destroy(dp->trans_table);
+
+    if (!dp->emission)
+        dp_emission_destroy(dp->emission);
+
+    if (!dp->state_table)
+        dp_state_table_destroy(dp->state_table);
+
+    if (!dp->state_idx)
+        state_idx_destroy(dp->state_idx);
+
+    seq_code_destroy(dp->seq_code);
+    free(dp);
+    return NULL;
 }
 
 void dp_create_from_model(struct imm_model* model)
 {
-    struct imm_dp* dp = malloc(sizeof(*dp));
+    struct imm_dp* dp = xmalloc(sizeof(*dp));
 
     dp->mstates = (struct model_state const**)model->mstates;
     dp->seq_code = model->seq_code;
@@ -196,7 +229,7 @@ static inline struct final_score best_trans_score_first_row(struct imm_dp const*
                                                             uint_fast16_t tgt_state, uint16_t* best_trans,
                                                             uint8_t* best_len)
 {
-    imm_float     score = (imm_float)imm_lprob_zero();
+    imm_float     score = imm_lprob_zero();
     uint_fast16_t prev_state = INVALID_STATE;
     uint_fast8_t  prev_seq_len = INVALID_SEQ_LEN;
     *best_trans = UINT16_MAX;
@@ -228,7 +261,7 @@ static inline struct final_score best_trans_score_first_row(struct imm_dp const*
 
 static struct final_score final_score(struct imm_dp const* dp, struct imm_dp_task* task)
 {
-    imm_float     score = (imm_float)imm_lprob_zero();
+    imm_float     score = imm_lprob_zero();
     uint_fast16_t end_state = dp_state_table_end_state(dp->state_table);
 
     uint_fast16_t final_state = INVALID_STATE;

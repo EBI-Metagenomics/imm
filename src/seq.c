@@ -1,16 +1,21 @@
 #include "imm/imm.h"
-#include "log.h"
+#include "std.h"
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
 struct imm_seq const* imm_seq_clone(struct imm_seq const* seq)
 {
-    struct imm_seq* new_seq = malloc(sizeof(*new_seq));
-    new_seq->abc = seq->abc;
-    new_seq->string = strndup(seq->string, seq->length);
-    new_seq->length = seq->length;
-    return new_seq;
+    struct imm_seq* new = xmalloc(sizeof(*new));
+    new->abc = seq->abc;
+    new->string = strndup(seq->string, seq->length);
+    if (!new->string) {
+        error("%s", explain(IMM_OUTOFMEM));
+        free(new);
+        return NULL;
+    }
+    new->length = seq->length;
+    return new;
 }
 
 struct imm_seq const* imm_seq_create(char const* string, struct imm_abc const* abc)
@@ -28,9 +33,14 @@ struct imm_seq const* imm_seq_create(char const* string, struct imm_abc const* a
         }
     }
 
-    struct imm_seq* seq = malloc(sizeof(*seq));
+    struct imm_seq* seq = xmalloc(sizeof(*seq));
     seq->abc = abc;
     seq->string = strdup(string);
+    if (!seq->string) {
+        error("%s", explain(IMM_OUTOFMEM));
+        free(seq);
+        return NULL;
+    }
     seq->length = (uint32_t)length;
     return seq;
 }

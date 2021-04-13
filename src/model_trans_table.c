@@ -11,7 +11,7 @@ struct model_trans_table
     khash_t(model_trans) * ktable;
 };
 
-static void       model_trans_name_sort(struct model_trans const** model_trans, uint32_t ntrans);
+static void       model_trans_name_sort(struct model_trans const** model_trans, uint16_t ntrans);
 static inline int name_compare(void const* a, void const* b);
 
 void model_trans_table_add(struct model_trans_table* table, struct model_trans* mtrans)
@@ -25,8 +25,8 @@ void model_trans_table_add(struct model_trans_table* table, struct model_trans* 
 
 struct model_trans const** model_trans_table_array(struct model_trans_table const* table)
 {
-    uint32_t                   size = model_trans_table_size(table);
-    struct model_trans const** mtrans = malloc(sizeof(*mtrans) * size);
+    uint16_t                   size = (uint16_t)model_trans_table_size(table);
+    struct model_trans const** mtrans = xmalloc(sizeof(*mtrans) * size);
 
     struct model_trans const** t = mtrans;
     unsigned long              i = 0;
@@ -45,7 +45,7 @@ unsigned long model_trans_table_begin(struct model_trans_table const* table) { r
 
 struct model_trans_table* model_trans_table_create(void)
 {
-    struct model_trans_table* table = malloc(sizeof(*table));
+    struct model_trans_table* table = xmalloc(sizeof(*table));
     table->ktable = kh_init(model_trans);
     return table;
 }
@@ -87,14 +87,14 @@ struct model_trans* model_trans_table_get(struct model_trans_table const* table,
     return kh_val(table->ktable, (khiter_t)iter);
 }
 
-unsigned model_trans_table_size(struct model_trans_table const* table)
+uint16_t model_trans_table_size(struct model_trans_table const* table)
 {
     khint_t n = kh_size(table->ktable);
     BUG(n > UINT_MAX);
-    return (unsigned)n;
+    return (uint16_t)n;
 }
 
-static void model_trans_name_sort(struct model_trans const** mtrans, uint32_t ntrans)
+static void model_trans_name_sort(struct model_trans const** mtrans, uint16_t ntrans)
 {
     qsort(mtrans, ntrans, sizeof(*mtrans), name_compare);
 }

@@ -24,7 +24,7 @@ static inline uint_fast16_t cpath_get_trans(struct cpath const* cpath, uint_fast
 static inline void          cpath_set_invalid(struct cpath* cpath, uint_fast32_t row, uint_fast16_t state);
 static inline void cpath_set_len(struct cpath* cpath, uint_fast32_t row, uint_fast16_t state, uint_fast8_t len);
 static inline void cpath_set_trans(struct cpath* cpath, uint_fast32_t row, uint_fast16_t state, uint_fast16_t trans);
-void               cpath_setup(struct cpath* path, uint_fast32_t len);
+int                cpath_setup(struct cpath* path, uint_fast32_t len);
 
 static inline uint8_t       __bits_len(struct cpath const* cpath, uint_fast32_t row, uint_fast16_t state);
 static inline uint_fast64_t __bits_start(struct cpath const* cpath, uint_fast32_t row, uint_fast16_t state);

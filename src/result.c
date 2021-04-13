@@ -1,4 +1,5 @@
 #include "result.h"
+#include "std.h"
 #include <stdlib.h>
 
 struct imm_result
@@ -10,7 +11,7 @@ struct imm_result
 
 struct imm_result* imm_result_create(struct imm_seq const* seq)
 {
-    struct imm_result* result = malloc(sizeof(*result));
+    struct imm_result* result = xmalloc(sizeof(*result));
     result->seq = seq;
     result->path = NULL;
     result->seconds = 0.;

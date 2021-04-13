@@ -2,7 +2,7 @@
 #define SEQ_CODE_H
 
 #include "imm/export.h"
-#include <inttypes.h>
+#include <stdint.h>
 #include <stdio.h>
 
 struct eseq;

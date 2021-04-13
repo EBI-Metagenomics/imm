@@ -5,12 +5,12 @@
 #include "dp_trans_table.h"
 #include "hmm.h"
 #include "imm/imm.h"
-#include "log.h"
 #include "model_state.h"
 #include "model_trans.h"
 #include "model_trans_table.h"
 #include "profile.h"
 #include "seq_code.h"
+#include "std.h"
 #include <stdlib.h>
 
 static struct imm_model*    new_model(void);
@@ -32,6 +32,11 @@ struct imm_model* imm_model_create(struct imm_hmm* hmm, struct imm_dp const* dp)
 
     model->nstates = (uint16_t)dp_state_table_nstates(dp_get_state_table(dp));
     model->states = malloc(sizeof(*model->states) * model->nstates);
+    if (!model->states) {
+        error("%s", explain(IMM_OUTOFMEM));
+        model_deep_destroy(model);
+        return NULL;
+    }
     for (uint16_t i = 0; i < model->nstates; ++i)
         model->states[i] = model->mstates[i]->state;
 
@@ -57,11 +62,8 @@ void model_deep_destroy(struct imm_model const* model)
     if (model->hmm)
         imm_hmm_destroy(model->hmm);
 
-    if (model->mstates)
-        free(model->mstates);
-
-    if (model->states)
-        free(model->states);
+    free_if(model->mstates);
+    free_if(model->states);
 
     if (model->seq_code)
         seq_code_destroy(model->seq_code);
@@ -185,7 +187,7 @@ int model_write_state(struct imm_profile const* prof, FILE* stream, struct imm_s
 
 static struct imm_model* new_model(void)
 {
-    struct imm_model* model = malloc(sizeof(*model));
+    struct imm_model* model = xmalloc(sizeof(*model));
     model->hmm = NULL;
     model->mstates = NULL;
     model->nstates = 0;
@@ -235,6 +237,11 @@ static int read_hmm(struct imm_profile* prof, struct imm_model* model, FILE* str
     }
 
     model->states = malloc(sizeof(*model->states) * model->nstates);
+    if (!model->states) {
+        error("%s", explain(IMM_OUTOFMEM));
+        model_deep_destroy(model);
+        return IMM_OUTOFMEM;
+    }
 
     for (uint16_t i = 0; i < model->nstates; ++i) {
         model->states[i] = model->mstates[i]->state;
@@ -252,7 +259,7 @@ err:
     if (model->hmm)
         imm_hmm_destroy(model->hmm);
 
-    return 1;
+    return IMM_SUCCESS;
 }
 
 static struct model_state** read_mstates(struct imm_profile* prof, struct imm_model* model, FILE* stream)
@@ -265,6 +272,9 @@ static struct model_state** read_mstates(struct imm_profile* prof, struct imm_mo
     }
 
     mstates = malloc(sizeof(*mstates) * (model->nstates));
+    if (!mstates)
+        goto err;
+
     for (uint16_t i = 0; i < model->nstates; ++i)
         mstates[i] = NULL;
 

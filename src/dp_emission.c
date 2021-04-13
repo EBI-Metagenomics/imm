@@ -1,8 +1,8 @@
 #include "dp_emission.h"
 #include "imm/imm.h"
-#include "log.h"
 #include "model_state.h"
 #include "seq_code.h"
+#include "std.h"
 #include <stdlib.h>
 
 struct dp_emission_chunk
@@ -19,9 +19,14 @@ static inline uint_fast32_t score_size(struct dp_emission const* emission, uint_
 struct dp_emission const* dp_emission_create(struct seq_code const* seq_code, struct model_state const* const* mstates,
                                              uint_fast16_t nstates)
 {
-    struct dp_emission* emiss_tbl = malloc(sizeof(*emiss_tbl));
+    struct dp_emission* emiss_tbl = xmalloc(sizeof(*emiss_tbl));
 
     emiss_tbl->offset = malloc(sizeof(*emiss_tbl->offset) * offset_size(nstates));
+    if (!emiss_tbl->offset) {
+        error("%s", explain(IMM_OUTOFMEM));
+        free(emiss_tbl);
+        return NULL;
+    }
     emiss_tbl->offset[0] = 0;
 
     uint8_t       min = imm_state_min_seq(model_state_get_state(mstates[0]));
@@ -33,11 +38,23 @@ struct dp_emission const* dp_emission_create(struct seq_code const* seq_code, st
     emiss_tbl->offset[nstates] = (uint32_t)size;
 
     emiss_tbl->score = malloc(sizeof(*emiss_tbl->score) * score_size(emiss_tbl, nstates));
+    if (!emiss_tbl->score) {
+        error("%s", explain(IMM_OUTOFMEM));
+        free(emiss_tbl->offset);
+        free(emiss_tbl);
+        return NULL;
+    }
 
     struct imm_abc const* abc = seq_code_abc(seq_code);
     char const*           set = imm_abc_symbols(abc);
     uint_fast8_t          set_size = imm_abc_length(abc);
     struct imm_cartes*    cartes = imm_cartes_create(set, set_size, seq_code_max_seq(seq_code));
+    if (!cartes) {
+        free(emiss_tbl->score);
+        free(emiss_tbl->offset);
+        free(emiss_tbl);
+        return NULL;
+    }
 
     for (uint_fast16_t i = 0; i < nstates; ++i) {
 
@@ -80,7 +97,7 @@ struct dp_emission const* dp_emission_read(FILE* stream)
 {
     struct dp_emission_chunk chunk = {.score_size = 0, .score = NULL, .offset_size = 0, .offset = NULL};
 
-    struct dp_emission* emission = malloc(sizeof(*emission));
+    struct dp_emission* emission = xmalloc(sizeof(*emission));
     emission->offset = NULL;
     emission->score = NULL;
 
@@ -90,6 +107,11 @@ struct dp_emission const* dp_emission_read(FILE* stream)
     }
 
     chunk.score = malloc(sizeof(*chunk.score) * chunk.score_size);
+    if (!chunk.score) {
+        error("%s", explain(IMM_OUTOFMEM));
+        free(emission);
+        return NULL;
+    }
 
     if (fread(chunk.score, sizeof(*chunk.score), chunk.score_size, stream) < chunk.score_size) {
         error("could not read score");
@@ -102,6 +124,12 @@ struct dp_emission const* dp_emission_read(FILE* stream)
     }
 
     chunk.offset = malloc(sizeof(*chunk.offset) * chunk.offset_size);
+    if (!chunk.score) {
+        error("%s", explain(IMM_OUTOFMEM));
+        free(chunk.score);
+        free(emission);
+        return NULL;
+    }
 
     if (fread(chunk.offset, sizeof(*chunk.offset), chunk.offset_size, stream) < chunk.offset_size) {
         error("could not read offset");

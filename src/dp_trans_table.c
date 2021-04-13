@@ -1,11 +1,11 @@
 #include "dp_trans_table.h"
 #include "imm/imm.h"
 #include "list.h"
-#include "log.h"
 #include "model_state.h"
 #include "model_trans.h"
 #include "model_trans_table.h"
 #include "state_idx.h"
+#include "std.h"
 #include <stdlib.h>
 
 struct incoming_trans
@@ -24,6 +24,7 @@ struct dp_trans_table_chunk
     uint16_t*  offset;
 };
 
+/* TODO: try to avoid so many mallocs */
 static uint_fast16_t        create_incoming_transitions(struct list_head*                incoming_trans,
                                                         struct model_state const* const* mstates, uint_fast16_t nstates,
                                                         struct state_idx const* state_idx);
@@ -54,14 +55,26 @@ struct dp_trans_table* dp_trans_table_create(struct model_state const* const* ms
 
     uint_fast16_t ntrans = create_incoming_transitions(incoming_trans, mstates, nstates, state_idx);
 
-    struct dp_trans_table* tbl = malloc(sizeof(*tbl));
+    struct dp_trans_table* tbl = xmalloc(sizeof(*tbl));
     tbl->ntrans = (uint16_t)ntrans;
     tbl->offset = malloc(sizeof(*tbl->offset) * offset_size(nstates));
+    if (!tbl->offset) {
+        error("%s", explain(IMM_OUTOFMEM));
+        free(tbl);
+        return NULL;
+    }
     tbl->offset[0] = 0;
 
     if (ntrans > 0) {
         tbl->score = malloc(sizeof(*tbl->score) * score_size(ntrans));
         tbl->source_state = malloc(sizeof(*tbl->source_state) * source_state_size(ntrans));
+        if (!tbl->score || !tbl->source_state) {
+            error("%s", explain(IMM_OUTOFMEM));
+            free_if(tbl->score);
+            free_if(tbl->source_state);
+            free(tbl);
+            return NULL;
+        }
     } else {
         tbl->score = NULL;
         tbl->source_state = NULL;
@@ -120,7 +133,7 @@ struct dp_trans_table* dp_trans_table_read(FILE* stream)
     struct dp_trans_table_chunk chunk = {
         .ntrans = 0, .score = NULL, .source_state = NULL, .offset_size = 0, .offset = NULL};
 
-    struct dp_trans_table* trans_tbl = malloc(sizeof(*trans_tbl));
+    struct dp_trans_table* trans_tbl = xmalloc(sizeof(*trans_tbl));
 
     if (fread(&chunk.ntrans, sizeof(chunk.ntrans), 1, stream) < 1) {
         error("could not read ntransitions");
@@ -128,6 +141,10 @@ struct dp_trans_table* dp_trans_table_read(FILE* stream)
     }
 
     chunk.score = malloc(sizeof(*chunk.score) * score_size(chunk.ntrans));
+    if (!chunk.score) {
+        error("%s", explain(IMM_OUTOFMEM));
+        goto err;
+    }
 
     if (fread(chunk.score, sizeof(*chunk.score), score_size(chunk.ntrans), stream) < score_size(chunk.ntrans)) {
         error("could not read score");
@@ -135,6 +152,10 @@ struct dp_trans_table* dp_trans_table_read(FILE* stream)
     }
 
     chunk.source_state = malloc(sizeof(*chunk.source_state) * source_state_size(chunk.ntrans));
+    if (!chunk.source_state) {
+        error("%s", explain(IMM_OUTOFMEM));
+        goto err;
+    }
 
     if (fread(chunk.source_state, sizeof(*chunk.source_state), source_state_size(chunk.ntrans), stream) <
         source_state_size(chunk.ntrans)) {
@@ -148,6 +169,10 @@ struct dp_trans_table* dp_trans_table_read(FILE* stream)
     }
 
     chunk.offset = malloc(sizeof(*chunk.offset) * chunk.offset_size);
+    if (!chunk.offset) {
+        error("%s", explain(IMM_OUTOFMEM));
+        goto err;
+    }
 
     if (fread(chunk.offset, sizeof(*chunk.offset), chunk.offset_size, stream) < chunk.offset_size) {
         error("could not read offset");
@@ -162,17 +187,10 @@ struct dp_trans_table* dp_trans_table_read(FILE* stream)
     return trans_tbl;
 
 err:
-    if (chunk.score)
-        free(chunk.score);
-
-    if (chunk.source_state)
-        free(chunk.source_state);
-
-    if (chunk.offset)
-        free(chunk.offset);
-
+    free_if(chunk.score);
+    free_if(chunk.source_state);
+    free_if(chunk.offset);
     free(trans_tbl);
-
     return NULL;
 }
 
@@ -235,7 +253,7 @@ static uint_fast16_t create_incoming_transitions(struct list_head*              
             struct imm_state const* dst_state = model_trans_get_state(mtrans);
             uint_fast16_t           dst = state_idx_find(state_idx, dst_state);
 
-            struct incoming_trans* it = malloc(sizeof(*it));
+            struct incoming_trans* it = xmalloc(sizeof(*it));
             it->score = lprob;
             it->source_state = (uint16_t)src;
             list_add_tail(&it->list_entry, incoming_trans + dst);

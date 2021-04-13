@@ -10,17 +10,13 @@ struct model_trans
 
 struct model_trans* model_trans_create(struct imm_state const* state, imm_float lprob)
 {
-    struct model_trans* mtrans = malloc(sizeof(*mtrans));
+    struct model_trans* mtrans = xmalloc(sizeof(*mtrans));
     mtrans->state = state;
     mtrans->lprob = lprob;
     return mtrans;
 }
 
-void model_trans_destroy(struct model_trans const* mtrans)
-{
-    BUG(mtrans == NULL);
-    free((void*)mtrans);
-}
+void model_trans_destroy(struct model_trans const* mtrans) { free((void*)mtrans); }
 
 imm_float model_trans_get_lprob(struct model_trans const* mtrans) { return mtrans->lprob; }
 

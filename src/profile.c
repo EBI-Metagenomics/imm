@@ -5,7 +5,6 @@
 #include "dp_trans_table.h"
 #include "hmm.h"
 #include "imm/imm.h"
-#include "log.h"
 #include "model.h"
 #include "model_state.h"
 #include "model_trans.h"
@@ -90,7 +89,7 @@ int imm_profile_write(struct imm_profile const* prof, FILE* stream)
 
 struct imm_profile* __imm_profile_create(struct imm_abc const* abc, struct imm_profile_vtable vtable, void* derived)
 {
-    struct imm_profile* prof = malloc(sizeof(*prof));
+    struct imm_profile* prof = xmalloc(sizeof(*prof));
     prof->abc = abc;
     prof->models = imm_vecp_create();
     prof->vtable = vtable;

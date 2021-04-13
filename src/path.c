@@ -1,5 +1,6 @@
 #include "imm/imm.h"
 #include "list.h"
+#include "std.h"
 #include "step.h"
 #include <stdlib.h>
 
@@ -12,7 +13,7 @@ void imm_path_append(struct imm_path* path, struct imm_step* step) { list_add_ta
 
 struct imm_path* imm_path_clone(struct imm_path const* path)
 {
-    struct imm_path* new_path = malloc(sizeof(*new_path));
+    struct imm_path* new_path = xmalloc(sizeof(*new_path));
     INIT_LIST_HEAD(&new_path->steps);
 
     struct list_head* entry = NULL;
@@ -28,7 +29,7 @@ struct imm_path* imm_path_clone(struct imm_path const* path)
 
 struct imm_path* imm_path_create(void)
 {
-    struct imm_path* path = malloc(sizeof(struct imm_path));
+    struct imm_path* path = xmalloc(sizeof(struct imm_path));
     INIT_LIST_HEAD(&path->steps);
     return path;
 }

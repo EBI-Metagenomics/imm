@@ -1,8 +1,8 @@
 #include "dp_state_table.h"
 #include "imm/imm.h"
-#include "log.h"
 #include "model_state.h"
 #include "state_idx.h"
+#include "std.h"
 #include <stdlib.h>
 
 struct dp_state_table_chunk
@@ -17,13 +17,22 @@ struct dp_state_table_chunk
 struct dp_state_table const* dp_state_table_create(struct model_state const* const* mstates, uint_fast16_t nstates,
                                                    struct imm_state const* end_state, struct state_idx* state_idx)
 {
-    struct dp_state_table* table = malloc(sizeof(*table));
+    struct dp_state_table* table = xmalloc(sizeof(*table));
 
     table->nstates = (uint16_t)nstates;
 
     table->min_seq = malloc(sizeof(*table->min_seq) * nstates);
     table->max_seq = malloc(sizeof(*table->max_seq) * nstates);
     table->start_lprob = malloc(sizeof(*table->start_lprob) * nstates);
+
+    if (!table->min_seq || !table->max_seq || !table->start_lprob) {
+        free_if(table->min_seq);
+        free_if(table->max_seq);
+        free_if(table->start_lprob);
+        free(table);
+        error("%s", explain(IMM_OUTOFMEM));
+        return NULL;
+    }
 
     for (uint_fast16_t i = 0; i < nstates; ++i) {
         state_idx_add(state_idx, model_state_get_state(mstates[i]));
@@ -59,7 +68,7 @@ struct dp_state_table* dp_state_table_read(FILE* stream)
     struct dp_state_table_chunk chunk = {
         .nstates = 0, .min_seq = NULL, .max_seq = NULL, .start_lprob = NULL, .end_state = 0};
 
-    struct dp_state_table* table = malloc(sizeof(*table));
+    struct dp_state_table* table = xmalloc(sizeof(*table));
 
     if (fread(&chunk.nstates, sizeof(chunk.nstates), 1, stream) < 1) {
         error("could not read nstates");
@@ -69,6 +78,15 @@ struct dp_state_table* dp_state_table_read(FILE* stream)
     chunk.min_seq = malloc(sizeof(*chunk.min_seq) * chunk.nstates);
     chunk.max_seq = malloc(sizeof(*chunk.max_seq) * chunk.nstates);
     chunk.start_lprob = malloc(sizeof(*chunk.start_lprob) * chunk.nstates);
+
+    if (!chunk.min_seq || !chunk.max_seq || !chunk.start_lprob) {
+        free_if(chunk.min_seq);
+        free_if(chunk.max_seq);
+        free_if(chunk.start_lprob);
+        free(table);
+        error("%s", explain(IMM_OUTOFMEM));
+        return NULL;
+    }
 
     if (fread(chunk.min_seq, sizeof(*chunk.min_seq), chunk.nstates, stream) < chunk.nstates) {
         error("could not read min_seq");
@@ -100,16 +118,9 @@ struct dp_state_table* dp_state_table_read(FILE* stream)
 
 err:
     free(table);
-
-    if (chunk.min_seq)
-        free(chunk.min_seq);
-
-    if (chunk.max_seq)
-        free(chunk.max_seq);
-
-    if (chunk.start_lprob)
-        free(chunk.start_lprob);
-
+    free_if(chunk.min_seq);
+    free_if(chunk.max_seq);
+    free_if(chunk.start_lprob);
     return NULL;
 }
 

@@ -1,5 +1,5 @@
 #include "imm/imm.h"
-#include "log.h"
+#include "std.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -26,11 +26,11 @@ static struct imm_state_vtable const __vtable = {destroy, lprob, max_seq, min_se
 struct imm_normal_state const* imm_normal_state_create(uint16_t id, char const* name, struct imm_abc const* abc,
                                                        imm_float const* lprobs)
 {
-    struct imm_normal_state* state = malloc(sizeof(*state));
+    struct imm_normal_state* state = xmalloc(sizeof(*state));
 
     size_t len = imm_abc_length(abc);
-    state->lprobs = malloc(sizeof(*state->lprobs) * len);
-    memcpy(state->lprobs, lprobs, sizeof(*state->lprobs) * len);
+    state->lprobs = xmalloc(sizeof(*state->lprobs) * len);
+    BUG(!memcpy(state->lprobs, lprobs, sizeof(*state->lprobs) * len));
 
     state->super = imm_state_create(id, name, abc, __vtable, state);
     return state;
@@ -63,7 +63,7 @@ struct imm_state const* imm_normal_state_read(FILE* stream, struct imm_abc const
         return NULL;
     }
 
-    chunk.lprobs = malloc(sizeof(*chunk.lprobs) * chunk.lprobs_size);
+    chunk.lprobs = xmalloc(sizeof(*chunk.lprobs) * chunk.lprobs_size);
 
     if (fread(chunk.lprobs, sizeof(*chunk.lprobs), chunk.lprobs_size, stream) < chunk.lprobs_size) {
         error("could not read lprobs");
@@ -72,7 +72,7 @@ struct imm_state const* imm_normal_state_read(FILE* stream, struct imm_abc const
         return NULL;
     }
 
-    struct imm_normal_state* normal_state = malloc(sizeof(*normal_state));
+    struct imm_normal_state* normal_state = xmalloc(sizeof(*normal_state));
     normal_state->super = state;
     normal_state->lprobs = chunk.lprobs;
     state->vtable = __vtable;

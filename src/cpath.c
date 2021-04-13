@@ -36,8 +36,15 @@ void cpath_deinit(struct cpath const* path)
         free(path->bitarr);
 }
 
-void cpath_setup(struct cpath* path, uint_fast32_t len)
+int cpath_setup(struct cpath* path, uint_fast32_t len)
 {
     uint64_t size = (uint64_t)path->bits_state[path->nstates] * (uint64_t)len;
-    path->bitarr = bitarr_realloc(path->bitarr, size);
+    void*    ptr = bitarr_realloc(path->bitarr, size);
+    if (!ptr) {
+        free(path->bitarr);
+        path->bitarr = NULL;
+        return IMM_OUTOFMEM;
+    }
+    path->bitarr = ptr;
+    return IMM_SUCCESS;
 }

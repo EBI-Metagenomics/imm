@@ -1,5 +1,5 @@
 #include "imm/imm.h"
-#include "log.h"
+#include "std.h"
 #include <stdlib.h>
 
 struct imm_mute_state
@@ -17,7 +17,7 @@ static struct imm_state_vtable const __vtable = {destroy, lprob, max_seq, min_se
 
 struct imm_mute_state const* imm_mute_state_create(uint16_t id, char const* name, struct imm_abc const* abc)
 {
-    struct imm_mute_state* state = malloc(sizeof(*state));
+    struct imm_mute_state* state = xmalloc(sizeof(*state));
 
     state->super = imm_state_create(id, name, abc, __vtable, state);
     return state;
@@ -42,7 +42,7 @@ struct imm_state const* imm_mute_state_read(FILE* stream, struct imm_abc const* 
         return NULL;
     }
 
-    struct imm_mute_state* mute_state = malloc(sizeof(*mute_state));
+    struct imm_mute_state* mute_state = xmalloc(sizeof(*mute_state));
     mute_state->super = state;
     state->vtable = __vtable;
     state->derived = mute_state;

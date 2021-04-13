@@ -1,6 +1,6 @@
 #include "imm/imm.h"
-#include "log.h"
 #include "profile.h"
+#include "std.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -39,9 +39,9 @@ struct imm_input* imm_input_create(char const* filepath)
         return NULL;
     }
 
-    struct imm_input* input = malloc(sizeof(*input));
+    struct imm_input* input = xmalloc(sizeof(*input));
     input->stream = stream;
-    input->filepath = strdup(filepath);
+    input->filepath = xstrdup(filepath);
     input->eof = false;
     input->closed = false;
 

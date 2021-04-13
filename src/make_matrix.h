@@ -16,6 +16,8 @@
     static inline struct NAME* NAME##_create(uint_fast32_t const nrows, uint_fast32_t const ncols)                     \
     {                                                                                                                  \
         struct NAME* matrix = malloc(sizeof(struct NAME));                                                             \
+        if (!matrix)                                                                                                   \
+            return NULL;                                                                                               \
         matrix->data = malloc(sizeof(T) * (nrows * ncols));                                                            \
         matrix->nrows = nrows;                                                                                         \
         matrix->ncols = ncols;                                                                                         \
@@ -70,11 +72,16 @@
     static inline uint_fast32_t NAME##_ncols(struct NAME const* matrix) { return matrix->ncols; }
 
 #define MAKE_MATRIX_RESIZE(NAME, T)                                                                                    \
-    static inline void NAME##_resize(struct NAME* matrix, uint_fast32_t const nrows, uint_fast32_t const ncols)        \
+    static inline int NAME##_resize(struct NAME* matrix, uint_fast32_t const nrows, uint_fast32_t const ncols)         \
     {                                                                                                                  \
-        matrix->data = realloc(matrix->data, sizeof(T) * (nrows * ncols));                                             \
+        void* ptr = realloc(matrix->data, sizeof(T) * (nrows * ncols));                                                \
+        if (!ptr) {                                                                                                    \
+            return IMM_OUTOFMEM;                                                                                       \
+        }                                                                                                              \
+        matrix->data = ptr;                                                                                            \
         matrix->nrows = nrows;                                                                                         \
         matrix->ncols = ncols;                                                                                         \
+        return IMM_SUCCESS;                                                                                            \
     }
 
 #endif

@@ -1,5 +1,5 @@
 #include "imm/imm.h"
-#include "log.h"
+#include "std.h"
 #include <stdlib.h>
 
 struct imm_table_state
@@ -18,7 +18,7 @@ static struct imm_state_vtable const __vtable = {destroy, lprob, max_seq, min_se
 
 struct imm_table_state const* imm_table_state_create(uint16_t id, char const* name, struct imm_seq_table const* table)
 {
-    struct imm_table_state* state = malloc(sizeof(*state));
+    struct imm_table_state* state = xmalloc(sizeof(*state));
     state->table = imm_seq_table_clone(table);
 
     state->super = imm_state_create(id, name, imm_seq_table_abc(table), __vtable, state);

@@ -1,4 +1,5 @@
-#include "imm/vec.h"
+#include "imm/imm.h"
+#include "std.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -28,8 +29,8 @@ void imm_veci_append(struct imm_veci* vec, int item)
 
 struct imm_veci* imm_veci_create(void)
 {
-    struct imm_veci* vec = malloc(sizeof(*vec));
-    vec->data = malloc(sizeof(*vec->data));
+    struct imm_veci* vec = xmalloc(sizeof(*vec));
+    vec->data = xmalloc(sizeof(*vec->data));
     vec->length = 0;
     vec->capacity = 1;
     return vec;
@@ -57,8 +58,8 @@ void imm_vecp_append(struct imm_vecp* vec, void const* item)
 
 struct imm_vecp* imm_vecp_create(void)
 {
-    struct imm_vecp* vec = malloc(sizeof(*vec));
-    vec->data = malloc(sizeof(*vec->data));
+    struct imm_vecp* vec = xmalloc(sizeof(*vec));
+    vec->data = xmalloc(sizeof(*vec->data));
     vec->length = 0;
     vec->capacity = 1;
     return vec;

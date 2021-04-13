@@ -1,10 +1,11 @@
 #include "model_state.h"
 #include "model_trans_table.h"
+#include "std.h"
 #include <stdlib.h>
 
 struct model_state* model_state_create(struct imm_state const* state, imm_float start_lprob)
 {
-    struct model_state* mstate = malloc(sizeof(*mstate));
+    struct model_state* mstate = xmalloc(sizeof(*mstate));
     mstate->state = state;
     mstate->start_lprob = start_lprob;
     mstate->mtrans_table = model_trans_table_create();
