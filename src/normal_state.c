@@ -91,7 +91,7 @@ int imm_normal_state_write(struct imm_state const* state, struct imm_profile con
     struct imm_normal_state const* s = __imm_state_derived(state);
 
     struct normal_state_chunk chunk = {
-        .lprobs_size = imm_abc_length(imm_state_get_abc(state)),
+        .lprobs_size = imm_abc_length(imm_state_abc(state)),
         .lprobs = s->lprobs,
     };
 
@@ -120,7 +120,7 @@ static imm_float lprob(struct imm_state const* state, struct imm_seq const* seq)
 {
     struct imm_normal_state const* s = __imm_state_derived(state);
     if (imm_seq_length(seq) == 1) {
-        struct imm_abc const* abc = imm_state_get_abc(state);
+        struct imm_abc const* abc = imm_state_abc(state);
         unsigned              idx = imm_abc_symbol_idx(abc, imm_seq_string(seq)[0]);
         if (idx != IMM_ABC_INVALID_IDX)
             return s->lprobs[idx];

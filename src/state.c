@@ -84,8 +84,8 @@ struct imm_state* __imm_state_read(FILE* stream, struct imm_abc const* abc)
 int __imm_state_write(struct imm_state const* state, FILE* stream)
 {
     struct state_chunk chunk = {.id = imm_state_id(state),
-                                .name_length = (uint8_t)strlen(imm_state_get_name(state)),
-                                .name = (char*)imm_state_get_name(state)};
+                                .name_length = (uint8_t)strlen(imm_state_name(state)),
+                                .name = (char*)imm_state_name(state)};
 
     if (fwrite(&chunk.id, sizeof(chunk.id), 1, stream) < 1) {
         error("could not write id");

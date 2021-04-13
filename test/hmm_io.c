@@ -93,9 +93,9 @@ void test_hmm_write_io_two_states(void)
         struct imm_state const* state = imm_model_state(model, i);
 
         if (imm_state_type_id(state) == IMM_MUTE_STATE_TYPE_ID) {
-            cass_cond(strcmp(imm_state_get_name(state), "state0") == 0);
+            cass_cond(strcmp(imm_state_name(state), "state0") == 0);
         } else if (imm_state_type_id(state) == IMM_NORMAL_STATE_TYPE_ID) {
-            cass_cond(strcmp(imm_state_get_name(state), "state1") == 0);
+            cass_cond(strcmp(imm_state_name(state), "state1") == 0);
         }
     }
 
@@ -221,10 +221,10 @@ void test_hmm_write_io_two_hmms(void)
         struct imm_state const* state = imm_model_state(model0, i);
 
         if (imm_state_type_id(state) == IMM_MUTE_STATE_TYPE_ID) {
-            cass_cond(strcmp(imm_state_get_name(state), "hmm0_state0") == 0);
+            cass_cond(strcmp(imm_state_name(state), "hmm0_state0") == 0);
             cass_equal(imm_state_id(state), 0);
         } else if (imm_state_type_id(state) == IMM_NORMAL_STATE_TYPE_ID) {
-            cass_cond(strcmp(imm_state_get_name(state), "hmm0_state1") == 0);
+            cass_cond(strcmp(imm_state_name(state), "hmm0_state1") == 0);
             cass_equal(imm_state_id(state), 1);
         }
     }
@@ -246,10 +246,10 @@ void test_hmm_write_io_two_hmms(void)
         struct imm_state const* state = imm_model_state(model1, i);
 
         if (imm_state_type_id(state) == IMM_MUTE_STATE_TYPE_ID) {
-            cass_cond(strcmp(imm_state_get_name(state), "hmm1_state0") == 0);
+            cass_cond(strcmp(imm_state_name(state), "hmm1_state0") == 0);
             cass_equal(imm_state_id(state), 2);
         } else if (imm_state_type_id(state) == IMM_NORMAL_STATE_TYPE_ID) {
-            cass_cond(strcmp(imm_state_get_name(state), "hmm1_state1") == 0);
+            cass_cond(strcmp(imm_state_name(state), "hmm1_state1") == 0);
             cass_equal(imm_state_id(state), 3);
         }
     }

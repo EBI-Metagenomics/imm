@@ -40,8 +40,8 @@ struct imm_state
 IMM_API struct imm_state const*     imm_state_create(uint16_t id, char const* name, struct imm_abc const* abc,
                                                      struct imm_state_vtable vtable, void* derived);
 IMM_API void                        imm_state_destroy(struct imm_state const* state);
-static inline struct imm_abc const* imm_state_get_abc(struct imm_state const* state) { return state->abc; }
-static inline char const*           imm_state_get_name(struct imm_state const* state) { return state->name; }
+static inline struct imm_abc const* imm_state_abc(struct imm_state const* state) { return state->abc; }
+static inline char const*           imm_state_name(struct imm_state const* state) { return state->name; }
 static inline uint16_t              imm_state_id(struct imm_state const* state) { return state->id; }
 IMM_API imm_float                   imm_state_lprob(struct imm_state const* state, struct imm_seq const* seq);
 static inline uint8_t imm_state_max_seq(struct imm_state const* state) { return state->vtable.max_seq(state); }

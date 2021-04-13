@@ -103,5 +103,5 @@ static inline int name_compare(void const* a, void const* b)
 {
     struct imm_state const* sa = model_trans_get_state(*(struct model_trans const**)a);
     struct imm_state const* sb = model_trans_get_state(*(struct model_trans const**)b);
-    return strcmp(imm_state_get_name(sa), imm_state_get_name(sb));
+    return strcmp(imm_state_name(sa), imm_state_name(sb));
 }

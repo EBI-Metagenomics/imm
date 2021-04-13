@@ -189,8 +189,8 @@ static void destroy_node_list(struct list_head* node_list)
 
 static inline int name_compare(void const* a, void const* b)
 {
-    char const* left = imm_state_get_name((*(struct model_state const**)a)->state);
-    char const* right = imm_state_get_name((*(struct model_state const**)b)->state);
+    char const* left = imm_state_name((*(struct model_state const**)a)->state);
+    char const* right = imm_state_name((*(struct model_state const**)b)->state);
     return strcmp(left, right);
 }
 
