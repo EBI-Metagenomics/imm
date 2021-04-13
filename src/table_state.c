@@ -16,12 +16,12 @@ static uint8_t   type_id(struct imm_state const* state);
 
 static struct imm_state_vtable const __vtable = {destroy, lprob, max_seq, min_seq, type_id};
 
-struct imm_table_state const* imm_table_state_create(char const* name, struct imm_seq_table const* table)
+struct imm_table_state const* imm_table_state_create(uint16_t id, char const* name, struct imm_seq_table const* table)
 {
     struct imm_table_state* state = malloc(sizeof(*state));
     state->table = imm_seq_table_clone(table);
 
-    state->super = imm_state_create(name, imm_seq_table_abc(table), __vtable, state);
+    state->super = imm_state_create(id, name, imm_seq_table_abc(table), __vtable, state);
     return state;
 }
 

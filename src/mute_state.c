@@ -15,11 +15,11 @@ static uint8_t   type_id(struct imm_state const* state) { return IMM_MUTE_STATE_
 
 static struct imm_state_vtable const __vtable = {destroy, lprob, max_seq, min_seq, type_id};
 
-struct imm_mute_state const* imm_mute_state_create(char const* name, struct imm_abc const* abc)
+struct imm_mute_state const* imm_mute_state_create(uint16_t id, char const* name, struct imm_abc const* abc)
 {
     struct imm_mute_state* state = malloc(sizeof(*state));
 
-    state->super = imm_state_create(name, abc, __vtable, state);
+    state->super = imm_state_create(id, name, abc, __vtable, state);
     return state;
 }
 

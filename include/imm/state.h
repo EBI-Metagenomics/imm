@@ -29,6 +29,7 @@ struct imm_state_vtable
 
 struct imm_state
 {
+    uint16_t              id;
     char const*           name;
     struct imm_abc const* abc;
 
@@ -36,7 +37,7 @@ struct imm_state
     void*                   derived;
 };
 
-IMM_API struct imm_state const*     imm_state_create(char const* name, struct imm_abc const* abc,
+IMM_API struct imm_state const*     imm_state_create(uint16_t id, char const* name, struct imm_abc const* abc,
                                                      struct imm_state_vtable vtable, void* derived);
 IMM_API void                        imm_state_destroy(struct imm_state const* state);
 static inline struct imm_abc const* imm_state_get_abc(struct imm_state const* state) { return state->abc; }

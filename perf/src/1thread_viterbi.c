@@ -65,10 +65,10 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
     struct imm_abc const* abc = imm_abc_create("BMIEJ", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
-    struct imm_mute_state const* start = imm_mute_state_create("START", abc);
+    struct imm_mute_state const* start = imm_mute_state_create(0, "START", abc);
     imm_hmm_add_state(hmm, imm_mute_state_super(start), imm_log(1.0));
 
-    struct imm_mute_state const* end = imm_mute_state_create("END", abc);
+    struct imm_mute_state const* end = imm_mute_state_create(1, "END", abc);
     imm_hmm_add_state(hmm, imm_mute_state_super(end), zero());
 
     imm_float B_lprobs[] = {imm_log(1.0), zero(), zero(), zero(), zero()};
@@ -77,11 +77,11 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
     imm_float M_lprobs[] = {zero(), imm_log(1.0), zero(), zero(), zero()};
     imm_float I_lprobs[] = {zero(), zero(), imm_log(1.0), zero(), zero()};
 
-    struct imm_normal_state const* B = imm_normal_state_create("B", abc, B_lprobs);
+    struct imm_normal_state const* B = imm_normal_state_create(2, "B", abc, B_lprobs);
     imm_hmm_add_state(hmm, imm_normal_state_super(B), zero());
-    struct imm_normal_state const* E = imm_normal_state_create("E", abc, E_lprobs);
+    struct imm_normal_state const* E = imm_normal_state_create(3, "E", abc, E_lprobs);
     imm_hmm_add_state(hmm, imm_normal_state_super(E), zero());
-    struct imm_normal_state const* J = imm_normal_state_create("J", abc, J_lprobs);
+    struct imm_normal_state const* J = imm_normal_state_create(4, "J", abc, J_lprobs);
     imm_hmm_add_state(hmm, imm_normal_state_super(J), zero());
 
     imm_hmm_set_trans(hmm, imm_mute_state_super(start), imm_normal_state_super(B), imm_log(0.2));
@@ -96,11 +96,12 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
     struct imm_normal_state const* I[ncore_nodes];
     struct imm_mute_state const*   D[ncore_nodes];
 
-    char name[10] = "\0";
+    char     name[10] = "\0";
+    uint16_t id = 5;
     for (uint16_t i = 0; i < ncore_nodes; ++i) {
-        M[i] = imm_normal_state_create(fmt_name(name, "M", i), abc, M_lprobs);
-        I[i] = imm_normal_state_create(fmt_name(name, "I", i), abc, I_lprobs);
-        D[i] = imm_mute_state_create(fmt_name(name, "D", i), abc);
+        M[i] = imm_normal_state_create(id++, fmt_name(name, "M", i), abc, M_lprobs);
+        I[i] = imm_normal_state_create(id++, fmt_name(name, "I", i), abc, I_lprobs);
+        D[i] = imm_mute_state_create(id++, fmt_name(name, "D", i), abc);
 
         imm_hmm_add_state(hmm, imm_normal_state_super(M[i]), zero());
         imm_hmm_add_state(hmm, imm_normal_state_super(I[i]), zero());

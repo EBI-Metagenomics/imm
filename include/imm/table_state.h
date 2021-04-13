@@ -2,6 +2,7 @@
 #define IMM_TABLE_STATE_H
 
 #include "imm/export.h"
+#include <stdint.h>
 #include <stdio.h>
 
 /** @file table_state.h
@@ -16,7 +17,8 @@ struct imm_seq_table;
 struct imm_state;
 struct imm_table_state;
 
-IMM_API struct imm_table_state const* imm_table_state_create(char const* name, struct imm_seq_table const* table);
+IMM_API struct imm_table_state const* imm_table_state_create(uint16_t id, char const* name,
+                                                             struct imm_seq_table const* table);
 IMM_API struct imm_table_state const* imm_table_state_derived(struct imm_state const* state);
 IMM_API void                          imm_table_state_destroy(struct imm_table_state const* state);
 IMM_API struct imm_state const*       imm_table_state_read(FILE* stream, struct imm_abc const* abc);
