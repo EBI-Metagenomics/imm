@@ -35,7 +35,6 @@ add_library(imm
     src/dp_task.c
     src/dp_trans_table.c
     src/eseq.c
-    src/file.c
     src/hmm.c
     src/input.c
     src/log.c
