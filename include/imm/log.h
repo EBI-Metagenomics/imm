@@ -16,7 +16,7 @@ enum imm_log_level
 
 struct imm_log_event
 {
-    va_list            params;
+    va_list            va;
     char const*        fmt;
     char const*        file;
     int                line;

@@ -5,8 +5,9 @@
 
 struct state_chunk
 {
-    uint8_t name_length;
-    char*   name;
+    uint16_t id;
+    uint8_t  name_length;
+    char*    name;
 };
 
 static inline int ascii_is_std(char const* str, size_t len);
@@ -54,6 +55,10 @@ struct imm_state* __imm_state_read(FILE* stream, struct imm_abc const* abc)
 {
     struct state_chunk chunk;
 
+    if (fread(&chunk.id, sizeof(chunk.id), 1, stream) < 1) {
+        return NULL;
+    }
+
     if (fread(&chunk.name_length, sizeof(chunk.name_length), 1, stream) < 1) {
         return NULL;
     }
@@ -67,6 +72,7 @@ struct imm_state* __imm_state_read(FILE* stream, struct imm_abc const* abc)
     }
 
     struct imm_state* state = malloc(sizeof(*state));
+    state->id = chunk.id;
     state->name = chunk.name;
     state->abc = abc;
     state->vtable = (struct imm_state_vtable){NULL, NULL, NULL, NULL, NULL};
@@ -77,8 +83,14 @@ struct imm_state* __imm_state_read(FILE* stream, struct imm_abc const* abc)
 
 int __imm_state_write(struct imm_state const* state, FILE* stream)
 {
-    struct state_chunk chunk = {.name_length = (uint8_t)strlen(imm_state_get_name(state)),
+    struct state_chunk chunk = {.id = imm_state_id(state),
+                                .name_length = (uint8_t)strlen(imm_state_get_name(state)),
                                 .name = (char*)imm_state_get_name(state)};
+
+    if (fwrite(&chunk.id, sizeof(chunk.id), 1, stream) < 1) {
+        error("could not write id");
+        return 1;
+    }
 
     if (fwrite(&chunk.name_length, sizeof(chunk.name_length), 1, stream) < 1) {
         error("could not write name_length");

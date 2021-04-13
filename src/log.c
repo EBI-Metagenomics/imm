@@ -16,15 +16,14 @@ void log_log(enum imm_log_level level, char const* file, int line, char const* f
     if (level < log_level)
         return;
 
-    va_list params;
-    va_start(params, fmt);
-    struct imm_log_event e = {params, fmt, file, line, level};
+    struct imm_log_event e = {.fmt = fmt, .file = file, .line = line, .level = level};
+    va_start(e.va, fmt);
     log_callback(e);
-    va_end(params);
+    va_end(e.va);
 }
 
 static void default_print(struct imm_log_event event)
 {
-    vfprintf(stderr, event.fmt, event.params);
+    vfprintf(stderr, event.fmt, event.va);
     fputc('\n', stderr);
 }
