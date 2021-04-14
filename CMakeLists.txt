@@ -30,6 +30,7 @@ add_library(imm
     src/cpath.c
     src/dp.c
     src/dp_emission.c
+    src/dp_inctrans.c
     src/dp_matrix.c
     src/dp_state_table.c
     src/dp_task.c

@@ -1,4 +1,5 @@
 #include "dp_trans_table.h"
+#include "dp_inctrans.h"
 #include "imm/imm.h"
 #include "list.h"
 #include "model_state.h"
@@ -24,10 +25,6 @@ struct dp_trans_table_chunk
     uint16_t*  offset;
 };
 
-/* TODO: try to avoid so many mallocs */
-static uint_fast16_t        create_incoming_transitions(struct list_head*                incoming_trans,
-                                                        struct model_state const* const* mstates, uint_fast16_t nstates,
-                                                        struct state_idx const* state_idx);
 static inline uint_fast16_t offset_size(uint_fast16_t nstates) { return nstates + 1; }
 static inline uint_fast16_t score_size(uint_fast16_t ntrans) { return ntrans; }
 static inline uint_fast16_t source_state_size(uint_fast16_t ntrans) { return ntrans; }
@@ -40,7 +37,7 @@ int dp_trans_table_change(struct dp_trans_table* trans_tbl, uint_fast16_t src_st
         if (dp_trans_table_source_state(trans_tbl, tgt_state, i) == src_state) {
 
             trans_tbl->score[trans_tbl->offset[tgt_state] + i] = lprob;
-            return 0;
+            return IMM_SUCCESS;
         }
     }
     return 1;
@@ -49,31 +46,26 @@ int dp_trans_table_change(struct dp_trans_table* trans_tbl, uint_fast16_t src_st
 struct dp_trans_table* dp_trans_table_create(struct model_state const* const* mstates, uint_fast16_t nstates,
                                              struct state_idx* state_idx)
 {
-    struct list_head incoming_trans[nstates];
-    for (uint_fast16_t i = 0; i < nstates; ++i)
-        INIT_LIST_HEAD(incoming_trans + i);
+    struct dp_trans_table* tbl = NULL;
+    struct dp_inctrans*    inctrans = dp_inctrans_create(mstates, nstates, state_idx);
+    if (!inctrans)
+        goto err;
 
-    uint_fast16_t ntrans = create_incoming_transitions(incoming_trans, mstates, nstates, state_idx);
-
-    struct dp_trans_table* tbl = xmalloc(sizeof(*tbl));
-    tbl->ntrans = (uint16_t)ntrans;
+    tbl = xmalloc(sizeof(*tbl));
+    tbl->ntrans = inctrans->ntotal_trans;
     tbl->offset = malloc(sizeof(*tbl->offset) * offset_size(nstates));
     if (!tbl->offset) {
         error("%s", explain(IMM_OUTOFMEM));
-        free(tbl);
-        return NULL;
+        goto err;
     }
     tbl->offset[0] = 0;
 
-    if (ntrans > 0) {
-        tbl->score = malloc(sizeof(*tbl->score) * score_size(ntrans));
-        tbl->source_state = malloc(sizeof(*tbl->source_state) * source_state_size(ntrans));
+    if (tbl->ntrans > 0) {
+        tbl->score = malloc(sizeof(*tbl->score) * score_size(tbl->ntrans));
+        tbl->source_state = malloc(sizeof(*tbl->source_state) * source_state_size(tbl->ntrans));
         if (!tbl->score || !tbl->source_state) {
             error("%s", explain(IMM_OUTOFMEM));
-            free_if(tbl->score);
-            free_if(tbl->source_state);
-            free(tbl);
-            return NULL;
+            goto err;
         }
     } else {
         tbl->score = NULL;
@@ -81,25 +73,30 @@ struct dp_trans_table* dp_trans_table_create(struct model_state const* const* ms
     }
 
     for (uint_fast16_t i = 0; i < nstates; ++i) {
-        uint_fast16_t          j = 0;
-        struct incoming_trans* it = NULL;
-        list_for_each_entry (it, incoming_trans + i, list_entry) {
+        uint16_t         j = 0;
+        struct inctrans* it = NULL;
+        list_for_each_entry (it, inctrans->lhead_mem + i, list_entry) {
 
             tbl->score[tbl->offset[i] + j] = it->score;
             tbl->source_state[tbl->offset[i] + j] = it->source_state;
             ++j;
         }
-        tbl->offset[i + 1] = (uint16_t)(tbl->offset[i] + j);
+        tbl->offset[i + 1] = tbl->offset[i] + j;
     }
 
-    for (uint_fast16_t i = 0; i < nstates; ++i) {
-        struct incoming_trans* it = NULL;
-        struct incoming_trans* tmp = NULL;
-        list_for_each_entry_safe (it, tmp, incoming_trans + i, list_entry)
-            free(it);
-    }
-
+    dp_inctrans_destroy(inctrans);
     return tbl;
+
+err:
+    if (inctrans)
+        dp_inctrans_destroy(inctrans);
+
+    if (tbl) {
+        free_if(tbl->score);
+        free_if(tbl->source_state);
+        free(tbl);
+    }
+    return NULL;
 }
 
 void dp_trans_table_destroy(struct dp_trans_table const* trans_tbl)
@@ -108,24 +105,6 @@ void dp_trans_table_destroy(struct dp_trans_table const* trans_tbl)
     free(trans_tbl->source_state);
     free(trans_tbl->offset);
     free((void*)trans_tbl);
-}
-
-void dp_trans_table_dump(struct dp_trans_table const* trans_tbl)
-{
-    printf("trans,src_state,tgt_state,score\n");
-    uint16_t tgt = 0;
-    uint16_t trans = 0;
-    while (trans < trans_tbl->ntrans) {
-
-        uint_fast16_t n = dp_trans_table_ntrans(trans_tbl, tgt);
-        for (uint_fast16_t t = 0; t < n; ++t) {
-
-            imm_float score = trans_tbl->score[trans];
-            uint16_t  src = (uint16_t)trans_tbl->source_state[trans];
-            printf("%" PRIu16 ",%" PRIu16 ",%" PRIu16 ",%f\n", trans, src, tgt, score);
-            ++trans;
-        }
-    }
 }
 
 struct dp_trans_table* dp_trans_table_read(FILE* stream)
@@ -229,36 +208,4 @@ int dp_trans_table_write(struct dp_trans_table const* trans, uint_fast16_t nstat
     }
 
     return 0;
-}
-
-static uint_fast16_t create_incoming_transitions(struct list_head*                incoming_trans,
-                                                 struct model_state const* const* mstates, uint_fast16_t nstates,
-                                                 struct state_idx const* state_idx)
-{
-    uint_fast16_t ntrans = 0;
-    for (uint_fast16_t i = 0; i < nstates; ++i) {
-
-        struct imm_state const*         src_state = model_state_get_state(mstates[i]);
-        uint_fast16_t                   src = state_idx_find(state_idx, src_state);
-        struct model_trans_table const* table = model_state_get_mtrans_table(mstates[i]);
-
-        unsigned long iter = 0;
-        model_trans_table_for_each(iter, table)
-        {
-            if (!model_trans_table_exist(table, iter))
-                continue;
-            struct model_trans const* mtrans = model_trans_table_get(table, iter);
-            imm_float                 lprob = (imm_float)model_trans_get_lprob(mtrans);
-
-            struct imm_state const* dst_state = model_trans_get_state(mtrans);
-            uint_fast16_t           dst = state_idx_find(state_idx, dst_state);
-
-            struct incoming_trans* it = xmalloc(sizeof(*it));
-            it->score = lprob;
-            it->source_state = (uint16_t)src;
-            list_add_tail(&it->list_entry, incoming_trans + dst);
-            ++ntrans;
-        }
-    }
-    return ntrans;
 }
