@@ -7,7 +7,7 @@ struct imm_abc_lprob const* imm_abc_lprob_create(struct imm_abc const* abc, imm_
 {
     struct imm_abc_lprob* abc_lprob = xmalloc(sizeof(struct imm_abc_lprob) + sizeof(imm_float) * imm_abc_length(abc));
     abc_lprob->abc = abc;
-    BUG(!memcpy(abc_lprob->lprobs, lprobs, sizeof(*lprobs) * imm_abc_length(abc)));
+    xmemcpy(abc_lprob->lprobs, lprobs, sizeof(*lprobs) * imm_abc_length(abc));
     return abc_lprob;
 }
 

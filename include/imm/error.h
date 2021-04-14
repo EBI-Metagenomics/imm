@@ -7,6 +7,7 @@ enum imm_error_code
     IMM_FAILURE,
     IMM_OUTOFMEM,
     IMM_ILLEGALARG,
+    IMM_IOERROR,
 };
 
 #endif

@@ -92,10 +92,10 @@ int imm_dp_change_trans(struct imm_dp* dp, struct imm_hmm* hmm, struct imm_state
     imm_float prev = imm_hmm_get_trans(hmm, src_state, tgt_state);
     if (!imm_lprob_is_valid(prev)) {
         error("transition does not exist");
-        return 1;
+        return IMM_ILLEGALARG;
     }
     if (imm_lprob_is_zero(prev) && imm_lprob_is_zero(lprob))
-        return 0;
+        return IMM_SUCCESS;
 
     uint_fast16_t src = state_idx_find(dp->state_idx, src_state);
     uint_fast16_t tgt = state_idx_find(dp->state_idx, tgt_state);
@@ -105,9 +105,9 @@ int imm_dp_change_trans(struct imm_dp* dp, struct imm_hmm* hmm, struct imm_state
         return 1;
     }
 
-    BUG(imm_hmm_set_trans(hmm, src_state, tgt_state, lprob) != 0);
+    BUG(imm_hmm_set_trans(hmm, src_state, tgt_state, lprob) != IMM_SUCCESS);
 
-    return 0;
+    return IMM_SUCCESS;
 }
 
 struct imm_dp* dp_create(struct imm_abc const* abc, struct model_state const** mstates, uint16_t nstates,

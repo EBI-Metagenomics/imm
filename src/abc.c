@@ -53,13 +53,11 @@ struct imm_abc* imm_abc_read(FILE* stream)
     }
 
     struct imm_abc* abc = __imm_abc_create(chunk.symbols, chunk.any_symbol, NULL);
-    free((void*)chunk.symbols);
-
+    free(chunk.symbols);
     return abc;
 
 err:
     free_if(chunk.symbols);
-
     return NULL;
 }
 
@@ -78,15 +76,13 @@ int imm_abc_write(struct imm_abc const* abc, FILE* stream) { return abc->vtable.
 
 struct imm_abc const* __imm_abc_clone(struct imm_abc const* abc)
 {
-    struct imm_abc* nabc = malloc(sizeof(struct imm_abc));
-
-    nabc->symbols = strdup(abc->symbols);
+    struct imm_abc* nabc = xmalloc(sizeof(struct imm_abc));
+    nabc->symbols = xstrdup(abc->symbols);
     nabc->length = abc->length;
-    memcpy(nabc->symbol_idx, abc->symbol_idx, sizeof(*abc->symbol_idx) * IMM_SYMBOL_IDX_SIZE);
+    xmemcpy(nabc->symbol_idx, abc->symbol_idx, sizeof(*abc->symbol_idx) * IMM_SYMBOL_IDX_SIZE);
     nabc->any_symbol = abc->any_symbol;
     nabc->vtable = abc->vtable;
     nabc->derived = NULL;
-
     return nabc;
 }
 
@@ -96,7 +92,7 @@ struct imm_abc* __imm_abc_create(char const* symbols, char any_symbol, void* der
         error("any_symbol is outside the range [%c, %c] ", IMM_FIRST_CHAR, IMM_LAST_CHAR);
         return NULL;
     }
-    struct imm_abc* abc = malloc(sizeof(struct imm_abc));
+    struct imm_abc* abc = xmalloc(sizeof(*abc));
     abc->any_symbol = any_symbol;
 
     for (size_t i = 0; i < IMM_SYMBOL_IDX_SIZE; ++i)
@@ -135,7 +131,7 @@ struct imm_abc* __imm_abc_create(char const* symbols, char any_symbol, void* der
         }
         abc->symbol_idx[j] = i;
     }
-    abc->symbols = strdup(symbols);
+    abc->symbols = xstrdup(symbols);
 
     abc->vtable = __vtable;
     abc->derived = derived;
@@ -158,19 +154,19 @@ int __imm_abc_write(struct imm_abc const* abc, FILE* stream)
 
     if (fwrite(&chunk.nsymbols, sizeof(chunk.nsymbols), 1, stream) < 1) {
         error("could not write nsymbols");
-        return 1;
+        return IMM_IOERROR;
     }
 
     if (fwrite(chunk.symbols, sizeof(*chunk.symbols), (size_t)(chunk.nsymbols + 1), stream) <
         (size_t)(chunk.nsymbols + 1)) {
         error("could not write symbols");
-        return 1;
+        return IMM_IOERROR;
     }
 
     if (fwrite(&chunk.any_symbol, sizeof(chunk.any_symbol), 1, stream) < 1) {
         error("could not write any_symbol");
-        return 1;
+        return IMM_IOERROR;
     }
 
-    return 0;
+    return IMM_SUCCESS;
 }
