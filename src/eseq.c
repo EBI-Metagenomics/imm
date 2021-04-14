@@ -13,7 +13,7 @@ int eseq_setup(struct eseq* eseq, struct imm_seq const* seq)
     uint_fast32_t ncols = matrixu16_ncols(eseq->code);
     int           err = matrixu16_resize(eseq->code, imm_seq_length(seq) + 1, ncols);
     if (err) {
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         return err;
     }
 

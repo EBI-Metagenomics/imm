@@ -10,7 +10,7 @@ struct imm_seq const* imm_seq_clone(struct imm_seq const* seq)
     new->abc = seq->abc;
     new->string = strndup(seq->string, seq->length);
     if (!new->string) {
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         free(new);
         return NULL;
     }
@@ -37,7 +37,7 @@ struct imm_seq const* imm_seq_create(char const* string, struct imm_abc const* a
     seq->abc = abc;
     seq->string = strdup(string);
     if (!seq->string) {
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         free(seq);
         return NULL;
     }

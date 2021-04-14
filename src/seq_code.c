@@ -75,7 +75,7 @@ struct eseq* seq_code_create_eseq(struct seq_code const* seq_code)
     eseq->seq_code = seq_code;
     eseq->code = matrixu16_create(1, (uint_fast16_t)(seq_code->max_seq - seq_code->min_seq + 1));
     if (!eseq->code) {
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         free(eseq);
         return NULL;
     }

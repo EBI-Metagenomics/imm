@@ -69,7 +69,7 @@ struct imm_state* __imm_state_read(FILE* stream, struct imm_abc const* abc)
     if (chunk.name_length > 0) {
         chunk.name = malloc(sizeof(*chunk.name) * (size_t)(chunk.name_length + 1));
         if (!chunk.name) {
-            error("%s", explain(IMM_OUTOFMEM));
+            error_explain(IMM_OUTOFMEM);
             return NULL;
         }
 

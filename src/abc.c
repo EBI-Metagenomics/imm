@@ -31,6 +31,10 @@ struct imm_abc* imm_abc_read(FILE* stream)
     }
 
     chunk.symbols = malloc(sizeof(*chunk.symbols) * (size_t)(chunk.nsymbols + 1));
+    if (!chunk.symbols) {
+        error_explain(IMM_OUTOFMEM);
+        goto err;
+    }
 
     if (fread(chunk.symbols, sizeof(*chunk.symbols), (size_t)(chunk.nsymbols + 1), stream) <
         (size_t)(chunk.nsymbols + 1)) {
@@ -54,8 +58,7 @@ struct imm_abc* imm_abc_read(FILE* stream)
     return abc;
 
 err:
-    if (chunk.symbols)
-        free((void*)chunk.symbols);
+    free_if(chunk.symbols);
 
     return NULL;
 }

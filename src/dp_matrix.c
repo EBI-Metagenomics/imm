@@ -11,7 +11,7 @@ struct dp_matrix* dp_matrix_create(struct dp_state_table const* states)
     matrix->states = states;
     matrix->state_col = malloc(sizeof(*matrix->state_col) * dp_state_table_nstates(states));
     if (!matrix->state_col) {
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         free(matrix);
         return NULL;
     }
@@ -26,7 +26,7 @@ struct dp_matrix* dp_matrix_create(struct dp_state_table const* states)
 
     matrix->score = matrixf_create(MAX_LOOKUP, next_col);
     if (!matrix->score) {
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         free(matrix->state_col);
         free(matrix);
         return NULL;

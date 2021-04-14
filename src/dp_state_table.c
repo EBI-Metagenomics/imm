@@ -30,7 +30,7 @@ struct dp_state_table const* dp_state_table_create(struct model_state const* con
         free_if(table->max_seq);
         free_if(table->start_lprob);
         free(table);
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         return NULL;
     }
 
@@ -84,7 +84,7 @@ struct dp_state_table* dp_state_table_read(FILE* stream)
         free_if(chunk.max_seq);
         free_if(chunk.start_lprob);
         free(table);
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         return NULL;
     }
 

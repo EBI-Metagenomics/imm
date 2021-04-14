@@ -55,7 +55,7 @@ struct dp_trans_table* dp_trans_table_create(struct model_state const* const* ms
     tbl->ntrans = inctrans->ntotal_trans;
     tbl->offset = malloc(sizeof(*tbl->offset) * offset_size(nstates));
     if (!tbl->offset) {
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         goto err;
     }
     tbl->offset[0] = 0;
@@ -64,7 +64,7 @@ struct dp_trans_table* dp_trans_table_create(struct model_state const* const* ms
         tbl->score = malloc(sizeof(*tbl->score) * score_size(tbl->ntrans));
         tbl->source_state = malloc(sizeof(*tbl->source_state) * source_state_size(tbl->ntrans));
         if (!tbl->score || !tbl->source_state) {
-            error("%s", explain(IMM_OUTOFMEM));
+            error_explain(IMM_OUTOFMEM);
             goto err;
         }
     } else {
@@ -121,7 +121,7 @@ struct dp_trans_table* dp_trans_table_read(FILE* stream)
 
     chunk.score = malloc(sizeof(*chunk.score) * score_size(chunk.ntrans));
     if (!chunk.score) {
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         goto err;
     }
 
@@ -132,7 +132,7 @@ struct dp_trans_table* dp_trans_table_read(FILE* stream)
 
     chunk.source_state = malloc(sizeof(*chunk.source_state) * source_state_size(chunk.ntrans));
     if (!chunk.source_state) {
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         goto err;
     }
 
@@ -149,7 +149,7 @@ struct dp_trans_table* dp_trans_table_read(FILE* stream)
 
     chunk.offset = malloc(sizeof(*chunk.offset) * chunk.offset_size);
     if (!chunk.offset) {
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         goto err;
     }
 

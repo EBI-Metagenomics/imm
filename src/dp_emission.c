@@ -23,7 +23,7 @@ struct dp_emission const* dp_emission_create(struct seq_code const* seq_code, st
 
     emiss_tbl->offset = malloc(sizeof(*emiss_tbl->offset) * offset_size(nstates));
     if (!emiss_tbl->offset) {
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         free(emiss_tbl);
         return NULL;
     }
@@ -39,7 +39,7 @@ struct dp_emission const* dp_emission_create(struct seq_code const* seq_code, st
 
     emiss_tbl->score = malloc(sizeof(*emiss_tbl->score) * score_size(emiss_tbl, nstates));
     if (!emiss_tbl->score) {
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         free(emiss_tbl->offset);
         free(emiss_tbl);
         return NULL;
@@ -108,7 +108,7 @@ struct dp_emission const* dp_emission_read(FILE* stream)
 
     chunk.score = malloc(sizeof(*chunk.score) * chunk.score_size);
     if (!chunk.score) {
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         free(emission);
         return NULL;
     }
@@ -125,7 +125,7 @@ struct dp_emission const* dp_emission_read(FILE* stream)
 
     chunk.offset = malloc(sizeof(*chunk.offset) * chunk.offset_size);
     if (!chunk.score) {
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         free(chunk.score);
         free(emission);
         return NULL;

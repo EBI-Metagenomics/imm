@@ -40,7 +40,7 @@ struct state_idx* state_idx_create(uint16_t size)
     state_idx->items = malloc(sizeof(*state_idx->items) * size);
     if (!state_idx->items) {
         free(state_idx);
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         return NULL;
     }
     state_idx->curr_item = state_idx->items;

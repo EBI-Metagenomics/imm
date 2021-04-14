@@ -21,7 +21,7 @@ struct imm_cartes* imm_cartes_create(char const* set, uint16_t set_size, uint16_
     cartes->iter_idx = 0;
     cartes->item = malloc(sizeof(*cartes->item) * (unsigned)(max_times + 1));
     if (!cartes->item) {
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         free(cartes);
         return NULL;
     }

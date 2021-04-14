@@ -37,7 +37,7 @@ int imm_seq_table_add(struct imm_seq_table* table, struct imm_seq const* seq, im
 
     struct emission* emiss = xmalloc(sizeof(*emiss));
     if (!(emiss->seq = imm_seq_clone(seq))) {
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         kh_del(emission, table->emission_table, iter);
         free(emiss);
         return IMM_OUTOFMEM;

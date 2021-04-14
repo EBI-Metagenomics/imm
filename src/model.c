@@ -33,7 +33,7 @@ struct imm_model* imm_model_create(struct imm_hmm* hmm, struct imm_dp const* dp)
     model->nstates = (uint16_t)dp_state_table_nstates(dp_get_state_table(dp));
     model->states = malloc(sizeof(*model->states) * model->nstates);
     if (!model->states) {
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         model_deep_destroy(model);
         return NULL;
     }
@@ -238,7 +238,7 @@ static int read_hmm(struct imm_profile* prof, struct imm_model* model, FILE* str
 
     model->states = malloc(sizeof(*model->states) * model->nstates);
     if (!model->states) {
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         model_deep_destroy(model);
         return IMM_OUTOFMEM;
     }

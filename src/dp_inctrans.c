@@ -20,14 +20,14 @@ struct dp_inctrans* dp_inctrans_create(struct model_state const* const* mstates,
     inctrans->ntotal_trans = trans_size(mstates, nstates);
     inctrans->itrans_mem = malloc(sizeof(*inctrans->itrans_mem) * inctrans->ntotal_trans);
     if (!inctrans->itrans_mem) {
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         free(inctrans);
         return NULL;
     }
 
     inctrans->lhead_mem = create_inctrans(nstates);
     if (!inctrans->lhead_mem) {
-        error("%s", explain(IMM_OUTOFMEM));
+        error_explain(IMM_OUTOFMEM);
         free(inctrans->itrans_mem);
         free(inctrans);
         return NULL;
