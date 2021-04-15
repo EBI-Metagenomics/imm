@@ -15,6 +15,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Install containers
+      run: sudo /bin/bash -c "$(curl -fsSL https://git.io/JerYI)" -s EBI-Metagenomics/containers
+
     - name: Install logaddexp
       run: sudo /bin/bash -c "$(curl -fsSL https://git.io/JerYI)" -s horta/logaddexp
 
