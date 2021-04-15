@@ -22,6 +22,7 @@ endif()
 
 find_package(logaddexp REQUIRED)
 find_package(elapsed REQUIRED)
+find_package(containers REQUIRED)
 
 add_library(imm
     src/abc.c
@@ -81,6 +82,7 @@ if(${CMAKE_C_COMPILER_ID} MATCHES "MSVC")
 else()
     set(WARNING_FLAGS -Wall -Wextra -pedantic -Wstrict-prototypes -Wshadow
         -Wconversion -Wmissing-prototypes -Wno-unused-parameter -Wsign-conversion
+        -Wno-gnu-statement-expression
         -Wno-unused-function # FIXME: added only to please clangd for now
         -Wno-empty-translation-unit # FIXME: added only to please clangd for now
     )
@@ -121,6 +123,7 @@ target_include_directories(imm
 )
 target_link_libraries(imm PUBLIC LOGADDEXP::logaddexp)
 target_link_libraries(imm PUBLIC ELAPSED::elapsed)
+target_link_libraries(imm PUBLIC CONTAINERS::containers)
 set_target_properties(imm PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
 target_compile_features(imm PRIVATE c_std_11)

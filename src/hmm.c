@@ -16,6 +16,7 @@ struct imm_hmm
 {
     struct imm_abc const*     abc;
     struct model_state_table* table;
+    /* HASH_DECLARE(states_tbl, 10); */
 };
 
 static imm_float get_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state);
@@ -39,6 +40,7 @@ struct imm_hmm* imm_hmm_create(struct imm_abc const* abc)
     struct imm_hmm* hmm = xmalloc(sizeof(*hmm));
     hmm->abc = abc;
     hmm->table = model_state_table_create();
+    /* hash_init(hmm->states_tbl); */
     return hmm;
 }
 
