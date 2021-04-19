@@ -33,6 +33,7 @@ struct imm_state const* imm_state_create(uint16_t id, char const* name, struct i
     s->abc = abc;
     s->vtable = vtable;
     s->derived = derived;
+    hnode_init(&s->hnode);
     return s;
 }
 
@@ -86,6 +87,7 @@ struct imm_state* __imm_state_read(FILE* stream, struct imm_abc const* abc)
     state->abc = abc;
     state->vtable = (struct imm_state_vtable){NULL, NULL, NULL, NULL, NULL};
     state->derived = NULL;
+    hnode_init(&state->hnode);
 
     return state;
 }

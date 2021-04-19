@@ -9,11 +9,17 @@ struct imm_dp;
 struct imm_hmm;
 struct model_state;
 
+union state_pair
+{
+    uint16_t ids[2];
+    uint32_t key;
+};
+
 struct trans
 {
-    uint16_t  src_state;
-    uint16_t  dst_state;
-    imm_float lprob;
+    union state_pair state_pair;
+    imm_float        lprob;
+    struct hnode     hnode;
 };
 
 #define MAX_NTRANS (1 << 13)
@@ -24,10 +30,10 @@ struct imm_hmm
     struct model_state_table* table;
     imm_float                 start_lprob;
     uint16_t                  start_state;
-    HASH_DECLARE(states_tbl, 11);
+    HASH_DECLARE(state_tbl, 11);
     HASH_DECLARE(trans_tbl, 11);
-    uint16_t     ntransitions;
-    struct trans transitions[MAX_NTRANS];
+    uint16_t     ntrans;
+    struct trans trans[MAX_NTRANS];
 };
 
 struct imm_abc const*            hmm_abc(struct imm_hmm const* hmm);
