@@ -7,12 +7,12 @@
 #include <stddef.h>
 
 /*
- * container_of - cast a member of a structure out to the containing structure
+ * container_of2 - cast a member of a structure out to the containing structure
  * @ptr:	the pointer to the member.
  * @type:	the type of the container struct this is embedded in.
  * @member:	the name of the member within the struct.
  */
-#define container_of(ptr, type, member)                                                                                \
+#define container_of2(ptr, type, member)                                                                               \
     __extension__({                                                                                                    \
         const __typeof__(((type*)0)->member)* __mptr = (ptr);                                                          \
         (type*)((char*)__mptr - offsetof(type, member));                                                               \
@@ -122,7 +122,7 @@ static inline int list_empty(const struct list_head* head) { return head->next =
  * @type:	the type of the struct this is embedded in.
  * @member:	the name of the list_head within the struct.
  */
-#define list_entry(ptr, type, member) container_of(ptr, type, member)
+#define list_entry(ptr, type, member) container_of2(ptr, type, member)
 
 /**
  * list_first_entry - get the first element from a list

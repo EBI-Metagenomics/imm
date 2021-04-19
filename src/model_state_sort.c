@@ -1,12 +1,12 @@
 #include "model_state_sort.h"
 #include "containers/containers.h"
 #include "imm/imm.h"
-#include "khash_ptr.h"
 #include "log.h"
 #include "model_state.h"
 #include "model_trans.h"
 #include "model_trans_table.h"
 #include "std.h"
+#include <stdlib.h>
 
 #define INITIAL_MARK 0
 #define TEMPORARY_MARK 1
@@ -19,6 +19,7 @@ struct vert
     int                       mark;
     struct queue              edgeq;
     struct node               node;
+    struct hnode              hnode;
 };
 
 struct edge
@@ -27,18 +28,18 @@ struct edge
     struct node  node;
 };
 
-KHASH_MAP_INIT_PTR(node, struct vert*)
+struct graph
+{
+    struct queue vertq;
+    HASH_DECLARE(vert_tbl, 11);
+};
 
-static int        check_mute_cycles(struct queue* node_list);
+static int        check_mute_cycles(struct queue* vertq);
 static int        check_mute_visit(struct vert* vert);
-static void       create_edges(struct queue* node_list, khash_t(node) * table);
-static void       create_nodes(struct model_state const** mstates, uint16_t nstates, struct queue* vertq,
-                               khash_t(node) * node_table);
-static void       destroy_edges(struct queue* edges);
-static void       destroy_node(struct vert* vert);
-static void       destroy_node_list(struct queue* node_list);
+static void       create_edges(struct graph* graph);
+static void       create_nodes(struct graph* graph, struct model_state const** mstates, uint16_t nstates);
 static inline int name_compare(void const* a, void const* b);
-static void       unmark_nodes(struct queue* node_list);
+static void       unmark_nodes(struct queue* vertq);
 static void       visit(struct vert* vert, struct model_state const*** mstate);
 
 void model_state_name_sort(struct model_state const** mstates, uint16_t nstates)
@@ -48,39 +49,35 @@ void model_state_name_sort(struct model_state const** mstates, uint16_t nstates)
 
 int model_state_topological_sort(struct model_state const** mstates, uint16_t nstates)
 {
-    struct queue vertq = QUEUE_INIT(vertq);
-    khash_t(node)* vert_tbl = kh_init(node);
+    struct graph graph;
+    queue_init(&graph.vertq);
+    hash_init(graph.vert_tbl);
 
-    create_nodes(mstates, nstates, &vertq, vert_tbl);
+    create_nodes(&graph, mstates, nstates);
 
-    if (check_mute_cycles(&vertq)) {
+    if (check_mute_cycles(&graph.vertq)) {
         error("mute cycles are not allowed");
-        destroy_node_list(&vertq);
-        kh_destroy(node, vert_tbl);
-        return 1;
+        return IMM_ILLEGALARG;
     }
-    unmark_nodes(&vertq);
+    unmark_nodes(&graph.vertq);
 
     struct model_state const** mstate_arr = malloc(sizeof(*mstate_arr) * nstates);
     struct model_state const** cur = mstate_arr + nstates;
     struct vert*               vert = NULL;
-    struct iter                iter = queue_iter(&vertq);
+    struct iter                iter = queue_iter(&graph.vertq);
     iter_for_each_entry(vert, &iter, node) { visit(vert, &cur); }
-
-    destroy_node_list(&vertq);
-    kh_destroy(node, vert_tbl);
 
     for (uint16_t i = 0; i < nstates; ++i)
         mstates[i] = mstate_arr[i];
 
     free(mstate_arr);
-    return 0;
+    return IMM_SUCCESS;
 }
 
-static int check_mute_cycles(struct queue* node_list)
+static int check_mute_cycles(struct queue* vertq)
 {
     struct vert* vert = NULL;
-    struct iter  iter = queue_iter(node_list);
+    struct iter  iter = queue_iter(vertq);
     iter_for_each_entry(vert, &iter, node)
     {
         if (check_mute_visit(vert))
@@ -114,14 +111,13 @@ static int check_mute_visit(struct vert* vert)
     return 0;
 }
 
-static void create_edges(struct queue* node_list, khash_t(node) * table)
+static void create_edges(struct graph* graph)
 {
-    struct vert* node = NULL;
-    struct iter  iter = queue_iter(node_list);
-    iter_for_each_entry(node, &iter, node)
+    struct vert* src = NULL;
+    struct iter  iter = queue_iter(&graph->vertq);
+    iter_for_each_entry(src, &iter, node)
     {
-
-        struct model_trans_table const* mtrans_table = model_state_get_mtrans_table(node->mstate);
+        struct model_trans_table const* mtrans_table = model_state_get_mtrans_table(src->mstate);
         struct model_trans const**      mtrans = model_trans_table_array(mtrans_table);
 
         for (uint16_t i = 0; i < model_trans_table_size(mtrans_table); ++i) {
@@ -130,60 +126,55 @@ static void create_edges(struct queue* node_list, khash_t(node) * table)
 
             struct edge* edge = malloc(sizeof(*edge));
 
-            khiter_t it = kh_get(node, table, model_trans_get_state(t));
-            BUG(it == kh_end(table));
+            struct vert* dst = NULL;
+            uint16_t     key = imm_state_id(model_trans_get_state(t));
+            hash_for_each_possible(graph->vert_tbl, dst, hnode, key)
+            {
+                if (imm_state_id(dst->state) == key)
+                    break;
+            }
+            BUG(dst == NULL);
 
-            edge->vert = kh_val(table, it);
-            queue_put(&node->edgeq, &edge->node);
+            edge->vert = dst;
+            queue_put(&src->edgeq, &edge->node);
         }
         free(mtrans);
     }
 }
 
-static void create_nodes(struct model_state const** mstates, uint16_t nstates, struct queue* vertq,
-                         khash_t(node) * node_table)
+static void create_nodes(struct graph* graph, struct model_state const** mstates, uint16_t nstates)
 {
     for (uint16_t i = 0; i < nstates; ++i) {
         struct model_state const* mstate = mstates[i];
 
-        struct vert* node = malloc(sizeof(*node));
-        node->state = model_state_get_state(mstate);
-        node->mstate = mstate;
-        node->mark = INITIAL_MARK;
+        struct vert* vert = malloc(sizeof(*vert));
+        vert->state = model_state_get_state(mstate);
+        vert->mstate = mstate;
+        vert->mark = INITIAL_MARK;
 
-        queue_init(&node->edgeq);
-        if (imm_lprob_is_zero(model_state_get_start(node->mstate)))
-            queue_put(vertq, &node->node);
+        queue_init(&vert->edgeq);
+        if (imm_lprob_is_zero(model_state_get_start(vert->mstate)))
+            queue_put(&graph->vertq, &vert->node);
         else
-            queue_put_first(vertq, &node->node);
+            queue_put_first(&graph->vertq, &vert->node);
 
-        int      ret = 0;
-        khiter_t iter = kh_put(node, node_table, node->state, &ret);
-        BUG(ret == -1 || ret == 0);
-        kh_key(node_table, iter) = node->state;
-        kh_val(node_table, iter) = node;
+        hash_add(graph->vert_tbl, &vert->hnode, imm_state_id(vert->state));
     }
 
-    create_edges(vertq, node_table);
+    create_edges(graph);
 }
-
-static void destroy_edges(struct queue* edges) { queue_init(edges); }
-
-static void destroy_node(struct vert* vert) { destroy_edges(&vert->edgeq); }
-
-static void destroy_node_list(struct queue* node_list) { queue_init(node_list); }
 
 static inline int name_compare(void const* a, void const* b)
 {
-    char const* left = imm_state_name((*(struct model_state const**)a)->state);
-    char const* right = imm_state_name((*(struct model_state const**)b)->state);
-    return strcmp(left, right);
+    struct imm_state const* s0 = (*(struct model_state const**)a)->state;
+    struct imm_state const* s1 = (*(struct model_state const**)b)->state;
+    return imm_state_id(s0) - imm_state_id(s1);
 }
 
-static void unmark_nodes(struct queue* node_list)
+static void unmark_nodes(struct queue* vertq)
 {
     struct vert* vert = NULL;
-    struct iter  iter = queue_iter(node_list);
+    struct iter  iter = queue_iter(vertq);
     iter_for_each_entry(vert, &iter, node) { vert->mark = INITIAL_MARK; }
 }
 

@@ -1,7 +1,7 @@
 #ifndef IMM_STATE_H
 #define IMM_STATE_H
 
-/* #include "containers/containers.h" */
+#include "containers/containers.h"
 #include "imm/export.h"
 #include "imm/float.h"
 #include "imm/lprob.h"
@@ -36,7 +36,7 @@ struct imm_state
 
     struct imm_state_vtable vtable;
     void*                   derived;
-    /* struct hnode            hnode; */
+    struct hnode            hnode;
 };
 
 IMM_API struct imm_state const*     imm_state_create(uint16_t id, char const* name, struct imm_abc const* abc,
