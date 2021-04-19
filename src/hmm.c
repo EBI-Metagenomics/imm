@@ -25,6 +25,8 @@ struct imm_hmm
 {
     struct imm_abc const*     abc;
     struct model_state_table* table;
+    imm_float                 start_lprob;
+    struct imm_state const*   start_state;
     HASH_DECLARE(states_tbl, 11);
     HASH_DECLARE(trans_tbl, 11);
     uint16_t     ntransitions;
@@ -52,6 +54,8 @@ struct imm_hmm* imm_hmm_create(struct imm_abc const* abc)
     struct imm_hmm* hmm = xmalloc(sizeof(*hmm));
     hmm->abc = abc;
     hmm->table = model_state_table_create();
+    hmm->start_lprob = imm_lprob_invalid();
+    hmm->start_state = NULL;
     hash_init(hmm->states_tbl);
     hash_init(hmm->trans_tbl);
     hmm->ntransitions = 0;
@@ -276,6 +280,8 @@ int imm_hmm_set_start(struct imm_hmm* hmm, struct imm_state const* state, imm_fl
     }
 
     model_state_set_start(model_state_table_get(hmm->table, i), lprob);
+    hmm->start_lprob = lprob;
+    hmm->start_state = state;
     return IMM_SUCCESS;
 }
 
