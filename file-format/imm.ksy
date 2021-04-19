@@ -44,6 +44,8 @@ types:
         type: dp
   hmm:
     seq:
+      - id: start_lprob
+        type: f4
       - id: nstates
         type: u2
       - id: states

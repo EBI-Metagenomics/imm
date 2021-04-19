@@ -231,6 +231,16 @@ static int read_hmm(struct imm_profile* prof, struct imm_model* model, FILE* str
 {
     model->hmm = imm_hmm_create(prof->abc);
 
+    if (fread(&model->hmm->start_lprob, sizeof(model->hmm->start_lprob), 1, stream) < 1) {
+        error("could not read starting lprob");
+        goto err;
+    }
+
+    if (fread(&model->hmm->start_state, sizeof(model->hmm->start_state), 1, stream) < 1) {
+        error("could not read starting state");
+        goto err;
+    }
+
     if (!(model->mstates = read_mstates(prof, model, stream))) {
         error("could not read states");
         goto err;
@@ -253,11 +263,13 @@ static int read_hmm(struct imm_profile* prof, struct imm_model* model, FILE* str
         goto err;
     }
 
-    return 0;
+    return IMM_SUCCESS;
 
 err:
-    if (model->hmm)
+    if (model->hmm) {
         imm_hmm_destroy(model->hmm);
+        model->hmm = NULL;
+    }
 
     return IMM_SUCCESS;
 }
@@ -375,6 +387,17 @@ static int write_dp(struct imm_model const* model, FILE* stream)
 
 static int write_hmm(struct imm_profile const* prof, struct imm_model const* model, FILE* stream)
 {
+    imm_float start_lprob = model->hmm->start_lprob;
+    if (fwrite(&start_lprob, sizeof(start_lprob), 1, stream) < 1) {
+        error("could not write starting lprob");
+        return 1;
+    }
+    uint16_t start_state = model->hmm->start_state;
+    if (fwrite(&start_state, sizeof(start_state), 1, stream) < 1) {
+        error("could not write starting state id");
+        return 1;
+    }
+
     if (write_mstates(prof, stream, (struct model_state const* const*)model->mstates, model->nstates)) {
         error("could not write states");
         return 1;
