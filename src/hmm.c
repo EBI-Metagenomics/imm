@@ -12,17 +12,29 @@
 #include "std.h"
 #include <stdlib.h>
 
+struct trans
+{
+    uint16_t  src_state;
+    uint16_t  dst_state;
+    imm_float lprob;
+};
+
+#define MAX_NTRANS (1 << 13)
+
 struct imm_hmm
 {
     struct imm_abc const*     abc;
     struct model_state_table* table;
-    /* HASH_DECLARE(states_tbl, 10); */
+    HASH_DECLARE(states_tbl, 11);
+    HASH_DECLARE(trans_tbl, 11);
+    uint16_t     ntransitions;
+    struct trans transitions[MAX_NTRANS];
 };
 
 static imm_float get_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state);
 static int       normalize_transitions(struct model_state* mstate);
 
-int imm_hmm_add_state(struct imm_hmm* hmm, struct imm_state const* state, imm_float start_lprob)
+int imm_hmm_add_state(struct imm_hmm* hmm, struct imm_state const* state)
 {
     unsigned long i = model_state_table_find(hmm->table, state);
     if (i != model_state_table_end(hmm->table)) {
@@ -30,7 +42,7 @@ int imm_hmm_add_state(struct imm_hmm* hmm, struct imm_state const* state, imm_fl
         return IMM_ILLEGALARG;
     }
 
-    struct model_state* mstate = model_state_create(state, start_lprob);
+    struct model_state* mstate = model_state_create(state, imm_lprob_zero());
     model_state_table_add(hmm->table, mstate);
     return IMM_SUCCESS;
 }
@@ -40,7 +52,9 @@ struct imm_hmm* imm_hmm_create(struct imm_abc const* abc)
     struct imm_hmm* hmm = xmalloc(sizeof(*hmm));
     hmm->abc = abc;
     hmm->table = model_state_table_create();
-    /* hash_init(hmm->states_tbl); */
+    hash_init(hmm->states_tbl);
+    hash_init(hmm->trans_tbl);
+    hmm->ntransitions = 0;
     return hmm;
 }
 

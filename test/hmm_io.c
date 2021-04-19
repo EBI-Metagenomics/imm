@@ -24,9 +24,9 @@ void test_hmm_write_io_two_states(void)
     imm_float                      lprobs1[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5), zero()};
     struct imm_normal_state const* state1 = imm_normal_state_create(1, "state1", abc, lprobs1);
 
-    imm_hmm_add_state(hmm, imm_mute_state_super(state0), imm_log(0.5));
+    imm_hmm_add_state(hmm, imm_mute_state_super(state0));
     imm_hmm_set_start(hmm, imm_mute_state_super(state0), imm_log(0.1));
-    imm_hmm_add_state(hmm, imm_normal_state_super(state1), imm_log(0.001));
+    imm_hmm_add_state(hmm, imm_normal_state_super(state1));
     imm_hmm_set_trans(hmm, imm_mute_state_super(state0), imm_normal_state_super(state1), imm_log(0.9));
 
     struct imm_dp const* dp = imm_hmm_create_dp(hmm, imm_normal_state_super(state1));
@@ -126,17 +126,17 @@ void test_hmm_write_io_two_hmms(void)
     struct imm_mute_state const*   hmm0_state0 = imm_mute_state_create(0, "hmm0_state0", abc);
     imm_float                      hmm0_lprobs[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5), zero()};
     struct imm_normal_state const* hmm0_state1 = imm_normal_state_create(1, "hmm0_state1", abc, hmm0_lprobs);
-    imm_hmm_add_state(hmm0, imm_mute_state_super(hmm0_state0), imm_log(0.5));
+    imm_hmm_add_state(hmm0, imm_mute_state_super(hmm0_state0));
     imm_hmm_set_start(hmm0, imm_mute_state_super(hmm0_state0), imm_log(0.1));
-    imm_hmm_add_state(hmm0, imm_normal_state_super(hmm0_state1), imm_log(0.001));
+    imm_hmm_add_state(hmm0, imm_normal_state_super(hmm0_state1));
     imm_hmm_set_trans(hmm0, imm_mute_state_super(hmm0_state0), imm_normal_state_super(hmm0_state1), imm_log(0.9));
 
     struct imm_mute_state const*   hmm1_state0 = imm_mute_state_create(2, NULL, abc);
     imm_float                      hmm1_lprobs[] = {imm_log(0.05), imm_log(0.05), imm_log(0.1), zero()};
     struct imm_normal_state const* hmm1_state1 = imm_normal_state_create(3, "", abc, hmm1_lprobs);
-    imm_hmm_add_state(hmm1, imm_mute_state_super(hmm1_state0), imm_log(0.5));
+    imm_hmm_add_state(hmm1, imm_mute_state_super(hmm1_state0));
     imm_hmm_set_start(hmm1, imm_mute_state_super(hmm1_state0), imm_log(0.1));
-    imm_hmm_add_state(hmm1, imm_normal_state_super(hmm1_state1), imm_log(0.01));
+    imm_hmm_add_state(hmm1, imm_normal_state_super(hmm1_state1));
     imm_hmm_set_trans(hmm1, imm_mute_state_super(hmm1_state0), imm_normal_state_super(hmm1_state1), imm_log(0.9));
 
     struct imm_dp const* dp0 = imm_hmm_create_dp(hmm0, imm_normal_state_super(hmm0_state1));

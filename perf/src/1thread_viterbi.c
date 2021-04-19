@@ -66,10 +66,11 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
     struct imm_mute_state const* start = imm_mute_state_create(0, "START", abc);
-    imm_hmm_add_state(hmm, imm_mute_state_super(start), imm_log(1.0));
+    imm_hmm_add_state(hmm, imm_mute_state_super(start));
+    imm_hmm_set_start(hmm, imm_mute_state_super(start), imm_log(1.0));
 
     struct imm_mute_state const* end = imm_mute_state_create(1, "END", abc);
-    imm_hmm_add_state(hmm, imm_mute_state_super(end), zero());
+    imm_hmm_add_state(hmm, imm_mute_state_super(end));
 
     imm_float B_lprobs[] = {imm_log(1.0), zero(), zero(), zero(), zero()};
     imm_float E_lprobs[] = {zero(), zero(), zero(), imm_log(1.0), zero()};
@@ -78,11 +79,11 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
     imm_float I_lprobs[] = {zero(), zero(), imm_log(1.0), zero(), zero()};
 
     struct imm_normal_state const* B = imm_normal_state_create(2, "B", abc, B_lprobs);
-    imm_hmm_add_state(hmm, imm_normal_state_super(B), zero());
+    imm_hmm_add_state(hmm, imm_normal_state_super(B));
     struct imm_normal_state const* E = imm_normal_state_create(3, "E", abc, E_lprobs);
-    imm_hmm_add_state(hmm, imm_normal_state_super(E), zero());
+    imm_hmm_add_state(hmm, imm_normal_state_super(E));
     struct imm_normal_state const* J = imm_normal_state_create(4, "J", abc, J_lprobs);
-    imm_hmm_add_state(hmm, imm_normal_state_super(J), zero());
+    imm_hmm_add_state(hmm, imm_normal_state_super(J));
 
     imm_hmm_set_trans(hmm, imm_mute_state_super(start), imm_normal_state_super(B), imm_log(0.2));
     imm_hmm_set_trans(hmm, imm_normal_state_super(B), imm_normal_state_super(B), imm_log(0.2));
@@ -103,9 +104,9 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
         I[i] = imm_normal_state_create(id++, fmt_name(name, "I", i), abc, I_lprobs);
         D[i] = imm_mute_state_create(id++, fmt_name(name, "D", i), abc);
 
-        imm_hmm_add_state(hmm, imm_normal_state_super(M[i]), zero());
-        imm_hmm_add_state(hmm, imm_normal_state_super(I[i]), zero());
-        imm_hmm_add_state(hmm, imm_mute_state_super(D[i]), zero());
+        imm_hmm_add_state(hmm, imm_normal_state_super(M[i]));
+        imm_hmm_add_state(hmm, imm_normal_state_super(I[i]));
+        imm_hmm_add_state(hmm, imm_mute_state_super(D[i]));
 
         if (i == 0)
             imm_hmm_set_trans(hmm, imm_normal_state_super(B), imm_normal_state_super(M[0]), imm_log(0.2));

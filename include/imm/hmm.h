@@ -12,7 +12,7 @@ struct imm_path;
 struct imm_seq;
 struct imm_state;
 
-IMM_API int             imm_hmm_add_state(struct imm_hmm* hmm, struct imm_state const* state, imm_float start_lprob);
+IMM_API int             imm_hmm_add_state(struct imm_hmm* hmm, struct imm_state const* state);
 IMM_API struct imm_hmm* imm_hmm_create(struct imm_abc const* abc);
 IMM_API struct imm_dp*  imm_hmm_create_dp(struct imm_hmm const* hmm, struct imm_state const* end_state);
 IMM_API int             imm_hmm_del_state(struct imm_hmm* hmm, struct imm_state const* state);

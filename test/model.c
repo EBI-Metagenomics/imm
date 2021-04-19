@@ -29,11 +29,12 @@ struct model create_model(void)
     m.hmm = hmm;
 
     struct imm_mute_state const* start = imm_mute_state_create(0, "START", abc);
-    imm_hmm_add_state(hmm, mute_super(start), imm_log(1.0));
+    imm_hmm_add_state(hmm, mute_super(start));
+    imm_hmm_set_start(hmm, mute_super(start), imm_log(1.0));
     imm_vecp_append(m.mute_states, start);
 
     struct imm_mute_state const* end = imm_mute_state_create(1, "END", abc);
-    imm_hmm_add_state(hmm, mute_super(end), zero());
+    imm_hmm_add_state(hmm, mute_super(end));
     m.end = end;
 
     imm_float B_lprobs[] = {imm_log(1.0), zero(), zero(), zero(), zero()};
@@ -43,13 +44,13 @@ struct model create_model(void)
     imm_float I_lprobs[] = {zero(), zero(), imm_log(1.0), zero(), zero()};
 
     struct imm_normal_state const* B = imm_normal_state_create(2, "B", abc, B_lprobs);
-    imm_hmm_add_state(hmm, normal_super(B), zero());
+    imm_hmm_add_state(hmm, normal_super(B));
     imm_vecp_append(m.normal_states, B);
     struct imm_normal_state const* E = imm_normal_state_create(3, "E", abc, E_lprobs);
-    imm_hmm_add_state(hmm, normal_super(E), zero());
+    imm_hmm_add_state(hmm, normal_super(E));
     imm_vecp_append(m.normal_states, E);
     struct imm_normal_state const* J = imm_normal_state_create(4, "J", abc, J_lprobs);
-    imm_hmm_add_state(hmm, normal_super(J), zero());
+    imm_hmm_add_state(hmm, normal_super(J));
     imm_vecp_append(m.normal_states, J);
 
     imm_hmm_set_trans(hmm, mute_super(start), normal_super(B), imm_log(0.2));
@@ -71,11 +72,11 @@ struct model create_model(void)
         I[i] = imm_normal_state_create(id++, fmt(name, "I", i), abc, I_lprobs);
         D[i] = imm_mute_state_create(id++, fmt(name, "D", i), abc);
 
-        imm_hmm_add_state(hmm, normal_super(M[i]), zero());
+        imm_hmm_add_state(hmm, normal_super(M[i]));
         imm_vecp_append(m.normal_states, M[i]);
-        imm_hmm_add_state(hmm, normal_super(I[i]), zero());
+        imm_hmm_add_state(hmm, normal_super(I[i]));
         imm_vecp_append(m.normal_states, I[i]);
-        imm_hmm_add_state(hmm, mute_super(D[i]), zero());
+        imm_hmm_add_state(hmm, mute_super(D[i]));
         imm_vecp_append(m.normal_states, D[i]);
 
         if (i == 0)

@@ -35,7 +35,8 @@ void test_hmm_likelihood_single_state(void)
     struct imm_normal_state const* state = imm_normal_state_create(0, "State0", abc, lprobs);
     struct imm_hmm*                hmm = imm_hmm_create(abc);
 
-    imm_hmm_add_state(hmm, imm_normal_state_super(state), imm_log(0.5));
+    imm_hmm_add_state(hmm, imm_normal_state_super(state));
+    imm_hmm_set_start(hmm, imm_normal_state_super(state), imm_log(0.5));
     cass_cond(imm_hmm_normalize(hmm) == 0);
 
     struct imm_path* path = imm_path_create();
@@ -108,8 +109,9 @@ void test_hmm_likelihood_two_states(void)
     imm_float                      lprobs1[] = {imm_log(0.5), imm_log(0.25), imm_log(0.5), imm_log(1.0)};
     struct imm_normal_state const* state1 = imm_normal_state_create(1, "State1", abc, lprobs1);
 
-    imm_hmm_add_state(hmm, imm_normal_state_super(state0), imm_log(1.0));
-    imm_hmm_add_state(hmm, imm_normal_state_super(state1), zero());
+    imm_hmm_add_state(hmm, imm_normal_state_super(state0));
+    imm_hmm_set_start(hmm, imm_normal_state_super(state0), imm_log(1.0));
+    imm_hmm_add_state(hmm, imm_normal_state_super(state1));
 
     imm_hmm_set_trans(hmm, imm_normal_state_super(state0), imm_normal_state_super(state0), imm_log(0.1));
     imm_hmm_set_trans(hmm, imm_normal_state_super(state0), imm_normal_state_super(state1), imm_log(0.2));
@@ -165,7 +167,8 @@ void test_hmm_likelihood_mute_state(void)
 
     struct imm_mute_state const* state = imm_mute_state_create(0, "State0", abc);
 
-    imm_hmm_add_state(hmm, imm_mute_state_super(state), imm_log(1.0));
+    imm_hmm_add_state(hmm, imm_mute_state_super(state));
+    imm_hmm_set_start(hmm, imm_mute_state_super(state), imm_log(1.0));
 
     imm_hmm_set_trans(hmm, imm_mute_state_super(state), imm_mute_state_super(state), imm_log(0.1));
 
@@ -213,8 +216,9 @@ void test_hmm_likelihood_two_mute_states(void)
     struct imm_mute_state const* S0 = imm_mute_state_create(0, "S0", abc);
     struct imm_mute_state const* S1 = imm_mute_state_create(1, "S1", abc);
 
-    imm_hmm_add_state(hmm, imm_mute_state_super(S0), 0.0);
-    imm_hmm_add_state(hmm, imm_mute_state_super(S1), zero());
+    imm_hmm_add_state(hmm, imm_mute_state_super(S0));
+    imm_hmm_set_start(hmm, imm_mute_state_super(S0), 0.0);
+    imm_hmm_add_state(hmm, imm_mute_state_super(S1));
 
     imm_hmm_set_trans(hmm, imm_mute_state_super(S0), imm_mute_state_super(S1), 0.0);
 
@@ -238,17 +242,18 @@ void test_hmm_likelihood_invalid(void)
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
     struct imm_mute_state const* S = imm_mute_state_create(0, "S", abc);
-    imm_hmm_add_state(hmm, imm_mute_state_super(S), 0.0);
+    imm_hmm_add_state(hmm, imm_mute_state_super(S));
+    imm_hmm_set_start(hmm, imm_mute_state_super(S), 0.0);
 
     struct imm_mute_state const* M1 = imm_mute_state_create(1, "M1", abc);
-    imm_hmm_add_state(hmm, imm_mute_state_super(M1), zero());
+    imm_hmm_add_state(hmm, imm_mute_state_super(M1));
 
     imm_float const                lprobs[] = {imm_log(0.8), imm_log(0.2)};
     struct imm_normal_state const* M2 = imm_normal_state_create(2, "M2", abc, lprobs);
-    imm_hmm_add_state(hmm, imm_normal_state_super(M2), zero());
+    imm_hmm_add_state(hmm, imm_normal_state_super(M2));
 
     struct imm_mute_state const* E = imm_mute_state_create(3, "E", abc);
-    imm_hmm_add_state(hmm, imm_mute_state_super(E), zero());
+    imm_hmm_add_state(hmm, imm_mute_state_super(E));
 
     imm_hmm_set_trans(hmm, imm_mute_state_super(S), imm_mute_state_super(M1), 0.0);
     imm_hmm_set_trans(hmm, imm_mute_state_super(M1), imm_normal_state_super(M2), 0.0);
