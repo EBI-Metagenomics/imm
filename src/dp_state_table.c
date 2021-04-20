@@ -110,7 +110,7 @@ struct dp_state_table* dp_state_table_read(FILE* stream)
     }
 
     if (fread(&chunk.start_lprob_, sizeof(chunk.start_lprob_), 1, stream) < 1) {
-        error("could not read start_lprob");
+        error("could not read start_lprob_");
         goto err;
     }
 
@@ -123,6 +123,8 @@ struct dp_state_table* dp_state_table_read(FILE* stream)
     table->min_seq = chunk.min_seq;
     table->max_seq = chunk.max_seq;
     table->start_lprob = chunk.start_lprob;
+    table->start_state = chunk.start_state;
+    table->start_lprob_ = chunk.start_lprob_;
     table->end_state = chunk.end_state;
 
     return table;
@@ -141,6 +143,8 @@ int dp_state_table_write(struct dp_state_table const* state_tbl, FILE* stream)
                                          .min_seq = state_tbl->min_seq,
                                          .max_seq = state_tbl->max_seq,
                                          .start_lprob = state_tbl->start_lprob,
+                                         .start_state = state_tbl->start_state,
+                                         .start_lprob_ = state_tbl->start_lprob_,
                                          .end_state = state_tbl->end_state};
 
     if (fwrite(&chunk.nstates, sizeof(chunk.nstates), 1, stream) < 1) {

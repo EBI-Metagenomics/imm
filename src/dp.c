@@ -357,7 +357,9 @@ static void viterbi_first_row(struct imm_dp const* dp, struct imm_dp_task* task,
         uint_fast8_t min_len = dp_state_table_min_seq(dp->state_table, i);
         uint_fast8_t max_len = (uint_fast8_t)MIN(dp_state_table_max_seq(dp->state_table, i), remain);
 
-        tscore.score = MAX(dp_state_table_start_lprob(dp->state_table, i), tscore.score);
+        if (dp->state_table->start_state == i)
+            tscore.score = MAX(dp->state_table->start_lprob_, tscore.score);
+
         set_score(dp, task, tscore.score, min_len, max_len, 0, i);
     }
 }
@@ -382,7 +384,9 @@ static void viterbi_first_row_safe(struct imm_dp const* dp, struct imm_dp_task* 
         uint_fast8_t min_len = dp_state_table_min_seq(dp->state_table, i);
         uint_fast8_t max_len = dp_state_table_max_seq(dp->state_table, i);
 
-        tscore.score = MAX(dp_state_table_start_lprob(dp->state_table, i), tscore.score);
+        if (dp->state_table->start_state == i)
+            tscore.score = MAX(dp->state_table->start_lprob_, tscore.score);
+
         set_score(dp, task, tscore.score, min_len, max_len, 0, i);
     }
 }
