@@ -88,7 +88,8 @@ struct imm_dp* imm_hmm_create_dp(struct imm_hmm const* hmm, struct imm_state con
         return NULL;
     }
 
-    return dp_create(hmm->abc, mstates, hmm->nstates, end_state);
+    return dp_create(hmm->abc, mstates, hmm->nstates, hmm_get_state(hmm, hmm->start_state), hmm->start_lprob,
+                     end_state);
 }
 
 int imm_hmm_del_state(struct imm_hmm* hmm, struct imm_state* state)
@@ -357,7 +358,7 @@ struct model_state const* const* hmm_get_mstates(struct imm_hmm const* hmm, stru
     return dp_get_mstates(dp);
 }
 
-struct imm_state* hmm_get_state(struct imm_hmm* hmm, uint16_t state_id)
+struct imm_state* hmm_get_state(struct imm_hmm const* hmm, uint16_t state_id)
 {
     struct imm_state* state = NULL;
     hash_for_each_possible(hmm->state_tbl, state, hnode, state_id)

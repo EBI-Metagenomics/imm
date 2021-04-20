@@ -1,6 +1,7 @@
 #ifndef DP_H
 #define DP_H
 
+#include "imm/float.h"
 #include <inttypes.h>
 #include <stdio.h>
 
@@ -23,7 +24,7 @@ struct imm_dp
 };
 
 struct imm_dp*            dp_create(struct imm_abc const* abc, struct model_state const** mstates, uint16_t nstates,
-                                    struct imm_state const* end_state);
+                                    struct imm_state const* start_state, imm_float start_lprob, struct imm_state const* end_state);
 void                      dp_create_from_model(struct imm_model* model);
 struct dp_emission const* dp_get_emission(struct imm_dp const* dp);
 struct model_state const* const* dp_get_mstates(struct imm_dp const* dp);

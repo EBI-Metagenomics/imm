@@ -111,7 +111,7 @@ int imm_dp_change_trans(struct imm_dp* dp, struct imm_hmm* hmm, struct imm_state
 }
 
 struct imm_dp* dp_create(struct imm_abc const* abc, struct model_state const** mstates, uint16_t nstates,
-                         struct imm_state const* end_state)
+                         struct imm_state const* start_state, imm_float start_lprob, struct imm_state const* end_state)
 {
     struct imm_dp* dp = xmalloc(sizeof(*dp));
     dp->mstates = mstates;
@@ -127,7 +127,7 @@ struct imm_dp* dp_create(struct imm_abc const* abc, struct model_state const** m
     if (!dp->state_idx)
         goto err;
 
-    dp->state_table = dp_state_table_create(mstates, nstates, end_state, dp->state_idx);
+    dp->state_table = dp_state_table_create(mstates, nstates, start_state, start_lprob, end_state, dp->state_idx);
     if (!dp->state_table)
         goto err;
 
