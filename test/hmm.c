@@ -84,8 +84,8 @@ void test_hmm_wrong_states(void)
     cass_cond(imm_hmm_set_trans(hmm, imm_mute_state_super(state1), imm_mute_state_super(state0), imm_log(0.3)) ==
               IMM_ILLEGALARG);
     cass_cond(imm_hmm_create_dp(hmm, imm_mute_state_super(state1)) == NULL);
-    cass_cond(imm_hmm_normalize_trans(hmm, imm_mute_state_super(state1)) == IMM_ILLEGALARG);
-    cass_cond(imm_hmm_normalize_trans(hmm, imm_mute_state_super(state0)) == IMM_SUCCESS);
+    cass_cond(imm_hmm_normalize_state_trans(hmm, imm_mute_state_super(state1)) == IMM_ILLEGALARG);
+    cass_cond(imm_hmm_normalize_state_trans(hmm, imm_mute_state_super(state0)) == IMM_SUCCESS);
 
     imm_hmm_destroy(hmm);
     imm_mute_state_destroy(state0);

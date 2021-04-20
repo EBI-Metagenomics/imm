@@ -22,9 +22,9 @@ IMM_API imm_float       imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_
                                           struct imm_state const* dst);
 IMM_API imm_float       imm_hmm_loglikelihood(struct imm_hmm const* hmm, struct imm_seq const* seq,
                                               struct imm_path const* path);
-IMM_API int             imm_hmm_normalize(struct imm_hmm* hmm);
+IMM_API int             imm_hmm_normalize_trans(struct imm_hmm* hmm);
 IMM_API int             imm_hmm_normalize_start(struct imm_hmm* hmm);
-IMM_API int             imm_hmm_normalize_trans(struct imm_hmm* hmm, struct imm_state const* src_state);
+IMM_API int             imm_hmm_normalize_state_trans(struct imm_hmm* hmm, struct imm_state const* src_state);
 IMM_API int             imm_hmm_set_start(struct imm_hmm* hmm, struct imm_state const* state, imm_float lprob);
 IMM_API int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state, struct imm_state const* tgt_state,
                               imm_float lprob);

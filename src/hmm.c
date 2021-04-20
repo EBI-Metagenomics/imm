@@ -207,11 +207,12 @@ err:
     return imm_lprob_invalid();
 }
 
-int imm_hmm_normalize(struct imm_hmm* hmm)
+int imm_hmm_normalize_trans(struct imm_hmm* hmm)
 {
-    int err = imm_hmm_normalize_start(hmm);
-    if (err)
-        goto err;
+    int err = IMM_SUCCESS;
+    /* int err = imm_hmm_normalize_start(hmm); */
+    /* if (err) */
+    /*     goto err; */
 
     unsigned long i = 0;
     model_state_table_for_each(i, hmm->table)
@@ -230,45 +231,45 @@ err:
     return err;
 }
 
-int imm_hmm_normalize_start(struct imm_hmm* hmm)
-{
-    unsigned size = model_state_table_size(hmm->table);
-    if (size == 0)
-        return IMM_SUCCESS;
+/* int imm_hmm_normalize_start(struct imm_hmm* hmm) */
+/* { */
+/*     unsigned size = model_state_table_size(hmm->table); */
+/*     if (size == 0) */
+/*         return IMM_SUCCESS; */
 
-    imm_float* lprobs = xmalloc(sizeof(*lprobs) * size);
-    imm_float* lprob = lprobs;
+/*     imm_float* lprobs = xmalloc(sizeof(*lprobs) * size); */
+/*     imm_float* lprob = lprobs; */
 
-    unsigned long i = 0;
-    model_state_table_for_each(i, hmm->table)
-    {
-        if (model_state_table_exist(hmm->table, i)) {
-            *lprob = model_state_get_start(model_state_table_get(hmm->table, i));
-            ++lprob;
-        }
-    }
+/*     unsigned long i = 0; */
+/*     model_state_table_for_each(i, hmm->table) */
+/*     { */
+/*         if (model_state_table_exist(hmm->table, i)) { */
+/*             *lprob = model_state_get_start(model_state_table_get(hmm->table, i)); */
+/*             ++lprob; */
+/*         } */
+/*     } */
 
-    int err = imm_lprob_normalize(lprobs, size);
-    if (err) {
-        error("no starting state is possible");
-        free(lprobs);
-        return err;
-    }
+/*     int err = imm_lprob_normalize(lprobs, size); */
+/*     if (err) { */
+/*         error("no starting state is possible"); */
+/*         free(lprobs); */
+/*         return err; */
+/*     } */
 
-    lprob = lprobs;
-    model_state_table_for_each(i, hmm->table)
-    {
-        if (model_state_table_exist(hmm->table, i)) {
-            model_state_set_start(model_state_table_get(hmm->table, i), *lprob);
-            ++lprob;
-        }
-    }
-    free(lprobs);
+/*     lprob = lprobs; */
+/*     model_state_table_for_each(i, hmm->table) */
+/*     { */
+/*         if (model_state_table_exist(hmm->table, i)) { */
+/*             model_state_set_start(model_state_table_get(hmm->table, i), *lprob); */
+/*             ++lprob; */
+/*         } */
+/*     } */
+/*     free(lprobs); */
 
-    return IMM_SUCCESS;
-}
+/*     return IMM_SUCCESS; */
+/* } */
 
-int imm_hmm_normalize_trans(struct imm_hmm* hmm, struct imm_state const* src_state)
+int imm_hmm_normalize_state_trans(struct imm_hmm* hmm, struct imm_state const* src_state)
 {
     unsigned long i = model_state_table_find(hmm->table, src_state);
     if (i == model_state_table_end(hmm->table)) {
@@ -305,16 +306,12 @@ int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state, st
         return IMM_ILLEGALARG;
     }
 
-    /* if (!imm_lprob_is_finite(lprob)) { */
-    /*     error("transition probability is not finite"); */
-    /*     return IMM_ILLEGALARG; */
-    /* } */
     if (!hash_hashed(&src_state->hnode)) {
-        error("src_state not found");
+        error("source state not found");
         return IMM_ILLEGALARG;
     }
     if (!hash_hashed(&tgt_state->hnode)) {
-        error("tgt_state not found");
+        error("destination state not found");
         return IMM_ILLEGALARG;
     }
 
@@ -323,18 +320,13 @@ int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state, st
 
     unsigned long i = model_trans_table_find(table, tgt_state);
     if (i == model_trans_table_end(table)) {
-        if (!imm_lprob_is_zero(lprob)) {
-            model_trans_table_add(table, model_trans_create(tgt_state, lprob));
-            struct trans* newt = hmm->trans + hmm->ntrans++;
-            newt->state_pair.ids[0] = imm_state_id(src_state);
-            newt->state_pair.ids[1] = imm_state_id(tgt_state);
-            newt->lprob = lprob;
-            hash_add(hmm->trans_tbl, &newt->hnode, newt->state_pair.key);
-        }
+        model_trans_table_add(table, model_trans_create(tgt_state, lprob));
+        struct trans* newt = hmm->trans + hmm->ntrans++;
+        newt->state_pair.ids[0] = imm_state_id(src_state);
+        newt->state_pair.ids[1] = imm_state_id(tgt_state);
+        newt->lprob = lprob;
+        hash_add(hmm->trans_tbl, &newt->hnode, newt->state_pair.key);
     } else {
-        /* if (imm_lprob_is_zero(lprob)) */
-        /*     model_trans_table_del(table, i); */
-        /* else { */
         model_trans_set_lprob(model_trans_table_get(table, i), lprob);
         union state_pair pair = {.ids[0] = imm_state_id(src_state), .ids[1] = imm_state_id(tgt_state)};
         struct trans*    cursor = NULL;
@@ -342,9 +334,11 @@ int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state, st
         {
             if (cursor->state_pair.key == pair.key) {
                 cursor->lprob = lprob;
+                return IMM_SUCCESS;
             }
         }
-        /* } */
+        error("transition not found");
+        return IMM_ILLEGALARG;
     }
 
     return IMM_SUCCESS;
