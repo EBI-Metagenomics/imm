@@ -88,6 +88,7 @@ struct imm_state* __imm_state_read(FILE* stream, struct imm_abc const* abc)
     state->abc = abc;
     state->vtable = (struct imm_state_vtable){NULL, NULL, NULL, NULL, NULL};
     state->derived = NULL;
+    stack_init(&state->trans);
     hnode_init(&state->hnode);
 
     return state;

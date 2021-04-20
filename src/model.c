@@ -331,6 +331,7 @@ static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct model_stat
         return 1;
     }
 
+    hmm->ntrans = 0;
     for (uint16_t i = 0; i < ntrans; ++i) {
 
         uint16_t  src_state = 0;
@@ -351,9 +352,18 @@ static int read_transitions(FILE* stream, struct imm_hmm* hmm, struct model_stat
             error("could not read lprob");
             return 1;
         }
-
         struct model_trans_table* tbl = model_state_get_mtrans_table(mstates[src_state]);
+        struct imm_state*         src = (struct imm_state*)model_state_get_state(mstates[src_state]);
         struct imm_state const*   tgt = model_state_get_state(mstates[tgt_state]);
+
+        struct trans* newt = hmm->trans + hmm->ntrans++;
+        trans_init(newt);
+        newt->pair.ids[0] = src->id;
+        newt->pair.ids[1] = tgt->id;
+        newt->lprob = lprob;
+        hash_add(hmm->trans_tbl, &newt->hnode, newt->pair.key);
+        stack_put(&src->trans, &newt->node);
+
         model_trans_table_add(tbl, model_trans_create(tgt, lprob));
     }
 

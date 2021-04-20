@@ -109,13 +109,15 @@ imm_float imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* s
                             struct imm_state const* dst_state)
 {
 
-    /* struct trans *cursor = NULL; */
-    /* union state_pair pair = STATE_PAIR_INIT(src_state->id, dst_state->id); */
-    /* hash_for_each_possible(hmm->trans_tbl, cursor, hnode, pair.key) { */
-    /*     if (cursor->state_pair.ids[0] == src_state->id && cursor->state_pair.ids[1] == dst_state->id) { */
-    /*         return cursor->lprob; */
-    /*     } */
-    /* } */
+    struct trans*    cursor = NULL;
+    union state_pair pair = STATE_PAIR_INIT(src_state->id, dst_state->id);
+    imm_float        lprob0 = 9339.0;
+    hash_for_each_possible(hmm->trans_tbl, cursor, hnode, pair.key)
+    {
+        if (cursor->pair.ids[0] == src_state->id && cursor->pair.ids[1] == dst_state->id) {
+            lprob0 = cursor->lprob;
+        }
+    }
 
     unsigned long src = model_state_table_find(hmm->table, src_state);
     if (src == model_state_table_end(hmm->table)) {
@@ -135,6 +137,11 @@ imm_float imm_hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* s
     if (i == model_trans_table_end(table))
         return imm_lprob_zero();
 
+    if ((lprob0 - model_trans_get_lprob(model_trans_table_get(table, i))) != 0.0) {
+        printf("%f %f\n", lprob0, model_trans_get_lprob(model_trans_table_get(table, i)));
+        fflush(stdout);
+    }
+    BUG((lprob0 - model_trans_get_lprob(model_trans_table_get(table, i))) != 0.0);
     return model_trans_get_lprob(model_trans_table_get(table, i));
 }
 
@@ -206,7 +213,7 @@ err:
 
 int imm_hmm_normalize_trans(struct imm_hmm* hmm)
 {
-    /* return normalize_transitions2(hmm); */
+    normalize_transitions2(hmm);
 
     int err = IMM_SUCCESS;
     /* int err = imm_hmm_normalize_start(hmm); */
@@ -291,7 +298,7 @@ int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state* src_state, struct i
         stack_put(&src_state->trans, &newt->node);
     } else {
         model_trans_set_lprob(model_trans_table_get(table, i), lprob);
-        union state_pair pair = {.ids[0] = imm_state_id(src_state), .ids[1] = imm_state_id(tgt_state)};
+        union state_pair pair = {.ids[0] = src_state->id, .ids[1] = tgt_state->id};
         struct trans*    cursor = NULL;
         hash_for_each_possible(hmm->trans_tbl, cursor, hnode, pair.key)
         {
@@ -325,7 +332,12 @@ struct imm_state const** imm_hmm_states(struct imm_hmm* hmm, uint32_t* nstates)
 
 struct imm_abc const* hmm_abc(struct imm_hmm const* hmm) { return hmm->abc; }
 
-void hmm_add_mstate(struct imm_hmm* hmm, struct model_state* mstate) { model_state_table_add(hmm->table, mstate); }
+void hmm_add_mstate(struct imm_hmm* hmm, struct model_state* mstate)
+{
+    model_state_table_add(hmm->table, mstate);
+    struct imm_state* state = (struct imm_state*)mstate->state;
+    hash_add(hmm->state_tbl, &state->hnode, mstate->state->id);
+}
 
 struct model_state const* const* hmm_get_mstates(struct imm_hmm const* hmm, struct imm_dp const* dp)
 {
@@ -361,6 +373,7 @@ static int normalize_transitions2(struct imm_hmm* hmm)
             return IMM_ILLEGALARG;
         }
 
+        it = stack_iter(&state->trans);
         iter_for_each_entry(trans, &it, node) { trans->lprob -= lnorm; }
     }
 
