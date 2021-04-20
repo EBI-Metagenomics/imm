@@ -791,8 +791,6 @@ void test_hmm_viterbi_profile_delete(void)
     cass_close(imm_hmm_loglikelihood(hmm, AB, path), 4 * imm_log(0.5));
     imm_path_destroy(path);
 
-    cass_cond(imm_hmm_del_state(hmm, imm_normal_state_super(N2)) == 0);
-
     cass_close(single_viterbi(hmm, A, imm_mute_state_super(M), &path), 2 * imm_log(0.5));
     cass_close(imm_hmm_loglikelihood(hmm, A, path), 2 * imm_log(0.5));
     imm_path_destroy(path);

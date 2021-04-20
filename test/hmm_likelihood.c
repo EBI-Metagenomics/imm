@@ -37,7 +37,7 @@ void test_hmm_likelihood_single_state(void)
 
     imm_hmm_add_state(hmm, imm_normal_state_super(state));
     imm_hmm_set_start(hmm, imm_normal_state_super(state), imm_log(0.5));
-    cass_cond(imm_hmm_normalize_trans(hmm) == 0);
+    cass_cond(imm_hmm_normalize_trans(hmm) == IMM_SUCCESS);
 
     struct imm_path* path = imm_path_create();
     imm_path_append(path, imm_step_create(imm_normal_state_super(state), 1));

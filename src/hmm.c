@@ -10,10 +10,12 @@
 #include "model_trans_table.h"
 #include "seq_code.h"
 #include "std.h"
+#include <containers/hash.h>
 #include <stdlib.h>
 
 static imm_float get_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state);
 static int       normalize_transitions(struct model_state* mstate);
+static int       normalize_transitions2(struct imm_hmm* hmm);
 
 int imm_hmm_add_state(struct imm_hmm* hmm, struct imm_state* state)
 {
@@ -22,6 +24,7 @@ int imm_hmm_add_state(struct imm_hmm* hmm, struct imm_state* state)
         return IMM_ILLEGALARG;
     }
     hash_add(hmm->state_tbl, &state->hnode, imm_state_id(state));
+    hmm->nstates++;
 
     unsigned long i = model_state_table_find(hmm->table, state);
     if (i != model_state_table_end(hmm->table)) {
@@ -54,17 +57,12 @@ struct imm_dp* imm_hmm_create_dp(struct imm_hmm const* hmm, struct imm_state con
     bool              found = false;
     hash_for_each_possible(hmm->state_tbl, cursor, hnode, imm_state_id(end_state))
     {
-        if (imm_state_id(cursor) == imm_state_id(end_state)) {
+        if (cursor == end_state) {
             found = true;
+            break;
         }
     }
-    /* if (!found) { */
-    /*     error("end_state not found"); */
-    /*     return NULL; */
-    /* } */
-
-    unsigned long end = model_state_table_find(hmm->table, end_state);
-    if (end == model_state_table_end(hmm->table)) {
+    if (!found) {
         error("end_state not found");
         return NULL;
     }
@@ -83,20 +81,19 @@ struct imm_dp* imm_hmm_create_dp(struct imm_hmm const* hmm, struct imm_state con
 
 int imm_hmm_del_state(struct imm_hmm* hmm, struct imm_state* state)
 {
-    unsigned long i = model_state_table_find(hmm->table, state);
-    /* if (i == model_state_table_end(hmm->table)) { */
+    /* TODO: not implemented yet */
+    return IMM_FAILURE;
+    /* unsigned long i = model_state_table_find(hmm->table, state); */
+
+    /* if (!hash_hashed(&state->hnode)) { */
     /*     error("state not found"); */
     /*     return IMM_ILLEGALARG; */
     /* } */
 
-    if (!hash_hashed(&state->hnode)) {
-        error("state not found");
-        return IMM_ILLEGALARG;
-    }
-
-    model_state_table_del(hmm->table, i);
-    hash_del(&state->hnode);
-    return IMM_SUCCESS;
+    /* model_state_table_del(hmm->table, i); */
+    /* hash_del(&state->hnode); */
+    /* hmm->nstates--; */
+    /* return IMM_SUCCESS; */
 }
 
 void imm_hmm_destroy(struct imm_hmm const* hmm)
@@ -209,6 +206,8 @@ err:
 
 int imm_hmm_normalize_trans(struct imm_hmm* hmm)
 {
+    /* return normalize_transitions2(hmm); */
+
     int err = IMM_SUCCESS;
     /* int err = imm_hmm_normalize_start(hmm); */
     /* if (err) */
@@ -230,44 +229,6 @@ err:
     error("failed to normalize the hmm");
     return err;
 }
-
-/* int imm_hmm_normalize_start(struct imm_hmm* hmm) */
-/* { */
-/*     unsigned size = model_state_table_size(hmm->table); */
-/*     if (size == 0) */
-/*         return IMM_SUCCESS; */
-
-/*     imm_float* lprobs = xmalloc(sizeof(*lprobs) * size); */
-/*     imm_float* lprob = lprobs; */
-
-/*     unsigned long i = 0; */
-/*     model_state_table_for_each(i, hmm->table) */
-/*     { */
-/*         if (model_state_table_exist(hmm->table, i)) { */
-/*             *lprob = model_state_get_start(model_state_table_get(hmm->table, i)); */
-/*             ++lprob; */
-/*         } */
-/*     } */
-
-/*     int err = imm_lprob_normalize(lprobs, size); */
-/*     if (err) { */
-/*         error("no starting state is possible"); */
-/*         free(lprobs); */
-/*         return err; */
-/*     } */
-
-/*     lprob = lprobs; */
-/*     model_state_table_for_each(i, hmm->table) */
-/*     { */
-/*         if (model_state_table_exist(hmm->table, i)) { */
-/*             model_state_set_start(model_state_table_get(hmm->table, i), *lprob); */
-/*             ++lprob; */
-/*         } */
-/*     } */
-/*     free(lprobs); */
-
-/*     return IMM_SUCCESS; */
-/* } */
 
 int imm_hmm_normalize_state_trans(struct imm_hmm* hmm, struct imm_state const* src_state)
 {
@@ -298,7 +259,7 @@ int imm_hmm_set_start(struct imm_hmm* hmm, struct imm_state const* state, imm_fl
     return IMM_SUCCESS;
 }
 
-int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state, struct imm_state const* tgt_state,
+int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state* src_state, struct imm_state const* tgt_state,
                       imm_float lprob)
 {
     if (!imm_lprob_is_finite(lprob)) {
@@ -322,17 +283,19 @@ int imm_hmm_set_trans(struct imm_hmm* hmm, struct imm_state const* src_state, st
     if (i == model_trans_table_end(table)) {
         model_trans_table_add(table, model_trans_create(tgt_state, lprob));
         struct trans* newt = hmm->trans + hmm->ntrans++;
-        newt->state_pair.ids[0] = imm_state_id(src_state);
-        newt->state_pair.ids[1] = imm_state_id(tgt_state);
+        trans_init(newt);
+        newt->pair.ids[0] = imm_state_id(src_state);
+        newt->pair.ids[1] = imm_state_id(tgt_state);
         newt->lprob = lprob;
-        hash_add(hmm->trans_tbl, &newt->hnode, newt->state_pair.key);
+        hash_add(hmm->trans_tbl, &newt->hnode, newt->pair.key);
+        stack_put(&src_state->trans, &newt->node);
     } else {
         model_trans_set_lprob(model_trans_table_get(table, i), lprob);
         union state_pair pair = {.ids[0] = imm_state_id(src_state), .ids[1] = imm_state_id(tgt_state)};
         struct trans*    cursor = NULL;
         hash_for_each_possible(hmm->trans_tbl, cursor, hnode, pair.key)
         {
-            if (cursor->state_pair.key == pair.key) {
+            if (cursor->pair.key == pair.key) {
                 cursor->lprob = lprob;
                 return IMM_SUCCESS;
             }
@@ -377,6 +340,31 @@ static imm_float get_start_lprob(struct imm_hmm const* hmm, struct imm_state con
         return imm_lprob_invalid();
     }
     return model_state_get_start(model_state_table_get(hmm->table, i));
+}
+
+static int normalize_transitions2(struct imm_hmm* hmm)
+{
+    struct imm_state* state = NULL;
+    unsigned          bkt = 0;
+    hash_for_each(hmm->state_tbl, bkt, state, hnode)
+    {
+        /* TODO: should normalize anyway */
+        if (stack_empty(&state->trans))
+            continue;
+        struct trans* trans = NULL;
+        struct iter   it = stack_iter(&state->trans);
+        imm_float     lnorm = imm_lprob_zero();
+        iter_for_each_entry(trans, &it, node) { lnorm = logaddexp(lnorm, trans->lprob); }
+
+        if (!imm_lprob_is_finite(lnorm)) {
+            error("non-finite normalization denominator");
+            return IMM_ILLEGALARG;
+        }
+
+        iter_for_each_entry(trans, &it, node) { trans->lprob -= lnorm; }
+    }
+
+    return IMM_SUCCESS;
 }
 
 static int normalize_transitions(struct model_state* mstate)

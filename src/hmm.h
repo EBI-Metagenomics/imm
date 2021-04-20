@@ -15,17 +15,24 @@ union state_pair
     uint32_t key;
 };
 
+struct trans
+{
+    union state_pair pair;
+    imm_float        lprob;
+    struct node      node;
+    struct hnode     hnode;
+};
+
 #define STATE_PAIR_INIT(src, dst)                                                                                      \
     {                                                                                                                  \
         .ids[0] = src, .ids[1] = dst                                                                                   \
     }
 
-struct trans
+static inline void trans_init(struct trans* trans)
 {
-    union state_pair state_pair;
-    imm_float        lprob;
-    struct hnode     hnode;
-};
+    node_init(&trans->node);
+    hnode_init(&trans->hnode);
+}
 
 #define MAX_NTRANS (1 << 13)
 

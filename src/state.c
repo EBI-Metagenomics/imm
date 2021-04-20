@@ -33,6 +33,7 @@ struct imm_state const* imm_state_create(uint16_t id, char const* name, struct i
     s->abc = abc;
     s->vtable = vtable;
     s->derived = derived;
+    stack_init(&s->trans);
     hnode_init(&s->hnode);
     return s;
 }

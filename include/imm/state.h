@@ -36,6 +36,7 @@ struct imm_state
 
     struct imm_state_vtable vtable;
     void*                   derived;
+    struct stack            trans;
     struct hnode            hnode;
 };
 

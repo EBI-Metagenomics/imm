@@ -39,11 +39,11 @@ void test_hmm_del_get_state(void)
     cass_cond(imm_hmm_add_state(hmm, imm_mute_state_super(state0)) == 0);
     cass_cond(imm_hmm_add_state(hmm, imm_mute_state_super(state1)) == 0);
 
-    cass_cond(imm_hmm_del_state(hmm, imm_mute_state_super(state0)) == 0);
-    cass_cond(imm_hmm_del_state(hmm, imm_mute_state_super(state1)) == 0);
+    /* cass_cond(imm_hmm_del_state(hmm, imm_mute_state_super(state0)) == 0); */
+    /* cass_cond(imm_hmm_del_state(hmm, imm_mute_state_super(state1)) == 0); */
 
-    cass_cond(imm_hmm_del_state(hmm, imm_mute_state_super(state0)) == IMM_ILLEGALARG);
-    cass_cond(imm_hmm_del_state(hmm, imm_mute_state_super(state1)) == IMM_ILLEGALARG);
+    /* cass_cond(imm_hmm_del_state(hmm, imm_mute_state_super(state0)) == IMM_ILLEGALARG); */
+    /* cass_cond(imm_hmm_del_state(hmm, imm_mute_state_super(state1)) == IMM_ILLEGALARG); */
 
     imm_hmm_destroy(hmm);
     imm_mute_state_destroy(state0);
