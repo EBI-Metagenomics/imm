@@ -5,6 +5,7 @@
 #include "imm/imm.h"
 #include "model_state.h"
 #include "model_state_sort.h"
+#include "model_state_sort_old.h"
 #include "model_state_table.h"
 #include "model_trans.h"
 #include "model_trans_table.h"
@@ -63,20 +64,31 @@ struct imm_dp* imm_hmm_create_dp(struct imm_hmm const* hmm, struct imm_state con
         }
     }
     if (!found) {
-        error("end_state not found");
+        error("end state not found");
         return NULL;
     }
 
+    struct imm_state const** states = xmalloc(sizeof(*states) * hmm->nstates);
+    unsigned                 bkt = 0;
+    unsigned                 i = 0;
+    hash_for_each(hmm->state_tbl, bkt, cursor, hnode) { states[i++] = cursor; }
     struct model_state const** mstates = model_state_table_array(hmm->table);
 
-    if (model_state_topological_sort(mstates, model_state_table_size(hmm->table))) {
-        error("could not sort mstates");
+    if (model_state_topological_sort(states, hmm->nstates)) {
+        error("could not sort states");
         free(mstates);
+        free(states);
         return NULL;
     }
-    uint16_t nstates = (uint16_t)model_state_table_size(hmm->table);
 
-    return dp_create(hmm->abc, mstates, nstates, end_state);
+    if (model_state_topological_sort_old(mstates, hmm->nstates)) {
+        error("could not sort states");
+        free(mstates);
+        free(states);
+        return NULL;
+    }
+
+    return dp_create(hmm->abc, mstates, hmm->nstates, end_state);
 }
 
 int imm_hmm_del_state(struct imm_hmm* hmm, struct imm_state* state)
@@ -337,11 +349,24 @@ void hmm_add_mstate(struct imm_hmm* hmm, struct model_state* mstate)
     model_state_table_add(hmm->table, mstate);
     struct imm_state* state = (struct imm_state*)mstate->state;
     hash_add(hmm->state_tbl, &state->hnode, mstate->state->id);
+    hmm->nstates++;
 }
 
 struct model_state const* const* hmm_get_mstates(struct imm_hmm const* hmm, struct imm_dp const* dp)
 {
     return dp_get_mstates(dp);
+}
+
+struct imm_state* hmm_get_state(struct imm_hmm* hmm, uint16_t state_id)
+{
+    struct imm_state* state = NULL;
+    hash_for_each_possible(hmm->state_tbl, state, hnode, state_id)
+    {
+        if (state->id == state_id)
+            return state;
+    }
+    BUG("could not find state");
+    return NULL;
 }
 
 static imm_float get_start_lprob(struct imm_hmm const* hmm, struct imm_state const* state)

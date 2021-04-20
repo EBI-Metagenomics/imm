@@ -44,6 +44,7 @@ add_library(imm
     src/model.c
     src/model_state.c
     src/model_state_sort.c
+    src/model_state_sort_old.c
     src/model_state_table.c
     src/model_trans.c
     src/model_trans_table.c

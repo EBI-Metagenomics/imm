@@ -5,7 +5,7 @@ void std_bug_print_exit(char const* file, char const* func, int line, char const
 
 #define BUG(cond)                                                                                                      \
     do {                                                                                                               \
-        if (!(cond))                                                                                                   \
+        if (!(bool)(cond))                                                                                             \
             break;                                                                                                     \
         std_bug_print_exit(__FILE__, __func__, __LINE__, #cond);                                                       \
     } while (0)

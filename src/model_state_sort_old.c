@@ -1,6 +1,5 @@
-#include "model_state_sort.h"
+#include "model_state_sort_old.h"
 #include "containers/containers.h"
-#include "hmm.h"
 #include "imm/imm.h"
 #include "log.h"
 #include "model_state.h"
@@ -15,11 +14,12 @@
 
 struct vert
 {
-    struct imm_state const* state;
-    int                     mark;
-    struct queue            edgeq;
-    struct node             node;
-    struct hnode            hnode;
+    struct imm_state const*   state;
+    struct model_state const* mstate;
+    int                       mark;
+    struct queue              edgeq;
+    struct node               node;
+    struct hnode              hnode;
 };
 
 struct edge
@@ -37,23 +37,23 @@ struct graph
 static int        check_mute_cycles(struct queue* vertq);
 static int        check_mute_visit(struct vert* vert);
 static void       create_edges(struct graph* graph);
-static void       create_vertices(struct graph* graph, struct imm_state const** states, uint16_t nstates);
+static void       create_nodes(struct graph* graph, struct model_state const** mstates, uint16_t nstates);
 static inline int name_compare(void const* a, void const* b);
 static void       unmark_nodes(struct queue* vertq);
-static void       visit(struct vert* vert, struct imm_state const*** state);
+static void       visit(struct vert* vert, struct model_state const*** mstate);
 
-void model_state_name_sort(struct model_state const** mstates, uint16_t nstates)
+void model_state_name_sort_old(struct model_state const** mstates, uint16_t nstates)
 {
     qsort(mstates, nstates, sizeof(*mstates), name_compare);
 }
 
-int model_state_topological_sort(struct imm_state const** states, uint16_t nstates)
+int model_state_topological_sort_old(struct model_state const** mstates, uint16_t nstates)
 {
     struct graph graph;
     queue_init(&graph.vertq);
     hash_init(graph.vert_tbl);
 
-    create_vertices(&graph, states, nstates);
+    create_nodes(&graph, mstates, nstates);
 
     if (check_mute_cycles(&graph.vertq)) {
         error("mute cycles are not allowed");
@@ -61,16 +61,16 @@ int model_state_topological_sort(struct imm_state const** states, uint16_t nstat
     }
     unmark_nodes(&graph.vertq);
 
-    struct imm_state const** state_arr = xmalloc(sizeof(*state_arr) * nstates);
-    struct imm_state const** cur = state_arr + nstates;
-    struct vert*             vert = NULL;
-    struct iter              iter = queue_iter(&graph.vertq);
+    struct model_state const** mstate_arr = malloc(sizeof(*mstate_arr) * nstates);
+    struct model_state const** cur = mstate_arr + nstates;
+    struct vert*               vert = NULL;
+    struct iter                iter = queue_iter(&graph.vertq);
     iter_for_each_entry(vert, &iter, node) { visit(vert, &cur); }
 
     for (uint16_t i = 0; i < nstates; ++i)
-        states[i] = state_arr[i];
+        mstates[i] = mstate_arr[i];
 
-    free(state_arr);
+    free(mstate_arr);
     return IMM_SUCCESS;
 }
 
@@ -117,22 +117,17 @@ static void create_edges(struct graph* graph)
     struct iter  iter = queue_iter(&graph->vertq);
     iter_for_each_entry(src, &iter, node)
     {
-        struct trans* trans = NULL;
-        struct iter   iter2 = stack_iter(&src->state->trans);
-        iter_for_each_entry(trans, &iter2, node)
-        {
+        struct model_trans_table const* mtrans_table = model_state_get_mtrans_table(src->mstate);
+        struct model_trans const**      mtrans = model_trans_table_array(mtrans_table);
 
-            /* struct model_trans_table const* mtrans_table = model_state_get_mtrans_table(src->state); */
-            /* struct model_trans const**      mtrans = model_trans_table_array(mtrans_table); */
+        for (uint16_t i = 0; i < model_trans_table_size(mtrans_table); ++i) {
 
-            /* for (uint16_t i = 0; i < model_trans_table_size(mtrans_table); ++i) { */
-
-            /* struct model_trans const* t = mtrans[i]; */
+            struct model_trans const* t = mtrans[i];
 
             struct edge* edge = malloc(sizeof(*edge));
 
             struct vert* dst = NULL;
-            uint16_t     key = trans->pair.ids[1];
+            uint16_t     key = imm_state_id(model_trans_get_state(t));
             hash_for_each_possible(graph->vert_tbl, dst, hnode, key)
             {
                 if (imm_state_id(dst->state) == key)
@@ -142,24 +137,26 @@ static void create_edges(struct graph* graph)
 
             edge->vert = dst;
             queue_put(&src->edgeq, &edge->node);
-            /* } */
         }
-        /* free(mtrans); */
+        free(mtrans);
     }
 }
 
-static void create_vertices(struct graph* graph, struct imm_state const** states, uint16_t nstates)
+static void create_nodes(struct graph* graph, struct model_state const** mstates, uint16_t nstates)
 {
     for (uint16_t i = 0; i < nstates; ++i) {
+        struct model_state const* mstate = mstates[i];
+
         struct vert* vert = malloc(sizeof(*vert));
-        vert->state = states[i];
+        vert->state = model_state_get_state(mstate);
+        vert->mstate = mstate;
         vert->mark = INITIAL_MARK;
 
         queue_init(&vert->edgeq);
-        /* if (imm_lprob_is_zero(model_state_get_start(vert->mstate))) */
-        /*     queue_put(&graph->vertq, &vert->node); */
-        /* else */
-        queue_put_first(&graph->vertq, &vert->node);
+        if (imm_lprob_is_zero(model_state_get_start(vert->mstate)))
+            queue_put(&graph->vertq, &vert->node);
+        else
+            queue_put_first(&graph->vertq, &vert->node);
 
         hash_add(graph->vert_tbl, &vert->hnode, imm_state_id(vert->state));
     }
@@ -181,7 +178,7 @@ static void unmark_nodes(struct queue* vertq)
     iter_for_each_entry(vert, &iter, node) { vert->mark = INITIAL_MARK; }
 }
 
-static void visit(struct vert* vert, struct imm_state const*** state)
+static void visit(struct vert* vert, struct model_state const*** mstate)
 {
     if (vert->mark == PERMANENT_MARK)
         return;
@@ -191,8 +188,8 @@ static void visit(struct vert* vert, struct imm_state const*** state)
     vert->mark = TEMPORARY_MARK;
     struct edge const* edge = NULL;
     struct iter        iter = queue_iter(&vert->edgeq);
-    iter_for_each_entry(edge, &iter, node) { visit(edge->vert, state); }
+    iter_for_each_entry(edge, &iter, node) { visit(edge->vert, mstate); }
     vert->mark = PERMANENT_MARK;
-    *state -= 1;
-    **state = vert->state;
+    *mstate -= 1;
+    **mstate = vert->mstate;
 }
