@@ -68,7 +68,8 @@ void test_hmm_likelihood_single_state(void)
     imm_path_destroy(path);
 
     cass_equal(imm_hmm_normalize(hmm), 0);
-    cass_equal(imm_hmm_set_trans(hmm, imm_normal_state_super(state), imm_normal_state_super(state), zero()), 0);
+    cass_equal(imm_hmm_set_trans(hmm, imm_normal_state_super(state), imm_normal_state_super(state), zero()),
+               IMM_ILLEGALARG);
     cass_equal(imm_hmm_normalize(hmm), 0);
     cass_equal(imm_hmm_set_trans(hmm, imm_normal_state_super(state), imm_normal_state_super(state), imm_log(0.5)), 0);
 

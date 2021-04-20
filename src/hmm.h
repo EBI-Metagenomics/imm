@@ -15,6 +15,11 @@ union state_pair
     uint32_t key;
 };
 
+#define STATE_PAIR_INIT(src, dst)                                                                                      \
+    {                                                                                                                  \
+        .ids[0] = src, .ids[1] = dst                                                                                   \
+    }
+
 struct trans
 {
     union state_pair state_pair;
@@ -30,9 +35,13 @@ struct imm_hmm
     struct model_state_table* table;
     imm_float                 start_lprob;
     uint16_t                  start_state;
+
+    uint16_t nstates;
     HASH_DECLARE(state_tbl, 11);
+
+    uint16_t ntrans;
     HASH_DECLARE(trans_tbl, 11);
-    uint16_t     ntrans;
+    /* TODO: check if this is wise */
     struct trans trans[MAX_NTRANS];
 };
 

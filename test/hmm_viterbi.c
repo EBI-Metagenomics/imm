@@ -57,12 +57,6 @@ void test_hmm_viterbi_one_mute_state(void)
     cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, C, path)));
     imm_path_destroy(path);
 
-    imm_hmm_set_start(hmm, imm_mute_state_super(state), imm_lprob_zero());
-
-    cass_cond(!is_valid(single_viterbi(hmm, EMPTY, imm_mute_state_super(state), &path)));
-    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, EMPTY, path)));
-    imm_path_destroy(path);
-
     cass_cond(!is_valid(single_viterbi(hmm, C, imm_mute_state_super(state), &path)));
     cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, C, path)));
     imm_path_destroy(path);
@@ -366,10 +360,14 @@ void test_hmm_viterbi_normal_states(void)
     cass_close(imm_hmm_loglikelihood(hmm, AGTC, path), -6.303991659557);
     imm_path_destroy(path);
 
-    imm_hmm_set_trans(hmm, imm_normal_state_super(state0), imm_normal_state_super(state0), zero());
-    imm_hmm_set_trans(hmm, imm_normal_state_super(state0), imm_normal_state_super(state1), zero());
-    imm_hmm_set_trans(hmm, imm_normal_state_super(state1), imm_normal_state_super(state0), zero());
-    imm_hmm_set_trans(hmm, imm_normal_state_super(state1), imm_normal_state_super(state1), zero());
+    cass_equal(imm_hmm_set_trans(hmm, imm_normal_state_super(state0), imm_normal_state_super(state0), zero()),
+               IMM_ILLEGALARG);
+    cass_equal(imm_hmm_set_trans(hmm, imm_normal_state_super(state0), imm_normal_state_super(state1), zero()),
+               IMM_ILLEGALARG);
+    cass_equal(imm_hmm_set_trans(hmm, imm_normal_state_super(state1), imm_normal_state_super(state0), zero()),
+               IMM_ILLEGALARG);
+    cass_equal(imm_hmm_set_trans(hmm, imm_normal_state_super(state1), imm_normal_state_super(state1), zero()),
+               IMM_ILLEGALARG);
 
     imm_hmm_set_start(hmm, imm_normal_state_super(state0), zero());
     imm_hmm_set_start(hmm, imm_normal_state_super(state1), zero());
@@ -382,20 +380,8 @@ void test_hmm_viterbi_normal_states(void)
     cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, EMPTY, path)));
     imm_path_destroy(path);
 
-    cass_cond(!is_valid(single_viterbi(hmm, A, imm_normal_state_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, A, path)));
-    imm_path_destroy(path);
-
     cass_cond(!is_valid(single_viterbi(hmm, A, imm_normal_state_super(state1), &path)));
     cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, A, path)));
-    imm_path_destroy(path);
-
-    cass_cond(!is_valid(single_viterbi(hmm, AA, imm_normal_state_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, AA, path)));
-    imm_path_destroy(path);
-
-    cass_cond(!is_valid(single_viterbi(hmm, AA, imm_normal_state_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, AA, path)));
     imm_path_destroy(path);
 
     imm_hmm_set_start(hmm, imm_normal_state_super(state0), 0.0);
@@ -414,14 +400,6 @@ void test_hmm_viterbi_normal_states(void)
 
     cass_cond(!is_valid(single_viterbi(hmm, A, imm_normal_state_super(state1), &path)));
     cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, A, path)));
-    imm_path_destroy(path);
-
-    cass_cond(!is_valid(single_viterbi(hmm, AA, imm_normal_state_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, AA, path)));
-    imm_path_destroy(path);
-
-    cass_cond(!is_valid(single_viterbi(hmm, AA, imm_normal_state_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, AA, path)));
     imm_path_destroy(path);
 
     imm_hmm_set_trans(hmm, imm_normal_state_super(state0), imm_normal_state_super(state0), imm_log(0.9));
@@ -444,10 +422,6 @@ void test_hmm_viterbi_normal_states(void)
 
     cass_close(single_viterbi(hmm, AA, imm_normal_state_super(state0), &path), 2 * imm_log(0.25) + imm_log(0.9));
     cass_close(imm_hmm_loglikelihood(hmm, AA, path), 2 * imm_log(0.25) + imm_log(0.9));
-    imm_path_destroy(path);
-
-    cass_cond(!is_valid(single_viterbi(hmm, AA, imm_normal_state_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, AA, path)));
     imm_path_destroy(path);
 
     imm_hmm_set_trans(hmm, imm_normal_state_super(state0), imm_normal_state_super(state1), imm_log(0.2));
