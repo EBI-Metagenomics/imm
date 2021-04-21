@@ -2,14 +2,11 @@
 
 static inline imm_float zero(void) { return imm_lprob_zero(); }
 
-static inline struct imm_state const* normal_super(struct imm_normal_state const* state)
+static inline struct imm_state* normal_super(struct imm_normal_state const* state)
 {
     return imm_normal_state_super(state);
 }
-static inline struct imm_state const* mute_super(struct imm_mute_state const* state)
-{
-    return imm_mute_state_super(state);
-}
+static inline struct imm_state* mute_super(struct imm_mute_state const* state) { return imm_mute_state_super(state); }
 
 static inline char* fmt(char* restrict buffer, char const* name, int i)
 {

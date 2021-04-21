@@ -4,7 +4,7 @@
 
 struct imm_mute_state
 {
-    struct imm_state const* super;
+    struct imm_state* super;
 };
 
 static void      destroy(struct imm_state const* state);
@@ -15,7 +15,7 @@ static uint8_t   type_id(struct imm_state const* state) { return IMM_MUTE_STATE_
 
 static struct imm_state_vtable const __vtable = {destroy, lprob, max_seq, min_seq, type_id};
 
-struct imm_mute_state const* imm_mute_state_create(uint16_t id, char const* name, struct imm_abc const* abc)
+struct imm_mute_state* imm_mute_state_create(uint16_t id, char const* name, struct imm_abc const* abc)
 {
     struct imm_mute_state* state = xmalloc(sizeof(*state));
 
@@ -23,7 +23,7 @@ struct imm_mute_state const* imm_mute_state_create(uint16_t id, char const* name
     return state;
 }
 
-struct imm_mute_state const* imm_mute_state_derived(struct imm_state const* state)
+struct imm_mute_state* imm_mute_state_derived(struct imm_state const* state)
 {
     if (imm_state_type_id(state) != IMM_MUTE_STATE_TYPE_ID) {
         error("could not cast to mute_state");
@@ -34,7 +34,7 @@ struct imm_mute_state const* imm_mute_state_derived(struct imm_state const* stat
 
 void imm_mute_state_destroy(struct imm_mute_state const* state) { state->super->vtable.destroy(state->super); }
 
-struct imm_state const* imm_mute_state_read(FILE* stream, struct imm_abc const* abc)
+struct imm_state* imm_mute_state_read(FILE* stream, struct imm_abc const* abc)
 {
     struct imm_state* state = __imm_state_read(stream, abc);
     if (!state) {
@@ -50,7 +50,7 @@ struct imm_state const* imm_mute_state_read(FILE* stream, struct imm_abc const* 
     return state;
 }
 
-struct imm_state const* imm_mute_state_super(struct imm_mute_state const* state) { return state->super; }
+struct imm_state* imm_mute_state_super(struct imm_mute_state const* state) { return state->super; }
 
 int imm_mute_state_write(struct imm_state const* state, struct imm_profile const* prof, FILE* stream)
 {

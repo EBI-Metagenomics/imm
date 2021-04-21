@@ -6,9 +6,6 @@
 #include "hmm.h"
 #include "imm/imm.h"
 #include "model.h"
-#include "model_state.h"
-#include "model_trans.h"
-#include "model_trans_table.h"
 #include "std.h"
 #include <stdlib.h>
 #include <string.h>

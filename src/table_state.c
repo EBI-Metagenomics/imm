@@ -4,7 +4,7 @@
 
 struct imm_table_state
 {
-    struct imm_state const*     super;
+    struct imm_state*           super;
     struct imm_seq_table const* table;
 };
 
@@ -16,7 +16,7 @@ static uint8_t   type_id(struct imm_state const* state);
 
 static struct imm_state_vtable const __vtable = {destroy, lprob, max_seq, min_seq, type_id};
 
-struct imm_table_state const* imm_table_state_create(uint16_t id, char const* name, struct imm_seq_table const* table)
+struct imm_table_state* imm_table_state_create(uint16_t id, char const* name, struct imm_seq_table const* table)
 {
     struct imm_table_state* state = xmalloc(sizeof(*state));
     state->table = imm_seq_table_clone(table);
@@ -25,7 +25,7 @@ struct imm_table_state const* imm_table_state_create(uint16_t id, char const* na
     return state;
 }
 
-struct imm_table_state const* imm_table_state_derived(struct imm_state const* state)
+struct imm_table_state* imm_table_state_derived(struct imm_state const* state)
 {
     if (imm_state_type_id(state) != IMM_TABLE_STATE_TYPE_ID) {
         error("could not cast to table_state");
@@ -36,13 +36,13 @@ struct imm_table_state const* imm_table_state_derived(struct imm_state const* st
 
 void imm_table_state_destroy(struct imm_table_state const* state) { state->super->vtable.destroy(state->super); }
 
-struct imm_state const* imm_table_state_read(FILE* stream, struct imm_abc const* abc)
+struct imm_state* imm_table_state_read(FILE* stream, struct imm_abc const* abc)
 {
-    error("imm_table_state_read not implemented");
+    BUG("imm_table_state_read not implemented");
     return NULL;
 }
 
-struct imm_state const* imm_table_state_super(struct imm_table_state const* state) { return state->super; }
+struct imm_state* imm_table_state_super(struct imm_table_state const* state) { return state->super; }
 
 static void destroy(struct imm_state const* state)
 {

@@ -42,12 +42,6 @@ add_library(imm
     src/log.c
     src/lprob.c
     src/model.c
-    src/model_state.c
-    src/model_state_sort.c
-    src/model_state_sort_old.c
-    src/model_state_table.c
-    src/model_trans.c
-    src/model_trans_table.c
     src/mute_state.c
     src/normal_state.c
     src/output.c
@@ -65,6 +59,7 @@ add_library(imm
     src/std/memory.c
     src/step.c
     src/table_state.c
+    src/topological_sort.c
     src/vec.c
 )
 add_library(IMM::imm ALIAS imm)

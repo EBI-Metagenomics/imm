@@ -8,6 +8,8 @@ enum imm_error_code
     IMM_OUTOFMEM,
     IMM_ILLEGALARG,
     IMM_IOERROR,
+    IMM_NOTIMPLEMENTED,
+    IMM_RUNTIMEERROR,
 };
 
 #endif

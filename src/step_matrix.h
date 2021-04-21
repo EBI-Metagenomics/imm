@@ -2,6 +2,7 @@
 #define STEP_MATRIX_H
 
 #include "dp_step.h"
+#include "imm/error.h"
 #include "make_matrix.h"
 
 MAKE_MATRIX_STRUCT(step_matrix, struct dp_step)

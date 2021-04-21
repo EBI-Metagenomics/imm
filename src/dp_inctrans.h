@@ -5,8 +5,8 @@
 #include "list.h"
 #include <stdint.h>
 
-/* struct dp_inctrans; */
-struct model_state;
+struct imm_hmm;
+struct imm_state;
 struct state_idx;
 
 struct inctrans
@@ -24,7 +24,7 @@ struct dp_inctrans
     struct list_head* next_list;
 };
 
-struct dp_inctrans* dp_inctrans_create(struct model_state const* const* mstates, uint_fast16_t nstates,
+struct dp_inctrans* dp_inctrans_create(struct imm_hmm const* hmm, struct imm_state** states,
                                        struct state_idx const* state_idx);
 void                dp_inctrans_destroy(struct dp_inctrans const* inctrans);
 

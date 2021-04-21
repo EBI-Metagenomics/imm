@@ -14,8 +14,8 @@ static char const unnamed[] = "unnamed";
 
 static inline int ascii_is_std(char const* str, size_t len);
 
-struct imm_state const* imm_state_create(uint16_t id, char const* name, struct imm_abc const* abc,
-                                         struct imm_state_vtable vtable, void* derived)
+struct imm_state* imm_state_create(uint16_t id, char const* name, struct imm_abc const* abc,
+                                   struct imm_state_vtable vtable, void* derived)
 {
     if (imm_abc_length(abc) == 0) {
         error("empty alphabet");

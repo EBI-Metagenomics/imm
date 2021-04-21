@@ -40,7 +40,7 @@ struct imm_state
     struct hnode            hnode;
 };
 
-IMM_API struct imm_state const*     imm_state_create(uint16_t id, char const* name, struct imm_abc const* abc,
+IMM_API struct imm_state*           imm_state_create(uint16_t id, char const* name, struct imm_abc const* abc,
                                                      struct imm_state_vtable vtable, void* derived);
 IMM_API void                        imm_state_destroy(struct imm_state const* state);
 static inline struct imm_abc const* imm_state_abc(struct imm_state const* state) { return state->abc; }
@@ -51,7 +51,7 @@ static inline uint8_t imm_state_max_seq(struct imm_state const* state) { return 
 static inline uint8_t imm_state_min_seq(struct imm_state const* state) { return state->vtable.min_seq(state); }
 static inline uint8_t imm_state_type_id(struct imm_state const* state) { return state->vtable.type_id(state); }
 
-static inline void const* __imm_state_derived(struct imm_state const* state) { return state->derived; }
+static inline void*       __imm_state_derived(struct imm_state const* state) { return state->derived; }
 IMM_API void              __imm_state_destroy(struct imm_state const* state);
 IMM_API struct imm_state* __imm_state_read(FILE* stream, struct imm_abc const* abc);
 IMM_API int               __imm_state_write(struct imm_state const* state, FILE* stream);

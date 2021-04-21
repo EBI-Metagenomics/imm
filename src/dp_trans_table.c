@@ -1,10 +1,8 @@
 #include "dp_trans_table.h"
 #include "dp_inctrans.h"
+#include "hmm.h"
 #include "imm/imm.h"
 #include "list.h"
-#include "model_state.h"
-#include "model_trans.h"
-#include "model_trans_table.h"
 #include "state_idx.h"
 #include "std.h"
 #include <stdlib.h>
@@ -25,15 +23,14 @@ struct dp_trans_table_chunk
     uint16_t*  offset;
 };
 
-static inline uint_fast16_t offset_size(uint_fast16_t nstates) { return nstates + 1; }
-static inline uint_fast16_t score_size(uint_fast16_t ntrans) { return ntrans; }
-static inline uint_fast16_t source_state_size(uint_fast16_t ntrans) { return ntrans; }
+static inline unsigned offset_size(unsigned nstates) { return nstates + 1; }
+static inline unsigned score_size(unsigned ntrans) { return ntrans; }
+static inline unsigned source_state_size(unsigned ntrans) { return ntrans; }
 
-int dp_trans_table_change(struct dp_trans_table* trans_tbl, uint_fast16_t src_state, uint_fast16_t tgt_state,
-                          imm_float lprob)
+int dp_trans_table_change(struct dp_trans_table* trans_tbl, unsigned src_state, unsigned tgt_state, imm_float lprob)
 {
     /* TODO: find a faster way to update the transition */
-    for (uint_fast16_t i = 0; i < dp_trans_table_ntrans(trans_tbl, tgt_state); ++i) {
+    for (unsigned i = 0; i < dp_trans_table_ntrans(trans_tbl, tgt_state); ++i) {
         if (dp_trans_table_source_state(trans_tbl, tgt_state, i) == src_state) {
 
             trans_tbl->score[trans_tbl->offset[tgt_state] + i] = lprob;
@@ -43,17 +40,17 @@ int dp_trans_table_change(struct dp_trans_table* trans_tbl, uint_fast16_t src_st
     return 1;
 }
 
-struct dp_trans_table* dp_trans_table_create(struct model_state const* const* mstates, uint_fast16_t nstates,
+struct dp_trans_table* dp_trans_table_create(struct imm_hmm const* hmm, struct imm_state** states,
                                              struct state_idx* state_idx)
 {
     struct dp_trans_table* tbl = NULL;
-    struct dp_inctrans*    inctrans = dp_inctrans_create(mstates, nstates, state_idx);
+    struct dp_inctrans*    inctrans = dp_inctrans_create(hmm, states, state_idx);
     if (!inctrans)
         goto err;
 
     tbl = xmalloc(sizeof(*tbl));
     tbl->ntrans = inctrans->ntotal_trans;
-    tbl->offset = malloc(sizeof(*tbl->offset) * offset_size(nstates));
+    tbl->offset = malloc(sizeof(*tbl->offset) * offset_size(hmm->nstates));
     if (!tbl->offset) {
         error_explain(IMM_OUTOFMEM);
         goto err;
@@ -72,7 +69,7 @@ struct dp_trans_table* dp_trans_table_create(struct model_state const* const* ms
         tbl->source_state = NULL;
     }
 
-    for (uint_fast16_t i = 0; i < nstates; ++i) {
+    for (unsigned i = 0; i < hmm->nstates; ++i) {
         uint16_t         j = 0;
         struct inctrans* it = NULL;
         list_for_each_entry (it, inctrans->lhead_mem + i, list_entry) {
@@ -173,7 +170,7 @@ err:
     return NULL;
 }
 
-int dp_trans_table_write(struct dp_trans_table const* trans, uint_fast16_t nstates, FILE* stream)
+int dp_trans_table_write(struct dp_trans_table const* trans, unsigned nstates, FILE* stream)
 {
     struct dp_trans_table_chunk chunk = {.ntrans = trans->ntrans,
                                          .score = trans->score,

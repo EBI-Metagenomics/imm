@@ -12,7 +12,7 @@ struct imm_model;
 
 struct imm_profile_vtable
 {
-    struct imm_state const* (*read_state)(struct imm_profile* prof, FILE* stream);
+    struct imm_state* (*read_state)(struct imm_profile* prof, FILE* stream);
     int (*write_state)(struct imm_profile const* prof, FILE* stream, struct imm_state const* state);
 };
 

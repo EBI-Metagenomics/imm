@@ -18,13 +18,13 @@ struct seq_code_chunk
 static inline uint8_t offset_size(struct seq_code const* seq_code);
 static inline uint8_t stride_size(struct seq_code const* seq_code) { return seq_code->max_seq; }
 
-struct seq_code const* seq_code_create(struct imm_abc const* abc, uint_fast8_t min_seq, uint_fast8_t max_seq)
+struct seq_code const* seq_code_create(struct imm_abc const* abc, unsigned min_seq, unsigned max_seq)
 {
     BUG(min_seq > max_seq);
     struct seq_code* seq_code = xmalloc(sizeof(*seq_code));
 
-    seq_code->min_seq = min_seq;
-    seq_code->max_seq = max_seq;
+    seq_code->min_seq = (uint8_t)min_seq;
+    seq_code->max_seq = (uint8_t)max_seq;
     seq_code->abc = abc;
 
     if (max_seq == 0)
@@ -58,11 +58,11 @@ struct seq_code const* seq_code_create(struct imm_abc const* abc, uint_fast8_t m
 uint_fast16_t seq_code_encode(struct seq_code const* seq_code, struct imm_seq const* seq)
 {
     uint_fast16_t code = seq_code->offset[imm_seq_length(seq) - seq_code->min_seq];
-    uint_fast8_t  len = (uint_fast8_t)imm_seq_length(seq);
-    for (uint_fast8_t i = 0; i < len; ++i) {
+    unsigned      len = (unsigned)imm_seq_length(seq);
+    for (unsigned i = 0; i < len; ++i) {
 
-        uint_fast8_t j = imm_abc_symbol_idx(seq_code->abc, imm_seq_string(seq)[i]);
-        uint_fast8_t offset = (uint_fast8_t)(seq_code->max_seq - len);
+        unsigned j = imm_abc_symbol_idx(seq_code->abc, imm_seq_string(seq)[i]);
+        unsigned offset = (unsigned)(seq_code->max_seq - len);
         code += (uint_fast16_t)(seq_code->stride[i + offset] * j);
     }
 

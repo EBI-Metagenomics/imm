@@ -1,6 +1,8 @@
 #ifndef STD_BUG_H
 #define STD_BUG_H
 
+#include <stdbool.h>
+
 void std_bug_print_exit(char const* file, char const* func, int line, char const* cond);
 
 #define BUG(cond)                                                                                                      \

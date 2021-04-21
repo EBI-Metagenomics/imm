@@ -7,7 +7,7 @@
 struct item
 {
     struct imm_state const* state;
-    uint_fast16_t           idx;
+    uint16_t                idx;
 };
 
 KHASH_MAP_INIT_PTR(item, struct item*)
@@ -34,7 +34,7 @@ void state_idx_add(struct state_idx* state_idx, struct imm_state const* state)
     kh_val(state_idx->table, iter) = item;
 }
 
-struct state_idx* state_idx_create(uint16_t size)
+struct state_idx* state_idx_create(unsigned size)
 {
     struct state_idx* state_idx = xmalloc(sizeof(*state_idx));
     state_idx->items = malloc(sizeof(*state_idx->items) * size);
@@ -55,9 +55,9 @@ void state_idx_destroy(struct state_idx* state_idx)
     free(state_idx);
 }
 
-uint_fast16_t state_idx_find(struct state_idx const* state_idx, struct imm_state const* state)
+uint16_t state_idx_find(struct state_idx const* state_idx, struct imm_state const* state)
 {
     khiter_t i = kh_get(item, state_idx->table, state);
     BUG(i == kh_end(state_idx->table));
-    return (uint_fast16_t)kh_val(state_idx->table, i)->idx;
+    return (uint16_t)kh_val(state_idx->table, i)->idx;
 }

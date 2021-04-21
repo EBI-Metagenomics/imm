@@ -6,7 +6,6 @@
 #include <stdio.h>
 
 struct imm_io;
-struct model_state;
 struct seq_code;
 
 struct dp_emission
@@ -15,18 +14,14 @@ struct dp_emission
     uint32_t*  offset; /**< Maps state to score array offset. */
 };
 
-struct dp_emission const* dp_emission_create(struct seq_code const* seq_code, struct model_state const* const* mstates,
-                                             uint_fast16_t nstates);
+struct dp_emission const* dp_emission_create(struct seq_code const* seq_code, struct imm_state** states,
+                                             unsigned nstates);
 void                      dp_emission_destroy(struct dp_emission const* emission);
-void                      dp_emission_offsets_dump(struct dp_emission const* emission, uint_fast16_t nstates);
 struct dp_emission const* dp_emission_read(FILE* stream);
-static inline imm_float   dp_emission_score(struct dp_emission const* emission, uint_fast16_t state,
-                                            uint_fast16_t seq_code);
-void                      dp_emission_scores_dump(struct dp_emission const* emission, uint_fast16_t nstates);
-int                       dp_emission_write(struct dp_emission const* emission, uint_fast16_t nstates, FILE* stream);
+static inline imm_float   dp_emission_score(struct dp_emission const* emission, unsigned state, unsigned seq_code);
+int                       dp_emission_write(struct dp_emission const* emission, unsigned nstates, FILE* stream);
 
-static inline imm_float dp_emission_score(struct dp_emission const* emission, uint_fast16_t state,
-                                          uint_fast16_t seq_code)
+static inline imm_float dp_emission_score(struct dp_emission const* emission, unsigned state, unsigned seq_code)
 {
     return emission->score[emission->offset[state] + seq_code];
 }

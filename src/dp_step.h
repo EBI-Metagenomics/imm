@@ -1,8 +1,8 @@
 #ifndef DP_STEP_H
 #define DP_STEP_H
 
-#include <inttypes.h>
 #include <limits.h>
+#include <stdint.h>
 
 struct dp_step
 {

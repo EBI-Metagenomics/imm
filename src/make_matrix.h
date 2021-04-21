@@ -1,6 +1,7 @@
 #ifndef MAKE_MATRIX_H
 #define MAKE_MATRIX_H
 
+#include "imm/error.h"
 #include <stdint.h>
 #include <stdlib.h>
 
