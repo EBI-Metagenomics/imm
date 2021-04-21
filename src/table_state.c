@@ -54,7 +54,7 @@ static void destroy(struct imm_state const* state)
 
 int imm_table_state_write(struct imm_state const* state, struct imm_profile const* prof, FILE* stream)
 {
-    error("table_state write is not implemented yet");
+    BUG("imm_table_state_write is not implemented yet");
     return 0;
 }
 

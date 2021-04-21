@@ -66,6 +66,6 @@ static void destroy(struct imm_state const* state)
 static imm_float lprob(struct imm_state const* state, struct imm_seq const* seq)
 {
     if (imm_seq_length(seq) == 0)
-        return (imm_float)0.;
+        return 0;
     return imm_lprob_zero();
 }

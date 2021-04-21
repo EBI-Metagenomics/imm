@@ -17,71 +17,53 @@ static struct imm_state** read_states(struct imm_profile* prof, struct imm_model
 static int                read_transitions(FILE* stream, struct imm_hmm* hmm, struct imm_state** states);
 static int                write_dp(struct imm_model const* model, FILE* stream);
 static int                write_hmm(struct imm_profile const* prof, struct imm_model const* model, FILE* stream);
-static int                write_state(struct imm_profile const* prof, FILE* stream, struct imm_state const* state);
-static int write_states(struct imm_profile const* prof, FILE* stream, struct imm_state** states, uint16_t nstates);
+static int                write_state(struct imm_profile const* prof, FILE* stream, struct imm_state* state);
+static int                write_states(struct imm_profile const* prof, FILE* stream, struct imm_model const* model);
 
-struct imm_model* imm_model_create(struct imm_hmm* hmm, struct imm_dp const* dp)
+struct imm_model* imm_model_create(struct imm_hmm* hmm, struct imm_dp* dp)
 {
     struct imm_model* model = new_model();
     model->hmm = hmm;
-    model->states = hmm_get_states(hmm, dp);
-
-    model->nstates = (uint16_t)dp_state_table_nstates(dp_get_state_table(dp));
-    /* TODO: another one? is this necessary? */
-    model->states = xmalloc(sizeof(*model->states) * model->nstates);
-    for (uint16_t i = 0; i < model->nstates; ++i)
-        model->states[i] = model->states[i];
-
+    model->dp = dp;
     model->seq_code = dp_get_seq_code(dp);
     model->emission = dp_get_emission(dp);
     model->trans_table = dp_get_trans_table(dp);
     model->state_table = dp_get_state_table(dp);
-    model->dp = dp;
     return model;
 }
 
-/* TODO: remove this cast, implement imm_model_set_trans... */
-struct imm_dp* imm_model_dp(struct imm_model const* model) { return (struct imm_dp*)model->dp; }
+struct imm_dp* imm_model_dp(struct imm_model const* model) { return model->dp; }
 
 struct imm_hmm* imm_model_hmm(struct imm_model const* model) { return model->hmm; }
 
-uint16_t imm_model_nstates(struct imm_model const* model) { return model->nstates; }
+uint16_t imm_model_nstates(struct imm_model const* model) { return model->hmm->nstates; }
 
-struct imm_state const* imm_model_state(struct imm_model const* model, uint16_t i) { return model->states[i]; }
-
-void model_deep_destroy(struct imm_model const* model)
+struct imm_state* imm_model_state(struct imm_model const* model, uint16_t i)
 {
-    if (model->hmm)
-        imm_hmm_destroy(model->hmm);
-
-    free_if(model->states);
-
-    if (model->seq_code)
-        seq_code_destroy(model->seq_code);
-
-    if (model->emission)
-        dp_emission_destroy(model->emission);
-
-    if (model->trans_table)
-        dp_trans_table_destroy(model->trans_table);
-
-    if (model->state_table)
-        dp_state_table_destroy(model->state_table);
-
-    if (model->dp)
-        imm_dp_destroy(model->dp);
+    return hmm_get_states(model->hmm, model->dp)[i];
 }
 
 void imm_model_destroy(struct imm_model const* model, bool deep)
 {
     if (deep) {
-        imm_hmm_destroy(imm_model_hmm(model));
-        imm_dp_destroy(imm_model_dp(model));
-        for (uint16_t i = 0; i < imm_model_nstates(model); ++i) {
-            imm_state_destroy(imm_model_state(model, i));
-        }
+        if (model->hmm)
+            imm_hmm_destroy(model->hmm);
+
+        if (model->seq_code)
+            seq_code_destroy(model->seq_code);
+
+        if (model->emission)
+            dp_emission_destroy(model->emission);
+
+        if (model->trans_table)
+            dp_trans_table_destroy(model->trans_table);
+
+        if (model->state_table)
+            dp_state_table_destroy(model->state_table);
+
+        if (model->dp)
+            imm_dp_destroy(model->dp);
     }
-    free(model->states);
     free((void*)model);
 }
 
@@ -101,7 +83,7 @@ struct imm_model const* model_read(struct imm_profile* prof, FILE* stream)
     return model;
 
 err:
-    model_deep_destroy(model);
+    imm_model_destroy(model, true);
     return NULL;
 }
 
@@ -137,26 +119,24 @@ struct imm_state* model_read_state(struct imm_profile* prof, FILE* stream)
 
 int model_write(struct imm_profile const* prof, struct imm_model const* model, FILE* stream)
 {
-    if (write_hmm(prof, model, stream)) {
+    int error = IMM_SUCCESS;
+    if ((error = write_hmm(prof, model, stream))) {
         error("could not write hmm");
-        return 1;
+        return error;
     }
 
-    if (write_dp(model, stream)) {
+    if ((error = write_dp(model, stream))) {
         error("could not write dp");
-        return 1;
+        return error;
     }
 
-    return 0;
+    return error;
 }
 
 int model_write_state(struct imm_profile const* prof, FILE* stream, struct imm_state const* state)
 {
     uint8_t type_id = imm_state_type_id(state);
-    if (fwrite(&type_id, sizeof(type_id), 1, stream) < 1) {
-        error("could not write state type id");
-        return 1;
-    }
+    xfwrite(&type_id, sizeof(type_id), 1, stream);
 
     int errno = 0;
     switch (type_id) {
@@ -180,8 +160,6 @@ static struct imm_model* new_model(void)
 {
     struct imm_model* model = xmalloc(sizeof(*model));
     model->hmm = NULL;
-    model->nstates = 0;
-    model->states = NULL;
     model->seq_code = NULL;
     model->emission = NULL;
     model->trans_table = NULL;
@@ -236,12 +214,7 @@ static int read_hmm(struct imm_profile* prof, struct imm_model* model, FILE* str
         goto err;
     }
 
-    model->states = malloc(sizeof(*model->states) * model->nstates);
-    if (!model->states) {
-        error_explain(IMM_OUTOFMEM);
-        model_deep_destroy(model);
-        return IMM_OUTOFMEM;
-    }
+    model->states = xmalloc(sizeof(*model->states) * model->nstates);
 
     for (uint16_t i = 0; i < model->nstates; ++i) {
         model->states[i] = model->states[i];
@@ -367,78 +340,58 @@ static int write_dp(struct imm_model const* model, FILE* stream)
 static int write_hmm(struct imm_profile const* prof, struct imm_model const* model, FILE* stream)
 {
     imm_float start_lprob = model->hmm->start_lprob;
-    if (fwrite(&start_lprob, sizeof(start_lprob), 1, stream) < 1) {
-        error("could not write starting lprob");
-        return 1;
-    }
+    xfwrite(&start_lprob, sizeof(start_lprob), 1, stream);
+
     uint16_t start_state = model->hmm->start_state;
-    if (fwrite(&start_state, sizeof(start_state), 1, stream) < 1) {
-        error("could not write starting state id");
-        return 1;
-    }
+    xfwrite(&start_state, sizeof(start_state), 1, stream);
 
-    if (write_states(prof, stream, model->states, model->nstates)) {
+    if (write_states(prof, stream, model)) {
         error("could not write states");
-        return 1;
+        return IMM_IOERROR;
     }
 
-    uint16_t ntrans = (uint16_t)dp_trans_table_total_ntrans(model->trans_table);
-    if (fwrite(&ntrans, sizeof(ntrans), 1, stream) < 1) {
-        error("could not write ntrans");
-        return 1;
-    }
+    uint16_t ntrans = model->hmm->ntrans;
+    xfwrite(&ntrans, sizeof(ntrans), 1, stream);
 
-    for (uint16_t tgt_state = 0; tgt_state < model->nstates; ++tgt_state) {
+    for (uint16_t dst = 0; dst < model->hmm->nstates; ++dst) {
 
-        unsigned n = dp_trans_table_ntrans(model->trans_table, tgt_state);
+        unsigned n = dp_trans_table_ntrans(model->trans_table, dst);
         for (unsigned trans = 0; trans < n; ++trans) {
 
-            uint16_t  src_state = (uint16_t)dp_trans_table_source_state(model->trans_table, tgt_state, trans);
-            imm_float score = dp_trans_table_score(model->trans_table, tgt_state, trans);
+            uint16_t  src = (uint16_t)dp_trans_table_source_state(model->trans_table, dst, trans);
+            imm_float score = dp_trans_table_score(model->trans_table, dst, trans);
 
-            if (fwrite(&src_state, sizeof(src_state), 1, stream) < 1) {
-                error("could not write source_state");
-                return 1;
-            }
+            uint16_t src_id = dp_get_states(model->dp)[src]->id;
+            uint16_t dst_id = dp_get_states(model->dp)[dst]->id;
 
-            if (fwrite(&tgt_state, sizeof(tgt_state), 1, stream) < 1) {
-                error("could not write target_state");
-                return 1;
-            }
-
-            if (fwrite(&score, sizeof(score), 1, stream) < 1) {
-                error("could not write score");
-                return 1;
-            }
+            xfwrite(&src_id, sizeof(src_id), 1, stream);
+            xfwrite(&dst_id, sizeof(dst_id), 1, stream);
+            xfwrite(&score, sizeof(score), 1, stream);
         }
-    }
-
-    return 0;
-}
-
-static int write_state(struct imm_profile const* prof, FILE* stream, struct imm_state const* state)
-{
-    if (prof->vtable.write_state(prof, stream, state)) {
-        error("could not write state");
-        return IMM_IOERROR;
     }
 
     return IMM_SUCCESS;
 }
 
-static int write_states(struct imm_profile const* prof, FILE* stream, struct imm_state** states, uint16_t nstates)
+static int write_state(struct imm_profile const* prof, FILE* stream, struct imm_state* state)
 {
-    if (fwrite(&nstates, sizeof(nstates), 1, stream) < 1) {
-        error("could not write nstates");
+    if (prof->vtable.write_state(prof, stream, state)) {
+        error("could not write state");
         return IMM_IOERROR;
     }
+    return IMM_SUCCESS;
+}
+
+static int write_states(struct imm_profile const* prof, FILE* stream, struct imm_model const* model)
+{
+    uint16_t nstates = model->hmm->nstates;
+    xfwrite(&nstates, sizeof(nstates), 1, stream);
 
     for (uint16_t i = 0; i < nstates; ++i) {
-        if (write_state(prof, stream, states[i])) {
+        if (write_state(prof, stream, dp_get_states(model->dp)[i])) {
             error("could not write state");
             return IMM_IOERROR;
         }
     }
-
     return IMM_SUCCESS;
 }

@@ -9,11 +9,16 @@ struct imm_normal_state
     imm_float*        lprobs;
 };
 
-struct normal_state_chunk
+struct chunk
 {
     uint8_t    lprobs_size;
     imm_float* lprobs;
 };
+
+#define CHUNK_INIT(size, probs)                                                                                        \
+    {                                                                                                                  \
+        .lprobs_size = (size), .lprobs = (probs)                                                                       \
+    }
 
 static void      destroy(struct imm_state const* state);
 static imm_float lprob(struct imm_state const* state, struct imm_seq const* seq);
@@ -55,7 +60,7 @@ struct imm_state* imm_normal_state_read(FILE* stream, struct imm_abc const* abc)
         return NULL;
     }
 
-    struct normal_state_chunk chunk = {.lprobs_size = 0, .lprobs = NULL};
+    struct chunk chunk = CHUNK_INIT(0, NULL);
 
     if (fread(&chunk.lprobs_size, sizeof(chunk.lprobs_size), 1, stream) < 1) {
         error("could not read lprobs_size");
@@ -85,27 +90,17 @@ struct imm_state* imm_normal_state_super(struct imm_normal_state* state) { retur
 
 int imm_normal_state_write(struct imm_state const* state, struct imm_profile const* prof, FILE* stream)
 {
-    if (__imm_state_write(state, stream))
-        return 1;
+    int error = IMM_SUCCESS;
+    if ((error = __imm_state_write(state, stream)))
+        return error;
 
     struct imm_normal_state const* s = __imm_state_derived(state);
 
-    struct normal_state_chunk chunk = {
-        .lprobs_size = imm_abc_length(imm_state_abc(state)),
-        .lprobs = s->lprobs,
-    };
+    struct chunk chunk = CHUNK_INIT(imm_abc_length(state->abc), s->lprobs);
+    xfwrite(&chunk.lprobs_size, sizeof(chunk.lprobs_size), 1, stream);
+    xfwrite(chunk.lprobs, sizeof(*chunk.lprobs), chunk.lprobs_size, stream);
 
-    if (fwrite(&chunk.lprobs_size, sizeof(chunk.lprobs_size), 1, stream) < 1) {
-        error("could not write lprobs_size");
-        return 1;
-    }
-
-    if (fwrite(chunk.lprobs, sizeof(*chunk.lprobs), chunk.lprobs_size, stream) < chunk.lprobs_size) {
-        error("could not write lprobs");
-        return 1;
-    }
-
-    return 0;
+    return error;
 }
 
 static void destroy(struct imm_state const* state)

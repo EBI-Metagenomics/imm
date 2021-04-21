@@ -96,29 +96,15 @@ struct imm_state* __imm_state_read(FILE* stream, struct imm_abc const* abc)
 
 int __imm_state_write(struct imm_state const* state, FILE* stream)
 {
-    struct state_chunk chunk = {.id = imm_state_id(state),
-                                .name_length = state->name ? (uint8_t)strlen(state->name) : 0,
-                                .name = (char*)state->name};
+    struct state_chunk chunk = {
+        .id = state->id, .name_length = state->name ? (uint8_t)strlen(state->name) : 0, .name = (char*)state->name};
 
-    if (fwrite(&chunk.id, sizeof(chunk.id), 1, stream) < 1) {
-        error("could not write id");
-        return 1;
-    }
+    xfwrite(&chunk.id, sizeof(chunk.id), 1, stream);
+    xfwrite(&chunk.name_length, sizeof(chunk.name_length), 1, stream);
+    if (chunk.name)
+        xfwrite(chunk.name, sizeof(*chunk.name), chunk.name_length + 1, stream);
 
-    if (fwrite(&chunk.name_length, sizeof(chunk.name_length), 1, stream) < 1) {
-        error("could not write name_length");
-        return 1;
-    }
-
-    if (chunk.name) {
-        if (fwrite(chunk.name, sizeof(*chunk.name), (size_t)(chunk.name_length + 1), stream) <
-            (size_t)(chunk.name_length + 1)) {
-            error("could not write name");
-            return 1;
-        }
-    }
-
-    return 0;
+    return IMM_SUCCESS;
 }
 
 static inline int ascii_is_std(char const* str, size_t len)

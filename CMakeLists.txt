@@ -55,6 +55,7 @@ add_library(imm
     src/state_idx.c
     src/std/bug.c
     src/std/error.c
+    src/std/io.c
     src/std/math.c
     src/std/memory.c
     src/step.c

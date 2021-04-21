@@ -7,6 +7,7 @@
 #include "std/compiler.h"
 #include "std/const.h"
 #include "std/error.h"
+#include "std/io.h"
 #include "std/math.h"
 #include "std/memory.h"
 

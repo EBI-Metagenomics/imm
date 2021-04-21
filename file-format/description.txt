@@ -35,14 +35,16 @@ The body of a profile block contains the following chunk:
 
 A model has the following fields:
 
-     model                                                state
-    |---------------|-|---------------------------|  /---|---------------------------|
-    | hmm: hmm      | | nstates: uint16_t         | /    | start_lprob: float        |
-    |               | |---------------------------|/     | state_type: uint8_t       |
-    |               | | State 0                   |      | name_length: uint8_t      |
-    |               | |---------------------------|\     | name: char[name_length+1] |
-    |               | | State 1                   | \    | body: sequence of bytes   |
-    |               | |---------------------------|  \---|---------------------------|
+     model
+    |---------------|-|---------------------------|
+    | hmm: hmm      | | start_lprob: float        |     state
+    |               | | start_state: uint16_t     |    |---------------------------|
+    |               | | nstates: uint16_t         |    | state_type: uint8_t       |
+    |               | |---------------------------|    | state_id: uint16_t        |
+    |               | | State 0                   |----| name_length: uint8_t      |
+    |               | |---------------------------|    | name: char[name_length+1] |
+    |               | | State 1                   |    | body: sequence of bytes   |
+    |               | |---------------------------|    |---------------------------|
     |               | ...
     |               | |---------------------------|
     |               | | State nstates-1           |

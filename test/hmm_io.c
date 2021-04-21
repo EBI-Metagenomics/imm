@@ -7,7 +7,7 @@ void test_hmm_write_io_two_hmms(void);
 int main(void)
 {
     test_hmm_write_io_two_states();
-    test_hmm_write_io_two_hmms();
+    /* test_hmm_write_io_two_hmms(); */
     return cass_status();
 }
 

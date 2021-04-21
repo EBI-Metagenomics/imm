@@ -13,13 +13,11 @@ struct seq_code;
 struct imm_model
 {
     struct imm_hmm*              hmm;
-    struct imm_state**           states;
-    uint16_t                     nstates;
+    struct imm_dp*               dp;
     struct seq_code const*       seq_code;
     struct dp_emission const*    emission;
     struct dp_trans_table*       trans_table;
     struct dp_state_table const* state_table;
-    struct imm_dp const*         dp;
 };
 
 void                    model_deep_destroy(struct imm_model const* model);
