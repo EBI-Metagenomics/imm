@@ -38,6 +38,7 @@ static inline void state_pair_init(union state_pair* pair, uint16_t src, uint16_
 static inline void trans_init(struct trans* trans, uint16_t src, uint16_t dst, imm_float lprob)
 {
     state_pair_init(&trans->pair, src, dst);
+    trans->lprob = lprob;
     node_init(&trans->node);
     hnode_init(&trans->hnode);
 }

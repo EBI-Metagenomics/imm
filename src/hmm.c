@@ -92,6 +92,10 @@ imm_float imm_hmm_loglikelihood(struct imm_hmm const* hmm, struct imm_seq const*
 
     uint_fast8_t            step_len = imm_step_seq_len(step);
     struct imm_state const* state = imm_step_state(step);
+    if (state != hmm_state(hmm, hmm->start_state)) {
+        error("first state is not starting state");
+        return imm_lprob_invalid();
+    }
 
     uint_fast32_t remain = imm_seq_length(seq);
     if (step_len > remain)

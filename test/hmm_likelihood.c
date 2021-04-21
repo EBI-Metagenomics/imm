@@ -45,38 +45,39 @@ void test_hmm_likelihood_single_state(void)
     imm_path_destroy(path);
 
     path = imm_path_create();
-    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, A, path)));
+    cass_cond(!imm_lprob_is_finite(imm_hmm_loglikelihood(hmm, A, path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
-    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, EMPTY, path)));
+    cass_cond(!imm_lprob_is_finite(imm_hmm_loglikelihood(hmm, EMPTY, path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
-    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, A, path)));
-    imm_path_destroy(path);
-
-    path = imm_path_create();
-    imm_path_append(path, imm_step_create(imm_normal_state_super(state), 1));
-    cass_cond(!is_valid(imm_hmm_loglikelihood(hmm, AG, path)));
+    cass_cond(!imm_lprob_is_finite(imm_hmm_loglikelihood(hmm, A, path)));
     imm_path_destroy(path);
 
     path = imm_path_create();
     imm_path_append(path, imm_step_create(imm_normal_state_super(state), 1));
+    cass_cond(!imm_lprob_is_finite(imm_hmm_loglikelihood(hmm, AG, path)));
+    imm_path_destroy(path);
+
+    path = imm_path_create();
     imm_path_append(path, imm_step_create(imm_normal_state_super(state), 1));
-    cass_cond(imm_lprob_is_zero(imm_hmm_loglikelihood(hmm, AA, path)));
+    imm_path_append(path, imm_step_create(imm_normal_state_super(state), 1));
+    cass_cond(!imm_lprob_is_finite(imm_hmm_loglikelihood(hmm, AA, path)));
     imm_path_destroy(path);
 
     cass_equal(imm_hmm_normalize_trans(hmm), 0);
     cass_equal(imm_hmm_set_trans(hmm, imm_normal_state_super(state), imm_normal_state_super(state), zero()),
                IMM_ILLEGALARG);
     cass_equal(imm_hmm_normalize_trans(hmm), 0);
-    cass_equal(imm_hmm_set_trans(hmm, imm_normal_state_super(state), imm_normal_state_super(state), imm_log(0.5)), 0);
+    cass_equal(imm_hmm_set_trans(hmm, imm_normal_state_super(state), imm_normal_state_super(state), imm_log(0.5)),
+               IMM_SUCCESS);
 
     path = imm_path_create();
     imm_path_append(path, imm_step_create(imm_normal_state_super(state), 1));
     imm_path_append(path, imm_step_create(imm_normal_state_super(state), 1));
-    cass_close(imm_hmm_loglikelihood(hmm, AA, path), -4.1588830948);
+    cass_close(imm_hmm_loglikelihood(hmm, AA, path), 2 * imm_log(0.5) + 2 * imm_log(0.25));
     imm_path_destroy(path);
 
     cass_cond(imm_hmm_normalize_trans(hmm) == 0);
@@ -130,7 +131,7 @@ void test_hmm_likelihood_two_states(void)
 
     path = imm_path_create();
     imm_path_append(path, imm_step_create(imm_normal_state_super(state1), 1));
-    cass_cond(imm_lprob_is_zero(imm_hmm_loglikelihood(hmm, G, path)));
+    cass_cond(!imm_lprob_is_finite(imm_hmm_loglikelihood(hmm, G, path)));
     imm_path_destroy(path);
 
     cass_cond(imm_hmm_normalize_trans(hmm) == 0);
@@ -268,7 +269,7 @@ void test_hmm_likelihood_invalid(void)
     cass_cond(imm_step_create(imm_mute_state_super(M1), 1) == NULL);
     imm_path_append(path, imm_step_create(imm_normal_state_super(M2), 1));
     imm_path_append(path, imm_step_create(imm_mute_state_super(E), 0));
-    cass_cond(imm_lprob_is_zero(imm_hmm_loglikelihood(hmm, C, path)));
+    cass_cond(!imm_lprob_is_finite(imm_hmm_loglikelihood(hmm, C, path)));
     imm_path_destroy(path);
 
     imm_hmm_destroy(hmm);
