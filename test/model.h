@@ -5,11 +5,11 @@
 
 struct model
 {
-    struct imm_hmm*              hmm;
-    struct imm_abc const*        abc;
-    struct imm_vecp*             mute_states;
-    struct imm_vecp*             normal_states;
-    struct imm_mute_state const* end;
+    struct imm_hmm*        hmm;
+    struct imm_abc const*  abc;
+    struct imm_vecp*       mute_states;
+    struct imm_vecp*       normal_states;
+    struct imm_mute_state* end;
 };
 
 struct model create_model(void);

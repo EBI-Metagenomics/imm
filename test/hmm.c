@@ -17,9 +17,9 @@ int main(void)
 
 void test_hmm_state_id(void)
 {
-    struct imm_abc const*        abc = imm_abc_create("ACGT", '*');
-    struct imm_mute_state const* state = imm_mute_state_create(0, "State0", abc);
-    struct imm_hmm*              hmm = imm_hmm_create(abc);
+    struct imm_abc const*  abc = imm_abc_create("ACGT", '*');
+    struct imm_mute_state* state = imm_mute_state_create(0, "State0", abc);
+    struct imm_hmm*        hmm = imm_hmm_create(abc);
 
     cass_cond(imm_hmm_add_state(hmm, imm_mute_state_super(state)) == IMM_SUCCESS);
     cass_cond(imm_hmm_add_state(hmm, imm_mute_state_super(state)) == IMM_ILLEGALARG);
@@ -31,10 +31,10 @@ void test_hmm_state_id(void)
 
 void test_hmm_del_get_state(void)
 {
-    struct imm_abc const*        abc = imm_abc_create("ACGT", '*');
-    struct imm_mute_state const* state0 = imm_mute_state_create(0, "State0", abc);
-    struct imm_mute_state const* state1 = imm_mute_state_create(1, "State1", abc);
-    struct imm_hmm*              hmm = imm_hmm_create(abc);
+    struct imm_abc const*  abc = imm_abc_create("ACGT", '*');
+    struct imm_mute_state* state0 = imm_mute_state_create(0, "State0", abc);
+    struct imm_mute_state* state1 = imm_mute_state_create(1, "State1", abc);
+    struct imm_hmm*        hmm = imm_hmm_create(abc);
 
     cass_cond(imm_hmm_add_state(hmm, imm_mute_state_super(state0)) == 0);
     cass_cond(imm_hmm_add_state(hmm, imm_mute_state_super(state1)) == 0);
@@ -53,10 +53,10 @@ void test_hmm_del_get_state(void)
 
 void test_hmm_set_trans(void)
 {
-    struct imm_abc const*        abc = imm_abc_create("ACGT", '*');
-    struct imm_mute_state const* state0 = imm_mute_state_create(0, "State0", abc);
-    struct imm_mute_state const* state1 = imm_mute_state_create(1, "State1", abc);
-    struct imm_hmm*              hmm = imm_hmm_create(abc);
+    struct imm_abc const*  abc = imm_abc_create("ACGT", '*');
+    struct imm_mute_state* state0 = imm_mute_state_create(0, "State0", abc);
+    struct imm_mute_state* state1 = imm_mute_state_create(1, "State1", abc);
+    struct imm_hmm*        hmm = imm_hmm_create(abc);
 
     imm_hmm_add_state(hmm, imm_mute_state_super(state0));
     imm_hmm_add_state(hmm, imm_mute_state_super(state1));
@@ -74,8 +74,8 @@ void test_hmm_wrong_states(void)
     struct imm_abc const* abc = imm_abc_create("ACGT", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
-    struct imm_mute_state const* state0 = imm_mute_state_create(0, "state0", abc);
-    struct imm_mute_state const* state1 = imm_mute_state_create(0, "state0", abc);
+    struct imm_mute_state* state0 = imm_mute_state_create(0, "state0", abc);
+    struct imm_mute_state* state1 = imm_mute_state_create(0, "state0", abc);
 
     imm_hmm_add_state(hmm, imm_mute_state_super(state0));
     cass_cond(imm_hmm_set_start(hmm, imm_mute_state_super(state1), imm_log(0.3)) == IMM_ILLEGALARG);

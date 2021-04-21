@@ -139,19 +139,20 @@ struct imm_dp* dp_create(struct imm_hmm const* hmm, struct imm_state** states, s
     return dp;
 
 err:
-    if (!dp->trans_table)
+    if (dp->trans_table)
         dp_trans_table_destroy(dp->trans_table);
 
-    if (!dp->emission)
+    if (dp->emission)
         dp_emission_destroy(dp->emission);
 
-    if (!dp->state_table)
+    if (dp->state_table)
         dp_state_table_destroy(dp->state_table);
 
-    if (!dp->state_idx)
+    if (dp->state_idx)
         state_idx_destroy(dp->state_idx);
 
-    seq_code_destroy(dp->seq_code);
+    if (dp->seq_code)
+        seq_code_destroy(dp->seq_code);
     free(dp);
     return NULL;
 }

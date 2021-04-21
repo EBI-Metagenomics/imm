@@ -18,7 +18,6 @@ struct inctrans
 
 struct dp_inctrans
 {
-    uint16_t          ntotal_trans;
     struct inctrans*  itrans_mem;
     struct list_head* lhead_mem;
     struct list_head* next_list;

@@ -157,7 +157,6 @@ static void graph_init(struct graph* graph, uint16_t nstates, uint16_t ntrans)
 {
     graph->verts = xmalloc(sizeof(*graph->verts) * nstates);
     graph->edges = xmalloc(sizeof(*graph->edges) * ntrans);
-    graph->edges = xmalloc(sizeof(*graph->edges) * ntrans);
     queue_init(&graph->vertq);
     hash_init(graph->vert_tbl);
 }

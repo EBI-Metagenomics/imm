@@ -2,11 +2,8 @@
 
 static inline imm_float zero(void) { return imm_lprob_zero(); }
 
-static inline struct imm_state* normal_super(struct imm_normal_state const* state)
-{
-    return imm_normal_state_super(state);
-}
-static inline struct imm_state* mute_super(struct imm_mute_state const* state) { return imm_mute_state_super(state); }
+static inline struct imm_state* normal_super(struct imm_normal_state* state) { return imm_normal_state_super(state); }
+static inline struct imm_state* mute_super(struct imm_mute_state* state) { return imm_mute_state_super(state); }
 
 static inline char* fmt(char* restrict buffer, char const* name, int i)
 {
@@ -25,12 +22,12 @@ struct model create_model(void)
     m.abc = abc;
     m.hmm = hmm;
 
-    struct imm_mute_state const* start = imm_mute_state_create(0, "START", abc);
+    struct imm_mute_state* start = imm_mute_state_create(0, "START", abc);
     imm_hmm_add_state(hmm, mute_super(start));
     imm_hmm_set_start(hmm, mute_super(start), imm_log(1.0));
     imm_vecp_append(m.mute_states, start);
 
-    struct imm_mute_state const* end = imm_mute_state_create(1, "END", abc);
+    struct imm_mute_state* end = imm_mute_state_create(1, "END", abc);
     imm_hmm_add_state(hmm, mute_super(end));
     m.end = end;
 
@@ -40,13 +37,13 @@ struct model create_model(void)
     imm_float M_lprobs[] = {zero(), imm_log(1.0), zero(), zero(), zero()};
     imm_float I_lprobs[] = {zero(), zero(), imm_log(1.0), zero(), zero()};
 
-    struct imm_normal_state const* B = imm_normal_state_create(2, "B", abc, B_lprobs);
+    struct imm_normal_state* B = imm_normal_state_create(2, "B", abc, B_lprobs);
     imm_hmm_add_state(hmm, normal_super(B));
     imm_vecp_append(m.normal_states, B);
-    struct imm_normal_state const* E = imm_normal_state_create(3, "E", abc, E_lprobs);
+    struct imm_normal_state* E = imm_normal_state_create(3, "E", abc, E_lprobs);
     imm_hmm_add_state(hmm, normal_super(E));
     imm_vecp_append(m.normal_states, E);
-    struct imm_normal_state const* J = imm_normal_state_create(4, "J", abc, J_lprobs);
+    struct imm_normal_state* J = imm_normal_state_create(4, "J", abc, J_lprobs);
     imm_hmm_add_state(hmm, normal_super(J));
     imm_vecp_append(m.normal_states, J);
 
@@ -58,9 +55,9 @@ struct model create_model(void)
     imm_hmm_set_trans(hmm, normal_super(J), normal_super(B), imm_log(0.2));
     imm_hmm_set_trans(hmm, normal_super(E), mute_super(end), imm_log(0.2));
 
-    struct imm_normal_state const* M[ncore_nodes];
-    struct imm_normal_state const* I[ncore_nodes];
-    struct imm_mute_state const*   D[ncore_nodes];
+    struct imm_normal_state* M[ncore_nodes];
+    struct imm_normal_state* I[ncore_nodes];
+    struct imm_mute_state*   D[ncore_nodes];
 
     char     name[10] = "\0";
     uint16_t id = 5;

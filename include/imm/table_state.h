@@ -19,10 +19,10 @@ struct imm_table_state;
 
 IMM_API struct imm_table_state* imm_table_state_create(uint16_t id, char const* name,
                                                        struct imm_seq_table const* table);
-IMM_API struct imm_table_state* imm_table_state_derived(struct imm_state const* state);
+IMM_API struct imm_table_state* imm_table_state_derived(struct imm_state* state);
 IMM_API void                    imm_table_state_destroy(struct imm_table_state const* state);
 IMM_API struct imm_state*       imm_table_state_read(FILE* stream, struct imm_abc const* abc);
-IMM_API struct imm_state*       imm_table_state_super(struct imm_table_state const* state);
+IMM_API struct imm_state*       imm_table_state_super(struct imm_table_state* state);
 IMM_API int imm_table_state_write(struct imm_state const* state, struct imm_profile const* prof, FILE* stream);
 
 #endif

@@ -49,7 +49,7 @@ struct dp_trans_table* dp_trans_table_create(struct imm_hmm const* hmm, struct i
         goto err;
 
     tbl = xmalloc(sizeof(*tbl));
-    tbl->ntrans = inctrans->ntotal_trans;
+    tbl->ntrans = hmm->ntrans;
     tbl->offset = malloc(sizeof(*tbl->offset) * offset_size(hmm->nstates));
     if (!tbl->offset) {
         error_explain(IMM_OUTOFMEM);

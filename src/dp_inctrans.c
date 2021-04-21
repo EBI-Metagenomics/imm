@@ -28,13 +28,13 @@ struct dp_inctrans* dp_inctrans_create(struct imm_hmm const* hmm, struct imm_sta
     struct list_head* list = inctrans->lhead_mem;
     for (unsigned i = 0; i < hmm->nstates; ++i) {
 
+        printf("i: %d\n", i);
         struct imm_state* src = states[i];
         uint16_t          src_idx = state_idx_find(state_idx, src);
         struct iter       iter = stack_iter(&src->trans);
         struct trans*     trans = NULL;
         iter_for_each_entry(trans, &iter, node)
         {
-
             struct imm_state const* dst = hmm_state(hmm, trans->pair.ids[1]);
             uint16_t                dst_idx = state_idx_find(state_idx, dst);
             it->score = trans->lprob;

@@ -36,7 +36,7 @@ struct imm_normal_state* imm_normal_state_create(uint16_t id, char const* name, 
     return state;
 }
 
-struct imm_normal_state* imm_normal_state_derived(struct imm_state const* state)
+struct imm_normal_state* imm_normal_state_derived(struct imm_state* state)
 {
     if (imm_state_type_id(state) != IMM_NORMAL_STATE_TYPE_ID) {
         error("could not cast to normal_state");
@@ -81,7 +81,7 @@ struct imm_state* imm_normal_state_read(FILE* stream, struct imm_abc const* abc)
     return state;
 }
 
-struct imm_state* imm_normal_state_super(struct imm_normal_state const* state) { return state->super; }
+struct imm_state* imm_normal_state_super(struct imm_normal_state* state) { return state->super; }
 
 int imm_normal_state_write(struct imm_state const* state, struct imm_profile const* prof, FILE* stream)
 {

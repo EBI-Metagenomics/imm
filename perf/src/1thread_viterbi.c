@@ -65,11 +65,11 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
     struct imm_abc const* abc = imm_abc_create("BMIEJ", '*');
     struct imm_hmm*       hmm = imm_hmm_create(abc);
 
-    struct imm_mute_state const* start = imm_mute_state_create(0, "START", abc);
+    struct imm_mute_state* start = imm_mute_state_create(0, "START", abc);
     imm_hmm_add_state(hmm, imm_mute_state_super(start));
     imm_hmm_set_start(hmm, imm_mute_state_super(start), imm_log(1.0));
 
-    struct imm_mute_state const* end = imm_mute_state_create(1, "END", abc);
+    struct imm_mute_state* end = imm_mute_state_create(1, "END", abc);
     imm_hmm_add_state(hmm, imm_mute_state_super(end));
 
     imm_float B_lprobs[] = {imm_log(1.0), zero(), zero(), zero(), zero()};
@@ -78,11 +78,11 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
     imm_float M_lprobs[] = {zero(), imm_log(1.0), zero(), zero(), zero()};
     imm_float I_lprobs[] = {zero(), zero(), imm_log(1.0), zero(), zero()};
 
-    struct imm_normal_state const* B = imm_normal_state_create(2, "B", abc, B_lprobs);
+    struct imm_normal_state* B = imm_normal_state_create(2, "B", abc, B_lprobs);
     imm_hmm_add_state(hmm, imm_normal_state_super(B));
-    struct imm_normal_state const* E = imm_normal_state_create(3, "E", abc, E_lprobs);
+    struct imm_normal_state* E = imm_normal_state_create(3, "E", abc, E_lprobs);
     imm_hmm_add_state(hmm, imm_normal_state_super(E));
-    struct imm_normal_state const* J = imm_normal_state_create(4, "J", abc, J_lprobs);
+    struct imm_normal_state* J = imm_normal_state_create(4, "J", abc, J_lprobs);
     imm_hmm_add_state(hmm, imm_normal_state_super(J));
 
     imm_hmm_set_trans(hmm, imm_mute_state_super(start), imm_normal_state_super(B), imm_log(0.2));
@@ -93,9 +93,9 @@ imm_float perf_1thread_viterbi(imm_float* seconds, uint16_t ncore_nodes, uint16_
     imm_hmm_set_trans(hmm, imm_normal_state_super(J), imm_normal_state_super(B), imm_log(0.2));
     imm_hmm_set_trans(hmm, imm_normal_state_super(E), imm_mute_state_super(end), imm_log(0.2));
 
-    struct imm_normal_state const* M[ncore_nodes];
-    struct imm_normal_state const* I[ncore_nodes];
-    struct imm_mute_state const*   D[ncore_nodes];
+    struct imm_normal_state* M[ncore_nodes];
+    struct imm_normal_state* I[ncore_nodes];
+    struct imm_mute_state*   D[ncore_nodes];
 
     char     name[10] = "\0";
     uint16_t id = 5;

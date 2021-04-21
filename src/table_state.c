@@ -25,7 +25,7 @@ struct imm_table_state* imm_table_state_create(uint16_t id, char const* name, st
     return state;
 }
 
-struct imm_table_state* imm_table_state_derived(struct imm_state const* state)
+struct imm_table_state* imm_table_state_derived(struct imm_state* state)
 {
     if (imm_state_type_id(state) != IMM_TABLE_STATE_TYPE_ID) {
         error("could not cast to table_state");
@@ -42,7 +42,7 @@ struct imm_state* imm_table_state_read(FILE* stream, struct imm_abc const* abc)
     return NULL;
 }
 
-struct imm_state* imm_table_state_super(struct imm_table_state const* state) { return state->super; }
+struct imm_state* imm_table_state_super(struct imm_table_state* state) { return state->super; }
 
 static void destroy(struct imm_state const* state)
 {
