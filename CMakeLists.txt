@@ -25,12 +25,12 @@ find_package(elapsed REQUIRED)
 find_package(containers REQUIRED)
 
 add_library(imm
-    # src/eseq.c
+    src/eseq.c
     src/hmm.c
     src/mute_state.c
     src/normal_state.c
     # src/result.c
-    # src/seq_code.c
+    src/seq_code.c
     # src/seq_table.c
     # src/state_idx.c
     # src/table_state.c

@@ -10,25 +10,23 @@ struct eseq
     struct seq_code const *seq_code;
 };
 
-void eseq_destroy(struct eseq const *eseq);
-
-static inline uint_fast16_t
-eseq_get(struct eseq const *eseq, uint_fast32_t position, uint_fast32_t length);
-
-static inline uint_fast32_t eseq_length(struct eseq const *eseq);
-
-int eseq_setup(struct eseq *eseq, struct imm_seq const *seq);
-
-static inline uint_fast16_t
-eseq_get(struct eseq const *eseq, uint_fast32_t position, uint_fast32_t length)
+static inline void eseq_del(struct eseq const *eseq)
 {
-    return matrixu16_get(eseq->code, position,
-                         length - seq_code_min_seq(eseq->seq_code));
+    matrixu16_destroy(eseq->code);
+    free((void *)eseq);
 }
 
-static inline uint_fast32_t eseq_length(struct eseq const *eseq)
+static inline uint_fast16_t eseq_get(struct eseq const *eseq, uint_fast32_t pos,
+                                     uint_fast32_t length)
+{
+    return matrixu16_get(eseq->code, pos, length - eseq->seq_code->min_seq);
+}
+
+static inline uint_fast32_t eseq_len(struct eseq const *eseq)
 {
     return matrixu16_nrows(eseq->code) - 1;
 }
+
+int eseq_setup(struct eseq *eseq, struct imm_seq const *seq);
 
 #endif

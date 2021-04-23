@@ -1,10 +1,8 @@
 #include "seq_code.h"
+#include "common/common.h"
 #include "eseq.h"
-#include "imm/imm.h"
-#include "log.h"
+#include "imm/abc.h"
 #include "matrix.h"
-#include "std.h"
-#include <stdint.h>
 
 struct seq_code_chunk
 {
@@ -15,14 +13,18 @@ struct seq_code_chunk
     uint16_t size;
 };
 
-static inline uint8_t offset_size(struct seq_code const *seq_code);
+static inline uint8_t offset_size(struct seq_code const *seq_code)
+{
+    return (uint8_t)(seq_code->max_seq - seq_code->min_seq + 1);
+}
+
 static inline uint8_t stride_size(struct seq_code const *seq_code)
 {
     return seq_code->max_seq;
 }
 
-struct seq_code const *seq_code_create(struct imm_abc const *abc,
-                                       unsigned min_seq, unsigned max_seq)
+struct seq_code const *seq_code_new(struct imm_abc const *abc, unsigned min_seq,
+                                    unsigned max_seq)
 {
     BUG(min_seq > max_seq);
     struct seq_code *seq_code = xmalloc(sizeof(*seq_code));
@@ -44,7 +46,7 @@ struct seq_code const *seq_code_create(struct imm_abc const *abc,
     {
         for (unsigned len = (unsigned)(max_seq - 2); 1 <= len + 1; --len)
             seq_code->stride[len] =
-                (uint16_t)(seq_code->stride[len + 1] * imm_abc_length(abc));
+                (uint16_t)(seq_code->stride[len + 1] * imm_abc_len(abc));
     }
 
     seq_code->offset =
@@ -59,7 +61,7 @@ struct seq_code const *seq_code_create(struct imm_abc const *abc,
                        seq_code->stride[max_seq - (len - 1) - 1]);
     }
 
-    unsigned long ncombs = ipow(imm_abc_length(abc), max_seq);
+    unsigned long ncombs = ipow(imm_abc_len(abc), max_seq);
     BUG(ncombs > UINT16_MAX);
 
     seq_code->size =
@@ -75,7 +77,6 @@ uint_fast16_t seq_code_encode(struct seq_code const *seq_code,
     unsigned len = (unsigned)imm_seq_len(seq);
     for (unsigned i = 0; i < len; ++i)
     {
-
         unsigned j = imm_abc_symbol_idx(seq_code->abc, imm_seq_str(seq)[i]);
         unsigned offset = (unsigned)(seq_code->max_seq - len);
         code += (uint_fast16_t)(seq_code->stride[i + offset] * j);
@@ -84,7 +85,7 @@ uint_fast16_t seq_code_encode(struct seq_code const *seq_code,
     return code;
 }
 
-struct eseq *seq_code_create_eseq(struct seq_code const *seq_code)
+struct eseq *seq_code_new_eseq(struct seq_code const *seq_code)
 {
     struct eseq *eseq = xmalloc(sizeof(*eseq));
     eseq->seq_code = seq_code;
@@ -106,6 +107,7 @@ void seq_code_destroy(struct seq_code const *seq_code)
     free((void *)seq_code);
 }
 
+#if 0
 int seq_code_write(struct seq_code const *seq_code, FILE *stream)
 {
     struct seq_code_chunk chunk = {.min_seq = seq_code->min_seq,
@@ -216,8 +218,4 @@ err:
 
     return NULL;
 }
-
-static inline uint8_t offset_size(struct seq_code const *seq_code)
-{
-    return (uint8_t)(seq_code->max_seq - seq_code->min_seq + 1);
-}
+#endif
