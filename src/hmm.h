@@ -22,8 +22,8 @@ struct imm_hmm
 
     uint16_t ntrans;
     HASH_DECLARE(trans_tbl, 11);
-    /* TODO: check if this is wise */
-    struct trans trans[HMM_MAX_NTRANS];
+    size_t trans_capacity;
+    struct trans *trans;
 };
 
 static inline void hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)

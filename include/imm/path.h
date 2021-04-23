@@ -3,11 +3,12 @@
 
 #include "imm/export.h"
 #include "imm/step.h"
+#include <stddef.h>
 #include <stdint.h>
 
 struct imm_path
 {
-    unsigned long size;
+    size_t capacity;
     uint32_t nsteps;
     struct imm_step *steps;
 };

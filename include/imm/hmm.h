@@ -19,6 +19,8 @@ IMM_API struct imm_hmm *imm_hmm_new(struct imm_abc const *abc);
 /*                                          struct imm_state const *end_state);
  */
 
+IMM_API void imm_hmm_reset(struct imm_hmm *hmm, struct imm_abc const *abc);
+
 static inline void imm_hmm_del(struct imm_hmm const *hmm) { free((void *)hmm); }
 
 IMM_API imm_float imm_hmm_start_lprob(struct imm_hmm const *hmm);

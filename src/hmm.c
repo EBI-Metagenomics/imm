@@ -22,13 +22,28 @@ int imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
 struct imm_hmm *imm_hmm_new(struct imm_abc const *abc)
 {
     struct imm_hmm *hmm = xmalloc(sizeof(*hmm));
+    hash_init(hmm->state_tbl);
+    imm_hmm_reset(hmm, abc);
+    hmm->trans_capacity = sizeof(*hmm->trans) * (1 << 8);
+    hmm->trans = xmalloc(hmm->trans_capacity);
+    return hmm;
+}
+
+void imm_hmm_reset(struct imm_hmm *hmm, struct imm_abc const *abc)
+{
     hmm->abc = abc;
     start_init(&hmm->start);
     hmm->nstates = 0;
+    unsigned bkt = 0;
+    struct imm_state *state = NULL;
+    struct hnode *tmp = NULL;
+    hash_for_each_safe(hmm->state_tbl, bkt, tmp, state, hnode)
+    {
+        hash_del(&state->hnode);
+    }
     hash_init(hmm->state_tbl);
     hmm->ntrans = 0;
     hash_init(hmm->trans_tbl);
-    return hmm;
 }
 
 /* struct imm_dp *imm_hmm_create_dp(struct imm_hmm const *hmm, */
@@ -234,6 +249,9 @@ int imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state *src,
     }
     else
     {
+        size_t size = sizeof(*hmm->trans);
+        size_t count = hmm->ntrans + 1;
+        hmm->trans = growmem(hmm->trans, count, size, &hmm->trans_capacity);
         struct trans *newt = hmm->trans + hmm->ntrans++;
         trans_init(newt, src->id, dst->id, lprob);
         hash_add(hmm->trans_tbl, &newt->hnode, newt->pair.key);

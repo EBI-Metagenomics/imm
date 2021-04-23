@@ -1,6 +1,7 @@
 #ifndef COMMON_MEMORY_H
 #define COMMON_MEMORY_H
 
+#include "common/bug.h"
 #include "common/error.h"
 #include <stdlib.h>
 #include <string.h>
@@ -9,6 +10,8 @@
 #define xmemcpy(d, s, c) __memcpy((d), (s), (c), __FILE__, __LINE__)
 #define xrealloc(ptr, new_size) __realloc((ptr), (new_size), __FILE__, __LINE__)
 #define xstrdup(x) __strdup((x), __FILE__, __LINE__)
+#define growmem(ptr, count, size, capacity)                                    \
+    __growmem((ptr), (count), (size), (capacity), __FILE__, __LINE__)
 
 static inline void free_if(void const *ptr)
 {
@@ -60,6 +63,18 @@ static inline char *__strdup(char const *str, char const *file, int line)
         exit(EXIT_FAILURE);
     }
     return new;
+}
+
+static inline void *__growmem(void *restrict ptr, size_t count, size_t size,
+                              size_t *capacity, char const *file, int line)
+{
+    if (size * count > *capacity)
+    {
+        (*capacity) <<= 1;
+        BUG(*capacity < size * count);
+        ptr = __realloc(ptr, *capacity, file, line);
+    }
+    return ptr;
 }
 
 #endif
