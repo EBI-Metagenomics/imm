@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 struct eseq;
 struct imm_abc;
@@ -18,21 +19,30 @@ struct seq_code
     struct imm_abc const *abc;
 };
 
-struct seq_code const *seq_code_new(struct imm_abc const *abc, unsigned min_seq,
-                                    unsigned max_seq);
-
-struct eseq *seq_code_new_eseq(struct seq_code const *seq_code);
-
-void seq_code_destroy(struct seq_code const *seq_code);
+static inline void seq_code_del(struct seq_code const *seq_code)
+{
+    free(seq_code->offset);
+    free(seq_code->stride);
+    free((void *)seq_code);
+}
 
 uint_fast16_t seq_code_encode(struct seq_code const *seq_code,
                               struct imm_seq const *seq);
+
+struct eseq *seq_code_new_eseq(struct seq_code const *seq_code);
+
+struct seq_code *seq_code_new(struct imm_abc const *abc, unsigned min_seq,
+                              unsigned max_seq);
 
 static inline uint_fast16_t seq_code_offset(struct seq_code const *seq_code,
                                             unsigned min_seq)
 {
     return (uint_fast16_t)(seq_code->offset[min_seq - seq_code->min_seq]);
 }
+
+struct seq_code *seq_code_reset(struct seq_code *seq_code,
+                                struct imm_abc const *abc, unsigned min_seq,
+                                unsigned max_seq);
 
 /* struct seq_code const *seq_code_read(FILE *stream, struct imm_abc const
  * *abc); */
