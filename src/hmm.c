@@ -1,6 +1,8 @@
 #include "hmm.h"
 #include "common/common.h"
+#include "imm/error.h"
 #include "imm/hmm.h"
+#include "imm/lprob.h"
 #include "imm/path.h"
 #include "imm/subseq.h"
 #include "start.h"
@@ -95,9 +97,7 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
         return imm_lprob_invalid();
     }
 
-    uint32_t step_idx = 0;
-    struct imm_step const *step = imm_path_step(path, step_idx++);
-    unsigned step_len = step->seq_len;
+    struct imm_step const *step = imm_path_step(path, 0);
     struct imm_state const *state = hmm_state(hmm, step->state_id);
     if (state != hmm_state(hmm, hmm->start.state_id))
     {
@@ -105,61 +105,43 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
         return imm_lprob_invalid();
     }
 
-    uint_fast32_t remain = imm_seq_len(seq);
-    if (step_len > remain)
-        goto length_mismatch;
+    if (step->seq_len > imm_seq_len(seq))
+    {
+        error("path emits more symbols than sequence");
+        return imm_lprob_invalid();
+    }
 
-    uint_fast32_t start = 0;
-    struct imm_seq subseq =
-        IMM_SUBSEQ(seq, (uint32_t)start, (uint32_t)step_len);
-
+    struct imm_seq subseq = IMM_SUBSEQ(seq, 0, step->seq_len);
     imm_float lprob = hmm->start.lprob + imm_state_lprob(state, &subseq);
 
-    struct imm_state const *prev_state = NULL;
-
-    goto enter;
-    do
+    uint32_t start = 0;
+    for (uint32_t i = 1; i < imm_seq_len(seq); ++i)
     {
-        step_len = step->seq_len;
+        start += step->seq_len;
+        step = imm_path_step(path, i);
+        if (start + step->seq_len > imm_seq_len(seq))
+        {
+            error("path emits more symbols than sequence");
+            return imm_lprob_invalid();
+        }
+
+        struct imm_state const *prev_state = state;
         if (!(state = hmm_state(hmm, step->state_id)))
         {
             error("state not found");
             return imm_lprob_invalid();
         }
-
-        if (step_len > remain)
-            goto length_mismatch;
-
-        imm_subseq_init(&subseq, seq, (uint32_t)start, (uint32_t)step_len);
-
+        imm_subseq_init(&subseq, seq, start, step->seq_len);
         lprob += imm_hmm_trans(hmm, prev_state, state);
         lprob += imm_state_lprob(state, &subseq);
-
-        if (!imm_lprob_is_valid(lprob))
-        {
-            error("unexpected invalid floating-point number");
-            goto err;
-        }
-
-    enter:
-        prev_state = state;
-        start += step_len;
-        BUG(remain < step_len);
-        remain -= step_len;
-        step = imm_path_step(path, step_idx++);
-    } while (step_idx <= nsteps);
-    if (remain > 0)
-    {
-        error("sequence is longer than symbols emitted by path");
-        goto err;
     }
 
+    if (start + step->seq_len < imm_seq_len(seq))
+    {
+        error("sequence is longer than symbols emitted by path");
+        return imm_lprob_invalid();
+    }
     return lprob;
-
-length_mismatch:
-    error("path emitted more symbols than sequence");
-err:
-    return imm_lprob_invalid();
 }
 
 int imm_hmm_normalize_trans(struct imm_hmm const *hmm)
