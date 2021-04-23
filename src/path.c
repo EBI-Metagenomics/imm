@@ -12,13 +12,13 @@ static inline void grow_if_needed(struct imm_path *path)
     }
 }
 
-void imm_path_add_safe(struct imm_path *path, struct imm_step step)
+void imm_path_add(struct imm_path *path, struct imm_step step)
 {
     grow_if_needed(path);
-    imm_path_add(path, step);
+    imm_path_add_unsafe(path, step);
 }
 
-struct imm_path *imm_path_create(void)
+struct imm_path *imm_path_new(void)
 {
     struct imm_path *path = xmalloc(sizeof(*path));
     path->size = sizeof(struct imm_step) * (1 << 4);

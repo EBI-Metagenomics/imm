@@ -16,10 +16,10 @@ void test_path(void)
     uint16_t state_ids[] = {42, 19};
     uint8_t seq_lens[] = {3, 5};
 
-    struct imm_path *path = imm_path_create();
+    struct imm_path *path = imm_path_new();
 
-    imm_path_add_safe(path, IMM_STEP(state_ids[0], seq_lens[0]));
-    imm_path_add_safe(path, IMM_STEP(state_ids[1], seq_lens[1]));
+    imm_path_add(path, IMM_STEP(state_ids[0], seq_lens[0]));
+    imm_path_add(path, IMM_STEP(state_ids[1], seq_lens[1]));
 
     cass_equal(imm_path_step(path, 0)->state_id, state_ids[0]);
     cass_equal(imm_path_step(path, 1)->state_id, state_ids[1]);
@@ -32,10 +32,10 @@ void test_path(void)
 
 void test_path_long(void)
 {
-    struct imm_path *path = imm_path_create();
+    struct imm_path *path = imm_path_new();
 
     for (uint16_t i = 0; i < 1 << 14; ++i)
-        imm_path_add_safe(path, IMM_STEP(i, i % 16));
+        imm_path_add(path, IMM_STEP(i, i % 16));
 
     for (uint16_t i = 0; i < 1 << 14; ++i)
     {
@@ -46,7 +46,7 @@ void test_path_long(void)
     imm_path_reset(path);
 
     for (uint16_t i = 0; i < 1 << 14; ++i)
-        imm_path_add_safe(path, IMM_STEP(i, i % 16));
+        imm_path_add(path, IMM_STEP(i, i % 16));
 
     for (uint16_t i = 0; i < 1 << 14; ++i)
     {

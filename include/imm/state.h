@@ -21,6 +21,8 @@ struct imm_abc;
 struct imm_profile;
 struct imm_state;
 
+#define IMM_STATE_ID_INVALID UINT16_MAX
+
 struct imm_state_vtable
 {
     void (*del)(struct imm_state const *state);

@@ -1,8 +1,9 @@
 #include "hmm.h"
 #include "common/common.h"
 #include "imm/hmm.h"
-#include "imm/state.h"
-#include <stdlib.h>
+#include "imm/path.h"
+#include "imm/subseq.h"
+#include "start.h"
 
 int imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
 {
@@ -16,12 +17,11 @@ int imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
     return IMM_SUCCESS;
 }
 
-struct imm_hmm *imm_hmm_create(struct imm_abc const *abc)
+struct imm_hmm *imm_hmm_new(struct imm_abc const *abc)
 {
     struct imm_hmm *hmm = xmalloc(sizeof(*hmm));
     hmm->abc = abc;
-    hmm->start_lprob = imm_lprob_invalid();
-    hmm->start_state = UINT16_MAX;
+    start_init(&hmm->start);
     hmm->nstates = 0;
     hash_init(hmm->state_tbl);
     hmm->ntrans = 0;
@@ -59,61 +59,53 @@ struct imm_hmm *imm_hmm_create(struct imm_abc const *abc)
 /*     return dp_create(hmm, states, end_state); */
 /* } */
 
-int imm_hmm_del_state(struct imm_hmm *hmm, struct imm_state *state)
+imm_float imm_hmm_start_lprob(struct imm_hmm const *hmm)
 {
-    return IMM_NOTIMPLEMENTED;
+    return hmm->start.lprob;
 }
 
-void imm_hmm_destroy(struct imm_hmm const *hmm) { free((void *)hmm); }
-
-imm_float imm_hmm_get_start(struct imm_hmm const *hmm,
-                            struct imm_state const *state)
-{
-    return hmm->start_lprob;
-}
-
-imm_float imm_hmm_get_trans(struct imm_hmm const *hmm,
-                            struct imm_state const *src,
-                            struct imm_state const *dst)
+imm_float imm_hmm_trans(struct imm_hmm const *hmm, struct imm_state const *src,
+                        struct imm_state const *dst)
 {
     if (!hash_hashed(&src->hnode) || !hash_hashed(&dst->hnode))
     {
         warn("state(s) not found");
         return imm_lprob_invalid();
     }
-    struct trans const *trans = hmm_get_trans(hmm, src, dst);
+    struct trans const *trans = hmm_trans(hmm, src, dst);
     if (trans)
         return trans->lprob;
     warn("trans not found");
     return imm_lprob_invalid();
 }
 
-imm_float imm_hmm_loglikelihood(struct imm_hmm const *hmm,
-                                struct imm_seq const *seq,
-                                struct imm_path const *path)
+imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
+                         struct imm_path const *path)
 {
-    if (hmm->abc != imm_seq_get_abc(seq))
+    if (hmm->abc != seq->abc)
     {
         error("hmm and seq must have the same alphabet");
         return imm_lprob_invalid();
     }
 
-    struct imm_step const *step = imm_path_first(path);
-    if (!step)
+    uint32_t nsteps = imm_path_nsteps(path);
+    if (nsteps == 0)
     {
         error("path must have steps");
         return imm_lprob_invalid();
     }
 
-    uint_fast8_t step_len = imm_step_seq_len(step);
-    struct imm_state const *state = imm_step_state(step);
-    if (state != hmm_state(hmm, hmm->start_state))
+    uint32_t step_idx = 0;
+    struct imm_step const *step = imm_path_step(path, step_idx++);
+    unsigned step_len = step->seq_len;
+    struct imm_state const *state = hmm_state(hmm, step->state_id);
+    if (state != hmm_state(hmm, hmm->start.state_id))
     {
-        error("first state is not starting state");
+        error("first state must be the starting one");
         return imm_lprob_invalid();
     }
 
-    uint_fast32_t remain = imm_seq_length(seq);
+    uint_fast32_t remain = imm_seq_len(seq);
     if (step_len > remain)
         goto length_mismatch;
 
@@ -121,22 +113,26 @@ imm_float imm_hmm_loglikelihood(struct imm_hmm const *hmm,
     struct imm_seq subseq =
         IMM_SUBSEQ(seq, (uint32_t)start, (uint32_t)step_len);
 
-    imm_float lprob = hmm->start_lprob + imm_state_lprob(state, &subseq);
+    imm_float lprob = hmm->start.lprob + imm_state_lprob(state, &subseq);
 
     struct imm_state const *prev_state = NULL;
 
     goto enter;
-    while (step)
+    do
     {
-        step_len = imm_step_seq_len(step);
-        state = imm_step_state(step);
+        step_len = step->seq_len;
+        if (!(state = hmm_state(hmm, step->state_id)))
+        {
+            error("state not found");
+            return imm_lprob_invalid();
+        }
 
         if (step_len > remain)
             goto length_mismatch;
 
-        imm_subseq_set(&subseq, seq, (uint32_t)start, (uint32_t)step_len);
+        imm_subseq_init(&subseq, seq, (uint32_t)start, (uint32_t)step_len);
 
-        lprob += imm_hmm_get_trans(hmm, prev_state, state);
+        lprob += imm_hmm_trans(hmm, prev_state, state);
         lprob += imm_state_lprob(state, &subseq);
 
         if (!imm_lprob_is_valid(lprob))
@@ -150,8 +146,8 @@ imm_float imm_hmm_loglikelihood(struct imm_hmm const *hmm,
         start += step_len;
         BUG(remain < step_len);
         remain -= step_len;
-        step = imm_path_next(path, step);
-    }
+        step = imm_path_step(path, step_idx++);
+    } while (step_idx <= nsteps);
     if (remain > 0)
     {
         error("sequence is longer than symbols emitted by path");
@@ -162,7 +158,6 @@ imm_float imm_hmm_loglikelihood(struct imm_hmm const *hmm,
 
 length_mismatch:
     error("path emitted more symbols than sequence");
-
 err:
     return imm_lprob_invalid();
 }
@@ -223,8 +218,8 @@ int imm_hmm_set_start(struct imm_hmm *hmm, struct imm_state const *state,
         error("state not found");
         return IMM_ILLEGALARG;
     }
-    hmm->start_lprob = lprob;
-    hmm->start_state = state->id;
+    hmm->start.lprob = lprob;
+    hmm->start.state_id = state->id;
     return IMM_SUCCESS;
 }
 
@@ -249,7 +244,7 @@ int imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state *src,
         return IMM_ILLEGALARG;
     }
 
-    struct trans *trans = hmm_get_trans(hmm, src, dst);
+    struct trans *trans = hmm_trans(hmm, src, dst);
 
     if (trans)
     {
@@ -264,43 +259,4 @@ int imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state *src,
     }
 
     return IMM_SUCCESS;
-}
-
-struct imm_abc const *hmm_abc(struct imm_hmm const *hmm) { return hmm->abc; }
-
-void hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
-{
-    hash_add(hmm->state_tbl, &state->hnode, state->id);
-    hmm->nstates++;
-}
-
-struct imm_state **hmm_get_states(struct imm_hmm const *hmm,
-                                  struct imm_dp const *dp)
-{
-    return dp_get_states(dp);
-}
-
-struct imm_state *hmm_state(struct imm_hmm const *hmm, uint16_t state_id)
-{
-    struct imm_state *state = NULL;
-    hash_for_each_possible(hmm->state_tbl, state, hnode, state_id)
-    {
-        if (state->id == state_id)
-            return state;
-    }
-    return NULL;
-}
-
-struct trans *hmm_get_trans(struct imm_hmm const *hmm,
-                            struct imm_state const *src,
-                            struct imm_state const *dst)
-{
-    struct trans *trans = NULL;
-    union state_pair pair = STATE_PAIR_INIT(src->id, dst->id);
-    hash_for_each_possible(hmm->trans_tbl, trans, hnode, pair.key)
-    {
-        if (trans->pair.ids[0] == src->id && trans->pair.ids[1] == dst->id)
-            return trans;
-    }
-    return NULL;
 }
