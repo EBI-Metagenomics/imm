@@ -1,65 +1,34 @@
-#include "imm/imm.h"
-#include "list.h"
-#include "std.h"
-#include "step.h"
+#include "imm/path.h"
+#include "common/common.h"
+#include "imm/step.h"
 #include <stdlib.h>
 
-struct imm_path
+static inline void grow_if_needed(struct imm_path *path)
 {
-    struct list_head steps;
-};
-
-void imm_path_append(struct imm_path* path, struct imm_step* step) { list_add_tail(&step->list_entry, &path->steps); }
-
-struct imm_path* imm_path_clone(struct imm_path const* path)
-{
-    struct imm_path* new_path = xmalloc(sizeof(*new_path));
-    INIT_LIST_HEAD(&new_path->steps);
-
-    struct list_head* entry = NULL;
-    list_for_each(entry, &path->steps)
+    if (sizeof(struct imm_step) * (path->nsteps + 1) > path->size)
     {
-        struct imm_step const* step = list_entry(entry, struct imm_step, list_entry);
-        struct imm_step*       new_step = imm_step_clone(step);
-        imm_path_append(new_path, new_step);
+        path->size <<= 1;
+        path->steps = xrealloc(path->steps, path->size);
     }
-
-    return new_path;
 }
 
-struct imm_path* imm_path_create(void)
+void imm_path_add_safe(struct imm_path *path, struct imm_step step)
 {
-    struct imm_path* path = xmalloc(sizeof(struct imm_path));
-    INIT_LIST_HEAD(&path->steps);
+    grow_if_needed(path);
+    imm_path_add(path, step);
+}
+
+struct imm_path *imm_path_create(void)
+{
+    struct imm_path *path = xmalloc(sizeof(*path));
+    path->size = sizeof(struct imm_step) * (1 << 4);
+    path->nsteps = 0;
+    path->steps = xmalloc(path->size);
     return path;
 }
 
-void imm_path_destroy(struct imm_path const* path)
+void imm_path_del(struct imm_path const *path)
 {
-    struct list_head *entry = NULL, *tmp = NULL;
-    list_for_each_safe (entry, tmp, &path->steps) {
-        struct imm_step const* step = list_entry(entry, struct imm_step, list_entry);
-        list_del(entry);
-        imm_step_destroy(step);
-    }
-    imm_path_free(path);
+    free(path->steps);
+    free((void *)path);
 }
-
-bool imm_path_empty(struct imm_path const* path) { return imm_path_first(path) == NULL; }
-
-struct imm_step const* imm_path_first(struct imm_path const* path)
-{
-    return list_first_entry_or_null(&path->steps, struct imm_step, list_entry);
-}
-
-void imm_path_free(struct imm_path const* path) { free((void*)path); }
-
-struct imm_step const* imm_path_next(struct imm_path const* path, struct imm_step const* step)
-{
-    struct imm_step const* next = list_next_entry(step, list_entry);
-    if (&path->steps != &next->list_entry)
-        return next;
-    return NULL;
-}
-
-void imm_path_prepend(struct imm_path* path, struct imm_step* step) { list_add(&step->list_entry, &path->steps); }

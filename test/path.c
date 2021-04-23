@@ -2,45 +2,57 @@
 #include "imm/imm.h"
 
 void test_path(void);
+void test_path_long(void);
 
 int main(void)
 {
     test_path();
+    test_path_long();
     return cass_status();
 }
 
 void test_path(void)
 {
-    struct imm_abc const* abc = imm_abc_create("ACGT", '*');
+    uint16_t state_ids[] = {42, 19};
+    uint8_t seq_lens[] = {3, 5};
 
-    imm_float                lprobs[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5), imm_lprob_zero()};
-    struct imm_normal_state* state0 = imm_normal_state_create(0, "State0", abc, lprobs);
-    struct imm_normal_state* state1 = imm_normal_state_create(1, "State1", abc, lprobs);
+    struct imm_path *path = imm_path_create();
 
-    struct imm_path* path = imm_path_create();
+    imm_path_add_safe(path, IMM_STEP(state_ids[0], seq_lens[0]));
+    imm_path_add_safe(path, IMM_STEP(state_ids[1], seq_lens[1]));
 
-    imm_path_append(path, imm_step_create(imm_normal_state_super(state0), 1));
-    imm_path_append(path, imm_step_create(imm_normal_state_super(state1), 1));
+    cass_equal(imm_path_step(path, 0)->state_id, state_ids[0]);
+    cass_equal(imm_path_step(path, 1)->state_id, state_ids[1]);
 
-    cass_cond(imm_step_create(imm_normal_state_super(state1), 2) == NULL);
-    cass_cond(imm_step_create(imm_normal_state_super(state1), 0) == NULL);
+    cass_equal(imm_path_step(path, 0)->seq_len, seq_lens[0]);
+    cass_equal(imm_path_step(path, 1)->seq_len, seq_lens[1]);
 
-    struct imm_path* new_path = imm_path_clone(path);
+    imm_path_del(path);
+}
 
-    struct imm_step const* s0 = imm_path_first(path);
-    struct imm_step const* s1 = imm_path_first(new_path);
-    while (s0) {
-        cass_cond(s1 != NULL);
-        cass_cond(imm_step_state(s0) == imm_step_state(s1));
-        cass_cond(imm_step_seq_len(s0) == imm_step_seq_len(s1));
-        s0 = imm_path_next(path, s0);
-        s1 = imm_path_next(path, s1);
+void test_path_long(void)
+{
+    struct imm_path *path = imm_path_create();
+
+    for (uint16_t i = 0; i < 1 << 14; ++i)
+        imm_path_add_safe(path, IMM_STEP(i, i % 16));
+
+    for (uint16_t i = 0; i < 1 << 14; ++i)
+    {
+        cass_equal(imm_path_step(path, i)->state_id, i);
+        cass_equal(imm_path_step(path, i)->seq_len, i % 16);
     }
 
-    imm_path_destroy(path);
-    imm_path_destroy(new_path);
+    imm_path_reset(path);
 
-    imm_normal_state_destroy(state0);
-    imm_normal_state_destroy(state1);
-    imm_abc_destroy(abc);
+    for (uint16_t i = 0; i < 1 << 14; ++i)
+        imm_path_add_safe(path, IMM_STEP(i, i % 16));
+
+    for (uint16_t i = 0; i < 1 << 14; ++i)
+    {
+        cass_equal(imm_path_step(path, i)->state_id, i);
+        cass_equal(imm_path_step(path, i)->seq_len, i % 16);
+    }
+
+    imm_path_del(path);
 }

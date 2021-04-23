@@ -8,20 +8,24 @@
 
 struct seq_code_chunk
 {
-    uint8_t   min_seq;
-    uint8_t   max_seq;
-    uint16_t* offset;
-    uint16_t* stride;
-    uint16_t  size;
+    uint8_t min_seq;
+    uint8_t max_seq;
+    uint16_t *offset;
+    uint16_t *stride;
+    uint16_t size;
 };
 
-static inline uint8_t offset_size(struct seq_code const* seq_code);
-static inline uint8_t stride_size(struct seq_code const* seq_code) { return seq_code->max_seq; }
+static inline uint8_t offset_size(struct seq_code const *seq_code);
+static inline uint8_t stride_size(struct seq_code const *seq_code)
+{
+    return seq_code->max_seq;
+}
 
-struct seq_code const* seq_code_create(struct imm_abc const* abc, unsigned min_seq, unsigned max_seq)
+struct seq_code const *seq_code_create(struct imm_abc const *abc,
+                                       unsigned min_seq, unsigned max_seq)
 {
     BUG(min_seq > max_seq);
-    struct seq_code* seq_code = xmalloc(sizeof(*seq_code));
+    struct seq_code *seq_code = xmalloc(sizeof(*seq_code));
 
     seq_code->min_seq = (uint8_t)min_seq;
     seq_code->max_seq = (uint8_t)max_seq;
@@ -29,39 +33,50 @@ struct seq_code const* seq_code_create(struct imm_abc const* abc, unsigned min_s
 
     if (max_seq == 0)
         seq_code->stride = NULL;
-    else {
-        seq_code->stride = xmalloc(sizeof(*seq_code->stride) * stride_size(seq_code));
+    else
+    {
+        seq_code->stride =
+            xmalloc(sizeof(*seq_code->stride) * stride_size(seq_code));
         seq_code->stride[max_seq - 1] = 1;
     }
 
-    if (max_seq > 1) {
+    if (max_seq > 1)
+    {
         for (unsigned len = (unsigned)(max_seq - 2); 1 <= len + 1; --len)
-            seq_code->stride[len] = (uint16_t)(seq_code->stride[len + 1] * imm_abc_length(abc));
+            seq_code->stride[len] =
+                (uint16_t)(seq_code->stride[len + 1] * imm_abc_length(abc));
     }
 
-    seq_code->offset = xmalloc(sizeof(*seq_code->offset) * offset_size(seq_code));
+    seq_code->offset =
+        xmalloc(sizeof(*seq_code->offset) * offset_size(seq_code));
     seq_code->offset[0] = 0;
-    for (unsigned len = (unsigned)(min_seq + 1); len <= max_seq; ++len) {
+    for (unsigned len = (unsigned)(min_seq + 1); len <= max_seq; ++len)
+    {
 
         unsigned i = len - min_seq;
-        seq_code->offset[i] = (uint16_t)(seq_code->offset[i - 1] + seq_code->stride[max_seq - (len - 1) - 1]);
+        seq_code->offset[i] =
+            (uint16_t)(seq_code->offset[i - 1] +
+                       seq_code->stride[max_seq - (len - 1) - 1]);
     }
 
     unsigned long ncombs = ipow(imm_abc_length(abc), max_seq);
     BUG(ncombs > UINT16_MAX);
 
-    seq_code->size = (uint16_t)(seq_code->offset[max_seq - min_seq] + (uint16_t)ncombs);
+    seq_code->size =
+        (uint16_t)(seq_code->offset[max_seq - min_seq] + (uint16_t)ncombs);
 
     return seq_code;
 }
 
-uint_fast16_t seq_code_encode(struct seq_code const* seq_code, struct imm_seq const* seq)
+uint_fast16_t seq_code_encode(struct seq_code const *seq_code,
+                              struct imm_seq const *seq)
 {
-    uint_fast16_t code = seq_code->offset[imm_seq_length(seq) - seq_code->min_seq];
-    unsigned      len = (unsigned)imm_seq_length(seq);
-    for (unsigned i = 0; i < len; ++i) {
+    uint_fast16_t code = seq_code->offset[imm_seq_len(seq) - seq_code->min_seq];
+    unsigned len = (unsigned)imm_seq_len(seq);
+    for (unsigned i = 0; i < len; ++i)
+    {
 
-        unsigned j = imm_abc_symbol_idx(seq_code->abc, imm_seq_string(seq)[i]);
+        unsigned j = imm_abc_symbol_idx(seq_code->abc, imm_seq_str(seq)[i]);
         unsigned offset = (unsigned)(seq_code->max_seq - len);
         code += (uint_fast16_t)(seq_code->stride[i + offset] * j);
     }
@@ -69,12 +84,14 @@ uint_fast16_t seq_code_encode(struct seq_code const* seq_code, struct imm_seq co
     return code;
 }
 
-struct eseq* seq_code_create_eseq(struct seq_code const* seq_code)
+struct eseq *seq_code_create_eseq(struct seq_code const *seq_code)
 {
-    struct eseq* eseq = xmalloc(sizeof(*eseq));
+    struct eseq *eseq = xmalloc(sizeof(*eseq));
     eseq->seq_code = seq_code;
-    eseq->code = matrixu16_create(1, (uint_fast16_t)(seq_code->max_seq - seq_code->min_seq + 1));
-    if (!eseq->code) {
+    eseq->code = matrixu16_create(
+        1, (uint_fast16_t)(seq_code->max_seq - seq_code->min_seq + 1));
+    if (!eseq->code)
+    {
         error_explain(IMM_OUTOFMEM);
         free(eseq);
         return NULL;
@@ -82,14 +99,14 @@ struct eseq* seq_code_create_eseq(struct seq_code const* seq_code)
     return eseq;
 }
 
-void seq_code_destroy(struct seq_code const* seq_code)
+void seq_code_destroy(struct seq_code const *seq_code)
 {
     free(seq_code->offset);
     free(seq_code->stride);
-    free((void*)seq_code);
+    free((void *)seq_code);
 }
 
-int seq_code_write(struct seq_code const* seq_code, FILE* stream)
+int seq_code_write(struct seq_code const *seq_code, FILE *stream)
 {
     struct seq_code_chunk chunk = {.min_seq = seq_code->min_seq,
                                    .max_seq = seq_code->max_seq,
@@ -97,27 +114,34 @@ int seq_code_write(struct seq_code const* seq_code, FILE* stream)
                                    .stride = seq_code->stride,
                                    .size = seq_code->size};
 
-    if (fwrite(&chunk.min_seq, sizeof(chunk.min_seq), 1, stream) < 1) {
+    if (fwrite(&chunk.min_seq, sizeof(chunk.min_seq), 1, stream) < 1)
+    {
         error("could not write min_seq");
         return 1;
     }
 
-    if (fwrite(&chunk.max_seq, sizeof(chunk.max_seq), 1, stream) < 1) {
+    if (fwrite(&chunk.max_seq, sizeof(chunk.max_seq), 1, stream) < 1)
+    {
         error("could not write max_seq");
         return 1;
     }
 
-    if (fwrite(chunk.offset, sizeof(*chunk.offset), offset_size(seq_code), stream) < offset_size(seq_code)) {
+    if (fwrite(chunk.offset, sizeof(*chunk.offset), offset_size(seq_code),
+               stream) < offset_size(seq_code))
+    {
         error("could not write offset");
         return 1;
     }
 
-    if (fwrite(chunk.stride, sizeof(*chunk.stride), stride_size(seq_code), stream) < stride_size(seq_code)) {
+    if (fwrite(chunk.stride, sizeof(*chunk.stride), stride_size(seq_code),
+               stream) < stride_size(seq_code))
+    {
         error("could not write stride");
         return 1;
     }
 
-    if (fwrite(&chunk.size, sizeof(chunk.size), 1, stream) < 1) {
+    if (fwrite(&chunk.size, sizeof(chunk.size), 1, stream) < 1)
+    {
         error("could not write size");
         return 1;
     }
@@ -125,22 +149,25 @@ int seq_code_write(struct seq_code const* seq_code, FILE* stream)
     return 0;
 }
 
-struct seq_code const* seq_code_read(FILE* stream, struct imm_abc const* abc)
+struct seq_code const *seq_code_read(FILE *stream, struct imm_abc const *abc)
 {
-    struct seq_code_chunk chunk = {.min_seq = 0, .max_seq = 0, .offset = NULL, .stride = NULL, .size = 0};
+    struct seq_code_chunk chunk = {
+        .min_seq = 0, .max_seq = 0, .offset = NULL, .stride = NULL, .size = 0};
 
-    struct seq_code* seq_code = xmalloc(sizeof(*seq_code));
+    struct seq_code *seq_code = xmalloc(sizeof(*seq_code));
     seq_code->offset = NULL;
     seq_code->stride = NULL;
     seq_code->size = 0;
     seq_code->abc = abc;
 
-    if (fread(&chunk.min_seq, sizeof(chunk.min_seq), 1, stream) < 1) {
+    if (fread(&chunk.min_seq, sizeof(chunk.min_seq), 1, stream) < 1)
+    {
         error("could not read min_seq");
         goto err;
     }
 
-    if (fread(&chunk.max_seq, sizeof(chunk.max_seq), 1, stream) < 1) {
+    if (fread(&chunk.max_seq, sizeof(chunk.max_seq), 1, stream) < 1)
+    {
         error("could not read max_seq");
         goto err;
     }
@@ -150,19 +177,24 @@ struct seq_code const* seq_code_read(FILE* stream, struct imm_abc const* abc)
 
     chunk.offset = xmalloc(sizeof(*chunk.offset) * offset_size(seq_code));
 
-    if (fread(chunk.offset, sizeof(*chunk.offset), offset_size(seq_code), stream) < offset_size(seq_code)) {
+    if (fread(chunk.offset, sizeof(*chunk.offset), offset_size(seq_code),
+              stream) < offset_size(seq_code))
+    {
         error("could not read offset");
         goto err;
     }
 
     chunk.stride = xmalloc(sizeof(*chunk.stride) * offset_size(seq_code));
 
-    if (fread(chunk.stride, sizeof(*chunk.stride), stride_size(seq_code), stream) < stride_size(seq_code)) {
+    if (fread(chunk.stride, sizeof(*chunk.stride), stride_size(seq_code),
+              stream) < stride_size(seq_code))
+    {
         error("could not read stride");
         goto err;
     }
 
-    if (fread(&chunk.size, sizeof(chunk.size), 1, stream) < 1) {
+    if (fread(&chunk.size, sizeof(chunk.size), 1, stream) < 1)
+    {
         error("could not read size");
         goto err;
     }
@@ -185,7 +217,7 @@ err:
     return NULL;
 }
 
-static inline uint8_t offset_size(struct seq_code const* seq_code)
+static inline uint8_t offset_size(struct seq_code const *seq_code)
 {
     return (uint8_t)(seq_code->max_seq - seq_code->min_seq + 1);
 }

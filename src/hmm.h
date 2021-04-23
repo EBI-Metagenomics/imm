@@ -6,7 +6,7 @@
 #include <stdint.h>
 
 struct imm_abc;
-struct imm_dp;
+/* struct imm_dp; */
 struct imm_hmm;
 struct imm_state;
 
@@ -19,23 +19,25 @@ union state_pair
 struct trans
 {
     union state_pair pair;
-    imm_float        lprob;
-    struct node      node;
-    struct hnode     hnode;
+    imm_float lprob;
+    struct node node;
+    struct hnode hnode;
 };
 
-#define STATE_PAIR_INIT(src, dst)                                                                                      \
-    {                                                                                                                  \
-        .ids[0] = (src), .ids[1] = (dst)                                                                               \
+#define STATE_PAIR_INIT(src, dst)                                              \
+    {                                                                          \
+        .ids[0] = (src), .ids[1] = (dst)                                       \
     }
 
-static inline void state_pair_init(union state_pair* pair, uint16_t src, uint16_t dst)
+static inline void state_pair_init(union state_pair *pair, uint16_t src,
+                                   uint16_t dst)
 {
     pair->ids[0] = src;
     pair->ids[1] = dst;
 }
 
-static inline void trans_init(struct trans* trans, uint16_t src, uint16_t dst, imm_float lprob)
+static inline void trans_init(struct trans *trans, uint16_t src, uint16_t dst,
+                              imm_float lprob)
 {
     state_pair_init(&trans->pair, src, dst);
     trans->lprob = lprob;
@@ -47,9 +49,9 @@ static inline void trans_init(struct trans* trans, uint16_t src, uint16_t dst, i
 
 struct imm_hmm
 {
-    struct imm_abc const* abc;
-    imm_float             start_lprob;
-    uint16_t              start_state;
+    struct imm_abc const *abc;
+    imm_float start_lprob;
+    uint16_t start_state;
 
     uint16_t nstates;
     HASH_DECLARE(state_tbl, 11);
@@ -60,10 +62,17 @@ struct imm_hmm
     struct trans trans[MAX_NTRANS];
 };
 
-struct imm_abc const* hmm_abc(struct imm_hmm const* hmm);
-void                  hmm_add_state(struct imm_hmm* hmm, struct imm_state* mstate);
-struct imm_state**    hmm_get_states(struct imm_hmm const* hmm, struct imm_dp const* dp);
-struct imm_state*     hmm_state(struct imm_hmm const* hmm, uint16_t state_id);
-struct trans* hmm_get_trans(struct imm_hmm const* hmm, struct imm_state const* src, struct imm_state const* dst);
+struct imm_abc const *hmm_abc(struct imm_hmm const *hmm);
+
+void hmm_add_state(struct imm_hmm *hmm, struct imm_state *mstate);
+
+/* struct imm_state **hmm_get_states(struct imm_hmm const *hmm, */
+/*                                   struct imm_dp const *dp); */
+
+struct imm_state *hmm_state(struct imm_hmm const *hmm, uint16_t state_id);
+
+struct trans *hmm_get_trans(struct imm_hmm const *hmm,
+                            struct imm_state const *src,
+                            struct imm_state const *dst);
 
 #endif

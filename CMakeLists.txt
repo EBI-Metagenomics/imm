@@ -25,43 +25,24 @@ find_package(elapsed REQUIRED)
 find_package(containers REQUIRED)
 
 add_library(imm
+    # src/eseq.c
+    # src/hmm.c
+    src/mute_state.c
+    src/normal_state.c
+    # src/result.c
+    # src/seq_code.c
+    # src/seq_table.c
+    # src/state_idx.c
+    # src/table_state.c
     src/abc.c
     src/abc_lprob.c
     src/cartes.c
-    src/cpath.c
-    src/dp.c
-    src/dp_emission.c
-    src/dp_inctrans.c
-    src/dp_matrix.c
-    src/dp_state_table.c
-    src/dp_task.c
-    src/dp_trans_table.c
-    src/eseq.c
-    src/hmm.c
-    src/input.c
+    src/common/error.c
     src/log.c
     src/lprob.c
-    src/model.c
-    src/mute_state.c
-    src/normal_state.c
-    src/output.c
     src/path.c
-    src/profile.c
-    src/result.c
     src/seq.c
-    src/seq_code.c
-    src/seq_table.c
     src/state.c
-    src/state_idx.c
-    src/std/bug.c
-    src/std/error.c
-    src/std/io.c
-    src/std/math.c
-    src/std/memory.c
-    src/step.c
-    src/table_state.c
-    src/topological_sort.c
-    src/vec.c
 )
 add_library(IMM::imm ALIAS imm)
 
@@ -187,7 +168,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/imm-config.cmake
 
 enable_testing()
 add_subdirectory(test)
-add_subdirectory(perf)
+# add_subdirectory(perf)
 
 option(COVERAGE "Enable coverage")
 if(COVERAGE)
