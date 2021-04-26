@@ -21,7 +21,7 @@ int main(void)
 
 void test_abc_normal(void)
 {
-    struct imm_abc const *abc = imm_abc_new("ACGT", '*');
+    struct imm_abc const *abc = imm_abc_new(4, "ACGT", '*');
     cass_cond(abc != NULL);
     cass_cond(imm_abc_symbol_id(abc, 2) == 'G');
     cass_cond(imm_abc_symbol_idx(abc, 'G') == 2);
@@ -36,7 +36,7 @@ void test_abc_normal(void)
 
 void test_abc_clone(void)
 {
-    struct imm_abc const *a = imm_abc_new("ACGT", '*');
+    struct imm_abc const *a = imm_abc_new(4, "ACGT", '*');
     cass_cond(a != NULL);
 
     struct imm_abc const *b = imm_abc_clone(a);
@@ -53,25 +53,25 @@ void test_abc_clone(void)
 
 void test_abc_duplicated_alphabet(void)
 {
-    struct imm_abc const *abc = imm_abc_new("ACTC", '*');
+    struct imm_abc const *abc = imm_abc_new(4, "ACTC", '*');
     cass_cond(abc == NULL);
 }
 
 void test_abc_duplicated_any_symbol(void)
 {
-    struct imm_abc const *abc = imm_abc_new("AC*T", '*');
+    struct imm_abc const *abc = imm_abc_new(4, "AC*T", '*');
     cass_cond(abc == NULL);
 }
 
 void test_abc_symbol_outside_range(void)
 {
     char symbols[] = {3, '\0'};
-    struct imm_abc const *abc = imm_abc_new(symbols, '*');
+    struct imm_abc const *abc = imm_abc_new(4, symbols, '*');
     cass_cond(abc == NULL);
 }
 
 void test_abc_any_symbol_outside_range(void)
 {
-    struct imm_abc const *abc = imm_abc_new("ACGT", 3);
+    struct imm_abc const *abc = imm_abc_new(4, "ACGT", 3);
     cass_cond(abc == NULL);
 }

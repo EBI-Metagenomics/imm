@@ -1,6 +1,7 @@
 #include "imm/normal_state.h"
 #include "common/common.h"
 #include "imm/abc.h"
+#include "imm/error.h"
 #include "imm/seq.h"
 #include "imm/state_types.h"
 #include <stdlib.h>
@@ -36,17 +37,14 @@ struct imm_state *imm_normal_state_read(FILE *stream, struct imm_abc const *abc)
 {
     struct imm_state *state = __imm_state_read(stream, abc);
     if (!state)
-    {
-        error("could not read normal state");
         return NULL;
-    }
 
     uint8_t lprobs_size = 0;
     imm_float *lprobs = NULL;
 
     if (fread(&lprobs_size, sizeof(lprobs_size), 1, stream) < 1)
     {
-        error("could not read lprobs_size");
+        xerror(IMM_IOERROR, "could not read lprobs_size");
         imm_state_free(state);
         return NULL;
     }
@@ -55,7 +53,7 @@ struct imm_state *imm_normal_state_read(FILE *stream, struct imm_abc const *abc)
 
     if (fread(lprobs, sizeof(*lprobs), lprobs_size, stream) < lprobs_size)
     {
-        error("could not read lprobs");
+        xerror(IMM_IOERROR, "could not read lprobs");
         free(lprobs);
         imm_state_free(state);
         return NULL;

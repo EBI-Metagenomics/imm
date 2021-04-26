@@ -1,7 +1,6 @@
 #include "imm/abc.h"
 #include "common/common.h"
-#include <stdlib.h>
-#include <string.h>
+#include "imm/error.h"
 
 struct abc_chunk
 {
@@ -18,11 +17,6 @@ struct imm_abc const *imm_abc_clone(struct imm_abc const *abc)
     return abc->vtable.clone(abc);
 }
 
-struct imm_abc const *imm_abc_new(char const *symbols, char const any_symbol)
-{
-    return __imm_abc_new(symbols, any_symbol, NULL);
-}
-
 void imm_abc_del(struct imm_abc const *abc) { abc->vtable.del(abc); }
 
 struct imm_abc *imm_abc_read(FILE *stream)
@@ -32,43 +26,44 @@ struct imm_abc *imm_abc_read(FILE *stream)
 
     if (fread(&chunk.nsymbols, sizeof(chunk.nsymbols), 1, stream) < 1)
     {
-        error("could not read nsymbols");
-        goto err;
+        xerror(IMM_IOERROR, "could not read nsymbols");
+        goto cleanup;
     }
 
     chunk.symbols =
         malloc(sizeof(*chunk.symbols) * (size_t)(chunk.nsymbols + 1));
     if (!chunk.symbols)
     {
-        error_explain(IMM_OUTOFMEM);
-        goto err;
+        xerror(IMM_OUTOFMEM, "abc symbols");
+        goto cleanup;
     }
 
     if (fread(chunk.symbols, sizeof(*chunk.symbols),
               (size_t)(chunk.nsymbols + 1),
               stream) < (size_t)(chunk.nsymbols + 1))
     {
-        error("could not read symbols");
-        goto err;
+        xerror(IMM_IOERROR, "could not read symbols");
+        goto cleanup;
     }
 
     if (chunk.symbols[chunk.nsymbols] != '\0')
     {
-        error("missing null character");
-        goto err;
+        xerror(IMM_IOERROR, "missing null character");
+        goto cleanup;
     }
 
     if (fread(&chunk.any_symbol, sizeof(chunk.any_symbol), 1, stream) < 1)
     {
-        error("could not read any_symbol");
-        goto err;
+        xerror(IMM_IOERROR, "could not read any_symbol");
+        goto cleanup;
     }
 
-    struct imm_abc *abc = __imm_abc_new(chunk.symbols, chunk.any_symbol, NULL);
+    struct imm_abc *abc =
+        __imm_abc_new(chunk.nsymbols, chunk.symbols, chunk.any_symbol, NULL);
     free(chunk.symbols);
     return abc;
 
-err:
+cleanup:
     free_if(chunk.symbols);
     return NULL;
 }
@@ -94,7 +89,7 @@ struct imm_abc const *__imm_abc_clone(struct imm_abc const *abc)
 {
     struct imm_abc *nabc = xmalloc(sizeof(struct imm_abc));
     nabc->symbols = xstrdup(abc->symbols);
-    nabc->length = abc->length;
+    nabc->len = abc->len;
     xmemcpy(nabc->symbol_idx, abc->symbol_idx,
             sizeof(*abc->symbol_idx) * IMM_SYMBOL_IDX_SIZE);
     nabc->any_symbol = abc->any_symbol;
@@ -103,48 +98,51 @@ struct imm_abc const *__imm_abc_clone(struct imm_abc const *abc)
     return nabc;
 }
 
-struct imm_abc *__imm_abc_new(char const *symbols, char any_symbol,
+struct imm_abc *__imm_abc_new(uint8_t len, char const *symbols, char any_symbol,
                               void *derived)
 {
     if (any_symbol < IMM_FIRST_CHAR || any_symbol > IMM_LAST_CHAR)
     {
-        error("any_symbol is outside the range [%c, %c] ", IMM_FIRST_CHAR,
-              IMM_LAST_CHAR);
+        xerror(IMM_ILLEGALARG,
+               "any_symbol outside range [" XSTR(IMM_FIRST_CHAR) ", " XSTR(
+                   IMM_LAST_CHAR) "] ");
         return NULL;
     }
+    if (len == 0)
+    {
+        xerror(IMM_ILLEGALARG, "alphabet cannot be empty");
+        return NULL;
+    }
+
     struct imm_abc *abc = xmalloc(sizeof(*abc));
     abc->any_symbol = any_symbol;
 
     for (size_t i = 0; i < IMM_SYMBOL_IDX_SIZE; ++i)
         abc->symbol_idx[i] = IMM_ABC_INVALID_IDX;
 
-    if (strlen(symbols) > IMM_SYMBOL_IDX_SIZE)
+    if (len > IMM_SYMBOL_IDX_SIZE)
     {
-        error("alphabet size cannot be larger than %zu", IMM_SYMBOL_IDX_SIZE);
+        xerror(IMM_ILLEGALARG, "symbols length is too large");
         free(abc);
         return NULL;
     }
 
-    size_t len = strlen(symbols);
-    if (len > UINT8_MAX)
-    {
-        error("symbols is too long");
-        return NULL;
-    }
-    abc->length = (uint8_t)len;
-    for (uint8_t i = 0; i < abc->length; ++i)
+    abc->len = len;
+    for (uint8_t i = 0; i < abc->len; ++i)
     {
         if (symbols[i] == any_symbol)
         {
-            error("any_symbol cannot be in the alphabet");
+            xerror(IMM_ILLEGALARG, "any_symbol cannot be in the alphabet");
             free(abc);
             return NULL;
         }
 
         if (symbols[i] < IMM_FIRST_CHAR || symbols[i] > IMM_LAST_CHAR)
         {
-            error("alphabet symbol is outside the range [%c, %c] ",
-                  IMM_FIRST_CHAR, IMM_LAST_CHAR);
+
+            xerror(IMM_ILLEGALARG,
+                   "symbol outside range [" XSTR(IMM_FIRST_CHAR) ", " XSTR(
+                       IMM_LAST_CHAR) "] ");
             free(abc);
             return NULL;
         }
@@ -152,7 +150,7 @@ struct imm_abc *__imm_abc_new(char const *symbols, char any_symbol,
         size_t j = __imm_abc_index(symbols[i]);
         if (abc->symbol_idx[j] != IMM_ABC_INVALID_IDX)
         {
-            error("alphabet cannot have duplicated symbols");
+            xerror(IMM_IOERROR, "alphabet cannot have duplicated symbols");
             free(abc);
             return NULL;
         }
@@ -181,24 +179,15 @@ int __imm_abc_write(struct imm_abc const *abc, FILE *stream)
                               .any_symbol = abc->any_symbol};
 
     if (fwrite(&chunk.nsymbols, sizeof(chunk.nsymbols), 1, stream) < 1)
-    {
-        error("could not write nsymbols");
-        return IMM_IOERROR;
-    }
+        return xerror(IMM_IOERROR, "failed to write nsymbols");
 
     if (fwrite(chunk.symbols, sizeof(*chunk.symbols),
                (size_t)(chunk.nsymbols + 1),
                stream) < (size_t)(chunk.nsymbols + 1))
-    {
-        error("could not write symbols");
-        return IMM_IOERROR;
-    }
+        return xerror(IMM_IOERROR, "failed to write symbols");
 
     if (fwrite(&chunk.any_symbol, sizeof(chunk.any_symbol), 1, stream) < 1)
-    {
-        error("could not write any_symbol");
-        return IMM_IOERROR;
-    }
+        return xerror(IMM_IOERROR, "failed to write any_symbol");
 
     return IMM_SUCCESS;
 }

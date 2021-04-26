@@ -4,15 +4,6 @@
 #include "imm/abc.h"
 #include "matrix.h"
 
-/* struct seq_code_chunk */
-/* { */
-/*     uint8_t min_seq; */
-/*     uint8_t max_seq; */
-/*     uint16_t *offset; */
-/*     uint16_t *stride; */
-/*     uint16_t size; */
-/* }; */
-
 static inline uint16_t calc_size(struct seq_code const *seq_code)
 {
     unsigned long ncombs = ipow(imm_abc_len(seq_code->abc), seq_code->max_seq);
@@ -54,7 +45,7 @@ struct eseq *seq_code_new_eseq(struct seq_code const *seq_code)
         1, (uint_fast16_t)(seq_code->max_seq - seq_code->min_seq + 1));
     if (!eseq->code)
     {
-        error_explain(IMM_OUTOFMEM);
+        xerror(IMM_OUTOFMEM, "failed to create matrix");
         free(eseq);
         return NULL;
     }

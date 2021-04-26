@@ -7,5 +7,6 @@
 #include "common/io.h"
 #include "common/math.h"
 #include "common/memory.h"
+#include "common/string.h"
 
 #endif

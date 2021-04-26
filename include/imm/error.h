@@ -10,6 +10,7 @@ enum imm_error_code
     IMM_IOERROR,
     IMM_NOTIMPLEMENTED,
     IMM_RUNTIMEERROR,
+    IMM_PARSEERROR,
 };
 
 #endif

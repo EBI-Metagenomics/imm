@@ -32,8 +32,6 @@ add_library(imm
     # src/result.c
     src/seq_code.c
     # src/seq_table.c
-    # src/state_idx.c
-    # src/table_state.c
     src/abc.c
     src/abc_lprob.c
     src/cartes.c

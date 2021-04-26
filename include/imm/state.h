@@ -11,17 +11,18 @@
 #include <stdint.h>
 #include <stdio.h>
 
-/** @file state.h
- * State module.
- *
- * An object of type @ref imm_state is meant to be immutable.
- */
-
 struct imm_abc;
 struct imm_profile;
 struct imm_state;
 
-#define IMM_STATE_ID_INVALID UINT16_MAX
+#define IMM_INVALID_STATE_ID UINT16_MAX
+
+enum state_typeid
+{
+    IMM_MUTE_STATE = 0,
+    IMM_NORMAL_STATE = 1,
+    IMM_INVALID_STATE = UINT16_MAX,
+};
 
 struct imm_state_vtable
 {

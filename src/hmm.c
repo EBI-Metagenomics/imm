@@ -10,10 +10,7 @@
 int imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
 {
     if (hash_hashed(&state->hnode))
-    {
-        error("state already belongs to a hmm");
-        return IMM_ILLEGALARG;
-    }
+        return xerror(IMM_ILLEGALARG, "state already belongs to a hmm");
     hash_add(hmm->state_tbl, &state->hnode, state->id);
     hmm->nstates++;
     return IMM_SUCCESS;
@@ -101,14 +98,14 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
 {
     if (hmm->abc != seq->abc)
     {
-        error("hmm and seq must have the same alphabet");
+        xerror(IMM_ILLEGALARG, "hmm and seq must have the same alphabet");
         return imm_lprob_invalid();
     }
 
     uint32_t nsteps = imm_path_nsteps(path);
     if (nsteps == 0)
     {
-        error("path must have steps");
+        xerror(IMM_ILLEGALARG, "path must have steps");
         return imm_lprob_invalid();
     }
 
@@ -116,13 +113,13 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
     struct imm_state const *state = hmm_state(hmm, step->state_id);
     if (state != hmm_state(hmm, hmm->start.state_id))
     {
-        error("first state must be the starting one");
+        xerror(IMM_ILLEGALARG, "first state must be the starting one");
         return imm_lprob_invalid();
     }
 
     if (step->seq_len > imm_seq_len(seq))
     {
-        error("path emits more symbols than sequence");
+        xerror(IMM_ILLEGALARG, "path emits more symbols than sequence");
         return imm_lprob_invalid();
     }
 
@@ -136,14 +133,14 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
         step = imm_path_step(path, i);
         if (start + step->seq_len > imm_seq_len(seq))
         {
-            error("path emits more symbols than sequence");
+            xerror(IMM_ILLEGALARG, "path emits more symbols than sequence");
             return imm_lprob_invalid();
         }
 
         struct imm_state const *prev_state = state;
         if (!(state = hmm_state(hmm, step->state_id)))
         {
-            error("state not found");
+            xerror(IMM_ILLEGALARG, "state not found");
             return imm_lprob_invalid();
         }
         imm_subseq_init(&subseq, seq, start, step->seq_len);
@@ -153,7 +150,8 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
 
     if (start + step->seq_len < imm_seq_len(seq))
     {
-        error("sequence is longer than symbols emitted by path");
+        xerror(IMM_ILLEGALARG,
+               "sequence is longer than symbols emitted by path");
         return imm_lprob_invalid();
     }
     return lprob;
@@ -163,23 +161,21 @@ int imm_hmm_normalize_trans(struct imm_hmm const *hmm)
 {
     struct imm_state *state = NULL;
     unsigned bkt = 0;
-    int error = IMM_SUCCESS;
+    int err = IMM_SUCCESS;
     hash_for_each(hmm->state_tbl, bkt, state, hnode)
     {
-        if ((error = imm_hmm_normalize_state_trans(hmm, state)))
+        if ((err = imm_hmm_normalize_state_trans(hmm, state)))
             break;
     }
-    return error;
+    return err;
 }
 
 int imm_hmm_normalize_state_trans(struct imm_hmm const *hmm,
                                   struct imm_state *src)
 {
     if (!hash_hashed(&src->hnode))
-    {
-        error("state not found");
-        return IMM_ILLEGALARG;
-    }
+        return xerror(IMM_ILLEGALARG, "state not found");
+
     if (stack_empty(&src->trans))
         return IMM_SUCCESS;
 
@@ -192,10 +188,7 @@ int imm_hmm_normalize_state_trans(struct imm_hmm const *hmm,
     }
 
     if (!imm_lprob_is_finite(lnorm))
-    {
-        error("non-finite normalization denominator");
-        return IMM_ILLEGALARG;
-    }
+        return xerror(IMM_ILLEGALARG, "non-finite normalization denominator");
 
     it = stack_iter(&src->trans);
     iter_for_each_entry(trans, &it, node) { trans->lprob -= lnorm; }
@@ -206,15 +199,11 @@ int imm_hmm_set_start(struct imm_hmm *hmm, struct imm_state const *state,
                       imm_float lprob)
 {
     if (!imm_lprob_is_finite(lprob))
-    {
-        error("probability must be finite");
-        return IMM_ILLEGALARG;
-    }
+        return xerror(IMM_ILLEGALARG, "probability must be finite");
+
     if (!hash_hashed(&state->hnode))
-    {
-        error("state not found");
-        return IMM_ILLEGALARG;
-    }
+        return xerror(IMM_ILLEGALARG, "state not found");
+
     hmm->start.lprob = lprob;
     hmm->start.state_id = state->id;
     return IMM_SUCCESS;
@@ -224,29 +213,18 @@ int imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state *src,
                       struct imm_state const *dst, imm_float lprob)
 {
     if (!imm_lprob_is_finite(lprob))
-    {
-        error("probability must be finite");
-        return IMM_ILLEGALARG;
-    }
+        return xerror(IMM_ILLEGALARG, "probability must be finite");
 
     if (!hash_hashed(&src->hnode))
-    {
-        error("source state not found");
-        return IMM_ILLEGALARG;
-    }
+        return xerror(IMM_ILLEGALARG, "source state not found");
 
     if (!hash_hashed(&dst->hnode))
-    {
-        error("destination state not found");
-        return IMM_ILLEGALARG;
-    }
+        return xerror(IMM_ILLEGALARG, "destination state not found");
 
     struct trans *trans = hmm_trans(hmm, src, dst);
 
     if (trans)
-    {
         trans->lprob = lprob;
-    }
     else
     {
         size_t size = sizeof(*hmm->trans);

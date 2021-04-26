@@ -8,8 +8,9 @@
 #define error(...) imm_log_error(__VA_ARGS__)
 #define fatal(...) imm_log_fatal(__VA_ARGS__)
 
-#define error_explain(ERROR) error("%s", explain((ERROR)))
+#define xerror(err, msg) __xerror(err, msg, __FILE__, __LINE__)
 
-char const *explain(enum imm_error_code ecode);
+int __xerror(enum imm_error_code code, char const *msg, char const *file,
+             int line);
 
 #endif

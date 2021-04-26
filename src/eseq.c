@@ -6,17 +6,12 @@ int eseq_setup(struct eseq *eseq, struct imm_seq const *seq)
 {
     uint_fast32_t ncols = matrixu16_ncols(eseq->code);
     if (matrixu16_resize(eseq->code, imm_seq_len(seq) + 1, ncols))
-    {
-        error_explain(IMM_OUTOFMEM);
-        return IMM_OUTOFMEM;
-    }
+        return xerror(IMM_OUTOFMEM, "failed to resize matrix");
 
     for (uint_fast32_t i = 0; i <= imm_seq_len(seq); ++i)
     {
-
         for (uint_fast32_t j = 0; j < ncols; ++j)
         {
-
             uint_fast32_t length = eseq->seq_code->min_seq + j;
             if (i + length > imm_seq_len(seq))
                 continue;

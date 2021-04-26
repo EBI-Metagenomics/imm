@@ -11,7 +11,7 @@ int main(void)
 
 void test_abc_lprob(void)
 {
-    struct imm_abc const *abc = imm_abc_new("ACGT", 'X');
+    struct imm_abc const *abc = imm_abc_new(4, "ACGT", 'X');
     imm_float const lprobs[4] = {imm_log(0.2), imm_log(0.01), imm_log(1.0),
                                  imm_log(0.5)};
     struct imm_abc_lprob const *abc_lprob = imm_abc_lprob_new(abc, lprobs);

@@ -24,7 +24,7 @@ static inline int is_valid(imm_float a) { return imm_lprob_is_valid(a); }
 
 void test_hmm_likelihood_single_state(void)
 {
-    struct imm_abc const *abc = imm_abc_new("ACGT", '*');
+    struct imm_abc const *abc = imm_abc_new(4, "ACGT", '*');
     struct imm_seq const *EMPTY = imm_seq_new(0, "", abc);
     struct imm_seq const *A = imm_seq_new(1, "A", abc);
     struct imm_seq const *AG = imm_seq_new(2, "AG", abc);
@@ -102,7 +102,7 @@ void test_hmm_likelihood_single_state(void)
 
 void test_hmm_likelihood_two_states(void)
 {
-    struct imm_abc const *abc = imm_abc_new("ACGT", '*');
+    struct imm_abc const *abc = imm_abc_new(4, "ACGT", '*');
     struct imm_seq const *A = imm_seq_new(1, "A", abc);
     struct imm_seq const *T = imm_seq_new(1, "T", abc);
     struct imm_seq const *G = imm_seq_new(1, "G", abc);
@@ -164,7 +164,7 @@ void test_hmm_likelihood_two_states(void)
 
 void test_hmm_likelihood_mute_state(void)
 {
-    struct imm_abc const *abc = imm_abc_new("ACGT", '*');
+    struct imm_abc const *abc = imm_abc_new(4, "ACGT", '*');
     struct imm_seq const *EMPTY = imm_seq_new(0, "", abc);
     struct imm_seq const *A = imm_seq_new(1, "A", abc);
     struct imm_seq const *T = imm_seq_new(1, "T", abc);
@@ -216,7 +216,7 @@ void test_hmm_likelihood_mute_state(void)
 
 void test_hmm_likelihood_two_mute_states(void)
 {
-    struct imm_abc const *abc = imm_abc_new("ACGT", '*');
+    struct imm_abc const *abc = imm_abc_new(4, "ACGT", '*');
     struct imm_seq const *EMPTY = imm_seq_new(0, "", abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
 
@@ -244,7 +244,7 @@ void test_hmm_likelihood_two_mute_states(void)
 
 void test_hmm_likelihood_invalid(void)
 {
-    struct imm_abc const *abc = imm_abc_new("AC", '*');
+    struct imm_abc const *abc = imm_abc_new(2, "AC", '*');
     struct imm_seq const *C = imm_seq_new(1, "C", abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
 
@@ -287,7 +287,7 @@ void test_hmm_likelihood_invalid(void)
 
 void test_hmm_likelihood_no_state(void)
 {
-    struct imm_abc const *abc = imm_abc_new("ACGT", '*');
+    struct imm_abc const *abc = imm_abc_new(4, "ACGT", '*');
     struct imm_seq const *EMPTY = imm_seq_new(0, "", abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
 

@@ -1,16 +1,11 @@
 #include "imm/state.h"
 #include "common/common.h"
 #include "imm/abc.h"
+#include "imm/error.h"
 
 struct imm_state *imm_state_new(uint16_t id, struct imm_abc const *abc,
                                 struct imm_state_vtable vtable, void *derived)
 {
-    if (imm_abc_len(abc) == 0)
-    {
-        error("empty alphabet");
-        return NULL;
-    }
-
     struct imm_state *state = xmalloc(sizeof(*state));
     state->id = id;
     state->abc = abc;
@@ -26,7 +21,7 @@ struct imm_state *__imm_state_read(FILE *stream, struct imm_abc const *abc)
     struct imm_state *state = xmalloc(sizeof(*state));
     if (fread(&state->id, sizeof(state->id), 1, stream) < 1)
     {
-        error("failed to read state id");
+        xerror(IMM_IOERROR, "failed to read state id");
         free(state);
         return NULL;
     }

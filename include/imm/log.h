@@ -37,12 +37,12 @@ IMM_API void imm_log_setup(imm_log_callback cb, enum imm_log_level level);
     __imm_log(IMM_LOG_FATAL, __FILE__, __LINE__, __VA_ARGS__)
 
 #if defined(HAVE_ATTR_FMT)
-IMM_API void __imm_log(enum imm_log_level level, char const *file, int line,
-                       char const *fmt, ...)
+IMM_API int __imm_log(enum imm_log_level level, char const *file, int line,
+                      char const *fmt, ...)
     __attribute__((format(printf, 4, 5)));
 #else
-IMM_API void __imm_log(enum imm_log_level level, char const *file, int line,
-                       char const *fmt, ...);
+IMM_API int __imm_log(enum imm_log_level level, char const *file, int line,
+                      char const *fmt, ...);
 #endif
 
 #endif

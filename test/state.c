@@ -13,7 +13,7 @@ int main(void)
 
 void test_normal_state(void)
 {
-    struct imm_abc const *abc = imm_abc_new("ACGT", '*');
+    struct imm_abc const *abc = imm_abc_new(4, "ACGT", '*');
     struct imm_seq const *A = imm_seq_new(1, "A", abc);
     struct imm_seq const *C = imm_seq_new(1, "C", abc);
     struct imm_seq const *G = imm_seq_new(1, "G", abc);
@@ -44,7 +44,7 @@ void test_normal_state(void)
 
 void test_mute_state(void)
 {
-    struct imm_abc const *abc = imm_abc_new("ACGT", '*');
+    struct imm_abc const *abc = imm_abc_new(4, "ACGT", '*');
     struct imm_seq const *EMPTY = imm_seq_new(0, "", abc);
     struct imm_seq const *A = imm_seq_new(1, "A", abc);
 

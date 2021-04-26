@@ -24,12 +24,15 @@ struct imm_cartes *imm_cartes_create(char const *set, unsigned set_size,
     cartes->item = malloc(sizeof(*cartes->item) * (unsigned)(max_times + 1));
     if (!cartes->item)
     {
-        error_explain(IMM_OUTOFMEM);
-        free(cartes);
-        return NULL;
+        xerror(IMM_OUTOFMEM, "failed to alloc items");
+        goto cleanup;
     }
     cartes->nitems = 0;
     return cartes;
+
+cleanup:
+    free_if(cartes);
+    return NULL;
 }
 
 void imm_cartes_destroy(struct imm_cartes const *cartes)

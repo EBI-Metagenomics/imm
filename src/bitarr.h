@@ -2,7 +2,6 @@
 #define BITARR_H
 
 #include "common/common.h"
-#include <stdlib.h>
 
 #define BITARR_LONG_START(bit) (bit / (sizeof(long) * BITS_PER_BYTE))
 #define BITARR_BIT_START(bit) (bit % (sizeof(long) * BITS_PER_BYTE))

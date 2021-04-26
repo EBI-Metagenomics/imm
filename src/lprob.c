@@ -5,10 +5,7 @@ int imm_lprob_normalize(imm_float *arr, size_t len)
 {
     imm_float lnorm = imm_lprob_sum(arr, len);
     if (!isfinite(lnorm))
-    {
-        error("non-finite normalization denominator");
-        return IMM_ILLEGALARG;
-    }
+        return xerror(IMM_ILLEGALARG, "non-finite normalization denominator");
 
     for (size_t i = 0; i < len; ++i)
         arr[i] -= lnorm;
