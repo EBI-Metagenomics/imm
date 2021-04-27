@@ -12,6 +12,7 @@ struct imm_state *imm_state_new(uint16_t id, struct imm_abc const *abc,
     state->vtable = vtable;
     state->derived = derived;
     stack_init(&state->trans);
+    state->nitrans = 0;
     hnode_init(&state->hnode);
     return state;
 }
@@ -30,6 +31,7 @@ struct imm_state *__imm_state_read(FILE *stream, struct imm_abc const *abc)
     state->vtable = (struct imm_state_vtable){NULL, NULL, NULL, NULL, NULL};
     state->derived = NULL;
     stack_init(&state->trans);
+    state->nitrans = 0; /* TODO: read nintras */
     hnode_init(&state->hnode);
 
     return state;

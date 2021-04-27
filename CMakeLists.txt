@@ -35,8 +35,16 @@ add_library(imm
     src/abc.c
     src/abc_lprob.c
     src/cartes.c
+    src/dp.c
+    src/dp/path.c
+    src/dp/bitarr.c
+    src/dp/emission.c
+    src/dp/state_table.c
+    src/dp/trans_table.c
+    src/dp_task.c
     src/common/error.c
     src/log.c
+    src/tsort.c
     src/lprob.c
     src/path.c
     src/seq.c
@@ -121,11 +129,25 @@ check_c_source_compiles(
 target_compile_definitions(imm PRIVATE $<$<BOOL:${HAVE_ATTR_FMT}>:HAVE_ATTR_FMT>)
 
 include(CheckTypeSize)
-check_type_size("intptr_t" SIZEOF_INTPTR_T)
-if(NOT HAVE_SIZEOF_INTPTR_T)
-    message(FATAL_ERROR "Could not determine the size of intptr_t.")
+
+check_type_size("int" SIZEOF_INT)
+if(NOT HAVE_SIZEOF_INT)
+    message(FATAL_ERROR "Could not determine the size of int.")
+else()
+    message(STATUS "Size of int: ${SIZEOF_INT} bytes.")
+    if (SIZEOF_INT LESS 4)
+        message(FATAL_ERROR "Int is too small.")
+    endif()
 endif()
-target_compile_definitions(imm PRIVATE SIZEOF_INTPTR_T=${SIZEOF_INTPTR_T})
+target_compile_definitions(imm PRIVATE SIZEOF_INT=${SIZEOF_INT})
+
+check_type_size("long" SIZEOF_LONG)
+if(NOT HAVE_SIZEOF_LONG)
+    message(FATAL_ERROR "Could not determine the size of long.")
+else()
+    message(STATUS "Size of long: ${SIZEOF_LONG} bytes.")
+endif()
+target_compile_definitions(imm PRIVATE SIZEOF_LONG=${SIZEOF_LONG})
 
 if(CLANG_ASAN_UBSAN)
     message(STATUS "Enabling Clang address sanitizer and undefined behavior sanitizer.")

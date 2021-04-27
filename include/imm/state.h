@@ -17,6 +17,9 @@ struct imm_state;
 
 #define IMM_INVALID_STATE_ID UINT16_MAX
 
+typedef uint16_t stateid_t;
+typedef uint16_t stateidx_t;
+
 enum state_typeid
 {
     IMM_MUTE_STATE = 0,
@@ -36,11 +39,16 @@ struct imm_state_vtable
 
 struct imm_state
 {
-    uint16_t id;
+    stateid_t id;
+    stateidx_t idx;
     struct imm_abc const *abc;
     struct imm_state_vtable vtable;
     void *derived;
-    struct stack trans;
+    struct
+    {
+        struct stack outgoing;
+        struct stack incoming;
+    } trans;
     struct hnode hnode;
 };
 

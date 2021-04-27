@@ -1,77 +1,127 @@
 #include "hmm.h"
 #include "common/common.h"
+#include "dp.h"
 #include "imm/error.h"
 #include "imm/hmm.h"
 #include "imm/lprob.h"
 #include "imm/path.h"
 #include "imm/subseq.h"
 #include "start.h"
+#include "state.h"
+#include "tsort.h"
+
+static void detach_states(struct imm_hmm *hmm)
+{
+    unsigned bkt = 0;
+    struct imm_state *state = NULL;
+    struct hnode *tmp = NULL;
+    hash_for_each_safe(hmm->states.tbl, bkt, tmp, state, hnode)
+    {
+        state_detach(state);
+    }
+}
+
+static void init_states_table(struct imm_hmm *hmm)
+{
+    hash_init(hmm->states.tbl);
+    hmm->states.size = 0;
+}
+
+static void init_transitions_table(struct imm_hmm *hmm)
+{
+    hmm->transitions.size = 0;
+    hash_init(hmm->transitions.tbl);
+    hmm->transitions.capacity = sizeof(struct trans) * (1 << 8);
+    hmm->transitions.data = xmalloc(hmm->transitions.capacity);
+}
+
+static void add_transition(struct imm_hmm *hmm, struct imm_state *src,
+                           struct imm_state *dst, imm_float lprob)
+{
+    size_t size = sizeof(struct trans);
+    size_t count = hmm->transitions.size + 1;
+    hmm->transitions.data =
+        growmem(hmm->transitions.data, count, size, &hmm->transitions.capacity);
+    struct trans *newt = hmm->transitions.data + hmm->transitions.size++;
+    trans_init(newt, src->id, dst->id, lprob);
+    hash_add(hmm->transitions.tbl, &newt->hnode, newt->pair.id.key);
+    stack_put(&src->trans.outgoing, &newt->node);
+    stack_put(&dst->trans.incoming, &newt->inode);
+}
+
+static void reset_transitions_table(struct imm_hmm *hmm)
+{
+    hmm->transitions.size = 0;
+    hash_init(hmm->transitions.tbl);
+}
 
 int imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
 {
     if (hash_hashed(&state->hnode))
         return xerror(IMM_ILLEGALARG, "state already belongs to a hmm");
-    hash_add(hmm->state_tbl, &state->hnode, state->id);
-    hmm->nstates++;
+    hmm_add_state(hmm, state);
     return IMM_SUCCESS;
 }
 
 struct imm_hmm *imm_hmm_new(struct imm_abc const *abc)
 {
     struct imm_hmm *hmm = xmalloc(sizeof(*hmm));
-    hash_init(hmm->state_tbl);
-    imm_hmm_reset(hmm, abc);
-    hmm->trans_capacity = sizeof(*hmm->trans) * (1 << 8);
-    hmm->trans = xmalloc(hmm->trans_capacity);
+    hmm->abc = abc;
+    start_init(&hmm->start);
+    init_states_table(hmm);
+    init_transitions_table(hmm);
     return hmm;
 }
 
 void imm_hmm_reset(struct imm_hmm *hmm, struct imm_abc const *abc)
 {
+    detach_states(hmm);
     hmm->abc = abc;
     start_init(&hmm->start);
-    hmm->nstates = 0;
-    unsigned bkt = 0;
-    struct imm_state *state = NULL;
-    struct hnode *tmp = NULL;
-    hash_for_each_safe(hmm->state_tbl, bkt, tmp, state, hnode)
-    {
-        hash_del(&state->hnode);
-    }
-    hash_init(hmm->state_tbl);
-    hmm->ntrans = 0;
-    hash_init(hmm->trans_tbl);
+    init_states_table(hmm);
+    reset_transitions_table(hmm);
 }
 
-/* struct imm_dp *imm_hmm_create_dp(struct imm_hmm const *hmm, */
-/*                                  struct imm_state const *end_state) { */
-/*     struct imm_state *cursor = NULL; */
-/*     bool found = false; */
-/*     hash_for_each_possible(hmm->state_tbl, cursor, hnode, end_state->id) { */
-/*         if (cursor == end_state) { */
-/*             found = true; */
-/*             break; */
-/*         } */
-/*     } */
-/*     if (!found) { */
-/*         error("end state not found"); */
-/*         return NULL; */
-/*     } */
+struct imm_dp *imm_hmm_new_dp(struct imm_hmm const *hmm,
+                              struct imm_state const *end_state)
+{
+    if (!hmm_state(hmm, end_state->id))
+    {
+        xerror(IMM_ILLEGALARG, "end state not found");
+        return NULL;
+    }
 
-/*     struct imm_state **states = xmalloc(sizeof(*states) * hmm->nstates); */
-/*     unsigned bkt = 0; */
-/*     unsigned i = 0; */
-/*     hash_for_each(hmm->state_tbl, bkt, cursor, hnode) { states[i++] = cursor;
- * } */
+    struct imm_state **states = xmalloc(sizeof(*states) * hmm->states.size);
+    unsigned bkt = 0;
+    unsigned i = 0;
+    struct imm_state *state = NULL;
+    hash_for_each(hmm->states.tbl, bkt, state, hnode) { states[i++] = state; }
 
-/*     if (topological_sort(states, hmm->nstates, hmm->ntrans)) { */
-/*         error("could not sort states"); */
-/*         free(states); */
-/*         return NULL; */
-/*     } */
+    if (tsort(states, hmm->states.size, hmm->transitions.size))
+    {
+        xerror(IMM_RUNTIMEERROR, "failed to sort states");
+        free(states);
+        return NULL;
+    }
+    for (i = 0; i < hmm->states.size; ++i)
+        states[i]->idx = (uint16_t)i;
 
-/*     return dp_create(hmm, states, end_state); */
-/* } */
+    struct trans *trans = NULL;
+    hash_for_each(hmm->transitions.tbl, bkt, trans, hnode)
+    {
+        struct imm_state *src = hmm_state(hmm, trans->pair.id.src);
+        struct imm_state *dst = hmm_state(hmm, trans->pair.id.dst);
+        trans->pair.idx.src = src->idx;
+        trans->pair.idx.dst = dst->idx;
+        states[i++] = state;
+    }
+
+    struct dp_args args;
+    dp_args_init(&args, hmm->transitions.size, hmm->states.size, states,
+                 hmm_state(hmm, hmm->start.state_id), hmm->start.lprob,
+                 end_state);
+    return dp_new(&args);
+}
 
 imm_float imm_hmm_start_lprob(struct imm_hmm const *hmm)
 {
@@ -162,7 +212,7 @@ int imm_hmm_normalize_trans(struct imm_hmm const *hmm)
     struct imm_state *state = NULL;
     unsigned bkt = 0;
     int err = IMM_SUCCESS;
-    hash_for_each(hmm->state_tbl, bkt, state, hnode)
+    hash_for_each(hmm->states.tbl, bkt, state, hnode)
     {
         if ((err = imm_hmm_normalize_state_trans(hmm, state)))
             break;
@@ -176,11 +226,11 @@ int imm_hmm_normalize_state_trans(struct imm_hmm const *hmm,
     if (!hash_hashed(&src->hnode))
         return xerror(IMM_ILLEGALARG, "state not found");
 
-    if (stack_empty(&src->trans))
+    if (stack_empty(&src->trans.outgoing))
         return IMM_SUCCESS;
 
     struct trans *trans = NULL;
-    struct iter it = stack_iter(&src->trans);
+    struct iter it = stack_iter(&src->trans.outgoing);
     imm_float lnorm = imm_lprob_zero();
     iter_for_each_entry(trans, &it, node)
     {
@@ -190,7 +240,7 @@ int imm_hmm_normalize_state_trans(struct imm_hmm const *hmm,
     if (!imm_lprob_is_finite(lnorm))
         return xerror(IMM_ILLEGALARG, "non-finite normalization denominator");
 
-    it = stack_iter(&src->trans);
+    it = stack_iter(&src->trans.outgoing);
     iter_for_each_entry(trans, &it, node) { trans->lprob -= lnorm; }
     return IMM_SUCCESS;
 }
@@ -210,7 +260,7 @@ int imm_hmm_set_start(struct imm_hmm *hmm, struct imm_state const *state,
 }
 
 int imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state *src,
-                      struct imm_state const *dst, imm_float lprob)
+                      struct imm_state *dst, imm_float lprob)
 {
     if (!imm_lprob_is_finite(lprob))
         return xerror(IMM_ILLEGALARG, "probability must be finite");
@@ -226,15 +276,7 @@ int imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state *src,
     if (trans)
         trans->lprob = lprob;
     else
-    {
-        size_t size = sizeof(*hmm->trans);
-        size_t count = hmm->ntrans + 1;
-        hmm->trans = growmem(hmm->trans, count, size, &hmm->trans_capacity);
-        struct trans *newt = hmm->trans + hmm->ntrans++;
-        trans_init(newt, src->id, dst->id, lprob);
-        hash_add(hmm->trans_tbl, &newt->hnode, newt->pair.key);
-        stack_put(&src->trans, &newt->node);
-    }
+        add_transition(hmm, src, dst, lprob);
 
     return IMM_SUCCESS;
 }

@@ -1,7 +1,6 @@
 #include "imm/path.h"
 #include "common/common.h"
 #include "imm/step.h"
-#include <stdlib.h>
 
 void imm_path_add(struct imm_path *path, struct imm_step step)
 {

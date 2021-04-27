@@ -2,11 +2,12 @@
 #define IMM_STEP_H
 
 #include "imm/export.h"
+#include "imm/state.h"
 #include <stdint.h>
 
 struct imm_step
 {
-    uint16_t state_id;
+    stateid_t state_id;
     uint8_t seq_len;
 };
 

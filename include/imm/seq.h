@@ -18,7 +18,7 @@ struct imm_seq
 };
 
 #define IMM_SEQ(len, str, abc)                                                 \
-    (struct imm_seq) { abc, len, str }
+    (struct imm_seq) { len, str, abc }
 
 static inline struct imm_abc const *imm_seq_abc(struct imm_seq const *seq)
 {

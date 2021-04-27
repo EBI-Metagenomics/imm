@@ -13,6 +13,8 @@ struct imm_cartes
     unsigned nitems;
 };
 
+/* TODO: create imm_cartes_reset */
+
 struct imm_cartes *imm_cartes_create(char const *set, unsigned set_size,
                                      unsigned max_times)
 {
@@ -21,18 +23,9 @@ struct imm_cartes *imm_cartes_create(char const *set, unsigned set_size,
     cartes->set_size = set_size;
     cartes->times = 0;
     cartes->iter_idx = 0;
-    cartes->item = malloc(sizeof(*cartes->item) * (unsigned)(max_times + 1));
-    if (!cartes->item)
-    {
-        xerror(IMM_OUTOFMEM, "failed to alloc items");
-        goto cleanup;
-    }
+    cartes->item = xmalloc(sizeof(*cartes->item) * (unsigned)(max_times + 1));
     cartes->nitems = 0;
     return cartes;
-
-cleanup:
-    free_if(cartes);
-    return NULL;
 }
 
 void imm_cartes_destroy(struct imm_cartes const *cartes)
