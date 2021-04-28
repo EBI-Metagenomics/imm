@@ -10,18 +10,18 @@ struct trans
 {
     struct pair pair;
     imm_float lprob;
-    struct node node;
-    struct node inode;
+    struct node outgoing;
+    struct node incoming;
     struct hnode hnode;
 };
 
-static inline void trans_init(struct trans *trans, uint16_t src, uint16_t dst,
+static inline void trans_init(struct trans *trans, unsigned src, unsigned dst,
                               imm_float lprob)
 {
     pair_init(&trans->pair, src, dst);
     trans->lprob = lprob;
-    node_init(&trans->node);
-    node_init(&trans->inode);
+    node_init(&trans->outgoing);
+    node_init(&trans->incoming);
     hnode_init(&trans->hnode);
 }
 

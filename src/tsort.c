@@ -85,7 +85,7 @@ static int check_mute_cycles(struct queue *vertq)
 
 static int check_mute_visit(struct vert *vert)
 {
-    if (imm_state_min_seq(vert->state) > 0)
+    if (imm_state_min_seqlen(vert->state) > 0)
         return 0;
 
     if (vert->mark == PERMANENT_MARK)

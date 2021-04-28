@@ -3,15 +3,20 @@
 
 #include "imm/export.h"
 #include "imm/state.h"
+#include <assert.h>
+#include <stdalign.h>
 #include <stdint.h>
 
 struct imm_step
 {
-    stateid_t state_id;
-    uint8_t seq_len;
+    imm_state_id_t state_id;
+    uint8_t seqlen;
 };
 
-#define IMM_STEP(state_id, seq_len)                                            \
-    (struct imm_step) { (state_id), (seq_len) }
+static_assert(sizeof(struct imm_step) == 4, "struct pair must be packed");
+static_assert(alignof(struct imm_step) == 2, "struct pair must align to 1");
+
+#define IMM_STEP(state_id, seqlen)                                             \
+    (struct imm_step) { (state_id), (seqlen) }
 
 #endif

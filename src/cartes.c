@@ -1,24 +1,13 @@
-#include "imm/cartes.h"
+#include "cartes.h"
 #include "common/common.h"
 #include <limits.h>
-#include <stdlib.h>
-
-struct imm_cartes
-{
-    char const *set;
-    unsigned set_size;
-    unsigned times;
-    unsigned iter_idx;
-    char *item;
-    unsigned nitems;
-};
 
 /* TODO: create imm_cartes_reset */
 
-struct imm_cartes *imm_cartes_create(char const *set, unsigned set_size,
-                                     unsigned max_times)
+struct cartes *cartes_new(char const *set, unsigned set_size,
+                          unsigned max_times)
 {
-    struct imm_cartes *cartes = xmalloc(sizeof(*cartes));
+    struct cartes *cartes = xmalloc(sizeof(*cartes));
     cartes->set = set;
     cartes->set_size = set_size;
     cartes->times = 0;
@@ -28,13 +17,13 @@ struct imm_cartes *imm_cartes_create(char const *set, unsigned set_size,
     return cartes;
 }
 
-void imm_cartes_destroy(struct imm_cartes const *cartes)
+void cartes_del(struct cartes const *cartes)
 {
     free((void *)cartes->item);
     free((void *)cartes);
 }
 
-char const *imm_cartes_next(struct imm_cartes *cartes)
+char const *cartes_next(struct cartes *cartes)
 {
     if (cartes->iter_idx == cartes->nitems)
         return NULL;
@@ -52,7 +41,7 @@ char const *imm_cartes_next(struct imm_cartes *cartes)
     return item;
 }
 
-void imm_cartes_setup(struct imm_cartes *cartes, unsigned times)
+void cartes_setup(struct cartes *cartes, unsigned times)
 {
     cartes->times = times;
     cartes->item[times] = '\0';

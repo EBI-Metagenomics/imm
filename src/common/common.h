@@ -1,6 +1,8 @@
 #ifndef COMMON_COMMON_H
 #define COMMON_COMMON_H
 
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
+
 #include "common/bits.h"
 #include "common/bug.h"
 #include "common/error.h"

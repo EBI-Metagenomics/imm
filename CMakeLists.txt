@@ -25,23 +25,23 @@ find_package(elapsed REQUIRED)
 find_package(containers REQUIRED)
 
 add_library(imm
-    src/eseq.c
+    src/dp/eseq.c
     src/hmm.c
     src/mute_state.c
     src/normal_state.c
     # src/result.c
-    src/seq_code.c
+    src/dp/seq_code.c
     # src/seq_table.c
     src/abc.c
     src/abc_lprob.c
     src/cartes.c
-    src/dp.c
+    src/dp/dp.c
     src/dp/path.c
     src/dp/bitarr.c
     src/dp/emission.c
     src/dp/state_table.c
     src/dp/trans_table.c
-    src/dp_task.c
+    src/dp/task.c
     src/common/error.c
     src/log.c
     src/tsort.c

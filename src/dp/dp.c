@@ -1,15 +1,14 @@
-#include "dp.h"
+#include "dp/dp.h"
 #include "common/common.h"
-#include "cpath.h"
-#include "dp_emission.h"
-#include "dp_matrix.h"
-#include "dp_state_table.h"
-#include "dp_task.h"
-#include "dp_trans_table.h"
+#include "dp/emission.h"
+#include "dp/matrix.h"
+#include "dp/state_table.h"
+#include "dp/task.h"
+#include "dp/trans_table.h"
 #include "elapsed/elapsed.h"
 #include "hmm.h"
 #include "imm/imm.h"
-#include "model.h"
+/* #include "model.h" */
 #include "profile.h"
 #include "result.h"
 #include "seq_code.h"
@@ -54,7 +53,7 @@ static void _viterbi_safe(struct imm_dp const *dp, struct imm_dp_task *task,
                           uint_fast32_t const start_row,
                           uint_fast32_t const stop_row);
 
-void imm_dp_destroy(struct imm_dp const *dp)
+void imm_dp_del(struct imm_dp const *dp)
 {
     free((void *)dp->states);
     seq_code_destroy(dp->seq_code);
@@ -75,7 +74,7 @@ struct imm_result const *imm_dp_viterbi(struct imm_dp const *dp,
     }
 
     struct imm_state const *end_state = dp->states[dp->state_table->end_state];
-    if (imm_seq_length(task->seq) < imm_state_min_seq(end_state))
+    if (imm_seq_length(task->seq) < imm_state_min_seqlen(end_state))
     {
         error("sequence is shorter than end_state's lower bound");
         return NULL;
@@ -335,18 +334,18 @@ static struct final_score final_score(struct imm_dp const *dp,
 
 static unsigned max_seq(uint16_t nstates, struct imm_state **states)
 {
-    unsigned max = imm_state_max_seq(states[0]);
+    unsigned max = imm_state_max_seqlen(states[0]);
     for (unsigned i = 1; i < nstates; ++i)
-        max = (unsigned)MAX(max, imm_state_max_seq(states[i]));
+        max = (unsigned)MAX(max, imm_state_max_seqlen(states[i]));
 
     return max;
 }
 
 static unsigned min_seq(uint16_t nstates, struct imm_state **states)
 {
-    unsigned min = imm_state_min_seq(states[0]);
+    unsigned min = imm_state_min_seqlen(states[0]);
     for (unsigned i = 1; i < nstates; ++i)
-        min = (unsigned)MIN(min, imm_state_min_seq(states[i]));
+        min = (unsigned)MIN(min, imm_state_min_seqlen(states[i]));
 
     return min;
 }

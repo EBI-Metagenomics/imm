@@ -1,44 +1,46 @@
 #ifndef DP_STATE_TABLE_H
 #define DP_STATE_TABLE_H
 
-#include "dp_args.h"
-#include <stdint.h>
-/* #include <stdio.h> */
+#include "imm/state.h"
+
+struct dp_args;
 
 struct state_table
 {
-    uint16_t nstates;
-    uint8_t *min_seq;
-    uint8_t *max_seq;
+    unsigned nstates;
     struct
     {
-        stateidx_t state;
+        imm_state_idx_t state;
         imm_float lprob;
     } start;
-    uint16_t end_state;
+    unsigned end_state;
+    union
+    {
+        unsigned char bytes[2];
+        struct __attribute__((__packed__))
+        {
+            uint8_t min;
+            uint8_t max;
+        };
+    } * seqlen;
 };
 
 #define DP_STATE_TABLE_MAX_SEQ 5
 
-struct state_table const *state_table_new(struct dp_args const *args);
+void state_table_deinit(struct state_table const *tbl);
 
-void state_table_del(struct state_table const *tbl);
+void state_table_init(struct state_table *tbl, struct dp_args const *args);
 
-static inline unsigned state_table_max_seq(struct state_table const *tbl,
-                                           unsigned state)
+static inline unsigned state_table_max_seqlen(struct state_table const *tbl,
+                                              unsigned state)
 {
-    return tbl->max_seq[state];
+    return tbl->seqlen[state].max;
 }
 
-static inline unsigned state_table_min_seq(struct state_table const *tbl,
-                                           unsigned state)
+static inline unsigned state_table_min_seqlen(struct state_table const *tbl,
+                                              unsigned state)
 {
-    return tbl->min_seq[state];
+    return tbl->seqlen[state].min;
 }
-
-/* struct state_table *dp_state_table_read(FILE *stream); */
-
-/* int dp_state_table_write(struct state_table const *state_tbl, FILE
- * *stream); */
 
 #endif

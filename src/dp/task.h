@@ -1,17 +1,17 @@
 #ifndef DP_TASK_H
 #define DP_TASK_H
 
-#include "cpath.h"
+#include "dp/matrix.h"
+#include "dp/path.h"
 
-struct dp_matrix;
 struct eseq;
 struct imm_seq;
 
 struct imm_dp_task
 {
-    struct dp_matrix *matrix;
+    struct matrix matrix;
+    struct path path;
     struct eseq *eseq;
-    struct dp_path cpath;
     struct imm_seq const *seq;
 };
 

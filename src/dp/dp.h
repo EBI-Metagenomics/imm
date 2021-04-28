@@ -1,22 +1,22 @@
 #ifndef DP_H
 #define DP_H
 
-#include "dp_args.h"
+#include "dp/args.h"
+#include "dp/emission.h"
+#include "dp/seq_code.h"
+#include "dp/state_table.h"
+#include "dp/trans_table.h"
+#include "imm/dp.h"
 #include <stdio.h>
 
-struct dp_emission;
-struct dp_state_table;
-struct dp_trans_table;
-/* struct imm_hmm; */
-/* struct imm_model; */
-struct imm_state;
+/* struct imm_state; */
 
 struct imm_dp
 {
-    struct seq_code const *seq_code;
-    struct dp_emission const *emission;
-    struct dp_trans_table *trans_table;
-    struct dp_state_table const *state_table;
+    struct seq_code seq_code;
+    struct emission emission;
+    struct trans_table trans_table;
+    struct state_table state_table;
 };
 
 struct imm_dp *dp_new(struct dp_args const *args);

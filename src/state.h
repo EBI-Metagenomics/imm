@@ -10,4 +10,6 @@ static inline void state_detach(struct imm_state *state)
     hash_del(&state->hnode);
 }
 
+void state_del(struct imm_state const *state);
+
 #endif

@@ -3,10 +3,12 @@
 #include "imm/abc.h"
 #include "imm/error.h"
 
-struct imm_seq const *imm_seq_new(uint32_t len, char const *str,
+void imm_seq_del(struct imm_seq const *seq) { free((void *)seq); }
+
+struct imm_seq const *imm_seq_new(unsigned len, char const *str,
                                   struct imm_abc const *abc)
 {
-    for (uint32_t i = 0; i < len; ++i)
+    for (unsigned i = 0; i < len; ++i)
     {
         if (!imm_abc_has_symbol(abc, str[i]) &&
             str[i] != imm_abc_any_symbol(abc))
@@ -15,7 +17,6 @@ struct imm_seq const *imm_seq_new(uint32_t len, char const *str,
             return NULL;
         }
     }
-
     struct imm_seq *seq = xmalloc(sizeof(*seq));
     seq->len = len;
     seq->str = str;

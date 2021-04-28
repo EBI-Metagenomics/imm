@@ -2,8 +2,6 @@
 #define IMM_SEQ_H
 
 #include "imm/export.h"
-#include <stdint.h>
-#include <stdlib.h>
 
 struct imm_abc;
 
@@ -12,7 +10,7 @@ struct imm_abc;
  */
 struct imm_seq
 {
-    uint32_t len;
+    unsigned len;
     char const *str;
     struct imm_abc const *abc;
 };
@@ -25,12 +23,12 @@ static inline struct imm_abc const *imm_seq_abc(struct imm_seq const *seq)
     return seq->abc;
 }
 
-IMM_API struct imm_seq const *imm_seq_new(uint32_t len, char const *str,
+IMM_API struct imm_seq const *imm_seq_new(unsigned len, char const *str,
                                           struct imm_abc const *abc);
 
-static inline void imm_seq_del(struct imm_seq const *seq) { free((void *)seq); }
+void imm_seq_del(struct imm_seq const *seq);
 
-static inline uint32_t imm_seq_len(struct imm_seq const *seq)
+static inline unsigned imm_seq_len(struct imm_seq const *seq)
 {
     return seq->len;
 }

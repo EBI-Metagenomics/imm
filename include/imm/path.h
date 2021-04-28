@@ -4,12 +4,11 @@
 #include "imm/export.h"
 #include "imm/step.h"
 #include <stddef.h>
-#include <stdint.h>
 
 struct imm_path
 {
     size_t capacity;
-    uint32_t nsteps;
+    unsigned nsteps;
     struct imm_step *steps;
 };
 
@@ -27,13 +26,13 @@ IMM_API void imm_path_del(struct imm_path const *path);
 
 static inline void imm_path_reset(struct imm_path *path) { path->nsteps = 0; }
 
-static inline uint32_t imm_path_nsteps(struct imm_path const *path)
+static inline unsigned imm_path_nsteps(struct imm_path const *path)
 {
     return path->nsteps;
 }
 
 static inline struct imm_step *imm_path_step(struct imm_path const *path,
-                                             uint32_t step)
+                                             unsigned step)
 {
     return path->steps + step;
 }

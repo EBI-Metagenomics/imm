@@ -1,6 +1,5 @@
 #include "hmm.h"
 #include "common/common.h"
-#include "dp.h"
 #include "imm/error.h"
 #include "imm/hmm.h"
 #include "imm/lprob.h"
@@ -42,11 +41,11 @@ static void add_transition(struct imm_hmm *hmm, struct imm_state *src,
     size_t count = hmm->transitions.size + 1;
     hmm->transitions.data =
         growmem(hmm->transitions.data, count, size, &hmm->transitions.capacity);
-    struct trans *newt = hmm->transitions.data + hmm->transitions.size++;
-    trans_init(newt, src->id, dst->id, lprob);
-    hash_add(hmm->transitions.tbl, &newt->hnode, newt->pair.id.key);
-    stack_put(&src->trans.outgoing, &newt->node);
-    stack_put(&dst->trans.incoming, &newt->inode);
+    struct trans *trans = hmm->transitions.data + hmm->transitions.size++;
+    trans_init(trans, src->id, dst->id, lprob);
+    hash_add(hmm->transitions.tbl, &trans->hnode, trans->pair.id.key);
+    stack_put(&src->trans.outgoing, &trans->outgoing);
+    stack_put(&dst->trans.incoming, &trans->incoming);
 }
 
 static void reset_transitions_table(struct imm_hmm *hmm)
@@ -82,6 +81,7 @@ void imm_hmm_reset(struct imm_hmm *hmm, struct imm_abc const *abc)
     reset_transitions_table(hmm);
 }
 
+#if 0
 struct imm_dp *imm_hmm_new_dp(struct imm_hmm const *hmm,
                               struct imm_state const *end_state)
 {
@@ -122,6 +122,7 @@ struct imm_dp *imm_hmm_new_dp(struct imm_hmm const *hmm,
                  end_state);
     return dp_new(&args);
 }
+#endif
 
 imm_float imm_hmm_start_lprob(struct imm_hmm const *hmm)
 {
@@ -139,7 +140,7 @@ imm_float imm_hmm_trans(struct imm_hmm const *hmm, struct imm_state const *src,
     struct trans const *trans = hmm_trans(hmm, src, dst);
     if (trans)
         return trans->lprob;
-    warn("trans not found");
+    warn("transition not found");
     return imm_lprob_invalid();
 }
 
@@ -152,7 +153,7 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
         return imm_lprob_invalid();
     }
 
-    uint32_t nsteps = imm_path_nsteps(path);
+    unsigned nsteps = imm_path_nsteps(path);
     if (nsteps == 0)
     {
         xerror(IMM_ILLEGALARG, "path must have steps");
@@ -167,21 +168,21 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
         return imm_lprob_invalid();
     }
 
-    if (step->seq_len > imm_seq_len(seq))
+    if (step->seqlen > imm_seq_len(seq))
     {
         xerror(IMM_ILLEGALARG, "path emits more symbols than sequence");
         return imm_lprob_invalid();
     }
 
-    struct imm_seq subseq = IMM_SUBSEQ(seq, 0, step->seq_len);
+    struct imm_seq subseq = IMM_SUBSEQ(seq, 0, step->seqlen);
     imm_float lprob = hmm->start.lprob + imm_state_lprob(state, &subseq);
 
-    uint32_t start = 0;
-    for (uint32_t i = 1; i < imm_seq_len(seq); ++i)
+    unsigned start = 0;
+    for (unsigned i = 1; i < imm_seq_len(seq); ++i)
     {
-        start += step->seq_len;
+        start += step->seqlen;
         step = imm_path_step(path, i);
-        if (start + step->seq_len > imm_seq_len(seq))
+        if (start + step->seqlen > imm_seq_len(seq))
         {
             xerror(IMM_ILLEGALARG, "path emits more symbols than sequence");
             return imm_lprob_invalid();
@@ -193,12 +194,12 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
             xerror(IMM_ILLEGALARG, "state not found");
             return imm_lprob_invalid();
         }
-        imm_subseq_init(&subseq, seq, start, step->seq_len);
+        imm_subseq_init(&subseq, seq, start, step->seqlen);
         lprob += imm_hmm_trans(hmm, prev_state, state);
         lprob += imm_state_lprob(state, &subseq);
     }
 
-    if (start + step->seq_len < imm_seq_len(seq))
+    if (start + step->seqlen < imm_seq_len(seq))
     {
         xerror(IMM_ILLEGALARG,
                "sequence is longer than symbols emitted by path");
@@ -232,7 +233,7 @@ int imm_hmm_normalize_state_trans(struct imm_hmm const *hmm,
     struct trans *trans = NULL;
     struct iter it = stack_iter(&src->trans.outgoing);
     imm_float lnorm = imm_lprob_zero();
-    iter_for_each_entry(trans, &it, node)
+    iter_for_each_entry(trans, &it, outgoing)
     {
         lnorm = logaddexp(lnorm, trans->lprob);
     }
@@ -241,7 +242,7 @@ int imm_hmm_normalize_state_trans(struct imm_hmm const *hmm,
         return xerror(IMM_ILLEGALARG, "non-finite normalization denominator");
 
     it = stack_iter(&src->trans.outgoing);
-    iter_for_each_entry(trans, &it, node) { trans->lprob -= lnorm; }
+    iter_for_each_entry(trans, &it, outgoing) { trans->lprob -= lnorm; }
     return IMM_SUCCESS;
 }
 
@@ -279,4 +280,28 @@ int imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state *src,
         add_transition(hmm, src, dst, lprob);
 
     return IMM_SUCCESS;
+}
+
+struct imm_state *hmm_state(struct imm_hmm const *hmm, imm_state_id_t state_id)
+{
+    struct imm_state *state = NULL;
+    hash_for_each_possible(hmm->states.tbl, state, hnode, state_id)
+    {
+        if (state->id == state_id)
+            return state;
+    }
+    return NULL;
+}
+
+struct trans *hmm_trans(struct imm_hmm const *hmm, struct imm_state const *src,
+                        struct imm_state const *dst)
+{
+    struct trans *trans = NULL;
+    struct pair pair = PAIR_INIT(src->id, dst->id);
+    hash_for_each_possible(hmm->transitions.tbl, trans, hnode, pair.id.key)
+    {
+        if (trans->pair.id.src == src->id && trans->pair.id.dst == dst->id)
+            return trans;
+    }
+    return NULL;
 }

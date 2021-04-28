@@ -7,13 +7,13 @@
 struct start
 {
     imm_float lprob;
-    uint16_t state_id;
+    imm_state_id_t state_id;
 };
 
 static inline void start_init(struct start *start)
 {
     start->lprob = imm_lprob_invalid();
-    start->state_id = IMM_INVALID_STATE_ID;
+    start->state_id = IMM_STATE_NULL_ID;
 }
 
 #endif

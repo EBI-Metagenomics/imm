@@ -7,15 +7,17 @@ extern "C" {
 
 #include "imm/abc.h"
 #include "imm/abc_lprob.h"
-#include "imm/cartes.h"
-/* #include "imm/dp.h" */
-/* #include "imm/dp_task.h" */
+#include "imm/abc_types.h"
+#include "imm/dp.h"
+#include "imm/dp_task.h"
 #include "imm/error.h"
 #include "imm/float.h"
 #include "imm/generics.h"
 #include "imm/hmm.h"
+#include "imm/state_types.h"
+#include "imm/sym.h"
 /* #include "imm/input.h" */
-#include "imm/io.h"
+/* #include "imm/io.h" */
 #include "imm/log.h"
 #include "imm/lprob.h"
 /* #include "imm/model.h" */
