@@ -45,9 +45,8 @@ void path_deinit(struct path const *path)
         free(path->bit);
 }
 
-int path_setup(struct path *path, unsigned len)
+void path_setup(struct path *path, unsigned len)
 {
     size_t size = path->state_offset[path->nstates] * len;
     path->bit = bitarr_realloc(path->bit, size);
-    return IMM_SUCCESS;
 }

@@ -30,7 +30,7 @@ add_library(imm
     src/mute_state.c
     src/normal_state.c
     # src/result.c
-    src/dp/seq_code.c
+    src/dp/code.c
     # src/seq_table.c
     src/abc.c
     src/abc_lprob.c

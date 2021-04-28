@@ -114,14 +114,15 @@ static void create_edges(struct graph *graph)
     struct vert *src = NULL;
     struct iter iter0 = queue_iter(&graph->vertq);
     struct edge *edge = graph->edges;
+    /* TODO: check whether to use incoming instead */
     iter_for_each_entry(src, &iter0, node)
     {
         struct trans *trans = NULL;
-        struct iter iter1 = stack_iter(&src->state->trans);
-        iter_for_each_entry(trans, &iter1, node)
+        struct iter iter1 = stack_iter(&src->state->trans.outgoing);
+        iter_for_each_entry(trans, &iter1, outgoing)
         {
             struct vert *dst = NULL;
-            uint16_t id = trans->pair.ids[1];
+            uint16_t id = trans->pair.id.dst;
             hash_for_each_possible(graph->vert_tbl, dst, hnode, id)
             {
                 if (dst->state->id == id)

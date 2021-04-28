@@ -75,7 +75,7 @@ void path_deinit(struct path const *path);
 void path_init(struct path *path, struct state_table const *state_tbl,
                struct trans_table const *trans_tbl);
 
-int path_setup(struct path *path, unsigned len);
+void path_setup(struct path *path, unsigned len);
 
 static inline unsigned path_seqlen(struct path const *path, unsigned pos,
                                    unsigned state)

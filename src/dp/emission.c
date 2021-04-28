@@ -1,9 +1,8 @@
 #include "dp/emission.h"
 #include "cartes.h"
 #include "common/common.h"
-#include "dp/seq_code.h"
+#include "dp/code.h"
 #include "imm/abc.h"
-#include "imm/seq.h"
 #include "imm/state.h"
 
 static inline unsigned offset_size(unsigned nstates) { return nstates + 1; }
@@ -14,36 +13,33 @@ static inline unsigned score_size(struct emission const *emission,
     return emission->offset[nstates];
 }
 
-void emission_del(struct emission const *emission)
+void emission_deinit(struct emission const *emission)
 {
     free(emission->score);
     free(emission->offset);
-    free((void *)emission);
 }
 
-struct emission const *emission_new(struct seq_code const *seq_code,
-                                    struct imm_state **states, unsigned nstates)
+void emission_init(struct emission *emiss, struct code const *code,
+                   struct imm_state **states, unsigned nstates)
 {
-    struct emission *tbl = xmalloc(sizeof(*tbl));
-
-    tbl->offset = xmalloc(sizeof(*tbl->offset) * offset_size(nstates));
-    tbl->offset[0] = 0;
+    emiss->offset = xmalloc(sizeof(*emiss->offset) * offset_size(nstates));
+    emiss->offset[0] = 0;
 
     unsigned min = imm_state_min_seqlen(states[0]);
-    unsigned size = seq_code_size(seq_code, min);
+    unsigned size = code_size(code, min);
     for (unsigned i = 1; i < nstates; ++i)
     {
-        tbl->offset[i] = (uint32_t)size;
-        size += seq_code_size(seq_code, imm_state_min_seqlen(states[i]));
+        emiss->offset[i] = size;
+        size += code_size(code, imm_state_min_seqlen(states[i]));
     }
-    tbl->offset[nstates] = (uint32_t)size;
+    emiss->offset[nstates] = size;
 
-    tbl->score = xmalloc(sizeof(*tbl->score) * score_size(tbl, nstates));
+    emiss->score = xmalloc(sizeof(*emiss->score) * score_size(emiss, nstates));
 
-    struct imm_abc const *abc = seq_code->abc;
+    struct imm_abc const *abc = code->abc;
     char const *set = abc->symbols;
     unsigned set_size = abc->nsymbols;
-    struct cartes *cartes = cartes_new(set, set_size, seq_code->seqlen.max);
+    struct cartes *cartes = cartes_new(set, set_size, code->seqlen.max);
 
     for (unsigned i = 0; i < nstates; ++i)
     {
@@ -57,14 +53,13 @@ struct emission const *emission_new(struct seq_code const *seq_code,
             {
 
                 struct imm_seq seq = IMM_SEQ(len, item, abc);
-                unsigned j = seq_code_encode(seq_code, &seq);
-                j -= seq_code_offset(seq_code, min_seq);
+                unsigned j = code_encode(code, &seq);
+                j -= code_offset(code, min_seq);
                 imm_float score = imm_state_lprob(states[i], &seq);
-                tbl->score[tbl->offset[i] + j] = score;
+                emiss->score[emiss->offset[i] + j] = score;
             }
         }
     }
 
     cartes_del(cartes);
-    return tbl;
 }

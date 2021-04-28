@@ -2,6 +2,7 @@
 #include "args.h"
 #include "common/common.h"
 #include "containers/stack.h"
+#include "imm/error.h"
 #include "trans.h"
 
 static inline unsigned offset_size(unsigned nstates) { return nstates + 1; }
@@ -18,7 +19,7 @@ int trans_table_change(struct trans_table *trans_tbl, unsigned src,
             return IMM_SUCCESS;
         }
     }
-    return 1;
+    return xerror(IMM_ILLEGALARG, "transition not found");
 }
 
 void trans_table_init(struct trans_table *tbl, struct dp_args const *args)

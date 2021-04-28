@@ -4,7 +4,7 @@
 #include "imm/float.h"
 
 struct imm_state;
-struct seq_code;
+struct code;
 
 struct emission
 {
@@ -12,11 +12,10 @@ struct emission
     unsigned *offset; /**< Maps state to score array offset. */
 };
 
-void emission_del(struct emission const *emission);
+void emission_deinit(struct emission const *emission);
 
-struct emission const *emission_new(struct seq_code const *seq_code,
-                                    struct imm_state **states,
-                                    unsigned nstates);
+void emission_init(struct emission *emission, struct code const *code,
+                   struct imm_state **states, unsigned nstates);
 
 static inline imm_float emission_score(struct emission const *emission,
                                        unsigned state, unsigned seq_code)
