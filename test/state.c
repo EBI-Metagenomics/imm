@@ -29,11 +29,6 @@ void test_normal_state(void)
     cass_close(imm_state_lprob(imm_super(state), G), imm_log(0.5));
     cass_cond(imm_lprob_is_zero(imm_state_lprob(imm_super(state), T)));
 
-    struct imm_state *super = imm_super(state);
-    cass_null(imm_mute_state(super));
-    state = imm_normal_state(super);
-    cass_not_null(state);
-
     imm_del(state);
     imm_del(abc);
     imm_del(A);
@@ -53,11 +48,6 @@ void test_mute_state(void)
     cass_equal(imm_state_id(imm_super(state)), 43);
     cass_close(imm_state_lprob(imm_super(state), EMPTY), 0.0);
     cass_cond(imm_lprob_is_zero(imm_state_lprob(imm_super(state), A)));
-
-    struct imm_state *super = imm_super(state);
-    cass_null(imm_normal_state(super));
-    state = imm_mute_state(super);
-    cass_not_null(state);
 
     imm_del(state);
     imm_del(abc);
