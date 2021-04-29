@@ -16,8 +16,8 @@ IMM_API struct imm_mute_state *imm_mute_state_new(imm_state_id_t id,
 
 IMM_API void imm_mute_state_del(struct imm_mute_state const *mute);
 
-static inline struct imm_state const *
-imm_mute_state_super(struct imm_mute_state const *mute)
+static inline struct imm_state *
+imm_mute_state_super(struct imm_mute_state *mute)
 {
     return mute->super;
 }

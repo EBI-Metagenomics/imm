@@ -1,5 +1,4 @@
 #include "cass/cass.h"
-#include "imm/error.h"
 #include "imm/imm.h"
 
 void test_hmm_state_id(void);
