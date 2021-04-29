@@ -13,21 +13,21 @@ int main(void)
 
 void test_path(void)
 {
-    uint16_t state_ids[] = {42, 19};
-    uint8_t seq_lens[] = {3, 5};
+    imm_state_tid_t state_ids[] = {42, 19};
+    uint8_t seqlens[] = {3, 5};
 
     struct imm_path *path = imm_path_new();
 
-    imm_path_add(path, IMM_STEP(state_ids[0], seq_lens[0]));
-    imm_path_add(path, IMM_STEP(state_ids[1], seq_lens[1]));
+    imm_path_add(path, IMM_STEP(state_ids[0], seqlens[0]));
+    imm_path_add(path, IMM_STEP(state_ids[1], seqlens[1]));
 
     cass_equal(imm_path_step(path, 0)->state_id, state_ids[0]);
     cass_equal(imm_path_step(path, 1)->state_id, state_ids[1]);
 
-    cass_equal(imm_path_step(path, 0)->seqlen, seq_lens[0]);
-    cass_equal(imm_path_step(path, 1)->seqlen, seq_lens[1]);
+    cass_equal(imm_path_step(path, 0)->seqlen, seqlens[0]);
+    cass_equal(imm_path_step(path, 1)->seqlen, seqlens[1]);
 
-    imm_path_del(path);
+    imm_del(path);
 }
 
 void test_path_long(void)
@@ -54,5 +54,5 @@ void test_path_long(void)
         cass_equal(imm_path_step(path, i)->seqlen, i % 16);
     }
 
-    imm_path_del(path);
+    imm_del(path);
 }
