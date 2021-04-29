@@ -1,28 +1,28 @@
 #include "cass/cass.h"
 #include "imm/imm.h"
 
-void test_hmm_likelihood_single_state(void);
-void test_hmm_likelihood_two_states(void);
-void test_hmm_likelihood_mute_state(void);
-void test_hmm_likelihood_two_mute_states(void);
-void test_hmm_likelihood_invalid(void);
-void test_hmm_likelihood_no_state(void);
+void test_hmm_loglik_single_state(void);
+void test_hmm_loglik_two_states(void);
+void test_hmm_loglik_mute_state(void);
+void test_hmm_loglik_two_mute_states(void);
+void test_hmm_loglik_invalid(void);
+void test_hmm_loglik_no_state(void);
 
 int main(void)
 {
-    test_hmm_likelihood_single_state();
-    test_hmm_likelihood_two_states();
-    test_hmm_likelihood_mute_state();
-    test_hmm_likelihood_two_mute_states();
-    test_hmm_likelihood_invalid();
-    test_hmm_likelihood_no_state();
+    test_hmm_loglik_single_state();
+    test_hmm_loglik_two_states();
+    test_hmm_loglik_mute_state();
+    test_hmm_loglik_two_mute_states();
+    test_hmm_loglik_invalid();
+    test_hmm_loglik_no_state();
     return cass_status();
 }
 
 static inline imm_float zero(void) { return imm_lprob_zero(); }
 static inline int is_valid(imm_float a) { return imm_lprob_is_valid(a); }
 
-void test_hmm_likelihood_single_state(void)
+void test_hmm_loglik_single_state(void)
 {
     struct imm_abc const *abc = imm_abc_new(4, "ACGT", '*');
     struct imm_seq const *EMPTY = imm_seq_new(0, "", abc);
@@ -100,7 +100,7 @@ void test_hmm_likelihood_single_state(void)
     imm_del(AG);
 }
 
-void test_hmm_likelihood_two_states(void)
+void test_hmm_loglik_two_states(void)
 {
     struct imm_abc const *abc = imm_abc_new(4, "ACGT", '*');
     struct imm_seq const *A = imm_seq_new(1, "A", abc);
@@ -162,7 +162,7 @@ void test_hmm_likelihood_two_states(void)
     imm_del(GT);
 }
 
-void test_hmm_likelihood_mute_state(void)
+void test_hmm_loglik_mute_state(void)
 {
     struct imm_abc const *abc = imm_abc_new(4, "ACGT", '*');
     struct imm_seq const *EMPTY = imm_seq_new(0, "", abc);
@@ -214,7 +214,7 @@ void test_hmm_likelihood_mute_state(void)
     imm_del(GT);
 }
 
-void test_hmm_likelihood_two_mute_states(void)
+void test_hmm_loglik_two_mute_states(void)
 {
     struct imm_abc const *abc = imm_abc_new(4, "ACGT", '*');
     struct imm_seq const *EMPTY = imm_seq_new(0, "", abc);
@@ -242,7 +242,7 @@ void test_hmm_likelihood_two_mute_states(void)
     imm_del(EMPTY);
 }
 
-void test_hmm_likelihood_invalid(void)
+void test_hmm_loglik_invalid(void)
 {
     struct imm_abc const *abc = imm_abc_new(2, "AC", '*');
     struct imm_seq const *C = imm_seq_new(1, "C", abc);
@@ -285,7 +285,7 @@ void test_hmm_likelihood_invalid(void)
     imm_del(C);
 }
 
-void test_hmm_likelihood_no_state(void)
+void test_hmm_loglik_no_state(void)
 {
     struct imm_abc const *abc = imm_abc_new(4, "ACGT", '*');
     struct imm_seq const *EMPTY = imm_seq_new(0, "", abc);
