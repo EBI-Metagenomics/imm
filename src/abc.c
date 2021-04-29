@@ -3,18 +3,17 @@
 #include "imm/error.h"
 #include "imm/sym.h"
 
-static struct imm_abc_vtable const __vtable = {abc_typeid, abc_del};
-
 void imm_abc_del(struct imm_abc const *abc) { abc->vtable.del(abc); }
 
 struct imm_abc const *imm_abc_new(unsigned len, char const *symbols,
                                   char any_symbol)
 {
-    return abc_new(len, symbols, any_symbol, NULL);
+    struct imm_abc_vtable vtable = {abc_del, IMM_ABC, NULL};
+    return abc_new(len, symbols, any_symbol, vtable);
 }
 
 struct imm_abc *abc_new(unsigned len, char const *symbols, char any_symbol,
-                        void *derived)
+                        struct imm_abc_vtable vtable)
 {
     if (!__imm_sym_valid(any_symbol))
     {
@@ -61,9 +60,8 @@ struct imm_abc *abc_new(unsigned len, char const *symbols, char any_symbol,
         }
         abc->symbol_idx[j] = (imm_sym_idx_t)i;
     }
-    abc->symbols = xstrdup(symbols);
-    abc->vtable = __vtable;
-    abc->derived = derived;
+    abc->symbols = symbols;
+    abc->vtable = vtable;
 
     return abc;
 
@@ -72,8 +70,4 @@ cleanup:
     return NULL;
 }
 
-void abc_del(struct imm_abc const *abc)
-{
-    free((void *)abc->symbols);
-    free((void *)abc);
-}
+void abc_del(struct imm_abc const *abc) { free((void *)abc); }

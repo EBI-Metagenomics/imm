@@ -27,6 +27,7 @@ find_package(containers REQUIRED)
 add_library(imm
     src/dp/eseq.c
     src/hmm.c
+    src/amino.c
     src/mute_state.c
     src/normal_state.c
     # src/result.c

@@ -9,8 +9,9 @@ struct imm_abc;
 
 struct imm_abc_vtable
 {
-    imm_abc_tid_t (*typeid)(struct imm_abc const *abc);
     void (*del)(struct imm_abc const *abc);
+    imm_abc_tid_t typeid;
+    void *derived;
 };
 
 /**
@@ -25,9 +26,7 @@ struct imm_abc
     char const *symbols;
     imm_sym_idx_t symbol_idx[IMM_SYM_IDX_SIZE];
     char any_symbol;
-
     struct imm_abc_vtable vtable;
-    void *derived;
 };
 
 static inline char imm_abc_any_symbol(struct imm_abc const *abc)
@@ -85,7 +84,7 @@ static inline char const *imm_abc_symbols(struct imm_abc const *abc)
 
 static inline imm_abc_tid_t imm_abc_typeid(struct imm_abc const *abc)
 {
-    return abc->vtable.typeid(abc);
+    return abc->vtable.typeid;
 }
 
 /* IMM_API int imm_abc_write(struct imm_abc const *abc, FILE *stream); */

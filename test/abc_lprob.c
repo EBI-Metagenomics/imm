@@ -21,6 +21,6 @@ void test_abc_lprob(void)
     cass_cond(!imm_lprob_is_valid(imm_abc_lprob_get(abc_lprob, 'X')));
     cass_close(imm_abc_lprob_get(abc_lprob, 'T'), imm_log(0.5));
 
-    imm_abc_del(abc);
+    imm_del(abc);
     imm_abc_lprob_del(abc_lprob);
 }

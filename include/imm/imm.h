@@ -8,6 +8,7 @@ extern "C" {
 #include "imm/abc.h"
 #include "imm/abc_lprob.h"
 #include "imm/abc_types.h"
+#include "imm/amino.h"
 #include "imm/dp.h"
 #include "imm/dp_task.h"
 #include "imm/error.h"

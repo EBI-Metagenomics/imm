@@ -21,4 +21,10 @@ IMM_API struct imm_normal_state *imm_normal_state_new(imm_state_id_t id,
 
 IMM_API void imm_normal_state_del(struct imm_normal_state const *normal);
 
+static inline struct imm_state const *
+imm_normal_state_super(struct imm_normal_state const *normal)
+{
+    return normal->super;
+}
+
 #endif
