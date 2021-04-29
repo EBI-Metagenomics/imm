@@ -35,13 +35,13 @@ static int check_mute_cycles(struct queue *vertq);
 static int check_mute_visit(struct vert *vert);
 static void create_edges(struct graph *graph);
 static void create_vertices(struct graph *graph, struct imm_state **states,
-                            uint16_t nstates);
+                            unsigned nstates);
 static void graph_deinit(struct graph const *graph);
-static void graph_init(struct graph *graph, uint16_t nstates, uint16_t ntrans);
+static void graph_init(struct graph *graph, unsigned nstates, unsigned ntrans);
 static void unmark_nodes(struct queue *vertq);
 static void visit(struct vert *vert, struct imm_state ***state);
 
-int tsort(struct imm_state **states, uint16_t nstates, uint16_t ntrans)
+int tsort(struct imm_state **states, unsigned nstates, unsigned ntrans)
 {
     struct graph graph;
     graph_init(&graph, nstates, ntrans);
@@ -63,7 +63,7 @@ int tsort(struct imm_state **states, uint16_t nstates, uint16_t ntrans)
     struct iter iter = queue_iter(&graph.vertq);
     iter_for_each_entry(vert, &iter, node) { visit(vert, &cur); }
 
-    for (uint16_t i = 0; i < nstates; ++i)
+    for (unsigned i = 0; i < nstates; ++i)
         states[i] = state_arr[i];
 
     free(state_arr);
@@ -122,7 +122,7 @@ static void create_edges(struct graph *graph)
         iter_for_each_entry(trans, &iter1, outgoing)
         {
             struct vert *dst = NULL;
-            uint16_t id = trans->pair.id.dst;
+            unsigned id = trans->pair.id.dst;
             hash_for_each_possible(graph->vert_tbl, dst, hnode, id)
             {
                 if (dst->state->id == id)
@@ -136,9 +136,9 @@ static void create_edges(struct graph *graph)
 }
 
 static void create_vertices(struct graph *graph, struct imm_state **states,
-                            uint16_t nstates)
+                            unsigned nstates)
 {
-    for (uint16_t i = 0; i < nstates; ++i)
+    for (unsigned i = 0; i < nstates; ++i)
     {
         struct vert *vert = graph->verts + i;
         vert->state = states[i];
@@ -159,7 +159,7 @@ static void graph_deinit(struct graph const *graph)
     free(graph->edges);
 }
 
-static void graph_init(struct graph *graph, uint16_t nstates, uint16_t ntrans)
+static void graph_init(struct graph *graph, unsigned nstates, unsigned ntrans)
 {
     graph->verts = xmalloc(sizeof(*graph->verts) * nstates);
     graph->edges = xmalloc(sizeof(*graph->edges) * ntrans);

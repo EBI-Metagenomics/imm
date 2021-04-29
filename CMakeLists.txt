@@ -25,31 +25,30 @@ find_package(elapsed REQUIRED)
 find_package(containers REQUIRED)
 
 add_library(imm
-    src/dp/eseq.c
-    src/hmm.c
-    src/amino.c
-    src/mute_state.c
-    src/normal_state.c
-    # src/result.c
-    src/dp/code.c
-    # src/seq_table.c
     src/abc.c
     src/abc_lprob.c
+    src/amino.c
     src/cartes.c
-    src/dp/dp.c
-    src/dp/path.c
+    src/common/error.c
     src/dp/bitarr.c
+    src/dp/code.c
+    src/dp/dp.c
     src/dp/emission.c
+    src/dp/eseq.c
+    src/dp/matrix.c
+    src/dp/path.c
     src/dp/state_table.c
     src/dp/trans_table.c
-    src/dp/task.c
-    src/common/error.c
+    src/hmm.c
     src/log.c
-    src/tsort.c
     src/lprob.c
+    src/mute_state.c
+    src/normal_state.c
     src/path.c
     src/seq.c
     src/state.c
+    src/task.c
+    src/tsort.c
 )
 add_library(IMM::imm ALIAS imm)
 

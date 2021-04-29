@@ -19,10 +19,12 @@
              : imm_mute_state_del,                                             \
              struct imm_seq const * : imm_seq_del,                             \
              struct imm_abc const * : imm_abc_del,                             \
+             struct imm_task * : imm_task_del,                             \
              struct imm_hmm * : imm_hmm_del,                                   \
-             struct imm_path * : imm_path_del,                                 \
              struct imm_abc_lprob const * : imm_abc_lprob_del,                 \
              struct imm_amino const * : imm_amino_del) (x)
+
+#define imm_deinit(x) _Generic((x), struct imm_path * : imm_path_deinit)(x)
 
 #define imm_id(x) _Generic((x), struct imm_state * : imm_state_id)(x)
 

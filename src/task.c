@@ -1,13 +1,10 @@
-#include "dp/task.h"
-#include "common/common.h"
-#include "dp/dp.h"
-#include "dp/eseq.h"
+#include "task.h"
 #include "dp/imm_dp.h"
-#include "imm/dp_task.h"
+#include "imm/task.h"
 
-struct imm_dp_task *imm_dp_task_new(struct imm_dp const *dp)
+struct imm_task *imm_task_new(struct imm_dp const *dp)
 {
-    struct imm_dp_task *task = xmalloc(sizeof(*task));
+    struct imm_task *task = xmalloc(sizeof(*task));
     matrix_init(&task->matrix, &dp->state_table);
     code_init_eseq(&task->eseq, &dp->code);
     path_init(&task->path, &dp->state_table, &dp->trans_table);
@@ -16,7 +13,7 @@ struct imm_dp_task *imm_dp_task_new(struct imm_dp const *dp)
     return task;
 }
 
-int imm_dp_task_setup(struct imm_dp_task *task, struct imm_seq const *seq)
+int imm_task_setup(struct imm_task *task, struct imm_seq const *seq)
 {
     task->seq = seq;
     eseq_setup(&task->eseq, seq);
@@ -24,7 +21,7 @@ int imm_dp_task_setup(struct imm_dp_task *task, struct imm_seq const *seq)
     return IMM_SUCCESS;
 }
 
-void imm_dp_task_del(struct imm_dp_task const *task)
+void imm_task_del(struct imm_task const *task)
 {
     matrix_deinit(&task->matrix);
     path_deinit(&task->path);

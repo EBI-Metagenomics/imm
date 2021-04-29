@@ -10,17 +10,11 @@ void imm_path_add(struct imm_path *path, struct imm_step step)
     imm_path_add_unsafe(path, step);
 }
 
-struct imm_path *imm_path_new(void)
+void imm_path_init(struct imm_path *path)
 {
-    struct imm_path *path = xmalloc(sizeof(*path));
     path->capacity = sizeof(*path->steps) * (1 << 4);
     path->nsteps = 0;
     path->steps = xmalloc(path->capacity);
-    return path;
 }
 
-void imm_path_del(struct imm_path const *path)
-{
-    free(path->steps);
-    free((void *)path);
-}
+void imm_path_deinit(struct imm_path *path) { free(path->steps); }

@@ -1,13 +1,17 @@
 #include "hmm.h"
 #include "common/common.h"
+#include "dp/dp.h"
 #include "imm/error.h"
 #include "imm/hmm.h"
 #include "imm/lprob.h"
 #include "imm/path.h"
+#include "imm/state_types.h"
 #include "imm/subseq.h"
 #include "start.h"
 #include "state.h"
 #include "tsort.h"
+#include <stdint.h>
+#include <stdio.h>
 
 static void detach_states(struct imm_hmm *hmm)
 {
@@ -54,6 +58,11 @@ static void reset_transitions_table(struct imm_hmm *hmm)
     hash_init(hmm->transitions.tbl);
 }
 
+static inline bool has_start_state(struct imm_hmm const *hmm)
+{
+    return hmm->start.state_id != IMM_STATE_NULL_ID;
+}
+
 int imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
 {
     if (hash_hashed(&state->hnode))
@@ -81,13 +90,19 @@ void imm_hmm_reset(struct imm_hmm *hmm, struct imm_abc const *abc)
     reset_transitions_table(hmm);
 }
 
-#if 0
+void imm_hmm_del(struct imm_hmm const *hmm) { free((void *)hmm); }
+
 struct imm_dp *imm_hmm_new_dp(struct imm_hmm const *hmm,
                               struct imm_state const *end_state)
 {
     if (!hmm_state(hmm, end_state->id))
     {
         xerror(IMM_ILLEGALARG, "end state not found");
+        return NULL;
+    }
+    if (!has_start_state(hmm))
+    {
+        xerror(IMM_ILLEGALARG, "start state not found");
         return NULL;
     }
 
@@ -104,25 +119,27 @@ struct imm_dp *imm_hmm_new_dp(struct imm_hmm const *hmm,
         return NULL;
     }
     for (i = 0; i < hmm->states.size; ++i)
-        states[i]->idx = (uint16_t)i;
+        states[i]->idx = (imm_state_idx_t)i;
 
     struct trans *trans = NULL;
+    bkt = 0;
     hash_for_each(hmm->transitions.tbl, bkt, trans, hnode)
     {
         struct imm_state *src = hmm_state(hmm, trans->pair.id.src);
         struct imm_state *dst = hmm_state(hmm, trans->pair.id.dst);
         trans->pair.idx.src = src->idx;
         trans->pair.idx.dst = dst->idx;
-        states[i++] = state;
     }
 
     struct dp_args args;
     dp_args_init(&args, hmm->transitions.size, hmm->states.size, states,
                  hmm_state(hmm, hmm->start.state_id), hmm->start.lprob,
                  end_state);
-    return dp_new(&args);
+
+    struct imm_dp *dp = dp_new(&args);
+    free(states);
+    return dp;
 }
-#endif
 
 imm_float imm_hmm_start_lprob(struct imm_hmm const *hmm)
 {

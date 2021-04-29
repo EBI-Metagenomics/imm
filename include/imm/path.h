@@ -20,9 +20,9 @@ static inline void imm_path_add_unsafe(struct imm_path *path,
     path->steps[path->nsteps++] = step;
 }
 
-IMM_API struct imm_path *imm_path_new(void);
+IMM_API void imm_path_init(struct imm_path *path);
 
-IMM_API void imm_path_del(struct imm_path const *path);
+IMM_API void imm_path_deinit(struct imm_path *path);
 
 static inline void imm_path_reset(struct imm_path *path) { path->nsteps = 0; }
 

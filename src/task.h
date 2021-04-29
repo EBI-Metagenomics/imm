@@ -1,5 +1,5 @@
-#ifndef DP_TASK_H
-#define DP_TASK_H
+#ifndef TASK_H
+#define TASK_H
 
 #include "dp/eseq.h"
 #include "dp/matrix.h"
@@ -7,7 +7,7 @@
 
 struct imm_seq;
 
-struct imm_dp_task
+struct imm_task
 {
     struct matrix matrix;
     struct path path;
