@@ -18,7 +18,7 @@ struct imm_normal_state *imm_normal_state_new(imm_state_id_t id,
     xmemcpy(normal->lprobs, lprobs, sizeof(*normal->lprobs) * len);
 
     struct imm_state_vtable vtable = {del, lprob, IMM_NORMAL_STATE, normal};
-    normal->super = imm_state_new(id, abc, vtable);
+    normal->super = state_new(id, abc, vtable, 0, 0);
     return normal;
 }
 

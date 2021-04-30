@@ -41,7 +41,7 @@ static unsigned max_seq(unsigned nstates, struct imm_state **states)
 {
     unsigned max = imm_state_max_seqlen(states[0]);
     for (unsigned i = 1; i < nstates; ++i)
-        max = (unsigned)MAX(max, imm_state_max_seqlen(states[i]));
+        max = MAX(max, imm_state_max_seqlen(states[i]));
 
     return max;
 }
@@ -50,7 +50,7 @@ static unsigned min_seq(unsigned nstates, struct imm_state **states)
 {
     unsigned min = imm_state_min_seqlen(states[0]);
     for (unsigned i = 1; i < nstates; ++i)
-        min = (unsigned)MIN(min, imm_state_min_seqlen(states[i]));
+        min = MIN(min, imm_state_min_seqlen(states[i]));
 
     return min;
 }
@@ -111,7 +111,7 @@ int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
 
     struct elapsed elapsed = elapsed_init();
     elapsed_start(&elapsed);
-    /* viterbi(dp, task, path); */
+    viterbi(dp, task, &result->path);
     elapsed_end(&elapsed);
     result->seconds = (imm_float)elapsed_seconds(&elapsed);
 
@@ -308,13 +308,13 @@ static struct final_score final_score(struct imm_dp const *dp,
 static void viterbi(struct imm_dp const *dp, struct imm_task *task,
                     struct imm_path *path)
 {
-    unsigned const len = eseq_len(&task->eseq);
+    unsigned len = eseq_len(&task->eseq);
 
-    if (len >= 1 + DP_STATE_TABLE_MAX_SEQ)
+    if (len >= 1 + STATE_TABLE_MAX_SEQ)
     {
         viterbi_first_row_safe(dp, task);
-        _viterbi_safe(dp, task, 1, len - DP_STATE_TABLE_MAX_SEQ);
-        _viterbi(dp, task, len - DP_STATE_TABLE_MAX_SEQ + 1, len);
+        _viterbi_safe(dp, task, 1, len - STATE_TABLE_MAX_SEQ);
+        _viterbi(dp, task, len - STATE_TABLE_MAX_SEQ + 1, len);
     }
     else
     {
@@ -397,31 +397,28 @@ static void viterbi_path(struct imm_dp const *dp, struct imm_task const *task,
                          struct imm_path *path, unsigned end_state,
                          unsigned end_seq_len)
 {
-    /* unsigned row = eseq_len(&task->eseq); */
-    /* unsigned state = end_state; */
-    unsigned seq_len = end_seq_len;
-    bool valid = seq_len != INVALID_SEQLEN;
+    unsigned row = eseq_len(&task->eseq);
+    unsigned state = end_state;
+    unsigned seqlen = end_seq_len;
+    bool valid = seqlen != INVALID_SEQLEN;
 
     while (valid)
     {
-#if 0
-        struct imm_state const *s = dp->states[state];
-        struct imm_step *new_step = imm_step_create(s, (uint8_t)seq_len);
-        imm_path_prepend(path, new_step);
-        row -= seq_len;
+        imm_state_id_t id = dp->state_table.ids[state];
+        struct imm_step step = IMM_STEP(id, (uint8_t)seqlen);
+        imm_path_add(path, step);
+        row -= seqlen;
 
-        valid = cpath_valid(&task->cpath, row, state);
+        valid = path_valid(&task->path, row, state);
         if (valid)
         {
-            unsigned trans =
-                (unsigned)cpath_get_trans(&task->cpath, row, state);
-            unsigned len = (unsigned)cpath_get_len(&task->cpath, row, state);
-            state = dp_trans_table_source_state(dp->trans_table, state, trans);
-            seq_len = (unsigned)(len + dp_state_table_min_seq(dp->state_table,
-                                                              state));
+            unsigned trans = path_trans(&task->path, row, state);
+            unsigned len = path_seqlen(&task->path, row, state);
+            state = trans_table_source_state(&dp->trans_table, state, trans);
+            seqlen = len + state_table_min_seqlen(&dp->state_table, state);
         }
-#endif
     }
+    imm_path_reverse(path);
 }
 
 static void _viterbi(struct imm_dp const *dp, struct imm_task *task,

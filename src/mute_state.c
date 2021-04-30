@@ -12,7 +12,7 @@ struct imm_mute_state *imm_mute_state_new(imm_state_id_t id,
 {
     struct imm_mute_state *mute = xmalloc(sizeof(*mute));
     struct imm_state_vtable vtable = {del, lprob, IMM_MUTE_STATE, mute};
-    mute->super = imm_state_new(id, abc, vtable);
+    mute->super = state_new(id, abc, vtable, 0, 0);
     return mute;
 }
 

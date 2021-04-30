@@ -8,6 +8,7 @@ struct dp_args;
 struct state_table
 {
     unsigned nstates;
+    imm_state_id_t *ids;
     struct
     {
         imm_state_idx_t state;
@@ -25,7 +26,7 @@ struct state_table
     } * seqlen;
 };
 
-#define DP_STATE_TABLE_MAX_SEQ 5
+#define STATE_TABLE_MAX_SEQ 5
 
 void state_table_deinit(struct state_table const *tbl);
 

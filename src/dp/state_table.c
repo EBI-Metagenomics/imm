@@ -5,7 +5,11 @@
 void state_table_init(struct state_table *tbl, struct dp_args const *args)
 {
     tbl->nstates = args->nstates;
+    tbl->ids = xmalloc(sizeof(*tbl->ids) * args->nstates);
     tbl->seqlen = xmalloc(sizeof(*tbl->seqlen) * args->nstates);
+
+    for (unsigned i = 0; i < args->nstates; ++i)
+        tbl->ids[i] = imm_state_id(args->states[i]);
 
     for (unsigned i = 0; i < args->nstates; ++i)
     {
@@ -20,6 +24,7 @@ void state_table_init(struct state_table *tbl, struct dp_args const *args)
 
 void state_table_deinit(struct state_table const *tbl)
 {
+    free(tbl->ids);
     free(tbl->seqlen);
     free((void *)tbl);
 }

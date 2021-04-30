@@ -47,10 +47,6 @@ static inline struct imm_abc const *imm_state_abc(struct imm_state const *state)
     return state->abc;
 }
 
-IMM_API struct imm_state *imm_state_new(imm_state_id_t id,
-                                        struct imm_abc const *abc,
-                                        struct imm_state_vtable vtable);
-
 static inline void imm_state_del(struct imm_state const *state)
 {
     state->vtable.del(state);
