@@ -13,6 +13,22 @@ struct imm_task *imm_task_new(struct imm_dp const *dp)
     return task;
 }
 
+int imm_task_reset(struct imm_task *task, struct imm_dp const *dp)
+{
+    /* TODO: implement smart reset */
+    matrix_deinit(&task->matrix);
+    path_deinit(&task->path);
+    eseq_deinit(&task->eseq);
+
+    matrix_init(&task->matrix, &dp->state_table);
+    code_init_eseq(&task->eseq, &dp->code);
+    path_init(&task->path, &dp->state_table, &dp->trans_table);
+    eseq_init(&task->eseq, &dp->code);
+    task->seq = NULL;
+
+    return IMM_SUCCESS;
+}
+
 int imm_task_setup(struct imm_task *task, struct imm_seq const *seq)
 {
     task->seq = seq;

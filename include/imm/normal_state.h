@@ -12,12 +12,12 @@ struct imm_abc;
 struct imm_normal_state
 {
     struct imm_state *super;
-    imm_float *lprobs;
+    imm_float const *lprobs;
 };
 
 IMM_API struct imm_normal_state *imm_normal_state_new(imm_state_id_t id,
                                                       struct imm_abc const *abc,
-                                                      imm_float const *lprobs);
+                                                      imm_float const lprobs[]);
 
 IMM_API void imm_normal_state_del(struct imm_normal_state const *normal);
 

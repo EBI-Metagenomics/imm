@@ -10,15 +10,12 @@ static imm_float lprob(struct imm_state const *state,
 
 struct imm_normal_state *imm_normal_state_new(imm_state_id_t id,
                                               struct imm_abc const *abc,
-                                              imm_float const *lprobs)
+                                              imm_float const lprobs[])
 {
     struct imm_normal_state *normal = xmalloc(sizeof(*normal));
-    unsigned len = imm_abc_len(abc);
-    normal->lprobs = xmalloc(sizeof(*normal->lprobs) * len);
-    xmemcpy(normal->lprobs, lprobs, sizeof(*normal->lprobs) * len);
-
+    normal->lprobs = lprobs;
     struct imm_state_vtable vtable = {del, lprob, IMM_NORMAL_STATE, normal};
-    normal->super = state_new(id, abc, vtable, 0, 0);
+    normal->super = state_new(id, abc, vtable, 1, 1);
     return normal;
 }
 
@@ -30,7 +27,6 @@ void imm_normal_state_del(struct imm_normal_state const *normal)
 static void del(struct imm_state const *state)
 {
     struct imm_normal_state const *normal = state->vtable.derived;
-    free(normal->lprobs);
     free((void *)normal);
     state_del(state);
 }
