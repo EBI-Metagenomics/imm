@@ -26,5 +26,4 @@ void state_table_deinit(struct state_table const *tbl)
 {
     free(tbl->ids);
     free(tbl->seqlen);
-    free((void *)tbl);
 }

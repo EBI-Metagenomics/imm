@@ -109,6 +109,7 @@ int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
         return xerror(IMM_ILLEGALARG,
                       "seq is shorter than end_state's lower bound");
 
+    result_reset(result);
     struct elapsed elapsed = elapsed_init();
     elapsed_start(&elapsed);
     viterbi(dp, task, &result->path);

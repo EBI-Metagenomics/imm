@@ -52,5 +52,4 @@ void trans_table_deinit(struct trans_table const *tbl)
 {
     free(tbl->trans);
     free(tbl->offset);
-    free((void *)tbl);
 }
