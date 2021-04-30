@@ -61,7 +61,6 @@ static void set_score(struct imm_dp const *dp, struct imm_task *task,
 {
     for (unsigned len = min_len; len <= max_len; ++len)
     {
-
         unsigned seq_code = eseq_get(&task->eseq, row, len);
         seq_code -= code_offset(&dp->code, min_len);
 
@@ -72,7 +71,7 @@ static void set_score(struct imm_dp const *dp, struct imm_task *task,
 }
 
 static void viterbi(struct imm_dp const *dp, struct imm_task *task,
-                    struct imm_path *path);
+                    struct imm_result *result);
 static void viterbi_first_row(struct imm_dp const *dp, struct imm_task *task,
                               unsigned remain);
 static void viterbi_first_row_safe(struct imm_dp const *dp,
@@ -112,7 +111,7 @@ int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
     result_reset(result);
     struct elapsed elapsed = elapsed_init();
     elapsed_start(&elapsed);
-    viterbi(dp, task, &result->path);
+    viterbi(dp, task, result);
     elapsed_end(&elapsed);
     result->seconds = (imm_float)elapsed_seconds(&elapsed);
 
@@ -307,7 +306,7 @@ static struct final_score final_score(struct imm_dp const *dp,
 }
 
 static void viterbi(struct imm_dp const *dp, struct imm_task *task,
-                    struct imm_path *path)
+                    struct imm_result *result)
 {
     unsigned len = eseq_len(&task->eseq);
 
@@ -324,7 +323,8 @@ static void viterbi(struct imm_dp const *dp, struct imm_task *task,
     }
 
     struct final_score const fscore = final_score(dp, task);
-    viterbi_path(dp, task, path, fscore.state, fscore.seq_len);
+    result->loglik = fscore.score;
+    viterbi_path(dp, task, &result->path, fscore.state, fscore.seq_len);
 }
 
 static void viterbi_first_row(struct imm_dp const *dp, struct imm_task *task,

@@ -79,8 +79,8 @@ if(CI_BUILD)
     add_compile_options(-Werror)
 endif()
 
-option(CLANG_ASAN_UBSAN "Enable Clang address & undefined behavior sanitizer for nvim binary." OFF)
-option(CLANG_MSAN "Enable Clang memory sanitizer for nvim binary." OFF)
+option(CLANG_ASAN_UBSAN "Enable Clang address & undefined behavior sanitizer." OFF)
+option(CLANG_MSAN "Enable Clang memory sanitizer." OFF)
 
 if((CLANG_ASAN_UBSAN AND CLANG_MSAN))
   message(FATAL_ERROR "Sanitizers cannot be enabled simultaneously")

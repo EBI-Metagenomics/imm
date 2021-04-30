@@ -26,7 +26,7 @@ static inline struct imm_abc const *imm_seq_abc(struct imm_seq const *seq)
 IMM_API struct imm_seq const *imm_seq_new(unsigned len, char const *str,
                                           struct imm_abc const *abc);
 
-void imm_seq_del(struct imm_seq const *seq);
+IMM_API void imm_seq_del(struct imm_seq const *seq);
 
 static inline unsigned imm_seq_len(struct imm_seq const *seq)
 {

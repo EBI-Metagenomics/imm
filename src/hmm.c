@@ -195,7 +195,7 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
     imm_float lprob = hmm->start.lprob + imm_state_lprob(state, &subseq);
 
     unsigned start = 0;
-    for (unsigned i = 1; i < imm_seq_len(seq); ++i)
+    for (unsigned i = 1; i < nsteps; ++i)
     {
         start += step->seqlen;
         step = imm_path_step(path, i);

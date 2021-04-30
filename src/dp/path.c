@@ -8,13 +8,12 @@ void path_init(struct path *path, struct state_table const *state_tbl,
 {
     path->nstates = state_tbl->nstates;
     path->state_offset =
-        xmalloc(sizeof(*path->state_offset) * path->nstates + 1);
+        xmalloc(sizeof(*path->state_offset) * (path->nstates + 1));
     path->trans_bits = malloc(sizeof(*path->trans_bits) * path->nstates);
     path->state_offset[0] = 0;
 
     for (unsigned dst = 0; dst < path->nstates; ++dst)
     {
-
         unsigned depth = 0;
         for (unsigned i = 0; i < trans_table_ntrans(trans_tbl, dst); ++i)
         {
