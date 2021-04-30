@@ -5,7 +5,7 @@
 
 void imm_abc_del(struct imm_abc const *abc) { abc->vtable.del(abc); }
 
-struct imm_abc const *imm_abc_new(unsigned len, char const *symbols,
+struct imm_abc const *imm_abc_new(unsigned len, char const symbols[len],
                                   char any_symbol)
 {
     struct imm_abc_vtable vtable = {abc_del, IMM_ABC, NULL};

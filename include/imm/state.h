@@ -63,7 +63,7 @@ static inline imm_float imm_state_lprob(struct imm_state const *state,
     if (state->abc != imm_seq_abc(seq))
     {
         imm_log_error("alphabets must be the same");
-        return imm_lprob_invalid();
+        return imm_lprob_nan();
     }
     return state->vtable.lprob(state, seq);
 }

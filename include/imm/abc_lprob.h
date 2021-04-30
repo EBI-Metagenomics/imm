@@ -31,7 +31,7 @@ static inline imm_float imm_abc_lprob_get(struct imm_abc_lprob const *abc_lprob,
     if (idx == IMM_SYM_NULL_IDX)
     {
         imm_log_error("symbol not found");
-        return imm_lprob_invalid();
+        return imm_lprob_nan();
     }
     return abc_lprob->lprobs[idx];
 }

@@ -6,7 +6,7 @@
 static inline void result_reset(struct imm_result *result)
 {
     imm_path_reset(&result->path);
-    result->loglik = imm_lprob_invalid();
+    result->loglik = imm_lprob_nan();
     result->seconds = 0;
 }
 

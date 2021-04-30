@@ -152,13 +152,13 @@ imm_float imm_hmm_trans(struct imm_hmm const *hmm, struct imm_state const *src,
     if (!hash_hashed(&src->hnode) || !hash_hashed(&dst->hnode))
     {
         warn("state(s) not found");
-        return imm_lprob_invalid();
+        return imm_lprob_nan();
     }
     struct trans const *trans = hmm_trans(hmm, src, dst);
     if (trans)
         return trans->lprob;
     warn("transition not found");
-    return imm_lprob_invalid();
+    return imm_lprob_nan();
 }
 
 imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
@@ -167,14 +167,14 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
     if (hmm->abc != seq->abc)
     {
         xerror(IMM_ILLEGALARG, "hmm and seq must have the same alphabet");
-        return imm_lprob_invalid();
+        return imm_lprob_nan();
     }
 
     unsigned nsteps = imm_path_nsteps(path);
     if (nsteps == 0)
     {
         xerror(IMM_ILLEGALARG, "path must have steps");
-        return imm_lprob_invalid();
+        return imm_lprob_nan();
     }
 
     struct imm_step const *step = imm_path_step(path, 0);
@@ -182,13 +182,13 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
     if (state != hmm_state(hmm, hmm->start.state_id))
     {
         xerror(IMM_ILLEGALARG, "first state must be the starting one");
-        return imm_lprob_invalid();
+        return imm_lprob_nan();
     }
 
     if (step->seqlen > imm_seq_len(seq))
     {
         xerror(IMM_ILLEGALARG, "path emits more symbols than sequence");
-        return imm_lprob_invalid();
+        return imm_lprob_nan();
     }
 
     struct imm_seq subseq = IMM_SUBSEQ(seq, 0, step->seqlen);
@@ -202,14 +202,14 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
         if (start + step->seqlen > imm_seq_len(seq))
         {
             xerror(IMM_ILLEGALARG, "path emits more symbols than sequence");
-            return imm_lprob_invalid();
+            return imm_lprob_nan();
         }
 
         struct imm_state const *prev_state = state;
         if (!(state = hmm_state(hmm, step->state_id)))
         {
             xerror(IMM_ILLEGALARG, "state not found");
-            return imm_lprob_invalid();
+            return imm_lprob_nan();
         }
         imm_subseq_init(&subseq, seq, start, step->seqlen);
         lprob += imm_hmm_trans(hmm, prev_state, state);
@@ -220,7 +220,7 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
     {
         xerror(IMM_ILLEGALARG,
                "sequence is longer than symbols emitted by path");
-        return imm_lprob_invalid();
+        return imm_lprob_nan();
     }
     return lprob;
 }

@@ -10,7 +10,7 @@ void test_viterbi_two_mute_states(void);
 void test_viterbi_mute_cycle(void);
 void test_viterbi_one_normal_state(void);
 void test_viterbi_two_normal_states(void);
-/* void test_viterbi_normal_states(void); */
+void test_viterbi_normal_states(void);
 /* void test_viterbi_profile1(void); */
 /* void test_viterbi_profile2(void); */
 /* void test_viterbi_profile_delete(void); */
@@ -25,7 +25,7 @@ int main(void)
     test_viterbi_mute_cycle();
     test_viterbi_one_normal_state();
     test_viterbi_two_normal_states();
-    /* test_viterbi_normal_states(); */
+    test_viterbi_normal_states();
     /* test_viterbi_profile1(); */
     /* test_viterbi_profile2(); */
     /* test_viterbi_profile_delete(); */
@@ -65,8 +65,8 @@ void test_viterbi_one_mute_state(void)
     cass_equal(imm_task_setup(task, C), IMM_SUCCESS);
     cass_equal(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     cass_equal(imm_path_nsteps(&result.path), 0);
-    cass_close(imm_hmm_loglik(hmm, C, &result.path), imm_lprob_invalid());
-    cass_close(result.loglik, imm_lprob_invalid());
+    cass_close(imm_hmm_loglik(hmm, C, &result.path), imm_lprob_nan());
+    cass_close(result.loglik, imm_lprob_nan());
 
     imm_del(dp);
     imm_del(task);
@@ -194,14 +194,14 @@ void test_viterbi_one_normal_state(void)
     cass_equal(imm_task_setup(task, T), IMM_SUCCESS);
     cass_equal(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     cass_equal(imm_path_nsteps(&result.path), 0);
-    cass_close(imm_hmm_loglik(hmm, T, &result.path), imm_lprob_invalid());
-    cass_close(result.loglik, imm_lprob_invalid());
+    cass_close(imm_hmm_loglik(hmm, T, &result.path), imm_lprob_nan());
+    cass_close(result.loglik, imm_lprob_nan());
 
     cass_equal(imm_task_setup(task, AC), IMM_SUCCESS);
     cass_equal(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     cass_equal(imm_path_nsteps(&result.path), 0);
-    cass_close(imm_hmm_loglik(hmm, AC, &result.path), imm_lprob_invalid());
-    cass_close(result.loglik, imm_lprob_invalid());
+    cass_close(imm_hmm_loglik(hmm, AC, &result.path), imm_lprob_nan());
+    cass_close(result.loglik, imm_lprob_nan());
 
     imm_hmm_set_trans(hmm, imm_super(state), imm_super(state), imm_log(0.1));
     imm_del(dp);
@@ -225,8 +225,8 @@ void test_viterbi_one_normal_state(void)
     cass_equal(imm_task_setup(task, ACT), IMM_SUCCESS);
     cass_equal(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     cass_equal(imm_path_nsteps(&result.path), 0);
-    cass_close(imm_hmm_loglik(hmm, ACT, &result.path), imm_lprob_invalid());
-    cass_close(result.loglik, imm_lprob_invalid());
+    cass_close(imm_hmm_loglik(hmm, ACT, &result.path), imm_lprob_nan());
+    cass_close(result.loglik, imm_lprob_nan());
 
     imm_hmm_normalize_trans(hmm);
     imm_del(dp);
@@ -249,8 +249,8 @@ void test_viterbi_one_normal_state(void)
     cass_equal(imm_task_setup(task, ACT), IMM_SUCCESS);
     cass_equal(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     cass_equal(imm_path_nsteps(&result.path), 0);
-    cass_close(imm_hmm_loglik(hmm, ACT, &result.path), imm_lprob_invalid());
-    cass_close(result.loglik, imm_lprob_invalid());
+    cass_close(imm_hmm_loglik(hmm, ACT, &result.path), imm_lprob_nan());
+    cass_close(result.loglik, imm_lprob_nan());
 
     imm_del(hmm);
     imm_del(state);
@@ -295,8 +295,8 @@ void test_viterbi_two_normal_states(void)
     cass_equal(imm_task_setup(task, EMPTY), IMM_SUCCESS);
     cass_equal(imm_dp_viterbi(dp, task, &result), IMM_ILLEGALARG);
     cass_equal(imm_path_nsteps(&result.path), 0);
-    cass_close(imm_hmm_loglik(hmm, EMPTY, &result.path), imm_lprob_invalid());
-    cass_close(result.loglik, imm_lprob_invalid());
+    cass_close(imm_hmm_loglik(hmm, EMPTY, &result.path), imm_lprob_nan());
+    cass_close(result.loglik, imm_lprob_nan());
 
     cass_equal(imm_task_setup(task, A), IMM_SUCCESS);
     cass_equal(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
@@ -308,14 +308,14 @@ void test_viterbi_two_normal_states(void)
     cass_equal(imm_task_setup(task, T), IMM_SUCCESS);
     cass_equal(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     cass_equal(imm_path_nsteps(&result.path), 0);
-    cass_close(imm_hmm_loglik(hmm, T, &result.path), imm_lprob_invalid());
-    cass_close(result.loglik, imm_lprob_invalid());
+    cass_close(imm_hmm_loglik(hmm, T, &result.path), imm_lprob_nan());
+    cass_close(result.loglik, imm_lprob_nan());
 
     cass_equal(imm_task_setup(task, AC), IMM_SUCCESS);
     cass_equal(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     cass_equal(imm_path_nsteps(&result.path), 0);
-    cass_close(imm_hmm_loglik(hmm, AC, &result.path), imm_lprob_invalid());
-    cass_close(result.loglik, imm_lprob_invalid());
+    cass_close(imm_hmm_loglik(hmm, AC, &result.path), imm_lprob_nan());
+    cass_close(result.loglik, imm_lprob_nan());
 
     imm_del(dp);
     dp = imm_hmm_new_dp(hmm, imm_super(state1));
@@ -332,8 +332,8 @@ void test_viterbi_two_normal_states(void)
     cass_equal(imm_task_setup(task, ATT), IMM_SUCCESS);
     cass_equal(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     cass_equal(imm_path_nsteps(&result.path), 0);
-    cass_close(imm_hmm_loglik(hmm, ATT, &result.path), imm_lprob_invalid());
-    cass_close(result.loglik, imm_lprob_invalid());
+    cass_close(imm_hmm_loglik(hmm, ATT, &result.path), imm_lprob_nan());
+    cass_close(result.loglik, imm_lprob_nan());
 
     imm_hmm_set_trans(hmm, imm_super(state1), imm_super(state1), imm_log(0.5));
     imm_hmm_set_start(hmm, imm_super(state1), imm_lprob_zero());
@@ -362,208 +362,191 @@ void test_viterbi_two_normal_states(void)
     imm_del(ATT);
 }
 
-#if 0
 void test_viterbi_normal_states(void)
 {
     struct imm_abc const *abc = imm_abc_new(4, "ACGT", '*');
-    struct imm_seq const *EMPTY = imm_seq_new("", abc);
-    struct imm_seq const *A = imm_seq_new("A", abc);
-    struct imm_seq const *AA = imm_seq_new("AA", abc);
-    struct imm_seq const *AG = imm_seq_new("AG", abc);
-    struct imm_seq const *AGT = imm_seq_new("AGT", abc);
-    struct imm_seq const *AGTC = imm_seq_new("AGTC", abc);
+    struct imm_seq const *EMPTY = imm_seq_new(0, "", abc);
+    struct imm_seq const *A = imm_seq_new(1, "A", abc);
+    struct imm_seq const *AA = imm_seq_new(2, "AA", abc);
+    struct imm_seq const *AG = imm_seq_new(2, "AG", abc);
+    struct imm_seq const *AGT = imm_seq_new(3, "AGT", abc);
+    struct imm_seq const *AGTC = imm_seq_new(4, "AGTC", abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
 
     imm_float const lprobs0[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5),
                                  zero()};
-    struct imm_normal_state *state0 =
-        imm_normal_state_new(0, "State0", abc, lprobs0);
+    struct imm_normal_state *state0 = imm_normal_state_new(0, abc, lprobs0);
 
     imm_float const lprobs1[] = {
         imm_log(0.5) - imm_log(2.25), imm_log(0.25) - imm_log(2.25),
-
         imm_log(0.5) - imm_log(2.25), imm_log(1.0) - imm_log(2.25)};
-    struct imm_normal_state *state1 =
-        imm_normal_state_new(1, "State1", abc, lprobs1);
+    struct imm_normal_state *state1 = imm_normal_state_new(1, abc, lprobs1);
 
     imm_hmm_add_state(hmm, imm_super(state0));
     imm_hmm_set_start(hmm, imm_super(state0), imm_log(1.0));
     imm_hmm_add_state(hmm, imm_super(state1));
 
-    imm_hmm_set_trans(hmm, imm_super(state0),
-                      imm_super(state0), imm_log(0.1));
-    imm_hmm_set_trans(hmm, imm_super(state0),
-                      imm_super(state1), imm_log(0.2));
-    imm_hmm_set_trans(hmm, imm_super(state1),
-                      imm_super(state1), imm_log(1.0));
+    imm_hmm_set_trans(hmm, imm_super(state0), imm_super(state0), imm_log(0.1));
+    imm_hmm_set_trans(hmm, imm_super(state0), imm_super(state1), imm_log(0.2));
+    imm_hmm_set_trans(hmm, imm_super(state1), imm_super(state1), imm_log(1.0));
 
     imm_hmm_normalize_trans(hmm);
 
-    struct imm_path *path = NULL;
-    cass_cond(!is_valid(
-        single_viterbi(hmm, EMPTY, imm_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_loglik(hmm, EMPTY, path)));
-    imm_path_destroy(path);
+    struct imm_result result;
+    imm_result_init(&result);
 
-    cass_cond(!is_valid(
-        single_viterbi(hmm, EMPTY, imm_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_loglik(hmm, EMPTY, path)));
-    imm_path_destroy(path);
+    struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(state0));
+    struct imm_task *task = imm_task_new(dp);
 
-    cass_close(single_viterbi(hmm, A, imm_super(state0), &path),
-               -1.386294361120);
+    cass_equal(imm_task_setup(task, EMPTY), IMM_SUCCESS);
+    cass_equal(imm_dp_viterbi(dp, task, &result), IMM_ILLEGALARG);
+    cass_equal(imm_path_nsteps(&result.path), 0);
+    cass_close(imm_hmm_loglik(hmm, EMPTY, &result.path), imm_lprob_nan());
+    cass_close(result.loglik, imm_lprob_nan());
 
-    cass_close(imm_hmm_loglik(hmm, A, path), -1.386294361120);
-    imm_path_destroy(path);
+    cass_equal(imm_task_setup(task, A), IMM_SUCCESS);
+    cass_equal(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    cass_equal(imm_path_nsteps(&result.path), 1);
+    cass_close(imm_hmm_loglik(hmm, A, &result.path), -1.386294361120);
+    cass_close(result.loglik, -1.386294361120);
 
-    cass_cond(!is_valid(
-        single_viterbi(hmm, A, imm_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_loglik(hmm, A, path)));
-    imm_path_destroy(path);
+    cass_equal(imm_task_setup(task, AG), IMM_SUCCESS);
+    cass_equal(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    cass_equal(imm_path_nsteps(&result.path), 2);
+    cass_close(imm_hmm_loglik(hmm, AG, &result.path), -3.178053830348);
+    cass_close(result.loglik, -3.178053830348);
 
-    cass_close(single_viterbi(hmm, AG, imm_super(state0), &path),
-               -3.178053830348);
+    imm_del(dp);
+    dp = imm_hmm_new_dp(hmm, imm_super(state1));
+    cass_equal(imm_task_reset(task, dp), IMM_SUCCESS);
 
-    cass_close(imm_hmm_loglik(hmm, AG, path), -3.178053830348);
-    imm_path_destroy(path);
+    cass_equal(imm_task_setup(task, AG), IMM_SUCCESS);
+    cass_equal(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    cass_equal(imm_path_nsteps(&result.path), 2);
+    cass_close(imm_hmm_loglik(hmm, AG, &result.path), -3.295836866004);
+    cass_close(result.loglik, -3.295836866004);
 
-    cass_close(single_viterbi(hmm, AG, imm_super(state1), &path),
-               -3.295836866004);
+    imm_del(dp);
+    dp = imm_hmm_new_dp(hmm, imm_super(state0));
+    cass_equal(imm_task_reset(task, dp), IMM_SUCCESS);
 
-    cass_close(imm_hmm_loglik(hmm, AG, path), -3.295836866004);
-    imm_path_destroy(path);
+    cass_equal(imm_task_setup(task, AGT), IMM_SUCCESS);
+    cass_equal(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    cass_equal(imm_path_nsteps(&result.path), 0);
+    cass_close(imm_hmm_loglik(hmm, AGT, &result.path), imm_lprob_nan());
+    cass_close(result.loglik, imm_lprob_nan());
 
-    cass_cond(!is_valid(
-        single_viterbi(hmm, AGT, imm_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_loglik(hmm, AGT, path)));
-    imm_path_destroy(path);
+    imm_del(dp);
+    dp = imm_hmm_new_dp(hmm, imm_super(state1));
+    cass_equal(imm_task_reset(task, dp), IMM_SUCCESS);
 
-    cass_close(single_viterbi(hmm, AGT, imm_super(state1), &path),
-               -4.106767082221);
+    cass_equal(imm_task_setup(task, AGT), IMM_SUCCESS);
+    cass_equal(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    cass_equal(imm_path_nsteps(&result.path), 3);
+    cass_close(imm_hmm_loglik(hmm, AGT, &result.path), -4.106767082221);
+    cass_close(result.loglik, -4.106767082221);
 
-    cass_close(imm_hmm_loglik(hmm, AGT, path), -4.106767082221);
-    imm_path_destroy(path);
+    imm_del(dp);
+    dp = imm_hmm_new_dp(hmm, imm_super(state0));
+    cass_equal(imm_task_reset(task, dp), IMM_SUCCESS);
 
-    cass_cond(!is_valid(
-        single_viterbi(hmm, AGTC, imm_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_loglik(hmm, AGTC, path)));
-    imm_path_destroy(path);
+    cass_equal(imm_task_setup(task, AGTC), IMM_SUCCESS);
+    cass_equal(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    cass_equal(imm_path_nsteps(&result.path), 0);
+    cass_close(imm_hmm_loglik(hmm, AGTC, &result.path), imm_lprob_nan());
+    cass_close(result.loglik, imm_lprob_nan());
 
-    cass_close(single_viterbi(hmm, AGTC, imm_super(state1), &path),
-               -6.303991659557);
-    cass_close(imm_hmm_loglik(hmm, AGTC, path), -6.303991659557);
-    imm_path_destroy(path);
+    imm_del(dp);
+    dp = imm_hmm_new_dp(hmm, imm_super(state1));
+    cass_equal(imm_task_reset(task, dp), IMM_SUCCESS);
 
-    cass_equal(imm_hmm_set_trans(hmm, imm_super(state0),
-                                 imm_super(state0), zero()),
+    cass_equal(imm_task_setup(task, AGTC), IMM_SUCCESS);
+    cass_equal(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    cass_equal(imm_path_nsteps(&result.path), 4);
+    cass_close(imm_hmm_loglik(hmm, AGTC, &result.path), -6.303991659557);
+    cass_close(result.loglik, -6.303991659557);
+
+    cass_equal(
+        imm_hmm_set_trans(hmm, imm_super(state0), imm_super(state0), zero()),
+        IMM_ILLEGALARG);
+    cass_equal(
+        imm_hmm_set_trans(hmm, imm_super(state0), imm_super(state1), zero()),
+        IMM_ILLEGALARG);
+    cass_equal(
+        imm_hmm_set_trans(hmm, imm_super(state1), imm_super(state0), zero()),
+        IMM_ILLEGALARG);
+    cass_equal(
+        imm_hmm_set_trans(hmm, imm_super(state1), imm_super(state1), zero()),
+        IMM_ILLEGALARG);
+
+    cass_equal(imm_hmm_set_start(hmm, imm_super(state0), zero()),
                IMM_ILLEGALARG);
-    cass_equal(imm_hmm_set_trans(hmm, imm_super(state0),
-                                 imm_super(state1), zero()),
-               IMM_ILLEGALARG);
-    cass_equal(imm_hmm_set_trans(hmm, imm_super(state1),
-                                 imm_super(state0), zero()),
-               IMM_ILLEGALARG);
-    cass_equal(imm_hmm_set_trans(hmm, imm_super(state1),
-                                 imm_super(state1), zero()),
+    cass_equal(imm_hmm_set_start(hmm, imm_super(state1), zero()),
                IMM_ILLEGALARG);
 
-    imm_hmm_set_start(hmm, imm_super(state0), zero());
-    imm_hmm_set_start(hmm, imm_super(state1), zero());
+    imm_hmm_set_start(hmm, imm_super(state0), imm_log(1.0));
 
-    cass_cond(!is_valid(
-        single_viterbi(hmm, EMPTY, imm_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_loglik(hmm, EMPTY, path)));
-    imm_path_destroy(path);
+    imm_del(dp);
+    dp = imm_hmm_new_dp(hmm, imm_super(state0));
+    cass_equal(imm_task_reset(task, dp), IMM_SUCCESS);
 
-    cass_cond(!is_valid(
-        single_viterbi(hmm, EMPTY, imm_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_loglik(hmm, EMPTY, path)));
-    imm_path_destroy(path);
+    cass_equal(imm_task_setup(task, EMPTY), IMM_SUCCESS);
+    cass_equal(imm_dp_viterbi(dp, task, &result), IMM_ILLEGALARG);
+    cass_equal(imm_path_nsteps(&result.path), 0);
 
-    cass_cond(!is_valid(
-        single_viterbi(hmm, A, imm_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_loglik(hmm, A, path)));
-    imm_path_destroy(path);
+    imm_del(dp);
+    dp = imm_hmm_new_dp(hmm, imm_super(state1));
+    cass_equal(imm_task_reset(task, dp), IMM_SUCCESS);
 
-    imm_hmm_set_start(hmm, imm_super(state0), 0.0);
+    cass_equal(imm_task_setup(task, EMPTY), IMM_SUCCESS);
+    cass_equal(imm_dp_viterbi(dp, task, &result), IMM_ILLEGALARG);
+    cass_equal(imm_path_nsteps(&result.path), 0);
 
-    cass_cond(!is_valid(
-        single_viterbi(hmm, EMPTY, imm_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_loglik(hmm, EMPTY, path)));
-    imm_path_destroy(path);
+    imm_del(dp);
+    dp = imm_hmm_new_dp(hmm, imm_super(state0));
+    cass_equal(imm_task_reset(task, dp), IMM_SUCCESS);
 
-    cass_cond(!is_valid(
-        single_viterbi(hmm, EMPTY, imm_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_loglik(hmm, EMPTY, path)));
-    imm_path_destroy(path);
+    cass_equal(imm_task_setup(task, A), IMM_SUCCESS);
+    cass_equal(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    cass_equal(imm_path_nsteps(&result.path), 1);
+    cass_close(imm_hmm_loglik(hmm, A, &result.path), imm_log(0.25));
+    cass_close(result.loglik, imm_log(0.25));
 
-    cass_close(single_viterbi(hmm, A, imm_super(state0), &path),
-               imm_log(0.25));
-    cass_close(imm_hmm_loglik(hmm, A, path), imm_log(0.25));
-    imm_path_destroy(path);
+    imm_hmm_set_trans(hmm, imm_super(state0), imm_super(state0), imm_log(0.9));
+    imm_del(dp);
+    dp = imm_hmm_new_dp(hmm, imm_super(state0));
+    cass_equal(imm_task_reset(task, dp), IMM_SUCCESS);
 
-    cass_cond(!is_valid(
-        single_viterbi(hmm, A, imm_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_loglik(hmm, A, path)));
-    imm_path_destroy(path);
+    cass_equal(imm_task_setup(task, A), IMM_SUCCESS);
+    cass_equal(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    cass_equal(imm_path_nsteps(&result.path), 1);
+    cass_close(imm_hmm_loglik(hmm, A, &result.path), imm_log(0.25));
+    cass_close(result.loglik, imm_log(0.25));
 
-    imm_hmm_set_trans(hmm, imm_super(state0),
-                      imm_super(state0), imm_log(0.9));
-
-    cass_cond(!is_valid(
-        single_viterbi(hmm, EMPTY, imm_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_loglik(hmm, EMPTY, path)));
-    imm_path_destroy(path);
-
-    cass_cond(!is_valid(
-        single_viterbi(hmm, EMPTY, imm_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_loglik(hmm, EMPTY, path)));
-    imm_path_destroy(path);
-
-    cass_close(single_viterbi(hmm, A, imm_super(state0), &path),
-               imm_log(0.25));
-    cass_close(imm_hmm_loglik(hmm, A, path), imm_log(0.25));
-    imm_path_destroy(path);
-
-    cass_cond(!is_valid(
-        single_viterbi(hmm, A, imm_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_loglik(hmm, A, path)));
-    imm_path_destroy(path);
-
-    cass_close(single_viterbi(hmm, AA, imm_super(state0), &path),
+    cass_equal(imm_task_setup(task, AA), IMM_SUCCESS);
+    cass_equal(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    cass_equal(imm_path_nsteps(&result.path), 2);
+    cass_close(imm_hmm_loglik(hmm, AA, &result.path),
                2 * imm_log(0.25) + imm_log(0.9));
-    cass_close(imm_hmm_loglik(hmm, AA, path),
+    cass_close(result.loglik, 2 * imm_log(0.25) + imm_log(0.9));
+
+    imm_hmm_set_trans(hmm, imm_super(state0), imm_super(state1), imm_log(0.2));
+    imm_del(dp);
+    dp = imm_hmm_new_dp(hmm, imm_super(state0));
+    cass_equal(imm_task_reset(task, dp), IMM_SUCCESS);
+
+    cass_equal(imm_task_setup(task, A), IMM_SUCCESS);
+    cass_equal(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    cass_equal(imm_path_nsteps(&result.path), 1);
+    cass_close(imm_hmm_loglik(hmm, A, &result.path), imm_log(0.25));
+    cass_close(result.loglik, imm_log(0.25));
+
+    cass_equal(imm_task_setup(task, AA), IMM_SUCCESS);
+    cass_equal(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    cass_equal(imm_path_nsteps(&result.path), 2);
+    cass_close(imm_hmm_loglik(hmm, AA, &result.path),
                2 * imm_log(0.25) + imm_log(0.9));
-    imm_path_destroy(path);
-
-    imm_hmm_set_trans(hmm, imm_super(state0),
-                      imm_super(state1), imm_log(0.2));
-
-    cass_cond(!is_valid(
-        single_viterbi(hmm, EMPTY, imm_super(state0), &path)));
-    cass_cond(!is_valid(imm_hmm_loglik(hmm, EMPTY, path)));
-    imm_path_destroy(path);
-
-    cass_cond(!is_valid(
-        single_viterbi(hmm, EMPTY, imm_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_loglik(hmm, EMPTY, path)));
-    imm_path_destroy(path);
-
-    cass_close(single_viterbi(hmm, A, imm_super(state0), &path),
-               imm_log(0.25));
-    cass_close(imm_hmm_loglik(hmm, A, path), imm_log(0.25));
-    imm_path_destroy(path);
-
-    cass_cond(!is_valid(
-        single_viterbi(hmm, A, imm_super(state1), &path)));
-    cass_cond(!is_valid(imm_hmm_loglik(hmm, A, path)));
-    imm_path_destroy(path);
-
-    cass_close(single_viterbi(hmm, AA, imm_super(state0), &path),
-               2 * imm_log(0.25) + imm_log(0.9));
-    cass_close(imm_hmm_loglik(hmm, AA, path),
-               2 * imm_log(0.25) + imm_log(0.9));
-    imm_path_destroy(path);
+    cass_close(result.loglik, 2 * imm_log(0.25) + imm_log(0.9));
 
     imm_del(hmm);
     imm_del(state0);
@@ -577,6 +560,7 @@ void test_viterbi_normal_states(void)
     imm_del(AGTC);
 }
 
+#if 0
 void test_viterbi_profile1(void)
 {
     struct imm_abc const *abc = imm_abc_new("AB", '*');

@@ -96,6 +96,7 @@ void imm_dp_del(struct imm_dp const *dp)
 int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
                    struct imm_result *result)
 {
+    result_reset(result);
     if (!task->seq)
         return xerror(IMM_ILLEGALARG, "seq has not been set");
 
@@ -108,7 +109,6 @@ int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
         return xerror(IMM_ILLEGALARG,
                       "seq is shorter than end_state's lower bound");
 
-    result_reset(result);
     struct elapsed elapsed = elapsed_init();
     elapsed_start(&elapsed);
     viterbi(dp, task, result);
@@ -300,7 +300,7 @@ static struct final_score final_score(struct imm_dp const *dp,
     }
     struct final_score fscore = {score, final_state, final_seq_len};
     if (final_state == INVALID_STATE)
-        fscore.score = (imm_float)imm_lprob_invalid();
+        fscore.score = (imm_float)imm_lprob_nan();
 
     return fscore;
 }

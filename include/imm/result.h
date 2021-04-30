@@ -20,7 +20,7 @@ static inline void imm_result_init(struct imm_result *result)
 {
     result->seq = NULL;
     imm_path_init(&result->path);
-    result->loglik = imm_lprob_invalid();
+    result->loglik = imm_lprob_nan();
     result->seconds = 0;
 }
 

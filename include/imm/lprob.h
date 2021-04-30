@@ -12,7 +12,7 @@ static inline imm_float imm_lprob_add(imm_float a, imm_float b)
     return logaddexp(a, b);
 }
 
-static inline imm_float imm_lprob_invalid(void) { return NAN; }
+static inline imm_float imm_lprob_nan(void) { return NAN; }
 
 static inline bool imm_lprob_is_valid(imm_float a) { return !isnan(a); }
 

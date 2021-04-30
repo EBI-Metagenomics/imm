@@ -1,0 +1,4 @@
+- Decide in which cases imm_dp_viterbi should return IMM_SUCCESS and
+imm_lprob_nan(), instead of IMM_ILLEGALARG and imm_lprob_nan(). If a
+path cannot be found, it seems to make sense to return IMM_SUCCESS
+as that does not seen to be an error.

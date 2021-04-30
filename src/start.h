@@ -12,7 +12,7 @@ struct start
 
 static inline void start_init(struct start *start)
 {
-    start->lprob = imm_lprob_invalid();
+    start->lprob = imm_lprob_nan();
     start->state_id = IMM_STATE_NULL_ID;
 }
 
