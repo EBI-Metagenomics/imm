@@ -19,16 +19,16 @@ void test_viterbi_cycle_mute_ending(void);
 
 int main(void)
 {
-    /* test_viterbi_one_mute_state(); */
-    /* test_viterbi_two_mute_states(); */
-    /* test_viterbi_mute_cycle(); */
-    /* test_viterbi_one_normal_state(); */
-    /* test_viterbi_two_normal_states(); */
-    /* test_viterbi_normal_states(); */
-    /* test_viterbi_profile1(); */
-    /* test_viterbi_profile2(); */
-    /* test_viterbi_profile_delete(); */
-    /* test_viterbi_global_profile(); */
+    test_viterbi_one_mute_state();
+    test_viterbi_two_mute_states();
+    test_viterbi_mute_cycle();
+    test_viterbi_one_normal_state();
+    test_viterbi_two_normal_states();
+    test_viterbi_normal_states();
+    test_viterbi_profile1();
+    test_viterbi_profile2();
+    test_viterbi_profile_delete();
+    test_viterbi_global_profile();
     test_viterbi_cycle_mute_ending();
     return cass_status();
 }
@@ -1166,7 +1166,7 @@ void test_viterbi_global_profile(void)
                   imm_log(0.01) + imm_log(0.9));
 
     DP_RESET(E, IMM_SUCCESS);
-    VITERBI_CHECK(AA, IMM_SUCCESS, IMM_SUCCESS, 4,
+    VITERBI_CHECK(AA, IMM_SUCCESS, IMM_SUCCESS, 6,
                   imm_log(0.01) + imm_log(0.9));
 
     DP_RESET(M2, IMM_SUCCESS);
@@ -1238,11 +1238,7 @@ void test_viterbi_cycle_mute_ending(void)
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(end));
     struct imm_task *task = imm_task_new(dp);
 
-    VITERBI_CHECK(A, IMM_SUCCESS, IMM_SUCCESS, 0, -13.815510557964272);
-
-    /* struct imm_path *path = NULL; */
-    /* cass_close(single_viterbi(hmm, A, imm_super(end), &path), */
-    /*            -13.815510557964272); */
+    VITERBI_CHECK(A, IMM_SUCCESS, IMM_SUCCESS, 5, -13.815510557964272);
 
     imm_del(hmm);
     imm_del(start);

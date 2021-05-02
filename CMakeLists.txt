@@ -79,17 +79,6 @@ if(CI_BUILD)
     add_compile_options(-Werror)
 endif()
 
-option(CLANG_ASAN_UBSAN "Enable Clang address & undefined behavior sanitizer." OFF)
-option(CLANG_MSAN "Enable Clang memory sanitizer." OFF)
-
-if((CLANG_ASAN_UBSAN AND CLANG_MSAN))
-  message(FATAL_ERROR "Sanitizers cannot be enabled simultaneously")
-endif()
-
-if((CLANG_ASAN_UBSAN OR CLANG_MSAN) AND NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
-  message(FATAL_ERROR "Sanitizers are only supported for Clang")
-endif()
-
 option(IMM_DOUBLE_PRECISION "Enable double-precision floating-point format for internals" Off)
 if(IMM_DOUBLE_PRECISION)
     message(STATUS "Double-precision floating-point format for internals - On")
@@ -148,16 +137,6 @@ else()
     message(STATUS "Size of long: ${SIZEOF_LONG} bytes.")
 endif()
 target_compile_definitions(imm PRIVATE SIZEOF_LONG=${SIZEOF_LONG})
-
-if(CLANG_ASAN_UBSAN)
-    message(STATUS "Enabling Clang address sanitizer and undefined behavior sanitizer.")
-    target_compile_options(imm PRIVATE -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=address -fsanitize=undefined)
-    set_property(TARGET imm APPEND_STRING PROPERTY LINK_FLAGS "-fsanitize=address -fsanitize=undefined ")
-elseif(CLANG_MSAN)
-    message(STATUS "Enabling Clang memory sanitizer.")
-    target_compile_options(imm PRIVATE -fsanitize=memory -fsanitize-memory-track-origins -fno-omit-frame-pointer -fno-optimize-sibling-calls)
-    set_property(TARGET imm APPEND_STRING PROPERTY LINK_FLAGS "-fsanitize=memory -fsanitize-memory-track-origins ")
-endif()
 
 install(TARGETS imm EXPORT imm-targets
     RUNTIME DESTINATION bin

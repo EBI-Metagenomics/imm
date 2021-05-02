@@ -27,3 +27,24 @@ void state_table_deinit(struct state_table const *tbl)
     free(tbl->ids);
     free(tbl->seqlen);
 }
+
+#ifndef NDEBUG
+void state_table_dump(struct state_table const *tbl)
+{
+    for (unsigned i = 0; i < tbl->nstates; ++i)
+    {
+        printf("%u", i);
+        if (i + 1 < tbl->nstates)
+            putc('\t', stdout);
+    }
+    putc('\n', stdout);
+
+    for (unsigned i = 0; i < tbl->nstates; ++i)
+    {
+        printf("%u", tbl->ids[i]);
+        if (i + 1 < tbl->nstates)
+            putc('\t', stdout);
+    }
+    putc('\n', stdout);
+}
+#endif

@@ -112,7 +112,8 @@ struct imm_dp *imm_hmm_new_dp(struct imm_hmm const *hmm,
     struct imm_state *state = NULL;
     hash_for_each(hmm->states.tbl, bkt, state, hnode) { states[i++] = state; }
 
-    if (tsort(states, hmm->states.size, hmm->transitions.size))
+    if (tsort(hmm->states.size, states, hmm->start.state_id,
+              hmm->transitions.size))
     {
         xerror(IMM_RUNTIMEERROR, "failed to sort states");
         free(states);

@@ -17,4 +17,8 @@ IMM_API int imm_dp_change_trans(struct imm_dp *dp, imm_state_idx_t src,
 IMM_API int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
                            struct imm_result *result);
 
+#ifndef NDEBUG
+IMM_API void dp_dump_state_table(struct imm_dp const *dp);
+#endif
+
 #endif

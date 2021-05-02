@@ -3,6 +3,7 @@
 
 struct imm_state;
 
-int tsort(struct imm_state **states, unsigned nstates, unsigned ntrans);
+int tsort(unsigned nstates, struct imm_state **states, unsigned start_state,
+          unsigned ntrans);
 
 #endif

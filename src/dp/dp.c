@@ -490,3 +490,10 @@ static void _viterbi_safe(struct imm_dp const *dp, struct imm_task *task,
         }
     }
 }
+
+#ifndef NDEBUG
+void dp_dump_state_table(struct imm_dp const *dp)
+{
+    state_table_dump(&dp->state_table);
+}
+#endif

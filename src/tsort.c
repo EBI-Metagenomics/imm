@@ -3,6 +3,7 @@
 #include "containers/containers.h"
 #include "imm/state.h"
 #include "trans.h"
+#include <containers/hash.h>
 
 #define INITIAL_MARK 0
 #define TEMPORARY_MARK 1
@@ -34,19 +35,20 @@ struct graph
 static int check_mute_cycles(struct queue *vertq);
 static int check_mute_visit(struct vert *vert);
 static void create_edges(struct graph *graph);
-static void create_vertices(struct graph *graph, struct imm_state **states,
-                            unsigned nstates);
+static void create_vertices(struct graph *graph, unsigned nstates,
+                            struct imm_state **states);
 static void graph_deinit(struct graph const *graph);
 static void graph_init(struct graph *graph, unsigned nstates, unsigned ntrans);
 static void unmark_nodes(struct queue *vertq);
-static void visit(struct vert *vert, struct imm_state ***state);
+static void visit(struct vert *vert, struct imm_state **state, unsigned *end);
 
-int tsort(struct imm_state **states, unsigned nstates, unsigned ntrans)
+int tsort(unsigned nstates, struct imm_state **states, unsigned start_state,
+          unsigned ntrans)
 {
     struct graph graph;
     graph_init(&graph, nstates, ntrans);
 
-    create_vertices(&graph, states, nstates);
+    create_vertices(&graph, nstates, states);
 
     if (check_mute_cycles(&graph.vertq))
     {
@@ -58,10 +60,31 @@ int tsort(struct imm_state **states, unsigned nstates, unsigned ntrans)
 
     /* TODO: could we use the original state array instead? */
     struct imm_state **state_arr = xmalloc(sizeof(*state_arr) * nstates);
-    struct imm_state **cur = state_arr + nstates;
+    /* TODO: nulling only needed for debugging */
+    for (unsigned i = 0; i < nstates; ++i)
+        state_arr[i] = NULL;
+
     struct vert *vert = NULL;
-    struct iter iter = queue_iter(&graph.vertq);
-    iter_for_each_entry(vert, &iter, node) { visit(vert, &cur); }
+
+    unsigned end = nstates;
+    hash_for_each_possible(graph.vert_tbl, vert, hnode, start_state)
+    {
+        if (vert->state->id == start_state)
+        {
+            visit(vert, state_arr, &end);
+            break;
+        }
+    }
+
+    unsigned bkt = 0;
+    hash_for_each(graph.vert_tbl, bkt, vert, hnode)
+    {
+        if (vert->state->id != start_state)
+        {
+            visit(vert, state_arr, &end);
+            break;
+        }
+    }
 
     for (unsigned i = 0; i < nstates; ++i)
         states[i] = state_arr[i];
@@ -114,7 +137,6 @@ static void create_edges(struct graph *graph)
     struct vert *src = NULL;
     struct iter iter0 = queue_iter(&graph->vertq);
     struct edge *edge = graph->edges;
-    /* TODO: check whether to use incoming instead */
     iter_for_each_entry(src, &iter0, node)
     {
         struct trans *trans = NULL;
@@ -135,8 +157,8 @@ static void create_edges(struct graph *graph)
     }
 }
 
-static void create_vertices(struct graph *graph, struct imm_state **states,
-                            unsigned nstates)
+static void create_vertices(struct graph *graph, unsigned nstates,
+                            struct imm_state **states)
 {
     for (unsigned i = 0; i < nstates; ++i)
     {
@@ -174,7 +196,7 @@ static void unmark_nodes(struct queue *vertq)
     iter_for_each_entry(vert, &iter, node) { vert->mark = INITIAL_MARK; }
 }
 
-static void visit(struct vert *vert, struct imm_state ***state)
+static void visit(struct vert *vert, struct imm_state **state, unsigned *end)
 {
     if (vert->mark == PERMANENT_MARK)
         return;
@@ -184,8 +206,8 @@ static void visit(struct vert *vert, struct imm_state ***state)
     vert->mark = TEMPORARY_MARK;
     struct edge const *edge = NULL;
     struct iter iter = queue_iter(&vert->edgeq);
-    iter_for_each_entry(edge, &iter, node) { visit(edge->vert, state); }
+    iter_for_each_entry(edge, &iter, node) { visit(edge->vert, state, end); }
     vert->mark = PERMANENT_MARK;
-    *state -= 1;
-    **state = vert->state;
+    *end = *end - 1;
+    state[*end] = vert->state;
 }

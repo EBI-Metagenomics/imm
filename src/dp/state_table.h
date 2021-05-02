@@ -44,4 +44,8 @@ static inline unsigned state_table_min_seqlen(struct state_table const *tbl,
     return tbl->seqlen[state].min;
 }
 
+#ifndef NDEBUG
+void state_table_dump(struct state_table const *tbl);
+#endif
+
 #endif
