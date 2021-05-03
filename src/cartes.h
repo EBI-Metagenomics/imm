@@ -11,10 +11,10 @@ struct cartes
     unsigned nitems;
 };
 
-struct cartes *cartes_new(char const *set, unsigned set_size,
-                          unsigned max_times);
+void cartes_init(struct cartes *cartes, char const *set, unsigned set_size,
+                 unsigned max_times);
 
-void cartes_del(struct cartes const *cartes);
+void cartes_deinit(struct cartes const *cartes);
 
 char const *cartes_next(struct cartes *cartes);
 

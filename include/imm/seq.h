@@ -2,6 +2,7 @@
 #define IMM_SEQ_H
 
 #include "imm/export.h"
+#include "imm/str.h"
 
 struct imm_abc;
 
@@ -15,7 +16,7 @@ struct imm_seq
     struct imm_abc const *abc;
 };
 
-#define IMM_SEQ(len, str, abc)                                                 \
+#define IMM_SEQ_UNSAFE(len, str, abc)                                          \
     (struct imm_seq) { len, str, abc }
 
 static inline struct imm_abc const *imm_seq_abc(struct imm_seq const *seq)
@@ -23,7 +24,7 @@ static inline struct imm_abc const *imm_seq_abc(struct imm_seq const *seq)
     return seq->abc;
 }
 
-IMM_API struct imm_seq const *imm_seq_new(unsigned len, char const *str,
+IMM_API struct imm_seq const *imm_seq_new(struct imm_str str,
                                           struct imm_abc const *abc);
 
 IMM_API void imm_seq_del(struct imm_seq const *seq);

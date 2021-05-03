@@ -19,7 +19,7 @@ int main(void)
 
 void test_abc_normal(void)
 {
-    struct imm_abc const *abc = imm_abc_new(4, "ACGT", '*');
+    struct imm_abc const *abc = imm_abc_new(IMM_STR("ACGT"), '*');
     NOTNULL(abc);
     EQ(imm_abc_symbol(abc, 2), 'G');
     EQ(imm_abc_symbol_idx(abc, 'G'), 2);
@@ -34,25 +34,25 @@ void test_abc_normal(void)
 
 void test_abc_duplicated_alphabet(void)
 {
-    struct imm_abc const *abc = imm_abc_new(4, "ACTC", '*');
+    struct imm_abc const *abc = imm_abc_new(IMM_STR("ACTC"), '*');
     ISNULL(abc);
 }
 
 void test_abc_duplicated_any_symbol(void)
 {
-    struct imm_abc const *abc = imm_abc_new(4, "AC*T", '*');
+    struct imm_abc const *abc = imm_abc_new(IMM_STR("AC*T"), '*');
     ISNULL(abc);
 }
 
 void test_abc_symbol_outside_range(void)
 {
     char symbols[] = {3, '\0'};
-    struct imm_abc const *abc = imm_abc_new(4, symbols, '*');
+    struct imm_abc const *abc = imm_abc_new((struct imm_str){2, symbols}, '*');
     ISNULL(abc);
 }
 
 void test_abc_any_symbol_outside_range(void)
 {
-    struct imm_abc const *abc = imm_abc_new(4, "ACGT", 3);
+    struct imm_abc const *abc = imm_abc_new(IMM_STR("ACGT"), 3);
     ISNULL(abc);
 }

@@ -3,6 +3,7 @@
 
 #include "imm/abc_types.h"
 #include "imm/export.h"
+#include "imm/str.h"
 #include "imm/sym.h"
 
 struct imm_abc;
@@ -34,7 +35,7 @@ static inline char imm_abc_any_symbol(struct imm_abc const *abc)
     return abc->any_symbol;
 }
 
-IMM_API struct imm_abc const *imm_abc_new(unsigned len, char const symbols[len],
+IMM_API struct imm_abc const *imm_abc_new(struct imm_str symbols,
                                           char any_symbol);
 
 IMM_API void imm_abc_del(struct imm_abc const *abc);

@@ -60,10 +60,6 @@ int tsort(unsigned nstates, struct imm_state **states, unsigned start_state,
 
     /* TODO: could we use the original state array instead? */
     struct imm_state **state_arr = xmalloc(sizeof(*state_arr) * nstates);
-    /* TODO: nulling only needed for debugging */
-    for (unsigned i = 0; i < nstates; ++i)
-        state_arr[i] = NULL;
-
     struct vert *vert = NULL;
 
     unsigned end = nstates;

@@ -13,11 +13,11 @@ int main(void)
 
 void test_normal_state(void)
 {
-    struct imm_abc const *abc = imm_abc_new(4, "ACGT", '*');
-    struct imm_seq const *A = imm_seq_new(1, "A", abc);
-    struct imm_seq const *C = imm_seq_new(1, "C", abc);
-    struct imm_seq const *G = imm_seq_new(1, "G", abc);
-    struct imm_seq const *T = imm_seq_new(1, "T", abc);
+    struct imm_abc const *abc = imm_abc_new(IMM_STR("ACGT"), '*');
+    struct imm_seq const *A = imm_seq_new(IMM_STR("A"), abc);
+    struct imm_seq const *C = imm_seq_new(IMM_STR("C"), abc);
+    struct imm_seq const *G = imm_seq_new(IMM_STR("G"), abc);
+    struct imm_seq const *T = imm_seq_new(IMM_STR("T"), abc);
 
     imm_float lprobs[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5),
                           imm_lprob_zero()};
@@ -39,9 +39,9 @@ void test_normal_state(void)
 
 void test_mute_state(void)
 {
-    struct imm_abc const *abc = imm_abc_new(4, "ACGT", '*');
-    struct imm_seq const *EMPTY = imm_seq_new(0, "", abc);
-    struct imm_seq const *A = imm_seq_new(1, "A", abc);
+    struct imm_abc const *abc = imm_abc_new(IMM_STR("ACGT"), '*');
+    struct imm_seq const *EMPTY = imm_seq_new(IMM_STR(""), abc);
+    struct imm_seq const *A = imm_seq_new(IMM_STR("A"), abc);
 
     struct imm_mute_state *state = imm_mute_state_new(43, abc);
 

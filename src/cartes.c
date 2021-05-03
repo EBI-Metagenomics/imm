@@ -4,24 +4,18 @@
 
 /* TODO: create imm_cartes_reset */
 
-struct cartes *cartes_new(char const *set, unsigned set_size,
-                          unsigned max_times)
+void cartes_init(struct cartes *cartes, char const *set, unsigned set_size,
+                 unsigned max_times)
 {
-    struct cartes *cartes = xmalloc(sizeof(*cartes));
     cartes->set = set;
     cartes->set_size = set_size;
     cartes->times = 0;
     cartes->iter_idx = 0;
     cartes->item = xmalloc(sizeof(*cartes->item) * (unsigned)(max_times + 1));
     cartes->nitems = 0;
-    return cartes;
 }
 
-void cartes_del(struct cartes const *cartes)
-{
-    free((void *)cartes->item);
-    free((void *)cartes);
-}
+void cartes_deinit(struct cartes const *cartes) { free((void *)cartes->item); }
 
 char const *cartes_next(struct cartes *cartes)
 {

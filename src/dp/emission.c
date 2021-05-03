@@ -39,7 +39,8 @@ void emission_init(struct emission *emiss, struct code const *code,
     struct imm_abc const *abc = code->abc;
     char const *set = abc->symbols;
     unsigned set_size = abc->nsymbols;
-    struct cartes *cartes = cartes_new(set, set_size, code->seqlen.max);
+    struct cartes cartes;
+    cartes_init(&cartes, set, set_size, code->seqlen.max);
 
     for (unsigned i = 0; i < nstates; ++i)
     {
@@ -47,12 +48,12 @@ void emission_init(struct emission *emiss, struct code const *code,
         for (unsigned len = min_seq; len <= imm_state_max_seqlen(states[i]);
              ++len)
         {
-            cartes_setup(cartes, len);
+            cartes_setup(&cartes, len);
             char const *item = NULL;
-            while ((item = cartes_next(cartes)) != NULL)
+            while ((item = cartes_next(&cartes)) != NULL)
             {
 
-                struct imm_seq seq = IMM_SEQ(len, item, abc);
+                struct imm_seq seq = IMM_SEQ_UNSAFE(len, item, abc);
                 unsigned j = code_encode(code, &seq);
                 j -= code_offset(code, min_seq);
                 imm_float score = imm_state_lprob(states[i], &seq);
@@ -61,5 +62,5 @@ void emission_init(struct emission *emiss, struct code const *code,
         }
     }
 
-    cartes_del(cartes);
+    cartes_deinit(&cartes);
 }

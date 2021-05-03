@@ -5,11 +5,10 @@
 
 void imm_abc_del(struct imm_abc const *abc) { abc->vtable.del(abc); }
 
-struct imm_abc const *imm_abc_new(unsigned len, char const symbols[len],
-                                  char any_symbol)
+struct imm_abc const *imm_abc_new(struct imm_str symbols, char any_symbol)
 {
     struct imm_abc_vtable vtable = {abc_del, IMM_ABC, NULL};
-    return abc_new(len, symbols, any_symbol, vtable);
+    return abc_new(symbols.len, symbols.data, any_symbol, vtable);
 }
 
 struct imm_abc *abc_new(unsigned len, char const *symbols, char any_symbol,

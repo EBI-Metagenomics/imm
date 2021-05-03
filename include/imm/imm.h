@@ -15,6 +15,7 @@ extern "C" {
 #include "imm/generics.h"
 #include "imm/hmm.h"
 #include "imm/state_types.h"
+#include "imm/str.h"
 #include "imm/sym.h"
 #include "imm/task.h"
 /* #include "imm/input.h" */
@@ -29,11 +30,9 @@ extern "C" {
 /* #include "imm/profile.h" */
 #include "imm/result.h"
 #include "imm/seq.h"
-/* #include "imm/seq_table.h" */
 #include "imm/state.h"
 #include "imm/step.h"
 #include "imm/subseq.h"
-/* #include "imm/table_state.h" */
 /* #include "imm/vec.h" */
 
 #ifdef __cplusplus
