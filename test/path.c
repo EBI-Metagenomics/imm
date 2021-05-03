@@ -1,4 +1,4 @@
-#include "cass/cass.h"
+#include "hope/hope.h"
 #include "imm/imm.h"
 
 void test_path(void);
@@ -8,7 +8,7 @@ int main(void)
 {
     test_path();
     test_path_long();
-    return cass_status();
+    return hope_status();
 }
 
 void test_path(void)
@@ -22,11 +22,11 @@ void test_path(void)
     imm_path_add(&path, IMM_STEP(state_ids[0], seqlens[0]));
     imm_path_add(&path, IMM_STEP(state_ids[1], seqlens[1]));
 
-    cass_equal(imm_path_step(&path, 0)->state_id, state_ids[0]);
-    cass_equal(imm_path_step(&path, 1)->state_id, state_ids[1]);
+    EQ(imm_path_step(&path, 0)->state_id, state_ids[0]);
+    EQ(imm_path_step(&path, 1)->state_id, state_ids[1]);
 
-    cass_equal(imm_path_step(&path, 0)->seqlen, seqlens[0]);
-    cass_equal(imm_path_step(&path, 1)->seqlen, seqlens[1]);
+    EQ(imm_path_step(&path, 0)->seqlen, seqlens[0]);
+    EQ(imm_path_step(&path, 1)->seqlen, seqlens[1]);
 
     imm_deinit(&path);
 }
@@ -41,8 +41,8 @@ void test_path_long(void)
 
     for (uint16_t i = 0; i < 1 << 14; ++i)
     {
-        cass_equal(imm_path_step(&path, i)->state_id, i);
-        cass_equal(imm_path_step(&path, i)->seqlen, i % 16);
+        EQ(imm_path_step(&path, i)->state_id, i);
+        EQ(imm_path_step(&path, i)->seqlen, i % 16);
     }
 
     imm_path_reset(&path);
@@ -52,8 +52,8 @@ void test_path_long(void)
 
     for (uint16_t i = 0; i < 1 << 14; ++i)
     {
-        cass_equal(imm_path_step(&path, i)->state_id, i);
-        cass_equal(imm_path_step(&path, i)->seqlen, i % 16);
+        EQ(imm_path_step(&path, i)->state_id, i);
+        EQ(imm_path_step(&path, i)->seqlen, i % 16);
     }
 
     imm_deinit(&path);

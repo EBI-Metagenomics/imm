@@ -1,4 +1,4 @@
-#include "cass/cass.h"
+#include "hope/hope.h"
 #include "imm/imm.h"
 
 void test_abc_lprob(void);
@@ -6,7 +6,7 @@ void test_abc_lprob(void);
 int main(void)
 {
     test_abc_lprob();
-    return cass_status();
+    return hope_status();
 }
 
 void test_abc_lprob(void)
@@ -16,11 +16,11 @@ void test_abc_lprob(void)
                                  imm_log(0.5)};
     struct imm_abc_lprob const *abc_lprob = imm_abc_lprob_new(abc, lprobs);
 
-    cass_close(imm_abc_lprob_get(abc_lprob, 'A'), imm_log(0.2));
-    cass_close(imm_abc_lprob_get(abc_lprob, 'C'), imm_log(0.01));
-    cass_cond(!imm_lprob_is_valid(imm_abc_lprob_get(abc_lprob, 'X')));
-    cass_close(imm_abc_lprob_get(abc_lprob, 'T'), imm_log(0.5));
+    CLOSE(imm_abc_lprob_get(abc_lprob, 'A'), imm_log(0.2));
+    CLOSE(imm_abc_lprob_get(abc_lprob, 'C'), imm_log(0.01));
+    COND(!imm_lprob_is_valid(imm_abc_lprob_get(abc_lprob, 'X')));
+    CLOSE(imm_abc_lprob_get(abc_lprob, 'T'), imm_log(0.5));
 
     imm_del(abc);
-    imm_abc_lprob_del(abc_lprob);
+    imm_del(abc_lprob);
 }

@@ -24,8 +24,8 @@ jobs:
     - name: Install elapsed
       run: sudo /bin/bash -c "$(curl -fsSL https://git.io/JerYI)" -s horta/elapsed
 
-    - name: Install cass
-      run: sudo /bin/bash -c "$(curl -fsSL https://git.io/JerYI)" -s horta/cass
+    - name: Install hope
+      run: sudo /bin/bash -c "$(curl -fsSL https://git.io/JerYI)" -s horta/hope
 
     - name: Create Build Environment
       run: cmake -E make_directory ${{runner.workspace}}/build
