@@ -10,8 +10,6 @@
 #include "start.h"
 #include "state.h"
 #include "tsort.h"
-#include <stdint.h>
-#include <stdio.h>
 
 static void detach_states(struct imm_hmm *hmm)
 {

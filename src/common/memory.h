@@ -13,13 +13,14 @@
 #define growmem(ptr, count, size, capacity)                                    \
     __growmem((ptr), (count), (size), (capacity), __FILE__, __LINE__)
 
-static inline void free_if(void const *ptr)
+static inline void free_if(void const *_Nullable ptr)
 {
     if (ptr)
         free((void *)ptr);
 }
 
-static inline void *__malloc(size_t size, char const *file, int line)
+static inline void *_Nonnull __malloc(size_t size, char const *_Nonnull file,
+                                      int line)
 {
     void *ptr = malloc(size);
     if (!ptr)
@@ -30,8 +31,10 @@ static inline void *__malloc(size_t size, char const *file, int line)
     return ptr;
 }
 
-static inline void *__memcpy(void *restrict dest, const void *restrict src,
-                             size_t count, char const *file, int line)
+static inline void *_Nonnull __memcpy(void *restrict _Nonnull dest,
+                                      const void *restrict _Nonnull src,
+                                      size_t count, char const *_Nonnull file,
+                                      int line)
 {
     void *ptr = memcpy(dest, src, count);
     if (!ptr)
@@ -42,8 +45,8 @@ static inline void *__memcpy(void *restrict dest, const void *restrict src,
     return ptr;
 }
 
-static inline void *__realloc(void *ptr, size_t new_size, char const *file,
-                              int line)
+static inline void *_Nonnull __realloc(void *_Nonnull ptr, size_t new_size,
+                                       char const *_Nonnull file, int line)
 {
     void *new_ptr = realloc(ptr, new_size);
     if (!new_ptr)
@@ -54,7 +57,8 @@ static inline void *__realloc(void *ptr, size_t new_size, char const *file,
     return new_ptr;
 }
 
-static inline char *__strdup(char const *str, char const *file, int line)
+static inline char *_Nonnull __strdup(char const *_Nonnull str,
+                                      char const *_Nonnull file, int line)
 {
     char *new = strdup(str);
     if (!new)
@@ -65,8 +69,10 @@ static inline char *__strdup(char const *str, char const *file, int line)
     return new;
 }
 
-static inline void *__growmem(void *restrict ptr, size_t count, size_t size,
-                              size_t *capacity, char const *file, int line)
+static inline void *_Nonnull __growmem(void *restrict _Nonnull ptr,
+                                       size_t count, size_t size,
+                                       size_t *_Nonnull capacity,
+                                       char const *_Nonnull file, int line)
 {
     if (size * count > *capacity)
     {

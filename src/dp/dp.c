@@ -8,13 +8,10 @@
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
 #include "elapsed/elapsed.h"
-#include "hmm.h"
 #include "imm/error.h"
 #include "imm/imm.h"
-#include "profile.h"
 #include "result.h"
 #include "task.h"
-#include <stdint.h>
 
 struct final_score
 {
