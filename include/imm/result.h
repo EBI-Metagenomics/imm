@@ -16,6 +16,11 @@ struct imm_result
     imm_float seconds;
 };
 
+#define IMM_RESULT_INIT()                                                      \
+    {                                                                          \
+        NULL, IMM_PATH_INIT(), imm_lprob_nan(), 0                              \
+    }
+
 static inline void imm_result_init(struct imm_result *result)
 {
     result->seq = NULL;

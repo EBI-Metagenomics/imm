@@ -61,8 +61,7 @@ void test_viterbi_one_mute_state(void)
     imm_hmm_add_state(hmm, imm_super(state));
     imm_hmm_set_start(hmm, imm_super(state), imm_log(0.5));
 
-    struct imm_result result;
-    imm_result_init(&result);
+    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(state));
     struct imm_task *task = imm_task_new(dp);
@@ -101,8 +100,7 @@ void test_viterbi_two_mute_states(void)
     imm_hmm_set_start(hmm, imm_super(state0), imm_log(0.5));
     imm_hmm_add_state(hmm, imm_super(state1));
 
-    struct imm_result result;
-    imm_result_init(&result);
+    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(state0));
     struct imm_task *task = imm_task_new(dp);
@@ -186,8 +184,7 @@ void test_viterbi_one_normal_state(void)
     imm_hmm_add_state(hmm, imm_super(state));
     imm_hmm_set_start(hmm, imm_super(state), imm_log(1.0));
 
-    struct imm_result result;
-    imm_result_init(&result);
+    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(state));
     struct imm_task *task = imm_task_new(dp);
@@ -297,8 +294,7 @@ void test_viterbi_two_normal_states(void)
     imm_hmm_add_state(hmm, imm_super(state1));
     imm_hmm_set_trans(hmm, imm_super(state0), imm_super(state1), imm_log(0.3));
 
-    struct imm_result result;
-    imm_result_init(&result);
+    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(state0));
     struct imm_task *task = imm_task_new(dp);
@@ -403,8 +399,7 @@ void test_viterbi_normal_states(void)
 
     imm_hmm_normalize_trans(hmm);
 
-    struct imm_result result;
-    imm_result_init(&result);
+    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(state0));
     struct imm_task *task = imm_task_new(dp);
@@ -607,8 +602,7 @@ void test_viterbi_profile1(void)
     imm_hmm_set_trans(hmm, imm_super(I0), imm_super(I0), imm_log(0.2));
     imm_hmm_set_trans(hmm, imm_super(I0), imm_super(end), imm_log(1.0));
 
-    struct imm_result result;
-    imm_result_init(&result);
+    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(end));
     struct imm_task *task = imm_task_new(dp);
@@ -800,8 +794,7 @@ void test_viterbi_profile2(void)
 
     imm_hmm_set_trans(hmm, imm_super(D2), imm_super(end), imm_log(1.0));
 
-    struct imm_result result;
-    imm_result_init(&result);
+    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(M2));
     struct imm_task *task = imm_task_new(dp);
@@ -1008,8 +1001,7 @@ void test_viterbi_profile_delete(void)
     imm_hmm_set_trans(hmm, imm_super(N1), imm_super(N2), imm_log(0.5));
     imm_hmm_set_trans(hmm, imm_super(M), imm_super(N2), imm_log(0.5));
 
-    struct imm_result result;
-    imm_result_init(&result);
+    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(N0));
     struct imm_task *task = imm_task_new(dp);
@@ -1123,8 +1115,7 @@ void test_viterbi_global_profile(void)
     imm_hmm_set_trans(hmm, imm_super(I1), imm_super(I1), imm_log(0.5));
     imm_hmm_set_trans(hmm, imm_super(I1), imm_super(M2), imm_log(0.5));
 
-    struct imm_result result;
-    imm_result_init(&result);
+    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(start));
     struct imm_task *task = imm_task_new(dp);
@@ -1232,8 +1223,7 @@ void test_viterbi_cycle_mute_ending(void)
     imm_hmm_set_trans(hmm, imm_super(E), imm_super(J), imm_log(0.1));
     imm_hmm_set_trans(hmm, imm_super(J), imm_super(B), imm_log(0.1));
 
-    struct imm_result result;
-    imm_result_init(&result);
+    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(end));
     struct imm_task *task = imm_task_new(dp);

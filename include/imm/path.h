@@ -14,6 +14,11 @@ struct imm_path
     struct imm_step *steps;
 };
 
+#define IMM_PATH_INIT()                                                        \
+    {                                                                          \
+        0, 0, 1, 0, NULL,                                                      \
+    }
+
 IMM_API void imm_path_add(struct imm_path *path, struct imm_step step);
 
 static inline struct imm_step *imm_path_step(struct imm_path const *path,

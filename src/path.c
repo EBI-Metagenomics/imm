@@ -4,6 +4,9 @@
 
 void imm_path_add(struct imm_path *path, struct imm_step step)
 {
+    if (path->capacity == 0)
+        imm_path_init(path);
+
     size_t count = (unsigned)path->nsteps + 1;
     size_t capacity = (size_t)path->capacity;
     path->steps = growmem(path->steps, count, sizeof(*path->steps), &capacity);
