@@ -46,6 +46,8 @@ int tsort(unsigned nstates, struct imm_state **states, unsigned start_state,
           unsigned ntrans)
 {
     struct graph graph;
+    /* TODO: consider add variable to imm_state instead of mallocing new
+     * structures here */
     graph_init(&graph, nstates, ntrans);
 
     create_vertices(&graph, nstates, states);
@@ -59,6 +61,7 @@ int tsort(unsigned nstates, struct imm_state **states, unsigned start_state,
     unmark_nodes(&graph.vertq);
 
     /* TODO: could we use the original state array instead? */
+    /* Maybe swapping? */
     struct imm_state **state_arr = xmalloc(sizeof(*state_arr) * nstates);
     struct vert *vert = NULL;
 
