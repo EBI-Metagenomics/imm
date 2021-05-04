@@ -1,4 +1,5 @@
 #include "hope/hope.h"
+#include "imm/hmm.h"
 #include "imm/imm.h"
 
 void test_dp_illegal(void);
@@ -45,7 +46,6 @@ void test_dp_illegal(void)
 
 void test_dp_empty_path(void)
 {
-
     struct imm_abc const *abc = imm_abc_new(IMM_STR("ACGT"), '*');
     struct imm_mute_state *state = imm_mute_state_new(3, abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);

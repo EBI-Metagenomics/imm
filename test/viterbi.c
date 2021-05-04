@@ -29,7 +29,6 @@ int main(void)
     return hope_status();
 }
 
-/* TODO: temporary, remove it by something else */
 #define VITERBI_CHECK(seq, status, nsteps, llik)                               \
     EQ(imm_task_setup(task, seq), status);                                     \
     EQ(imm_dp_viterbi(dp, task, &result), status);                             \
