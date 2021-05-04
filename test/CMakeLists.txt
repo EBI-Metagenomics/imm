@@ -28,5 +28,4 @@ imm_add_test(viterbi viterbi.c)
 imm_add_test(hmm_loglik hmm_loglik.c)
 
 # imm_add_test(hmm_io hmm_io.c)
-# imm_add_test(viterbi viterbi.c)
 # imm_add_test(perf "perf.c;model.c")

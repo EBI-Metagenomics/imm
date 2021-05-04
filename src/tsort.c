@@ -60,17 +60,13 @@ int tsort(unsigned nstates, struct imm_state **states, unsigned start_state,
     }
     unmark_nodes(&graph.vertq);
 
-    /* TODO: could we use the original state array instead? */
-    /* Maybe swapping? */
-    struct imm_state **state_arr = xmalloc(sizeof(*state_arr) * nstates);
     struct vert *vert = NULL;
-
     unsigned end = nstates;
     hash_for_each_possible(graph.vert_tbl, vert, hnode, start_state)
     {
         if (vert->state->id == start_state)
         {
-            visit(vert, state_arr, &end);
+            visit(vert, states, &end);
             break;
         }
     }
@@ -80,15 +76,11 @@ int tsort(unsigned nstates, struct imm_state **states, unsigned start_state,
     {
         if (vert->state->id != start_state)
         {
-            visit(vert, state_arr, &end);
+            visit(vert, states, &end);
             break;
         }
     }
 
-    for (unsigned i = 0; i < nstates; ++i)
-        states[i] = state_arr[i];
-
-    free(state_arr);
     graph_deinit(&graph);
     return IMM_SUCCESS;
 }
