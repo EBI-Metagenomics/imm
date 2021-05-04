@@ -9,7 +9,7 @@
 
 struct imm_step
 {
-    imm_state_id_t state_id;
+    __imm_state_id_t state_id;
     uint8_t seqlen;
 };
 
@@ -17,6 +17,6 @@ static_assert(sizeof(struct imm_step) == 4, "struct pair must be packed");
 static_assert(alignof(struct imm_step) == 2, "struct pair must align to 1");
 
 #define IMM_STEP(state_id, seqlen)                                             \
-    (struct imm_step) { (state_id), (seqlen) }
+    (struct imm_step) { (__imm_state_id_t)(state_id), (uint8_t)(seqlen) }
 
 #endif

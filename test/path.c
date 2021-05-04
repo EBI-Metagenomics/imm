@@ -13,7 +13,7 @@ int main(void)
 
 void test_path(void)
 {
-    imm_state_tid_t state_ids[] = {42, 19};
+    unsigned state_ids[] = {42, 19};
     uint8_t seqlens[] = {3, 5};
 
     struct imm_path path;

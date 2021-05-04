@@ -1,7 +1,7 @@
 #include "state.h"
 #include "common/common.h"
 
-struct imm_state *state_new(imm_state_id_t id, struct imm_abc const *abc,
+struct imm_state *state_new(__imm_state_id_t id, struct imm_abc const *abc,
                             struct imm_state_vtable vtable, unsigned min_seqlen,
                             unsigned max_seqlen)
 {

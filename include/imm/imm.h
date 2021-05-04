@@ -18,6 +18,7 @@ extern "C" {
 #include "imm/str.h"
 #include "imm/sym.h"
 #include "imm/task.h"
+#include "imm/trans.h"
 /* #include "imm/input.h" */
 /* #include "imm/io.h" */
 #include "imm/log.h"

@@ -9,24 +9,11 @@
 #include "imm/lprob.h"
 #include "imm/seq.h"
 #include "imm/state_types.h"
-#include <stdio.h>
-
-struct imm_abc;
-struct imm_state;
-
-struct imm_state_vtable
-{
-    void (*del)(struct imm_state const *state);
-    imm_float (*lprob)(struct imm_state const *state,
-                       struct imm_seq const *seq);
-    imm_state_tid_t typeid;
-    void *derived;
-};
 
 struct imm_state
 {
-    imm_state_id_t id;
-    imm_state_idx_t idx;
+    unsigned id;
+    unsigned idx;
     struct imm_abc const *abc;
     struct
     {
@@ -52,7 +39,7 @@ static inline void imm_state_del(struct imm_state const *state)
     state->vtable.del(state);
 }
 
-static inline imm_state_id_t imm_state_id(struct imm_state const *state)
+static inline unsigned imm_state_id(struct imm_state const *state)
 {
     return state->id;
 }
@@ -78,7 +65,7 @@ static inline unsigned imm_state_min_seqlen(struct imm_state const *state)
     return state->seqlen.min;
 }
 
-static inline imm_state_tid_t imm_state_typeid(struct imm_state const *state)
+static inline enum state_typeid imm_state_typeid(struct imm_state const *state)
 {
     return state->vtable.typeid;
 }

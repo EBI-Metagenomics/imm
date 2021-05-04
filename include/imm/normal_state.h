@@ -15,7 +15,7 @@ struct imm_normal_state
     imm_float const *lprobs;
 };
 
-IMM_API struct imm_normal_state *imm_normal_state_new(imm_state_id_t id,
+IMM_API struct imm_normal_state *imm_normal_state_new(__imm_state_id_t id,
                                                       struct imm_abc const *abc,
                                                       imm_float const lprobs[]);
 

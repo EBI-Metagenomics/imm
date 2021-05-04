@@ -127,7 +127,7 @@ struct imm_dp *imm_hmm_new_dp(struct imm_hmm const *hmm,
         return NULL;
     }
     for (i = 0; i < hmm->states.size; ++i)
-        states[i]->idx = (imm_state_idx_t)i;
+        states[i]->idx = i;
 
     struct trans *trans = NULL;
     bkt = 0;
@@ -135,8 +135,8 @@ struct imm_dp *imm_hmm_new_dp(struct imm_hmm const *hmm,
     {
         struct imm_state *src = hmm_state(hmm, trans->pair.id.src);
         struct imm_state *dst = hmm_state(hmm, trans->pair.id.dst);
-        trans->pair.idx.src = src->idx;
-        trans->pair.idx.dst = dst->idx;
+        trans->pair.idx.src = (__imm_state_idx_t)src->idx;
+        trans->pair.idx.dst = (__imm_state_idx_t)dst->idx;
     }
 
     struct dp_args args;
@@ -307,7 +307,7 @@ int imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state *src,
     return IMM_SUCCESS;
 }
 
-struct imm_state *hmm_state(struct imm_hmm const *hmm, imm_state_id_t state_id)
+struct imm_state *hmm_state(struct imm_hmm const *hmm, unsigned state_id)
 {
     struct imm_state *state = NULL;
     hash_for_each_possible(hmm->states.tbl, state, hnode, state_id)

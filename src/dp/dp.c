@@ -8,8 +8,10 @@
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
 #include "elapsed/elapsed.h"
+#include "imm/compiler.h"
+#include "imm/dp.h"
 #include "imm/error.h"
-#include "imm/imm.h"
+#include "imm/trans.h"
 #include "result.h"
 #include "task.h"
 
@@ -115,16 +117,9 @@ int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
     return IMM_SUCCESS;
 }
 
-int imm_dp_change_trans(struct imm_dp *dp, imm_state_idx_t src,
-                        imm_state_idx_t dst, imm_float lprob)
+unsigned imm_dp_trans_idx(struct imm_dp *dp, unsigned src_idx, unsigned dst_idx)
 {
-    if (!imm_lprob_is_valid(lprob))
-    {
-        error("invalid lprob");
-        return IMM_ILLEGALARG;
-    }
-
-    return trans_table_change(&dp->trans_table, src, dst, lprob);
+    return trans_table_idx(&dp->trans_table, src_idx, dst_idx);
 }
 
 struct imm_dp *dp_new(struct dp_args const *args)
@@ -402,7 +397,7 @@ static void viterbi_path(struct imm_dp const *dp, struct imm_task const *task,
 
     while (valid)
     {
-        imm_state_id_t id = dp->state_table.ids[state];
+        __imm_state_id_t id = dp->state_table.ids[state];
         struct imm_step step = IMM_STEP(id, (uint8_t)seqlen);
         imm_path_add(path, step);
         row -= seqlen;

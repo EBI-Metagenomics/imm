@@ -3,23 +3,21 @@
 #include "common/common.h"
 #include "containers/stack.h"
 #include "imm/error.h"
+#include "imm/trans.h"
 #include "trans.h"
 
 static inline unsigned offset_size(unsigned nstates) { return nstates + 1; }
 
-int trans_table_change(struct trans_table *trans_tbl, unsigned src,
-                       unsigned dst, imm_float lprob)
+unsigned trans_table_idx(struct trans_table *trans_tbl, unsigned src_idx,
+                         unsigned dst_idx)
 {
-    /* TODO: find a faster way to update the transition */
-    for (unsigned i = 0; i < trans_table_ntrans(trans_tbl, dst); ++i)
+    for (unsigned i = 0; i < trans_table_ntrans(trans_tbl, dst_idx); ++i)
     {
-        if (trans_table_source_state(trans_tbl, dst, i) == src)
-        {
-            trans_tbl->trans[trans_tbl->offset[dst] + i].score = lprob;
-            return IMM_SUCCESS;
-        }
+        if (trans_table_source_state(trans_tbl, dst_idx, i) == src_idx)
+            return trans_tbl->offset[dst_idx] + i;
     }
-    return xerror(IMM_ILLEGALARG, "transition not found");
+    xerror(IMM_ILLEGALARG, "transition not found");
+    return IMM_NULL_TRANS;
 }
 
 void trans_table_init(struct trans_table *tbl, struct dp_args const *args)

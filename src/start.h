@@ -7,7 +7,7 @@
 struct start
 {
     imm_float lprob;
-    imm_state_id_t state_id;
+    unsigned state_id;
 };
 
 static inline void start_init(struct start *start)

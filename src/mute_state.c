@@ -7,7 +7,7 @@ static void del(struct imm_state const *state);
 static imm_float lprob(struct imm_state const *state,
                        struct imm_seq const *seq);
 
-struct imm_mute_state *imm_mute_state_new(imm_state_id_t id,
+struct imm_mute_state *imm_mute_state_new(__imm_state_id_t id,
                                           struct imm_abc const *abc)
 {
     struct imm_mute_state *mute = xmalloc(sizeof(*mute));
