@@ -20,6 +20,6 @@ void test_abc_lprob(void)
 
     CLOSE(imm_abc_lprob_get(&lprob, 'A'), imm_log(0.2));
     CLOSE(imm_abc_lprob_get(&lprob, 'C'), imm_log(0.01));
-    COND(!imm_lprob_is_valid(imm_abc_lprob_get(&lprob, 'X')));
+    COND(!imm_lprob_is_nan(imm_abc_lprob_get(&lprob, 'X')));
     CLOSE(imm_abc_lprob_get(&lprob, 'T'), imm_log(0.5));
 }

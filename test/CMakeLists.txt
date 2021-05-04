@@ -25,7 +25,7 @@ imm_add_test(path path.c)
 imm_add_test(hmm hmm.c)
 # imm_add_test(dp dp.c)
 # imm_add_test(viterbi viterbi.c)
-# imm_add_test(hmm_loglik hmm_loglik.c)
+imm_add_test(hmm_loglik hmm_loglik.c)
 
 # imm_add_test(hmm_io hmm_io.c)
 # imm_add_test(viterbi viterbi.c)
