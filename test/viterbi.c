@@ -529,42 +529,30 @@ void test_viterbi_profile2(void)
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(M2));
     struct imm_task *task = imm_task_new(dp);
 
-    EQ(imm_task_setup(task, &A), IMM_SUCCESS);
-    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
-    EQ(imm_path_nsteps(&result.path), 2);
-    CLOSE(imm_hmm_loglik(hmm, &A, &result.path), imm_log(0.05));
-    CLOSE(result.loglik, imm_log(0.05));
+    VITERBI_CHECK(&A, IMM_SUCCESS, 2, imm_log(0.05));
 
     DP_RESET(M2, IMM_SUCCESS);
-
     VITERBI_CHECK(&C, IMM_SUCCESS, 2, imm_log(0.05));
     VITERBI_CHECK(&G, IMM_SUCCESS, 2, imm_log(0.05));
     VITERBI_CHECK(&T, IMM_SUCCESS, 2, imm_log(0.05));
 
     DP_RESET(end, IMM_SUCCESS);
-
     VITERBI_CHECK(&A, IMM_SUCCESS, 3, imm_log(0.6));
     VITERBI_CHECK(&C, IMM_SUCCESS, 3, imm_log(0.05));
     VITERBI_CHECK(&G, IMM_SUCCESS, 3, imm_log(0.6));
     VITERBI_CHECK(&T, IMM_SUCCESS, 3, imm_log(0.05));
 
     DP_RESET(M1, IMM_SUCCESS);
-
     VITERBI_CHECK(&A, IMM_SUCCESS, 2, imm_log(0.6));
 
-    VITERBI_CHECK(&C, IMM_SUCCESS, 2, imm_log(0.4));
-
     DP_RESET(end, IMM_SUCCESS);
-
     VITERBI_CHECK(&GA, IMM_SUCCESS, 4, 2 * imm_log(0.6));
 
     DP_RESET(I0, IMM_SUCCESS);
-
     VITERBI_CHECK(&GT, IMM_SUCCESS, 3,
                   imm_log(0.6) + imm_log(0.2) + imm_log(0.7));
 
     DP_RESET(end, IMM_SUCCESS);
-
     VITERBI_CHECK(&GTTTA, IMM_SUCCESS, 7,
                   imm_log(0.6) + imm_log(0.2) + 3 * imm_log(0.7) +
                       3 * imm_log(0.5) + imm_log(0.6));
@@ -574,20 +562,17 @@ void test_viterbi_profile2(void)
                       3 * imm_log(0.5) + imm_log(0.6) + imm_log(0.05));
 
     DP_RESET(M2, IMM_SUCCESS);
-
     VITERBI_CHECK(&GTTTACA, IMM_SUCCESS, 8,
                   imm_log(0.6) + imm_log(0.2) + 3 * imm_log(0.7) +
                       3 * imm_log(0.5) + imm_log(0.6) + imm_log(0.2) +
                       imm_log(0.1) + imm_log(0.5) + imm_log(0.05));
 
     DP_RESET(M1, IMM_SUCCESS);
-
     VITERBI_CHECK(&GTTTACA, IMM_SUCCESS, 8,
                   imm_log(0.6) + imm_log(0.2) + 5 * imm_log(0.5) +
                       3 * imm_log(0.7) + 2 * imm_log(0.1) + imm_log(0.6));
 
     DP_RESET(end, IMM_SUCCESS);
-
     VITERBI_CHECK(&GTTTACA, IMM_SUCCESS, 9,
                   imm_log(0.6) + imm_log(0.2) + 5 * imm_log(0.5) +
                       3 * imm_log(0.7) + 2 * imm_log(0.1) + imm_log(0.6));
