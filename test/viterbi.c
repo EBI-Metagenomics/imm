@@ -1,4 +1,5 @@
 #include "hope/hope.h"
+#include "imm/error.h"
 #include "imm/imm.h"
 
 void test_viterbi_one_mute_state(void);
@@ -901,6 +902,16 @@ void test_viterbi_cycle_mute_ending(void)
     struct imm_task *task = imm_task_new(dp);
 
     VITERBI_CHECK(A, IMM_SUCCESS, 5, -13.815510557964272);
+
+    unsigned BM = imm_dp_trans_idx(dp, imm_state_id(imm_super(B)),
+                                   imm_state_id(imm_super(M)));
+
+    imm_dp_change_trans(dp, BM, imm_log(1.0));
+
+    EQ(imm_task_setup(task, A), IMM_SUCCESS);
+    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    EQ(imm_path_nsteps(&result.path), 5);
+    CLOSE(result.loglik, -11.5129261017);
 
     imm_deinit(&result);
     imm_del(task);

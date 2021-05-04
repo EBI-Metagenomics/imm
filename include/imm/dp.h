@@ -15,6 +15,9 @@ IMM_API void imm_dp_del(struct imm_dp const *dp);
 IMM_API unsigned imm_dp_trans_idx(struct imm_dp *dp, unsigned src_idx,
                                   unsigned dst_idx);
 
+IMM_API int imm_dp_change_trans(struct imm_dp *dp, unsigned trans_idx,
+                                imm_float lprob);
+
 IMM_API int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
                            struct imm_result *result);
 
