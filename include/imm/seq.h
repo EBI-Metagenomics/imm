@@ -16,6 +16,8 @@ struct imm_seq
     struct imm_abc const *abc;
 };
 
+extern struct imm_seq imm_seq_empty;
+
 #define IMM_SEQ_UNSAFE(len, str, abc)                                          \
     (struct imm_seq) { len, str, abc }
 

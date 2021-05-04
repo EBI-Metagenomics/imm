@@ -17,24 +17,25 @@ int main(void)
 
 void test_hmm_state_id(void)
 {
-    struct imm_abc const *abc = imm_abc_init(IMM_STR("ACGT"), '*');
-    struct imm_mute_state *state = imm_mute_state_new(0, abc);
-    struct imm_hmm *hmm = imm_hmm_new(abc);
+    struct imm_abc abc = imm_abc_empty;
+    imm_abc_init(&abc, IMM_STR("ACGT"), '*');
+    struct imm_mute_state *state = imm_mute_state_new(0, &abc);
+    struct imm_hmm *hmm = imm_hmm_new(&abc);
 
     EQ(imm_hmm_add_state(hmm, imm_super(state)), IMM_SUCCESS);
     EQ(imm_hmm_add_state(hmm, imm_super(state)), IMM_ILLEGALARG);
 
     imm_del(hmm);
     imm_del(state);
-    imm_del(abc);
 }
 
 void test_hmm_set_trans(void)
 {
-    struct imm_abc const *abc = imm_abc_init(IMM_STR("ACGT"), '*');
-    struct imm_mute_state *state0 = imm_mute_state_new(0, abc);
-    struct imm_mute_state *state1 = imm_mute_state_new(1, abc);
-    struct imm_hmm *hmm = imm_hmm_new(abc);
+    struct imm_abc abc = imm_abc_empty;
+    imm_abc_init(&abc, IMM_STR("ACGT"), '*');
+    struct imm_mute_state *state0 = imm_mute_state_new(0, &abc);
+    struct imm_mute_state *state1 = imm_mute_state_new(1, &abc);
+    struct imm_hmm *hmm = imm_hmm_new(&abc);
 
     EQ(imm_hmm_add_state(hmm, imm_super(state0)), IMM_SUCCESS);
     EQ(imm_hmm_add_state(hmm, imm_super(state1)), IMM_SUCCESS);
@@ -46,16 +47,16 @@ void test_hmm_set_trans(void)
     imm_del(hmm);
     imm_del(state0);
     imm_del(state1);
-    imm_del(abc);
 }
 
 void test_hmm_wrong_states(void)
 {
-    struct imm_abc const *abc = imm_abc_init(IMM_STR("ACGT"), '*');
-    struct imm_hmm *hmm = imm_hmm_new(abc);
+    struct imm_abc abc = imm_abc_empty;
+    imm_abc_init(&abc, IMM_STR("ACGT"), '*');
+    struct imm_hmm *hmm = imm_hmm_new(&abc);
 
-    struct imm_mute_state *state0 = imm_mute_state_new(0, abc);
-    struct imm_mute_state *state1 = imm_mute_state_new(0, abc);
+    struct imm_mute_state *state0 = imm_mute_state_new(0, &abc);
+    struct imm_mute_state *state1 = imm_mute_state_new(0, &abc);
 
     EQ(imm_hmm_add_state(hmm, imm_super(state0)), IMM_SUCCESS);
 
@@ -78,15 +79,15 @@ void test_hmm_wrong_states(void)
     imm_del(hmm);
     imm_del(state0);
     imm_del(state1);
-    imm_del(abc);
 }
 
 void test_hmm_reset(void)
 {
-    struct imm_abc const *abc = imm_abc_init(IMM_STR("ACGT"), '*');
-    struct imm_mute_state *state0 = imm_mute_state_new(0, abc);
-    struct imm_mute_state *state1 = imm_mute_state_new(1, abc);
-    struct imm_hmm *hmm = imm_hmm_new(abc);
+    struct imm_abc abc = imm_abc_empty;
+    imm_abc_init(&abc, IMM_STR("ACGT"), '*');
+    struct imm_mute_state *state0 = imm_mute_state_new(0, &abc);
+    struct imm_mute_state *state1 = imm_mute_state_new(1, &abc);
+    struct imm_hmm *hmm = imm_hmm_new(&abc);
 
     EQ(imm_hmm_add_state(hmm, imm_super(state0)), IMM_SUCCESS);
     EQ(imm_hmm_add_state(hmm, imm_super(state1)), IMM_SUCCESS);
@@ -96,7 +97,7 @@ void test_hmm_reset(void)
     CLOSE(imm_hmm_trans(hmm, imm_super(state0), imm_super(state1)),
           imm_log(0.5));
 
-    imm_hmm_reset(hmm, abc);
+    imm_hmm_reset(hmm, &abc);
 
     EQ(imm_hmm_add_state(hmm, imm_super(state0)), IMM_SUCCESS);
     EQ(imm_hmm_add_state(hmm, imm_super(state1)), IMM_SUCCESS);
@@ -109,5 +110,4 @@ void test_hmm_reset(void)
     imm_del(hmm);
     imm_del(state0);
     imm_del(state1);
-    imm_del(abc);
 }

@@ -17,7 +17,6 @@
     _Generic((x), struct imm_normal_state *                                    \
              : imm_normal_state_del, struct imm_mute_state *                   \
              : imm_mute_state_del,                                             \
-             struct imm_seq const * : imm_seq_del,                             \
              struct imm_abc const * : imm_abc_del,                             \
              struct imm_task * : imm_task_del,                                 \
              struct imm_hmm * : imm_hmm_del,                                   \

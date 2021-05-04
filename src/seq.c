@@ -2,6 +2,12 @@
 #include "common/common.h"
 #include "imm/abc.h"
 
+struct imm_seq imm_seq_empty = {
+    .len = 0,
+    .str = "",
+    .abc = &imm_abc_empty,
+};
+
 int imm_seq_init(struct imm_seq *seq, struct imm_str str,
                  struct imm_abc const *abc)
 {
