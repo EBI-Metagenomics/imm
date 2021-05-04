@@ -25,7 +25,10 @@
              struct imm_abc_lprob const * : imm_abc_lprob_del,                 \
              struct imm_amino const * : imm_amino_del) (x)
 
-#define imm_deinit(x) _Generic((x), struct imm_path * : imm_path_deinit)(x)
+#define imm_deinit(x)                                                          \
+    _Generic((x), struct imm_path *                                            \
+             : imm_path_deinit, struct imm_result *                            \
+             : imm_result_deinit)(x)
 
 #define imm_id(x) _Generic((x), struct imm_state * : imm_state_id)(x)
 

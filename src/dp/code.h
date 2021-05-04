@@ -24,8 +24,6 @@ void code_deinit(struct code const *code);
 
 unsigned code_encode(struct code const *code, struct imm_seq const *seq);
 
-void code_init_eseq(struct eseq *eseq, struct code const *code);
-
 void code_init(struct code *code, struct imm_abc const *abc, unsigned min_seq,
                unsigned max_seq);
 

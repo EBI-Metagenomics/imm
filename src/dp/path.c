@@ -9,7 +9,7 @@ void path_init(struct path *path, struct state_table const *state_tbl,
     path->nstates = state_tbl->nstates;
     path->state_offset =
         xmalloc(sizeof(*path->state_offset) * (path->nstates + 1));
-    path->trans_bits = malloc(sizeof(*path->trans_bits) * path->nstates);
+    path->trans_bits = xmalloc(sizeof(*path->trans_bits) * path->nstates);
     path->state_offset[0] = 0;
 
     for (unsigned dst = 0; dst < path->nstates; ++dst)

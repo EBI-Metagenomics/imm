@@ -6,7 +6,6 @@ struct imm_task *imm_task_new(struct imm_dp const *dp)
 {
     struct imm_task *task = xmalloc(sizeof(*task));
     matrix_init(&task->matrix, &dp->state_table);
-    code_init_eseq(&task->eseq, &dp->code);
     path_init(&task->path, &dp->state_table, &dp->trans_table);
     eseq_init(&task->eseq, &dp->code);
     task->seq = NULL;
@@ -21,7 +20,6 @@ int imm_task_reset(struct imm_task *task, struct imm_dp const *dp)
     eseq_deinit(&task->eseq);
 
     matrix_init(&task->matrix, &dp->state_table);
-    code_init_eseq(&task->eseq, &dp->code);
     path_init(&task->path, &dp->state_table, &dp->trans_table);
     eseq_init(&task->eseq, &dp->code);
     task->seq = NULL;

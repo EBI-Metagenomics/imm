@@ -49,7 +49,10 @@ struct path
     uint8_t *trans_bits;
 };
 
-static inline unsigned __path_invalid(unsigned bits) { return (1 << bits) - 1; }
+static inline unsigned __path_invalid(unsigned bits)
+{
+    return (unsigned)((1 << bits) - 1);
+}
 
 static inline unsigned __path_state_bits(struct path const *path, unsigned pos,
                                          unsigned state)

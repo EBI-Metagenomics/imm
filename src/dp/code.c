@@ -41,12 +41,6 @@ unsigned code_encode(struct code const *code, struct imm_seq const *seq)
     return c;
 }
 
-void code_init_eseq(struct eseq *eseq, struct code const *code)
-{
-    eseq->code = code;
-    matrixu16_init(&eseq->data, 1, (code->seqlen.max - code->seqlen.min) + 1);
-}
-
 void code_init(struct code *code, struct imm_abc const *abc, unsigned min_seq,
                unsigned max_seq)
 {

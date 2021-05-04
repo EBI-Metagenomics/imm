@@ -50,13 +50,12 @@ void test_viterbi_one_mute_state(void)
     struct imm_seq const *EMPTY = imm_seq_new(IMM_STR(""), abc);
     struct imm_seq const *C = imm_seq_new(IMM_STR("C"), abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
+    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_mute_state *state = imm_mute_state_new(0, abc);
 
     imm_hmm_add_state(hmm, imm_super(state));
     imm_hmm_set_start(hmm, imm_super(state), imm_log(0.5));
-
-    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(state));
     struct imm_task *task = imm_task_new(dp);
@@ -64,6 +63,7 @@ void test_viterbi_one_mute_state(void)
     VITERBI_CHECK(EMPTY, IMM_SUCCESS, 1, imm_log(0.5));
     VITERBI_CHECK(C, IMM_SUCCESS, 0, imm_lprob_nan());
 
+    imm_deinit(&result);
     imm_del(dp);
     imm_del(task);
     imm_del(hmm);
@@ -78,6 +78,7 @@ void test_viterbi_two_mute_states(void)
     struct imm_abc const *abc = imm_abc_new(IMM_STR("ACGT"), '*');
     struct imm_seq const *EMPTY = imm_seq_new(IMM_STR(""), abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
+    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_mute_state *state0 = imm_mute_state_new(0, abc);
     struct imm_mute_state *state1 = imm_mute_state_new(1, abc);
@@ -85,8 +86,6 @@ void test_viterbi_two_mute_states(void)
     imm_hmm_add_state(hmm, imm_super(state0));
     imm_hmm_set_start(hmm, imm_super(state0), imm_log(0.5));
     imm_hmm_add_state(hmm, imm_super(state1));
-
-    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(state0));
     struct imm_task *task = imm_task_new(dp);
@@ -111,6 +110,7 @@ void test_viterbi_two_mute_states(void)
           imm_log(0.5) + imm_log(0.1));
     CLOSE(result.loglik, imm_log(0.5) + imm_log(0.1));
 
+    imm_deinit(&result);
     imm_del(hmm);
     imm_del(state0);
     imm_del(state1);
@@ -157,14 +157,13 @@ void test_viterbi_one_normal_state(void)
     struct imm_seq const *AC = imm_seq_new(IMM_STR("AC"), abc);
     struct imm_seq const *ACT = imm_seq_new(IMM_STR("ACT"), abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
+    struct imm_result result = IMM_RESULT_INIT();
 
     imm_float lprobs0[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5), zero()};
     struct imm_normal_state *state = imm_normal_state_new(0, abc, lprobs0);
 
     imm_hmm_add_state(hmm, imm_super(state));
     imm_hmm_set_start(hmm, imm_super(state), imm_log(1.0));
-
-    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(state));
     struct imm_task *task = imm_task_new(dp);
@@ -190,6 +189,9 @@ void test_viterbi_one_normal_state(void)
     VITERBI_CHECK(AA, IMM_SUCCESS, 2, 2 * imm_log(0.25));
     VITERBI_CHECK(ACT, IMM_SUCCESS, 0, imm_lprob_nan());
 
+    imm_deinit(&result);
+    imm_del(task);
+    imm_del(dp);
     imm_del(hmm);
     imm_del(state);
     imm_del(abc);
@@ -211,6 +213,7 @@ void test_viterbi_two_normal_states(void)
     struct imm_seq const *AT = imm_seq_new(IMM_STR("AT"), abc);
     struct imm_seq const *ATT = imm_seq_new(IMM_STR("ATT"), abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
+    struct imm_result result = IMM_RESULT_INIT();
 
     imm_float lprobs0[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5), zero()};
     struct imm_normal_state *state0 = imm_normal_state_new(0, abc, lprobs0);
@@ -223,8 +226,6 @@ void test_viterbi_two_normal_states(void)
     imm_hmm_set_start(hmm, imm_super(state0), imm_log(0.1));
     imm_hmm_add_state(hmm, imm_super(state1));
     imm_hmm_set_trans(hmm, imm_super(state0), imm_super(state1), imm_log(0.3));
-
-    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(state0));
     struct imm_task *task = imm_task_new(dp);
@@ -253,6 +254,9 @@ void test_viterbi_two_normal_states(void)
                   imm_log(0.1) + imm_log(0.25) + imm_log(0.3) +
                       3 * imm_log(0.5));
 
+    imm_deinit(&result);
+    imm_del(task);
+    imm_del(dp);
     imm_del(hmm);
     imm_del(state0);
     imm_del(state1);
@@ -275,6 +279,7 @@ void test_viterbi_normal_states(void)
     struct imm_seq const *AGT = imm_seq_new(IMM_STR("AGT"), abc);
     struct imm_seq const *AGTC = imm_seq_new(IMM_STR("AGTC"), abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
+    struct imm_result result = IMM_RESULT_INIT();
 
     imm_float const lprobs0[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5),
                                  zero()};
@@ -294,8 +299,6 @@ void test_viterbi_normal_states(void)
     imm_hmm_set_trans(hmm, imm_super(state1), imm_super(state1), imm_log(1.0));
 
     imm_hmm_normalize_trans(hmm);
-
-    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(state0));
     struct imm_task *task = imm_task_new(dp);
@@ -362,6 +365,9 @@ void test_viterbi_normal_states(void)
     VITERBI_CHECK(A, IMM_SUCCESS, 1, imm_log(0.25));
     VITERBI_CHECK(AA, IMM_SUCCESS, 2, 2 * imm_log(0.25) + imm_log(0.9));
 
+    imm_deinit(&result);
+    imm_del(task);
+    imm_del(dp);
     imm_del(hmm);
     imm_del(state0);
     imm_del(state1);
@@ -383,6 +389,7 @@ void test_viterbi_profile1(void)
     struct imm_seq const *AA = imm_seq_new(IMM_STR("AA"), abc);
     struct imm_seq const *AAB = imm_seq_new(IMM_STR("AAB"), abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
+    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_mute_state *start = imm_mute_state_new(0, abc);
     struct imm_mute_state *D0 = imm_mute_state_new(1, abc);
@@ -409,8 +416,6 @@ void test_viterbi_profile1(void)
     imm_hmm_set_trans(hmm, imm_super(M0), imm_super(I0), imm_log(0.1));
     imm_hmm_set_trans(hmm, imm_super(I0), imm_super(I0), imm_log(0.2));
     imm_hmm_set_trans(hmm, imm_super(I0), imm_super(end), imm_log(1.0));
-
-    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(end));
     struct imm_task *task = imm_task_new(dp);
@@ -451,6 +456,9 @@ void test_viterbi_profile1(void)
                   imm_log(0.5) + imm_log(0.4) + imm_log(0.1) + imm_log(0.2) +
                       2 * imm_log(0.5));
 
+    imm_deinit(&result);
+    imm_del(dp);
+    imm_del(task);
     imm_del(hmm);
     imm_del(start);
     imm_del(D0);
@@ -478,6 +486,7 @@ void test_viterbi_profile2(void)
     struct imm_seq const *CDDDAB = imm_seq_new(IMM_STR("CDDDAB"), abc);
     struct imm_seq const *CDDDABA = imm_seq_new(IMM_STR("CDDDABA"), abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
+    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_mute_state *start = imm_mute_state_new(0, abc);
 
@@ -539,8 +548,6 @@ void test_viterbi_profile2(void)
     imm_hmm_set_trans(hmm, imm_super(D1), imm_super(M2), imm_log(0.7));
 
     imm_hmm_set_trans(hmm, imm_super(D2), imm_super(end), imm_log(1.0));
-
-    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(M2));
     struct imm_task *task = imm_task_new(dp);
@@ -613,6 +620,9 @@ void test_viterbi_profile2(void)
                   imm_log(0.6) + imm_log(0.2) + 5 * imm_log(0.5) +
                       3 * imm_log(0.7) + 2 * imm_log(0.1) + imm_log(0.6));
 
+    imm_deinit(&result);
+    imm_del(task);
+    imm_del(dp);
     imm_del(hmm);
     imm_del(start);
     imm_del(M0);
@@ -641,6 +651,7 @@ void test_viterbi_profile_delete(void)
     struct imm_seq const *A = imm_seq_new(IMM_STR("A"), abc);
     struct imm_seq const *AB = imm_seq_new(IMM_STR("AB"), abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
+    struct imm_result result = IMM_RESULT_INIT();
 
     imm_float N0_lprobs[] = {imm_log(0.5), zero()};
     struct imm_normal_state *N0 = imm_normal_state_new(0, abc, N0_lprobs);
@@ -664,8 +675,6 @@ void test_viterbi_profile_delete(void)
     imm_hmm_set_trans(hmm, imm_super(N1), imm_super(N2), imm_log(0.5));
     imm_hmm_set_trans(hmm, imm_super(M), imm_super(N2), imm_log(0.5));
 
-    struct imm_result result = IMM_RESULT_INIT();
-
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(N0));
     struct imm_task *task = imm_task_new(dp);
 
@@ -680,6 +689,9 @@ void test_viterbi_profile_delete(void)
     DP_RESET(M, IMM_SUCCESS);
     VITERBI_CHECK(A, IMM_SUCCESS, 2, 2 * imm_log(0.5));
 
+    imm_deinit(&result);
+    imm_del(task);
+    imm_del(dp);
     imm_del(hmm);
     imm_del(N0);
     imm_del(M);
@@ -704,6 +716,7 @@ void test_viterbi_global_profile(void)
     struct imm_seq const *CCABB = imm_seq_new(IMM_STR("CCABB"), abc);
     struct imm_seq const *CCABA = imm_seq_new(IMM_STR("CCABA"), abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
+    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_mute_state *start = imm_mute_state_new(0, abc);
 
@@ -778,8 +791,6 @@ void test_viterbi_global_profile(void)
     imm_hmm_set_trans(hmm, imm_super(I1), imm_super(I1), imm_log(0.5));
     imm_hmm_set_trans(hmm, imm_super(I1), imm_super(M2), imm_log(0.5));
 
-    struct imm_result result = IMM_RESULT_INIT();
-
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(start));
     struct imm_task *task = imm_task_new(dp);
 
@@ -823,6 +834,9 @@ void test_viterbi_global_profile(void)
     VITERBI_CHECK(AAB, IMM_SUCCESS, 5,
                   imm_log(0.01) + imm_log(0.9) + imm_log(0.5));
 
+    imm_deinit(&result);
+    imm_del(task);
+    imm_del(dp);
     imm_del(hmm);
     imm_del(start);
     imm_del(B);
@@ -854,6 +868,7 @@ void test_viterbi_cycle_mute_ending(void)
     struct imm_abc const *abc = imm_abc_new(IMM_STR("AB"), '*');
     struct imm_seq const *A = imm_seq_new(IMM_STR("A"), abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
+    struct imm_result result = IMM_RESULT_INIT();
 
     struct imm_mute_state *start = imm_mute_state_new(0, abc);
     imm_hmm_add_state(hmm, imm_super(start));
@@ -882,13 +897,14 @@ void test_viterbi_cycle_mute_ending(void)
     imm_hmm_set_trans(hmm, imm_super(E), imm_super(J), imm_log(0.1));
     imm_hmm_set_trans(hmm, imm_super(J), imm_super(B), imm_log(0.1));
 
-    struct imm_result result = IMM_RESULT_INIT();
-
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(end));
     struct imm_task *task = imm_task_new(dp);
 
     VITERBI_CHECK(A, IMM_SUCCESS, 5, -13.815510557964272);
 
+    imm_deinit(&result);
+    imm_del(task);
+    imm_del(dp);
     imm_del(hmm);
     imm_del(start);
     imm_del(B);

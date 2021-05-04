@@ -36,6 +36,11 @@ static void init_transitions_table(struct imm_hmm *hmm)
     hmm->transitions.data = xmalloc(hmm->transitions.capacity);
 }
 
+static void deinit_transitions_table(struct imm_hmm const *hmm)
+{
+    free((void *)hmm->transitions.data);
+}
+
 static void add_transition(struct imm_hmm *hmm, struct imm_state *src,
                            struct imm_state *dst, imm_float lprob)
 {
@@ -88,7 +93,11 @@ void imm_hmm_reset(struct imm_hmm *hmm, struct imm_abc const *abc)
     reset_transitions_table(hmm);
 }
 
-void imm_hmm_del(struct imm_hmm const *hmm) { free((void *)hmm); }
+void imm_hmm_del(struct imm_hmm const *hmm)
+{
+    deinit_transitions_table(hmm);
+    free((void *)hmm);
+}
 
 struct imm_dp *imm_hmm_new_dp(struct imm_hmm const *hmm,
                               struct imm_state const *end_state)
