@@ -42,7 +42,7 @@ void trans_table_init(struct trans_table *tbl, struct dp_args const *args)
             tbl->trans[tbl->offset[i] + j].src = trans->pair.idx.src;
             ++j;
         }
-        tbl->offset[i + 1] = (uint16_t)(tbl->offset[i] + j);
+        tbl->offset[i + 1] = (imm_trans_idx_t)(tbl->offset[i] + j);
     }
 }
 

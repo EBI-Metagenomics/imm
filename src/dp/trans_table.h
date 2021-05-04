@@ -3,6 +3,7 @@
 
 #include "imm/float.h"
 #include "imm/state_types.h"
+#include "imm/trans.h"
 
 struct dp_args;
 
@@ -14,8 +15,8 @@ struct trans_table
         imm_float score;       /**< Transition score. */
         __imm_state_idx_t src; /**< Source state. */
     } * trans;
-    uint16_t *offset; /**< Maps (dest. state, local trans) to score
-                           and src. state indices. */
+    imm_trans_idx_t *offset; /**< Maps (dest. state, local trans) to score
+                            and src. state indices. */
 };
 
 unsigned trans_table_idx(struct trans_table *tbl, unsigned src_idx,
