@@ -22,7 +22,6 @@
              struct imm_task * : imm_task_del,                                 \
              struct imm_hmm * : imm_hmm_del,                                   \
              struct imm_dp * : imm_dp_del,                                     \
-             struct imm_abc_lprob const * : imm_abc_lprob_del,                 \
              struct imm_amino const * : imm_amino_del) (x)
 
 #define imm_deinit(x)                                                          \

@@ -36,13 +36,12 @@ void test_amino_lprob(void)
     imm_float const lprobs[IMM_AMINO_NSYMBOLS] = {
         zero, imm_log(1), [19] = imm_log(19)};
 
-    struct imm_abc_lprob const *lprob =
-        imm_abc_lprob_new(imm_super(amino), lprobs);
+    struct imm_abc_lprob lprob;
+    imm_abc_lprob_init(&lprob, imm_super(amino), lprobs);
 
-    COND(imm_lprob_is_zero(imm_abc_lprob_get(lprob, 'A')));
-    CLOSE(imm_abc_lprob_get(lprob, 'C'), log(1));
-    CLOSE(imm_abc_lprob_get(lprob, 'Y'), log(19));
+    COND(imm_lprob_is_zero(imm_abc_lprob_get(&lprob, 'A')));
+    CLOSE(imm_abc_lprob_get(&lprob, 'C'), log(1));
+    CLOSE(imm_abc_lprob_get(&lprob, 'Y'), log(19));
 
     imm_del(amino);
-    imm_del(lprob);
 }

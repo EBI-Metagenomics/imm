@@ -5,7 +5,6 @@
 
 #include "common/bits.h"
 #include "common/bug.h"
-#include "common/compiler.h"
 #include "common/error.h"
 #include "common/io.h"
 #include "common/math.h"

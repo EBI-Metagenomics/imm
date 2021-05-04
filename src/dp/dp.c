@@ -205,7 +205,7 @@ static struct final_score best_trans_score(struct imm_dp const *dp,
         unsigned src = trans_table_source_state(&dp->trans_table, dst, i);
         unsigned min_seq = state_table_min_seqlen(&dp->state_table, src);
 
-        if (unlikely(row < min_seq) || (min_seq == 0 && src > dst))
+        if (imm_unlikely(row < min_seq) || (min_seq == 0 && src > dst))
             continue;
 
         unsigned max_seq = state_table_max_seqlen(&dp->state_table, src);

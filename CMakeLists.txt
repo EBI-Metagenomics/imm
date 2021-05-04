@@ -26,7 +26,6 @@ find_package(containers REQUIRED)
 
 add_library(imm
     src/abc.c
-    src/abc_lprob.c
     src/amino.c
     src/cartes.c
     src/common/error.c
