@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-typedef uint8_t imm_sym_idx_t;
+typedef uint8_t __imm_sym_idx_t;
 
 enum imm_sym_type
 {
@@ -14,21 +14,21 @@ enum imm_sym_type
     IMM_SYM_ANY = 2,
 };
 
-#define IMM_SYM_FIRST '!'
-#define IMM_SYM_LAST '~'
+#define __IMM_SYM_FIRST '!'
+#define __IMM_SYM_LAST '~'
 
 #define IMM_SYM_NULL_IDX UINT8_MAX
 
-#define IMM_SYM_IDX_SIZE ((size_t)((IMM_SYM_LAST - IMM_SYM_FIRST) + 1))
+#define __IMM_SYM_IDX_SIZE ((size_t)((__IMM_SYM_LAST - __IMM_SYM_FIRST) + 1))
 
-static inline imm_sym_idx_t __imm_sym_index(char const c)
+static inline unsigned __imm_sym_index(char const c)
 {
-    return (imm_sym_idx_t)(c - IMM_SYM_FIRST);
+    return (unsigned)(c - __IMM_SYM_FIRST);
 }
 
 static inline bool __imm_sym_valid(char const symbol)
 {
-    return symbol >= IMM_SYM_FIRST && symbol <= IMM_SYM_LAST;
+    return symbol >= __IMM_SYM_FIRST && symbol <= __IMM_SYM_LAST;
 }
 
 #endif

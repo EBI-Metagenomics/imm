@@ -24,7 +24,7 @@ struct imm_abc *abc_new(unsigned len, char const *symbols, char any_symbol,
         xerror(IMM_ILLEGALARG, "alphabet cannot be empty");
         return NULL;
     }
-    if (len > IMM_SYM_IDX_SIZE)
+    if (len > __IMM_SYM_IDX_SIZE)
     {
         xerror(IMM_ILLEGALARG, "symbols length is too large");
         return NULL;
@@ -57,7 +57,7 @@ struct imm_abc *abc_new(unsigned len, char const *symbols, char any_symbol,
             xerror(IMM_ILLEGALARG, "alphabet cannot have duplicated symbols");
             goto cleanup;
         }
-        abc->symbol_idx[j] = (imm_sym_idx_t)i;
+        abc->symbol_idx[j] = (__imm_sym_idx_t)i;
     }
     abc->symbols = symbols;
     abc->vtable = vtable;

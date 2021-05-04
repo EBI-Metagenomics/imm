@@ -11,7 +11,7 @@ struct imm_abc;
 struct imm_abc_vtable
 {
     void (*del)(struct imm_abc const *abc);
-    imm_abc_tid_t typeid;
+    enum imm_abc_typeid typeid;
     void *derived;
 };
 
@@ -25,7 +25,7 @@ struct imm_abc
 {
     unsigned nsymbols;
     char const *symbols;
-    imm_sym_idx_t symbol_idx[IMM_SYM_IDX_SIZE];
+    __imm_sym_idx_t symbol_idx[__IMM_SYM_IDX_SIZE];
     char any_symbol;
     struct imm_abc_vtable vtable;
 };
@@ -55,13 +55,13 @@ static inline unsigned imm_abc_len(struct imm_abc const *abc)
 
 /* IMM_API struct imm_abc *imm_abc_read(FILE *stream); */
 
-static inline char imm_abc_symbol(struct imm_abc const *abc, imm_sym_idx_t idx)
+static inline char imm_abc_symbol(struct imm_abc const *abc, unsigned idx)
 {
     return abc->symbols[idx];
 }
 
-static inline imm_abc_tid_t imm_abc_symbol_idx(struct imm_abc const *abc,
-                                               char symbol)
+static inline unsigned imm_abc_symbol_idx(struct imm_abc const *abc,
+                                          char symbol)
 {
     return abc->symbol_idx[__imm_sym_index(symbol)];
 }
@@ -83,7 +83,7 @@ static inline char const *imm_abc_symbols(struct imm_abc const *abc)
     return abc->symbols;
 }
 
-static inline imm_abc_tid_t imm_abc_typeid(struct imm_abc const *abc)
+static inline enum imm_abc_typeid imm_abc_typeid(struct imm_abc const *abc)
 {
     return abc->vtable.typeid;
 }

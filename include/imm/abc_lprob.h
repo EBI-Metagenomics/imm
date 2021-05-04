@@ -27,7 +27,7 @@ IMM_API void imm_abc_lprob_del(struct imm_abc_lprob const *abc_lprob);
 static inline imm_float imm_abc_lprob_get(struct imm_abc_lprob const *abc_lprob,
                                           char symbol)
 {
-    imm_sym_idx_t idx = imm_abc_symbol_idx(abc_lprob->abc, symbol);
+    unsigned idx = imm_abc_symbol_idx(abc_lprob->abc, symbol);
     if (idx == IMM_SYM_NULL_IDX)
     {
         imm_log_error("symbol not found");
