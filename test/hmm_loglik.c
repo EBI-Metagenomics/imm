@@ -24,11 +24,11 @@ static inline int is_valid(imm_float a) { return imm_lprob_is_valid(a); }
 
 void test_hmm_loglik_single_state(void)
 {
-    struct imm_abc const *abc = imm_abc_new(IMM_STR("ACGT"), '*');
-    struct imm_seq const *EMPTY = imm_seq_new(IMM_STR(""), abc);
-    struct imm_seq const *A = imm_seq_new(IMM_STR("A"), abc);
-    struct imm_seq const *AG = imm_seq_new(IMM_STR("AG"), abc);
-    struct imm_seq const *AA = imm_seq_new(IMM_STR("AA"), abc);
+    struct imm_abc const *abc = imm_abc_init(IMM_STR("ACGT"), '*');
+    struct imm_seq const *EMPTY = imm_seq_init(IMM_STR(""), abc);
+    struct imm_seq const *A = imm_seq_init(IMM_STR("A"), abc);
+    struct imm_seq const *AG = imm_seq_init(IMM_STR("AG"), abc);
+    struct imm_seq const *AA = imm_seq_init(IMM_STR("AA"), abc);
 
     imm_float lprobs[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5), zero()};
 
@@ -94,11 +94,11 @@ void test_hmm_loglik_single_state(void)
 
 void test_hmm_loglik_two_states(void)
 {
-    struct imm_abc const *abc = imm_abc_new(IMM_STR("ACGT"), '*');
-    struct imm_seq const *A = imm_seq_new(IMM_STR("A"), abc);
-    struct imm_seq const *T = imm_seq_new(IMM_STR("T"), abc);
-    struct imm_seq const *G = imm_seq_new(IMM_STR("G"), abc);
-    struct imm_seq const *GT = imm_seq_new(IMM_STR("GT"), abc);
+    struct imm_abc const *abc = imm_abc_init(IMM_STR("ACGT"), '*');
+    struct imm_seq const *A = imm_seq_init(IMM_STR("A"), abc);
+    struct imm_seq const *T = imm_seq_init(IMM_STR("T"), abc);
+    struct imm_seq const *G = imm_seq_init(IMM_STR("G"), abc);
+    struct imm_seq const *GT = imm_seq_init(IMM_STR("GT"), abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
 
     imm_float lprobs0[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5), zero()};
@@ -153,12 +153,12 @@ void test_hmm_loglik_two_states(void)
 
 void test_hmm_loglik_mute_state(void)
 {
-    struct imm_abc const *abc = imm_abc_new(IMM_STR("ACGT"), '*');
-    struct imm_seq const *EMPTY = imm_seq_new(IMM_STR(""), abc);
-    struct imm_seq const *A = imm_seq_new(IMM_STR("A"), abc);
-    struct imm_seq const *T = imm_seq_new(IMM_STR("T"), abc);
-    struct imm_seq const *G = imm_seq_new(IMM_STR("G"), abc);
-    struct imm_seq const *GT = imm_seq_new(IMM_STR("GT"), abc);
+    struct imm_abc const *abc = imm_abc_init(IMM_STR("ACGT"), '*');
+    struct imm_seq const *EMPTY = imm_seq_init(IMM_STR(""), abc);
+    struct imm_seq const *A = imm_seq_init(IMM_STR("A"), abc);
+    struct imm_seq const *T = imm_seq_init(IMM_STR("T"), abc);
+    struct imm_seq const *G = imm_seq_init(IMM_STR("G"), abc);
+    struct imm_seq const *GT = imm_seq_init(IMM_STR("GT"), abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
 
     struct imm_mute_state *state = imm_mute_state_new(0, abc);
@@ -201,8 +201,8 @@ void test_hmm_loglik_mute_state(void)
 
 void test_hmm_loglik_two_mute_states(void)
 {
-    struct imm_abc const *abc = imm_abc_new(IMM_STR("ACGT"), '*');
-    struct imm_seq const *EMPTY = imm_seq_new(IMM_STR(""), abc);
+    struct imm_abc const *abc = imm_abc_init(IMM_STR("ACGT"), '*');
+    struct imm_seq const *EMPTY = imm_seq_init(IMM_STR(""), abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
 
     struct imm_mute_state *S0 = imm_mute_state_new(0, abc);
@@ -230,8 +230,8 @@ void test_hmm_loglik_two_mute_states(void)
 
 void test_hmm_loglik_invalid(void)
 {
-    struct imm_abc const *abc = imm_abc_new(IMM_STR("AC"), '*');
-    struct imm_seq const *C = imm_seq_new(IMM_STR("C"), abc);
+    struct imm_abc const *abc = imm_abc_init(IMM_STR("AC"), '*');
+    struct imm_seq const *C = imm_seq_init(IMM_STR("C"), abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
 
     struct imm_mute_state *S = imm_mute_state_new(0, abc);
@@ -274,8 +274,8 @@ void test_hmm_loglik_invalid(void)
 
 void test_hmm_loglik_no_state(void)
 {
-    struct imm_abc const *abc = imm_abc_new(IMM_STR("ACGT"), '*');
-    struct imm_seq const *EMPTY = imm_seq_new(IMM_STR(""), abc);
+    struct imm_abc const *abc = imm_abc_init(IMM_STR("ACGT"), '*');
+    struct imm_seq const *EMPTY = imm_seq_init(IMM_STR(""), abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
 
     struct imm_path path;

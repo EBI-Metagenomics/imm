@@ -10,8 +10,8 @@
 #define imm_super(x)                                                           \
     _Generic((x), struct imm_normal_state *                                    \
              : imm_normal_state_super, struct imm_mute_state *                 \
-             : imm_mute_state_super, struct imm_amino const *                  \
-             : imm_amino_super)(x)
+             : imm_mute_state_super, struct imm_amino *                        \
+             : imm_amino_super, struct imm_amino const*:imm_amino_super)(x)
 
 #define imm_del(x)                                                             \
     _Generic((x), struct imm_normal_state *                                    \
@@ -21,8 +21,7 @@
              struct imm_abc const * : imm_abc_del,                             \
              struct imm_task * : imm_task_del,                                 \
              struct imm_hmm * : imm_hmm_del,                                   \
-             struct imm_dp * : imm_dp_del,                                     \
-             struct imm_amino const * : imm_amino_del) (x)
+             struct imm_dp * : imm_dp_del) (x)
 
 #define imm_deinit(x)                                                          \
     _Generic((x), struct imm_path *                                            \

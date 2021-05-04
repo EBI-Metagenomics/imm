@@ -18,7 +18,7 @@ int main(void)
 
 void test_dp_illegal(void)
 {
-    struct imm_abc const *abc = imm_abc_new(IMM_STR("ACGT"), '*');
+    struct imm_abc const *abc = imm_abc_init(IMM_STR("ACGT"), '*');
     struct imm_mute_state *state = imm_mute_state_new(3, abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
 
@@ -46,7 +46,7 @@ void test_dp_illegal(void)
 
 void test_dp_empty_path(void)
 {
-    struct imm_abc const *abc = imm_abc_new(IMM_STR("ACGT"), '*');
+    struct imm_abc const *abc = imm_abc_init(IMM_STR("ACGT"), '*');
     struct imm_mute_state *state = imm_mute_state_new(3, abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
     struct imm_result result = IMM_RESULT_INIT();
@@ -57,7 +57,7 @@ void test_dp_empty_path(void)
     NOTNULL(dp);
 
     struct imm_task *task = imm_task_new(dp);
-    struct imm_seq const *seq = imm_seq_new(IMM_STR("A"), abc);
+    struct imm_seq const *seq = imm_seq_init(IMM_STR("A"), abc);
     imm_task_setup(task, seq);
     EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     EQ(imm_path_nsteps(&result.path), 0);
@@ -72,7 +72,7 @@ void test_dp_empty_path(void)
 
 void test_dp_one_mute(void)
 {
-    struct imm_abc const *abc = imm_abc_new(IMM_STR("ACGT"), '*');
+    struct imm_abc const *abc = imm_abc_init(IMM_STR("ACGT"), '*');
     struct imm_mute_state *state = imm_mute_state_new(3, abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
     struct imm_result result = IMM_RESULT_INIT();
@@ -85,13 +85,13 @@ void test_dp_one_mute(void)
     struct imm_task *task = imm_task_new(dp);
     EQ(imm_dp_viterbi(dp, task, &result), IMM_ILLEGALARG);
 
-    struct imm_seq const *seq = imm_seq_new(IMM_STR(""), abc);
+    struct imm_seq const *seq = imm_seq_init(IMM_STR(""), abc);
     imm_task_setup(task, seq);
     EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     EQ(imm_path_nsteps(&result.path), 1);
     imm_del(seq);
 
-    seq = imm_seq_new(IMM_STR("ATT"), abc);
+    seq = imm_seq_init(IMM_STR("ATT"), abc);
     imm_task_setup(task, seq);
     EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     EQ(imm_path_nsteps(&result.path), 0);
@@ -107,7 +107,7 @@ void test_dp_one_mute(void)
 
 void test_dp_two_mutes(void)
 {
-    struct imm_abc const *abc = imm_abc_new(IMM_STR("ACGT"), '*');
+    struct imm_abc const *abc = imm_abc_init(IMM_STR("ACGT"), '*');
     struct imm_mute_state *state0 = imm_mute_state_new(0, abc);
     struct imm_mute_state *state1 = imm_mute_state_new(12, abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
@@ -130,7 +130,7 @@ void test_dp_two_mutes(void)
 
     EQ(imm_dp_viterbi(dp, task, &result), IMM_ILLEGALARG);
 
-    struct imm_seq const *seq = imm_seq_new(IMM_STR(""), abc);
+    struct imm_seq const *seq = imm_seq_init(IMM_STR(""), abc);
     imm_task_setup(task, seq);
     EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     EQ(imm_path_nsteps(&result.path), 2);
@@ -140,7 +140,7 @@ void test_dp_two_mutes(void)
     EQ(imm_path_step(&result.path, 1)->state_id, 12);
     imm_del(seq);
 
-    seq = imm_seq_new(IMM_STR("ATT"), abc);
+    seq = imm_seq_init(IMM_STR("ATT"), abc);
     imm_task_setup(task, seq);
     EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     EQ(imm_path_nsteps(&result.path), 0);

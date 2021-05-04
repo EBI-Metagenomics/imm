@@ -2,10 +2,7 @@
 #define IMM_NORMAL_STATE_H
 
 #include "imm/export.h"
-#include "imm/float.h"
 #include "imm/state_types.h"
-#include <stdint.h>
-#include <stdio.h>
 
 struct imm_abc;
 
@@ -15,7 +12,7 @@ struct imm_normal_state
     imm_float const *lprobs;
 };
 
-IMM_API struct imm_normal_state *imm_normal_state_new(__imm_state_id_t id,
+IMM_API struct imm_normal_state *imm_normal_state_new(unsigned id,
                                                       struct imm_abc const *abc,
                                                       imm_float const lprobs[]);
 

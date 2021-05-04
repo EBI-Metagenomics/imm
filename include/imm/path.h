@@ -3,7 +3,6 @@
 
 #include "imm/export.h"
 #include "imm/step.h"
-#include <stddef.h>
 
 struct imm_path
 {

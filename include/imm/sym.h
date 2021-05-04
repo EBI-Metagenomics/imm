@@ -21,12 +21,11 @@ enum imm_sym_type
 
 #define __IMM_SYM_IDX_SIZE ((size_t)((__IMM_SYM_LAST - __IMM_SYM_FIRST) + 1))
 
-static inline unsigned __imm_sym_index(char const c)
-{
-    return (unsigned)(c - __IMM_SYM_FIRST);
-}
+#define __IMM_SYM_INDEX(c) ((unsigned)(c - __IMM_SYM_FIRST))
 
-static inline bool __imm_sym_valid(char const symbol)
+static inline unsigned __imm_sym_index(char c) { return __IMM_SYM_INDEX(c); }
+
+static inline bool __imm_sym_valid(char symbol)
 {
     return symbol >= __IMM_SYM_FIRST && symbol <= __IMM_SYM_LAST;
 }

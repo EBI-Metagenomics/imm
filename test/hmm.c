@@ -17,7 +17,7 @@ int main(void)
 
 void test_hmm_state_id(void)
 {
-    struct imm_abc const *abc = imm_abc_new(IMM_STR("ACGT"), '*');
+    struct imm_abc const *abc = imm_abc_init(IMM_STR("ACGT"), '*');
     struct imm_mute_state *state = imm_mute_state_new(0, abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
 
@@ -31,7 +31,7 @@ void test_hmm_state_id(void)
 
 void test_hmm_set_trans(void)
 {
-    struct imm_abc const *abc = imm_abc_new(IMM_STR("ACGT"), '*');
+    struct imm_abc const *abc = imm_abc_init(IMM_STR("ACGT"), '*');
     struct imm_mute_state *state0 = imm_mute_state_new(0, abc);
     struct imm_mute_state *state1 = imm_mute_state_new(1, abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);
@@ -51,7 +51,7 @@ void test_hmm_set_trans(void)
 
 void test_hmm_wrong_states(void)
 {
-    struct imm_abc const *abc = imm_abc_new(IMM_STR("ACGT"), '*');
+    struct imm_abc const *abc = imm_abc_init(IMM_STR("ACGT"), '*');
     struct imm_hmm *hmm = imm_hmm_new(abc);
 
     struct imm_mute_state *state0 = imm_mute_state_new(0, abc);
@@ -83,7 +83,7 @@ void test_hmm_wrong_states(void)
 
 void test_hmm_reset(void)
 {
-    struct imm_abc const *abc = imm_abc_new(IMM_STR("ACGT"), '*');
+    struct imm_abc const *abc = imm_abc_init(IMM_STR("ACGT"), '*');
     struct imm_mute_state *state0 = imm_mute_state_new(0, abc);
     struct imm_mute_state *state1 = imm_mute_state_new(1, abc);
     struct imm_hmm *hmm = imm_hmm_new(abc);

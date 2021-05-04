@@ -69,6 +69,7 @@ else()
         -Wno-gnu-statement-expression
         -Wno-unused-function # FIXME: added only to please clangd for now
         -Wno-empty-translation-unit # FIXME: added only to please clangd for now
+        -Wno-gnu-designator
     )
 endif()
 

@@ -24,10 +24,8 @@ static inline struct imm_abc const *imm_seq_abc(struct imm_seq const *seq)
     return seq->abc;
 }
 
-IMM_API struct imm_seq const *imm_seq_new(struct imm_str str,
-                                          struct imm_abc const *abc);
-
-IMM_API void imm_seq_del(struct imm_seq const *seq);
+IMM_API int imm_seq_init(struct imm_seq *seq, struct imm_str str,
+                         struct imm_abc const *abc);
 
 static inline unsigned imm_seq_len(struct imm_seq const *seq)
 {
