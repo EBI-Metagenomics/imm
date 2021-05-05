@@ -15,7 +15,7 @@ struct imm_normal_state *imm_normal_state_new(unsigned id,
     struct imm_normal_state *normal = xmalloc(sizeof(*normal));
     normal->lprobs = lprobs;
     struct imm_state_vtable vtable = {del, lprob, IMM_NORMAL_STATE, normal};
-    normal->super = state_new(id, abc, vtable, 1, 1);
+    normal->super = state_new(id, abc, vtable, IMM_SPAN(1, 1));
     return normal;
 }
 

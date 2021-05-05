@@ -2,15 +2,14 @@
 #include "common/common.h"
 
 struct imm_state *state_new(unsigned id, struct imm_abc const *abc,
-                            struct imm_state_vtable vtable, unsigned min_seqlen,
-                            unsigned max_seqlen)
+                            struct imm_state_vtable vtable,
+                            struct imm_span span)
 {
     struct imm_state *state = xmalloc(sizeof(*state));
     state->id = id;
     state->idx = IMM_STATE_NULL_IDX;
     state->abc = abc;
-    state->seqlen.min = min_seqlen;
-    state->seqlen.max = max_seqlen;
+    state->span = span;
     state->vtable = vtable;
     stack_init(&state->trans.outgoing);
     stack_init(&state->trans.incoming);

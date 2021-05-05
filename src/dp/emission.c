@@ -25,12 +25,12 @@ void emission_init(struct emission *emiss, struct code const *code,
     emiss->offset = xmalloc(sizeof(*emiss->offset) * offset_size(nstates));
     emiss->offset[0] = 0;
 
-    unsigned min = imm_state_min_seqlen(states[0]);
+    unsigned min = imm_state_span(states[0]).min;
     unsigned size = code_size(code, min);
     for (unsigned i = 1; i < nstates; ++i)
     {
         emiss->offset[i] = size;
-        size += code_size(code, imm_state_min_seqlen(states[i]));
+        size += code_size(code, imm_state_span(states[i]).min);
     }
     emiss->offset[nstates] = size;
 
@@ -44,8 +44,8 @@ void emission_init(struct emission *emiss, struct code const *code,
 
     for (unsigned i = 0; i < nstates; ++i)
     {
-        unsigned min_seq = imm_state_min_seqlen(states[i]);
-        for (unsigned len = min_seq; len <= imm_state_max_seqlen(states[i]);
+        unsigned min_seq = imm_state_span(states[i]).min;
+        for (unsigned len = min_seq; len <= imm_state_span(states[i]).max;
              ++len)
         {
             cartes_setup(&cartes, len);

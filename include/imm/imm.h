@@ -14,6 +14,7 @@ extern "C" {
 #include "imm/float.h"
 #include "imm/generics.h"
 #include "imm/hmm.h"
+#include "imm/span.h"
 #include "imm/state_types.h"
 #include "imm/str.h"
 #include "imm/sym.h"

@@ -20,8 +20,8 @@ struct state_table
         unsigned char bytes[2];
         struct __attribute__((__packed__))
         {
-            uint8_t min;
-            uint8_t max;
+            __imm_state_seqlen_t min;
+            __imm_state_seqlen_t max;
         };
     } * seqlen;
 };

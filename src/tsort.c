@@ -9,7 +9,7 @@
 
 static bool check_mute_visit(struct imm_state **states, struct imm_state *state)
 {
-    if (imm_state_min_seqlen(state) > 0)
+    if (imm_state_span(state).min > 0)
         return false;
 
     if (state->mark == PERMANENT_MARK)

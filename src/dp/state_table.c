@@ -14,9 +14,9 @@ void state_table_init(struct state_table *tbl, struct dp_args const *args)
     for (unsigned i = 0; i < args->nstates; ++i)
     {
         tbl->seqlen[i].min =
-            (__imm_state_seqlen_t)imm_state_min_seqlen(args->states[i]);
+            (__imm_state_seqlen_t)imm_state_span(args->states[i]).min;
         tbl->seqlen[i].max =
-            (__imm_state_seqlen_t)imm_state_max_seqlen(args->states[i]);
+            (__imm_state_seqlen_t)imm_state_span(args->states[i]).max;
     }
 
     tbl->start.lprob = args->start.lprob;
