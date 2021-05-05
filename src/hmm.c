@@ -119,18 +119,20 @@ void imm_hmm_del(struct imm_hmm const *hmm)
 struct imm_dp *imm_hmm_new_dp(struct imm_hmm const *hmm,
                               struct imm_state const *end_state)
 {
+    struct imm_dp *dp = NULL;
+    struct imm_state **states = xmalloc(sizeof(*states) * hmm->states.size);
+
     if (!hmm_state(hmm, end_state->id))
     {
         xerror(IMM_ILLEGALARG, "end state not found");
-        return NULL;
+        goto cleanup;
     }
     if (!has_start_state(hmm))
     {
         xerror(IMM_ILLEGALARG, "start state not found");
-        return NULL;
+        goto cleanup;
     }
 
-    struct imm_state **states = xmalloc(sizeof(*states) * hmm->states.size);
     unsigned bkt = 0;
     unsigned i = 0;
     struct imm_state *state = NULL;
@@ -141,8 +143,7 @@ struct imm_dp *imm_hmm_new_dp(struct imm_hmm const *hmm,
     if (tsort(hmm->states.size, states, start_idx))
     {
         xerror(IMM_RUNTIMEERROR, "failed to sort states");
-        free(states);
-        return NULL;
+        goto cleanup;
     }
     set_state_indices(hmm, states);
 
@@ -151,7 +152,9 @@ struct imm_dp *imm_hmm_new_dp(struct imm_hmm const *hmm,
                  hmm_state(hmm, hmm->start.state_id), hmm->start.lprob,
                  end_state);
 
-    struct imm_dp *dp = dp_new(&args);
+    dp = dp_new(&args);
+
+cleanup:
     free(states);
     return dp;
 }
