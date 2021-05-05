@@ -10,8 +10,8 @@ void matrix_init(struct matrix *matrix, struct state_table const *tbl)
     unsigned next_col = 0;
     for (unsigned i = 0; i < tbl->nstates; ++i)
     {
-        unsigned const min = state_table_min_seqlen(tbl, i);
-        unsigned const max = state_table_max_seqlen(tbl, i);
+        unsigned min = state_table_span(tbl, i).min;
+        unsigned max = state_table_span(tbl, i).max;
         matrix->state_col[i] = (int16_t)(next_col - min);
         next_col += (unsigned)(max - min + 1);
     }

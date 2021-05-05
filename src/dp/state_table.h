@@ -1,6 +1,7 @@
 #ifndef DP_STATE_TABLE_H
 #define DP_STATE_TABLE_H
 
+#include "dp/span.h"
 #include "imm/state.h"
 
 struct dp_args;
@@ -15,15 +16,7 @@ struct state_table
         imm_float lprob;
     } start;
     unsigned end_state;
-    union
-    {
-        unsigned char bytes[2];
-        struct __attribute__((__packed__))
-        {
-            __imm_state_seqlen_t min;
-            __imm_state_seqlen_t max;
-        };
-    } * seqlen;
+    struct span *span;
 };
 
 #define STATE_TABLE_MAX_SEQ 5
@@ -32,16 +25,10 @@ void state_table_deinit(struct state_table const *tbl);
 
 void state_table_init(struct state_table *tbl, struct dp_args const *args);
 
-static inline unsigned state_table_max_seqlen(struct state_table const *tbl,
-                                              unsigned state)
+static inline struct span state_table_span(struct state_table const *tbl,
+                                           unsigned state)
 {
-    return tbl->seqlen[state].max;
-}
-
-static inline unsigned state_table_min_seqlen(struct state_table const *tbl,
-                                              unsigned state)
-{
-    return tbl->seqlen[state].min;
+    return tbl->span[state];
 }
 
 #ifndef NDEBUG

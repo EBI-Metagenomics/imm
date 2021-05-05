@@ -2,8 +2,6 @@
 #include "common/common.h"
 #include <limits.h>
 
-/* TODO: create imm_cartes_reset */
-
 void cartes_init(struct cartes *cartes, char const *set, unsigned set_size,
                  unsigned max_times)
 {

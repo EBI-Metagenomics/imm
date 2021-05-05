@@ -19,8 +19,8 @@ void path_init(struct path *path, struct state_table const *state_tbl,
         {
 
             unsigned src = trans_table_source_state(trans_tbl, dst, i);
-            unsigned min_seq = state_table_min_seqlen(state_tbl, src);
-            unsigned max_seq = state_table_max_seqlen(state_tbl, src);
+            unsigned min_seq = state_table_span(state_tbl, src).min;
+            unsigned max_seq = state_table_span(state_tbl, src).max;
             depth = MAX(max_seq - min_seq, depth);
         }
         path->state_offset[dst + 1] = path->state_offset[dst];

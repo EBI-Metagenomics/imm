@@ -6,17 +6,15 @@ void state_table_init(struct state_table *tbl, struct dp_args const *args)
 {
     tbl->nstates = args->nstates;
     tbl->ids = xmalloc(sizeof(*tbl->ids) * args->nstates);
-    tbl->seqlen = xmalloc(sizeof(*tbl->seqlen) * args->nstates);
+    tbl->span = xmalloc(sizeof(*tbl->span) * args->nstates);
 
     for (unsigned i = 0; i < args->nstates; ++i)
         tbl->ids[i] = (__imm_state_id_t)imm_state_id(args->states[i]);
 
     for (unsigned i = 0; i < args->nstates; ++i)
     {
-        tbl->seqlen[i].min =
-            (__imm_state_seqlen_t)imm_state_span(args->states[i]).min;
-        tbl->seqlen[i].max =
-            (__imm_state_seqlen_t)imm_state_span(args->states[i]).max;
+        tbl->span[i] = SPAN(imm_state_span(args->states[i]).min,
+                            imm_state_span(args->states[i]).min);
     }
 
     tbl->start.lprob = args->start.lprob;
@@ -27,7 +25,7 @@ void state_table_init(struct state_table *tbl, struct dp_args const *args)
 void state_table_deinit(struct state_table const *tbl)
 {
     free(tbl->ids);
-    free(tbl->seqlen);
+    free(tbl->span);
 }
 
 #ifndef NDEBUG
