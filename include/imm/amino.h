@@ -6,18 +6,18 @@
 
 #define IMM_AMINO_ANY_SYMBOL 'X'
 #define IMM_AMINO_SYMBOLS "ACDEFGHIKLMNPQRSTVWY"
-#define IMM_AMINO_NSYMBOLS ((unsigned)(sizeof(IMM_AMINO_SYMBOLS) - 1))
-
-struct imm_abc;
+#define IMM_AMINO_NSYMBOLS 20
 
 struct imm_amino
 {
     struct imm_abc super;
 };
 
-extern struct imm_amino imm_amino_default;
+extern struct imm_amino const imm_amino_default;
 
-IMM_API int imm_amino_init(struct imm_amino *amino);
+IMM_API int imm_amino_init(struct imm_amino *amino,
+                           char const symbols[IMM_AMINO_NSYMBOLS],
+                           char any_symbol);
 
 static inline struct imm_abc const *
 imm_amino_super(struct imm_amino const *amino)

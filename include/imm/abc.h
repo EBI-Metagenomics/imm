@@ -21,7 +21,7 @@ struct imm_abc
     struct imm_abc_vtable vtable;
 };
 
-extern struct imm_abc imm_abc_empty;
+extern struct imm_abc const imm_abc_empty;
 
 static inline char imm_abc_any_symbol(struct imm_abc const *abc)
 {

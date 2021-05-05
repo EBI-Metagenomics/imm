@@ -3,7 +3,7 @@
 #include "imm/error.h"
 #include "imm/sym.h"
 
-struct imm_abc imm_abc_empty = {
+struct imm_abc const imm_abc_empty = {
     .nsymbols = 0,
     .symbols = NULL,
     .symbol_idx[0 ...(__IMM_SYM_IDX_SIZE) - 1] = IMM_SYM_NULL_IDX,

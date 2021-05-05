@@ -29,6 +29,8 @@ add_library(imm
     src/amino.c
     src/cartes.c
     src/common/error.c
+    src/defaults.c
+    src/dna.c
     src/dp/bitarr.c
     src/dp/code.c
     src/dp/dp.c
@@ -43,7 +45,9 @@ add_library(imm
     src/lprob.c
     src/mute_state.c
     src/normal_state.c
+    src/nuclt.c
     src/path.c
+    src/rna.c
     src/seq.c
     src/state.c
     src/task.c
