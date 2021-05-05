@@ -13,6 +13,8 @@ struct imm_dna
     struct imm_nuclt super;
 };
 
+extern struct imm_dna const imm_dna_default;
+
 IMM_API int imm_dna_init(struct imm_dna *dna,
                          char const symbols[IMM_DNA_NSYMBOLS], char any_symbol);
 

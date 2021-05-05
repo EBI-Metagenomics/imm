@@ -11,7 +11,10 @@
     _Generic((x), struct imm_normal_state *                                    \
              : imm_normal_state_super, struct imm_mute_state *                 \
              : imm_mute_state_super, struct imm_amino *                        \
-             : imm_amino_super, struct imm_amino const*:imm_amino_super)(x)
+             : imm_amino_super, struct imm_amino const*:imm_amino_super,       \
+             struct imm_dna const*:imm_dna_super,                              \
+             struct imm_nuclt const*:imm_nuclt_super,                              \
+             struct imm_rna const*:imm_rna_super)(x)
 
 #define imm_del(x)                                                             \
     _Generic((x), struct imm_normal_state *                                    \

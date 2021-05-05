@@ -9,6 +9,7 @@ extern "C" {
 #include "imm/abc_lprob.h"
 #include "imm/abc_types.h"
 #include "imm/amino.h"
+#include "imm/codon.h"
 #include "imm/dna.h"
 #include "imm/dp.h"
 #include "imm/error.h"
@@ -23,6 +24,7 @@ extern "C" {
 #include "imm/sym.h"
 #include "imm/task.h"
 #include "imm/trans.h"
+#include "imm/triplet.h"
 /* #include "imm/input.h" */
 /* #include "imm/io.h" */
 #include "imm/log.h"
