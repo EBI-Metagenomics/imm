@@ -1,204 +1,94 @@
 #include "tsort.h"
 #include "common/common.h"
-#include "containers/containers.h"
 #include "imm/state.h"
 #include "trans.h"
-#include <containers/hash.h>
 
 #define INITIAL_MARK 0
 #define TEMPORARY_MARK 1
 #define PERMANENT_MARK 2
 
-struct vert
+static bool check_mute_visit(struct imm_state **states, struct imm_state *state)
 {
-    struct imm_state *state;
-    int mark;
-    struct queue edgeq;
-    struct node node;
-    struct hnode hnode;
-};
+    if (imm_state_min_seqlen(state) > 0)
+        return false;
 
-struct edge
-{
-    struct vert *vert;
-    struct node node;
-};
+    if (state->mark == PERMANENT_MARK)
+        return false;
 
-struct graph
-{
-    struct vert *verts;
-    struct edge *edges;
-    struct queue vertq;
-    HASH_DECLARE(vert_tbl, 11);
-};
+    if (state->mark == TEMPORARY_MARK)
+        return true;
 
-static int check_mute_cycles(struct queue *vertq);
-static int check_mute_visit(struct vert *vert);
-static void create_edges(struct graph *graph);
-static void create_vertices(struct graph *graph, unsigned nstates,
-                            struct imm_state **states);
-static void graph_deinit(struct graph const *graph);
-static void graph_init(struct graph *graph, unsigned nstates, unsigned ntrans);
-static void unmark_nodes(struct queue *vertq);
-static void visit(struct vert *vert, struct imm_state **state, unsigned *end);
+    state->mark = TEMPORARY_MARK;
 
-int tsort(unsigned nstates, struct imm_state **states, unsigned start_state,
-          unsigned ntrans)
-{
-    struct graph graph;
-    /* TODO: consider add variable to imm_state instead of mallocing new
-     * structures here */
-    graph_init(&graph, nstates, ntrans);
-
-    create_vertices(&graph, nstates, states);
-
-    if (check_mute_cycles(&graph.vertq))
+    struct trans *trans = NULL;
+    struct iter it = stack_iter(&state->trans.outgoing);
+    iter_for_each_entry(trans, &it, outgoing)
     {
-        error("mute cycles are not allowed");
-        graph_deinit(&graph);
-        return IMM_RUNTIMEERROR;
+        if (check_mute_visit(states, states[trans->pair.idx.dst]))
+            return true;
     }
-    unmark_nodes(&graph.vertq);
+    state->mark = PERMANENT_MARK;
 
-    struct vert *vert = NULL;
-    unsigned end = nstates;
-    hash_for_each_possible(graph.vert_tbl, vert, hnode, start_state)
-    {
-        if (vert->state->id == start_state)
-        {
-            visit(vert, states, &end);
-            break;
-        }
-    }
-
-    unsigned bkt = 0;
-    hash_for_each(graph.vert_tbl, bkt, vert, hnode)
-    {
-        if (vert->state->id != start_state)
-        {
-            visit(vert, states, &end);
-            break;
-        }
-    }
-
-    graph_deinit(&graph);
-    return IMM_SUCCESS;
+    return false;
 }
 
-static int check_mute_cycles(struct queue *vertq)
+static int check_mute_cycles(unsigned nstates, struct imm_state **states)
 {
-    struct vert *vert = NULL;
-    struct iter iter = queue_iter(vertq);
-    iter_for_each_entry(vert, &iter, node)
+    for (unsigned i = 0; i < nstates; ++i)
     {
-        if (check_mute_visit(vert))
+        if (check_mute_visit(states, states[i]))
             return IMM_FAILURE;
     }
     return IMM_SUCCESS;
 }
 
-static int check_mute_visit(struct vert *vert)
-{
-    if (imm_state_min_seqlen(vert->state) > 0)
-        return 0;
-
-    if (vert->mark == PERMANENT_MARK)
-        return 0;
-
-    if (vert->mark == TEMPORARY_MARK)
-    {
-        return 1;
-    }
-
-    vert->mark = TEMPORARY_MARK;
-    struct edge const *edge = NULL;
-    struct iter iter = queue_iter(&vert->edgeq);
-    iter_for_each_entry(edge, &iter, node)
-    {
-        if (check_mute_visit(edge->vert))
-            return 1;
-    }
-    vert->mark = PERMANENT_MARK;
-
-    return 0;
-}
-
-static void create_edges(struct graph *graph)
-{
-    struct vert *src = NULL;
-    struct iter iter0 = queue_iter(&graph->vertq);
-    struct edge *edge = graph->edges;
-    iter_for_each_entry(src, &iter0, node)
-    {
-        struct trans *trans = NULL;
-        struct iter iter1 = stack_iter(&src->state->trans.outgoing);
-        iter_for_each_entry(trans, &iter1, outgoing)
-        {
-            struct vert *dst = NULL;
-            unsigned id = trans->pair.id.dst;
-            hash_for_each_possible(graph->vert_tbl, dst, hnode, id)
-            {
-                if (dst->state->id == id)
-                    break;
-            }
-            edge->vert = dst;
-            queue_put(&src->edgeq, &edge->node);
-            ++edge;
-        }
-    }
-}
-
-static void create_vertices(struct graph *graph, unsigned nstates,
-                            struct imm_state **states)
+static void clear_marks(unsigned nstates, struct imm_state **states)
 {
     for (unsigned i = 0; i < nstates; ++i)
+        states[i]->mark = INITIAL_MARK;
+}
+
+static void visit(struct imm_state *state, struct imm_state **states,
+                  unsigned *end, struct imm_state **tmp)
+{
+    if (state->mark == PERMANENT_MARK)
+        return;
+    if (state->mark == TEMPORARY_MARK)
+        return;
+
+    state->mark = TEMPORARY_MARK;
+    struct trans const *trans = NULL;
+    struct iter it = stack_iter(&state->trans.outgoing);
+    iter_for_each_entry(trans, &it, outgoing)
     {
-        struct vert *vert = graph->verts + i;
-        vert->state = states[i];
-        vert->mark = INITIAL_MARK;
-
-        queue_init(&vert->edgeq);
-        queue_put_first(&graph->vertq, &vert->node);
-
-        hash_add(graph->vert_tbl, &vert->hnode, vert->state->id);
+        visit(states[trans->pair.idx.dst], states, end, tmp);
     }
-
-    create_edges(graph);
-}
-
-static void graph_deinit(struct graph const *graph)
-{
-    free(graph->verts);
-    free(graph->edges);
-}
-
-static void graph_init(struct graph *graph, unsigned nstates, unsigned ntrans)
-{
-    graph->verts = xmalloc(sizeof(*graph->verts) * nstates);
-    graph->edges = xmalloc(sizeof(*graph->edges) * ntrans);
-    queue_init(&graph->vertq);
-    hash_init(graph->vert_tbl);
-}
-
-static void unmark_nodes(struct queue *vertq)
-{
-    struct vert *vert = NULL;
-    struct iter iter = queue_iter(vertq);
-    iter_for_each_entry(vert, &iter, node) { vert->mark = INITIAL_MARK; }
-}
-
-static void visit(struct vert *vert, struct imm_state **state, unsigned *end)
-{
-    if (vert->mark == PERMANENT_MARK)
-        return;
-    if (vert->mark == TEMPORARY_MARK)
-        return;
-
-    vert->mark = TEMPORARY_MARK;
-    struct edge const *edge = NULL;
-    struct iter iter = queue_iter(&vert->edgeq);
-    iter_for_each_entry(edge, &iter, node) { visit(edge->vert, state, end); }
-    vert->mark = PERMANENT_MARK;
+    state->mark = PERMANENT_MARK;
     *end = *end - 1;
-    state[*end] = vert->state;
+    tmp[*end] = state;
+}
+
+int tsort(unsigned nstates, struct imm_state **states, unsigned start_idx)
+{
+    clear_marks(nstates, states);
+
+    if (check_mute_cycles(nstates, states))
+        return xerror(IMM_RUNTIMEERROR, "mute cycles are not allowed");
+
+    clear_marks(nstates, states);
+
+    struct imm_state **tmp = xmalloc(sizeof(*tmp) * nstates);
+    unsigned end = nstates;
+    visit(states[start_idx], states, &end, tmp);
+
+    for (unsigned i = 0; i < start_idx; ++i)
+        visit(states[i], states, &end, tmp);
+
+    for (unsigned i = start_idx + 1; i < nstates; ++i)
+        visit(states[i], states, &end, tmp);
+
+    xmemcpy(states, tmp, sizeof(*tmp) * nstates);
+    free(tmp);
+
+    return IMM_SUCCESS;
 }

@@ -66,6 +66,23 @@ static inline bool has_start_state(struct imm_hmm const *hmm)
     return hmm->start.state_id != IMM_STATE_NULL_ID;
 }
 
+static void set_state_indices(struct imm_hmm const *hmm,
+                              struct imm_state **states)
+{
+    for (unsigned i = 0; i < hmm->states.size; ++i)
+        states[i]->idx = i;
+
+    struct trans *trans = NULL;
+    unsigned bkt = 0;
+    hash_for_each(hmm->transitions.tbl, bkt, trans, hnode)
+    {
+        struct imm_state *src = hmm_state(hmm, trans->pair.id.src);
+        struct imm_state *dst = hmm_state(hmm, trans->pair.id.dst);
+        trans->pair.idx.src = (__imm_state_idx_t)src->idx;
+        trans->pair.idx.dst = (__imm_state_idx_t)dst->idx;
+    }
+}
+
 int imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
 {
     if (hash_hashed(&state->hnode))
@@ -118,26 +135,16 @@ struct imm_dp *imm_hmm_new_dp(struct imm_hmm const *hmm,
     unsigned i = 0;
     struct imm_state *state = NULL;
     hash_for_each(hmm->states.tbl, bkt, state, hnode) { states[i++] = state; }
+    set_state_indices(hmm, states);
 
-    if (tsort(hmm->states.size, states, hmm->start.state_id,
-              hmm->transitions.size))
+    unsigned start_idx = hmm_state(hmm, hmm->start.state_id)->idx;
+    if (tsort(hmm->states.size, states, start_idx))
     {
         xerror(IMM_RUNTIMEERROR, "failed to sort states");
         free(states);
         return NULL;
     }
-    for (i = 0; i < hmm->states.size; ++i)
-        states[i]->idx = i;
-
-    struct trans *trans = NULL;
-    bkt = 0;
-    hash_for_each(hmm->transitions.tbl, bkt, trans, hnode)
-    {
-        struct imm_state *src = hmm_state(hmm, trans->pair.id.src);
-        struct imm_state *dst = hmm_state(hmm, trans->pair.id.dst);
-        trans->pair.idx.src = (__imm_state_idx_t)src->idx;
-        trans->pair.idx.dst = (__imm_state_idx_t)dst->idx;
-    }
+    set_state_indices(hmm, states);
 
     struct dp_args args;
     dp_args_init(&args, hmm->transitions.size, hmm->states.size, states,

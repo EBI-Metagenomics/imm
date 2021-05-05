@@ -27,6 +27,7 @@ struct imm_state
         struct stack incoming;
     } trans;
     struct hnode hnode;
+    int mark;
 };
 
 static inline struct imm_abc const *imm_state_abc(struct imm_state const *state)

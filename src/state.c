@@ -15,6 +15,7 @@ struct imm_state *state_new(unsigned id, struct imm_abc const *abc,
     stack_init(&state->trans.outgoing);
     stack_init(&state->trans.incoming);
     hnode_init(&state->hnode);
+    state->mark = 0;
     return state;
 }
 
