@@ -25,9 +25,11 @@ find_package(elapsed REQUIRED)
 find_package(containers REQUIRED)
 
 add_library(imm
+    src/arr3d.c
     src/abc.c
     src/amino.c
     src/cartes.c
+    src/codon_lprob.c
     src/common/error.c
     src/defaults.c
     src/dna.c

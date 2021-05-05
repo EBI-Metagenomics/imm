@@ -27,6 +27,7 @@ imm_add_test(hmm hmm.c)
 imm_add_test(dp dp.c)
 imm_add_test(viterbi viterbi.c)
 imm_add_test(hmm_loglik hmm_loglik.c)
+imm_add_test(codon_lprob codon_lprob.c)
 
 # imm_add_test(hmm_io hmm_io.c)
 # imm_add_test(perf "perf.c;model.c")

@@ -2,6 +2,7 @@
 #define IMM_ABC_H
 
 #include "imm/abc_types.h"
+#include "imm/compiler.h"
 #include "imm/export.h"
 #include "imm/str.h"
 #include "imm/sym.h"
@@ -35,7 +36,7 @@ IMM_API void imm_abc_del(struct imm_abc const *abc);
 
 static inline bool imm_abc_has_symbol(struct imm_abc const *abc, char symbol)
 {
-    if (!__imm_sym_valid(symbol))
+    if (imm_unlikely(!__imm_sym_valid(symbol)))
         return false;
 
     return abc->symbol_idx[__imm_sym_index(symbol)] != IMM_SYM_NULL_IDX;
