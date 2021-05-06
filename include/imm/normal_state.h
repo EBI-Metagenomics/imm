@@ -12,9 +12,9 @@ struct imm_normal_state
     imm_float const *lprobs;
 };
 
-IMM_API struct imm_normal_state *imm_normal_state_new(unsigned id,
-                                                      struct imm_abc const *abc,
-                                                      imm_float const lprobs[]);
+IMM_API struct imm_normal_state *
+imm_normal_state_new(unsigned id, struct imm_abc const *abc,
+                     imm_float const lprobs[1]);
 
 IMM_API void imm_normal_state_del(struct imm_normal_state const *normal);
 

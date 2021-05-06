@@ -50,14 +50,14 @@ static inline void imm_sym_set_idx(struct imm_sym *sym, unsigned id,
     sym->idx[id] = (imm_sym_idx_t)idx;
 }
 
-static inline bool imm_sym_valid(char c)
+static inline bool imm_sym_valid_char(char c)
 {
     return imm_likely(c >= IMM_SYM_FIRST_CHAR && c <= IMM_SYM_LAST_CHAR);
 }
 
 static inline bool imm_sym_valid_id(unsigned id)
 {
-    return imm_sym_valid(imm_sym_char(id));
+    return imm_sym_valid_char(imm_sym_char(id));
 }
 
 #endif

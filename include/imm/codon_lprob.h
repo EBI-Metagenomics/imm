@@ -2,6 +2,7 @@
 #define IMM_CODON_LPROB_H
 
 #include "imm/arr3d.h"
+#include "imm/bug.h"
 #include "imm/codon.h"
 #include "imm/compiler.h"
 #include "imm/error.h"
@@ -31,37 +32,20 @@ IMM_API void imm_codon_lprob_init(struct imm_codon_lprob *codonp,
 
 IMM_API void imm_codon_lprob_deinit(struct imm_codon_lprob *codonp);
 
-static inline bool __imm_codon_lprob_check(struct imm_codon_lprob const *codonp,
-                                           struct imm_codon const *codon)
-{
-    if (imm_unlikely(codonp->nuclt != codon->nuclt))
-    {
-        imm_log_error("alphabets must be the same");
-        return false;
-    }
-
-    return true;
-}
-
 static inline imm_float
 imm_codon_lprob_get(struct imm_codon_lprob const *codonp,
                     struct imm_codon const *codon)
 {
-    if (imm_unlikely(!__imm_codon_lprob_check(codonp, codon)))
-        return imm_lprob_nan();
-
+    IMM_BUG(codonp->nuclt != codon->nuclt);
     return imm_arr3d_get(&codonp->lprobs, codon->idx);
 }
 
-static inline int imm_codon_lprob_set(struct imm_codon_lprob *codonp,
-                                      struct imm_codon const *codon,
-                                      imm_float lprob)
+static inline void imm_codon_lprob_set(struct imm_codon_lprob *codonp,
+                                       struct imm_codon const *codon,
+                                       imm_float lprob)
 {
-    if (imm_unlikely(!__imm_codon_lprob_check(codonp, codon)))
-        return IMM_ILLEGALARG;
-
+    IMM_BUG(codonp->nuclt != codon->nuclt);
     imm_arr3d_set(&codonp->lprobs, codon->idx, lprob);
-    return IMM_SUCCESS;
 }
 
 static inline int imm_codon_lprob_normalize(struct imm_codon_lprob *codonp)

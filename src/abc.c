@@ -21,7 +21,7 @@ int imm_abc_init(struct imm_abc *abc, struct imm_str symbols, char any_symbol)
 int abc_init(struct imm_abc *abc, unsigned len, char const *symbols,
              char any_symbol, struct imm_abc_vtable vtable)
 {
-    if (!imm_sym_valid(any_symbol))
+    if (!imm_sym_valid_char(any_symbol))
         return xerror(IMM_ILLEGALARG, "any_symbol outside range");
 
     if (len == 0)
@@ -41,7 +41,7 @@ int abc_init(struct imm_abc *abc, unsigned len, char const *symbols,
             return xerror(IMM_ILLEGALARG,
                           "any_symbol cannot be in the alphabet");
 
-        if (!imm_sym_valid(symbols[i]))
+        if (!imm_sym_valid_char(symbols[i]))
             return xerror(IMM_ILLEGALARG, "symbol outside range");
 
         unsigned id = imm_sym_id(symbols[i]);

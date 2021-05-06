@@ -30,7 +30,7 @@ add_library(imm
     src/amino.c
     src/sym.c
     src/cartes.c
-    # src/codon_marg.c
+    src/codon_marg.c
     src/codon_lprob.c
     src/common/error.c
     src/common/bug.c

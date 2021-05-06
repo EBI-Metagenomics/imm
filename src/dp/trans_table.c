@@ -17,7 +17,7 @@ unsigned trans_table_idx(struct trans_table *trans_tbl, unsigned src_idx,
             return trans_tbl->offset[dst_idx] + i;
     }
     xerror(IMM_ILLEGALARG, "transition not found");
-    return IMM_NULL_TRANS;
+    return IMM_NULL_TRANS_IDX;
 }
 
 void trans_table_init(struct trans_table *tbl, struct dp_args const *args)

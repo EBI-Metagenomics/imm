@@ -73,7 +73,7 @@ static inline unsigned imm_abc_symbol_idx(struct imm_abc const *abc,
     return __imm_abc_symbol_idx(abc, imm_sym_id(symbol));
 }
 
-static inline bool imm_abc_any_symbol_idx(struct imm_abc const *abc)
+static inline unsigned imm_abc_any_symbol_idx(struct imm_abc const *abc)
 {
     return abc->nsymbols;
 }

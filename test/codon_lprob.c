@@ -23,7 +23,7 @@ void test_codon_lprob(void)
     EQ(imm_codon_set(&codon, IMM_TRIPLET('A', 'C', 'C')), IMM_SUCCESS);
 
     COND(imm_lprob_is_zero(imm_codon_lprob_get(&codonp, &codon)));
-    EQ(imm_codon_lprob_set(&codonp, &codon, imm_log(0.5)), IMM_SUCCESS);
+    imm_codon_lprob_set(&codonp, &codon, imm_log(0.5));
     CLOSE(imm_codon_lprob_get(&codonp, &codon), imm_log(0.5));
 
     EQ(imm_codon_lprob_normalize(&codonp), IMM_SUCCESS);

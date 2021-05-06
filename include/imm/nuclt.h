@@ -17,7 +17,10 @@ IMM_API int imm_nuclt_init(struct imm_nuclt *nuclt,
                            char const symbols[IMM_NUCLT_NSYMBOLS],
                            char any_symbol);
 
-static inline unsigned imm_nuclt_len(void) { return IMM_NUCLT_NSYMBOLS; }
+static inline unsigned imm_nuclt_len(struct imm_nuclt const *nuclt)
+{
+    return IMM_NUCLT_NSYMBOLS;
+}
 
 static inline struct imm_abc const *
 imm_nuclt_super(struct imm_nuclt const *nuclt)
