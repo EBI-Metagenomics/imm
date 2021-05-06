@@ -7,15 +7,16 @@
 #define IMM_STATE_NULL_ID UINT16_MAX
 #define IMM_STATE_NULL_IDX UINT16_MAX
 
-typedef uint16_t __imm_state_id_t;
-typedef uint16_t __imm_state_idx_t;
-typedef uint8_t __imm_state_seqlen_t;
+typedef uint16_t imm_state_id_t;
+typedef uint16_t imm_state_idx_t;
+typedef uint8_t imm_state_seqlen_t;
 
 enum state_typeid
 {
     IMM_NULL_STATE = 0,
     IMM_MUTE_STATE = 1,
     IMM_NORMAL_STATE = 2,
+    IMM_CODON_STATE = 3,
 };
 
 struct imm_seq;

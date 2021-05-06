@@ -78,8 +78,8 @@ static void set_state_indices(struct imm_hmm const *hmm,
     {
         struct imm_state *src = hmm_state(hmm, trans->pair.id.src);
         struct imm_state *dst = hmm_state(hmm, trans->pair.id.dst);
-        trans->pair.idx.src = (__imm_state_idx_t)src->idx;
-        trans->pair.idx.dst = (__imm_state_idx_t)dst->idx;
+        trans->pair.idx.src = (imm_state_idx_t)src->idx;
+        trans->pair.idx.dst = (imm_state_idx_t)dst->idx;
     }
 }
 

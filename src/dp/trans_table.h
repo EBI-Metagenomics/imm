@@ -12,8 +12,8 @@ struct trans_table
     unsigned ntrans; /**< Number of transitions. */
     struct __attribute__((__packed__))
     {
-        imm_float score;       /**< Transition score. */
-        __imm_state_idx_t src; /**< Source state. */
+        imm_float score;     /**< Transition score. */
+        imm_state_idx_t src; /**< Source state. */
     } * trans;
     imm_trans_idx_t *offset; /**< Maps (dest. state, local trans) to score
                             and src. state indices. */

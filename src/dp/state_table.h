@@ -9,10 +9,10 @@ struct dp_args;
 struct state_table
 {
     unsigned nstates;
-    __imm_state_id_t *ids;
+    imm_state_id_t *ids;
     struct
     {
-        __imm_state_idx_t state;
+        imm_state_idx_t state;
         imm_float lprob;
     } start;
     unsigned end_state;

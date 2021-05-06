@@ -50,6 +50,7 @@ add_library(imm
     src/lprob.c
     src/mute_state.c
     src/normal_state.c
+    src/codon_state.c
     src/nuclt.c
     src/path.c
     src/rna.c

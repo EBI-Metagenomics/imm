@@ -9,7 +9,7 @@ void state_table_init(struct state_table *tbl, struct dp_args const *args)
     tbl->span = xmalloc(sizeof(*tbl->span) * args->nstates);
 
     for (unsigned i = 0; i < args->nstates; ++i)
-        tbl->ids[i] = (__imm_state_id_t)imm_state_id(args->states[i]);
+        tbl->ids[i] = (imm_state_id_t)imm_state_id(args->states[i]);
 
     for (unsigned i = 0; i < args->nstates; ++i)
     {
@@ -18,7 +18,7 @@ void state_table_init(struct state_table *tbl, struct dp_args const *args)
     }
 
     tbl->start.lprob = args->start.lprob;
-    tbl->start.state = (__imm_state_idx_t)args->start.state->idx;
+    tbl->start.state = (imm_state_idx_t)args->start.state->idx;
     tbl->end_state = args->end_state->idx;
 }
 

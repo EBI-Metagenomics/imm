@@ -408,8 +408,8 @@ static void viterbi_path(struct imm_dp const *dp, struct imm_task const *task,
 
     while (valid)
     {
-        __imm_state_id_t id = dp->state_table.ids[state];
-        struct imm_step step = IMM_STEP(id, (uint8_t)seqlen);
+        imm_state_id_t id = dp->state_table.ids[state];
+        struct imm_step step = IMM_STEP(id, seqlen);
         imm_path_add(path, step);
         row -= seqlen;
 

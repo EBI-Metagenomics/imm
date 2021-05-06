@@ -14,6 +14,7 @@ extern "C" {
 #include "imm/codon.h"
 #include "imm/codon_lprob.h"
 #include "imm/codon_marg.h"
+#include "imm/codon_state.h"
 #include "imm/dna.h"
 #include "imm/dp.h"
 #include "imm/error.h"
