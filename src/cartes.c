@@ -1,5 +1,6 @@
 #include "cartes.h"
 #include "common/common.h"
+#include "imm/imm.h"
 #include <limits.h>
 
 void cartes_init(struct cartes *cartes, char const *set, unsigned set_size,
@@ -39,6 +40,6 @@ void cartes_setup(struct cartes *cartes, unsigned times)
     cartes->item[times] = '\0';
     cartes->iter_idx = 0;
     unsigned long nitems = ipow(cartes->set_size, times);
-    BUG(nitems > UINT_MAX);
+    IMM_BUG(nitems > UINT_MAX);
     cartes->nitems = (unsigned)nitems;
 }

@@ -28,9 +28,12 @@ add_library(imm
     src/arr3d.c
     src/abc.c
     src/amino.c
+    src/sym.c
     src/cartes.c
+    # src/codon_marg.c
     src/codon_lprob.c
     src/common/error.c
+    src/common/bug.c
     src/defaults.c
     src/dna.c
     src/dp/bitarr.c

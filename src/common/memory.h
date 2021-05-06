@@ -1,8 +1,8 @@
 #ifndef COMMON_MEMORY_H
 #define COMMON_MEMORY_H
 
-#include "common/bug.h"
 #include "common/error.h"
+#include "imm/bug.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -91,7 +91,7 @@ static inline void *__growmem(void *restrict ptr, size_t count, size_t size,
     if (size * count > *capacity)
     {
         (*capacity) <<= 1;
-        BUG(*capacity < size * count);
+        IMM_BUG(*capacity < size * count);
         ptr = __realloc(ptr, *capacity, file, line);
     }
     return ptr;

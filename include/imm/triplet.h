@@ -1,6 +1,7 @@
 #ifndef IMM_TRIPLET_H
 #define IMM_TRIPLET_H
 
+#include "imm/sym.h"
 #include <assert.h>
 
 struct imm_triplet
@@ -9,21 +10,20 @@ struct imm_triplet
     {
         struct __attribute__((__packed__))
         {
-            char a;
-            char b;
-            char c;
-            char pad;
+            unsigned a;
+            unsigned b;
+            unsigned c;
         };
-        char str[4];
+        unsigned ids[3];
     };
 } __attribute__((__packed__));
 
-static_assert(sizeof(struct imm_triplet) == 4, "imm_triplet must be packed");
+static_assert(sizeof(struct imm_triplet) == 12, "imm_triplet must be packed");
 
-#define IMM_TRIPLET_INIT(A, B, C)                                              \
+#define IMM_TRIPLET(A, B, C)                                                   \
     (struct imm_triplet)                                                       \
     {                                                                          \
-        .str = { A, B, C, '\0' }                                               \
+        .ids = { imm_sym_id(A), imm_sym_id(B), imm_sym_id(C) }                 \
     }
 
 #endif

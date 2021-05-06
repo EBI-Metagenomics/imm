@@ -10,6 +10,7 @@ extern "C" {
 #include "imm/abc_types.h"
 #include "imm/amino.h"
 #include "imm/arr3d.h"
+#include "imm/bug.h"
 #include "imm/codon.h"
 #include "imm/codon_lprob.h"
 #include "imm/dna.h"

@@ -1,13 +1,14 @@
 #include "dp/code.h"
 #include "dp/eseq.h"
 #include "imm/abc.h"
+#include "imm/bug.h"
 #include "imm/seq.h"
 #include "matrix/matrix.h"
 
 static inline unsigned calc_size(struct code const *code)
 {
     unsigned long ncombs = ipow(imm_abc_len(code->abc), code->seqlen.max);
-    BUG(ncombs > UINT16_MAX);
+    IMM_BUG(ncombs > UINT16_MAX);
     return (unsigned)(code->offset[code->seqlen.max - code->seqlen.min] +
                       ncombs);
 }
@@ -34,7 +35,7 @@ unsigned code_encode(struct code const *code, struct imm_seq const *seq)
     unsigned len = imm_seq_len(seq);
     for (unsigned i = 0; i < len; ++i)
     {
-        unsigned j = imm_abc_symbol_idx(code->abc, imm_seq_str(seq)[i]);
+        unsigned j = imm_abc_symbol_idx(code->abc, seq->str[i]);
         unsigned offset = code->seqlen.max - len;
         c += code->stride[i + offset] * j;
     }

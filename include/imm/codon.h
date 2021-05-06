@@ -11,48 +11,53 @@
 struct imm_codon
 {
     struct imm_nuclt const *nuclt;
-    struct imm_triplet triplet;
+    union
+    {
+        struct __attribute__((__packed__))
+        {
+            unsigned a;
+            unsigned b;
+            unsigned c;
+        };
+        unsigned idx[3];
+    };
 };
-
-static inline struct imm_triplet const *
-imm_codon_get(struct imm_codon const *codon)
-{
-    return &codon->triplet;
-}
 
 static inline int imm_codon_set(struct imm_codon *codon,
                                 struct imm_triplet triplet)
 {
     struct imm_abc const *abc = imm_nuclt_super(codon->nuclt);
 
-    if (imm_unlikely(!(imm_abc_symbol_type(abc, triplet.a) != IMM_SYM_NULL &&
-                       imm_abc_symbol_type(abc, triplet.b) != IMM_SYM_NULL &&
-                       imm_abc_symbol_type(abc, triplet.c) != IMM_SYM_NULL)))
+    if (imm_unlikely(!(__imm_abc_symbol_type(abc, triplet.a) != IMM_SYM_NULL &&
+                       __imm_abc_symbol_type(abc, triplet.b) != IMM_SYM_NULL &&
+                       __imm_abc_symbol_type(abc, triplet.c) != IMM_SYM_NULL)))
     {
         imm_log_error("invalid triplet");
         return IMM_ILLEGALARG;
     }
 
-    codon->triplet = triplet;
+    codon->a = __imm_abc_symbol_idx(abc, triplet.a);
+    codon->b = __imm_abc_symbol_idx(abc, triplet.b);
+    codon->c = __imm_abc_symbol_idx(abc, triplet.c);
     return IMM_SUCCESS;
 }
 
 #define IMM_CODON_INIT(nuclt)                                                  \
     (struct imm_codon)                                                         \
     {                                                                          \
-        (nuclt), IMM_TRIPLET_INIT(imm_abc_any_symbol(imm_nuclt_super(nuclt)),  \
-                                  imm_abc_any_symbol(imm_nuclt_super(nuclt)),  \
-                                  imm_abc_any_symbol(imm_nuclt_super(nuclt)))  \
+        (nuclt), .a = imm_abc_any_symbol_idx(imm_nuclt_super(nuclt)),          \
+                 .b = imm_abc_any_symbol_idx(imm_nuclt_super(nuclt)),          \
+                 .c = imm_abc_any_symbol_idx(imm_nuclt_super(nuclt))           \
     }
 
 static inline void imm_codon_init(struct imm_codon *codon,
                                   struct imm_nuclt const *nuclt)
 {
     codon->nuclt = nuclt;
-    codon->triplet.a = imm_abc_any_symbol(imm_nuclt_super(nuclt));
-    codon->triplet.b = imm_abc_any_symbol(imm_nuclt_super(nuclt));
-    codon->triplet.c = imm_abc_any_symbol(imm_nuclt_super(nuclt));
-    codon->triplet.pad = '\0';
+    struct imm_abc const *abc = imm_nuclt_super(nuclt);
+    codon->a = imm_abc_any_symbol_idx(abc);
+    codon->b = imm_abc_any_symbol_idx(abc);
+    codon->c = imm_abc_any_symbol_idx(abc);
 }
 
 #endif

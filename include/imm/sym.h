@@ -1,11 +1,14 @@
 #ifndef IMM_SYM_H
 #define IMM_SYM_H
 
+#include "imm/compiler.h"
+#include "imm/export.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
-typedef uint8_t __imm_sym_idx_t;
+typedef uint8_t imm_sym_id_t;
+typedef uint8_t imm_sym_idx_t;
 
 enum imm_sym_type
 {
@@ -14,20 +17,47 @@ enum imm_sym_type
     IMM_SYM_ANY = 2,
 };
 
-#define __IMM_SYM_FIRST '!'
-#define __IMM_SYM_LAST '~'
+#define IMM_SYM_FIRST_CHAR '!'
+#define IMM_SYM_LAST_CHAR '~'
 
+#define IMM_SYM_NULL_ID UINT8_MAX
 #define IMM_SYM_NULL_IDX UINT8_MAX
 
-#define __IMM_SYM_IDX_SIZE ((size_t)((__IMM_SYM_LAST - __IMM_SYM_FIRST) + 1))
+#define IMM_SYM_SIZE ((size_t)((IMM_SYM_LAST_CHAR - IMM_SYM_FIRST_CHAR) + 1))
 
-#define __IMM_SYM_INDEX(c) ((unsigned)(c - __IMM_SYM_FIRST))
+#define IMM_SYM_ID(c) ((unsigned)(c - IMM_SYM_FIRST_CHAR))
+#define IMM_SYM_CHAR(x) ((char)(x + IMM_SYM_FIRST_CHAR))
 
-static inline unsigned __imm_sym_index(char c) { return __IMM_SYM_INDEX(c); }
-
-static inline bool __imm_sym_valid(char symbol)
+struct imm_sym
 {
-    return symbol >= __IMM_SYM_FIRST && symbol <= __IMM_SYM_LAST;
+    imm_sym_idx_t idx[IMM_SYM_SIZE];
+};
+
+IMM_API void imm_sym_init(struct imm_sym *sym);
+
+static inline unsigned imm_sym_id(char c) { return IMM_SYM_ID(c); }
+
+static inline char imm_sym_char(unsigned id) { return IMM_SYM_CHAR(id); }
+
+static inline unsigned imm_sym_idx(struct imm_sym const *sym, unsigned id)
+{
+    return sym->idx[id];
+}
+
+static inline void imm_sym_set_idx(struct imm_sym *sym, unsigned id,
+                                   unsigned idx)
+{
+    sym->idx[id] = (imm_sym_idx_t)idx;
+}
+
+static inline bool imm_sym_valid(char c)
+{
+    return imm_likely(c >= IMM_SYM_FIRST_CHAR && c <= IMM_SYM_LAST_CHAR);
+}
+
+static inline bool imm_sym_valid_id(unsigned id)
+{
+    return imm_sym_valid(imm_sym_char(id));
 }
 
 #endif

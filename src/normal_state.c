@@ -37,7 +37,7 @@ static imm_float lprob(struct imm_state const *state, struct imm_seq const *seq)
     if (imm_seq_len(seq) == 1)
     {
         struct imm_abc const *abc = imm_state_abc(state);
-        unsigned idx = imm_abc_symbol_idx(abc, imm_seq_str(seq)[0]);
+        unsigned idx = imm_abc_symbol_idx(abc, seq->str[0]);
         if (idx != IMM_SYM_NULL_IDX)
             return normal->lprobs[idx];
     }
