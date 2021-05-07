@@ -19,11 +19,6 @@ struct imm_normal_state *imm_normal_state_new(unsigned id,
     return normal;
 }
 
-void imm_normal_state_del(struct imm_normal_state const *normal)
-{
-    normal->super->vtable.del(normal->super);
-}
-
 static void del(struct imm_state const *state)
 {
     struct imm_normal_state const *normal = state->vtable.derived;

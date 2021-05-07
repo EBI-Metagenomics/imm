@@ -1,8 +1,8 @@
 #include "dp/emission.h"
-#include "cartes.h"
 #include "common/common.h"
 #include "dp/code.h"
 #include "imm/abc.h"
+#include "imm/cartes.h"
 #include "imm/state.h"
 
 static inline unsigned offset_size(unsigned nstates) { return nstates + 1; }
@@ -39,8 +39,8 @@ void emission_init(struct emission *emiss, struct code const *code,
     struct imm_abc const *abc = code->abc;
     char const *set = abc->symbols;
     unsigned set_size = abc->nsymbols;
-    struct cartes cartes;
-    cartes_init(&cartes, set, set_size, code->seqlen.max);
+    struct imm_cartes cartes;
+    imm_cartes_init(&cartes, set, set_size, code->seqlen.max);
 
     for (unsigned i = 0; i < nstates; ++i)
     {
@@ -48,9 +48,9 @@ void emission_init(struct emission *emiss, struct code const *code,
         for (unsigned len = min_seq; len <= imm_state_span(states[i]).max;
              ++len)
         {
-            cartes_setup(&cartes, len);
+            imm_cartes_setup(&cartes, len);
             char const *item = NULL;
-            while ((item = cartes_next(&cartes)) != NULL)
+            while ((item = imm_cartes_next(&cartes)) != NULL)
             {
 
                 struct imm_seq seq = IMM_SEQ_UNSAFE(len, item, abc);
@@ -62,5 +62,5 @@ void emission_init(struct emission *emiss, struct code const *code,
         }
     }
 
-    cartes_deinit(&cartes);
+    imm_cartes_deinit(&cartes);
 }

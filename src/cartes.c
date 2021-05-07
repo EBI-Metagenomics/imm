@@ -1,10 +1,10 @@
-#include "cartes.h"
+#include "imm/cartes.h"
 #include "common/common.h"
 #include "imm/imm.h"
 #include <limits.h>
 
-void cartes_init(struct cartes *cartes, char const *set, unsigned set_size,
-                 unsigned max_times)
+void imm_cartes_init(struct imm_cartes *cartes, char const *set,
+                     unsigned set_size, unsigned max_times)
 {
     cartes->set = set;
     cartes->set_size = set_size;
@@ -14,9 +14,12 @@ void cartes_init(struct cartes *cartes, char const *set, unsigned set_size,
     cartes->nitems = 0;
 }
 
-void cartes_deinit(struct cartes const *cartes) { free((void *)cartes->item); }
+void imm_cartes_deinit(struct imm_cartes const *cartes)
+{
+    free((void *)cartes->item);
+}
 
-char const *cartes_next(struct cartes *cartes)
+char const *imm_cartes_next(struct imm_cartes *cartes)
 {
     if (cartes->iter_idx == cartes->nitems)
         return NULL;
@@ -34,7 +37,7 @@ char const *cartes_next(struct cartes *cartes)
     return item;
 }
 
-void cartes_setup(struct cartes *cartes, unsigned times)
+void imm_cartes_setup(struct imm_cartes *cartes, unsigned times)
 {
     cartes->times = times;
     cartes->item[times] = '\0';

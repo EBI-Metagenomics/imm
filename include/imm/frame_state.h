@@ -3,12 +3,13 @@
 
 #include "imm/export.h"
 #include "imm/float.h"
+#include "imm/state.h"
 #include "imm/state_types.h"
 
 /* struct imm_seq; */
 struct imm_state;
 struct imm_nuclt_lprob;
-/* struct imm_codon; */
+struct imm_codon;
 struct imm_codon_marg;
 /* struct imm_frame_state; */
 /* struct imm_profile; */
@@ -26,6 +27,19 @@ struct imm_frame_state
 IMM_API struct imm_frame_state *
 imm_frame_state_new(unsigned id, struct imm_nuclt_lprob const *nucltp,
                     struct imm_codon_marg const *codonm, imm_float epsilon);
+
+static inline void imm_frame_state_del(struct imm_frame_state const *frame)
+{
+    frame->super->vtable.del(frame->super);
+}
+
+IMM_API imm_float imm_frame_state_lposterior(
+    struct imm_frame_state const *state, struct imm_codon const *codon,
+    struct imm_seq const *seq);
+
+IMM_API imm_float imm_frame_state_decode(struct imm_frame_state const *state,
+                                         struct imm_seq const *seq,
+                                         struct imm_codon *codon);
 
 #if 0
 IMM_API struct imm_nuclt_lprob const *
@@ -53,12 +67,12 @@ imm_normal_state_new(unsigned id, struct imm_nuclt const *nuclt,
                      imm_float const lprobs[1]);
 
 IMM_API void imm_normal_state_del(struct imm_normal_state const *normal);
+#endif
 
 static inline struct imm_state *
-imm_normal_state_super(struct imm_normal_state *normal)
+imm_frame_state_super(struct imm_frame_state *frame)
 {
-    return normal->super;
+    return frame->super;
 }
-#endif
 
 #endif

@@ -11,6 +11,7 @@ extern "C" {
 #include "imm/amino.h"
 #include "imm/arr3d.h"
 #include "imm/bug.h"
+#include "imm/cartes.h"
 #include "imm/codon.h"
 #include "imm/codon_lprob.h"
 #include "imm/codon_marg.h"

@@ -32,6 +32,7 @@ add_library(imm
     src/codon_lprob.c
     src/codon_marg.c
     src/codon_state.c
+    src/frame_state.c
     src/common/bug.c
     src/common/error.c
     src/defaults.c
@@ -45,7 +46,6 @@ add_library(imm
     src/dp/path.c
     src/dp/state_table.c
     src/dp/trans_table.c
-    # src/frame_state.c
     src/hmm.c
     src/log.c
     src/lprob.c
