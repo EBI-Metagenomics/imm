@@ -1,5 +1,4 @@
 #include "hope/hope.h"
-#include "imm/abc.h"
 #include "imm/imm.h"
 
 void test_frame_state1(void);
@@ -301,65 +300,60 @@ void test_frame_state_decode(void)
          codon.b == imm_abc_symbol_idx(abc, 'T') &&
          codon.c == imm_abc_symbol_idx(abc, 'G'));
 
-#if 0
-    seq = imm_seq_init("ATGT", abc);
-    CLOSE(imm_frame_state_decode(state, seq, codon), -4.710599080052);
-    imm_seq_destroy(seq);
-    t = imm_codon_get_triplet(codon);
-    COND(t.a == 'A' && t.b == 'T' && t.c == 'G');
+    imm_seq_init(&seq, IMM_STR("ATGT"), abc);
+    CLOSE(imm_frame_state_decode(state, &seq, &codon), -4.710599080052);
+    COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+         codon.b == imm_abc_symbol_idx(abc, 'T') &&
+         codon.c == imm_abc_symbol_idx(abc, 'G'));
 
-    seq = imm_seq_init("ATGA", abc);
-    CLOSE(imm_frame_state_decode(state, seq, codon), -6.097714346951);
-    imm_seq_destroy(seq);
-    t = imm_codon_get_triplet(codon);
-    COND(t.a == 'A' && t.b == 'T' && t.c == 'G');
+    imm_seq_init(&seq, IMM_STR("ATGA"), abc);
+    CLOSE(imm_frame_state_decode(state, &seq, &codon), -6.097714346951);
+    COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+         codon.b == imm_abc_symbol_idx(abc, 'T') &&
+         codon.c == imm_abc_symbol_idx(abc, 'G'));
 
-    seq = imm_seq_init("ATGGT", abc);
-    CLOSE(imm_frame_state_decode(state, seq, codon), -9.031100481720);
-    imm_seq_destroy(seq);
-    t = imm_codon_get_triplet(codon);
-    COND(t.a == 'A' && t.b == 'T' && t.c == 'G');
+    imm_seq_init(&seq, IMM_STR("ATGGT"), abc);
+    CLOSE(imm_frame_state_decode(state, &seq, &codon), -9.031100481720);
+    COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+         codon.b == imm_abc_symbol_idx(abc, 'T') &&
+         codon.c == imm_abc_symbol_idx(abc, 'G'));
 
-    seq = imm_seq_init("ATT", abc);
-    CLOSE(imm_frame_state_decode(state, seq, codon), -2.977101440300);
-    imm_seq_destroy(seq);
-    t = imm_codon_get_triplet(codon);
-    COND(t.a == 'A' && t.b == 'T' && t.c == 'T');
+    imm_seq_init(&seq, IMM_STR("ATT"), abc);
+    CLOSE(imm_frame_state_decode(state, &seq, &codon), -2.977101440300);
+    COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+         codon.b == imm_abc_symbol_idx(abc, 'T') &&
+         codon.c == imm_abc_symbol_idx(abc, 'T'));
 
-    seq = imm_seq_init("ATC", abc);
-    CLOSE(imm_frame_state_decode(state, seq, codon), -7.720225141384);
-    imm_seq_destroy(seq);
-    t = imm_codon_get_triplet(codon);
-    COND(t.a == 'A' && t.b == 'T' && t.c == 'G');
+    imm_seq_init(&seq, IMM_STR("ATC"), abc);
+    CLOSE(imm_frame_state_decode(state, &seq, &codon), -7.720225141384);
+    COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+         codon.b == imm_abc_symbol_idx(abc, 'T') &&
+         codon.c == imm_abc_symbol_idx(abc, 'G'));
 
-    seq = imm_seq_init("TC", abc);
-    CLOSE(imm_frame_state_decode(state, seq, codon), -4.199089882536);
-    imm_seq_destroy(seq);
-    t = imm_codon_get_triplet(codon);
-    COND(t.a == 'G' && t.b == 'T' && t.c == 'C');
+    imm_seq_init(&seq, IMM_STR("TC"), abc);
+    CLOSE(imm_frame_state_decode(state, &seq, &codon), -4.199089882536);
+    COND(codon.a == imm_abc_symbol_idx(abc, 'G') &&
+         codon.b == imm_abc_symbol_idx(abc, 'T') &&
+         codon.c == imm_abc_symbol_idx(abc, 'C'));
 
-    seq = imm_seq_init("A", abc);
-    CLOSE(imm_frame_state_decode(state, seq, codon), -6.400011321754);
-    imm_seq_destroy(seq);
-    t = imm_codon_get_triplet(codon);
-    COND(t.a == 'A' && t.b == 'T' && t.c == 'G');
+    imm_seq_init(&seq, IMM_STR("A"), abc);
+    CLOSE(imm_frame_state_decode(state, &seq, &codon), -6.400011321754);
+    COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+         codon.b == imm_abc_symbol_idx(abc, 'T') &&
+         codon.c == imm_abc_symbol_idx(abc, 'G'));
 
-    seq = imm_seq_init("AG", abc);
-    CLOSE(imm_frame_state_decode(state, seq, codon), -3.507173471362);
-    imm_seq_destroy(seq);
-    t = imm_codon_get_triplet(codon);
-    COND(t.a == 'A' && t.b == 'T' && t.c == 'G');
+    imm_seq_init(&seq, IMM_STR("AG"), abc);
+    CLOSE(imm_frame_state_decode(state, &seq, &codon), -3.507173471362);
+    COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+         codon.b == imm_abc_symbol_idx(abc, 'T') &&
+         codon.c == imm_abc_symbol_idx(abc, 'G'));
 
-    seq = imm_seq_init("GC", abc);
-    CLOSE(imm_frame_state_decode(state, seq, codon), -4.199705077880);
-    imm_seq_destroy(seq);
-    t = imm_codon_get_triplet(codon);
-    COND(t.a == 'G' && t.b == 'T' && t.c == 'C');
+    imm_seq_init(&seq, IMM_STR("GC"), abc);
+    CLOSE(imm_frame_state_decode(state, &seq, &codon), -4.199705077880);
+    COND(codon.a == imm_abc_symbol_idx(abc, 'G') &&
+         codon.b == imm_abc_symbol_idx(abc, 'T') &&
+         codon.c == imm_abc_symbol_idx(abc, 'C'));
 
-    imm_base_abc_destroy(base);
-    imm_frame_state_destroy(state);
-    imm_base_lprob_destroy(nucltp);
-    imm_codon_marg_destroy(codonm);
-    imm_codon_destroy(codon);
-#endif
+    imm_frame_state_del(state);
+    imm_codon_marg_deinit(&codonm);
 }
