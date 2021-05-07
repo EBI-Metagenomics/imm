@@ -3,10 +3,6 @@
 
 #include "imm/abc.h"
 #include "imm/bug.h"
-#include "imm/compiler.h"
-#include "imm/error.h"
-#include "imm/export.h"
-#include "imm/log.h"
 #include "imm/lprob.h"
 
 struct imm_abc_lprob

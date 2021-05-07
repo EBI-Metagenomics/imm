@@ -26,9 +26,15 @@ static inline bool imm_lprob_is_finite(imm_float a)
     return imm_lprob_is_nan(a) && !imm_lprob_is_zero(a);
 }
 
-IMM_API int imm_lprob_normalize(imm_float *arr, unsigned len);
+IMM_API int imm_lprob_normalize(unsigned len, imm_float arr[len]);
 
-IMM_API imm_float imm_lprob_sum(imm_float const *arr, unsigned len);
+static inline imm_float imm_lprob_sum(unsigned len, imm_float const arr[len])
+{
+    imm_float r = arr[0];
+    for (unsigned i = 1; i < len; ++i)
+        r = logaddexp(r, arr[i]);
+    return r;
+}
 
 static inline imm_float imm_lprob_zero(void) { return -INFINITY; }
 

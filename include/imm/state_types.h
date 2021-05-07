@@ -17,6 +17,7 @@ enum state_typeid
     IMM_MUTE_STATE = 1,
     IMM_NORMAL_STATE = 2,
     IMM_CODON_STATE = 3,
+    IMM_FRAME_STATE = 4,
 };
 
 struct imm_seq;

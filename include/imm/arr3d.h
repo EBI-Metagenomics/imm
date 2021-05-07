@@ -45,7 +45,7 @@ static inline imm_float imm_arr3d_get(struct imm_arr3d const *arr,
 
 static inline int imm_arr3d_normalize(struct imm_arr3d const *arr)
 {
-    return imm_lprob_normalize(arr->data, imm_arr3d_len(arr));
+    return imm_lprob_normalize(imm_arr3d_len(arr), arr->data);
 }
 
 static inline void imm_arr3d_set(struct imm_arr3d *arr, unsigned const idx[3],

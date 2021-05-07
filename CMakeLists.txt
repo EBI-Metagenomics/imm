@@ -25,15 +25,15 @@ find_package(elapsed REQUIRED)
 find_package(containers REQUIRED)
 
 add_library(imm
-    src/arr3d.c
     src/abc.c
     src/amino.c
-    src/sym.c
+    src/arr3d.c
     src/cartes.c
-    src/codon_marg.c
     src/codon_lprob.c
-    src/common/error.c
+    src/codon_marg.c
+    src/codon_state.c
     src/common/bug.c
+    src/common/error.c
     src/defaults.c
     src/dna.c
     src/dp/bitarr.c
@@ -45,17 +45,18 @@ add_library(imm
     src/dp/path.c
     src/dp/state_table.c
     src/dp/trans_table.c
+    # src/frame_state.c
     src/hmm.c
     src/log.c
     src/lprob.c
     src/mute_state.c
     src/normal_state.c
-    src/codon_state.c
     src/nuclt.c
     src/path.c
     src/rna.c
     src/seq.c
     src/state.c
+    src/sym.c
     src/task.c
     src/tsort.c
 )

@@ -50,4 +50,10 @@ imm_codon_marg_lprob(struct imm_codon_marg const *codonm,
     return imm_arr3d_get(&codonm->lprobs, codon->idx);
 }
 
+static inline imm_float imm_codon_marg_lp(struct imm_codon_marg const *codonm,
+                                          struct imm_codon codon)
+{
+    return imm_arr3d_get(&codonm->lprobs, codon.idx);
+}
+
 #endif
