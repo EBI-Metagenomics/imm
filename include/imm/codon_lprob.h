@@ -1,12 +1,8 @@
 #ifndef IMM_CODON_LPROB_H
 #define IMM_CODON_LPROB_H
 
-#include "imm/arr3d.h"
 #include "imm/bug.h"
 #include "imm/codon.h"
-#include "imm/compiler.h"
-#include "imm/error.h"
-#include "imm/export.h"
 #include "imm/lprob.h"
 #include "imm/nuclt.h"
 
@@ -24,20 +20,28 @@ struct imm_codon_lprob
     /**
      * Pre-computed probability p(𝑋₁=𝚡₁,𝑋₂=𝚡₂,𝑋₃=𝚡₃).
      */
-    struct imm_arr3d lprobs;
+    imm_float lprobs[IMM_NUCLT_NSYMBOLS][IMM_NUCLT_NSYMBOLS]
+                    [IMM_NUCLT_NSYMBOLS];
 };
 
-IMM_API void imm_codon_lprob_init(struct imm_codon_lprob *codonp,
-                                  struct imm_nuclt const *nuclt);
-
-IMM_API void imm_codon_lprob_deinit(struct imm_codon_lprob *codonp);
+#define IMM_CODON_LPROB_INIT(nuclt)                                            \
+    (struct imm_codon_lprob)                                                   \
+    {                                                                          \
+        nuclt,                                                                 \
+        {                                                                      \
+            [0 ... IMM_NUCLT_NSYMBOLS - 1] = {                                 \
+                [0 ... IMM_NUCLT_NSYMBOLS -                                    \
+                 1] = {[0 ... IMM_NUCLT_NSYMBOLS - 1] = IMM_LPROB_ZERO}        \
+            }                                                                  \
+        }                                                                      \
+    }
 
 static inline imm_float
 imm_codon_lprob_get(struct imm_codon_lprob const *codonp,
                     struct imm_codon const *codon)
 {
     IMM_BUG(codonp->nuclt != codon->nuclt);
-    return imm_arr3d_get(&codonp->lprobs, codon->idx);
+    return codonp->lprobs[codon->a][codon->b][codon->c];
 }
 
 static inline void imm_codon_lprob_set(struct imm_codon_lprob *codonp,
@@ -45,12 +49,14 @@ static inline void imm_codon_lprob_set(struct imm_codon_lprob *codonp,
                                        imm_float lprob)
 {
     IMM_BUG(codonp->nuclt != codon->nuclt);
-    imm_arr3d_set(&codonp->lprobs, codon->idx, lprob);
+    codonp->lprobs[codon->a][codon->b][codon->c] = lprob;
 }
 
 static inline int imm_codon_lprob_normalize(struct imm_codon_lprob *codonp)
 {
-    return imm_arr3d_normalize(&codonp->lprobs);
+    return imm_lprob_normalize(IMM_NUCLT_NSYMBOLS * IMM_NUCLT_NSYMBOLS *
+                                   IMM_NUCLT_NSYMBOLS,
+                               &codonp->lprobs[0][0][0]);
 }
 
 #endif

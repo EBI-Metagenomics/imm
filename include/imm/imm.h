@@ -9,6 +9,7 @@ extern "C" {
 #include "imm/abc_lprob.h"
 #include "imm/abc_types.h"
 #include "imm/amino.h"
+#include "imm/amino_lprob.h"
 #include "imm/arr3d.h"
 #include "imm/bug.h"
 #include "imm/cartes.h"

@@ -13,8 +13,7 @@ void test_codon_lprob(void)
 {
     struct imm_dna const *dna = &imm_dna_default;
 
-    struct imm_codon_lprob codonp;
-    imm_codon_lprob_init(&codonp, imm_super(dna));
+    struct imm_codon_lprob codonp = IMM_CODON_LPROB_INIT(imm_super(dna));
 
     EQ(imm_codon_lprob_normalize(&codonp), IMM_ILLEGALARG);
 
@@ -31,6 +30,4 @@ void test_codon_lprob(void)
 
     EQ(imm_codon_set(&codon, IMM_TRIPLET('A', 'C', 'X')), IMM_SUCCESS);
     COND(imm_lprob_is_zero(imm_codon_lprob_get(&codonp, &codon)));
-
-    imm_codon_lprob_deinit(&codonp);
 }

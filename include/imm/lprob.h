@@ -36,6 +36,8 @@ static inline imm_float imm_lprob_sum(unsigned len, imm_float const arr[len])
     return r;
 }
 
-static inline imm_float imm_lprob_zero(void) { return -INFINITY; }
+#define IMM_LPROB_ZERO -INFINITY
+
+static inline imm_float imm_lprob_zero(void) { return IMM_LPROB_ZERO; }
 
 #endif

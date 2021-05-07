@@ -29,7 +29,6 @@ add_library(imm
     src/amino.c
     src/arr3d.c
     src/cartes.c
-    src/codon_lprob.c
     src/codon_marg.c
     src/codon_state.c
     src/frame_state.c

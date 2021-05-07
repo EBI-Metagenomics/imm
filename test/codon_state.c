@@ -15,8 +15,7 @@ void test_codon_state(void)
     imm_nuclt_init(&nuclt, "ACGT", 'X');
     struct imm_abc const *abc = imm_super(&nuclt);
 
-    struct imm_codon_lprob codonp;
-    imm_codon_lprob_init(&codonp, &nuclt);
+    struct imm_codon_lprob codonp = IMM_CODON_LPROB_INIT(&nuclt);
     struct imm_codon codon = IMM_CODON_INIT(&nuclt);
 
     imm_codon_set(&codon, IMM_TRIPLET('A', 'T', 'G'));
@@ -35,5 +34,4 @@ void test_codon_state(void)
     COND(!imm_lprob_is_nan(imm_state_lprob(s, &seq)));
 
     imm_del(state);
-    imm_codon_lprob_deinit(&codonp);
 }

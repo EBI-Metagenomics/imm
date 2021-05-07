@@ -16,4 +16,9 @@ typedef float imm_float;
 
 #define imm_log(x) ((imm_float)log(x))
 
+#define IMM_NARGS(...) (sizeof((int[]){__VA_ARGS__}) / sizeof(int))
+
+#define IMM_FARR(...)                                                          \
+    (imm_float[IMM_NARGS(__VA_ARGS__)]) { __VA_ARGS__ }
+
 #endif
