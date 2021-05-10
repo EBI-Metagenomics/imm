@@ -36,6 +36,9 @@ static inline void imm_codon_set(struct imm_codon *codon,
     codon->c = __imm_abc_symbol_idx(abc, triplet.c);
 }
 
+#define IMM_CODON(abc, a, b, c)                                                \
+    imm_codon_init((abc), IMM_TRIPLET((a), (b), (c)))
+
 static inline struct imm_codon imm_codon_init(struct imm_nuclt const *nuclt,
                                               struct imm_triplet triplet)
 {
