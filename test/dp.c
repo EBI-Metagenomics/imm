@@ -15,9 +15,9 @@ static struct imm_seq ATT;
 int main(void)
 {
     imm_abc_init(&abc, IMM_STR("ACGT"), '*');
-    imm_seq_init(&EMPTY, IMM_STR(""), &abc);
-    imm_seq_init(&A, IMM_STR("A"), &abc);
-    imm_seq_init(&ATT, IMM_STR("ATT"), &abc);
+    EMPTY = imm_seq_init(IMM_STR(""), &abc);
+    A = imm_seq_init(IMM_STR("A"), &abc);
+    ATT = imm_seq_init(IMM_STR("ATT"), &abc);
 
     test_dp_illegal();
     test_dp_empty_path();

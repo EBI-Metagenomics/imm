@@ -1,5 +1,7 @@
 #include "common/error.h"
 #include "imm/error.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 static char const *__msg[] = {
     [IMM_SUCCESS] = "success",          [IMM_FAILURE] = "failure",
@@ -13,4 +15,10 @@ int __xerror(enum imm_error_code err, char const *msg, char const *file,
 {
     __imm_log(IMM_LOG_ERROR, file, line, "%s: %s", __msg[err], msg);
     return (int)err;
+}
+
+void imm_die(enum imm_error_code level, char const *msg)
+{
+    fprintf(stderr, "%s\n", msg);
+    exit(1);
 }

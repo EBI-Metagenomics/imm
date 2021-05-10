@@ -1,6 +1,8 @@
 #ifndef ERROR_H
 #define ERROR_H
 
+#include "imm/export.h"
+
 enum imm_error_code
 {
     IMM_SUCCESS = 0,
@@ -12,5 +14,8 @@ enum imm_error_code
     IMM_RUNTIMEERROR,
     IMM_PARSEERROR,
 };
+
+IMM_API void imm_die(enum imm_error_code level, char const *msg)
+    __attribute__((noreturn));
 
 #endif

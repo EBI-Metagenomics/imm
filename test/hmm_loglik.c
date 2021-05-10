@@ -20,13 +20,13 @@ static struct imm_seq GT;
 int main(void)
 {
     imm_abc_init(&abc, IMM_STR("ACGT"), '*');
-    imm_seq_init(&EMPTY, IMM_STR(""), &abc);
-    imm_seq_init(&A, IMM_STR("A"), &abc);
-    imm_seq_init(&T, IMM_STR("T"), &abc);
-    imm_seq_init(&G, IMM_STR("G"), &abc);
-    imm_seq_init(&AG, IMM_STR("AG"), &abc);
-    imm_seq_init(&AA, IMM_STR("AA"), &abc);
-    imm_seq_init(&GT, IMM_STR("GT"), &abc);
+    EMPTY = imm_seq_init(IMM_STR(""), &abc);
+    A = imm_seq_init(IMM_STR("A"), &abc);
+    T = imm_seq_init(IMM_STR("T"), &abc);
+    G = imm_seq_init(IMM_STR("G"), &abc);
+    AG = imm_seq_init(IMM_STR("AG"), &abc);
+    AA = imm_seq_init(IMM_STR("AA"), &abc);
+    GT = imm_seq_init(IMM_STR("GT"), &abc);
 
     test_hmm_loglik_single_state();
     test_hmm_loglik_two_states();
@@ -211,8 +211,7 @@ void test_hmm_loglik_invalid(void)
     struct imm_abc abc_ac = imm_abc_empty;
     imm_abc_init(&abc_ac, IMM_STR("AC"), '*');
 
-    struct imm_seq C = imm_seq_empty;
-    imm_seq_init(&C, IMM_STR("C"), &abc_ac);
+    struct imm_seq C = imm_seq_init(IMM_STR("C"), &abc_ac);
 
     struct imm_hmm *hmm = imm_hmm_new(&abc_ac);
 
