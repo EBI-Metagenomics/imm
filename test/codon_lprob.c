@@ -12,22 +12,21 @@ int main(void)
 void test_codon_lprob(void)
 {
     struct imm_dna const *dna = &imm_dna_default;
+    struct imm_nuclt const *nuclt = imm_super(dna);
 
     struct imm_codon_lprob codonp = imm_codon_lprob_init(imm_super(dna));
 
     EQ(imm_codon_lprob_normalize(&codonp), IMM_ILLEGALARG);
 
-    struct imm_codon codon = imm_codon_init(imm_super(dna));
+    struct imm_codon codon = imm_codon_init(nuclt, IMM_TRIPLET('A', 'C', 'C'));
 
-    EQ(imm_codon_set(&codon, IMM_TRIPLET('A', 'C', 'C')), IMM_SUCCESS);
-
-    COND(imm_lprob_is_zero(imm_codon_lprob_get(&codonp, &codon)));
-    imm_codon_lprob_set(&codonp, &codon, imm_log(0.5));
-    CLOSE(imm_codon_lprob_get(&codonp, &codon), imm_log(0.5));
+    COND(imm_lprob_is_zero(imm_codon_lprob_get(&codonp, codon)));
+    imm_codon_lprob_set(&codonp, codon, imm_log(0.5));
+    CLOSE(imm_codon_lprob_get(&codonp, codon), imm_log(0.5));
 
     EQ(imm_codon_lprob_normalize(&codonp), IMM_SUCCESS);
-    CLOSE(imm_codon_lprob_get(&codonp, &codon), imm_log(1.0));
+    CLOSE(imm_codon_lprob_get(&codonp, codon), imm_log(1.0));
 
-    EQ(imm_codon_set(&codon, IMM_TRIPLET('A', 'C', 'X')), IMM_SUCCESS);
-    COND(imm_lprob_is_zero(imm_codon_lprob_get(&codonp, &codon)));
+    codon = imm_codon_init(nuclt, IMM_TRIPLET('A', 'C', 'X'));
+    COND(imm_lprob_is_zero(imm_codon_lprob_get(&codonp, codon)));
 }

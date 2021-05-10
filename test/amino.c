@@ -13,7 +13,7 @@ int main(void)
 
 void test_amino_success(void)
 {
-    char const symbols[IMM_AMINO_NSYMBOLS + 1] = IMM_AMINO_SYMBOLS;
+    char const symbols[IMM_AMINO_SIZE + 1] = IMM_AMINO_SYMBOLS;
 
     struct imm_amino const *amino = &imm_amino_default;
     for (unsigned i = 0; i < imm_abc_len(&amino->super); ++i)

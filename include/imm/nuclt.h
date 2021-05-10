@@ -6,7 +6,7 @@
 
 #define IMM_NUCLT_ANY_SYMBOL 'X'
 #define IMM_NUCLT_SYMBOLS "ACGT"
-#define IMM_NUCLT_NSYMBOLS 4
+#define IMM_NUCLT_SIZE 4
 
 struct imm_nuclt
 {
@@ -14,12 +14,11 @@ struct imm_nuclt
 };
 
 IMM_API int imm_nuclt_init(struct imm_nuclt *nuclt,
-                           char const symbols[IMM_NUCLT_NSYMBOLS],
-                           char any_symbol);
+                           char const symbols[IMM_NUCLT_SIZE], char any_symbol);
 
 static inline unsigned imm_nuclt_len(struct imm_nuclt const *nuclt)
 {
-    return IMM_NUCLT_NSYMBOLS;
+    return IMM_NUCLT_SIZE;
 }
 
 static inline struct imm_abc const *

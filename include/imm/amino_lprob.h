@@ -2,23 +2,22 @@
 #define IMM_AMINO_LPROB_H
 
 #include "imm/amino.h"
-#include "imm/bug.h"
 #include "imm/generics.h"
 #include "imm/lprob.h"
 
 struct imm_amino_lprob
 {
     struct imm_amino const *amino;
-    imm_float lprobs[IMM_AMINO_NSYMBOLS];
+    imm_float lprobs[IMM_AMINO_SIZE];
 };
 
 static inline struct imm_amino_lprob
 imm_amino_lprob_init(struct imm_amino const *amino,
-                     imm_float const lprobs[IMM_AMINO_NSYMBOLS])
+                     imm_float const lprobs[IMM_AMINO_SIZE])
 {
     struct imm_amino_lprob lprob;
     lprob.amino = amino;
-    for (unsigned i = 0; i < IMM_AMINO_NSYMBOLS; ++i)
+    for (unsigned i = 0; i < IMM_AMINO_SIZE; ++i)
         lprob.lprobs[i] = lprobs[i];
     return lprob;
 }

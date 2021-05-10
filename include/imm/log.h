@@ -4,14 +4,26 @@
 #include "imm/export.h"
 #include <stdarg.h>
 
-enum imm_log_level
+enum imm_level
 {
-    IMM_LOG_TRACE,
-    IMM_LOG_DEBUG,
-    IMM_LOG_INFO,
-    IMM_LOG_WARN,
-    IMM_LOG_ERROR,
-    IMM_LOG_FATAL
+    IMM_TRACE,
+    IMM_DEBUG,
+    IMM_INFO,
+    IMM_WARN,
+    IMM_ERROR,
+    IMM_FATAL
+};
+
+enum imm_code
+{
+    IMM_SUCCESS = 0,
+    IMM_FAILURE,
+    IMM_OUTOFMEM,
+    IMM_ILLEGALARG,
+    IMM_IOERROR,
+    IMM_NOTIMPLEMENTED,
+    IMM_RUNTIMEERROR,
+    IMM_PARSEERROR,
 };
 
 struct imm_log_event
@@ -20,29 +32,34 @@ struct imm_log_event
     char const *fmt;
     char const *file;
     int line;
-    enum imm_log_level level;
+    enum imm_level level;
+    enum imm_code code;
 };
 
 typedef void (*imm_log_callback)(struct imm_log_event event);
 
-IMM_API void imm_log_setup(imm_log_callback cb, enum imm_log_level level);
+IMM_API void imm_log_setup(imm_log_callback cb, enum imm_level level);
 
-#define imm_log_warn(...)                                                      \
-    __imm_log(IMM_LOG_WARN, __FILE__, __LINE__, __VA_ARGS__)
+#define __imm_log(lvl, code, ...)                                              \
+    __imm_log_impl(lvl, code, __FILE__, __LINE__, __VA_ARGS__)
 
-#define imm_log_error(...)                                                     \
-    __imm_log(IMM_LOG_ERROR, __FILE__, __LINE__, __VA_ARGS__)
+IMM_API int __imm_log_impl(enum imm_level level, enum imm_code code,
+                           char const *file, int line, char const *fmt, ...)
+    __attribute__((format(printf, 5, 6)));
 
-#define imm_log_fatal(...)                                                     \
-    __imm_log(IMM_LOG_FATAL, __FILE__, __LINE__, __VA_ARGS__)
-
-#if defined(HAVE_ATTR_FMT)
-IMM_API int __imm_log(enum imm_log_level level, char const *file, int line,
-                      char const *fmt, ...)
-    __attribute__((format(printf, 4, 5)));
+#ifdef NDEBUG
+#define IMM_BUG(cond)
 #else
-IMM_API int __imm_log(enum imm_log_level level, char const *file, int line,
-                      char const *fmt, ...);
+#define IMM_BUG(cond)                                                          \
+    do                                                                         \
+    {                                                                          \
+        if (!(int)(cond))                                                      \
+            break;                                                             \
+        imm_bug(__FILE__, __func__, __LINE__, #cond);                          \
+    } while (0)
 #endif
+
+IMM_API void __imm_bug(char const *file, char const *func, int line,
+                       char const *cond) __attribute__((noreturn));
 
 #endif

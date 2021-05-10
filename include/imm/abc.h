@@ -2,9 +2,9 @@
 #define IMM_ABC_H
 
 #include "imm/abc_types.h"
-#include "imm/bug.h"
 #include "imm/compiler.h"
 #include "imm/export.h"
+#include "imm/log.h"
 #include "imm/str.h"
 #include "imm/sym.h"
 

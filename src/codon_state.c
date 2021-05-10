@@ -48,5 +48,5 @@ static imm_float lprob(struct imm_state const *state, struct imm_seq const *seq)
         .b = imm_abc_symbol_idx(state->abc, imm_seq_str(seq)[1]),
         .c = imm_abc_symbol_idx(state->abc, imm_seq_str(seq)[2])};
 
-    return imm_codon_lprob_get(codonp, &codon);
+    return imm_codon_lprob_get(codonp, codon);
 }

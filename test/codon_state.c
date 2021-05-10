@@ -16,12 +16,11 @@ void test_codon_state(void)
     struct imm_abc const *abc = imm_super(&nuclt);
 
     struct imm_codon_lprob codonp = imm_codon_lprob_init(&nuclt);
-    struct imm_codon codon = imm_codon_init(&nuclt);
+    struct imm_codon codon = imm_codon_init(&nuclt, IMM_TRIPLET('A', 'T', 'G'));
 
-    imm_codon_set(&codon, IMM_TRIPLET('A', 'T', 'G'));
-    imm_codon_lprob_set(&codonp, &codon, imm_log(0.8 / 0.9));
-    imm_codon_set(&codon, IMM_TRIPLET('A', 'T', 'T'));
-    imm_codon_lprob_set(&codonp, &codon, imm_log(0.1 / 0.9));
+    imm_codon_lprob_set(&codonp, codon, imm_log(0.8 / 0.9));
+    codon = imm_codon_init(&nuclt, IMM_TRIPLET('A', 'T', 'T'));
+    imm_codon_lprob_set(&codonp, codon, imm_log(0.1 / 0.9));
 
     struct imm_codon_state *state = imm_codon_state_new(0, &codonp);
     const struct imm_state *s = imm_super(state);

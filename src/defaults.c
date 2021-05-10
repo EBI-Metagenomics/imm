@@ -16,7 +16,7 @@ struct imm_amino const
     imm_amino_default =
         {.super =
              {
-                 .nsymbols = IMM_AMINO_NSYMBOLS,
+                 .nsymbols = IMM_AMINO_SIZE,
                  .symbols = IMM_AMINO_SYMBOLS,
                  .sym = {.idx =
                              {
@@ -44,7 +44,7 @@ struct imm_amino const
                                  NIL('U', 'V'),
                                  SET('V', 17),
                                  SET('W', 18),
-                                 SET(IMM_AMINO_ANY_SYMBOL, IMM_AMINO_NSYMBOLS),
+                                 SET(IMM_AMINO_ANY_SYMBOL, IMM_AMINO_SIZE),
                                  SET('Y', 19),
                                  NIL('Z', IMM_SYM_LAST_CHAR),
                              }},
@@ -54,7 +54,7 @@ struct imm_amino const
 
 struct imm_nuclt const imm_nuclt_default = {
     .super = {
-        .nsymbols = IMM_NUCLT_NSYMBOLS,
+        .nsymbols = IMM_NUCLT_SIZE,
         .symbols = IMM_NUCLT_SYMBOLS,
         .sym = {.idx =
                     {
@@ -67,7 +67,7 @@ struct imm_nuclt const imm_nuclt_default = {
                         NIL('H', 'T'),
                         SET('T', 3),
                         NIL('U', IMM_NUCLT_ANY_SYMBOL),
-                        SET(IMM_NUCLT_ANY_SYMBOL, IMM_NUCLT_NSYMBOLS),
+                        SET(IMM_NUCLT_ANY_SYMBOL, IMM_NUCLT_SIZE),
                         NIL('Y', IMM_SYM_LAST_CHAR),
                     }},
         .any_symbol_id = IMM_SYM_ID(IMM_NUCLT_ANY_SYMBOL),
@@ -76,7 +76,7 @@ struct imm_nuclt const imm_nuclt_default = {
 
 struct imm_dna const imm_dna_default = {
     .super.super = {
-        .nsymbols = IMM_DNA_NSYMBOLS,
+        .nsymbols = IMM_DNA_SIZE,
         .symbols = IMM_DNA_SYMBOLS,
         .sym = {.idx =
                     {
@@ -89,7 +89,7 @@ struct imm_dna const imm_dna_default = {
                         NIL('H', 'T'),
                         SET('T', 3),
                         NIL('U', IMM_DNA_ANY_SYMBOL),
-                        SET(IMM_DNA_ANY_SYMBOL, IMM_DNA_NSYMBOLS),
+                        SET(IMM_DNA_ANY_SYMBOL, IMM_DNA_SIZE),
                         NIL('Y', IMM_SYM_LAST_CHAR),
                     }},
         .any_symbol_id = IMM_SYM_ID(IMM_DNA_ANY_SYMBOL),
@@ -98,7 +98,7 @@ struct imm_dna const imm_dna_default = {
 
 struct imm_rna const imm_rna_default = {
     .super.super = {
-        .nsymbols = IMM_RNA_NSYMBOLS,
+        .nsymbols = IMM_RNA_SIZE,
         .symbols = IMM_RNA_SYMBOLS,
         .sym = {.idx =
                     {
@@ -111,7 +111,7 @@ struct imm_rna const imm_rna_default = {
                         NIL('H', 'U'),
                         SET('U', 3),
                         NIL('V', IMM_RNA_ANY_SYMBOL),
-                        SET(IMM_RNA_ANY_SYMBOL, IMM_RNA_NSYMBOLS),
+                        SET(IMM_RNA_ANY_SYMBOL, IMM_RNA_SIZE),
                         NIL('Y', IMM_SYM_LAST_CHAR),
                     }},
         .any_symbol_id = IMM_SYM_ID(IMM_RNA_ANY_SYMBOL),

@@ -5,12 +5,12 @@
 #include "imm/generics.h"
 #include "imm/nuclt.h"
 
-static_assert(IMM_NUCLT_NSYMBOLS == 4, "nuclt size expected to be four");
+static_assert(IMM_NUCLT_SIZE == 4, "nuclt size expected to be four");
 
 static imm_float marginalization(struct imm_codon_marg const *codonm,
                                  struct imm_codon const *codon)
 {
-    unsigned const symbol_idx[IMM_NUCLT_NSYMBOLS] = {0, 1, 2, 3};
+    unsigned const symbol_idx[IMM_NUCLT_SIZE] = {0, 1, 2, 3};
     unsigned any = imm_abc_any_symbol_idx(imm_super(codonm->nuclt));
     unsigned const *arr[3];
     unsigned shape[3];
@@ -28,7 +28,8 @@ static imm_float marginalization(struct imm_codon_marg const *codonm,
         }
     }
 
-    struct imm_codon t = imm_codon_init(codon->nuclt);
+    struct imm_codon t;
+    t.nuclt = codon->nuclt;
     imm_float lprob = imm_lprob_zero();
     for (unsigned a = 0; a < shape[0]; ++a)
     {
@@ -39,7 +40,7 @@ static imm_float marginalization(struct imm_codon_marg const *codonm,
                 t.a = arr[0][a];
                 t.b = arr[1][b];
                 t.c = arr[2][c];
-                lprob = imm_lprob_add(lprob, imm_codon_marg_lprob(codonm, &t));
+                lprob = imm_lprob_add(lprob, imm_codon_marg_lprob(codonm, t));
             }
         }
     }
@@ -53,7 +54,8 @@ static void set_marginal_lprobs(struct imm_codon_marg *codonm)
     unsigned any = imm_abc_any_symbol_idx(abc);
     IMM_BUG(any != imm_len(codonm->nuclt));
 
-    struct imm_codon codon = imm_codon_init(codonm->nuclt);
+    struct imm_codon codon;
+    codon.nuclt = codonm->nuclt;
 
     IMM_BUG(codonm->lprobs.shape[0] != codonm->lprobs.shape[1]);
     IMM_BUG(codonm->lprobs.shape[1] != codonm->lprobs.shape[2]);
@@ -82,7 +84,7 @@ static void set_nonmarginal_lprobs(struct imm_codon_marg *codonm,
     while (!codon_iter_end(iter))
     {
         struct imm_codon const codon = codon_iter_next(&iter);
-        imm_float lprob = imm_codon_lprob_get(codonp, &codon);
+        imm_float lprob = imm_codon_lprob_get(codonp, codon);
         imm_arr3d_set(&codonm->lprobs, codon.idx, lprob);
     }
 }

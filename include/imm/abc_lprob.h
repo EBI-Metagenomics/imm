@@ -2,7 +2,6 @@
 #define IMM_ABC_LPROB_H
 
 #include "imm/abc.h"
-#include "imm/bug.h"
 #include "imm/lprob.h"
 
 struct imm_abc_lprob

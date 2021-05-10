@@ -1,7 +1,7 @@
 #ifndef COMMON_IO_H
 #define COMMON_IO_H
 
-#include "common/error.h"
+#include "common/log.h"
 #include <stdio.h>
 
 #define xfwrite(buffer, size, count, stream)                                   \
@@ -12,7 +12,7 @@ static inline void __fwrite(const void *restrict buffer, size_t size,
                             char const *file, int line, char const *buffstr)
 {
     if (fwrite(buffer, size, count, stream) < count)
-        error("failed to write %s", buffstr);
+        error(IMM_IOERROR, "failed to write %s", buffstr);
 }
 
 #endif

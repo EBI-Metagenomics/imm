@@ -1,8 +1,7 @@
 #ifndef COMMON_MEMORY_H
 #define COMMON_MEMORY_H
 
-#include "common/error.h"
-#include "imm/bug.h"
+#include "common/log.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -41,10 +40,7 @@ static inline void *__malloc(size_t size, char const file[static 1], int line)
 {
     void *ptr = malloc(size);
     if (!ptr)
-    {
-        __imm_log(IMM_LOG_FATAL, file, line, "failed to malloc");
-        exit(EXIT_FAILURE);
-    }
+        fatal(IMM_IOERROR, "failed to malloc");
     return ptr;
 }
 
@@ -53,10 +49,7 @@ static inline void *__memcpy(void *restrict dest, const void *restrict src,
 {
     void *ptr = memcpy(dest, src, count);
     if (!ptr)
-    {
-        __imm_log(IMM_LOG_FATAL, file, line, "failed to memcpy");
-        exit(EXIT_FAILURE);
-    }
+        fatal(IMM_IOERROR, "failed to memcpy");
     return ptr;
 }
 
@@ -65,10 +58,7 @@ static inline void *__realloc(void *ptr, size_t new_size,
 {
     void *new_ptr = realloc(ptr, new_size);
     if (!new_ptr)
-    {
-        __imm_log(IMM_LOG_FATAL, file, line, "failed to realloc");
-        exit(EXIT_FAILURE);
-    }
+        fatal(IMM_IOERROR, "failed to realloc");
     return new_ptr;
 }
 
@@ -77,10 +67,7 @@ static inline char *__strdup(char const *str, char const file[static 1],
 {
     char *new = strdup(str);
     if (!new)
-    {
-        __imm_log(IMM_LOG_FATAL, file, line, "failed to strdup");
-        exit(EXIT_FAILURE);
-    }
+        fatal(IMM_IOERROR, "failed to strdup");
     return new;
 }
 

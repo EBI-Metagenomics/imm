@@ -1,7 +1,6 @@
 #include "dp/code.h"
 #include "dp/eseq.h"
 #include "imm/abc.h"
-#include "imm/bug.h"
 #include "imm/seq.h"
 #include "matrix/matrix.h"
 

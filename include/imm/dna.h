@@ -6,7 +6,7 @@
 
 #define IMM_DNA_ANY_SYMBOL 'X'
 #define IMM_DNA_SYMBOLS "ACGT"
-#define IMM_DNA_NSYMBOLS 4
+#define IMM_DNA_SIZE 4
 
 struct imm_dna
 {
@@ -15,8 +15,8 @@ struct imm_dna
 
 extern struct imm_dna const imm_dna_default;
 
-IMM_API int imm_dna_init(struct imm_dna *dna,
-                         char const symbols[IMM_DNA_NSYMBOLS], char any_symbol);
+IMM_API int imm_dna_init(struct imm_dna *dna, char const symbols[IMM_DNA_SIZE],
+                         char any_symbol);
 
 static inline struct imm_nuclt const *imm_dna_super(struct imm_dna const *dna)
 {

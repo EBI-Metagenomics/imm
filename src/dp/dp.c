@@ -8,10 +8,8 @@
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
 #include "elapsed/elapsed.h"
-#include "imm/bug.h"
 #include "imm/compiler.h"
 #include "imm/dp.h"
-#include "imm/error.h"
 #include "imm/lprob.h"
 #include "imm/trans.h"
 #include "result.h"
@@ -99,16 +97,16 @@ int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
 {
     result_reset(result);
     if (!task->seq)
-        return xerror(IMM_ILLEGALARG, "seq has not been set");
+        return error(IMM_ILLEGALARG, "seq has not been set");
 
     if (dp->code.abc != imm_seq_abc(task->seq))
-        return xerror(IMM_ILLEGALARG, "dp and seq must have the same alphabet");
+        return error(IMM_ILLEGALARG, "dp and seq must have the same alphabet");
 
     unsigned end_state = dp->state_table.end_state;
     unsigned min = state_table_span(&dp->state_table, end_state).min;
     if (imm_seq_len(task->seq) < min)
-        return xerror(IMM_ILLEGALARG,
-                      "seq is shorter than end_state's lower bound");
+        return error(IMM_ILLEGALARG,
+                     "seq is shorter than end_state's lower bound");
 
     struct elapsed elapsed = elapsed_init();
     elapsed_start(&elapsed);
@@ -127,7 +125,7 @@ unsigned imm_dp_trans_idx(struct imm_dp *dp, unsigned src_idx, unsigned dst_idx)
 int imm_dp_change_trans(struct imm_dp *dp, unsigned trans_idx, imm_float lprob)
 {
     if (imm_unlikely(!imm_lprob_is_finite(lprob)))
-        return xerror(IMM_ILLEGALARG, "lprob must be finite");
+        return error(IMM_ILLEGALARG, "lprob must be finite");
 
     trans_table_change(&dp->trans_table, trans_idx, lprob);
     return IMM_SUCCESS;

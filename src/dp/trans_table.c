@@ -2,7 +2,6 @@
 #include "args.h"
 #include "common/common.h"
 #include "containers/stack.h"
-#include "imm/error.h"
 #include "imm/trans.h"
 #include "trans.h"
 
@@ -16,7 +15,7 @@ unsigned trans_table_idx(struct trans_table *trans_tbl, unsigned src_idx,
         if (trans_table_source_state(trans_tbl, dst_idx, i) == src_idx)
             return trans_tbl->offset[dst_idx] + i;
     }
-    xerror(IMM_ILLEGALARG, "transition not found");
+    error(IMM_ILLEGALARG, "transition not found");
     return IMM_NULL_TRANS_IDX;
 }
 

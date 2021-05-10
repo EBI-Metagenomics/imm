@@ -32,8 +32,6 @@ add_library(imm
     src/codon_marg.c
     src/codon_state.c
     src/frame_state.c
-    src/common/bug.c
-    src/common/error.c
     src/defaults.c
     src/dna.c
     src/dp/bitarr.c

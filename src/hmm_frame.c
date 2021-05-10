@@ -27,23 +27,25 @@ void test_hmm_frame_state_0eps(void)
 {
     struct imm_dna const *dna = &imm_dna_default;
     struct imm_nuclt const *nuclt = imm_super(dna);
-    struct imm_nuclt_lprob nucltp;
-    imm_nuclt_lprob_init(
-        &nucltp, nuclt,
-        IMM_FARR(imm_log(0.25), imm_log(0.25), imm_log(0.5), imm_lprob_zero()));
+    struct imm_nuclt_lprob nucltp =
+        imm_nuclt_lprob_init(nuclt, IMM_FARR(imm_log(0.25), imm_log(0.25),
+                                             imm_log(0.5), imm_lprob_zero()));
 
-    struct imm_codon_lprob codonp;
-    imm_codon_lprob_init(&codonp, nuclt);
-    struct imm_codon codon = IMM_CODON_INIT(nuclt);
-    COND(imm_codon_set(&codon, IMM_TRIPLET('A', 'T', 'G')) == 0);
-    imm_codon_lprob_set(&codonp, &codon, imm_log(0.8));
-    COND(imm_codon_set(&codon, IMM_TRIPLET('A', 'T', 'T')) == 0);
-    imm_codon_lprob_set(&codonp, &codon, imm_log(0.1));
-    COND(imm_codon_set(&codon, IMM_TRIPLET('C', 'C', 'C')) == 0);
-    imm_codon_lprob_set(&codonp, &codon, imm_log(0.1));
+    struct imm_codon_lprob codonp = imm_codon_lprob_init(nuclt);
+
+    imm_codon_lprob_set(&codonp,
+                        imm_codon_init(nuclt, IMM_TRIPLET('A', 'T', 'G')),
+                        imm_log(0.8));
+    imm_codon_lprob_set(&codonp,
+                        imm_codon_init(nuclt, IMM_TRIPLET('A', 'T', 'T')),
+                        imm_log(0.1));
+    imm_codon_lprob_set(&codonp,
+                        imm_codon_init(nuclt, IMM_TRIPLET('C', 'C', 'C')),
+                        imm_log(0.1));
+
     struct imm_codon_marg codonm;
     imm_codon_marg_init(&codonm, &codonp);
-    imm_codon_lprob_destroy(codonp);
+    imm_codon_lprob_deinit(codonp);
 
     struct imm_hmm *hmm = imm_hmm_create(abc);
 

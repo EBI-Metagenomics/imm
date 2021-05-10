@@ -1,9 +1,9 @@
 #ifndef IMM_ARR3D_H
 #define IMM_ARR3D_H
 
-#include "imm/bug.h"
 #include "imm/export.h"
 #include "imm/float.h"
+#include "imm/log.h"
 #include "imm/lprob.h"
 
 struct imm_arr3d

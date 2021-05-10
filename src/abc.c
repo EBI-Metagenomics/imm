@@ -1,7 +1,5 @@
 #include "abc.h"
 #include "common/common.h"
-#include "imm/bug.h"
-#include "imm/error.h"
 #include "imm/sym.h"
 
 struct imm_abc const imm_abc_empty = {
@@ -22,13 +20,13 @@ int abc_init(struct imm_abc *abc, unsigned len, char const *symbols,
              char any_symbol, struct imm_abc_vtable vtable)
 {
     if (!imm_sym_valid_char(any_symbol))
-        return xerror(IMM_ILLEGALARG, "any_symbol outside range");
+        return error(IMM_ILLEGALARG, "any_symbol outside range");
 
     if (len == 0)
-        return xerror(IMM_ILLEGALARG, "alphabet cannot be empty");
+        return error(IMM_ILLEGALARG, "alphabet cannot be empty");
 
     if (len > IMM_SYM_SIZE)
-        return xerror(IMM_ILLEGALARG, "symbols length is too large");
+        return error(IMM_ILLEGALARG, "symbols length is too large");
 
     abc->nsymbols = len;
     abc->symbols = symbols;
@@ -38,16 +36,16 @@ int abc_init(struct imm_abc *abc, unsigned len, char const *symbols,
     for (unsigned i = 0; i < abc->nsymbols; ++i)
     {
         if (symbols[i] == any_symbol)
-            return xerror(IMM_ILLEGALARG,
-                          "any_symbol cannot be in the alphabet");
+            return error(IMM_ILLEGALARG,
+                         "any_symbol cannot be in the alphabet");
 
         if (!imm_sym_valid_char(symbols[i]))
-            return xerror(IMM_ILLEGALARG, "symbol outside range");
+            return error(IMM_ILLEGALARG, "symbol outside range");
 
         unsigned id = imm_sym_id(symbols[i]);
         if (imm_sym_idx(&abc->sym, id) != IMM_SYM_NULL_IDX)
-            return xerror(IMM_ILLEGALARG,
-                          "alphabet cannot have duplicated symbols");
+            return error(IMM_ILLEGALARG,
+                         "alphabet cannot have duplicated symbols");
 
         imm_sym_set_idx(&abc->sym, id, i);
     }

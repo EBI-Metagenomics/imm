@@ -73,7 +73,7 @@ int tsort(unsigned nstates, struct imm_state **states, unsigned start_idx)
     clear_marks(nstates, states);
 
     if (check_mute_cycles(nstates, states))
-        return xerror(IMM_RUNTIMEERROR, "mute cycles are not allowed");
+        return error(IMM_RUNTIMEERROR, "mute cycles are not allowed");
 
     clear_marks(nstates, states);
 

@@ -2,9 +2,9 @@
 #define IMM_SEQ_H
 
 #include "imm/abc.h"
-#include "imm/bug.h"
-#include "imm/error.h"
+#include "imm/compiler.h"
 #include "imm/export.h"
+#include "imm/log.h"
 #include "imm/str.h"
 
 struct imm_abc;
@@ -31,11 +31,9 @@ static inline struct imm_seq imm_seq_init(struct imm_str str,
 {
     for (unsigned i = 0; i < str.len; ++i)
     {
-        if (!imm_abc_has_symbol(abc, str.data[i]) &&
-            str.data[i] != imm_abc_any_symbol(abc))
-        {
-            imm_die(IMM_ILLEGALARG, "invalid sequence");
-        }
+        if (imm_unlikely(!imm_abc_has_symbol(abc, str.data[i]) &&
+                         str.data[i] != imm_abc_any_symbol(abc)))
+            __imm_log(IMM_FATAL, IMM_ILLEGALARG, "invalid sequence");
     }
 
     return (struct imm_seq){str.len, str.data, abc};

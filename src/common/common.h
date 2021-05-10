@@ -5,8 +5,8 @@
 #define STRUCT_FIELD(s, f) (((struct s *)0)->f)
 
 #include "common/bits.h"
-#include "common/error.h"
 #include "common/io.h"
+#include "common/log.h"
 #include "common/math.h"
 #include "common/memory.h"
 #include "common/string.h"

@@ -45,9 +45,9 @@ IMM_API void imm_codon_marg_deinit(struct imm_codon_marg *codonm);
  */
 static inline imm_float
 imm_codon_marg_lprob(struct imm_codon_marg const *codonm,
-                     struct imm_codon const *codon)
+                     struct imm_codon codon)
 {
-    return imm_arr3d_get(&codonm->lprobs, codon->idx);
+    return imm_arr3d_get(&codonm->lprobs, codon.idx);
 }
 
 static inline imm_float imm_codon_marg_lp(struct imm_codon_marg const *codonm,

@@ -13,8 +13,8 @@ void test_amino_lprob(void)
 {
     struct imm_amino const *amino = &imm_amino_default;
 
-    imm_float const lprobs[IMM_AMINO_NSYMBOLS] = {
-        imm_lprob_zero(), imm_log(1), [19] = imm_log(19)};
+    imm_float const lprobs[IMM_AMINO_SIZE] = {imm_lprob_zero(),
+                                              imm_log(1), [19] = imm_log(19)};
     struct imm_amino_lprob aminop = imm_amino_lprob_init(amino, lprobs);
 
     COND(imm_lprob_is_zero(imm_amino_lprob_get(&aminop, 'A')));

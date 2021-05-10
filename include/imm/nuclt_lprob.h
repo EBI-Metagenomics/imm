@@ -1,24 +1,24 @@
 #ifndef IMM_NUCLT_LPROB_H
 #define IMM_NUCLT_LPROB_H
 
-#include "imm/bug.h"
 #include "imm/generics.h"
+#include "imm/log.h"
 #include "imm/lprob.h"
 #include "imm/nuclt.h"
 
 struct imm_nuclt_lprob
 {
     struct imm_nuclt const *nuclt;
-    imm_float lprobs[IMM_NUCLT_NSYMBOLS];
+    imm_float lprobs[IMM_NUCLT_SIZE];
 };
 
 static inline struct imm_nuclt_lprob
 imm_nuclt_lprob_init(struct imm_nuclt const *nuclt,
-                     imm_float const lprobs[IMM_NUCLT_NSYMBOLS])
+                     imm_float const lprobs[IMM_NUCLT_SIZE])
 {
     struct imm_nuclt_lprob lprob;
     lprob.nuclt = nuclt;
-    for (unsigned i = 0; i < IMM_NUCLT_NSYMBOLS; ++i)
+    for (unsigned i = 0; i < IMM_NUCLT_SIZE; ++i)
         lprob.lprobs[i] = lprobs[i];
     return lprob;
 }

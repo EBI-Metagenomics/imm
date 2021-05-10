@@ -391,7 +391,8 @@ imm_float imm_frame_state_decode(struct imm_frame_state const *state,
     unsigned const n = imm_nuclt_len(state->nucltp->nuclt);
 
     imm_float max_lprob = imm_lprob_zero();
-    struct imm_codon tmp = imm_codon_init(state->nucltp->nuclt);
+    struct imm_codon tmp;
+    tmp.nuclt = state->nucltp->nuclt;
 
     for (unsigned i0 = 0; i0 < n; ++i0)
     {
@@ -445,7 +446,7 @@ imm_float imm_frame_state_lposterior(struct imm_frame_state const *state,
         return imm_lprob_nan();
     }
 
-    return lprob + imm_codon_marg_lprob(state->codonm, codon);
+    return lprob + imm_codon_marg_lprob(state->codonm, *codon);
 }
 
 static imm_float lprob(struct imm_state const *state, struct imm_seq const *seq)
