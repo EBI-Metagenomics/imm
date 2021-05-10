@@ -60,7 +60,7 @@ static void set_marginal_lprobs(struct imm_codon_marg *codonm)
     IMM_BUG(codonm->lprobs.shape[0] != codonm->lprobs.shape[1]);
     IMM_BUG(codonm->lprobs.shape[1] != codonm->lprobs.shape[2]);
 
-    unsigned size = codonm->lprobs.shape[0];
+    unsigned size = IMM_NUCLT_SIZE + 1;
     for (unsigned k = 0; k < 3; ++k)
     {
         for (unsigned i = 0; i < size; ++i)
@@ -71,7 +71,8 @@ static void set_marginal_lprobs(struct imm_codon_marg *codonm)
                 codon.idx[(k + 1) % 3] = i;
                 codon.idx[(k + 2) % 3] = j;
                 imm_float lprob = marginalization(codonm, &codon);
-                imm_arr3d_set(&codonm->lprobs, codon.idx, lprob);
+                codonm->lprobs[codon.idx[0]][codon.idx[1]][codon.idx[2]] =
+                    lprob;
             }
         }
     }
@@ -85,22 +86,15 @@ static void set_nonmarginal_lprobs(struct imm_codon_marg *codonm,
     {
         struct imm_codon const codon = codon_iter_next(&iter);
         imm_float lprob = imm_codon_lprob_get(codonp, codon);
-        imm_arr3d_set(&codonm->lprobs, codon.idx, lprob);
+        codonm->lprobs[codon.idx[0]][codon.idx[1]][codon.idx[2]] = lprob;
     }
 }
 
-void imm_codon_marg_init(struct imm_codon_marg *codonm,
-                         struct imm_codon_lprob *codonp)
+struct imm_codon_marg imm_codon_marg_init(struct imm_codon_lprob *codonp)
 {
-    codonm->nuclt = codonp->nuclt;
-    unsigned size = imm_nuclt_len(codonp->nuclt) + 1;
-    imm_arr3d_init(&codonm->lprobs, size, size, size);
-
-    set_nonmarginal_lprobs(codonm, codonp);
-    set_marginal_lprobs(codonm);
-}
-
-void imm_codon_marg_deinit(struct imm_codon_marg *codonm)
-{
-    imm_arr3d_deinit(&codonm->lprobs);
+    struct imm_codon_marg codonm;
+    codonm.nuclt = codonp->nuclt;
+    set_nonmarginal_lprobs(&codonm, codonp);
+    set_marginal_lprobs(&codonm);
+    return codonm;
 }

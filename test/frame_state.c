@@ -31,8 +31,7 @@ void test_frame_state1(void)
     imm_codon_lprob_set(&codonp, codon, imm_log(0.8 / 0.9));
     codon = IMM_CODON(nuclt, 'A', 'T', 'T');
     imm_codon_lprob_set(&codonp, codon, imm_log(0.1 / 0.9));
-    struct imm_codon_marg codonm;
-    imm_codon_marg_init(&codonm, &codonp);
+    struct imm_codon_marg codonm = imm_codon_marg_init(&codonp);
 
     struct imm_frame_state *state =
         imm_frame_state_new(0, &nucltp, &codonm, (imm_float)0.1);
@@ -55,7 +54,6 @@ void test_frame_state1(void)
     seq = imm_seq_init(IMM_STR("ATTAAT"), abc);
     COND(imm_lprob_is_zero(imm_state_lprob(s, &seq)));
 
-    imm_codon_marg_deinit(&codonm);
     imm_frame_state_del(state);
 }
 
@@ -73,8 +71,7 @@ void test_frame_state2(void)
     imm_codon_lprob_set(&codonp, codon, imm_log(0.8 / 0.9));
     codon = IMM_CODON(nuclt, 'A', 'T', 'T');
     imm_codon_lprob_set(&codonp, codon, imm_log(0.1 / 0.9));
-    struct imm_codon_marg codonm;
-    imm_codon_marg_init(&codonm, &codonp);
+    struct imm_codon_marg codonm = imm_codon_marg_init(&codonp);
 
     struct imm_frame_state *state =
         imm_frame_state_new(0, &nucltp, &codonm, (imm_float)0.1);
@@ -112,7 +109,6 @@ void test_frame_state2(void)
     seq = imm_seq_init(IMM_STR("ATTAAT"), abc);
     COND(imm_lprob_is_zero(imm_state_lprob(s, &seq)));
 
-    imm_codon_marg_deinit(&codonm);
     imm_frame_state_del(state);
 }
 
@@ -133,8 +129,7 @@ void test_frame_state3(void)
     imm_codon_lprob_set(&codonp, codon, imm_log(0.1) - imm_log(1.3));
     codon = IMM_CODON(nuclt, 'G', 'T', 'C');
     imm_codon_lprob_set(&codonp, codon, imm_log(0.4) - imm_log(1.3));
-    struct imm_codon_marg codonm;
-    imm_codon_marg_init(&codonm, &codonp);
+    struct imm_codon_marg codonm = imm_codon_marg_init(&codonp);
 
     struct imm_frame_state *state =
         imm_frame_state_new(0, &nucltp, &codonm, (imm_float)0.1);
@@ -174,7 +169,6 @@ void test_frame_state3(void)
     seq = imm_seq_init(IMM_STR("GTCAA"), abc);
     CLOSE(imm_state_lprob(s, &seq), -12.902301492627526);
 
-    imm_codon_marg_deinit(&codonm);
     imm_frame_state_del(state);
 }
 
@@ -212,8 +206,7 @@ void test_frame_state_lposterior(void)
     imm_codon_lprob_set(&codonp, codon, imm_log(0.4));
 
     COND(imm_codon_lprob_normalize(&codonp) == 0);
-    struct imm_codon_marg codonm;
-    imm_codon_marg_init(&codonm, &codonp);
+    struct imm_codon_marg codonm = imm_codon_marg_init(&codonp);
 
     struct imm_frame_state *state =
         imm_frame_state_new(0, &nucltp, &codonm, (imm_float)0.1);
@@ -248,7 +241,6 @@ void test_frame_state_lposterior(void)
     imm_cartes_deinit(&codon_iter);
 
     imm_frame_state_del(state);
-    imm_codon_marg_deinit(&codonm);
 }
 
 void test_frame_state_decode(void)
@@ -269,8 +261,7 @@ void test_frame_state_decode(void)
     codon = IMM_CODON(nuclt, 'G', 'T', 'C');
     imm_codon_lprob_set(&codonp, codon, imm_log(0.4) - imm_log(1.3));
 
-    struct imm_codon_marg codonm;
-    imm_codon_marg_init(&codonm, &codonp);
+    struct imm_codon_marg codonm = imm_codon_marg_init(&codonp);
 
     struct imm_frame_state const *state =
         imm_frame_state_new(0, &nucltp, &codonm, (imm_float)0.1);
@@ -337,5 +328,4 @@ void test_frame_state_decode(void)
          codon.c == imm_abc_symbol_idx(abc, 'C'));
 
     imm_frame_state_del(state);
-    imm_codon_marg_deinit(&codonm);
 }

@@ -22,13 +22,12 @@ struct imm_codon_marg
      * Pre-computed marginalization forms of
      * p(𝑋₁=𝚡₁,𝑋₂=𝚡₂,𝑋₃=𝚡₃).
      */
-    struct imm_arr3d lprobs;
+    imm_float lprobs[IMM_NUCLT_SIZE + 1][IMM_NUCLT_SIZE + 1]
+                    [IMM_NUCLT_SIZE + 1];
 };
 
-IMM_API void imm_codon_marg_init(struct imm_codon_marg *codonm,
-                                 struct imm_codon_lprob *codonp);
-
-IMM_API void imm_codon_marg_deinit(struct imm_codon_marg *codonm);
+IMM_API struct imm_codon_marg
+imm_codon_marg_init(struct imm_codon_lprob *codonp);
 
 /**
  * Calculate any of the marginalization forms of
@@ -47,13 +46,7 @@ static inline imm_float
 imm_codon_marg_lprob(struct imm_codon_marg const *codonm,
                      struct imm_codon codon)
 {
-    return imm_arr3d_get(&codonm->lprobs, codon.idx);
-}
-
-static inline imm_float imm_codon_marg_lp(struct imm_codon_marg const *codonm,
-                                          struct imm_codon codon)
-{
-    return imm_arr3d_get(&codonm->lprobs, codon.idx);
+    return codonm->lprobs[codon.idx[0]][codon.idx[1]][codon.idx[2]];
 }
 
 #endif

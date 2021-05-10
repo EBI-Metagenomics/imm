@@ -25,7 +25,7 @@ imm_frame_state_new(unsigned id, struct imm_nuclt_lprob const *nucltp,
 
     struct imm_state_vtable vtable = {del, lprob, IMM_FRAME_STATE, state};
     struct imm_abc const *abc = imm_super(codonm->nuclt);
-    state->super = state_new(id, abc, vtable, IMM_SPAN(3, 3));
+    state->super = state_new(id, abc, vtable, IMM_SPAN(1, 5));
     return state;
 }
 
@@ -46,7 +46,7 @@ static inline imm_float logaddexp3(imm_float const a, imm_float const b,
     (struct imm_codon) { .a = (A), .b = (B), .c = (C) }
 
 #define LP(A, B, C)                                                            \
-    imm_codon_marg_lp(state->codonm, CODON(nucl[A], nucl[B], nucl[C]))
+    imm_codon_marg_lprob(state->codonm, CODON(nucl[A], nucl[B], nucl[C]))
 
 #define NUMARGS(...) (sizeof((int[]){__VA_ARGS__}) / sizeof(int))
 

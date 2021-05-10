@@ -92,6 +92,12 @@ void imm_dp_del(struct imm_dp const *dp)
     free((void *)dp);
 }
 
+struct imm_dp *dp_reset(struct imm_dp *dp, struct dp_args const *args)
+{
+    imm_dp_del(dp);
+    return dp_new(args);
+}
+
 int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
                    struct imm_result *result)
 {

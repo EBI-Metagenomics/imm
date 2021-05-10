@@ -24,8 +24,7 @@ void test_codonm_nonmarginal(void)
                         imm_codon_init(nuclt, IMM_TRIPLET('A', 'T', 'T')),
                         imm_log(0.1));
 
-    struct imm_codon_marg codonm;
-    imm_codon_marg_init(&codonm, &codonp);
+    struct imm_codon_marg codonm = imm_codon_marg_init(&codonp);
 
     CLOSE(imm_codon_marg_lprob(
               &codonm, imm_codon_init(nuclt, IMM_TRIPLET('A', 'T', 'G'))),
@@ -37,8 +36,6 @@ void test_codonm_nonmarginal(void)
 
     COND(imm_lprob_is_zero(imm_codon_marg_lprob(
         &codonm, imm_codon_init(nuclt, IMM_TRIPLET('T', 'T', 'T')))));
-
-    imm_codon_marg_deinit(&codonm);
 }
 
 void test_codonm_marginal(void)
@@ -54,8 +51,7 @@ void test_codonm_marginal(void)
                         imm_codon_init(nuclt, IMM_TRIPLET('A', 'T', 'T')),
                         imm_log(0.1));
 
-    struct imm_codon_marg codonm;
-    imm_codon_marg_init(&codonm, &codonp);
+    struct imm_codon_marg codonm = imm_codon_marg_init(&codonp);
 
     CLOSE(imm_codon_marg_lprob(
               &codonm, imm_codon_init(nuclt, IMM_TRIPLET('A', 'T', 'G'))),
@@ -81,6 +77,4 @@ void test_codonm_marginal(void)
     CLOSE(imm_codon_marg_lprob(
               &codonm, imm_codon_init(nuclt, IMM_TRIPLET('X', 'X', 'T'))),
           imm_log(0.1));
-
-    imm_codon_marg_deinit(&codonm);
 }
