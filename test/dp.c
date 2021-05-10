@@ -56,7 +56,7 @@ void test_dp_empty_path(void)
 {
     struct imm_mute_state *state = imm_mute_state_new(3, &abc);
     struct imm_hmm *hmm = imm_hmm_new(&abc);
-    struct imm_result result = IMM_RESULT_INIT();
+    struct imm_result result = imm_result_init();
 
     EQ(imm_hmm_add_state(hmm, imm_super(state)), IMM_SUCCESS);
     EQ(imm_hmm_set_start(hmm, imm_super(state), imm_log(0.1)), IMM_SUCCESS);
@@ -78,7 +78,7 @@ void test_dp_one_mute(void)
 {
     struct imm_mute_state *state = imm_mute_state_new(3, &abc);
     struct imm_hmm *hmm = imm_hmm_new(&abc);
-    struct imm_result result = IMM_RESULT_INIT();
+    struct imm_result result = imm_result_init();
 
     EQ(imm_hmm_add_state(hmm, imm_super(state)), IMM_SUCCESS);
 
@@ -108,7 +108,7 @@ void test_dp_two_mutes(void)
     struct imm_mute_state *state0 = imm_mute_state_new(0, &abc);
     struct imm_mute_state *state1 = imm_mute_state_new(12, &abc);
     struct imm_hmm *hmm = imm_hmm_new(&abc);
-    struct imm_result result = IMM_RESULT_INIT();
+    struct imm_result result = imm_result_init();
 
     EQ(imm_hmm_add_state(hmm, imm_super(state0)), IMM_SUCCESS);
     EQ(imm_hmm_add_state(hmm, imm_super(state1)), IMM_SUCCESS);

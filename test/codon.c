@@ -14,7 +14,7 @@ void test_codon(void)
     struct imm_dna const *dna = &imm_dna_default;
     struct imm_abc const *abc = imm_super(imm_super(dna));
 
-    struct imm_codon codon = IMM_CODON_INIT(imm_super(dna));
+    struct imm_codon codon = imm_codon_init(imm_super(dna));
 
     EQ(codon.a, imm_abc_any_symbol_idx(abc));
     EQ(codon.b, imm_abc_any_symbol_idx(abc));

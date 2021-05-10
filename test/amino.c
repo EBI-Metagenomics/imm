@@ -33,15 +33,11 @@ void test_amino_success(void)
 
 void test_amino_lprob(void)
 {
-    struct imm_amino const *amino = &imm_amino_default;
-    imm_float const zero = imm_lprob_zero();
-    imm_float const lprobs[IMM_AMINO_NSYMBOLS] = {
-        zero, imm_log(1), [19] = imm_log(19)};
+    struct imm_amino_lprob lprob = imm_amino_lprob_init(
+        &imm_amino_default,
+        (imm_float[]){imm_lprob_zero(), imm_log(1), [19] = imm_log(19)});
 
-    struct imm_abc_lprob lprob;
-    imm_abc_lprob_init(&lprob, imm_super(amino), lprobs);
-
-    COND(imm_lprob_is_zero(imm_abc_lprob_get(&lprob, 'A')));
-    CLOSE(imm_abc_lprob_get(&lprob, 'C'), log(1));
-    CLOSE(imm_abc_lprob_get(&lprob, 'Y'), log(19));
+    COND(imm_lprob_is_zero(imm_amino_lprob_get(&lprob, 'A')));
+    CLOSE(imm_amino_lprob_get(&lprob, 'C'), log(1));
+    CLOSE(imm_amino_lprob_get(&lprob, 'Y'), log(19));
 }

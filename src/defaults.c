@@ -1,8 +1,11 @@
 #include "abc.h"
 #include "common/common.h"
 #include "imm/amino.h"
+#include "imm/amino_lprob.h"
 #include "imm/dna.h"
+#include "imm/lprob.h"
 #include "imm/nuclt.h"
+#include "imm/nuclt_lprob.h"
 #include "imm/rna.h"
 
 #define ID(c) IMM_SYM_ID(c)

@@ -13,11 +13,6 @@ struct imm_path
     struct imm_step *steps;
 };
 
-#define IMM_PATH_INIT()                                                        \
-    {                                                                          \
-        0, 0, 1, 0, NULL,                                                      \
-    }
-
 IMM_API void imm_path_add(struct imm_path *path, struct imm_step step);
 
 static inline struct imm_step *imm_path_step(struct imm_path const *path,
@@ -34,7 +29,10 @@ static inline void imm_path_add_unsafe(struct imm_path *path,
     *imm_path_step(path, (unsigned)path->nsteps++) = step;
 }
 
-IMM_API void imm_path_init(struct imm_path *path);
+static inline struct imm_path imm_path_init(void)
+{
+    return (struct imm_path){0, 0, 1, 0, NULL};
+}
 
 IMM_API void imm_path_deinit(struct imm_path *path);
 

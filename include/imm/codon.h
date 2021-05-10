@@ -42,22 +42,12 @@ static inline int imm_codon_set(struct imm_codon *codon,
     return IMM_SUCCESS;
 }
 
-#define IMM_CODON_INIT(nuclt)                                                  \
-    (struct imm_codon)                                                         \
-    {                                                                          \
-        (nuclt), .a = imm_abc_any_symbol_idx(imm_nuclt_super(nuclt)),          \
-                 .b = imm_abc_any_symbol_idx(imm_nuclt_super(nuclt)),          \
-                 .c = imm_abc_any_symbol_idx(imm_nuclt_super(nuclt))           \
-    }
-
-static inline void imm_codon_init(struct imm_codon *codon,
-                                  struct imm_nuclt const *nuclt)
+static inline struct imm_codon imm_codon_init(struct imm_nuclt const *nuclt)
 {
-    codon->nuclt = nuclt;
-    struct imm_abc const *abc = imm_nuclt_super(nuclt);
-    codon->a = imm_abc_any_symbol_idx(abc);
-    codon->b = imm_abc_any_symbol_idx(abc);
-    codon->c = imm_abc_any_symbol_idx(abc);
+    return (struct imm_codon){
+        nuclt, .a = imm_abc_any_symbol_idx(imm_nuclt_super(nuclt)),
+        .b = imm_abc_any_symbol_idx(imm_nuclt_super(nuclt)),
+        .c = imm_abc_any_symbol_idx(imm_nuclt_super(nuclt))};
 }
 
 #endif

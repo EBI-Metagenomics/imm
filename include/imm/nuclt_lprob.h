@@ -12,14 +12,15 @@ struct imm_nuclt_lprob
     imm_float lprobs[IMM_NUCLT_NSYMBOLS];
 };
 
-static inline void
-imm_nuclt_lprob_init(struct imm_nuclt_lprob *lprob,
-                     struct imm_nuclt const *nuclt,
+static inline struct imm_nuclt_lprob
+imm_nuclt_lprob_init(struct imm_nuclt const *nuclt,
                      imm_float const lprobs[IMM_NUCLT_NSYMBOLS])
 {
-    lprob->nuclt = nuclt;
+    struct imm_nuclt_lprob lprob;
+    lprob.nuclt = nuclt;
     for (unsigned i = 0; i < IMM_NUCLT_NSYMBOLS; ++i)
-        lprob->lprobs[i] = lprobs[i];
+        lprob.lprobs[i] = lprobs[i];
+    return lprob;
 }
 
 static inline imm_float

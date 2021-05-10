@@ -10,16 +10,16 @@
 struct imm_step
 {
     imm_state_id_t state_id;
-    uint8_t seqlen;
+    imm_state_seqlen_t seqlen;
 };
 
 static_assert(sizeof(struct imm_step) == 4, "struct pair must be packed");
 static_assert(alignof(struct imm_step) == 2, "struct pair must align to 1");
 
-#define IMM_STEP(state_id, seqlen)                                             \
-    (struct imm_step)                                                          \
-    {                                                                          \
-        (imm_state_id_t)(state_id), (imm_state_seqlen_t)(seqlen)               \
-    }
+static inline struct imm_step imm_step_init(unsigned state_id, unsigned seqlen)
+{
+    return (struct imm_step){(imm_state_id_t)state_id,
+                             (imm_state_seqlen_t)seqlen};
+}
 
 #endif

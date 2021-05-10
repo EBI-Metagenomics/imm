@@ -11,12 +11,10 @@ struct imm_abc_lprob
     imm_float const *lprobs;
 };
 
-static inline void imm_abc_lprob_init(struct imm_abc_lprob *lprob,
-                                      struct imm_abc const *abc,
-                                      imm_float const *lprobs)
+static inline struct imm_abc_lprob imm_abc_lprob_init(struct imm_abc const *abc,
+                                                      imm_float const *lprobs)
 {
-    lprob->abc = abc;
-    lprob->lprobs = lprobs;
+    return (struct imm_abc_lprob){abc, lprobs};
 }
 
 static inline imm_float imm_abc_lprob_get(struct imm_abc_lprob const *lprob,

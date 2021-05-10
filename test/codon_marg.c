@@ -14,9 +14,9 @@ int main(void)
 void test_codonm_nonmarginal(void)
 {
     struct imm_dna const *dna = &imm_dna_default;
-    struct imm_codon_lprob codonp = IMM_CODON_LPROB_INIT(imm_super(dna));
+    struct imm_codon_lprob codonp = imm_codon_lprob_init(imm_super(dna));
 
-    struct imm_codon codon = IMM_CODON_INIT(imm_super(dna));
+    struct imm_codon codon = imm_codon_init(imm_super(dna));
 
     EQ(imm_codon_set(&codon, IMM_TRIPLET('A', 'T', 'G')), IMM_SUCCESS);
     imm_codon_lprob_set(&codonp, &codon, imm_log(0.8));
@@ -40,9 +40,9 @@ void test_codonm_nonmarginal(void)
 void test_codonm_marginal(void)
 {
     struct imm_dna const *dna = &imm_dna_default;
-    struct imm_codon_lprob codonp = IMM_CODON_LPROB_INIT(imm_super(dna));
+    struct imm_codon_lprob codonp = imm_codon_lprob_init(imm_super(dna));
 
-    struct imm_codon codon = IMM_CODON_INIT(imm_super(dna));
+    struct imm_codon codon = imm_codon_init(imm_super(dna));
 
     EQ(imm_codon_set(&codon, IMM_TRIPLET('A', 'T', 'G')), IMM_SUCCESS);
     imm_codon_lprob_set(&codonp, &codon, imm_log(0.8));

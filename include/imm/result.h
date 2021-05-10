@@ -16,17 +16,9 @@ struct imm_result
     imm_float seconds;
 };
 
-#define IMM_RESULT_INIT()                                                      \
-    {                                                                          \
-        NULL, IMM_PATH_INIT(), imm_lprob_nan(), 0                              \
-    }
-
-static inline void imm_result_init(struct imm_result *result)
+static inline struct imm_result imm_result_init(void)
 {
-    result->seq = NULL;
-    imm_path_init(&result->path);
-    result->loglik = imm_lprob_nan();
-    result->seconds = 0;
+    return (struct imm_result){NULL, imm_path_init(), imm_lprob_nan(), 0};
 }
 
 static inline void imm_result_deinit(struct imm_result *result)

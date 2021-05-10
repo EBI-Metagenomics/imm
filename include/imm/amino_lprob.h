@@ -12,14 +12,15 @@ struct imm_amino_lprob
     imm_float lprobs[IMM_AMINO_NSYMBOLS];
 };
 
-static inline void
-imm_amino_lprob_init(struct imm_amino_lprob *lprob,
-                     struct imm_amino const *amino,
+static inline struct imm_amino_lprob
+imm_amino_lprob_init(struct imm_amino const *amino,
                      imm_float const lprobs[IMM_AMINO_NSYMBOLS])
 {
-    lprob->amino = amino;
+    struct imm_amino_lprob lprob;
+    lprob.amino = amino;
     for (unsigned i = 0; i < IMM_AMINO_NSYMBOLS; ++i)
-        lprob->lprobs[i] = lprobs[i];
+        lprob.lprobs[i] = lprobs[i];
+    return lprob;
 }
 
 static inline imm_float

@@ -16,11 +16,10 @@ void test_path(void)
     unsigned state_ids[] = {42, 19};
     uint8_t seqlens[] = {3, 5};
 
-    struct imm_path path;
-    imm_path_init(&path);
+    struct imm_path path = imm_path_init();
 
-    imm_path_add(&path, IMM_STEP(state_ids[0], seqlens[0]));
-    imm_path_add(&path, IMM_STEP(state_ids[1], seqlens[1]));
+    imm_path_add(&path, imm_step_init(state_ids[0], seqlens[0]));
+    imm_path_add(&path, imm_step_init(state_ids[1], seqlens[1]));
 
     EQ(imm_path_step(&path, 0)->state_id, state_ids[0]);
     EQ(imm_path_step(&path, 1)->state_id, state_ids[1]);
@@ -33,11 +32,10 @@ void test_path(void)
 
 void test_path_long(void)
 {
-    struct imm_path path;
-    imm_path_init(&path);
+    struct imm_path path = imm_path_init();
 
     for (uint16_t i = 0; i < 1 << 14; ++i)
-        imm_path_add(&path, IMM_STEP(i, i % 16));
+        imm_path_add(&path, imm_step_init(i, i % 16));
 
     for (uint16_t i = 0; i < 1 << 14; ++i)
     {
@@ -48,7 +46,7 @@ void test_path_long(void)
     imm_path_reset(&path);
 
     for (uint16_t i = 0; i < 1 << 14; ++i)
-        imm_path_add(&path, IMM_STEP(i, i % 16));
+        imm_path_add(&path, imm_step_init(i, i % 16));
 
     for (uint16_t i = 0; i < 1 << 14; ++i)
     {

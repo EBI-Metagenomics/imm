@@ -24,17 +24,19 @@ struct imm_codon_lprob
                     [IMM_NUCLT_NSYMBOLS];
 };
 
-#define IMM_CODON_LPROB_INIT(nuclt)                                            \
-    (struct imm_codon_lprob)                                                   \
-    {                                                                          \
-        nuclt,                                                                 \
-        {                                                                      \
-            [0 ... IMM_NUCLT_NSYMBOLS - 1] = {                                 \
-                [0 ... IMM_NUCLT_NSYMBOLS -                                    \
-                 1] = {[0 ... IMM_NUCLT_NSYMBOLS - 1] = IMM_LPROB_ZERO}        \
-            }                                                                  \
-        }                                                                      \
-    }
+static inline struct imm_codon_lprob
+imm_codon_lprob_init(struct imm_nuclt const *nuclt)
+{
+    struct imm_codon_lprob lprob;
+    lprob.nuclt = nuclt;
+
+    for (unsigned a = 0; a < IMM_NUCLT_NSYMBOLS; ++a)
+        for (unsigned b = 0; b < IMM_NUCLT_NSYMBOLS; ++b)
+            for (unsigned c = 0; c < IMM_NUCLT_NSYMBOLS; ++c)
+                lprob.lprobs[a][b][c] = imm_lprob_zero();
+
+    return lprob;
+}
 
 static inline imm_float
 imm_codon_lprob_get(struct imm_codon_lprob const *codonp,

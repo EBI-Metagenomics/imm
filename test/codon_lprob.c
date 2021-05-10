@@ -13,11 +13,11 @@ void test_codon_lprob(void)
 {
     struct imm_dna const *dna = &imm_dna_default;
 
-    struct imm_codon_lprob codonp = IMM_CODON_LPROB_INIT(imm_super(dna));
+    struct imm_codon_lprob codonp = imm_codon_lprob_init(imm_super(dna));
 
     EQ(imm_codon_lprob_normalize(&codonp), IMM_ILLEGALARG);
 
-    struct imm_codon codon = IMM_CODON_INIT(imm_super(dna));
+    struct imm_codon codon = imm_codon_init(imm_super(dna));
 
     EQ(imm_codon_set(&codon, IMM_TRIPLET('A', 'C', 'C')), IMM_SUCCESS);
 

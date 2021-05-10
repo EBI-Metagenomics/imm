@@ -102,7 +102,7 @@ static inline imm_float zero(void) { return imm_lprob_zero(); }
 void test_viterbi_one_mute_state(void)
 {
     struct imm_hmm *hmm = imm_hmm_new(&abc);
-    struct imm_result result = IMM_RESULT_INIT();
+    struct imm_result result = imm_result_init();
 
     struct imm_mute_state *state = imm_mute_state_new(0, &abc);
 
@@ -125,7 +125,7 @@ void test_viterbi_one_mute_state(void)
 void test_viterbi_two_mute_states(void)
 {
     struct imm_hmm *hmm = imm_hmm_new(&abc);
-    struct imm_result result = IMM_RESULT_INIT();
+    struct imm_result result = imm_result_init();
 
     struct imm_mute_state *state0 = imm_mute_state_new(0, &abc);
     struct imm_mute_state *state1 = imm_mute_state_new(1, &abc);
@@ -191,7 +191,7 @@ void test_viterbi_mute_cycle(void)
 void test_viterbi_one_normal_state(void)
 {
     struct imm_hmm *hmm = imm_hmm_new(&abc);
-    struct imm_result result = IMM_RESULT_INIT();
+    struct imm_result result = imm_result_init();
 
     imm_float lprobs0[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5), zero()};
     struct imm_normal_state *state = imm_normal_state_new(0, &abc, lprobs0);
@@ -233,7 +233,7 @@ void test_viterbi_one_normal_state(void)
 void test_viterbi_two_normal_states(void)
 {
     struct imm_hmm *hmm = imm_hmm_new(&abc);
-    struct imm_result result = IMM_RESULT_INIT();
+    struct imm_result result = imm_result_init();
 
     imm_float lprobs0[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5), zero()};
     struct imm_normal_state *state0 = imm_normal_state_new(0, &abc, lprobs0);
@@ -285,7 +285,7 @@ void test_viterbi_two_normal_states(void)
 void test_viterbi_normal_states(void)
 {
     struct imm_hmm *hmm = imm_hmm_new(&abc);
-    struct imm_result result = IMM_RESULT_INIT();
+    struct imm_result result = imm_result_init();
 
     imm_float const lprobs0[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5),
                                  zero()};
@@ -382,7 +382,7 @@ void test_viterbi_normal_states(void)
 void test_viterbi_profile1(void)
 {
     struct imm_hmm *hmm = imm_hmm_new(&abc_ab);
-    struct imm_result result = IMM_RESULT_INIT();
+    struct imm_result result = imm_result_init();
 
     struct imm_mute_state *start = imm_mute_state_new(0, &abc_ab);
     struct imm_mute_state *D0 = imm_mute_state_new(1, &abc_ab);
@@ -463,7 +463,7 @@ void test_viterbi_profile1(void)
 void test_viterbi_profile2(void)
 {
     struct imm_hmm *hmm = imm_hmm_new(&abc);
-    struct imm_result result = IMM_RESULT_INIT();
+    struct imm_result result = imm_result_init();
 
     struct imm_mute_state *start = imm_mute_state_new(0, &abc);
 
@@ -595,7 +595,7 @@ void test_viterbi_profile2(void)
 void test_viterbi_profile_delete(void)
 {
     struct imm_hmm *hmm = imm_hmm_new(&abc_ab);
-    struct imm_result result = IMM_RESULT_INIT();
+    struct imm_result result = imm_result_init();
 
     imm_float N0_lprobs[] = {imm_log(0.5), zero()};
     struct imm_normal_state *N0 = imm_normal_state_new(0, &abc_ab, N0_lprobs);
@@ -668,7 +668,7 @@ void test_viterbi_global_profile(void)
     imm_seq_init(&CCABA_z, IMM_STR("CCABA"), &abc_z);
 
     struct imm_hmm *hmm = imm_hmm_new(&abc_z);
-    struct imm_result result = IMM_RESULT_INIT();
+    struct imm_result result = imm_result_init();
 
     struct imm_mute_state *start = imm_mute_state_new(0, &abc_z);
 
@@ -805,7 +805,7 @@ void test_viterbi_global_profile(void)
 void test_viterbi_cycle_mute_ending(void)
 {
     struct imm_hmm *hmm = imm_hmm_new(&abc_ab);
-    struct imm_result result = IMM_RESULT_INIT();
+    struct imm_result result = imm_result_init();
 
     struct imm_mute_state *start = imm_mute_state_new(0, &abc_ab);
     imm_hmm_add_state(hmm, imm_super(start));
