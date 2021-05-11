@@ -15,7 +15,7 @@ struct imm_normal_state
 
 IMM_API struct imm_normal_state *
 imm_normal_state_new(unsigned id, struct imm_abc const *abc,
-                     imm_float const lprobs[1]);
+                     imm_float const lprobs[static 1]);
 
 static inline void imm_normal_state_del(struct imm_normal_state const *normal)
 {

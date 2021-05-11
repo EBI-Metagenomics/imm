@@ -25,41 +25,24 @@ static void detach_states(struct imm_hmm *hmm)
 
 static void init_states_table(struct imm_hmm *hmm)
 {
-    hash_init(hmm->states.tbl);
     hmm->states.size = 0;
+    hash_init(hmm->states.tbl);
 }
 
 static void init_transitions_table(struct imm_hmm *hmm)
 {
     hmm->transitions.size = 0;
     hash_init(hmm->transitions.tbl);
-    hmm->transitions.capacity = sizeof(struct trans) * (1 << 8);
-    hmm->transitions.data = xmalloc(hmm->transitions.capacity);
-}
-
-static void deinit_transitions_table(struct imm_hmm const *hmm)
-{
-    free((void *)hmm->transitions.data);
 }
 
 static void add_transition(struct imm_hmm *hmm, struct imm_state *src,
                            struct imm_state *dst, imm_float lprob)
 {
-    size_t size = sizeof(struct trans);
-    size_t count = hmm->transitions.size + 1;
-    hmm->transitions.data =
-        growmem(hmm->transitions.data, count, size, &hmm->transitions.capacity);
     struct trans *trans = hmm->transitions.data + hmm->transitions.size++;
     trans_init(trans, src->id, dst->id, lprob);
     hash_add(hmm->transitions.tbl, &trans->hnode, trans->pair.id.key);
     stack_put(&src->trans.outgoing, &trans->outgoing);
     stack_put(&dst->trans.incoming, &trans->incoming);
-}
-
-static void reset_transitions_table(struct imm_hmm *hmm)
-{
-    hmm->transitions.size = 0;
-    hash_init(hmm->transitions.tbl);
 }
 
 static inline bool has_start_state(struct imm_hmm const *hmm)
@@ -108,14 +91,10 @@ void imm_hmm_reset(struct imm_hmm *hmm, struct imm_abc const *abc)
     hmm->abc = abc;
     start_init(&hmm->start);
     init_states_table(hmm);
-    reset_transitions_table(hmm);
+    init_transitions_table(hmm);
 }
 
-void imm_hmm_del(struct imm_hmm const *hmm)
-{
-    deinit_transitions_table(hmm);
-    free((void *)hmm);
-}
+void imm_hmm_del(struct imm_hmm const *hmm) { free((void *)hmm); }
 
 struct imm_dp *imm_hmm_new_dp(struct imm_hmm const *hmm,
                               struct imm_state const *end_state)

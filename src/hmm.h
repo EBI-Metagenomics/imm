@@ -5,6 +5,8 @@
 #include "start.h"
 #include "trans.h"
 
+#define MAX_NTRANS_BITS 12
+
 struct imm_abc;
 struct imm_hmm;
 struct imm_state;
@@ -17,15 +19,14 @@ struct imm_hmm
     struct
     {
         unsigned size;
-        HASH_DECLARE(tbl, 11);
+        HASH_DECLARE(tbl, MAX_NTRANS_BITS - 1);
     } states;
 
     struct
     {
         unsigned size;
-        HASH_DECLARE(tbl, 11);
-        size_t capacity;
-        struct trans *data;
+        HASH_DECLARE(tbl, MAX_NTRANS_BITS - 1);
+        struct trans data[(1 << MAX_NTRANS_BITS)];
     } transitions;
 };
 

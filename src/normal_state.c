@@ -10,7 +10,7 @@ static imm_float lprob(struct imm_state const *state,
 
 struct imm_normal_state *imm_normal_state_new(unsigned id,
                                               struct imm_abc const *abc,
-                                              imm_float const lprobs[1])
+                                              imm_float const lprobs[static 1])
 {
     struct imm_normal_state *normal = xmalloc(sizeof(*normal));
     normal->lprobs = lprobs;
