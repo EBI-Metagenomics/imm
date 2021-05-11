@@ -67,16 +67,20 @@ generate_export_header(imm BASE_NAME IMM
     EXPORT_FILE_NAME ${CMAKE_CURRENT_BINARY_DIR}/imm/export.h)
 
 if(${CMAKE_C_COMPILER_ID} MATCHES "MSVC")
-    set(WARNING_FLAGS /W3)
+    list(APPEND WARNING_FLAGS /W3)
 else()
-    set(WARNING_FLAGS -Wall -Wextra -Wno-pedantic -Wstrict-prototypes -Wshadow
+    list(APPEND WARNING_FLAGS -Wall -Wextra -Wno-pedantic -Wstrict-prototypes -Wshadow
         -Wconversion -Wmissing-prototypes -Wno-unused-parameter -Wsign-conversion
-        -Wno-nullability-extension
-        -Wno-gnu-statement-expression
-        -Wno-unused-function # FIXME: added only to please clangd for now
-        -Wno-empty-translation-unit # FIXME: added only to please clangd for now
-        -Wno-gnu-designator
+        -Wno-unused-function
     )
+endif()
+
+if(NOT ${CMAKE_C_COMPILER_ID} MATCHES "GNU")
+    list(APPEND WARNING_FLAGS
+        -Wno-gnu-designator
+        -Wno-empty-translation-unit
+        -Wno-gnu-statement-expression
+        -Wno-nullability-extension)
 endif()
 
 option(CI_BUILD "CI, extra flags will be set" OFF)

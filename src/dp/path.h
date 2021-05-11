@@ -57,7 +57,8 @@ static inline unsigned __path_invalid(unsigned bits)
 static inline unsigned __path_state_bits(struct path const *path, unsigned pos,
                                          unsigned state)
 {
-    return path->state_offset[state + 1] - path->state_offset[state];
+    return (unsigned)(path->state_offset[state + 1] -
+                      path->state_offset[state]);
 }
 
 static inline unsigned __path_seqlen_bits(struct path const *path, unsigned pos,

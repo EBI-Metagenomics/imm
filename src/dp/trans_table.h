@@ -35,7 +35,7 @@ void trans_table_deinit(struct trans_table const *tbl);
 static inline unsigned trans_table_ntrans(struct trans_table const *tbl,
                                           unsigned dst)
 {
-    return tbl->offset[dst + 1] - tbl->offset[dst];
+    return (unsigned)(tbl->offset[dst + 1] - tbl->offset[dst]);
 }
 
 static inline imm_float trans_table_score(struct trans_table const *tbl,
