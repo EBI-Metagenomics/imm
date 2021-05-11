@@ -33,8 +33,6 @@ static inline char imm_abc_any_symbol(struct imm_abc const *abc)
 IMM_API int imm_abc_init(struct imm_abc *abc, struct imm_str symbols,
                          char any_symbol_id);
 
-IMM_API void imm_abc_del(struct imm_abc const *abc);
-
 static inline bool imm_abc_has_symbol_id(struct imm_abc const *abc, unsigned id)
 {
     if (imm_unlikely(!imm_sym_valid_id(id)))

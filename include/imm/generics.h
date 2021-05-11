@@ -35,15 +35,14 @@
              struct imm_rna const * : imm_rna_typeid)(x)
 
 #define imm_del(x)                                                             \
-    _Generic((x),                                                              \
-             struct imm_normal_state *: imm_normal_state_del,                  \
-             struct imm_mute_state *: imm_mute_state_del,                      \
-             struct imm_codon_state *: imm_codon_state_del,                    \
-             struct imm_frame_state *: imm_frame_state_del,                    \
-             struct imm_abc const * : imm_abc_del,                             \
-             struct imm_task * : imm_task_del,                                 \
-             struct imm_hmm * : imm_hmm_del,                                   \
-             struct imm_dp * : imm_dp_del) (x)
+    _Generic((x), struct imm_normal_state *                                    \
+             : imm_normal_state_del, struct imm_mute_state *                   \
+             : imm_mute_state_del, struct imm_codon_state *                    \
+             : imm_codon_state_del, struct imm_frame_state *                   \
+             : imm_frame_state_del, struct imm_task *                          \
+             : imm_task_del, struct imm_hmm *                                  \
+             : imm_hmm_del, struct imm_dp *                                    \
+             : imm_dp_del)(x)
 
 #define imm_deinit(x)                                                          \
     _Generic((x), struct imm_path *                                            \
