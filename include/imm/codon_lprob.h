@@ -24,7 +24,7 @@ struct imm_codon_lprob
 };
 
 static inline struct imm_codon_lprob
-imm_codon_lprob_init(struct imm_nuclt const *nuclt)
+imm_codon_lprob(struct imm_nuclt const *nuclt)
 {
     struct imm_codon_lprob lprob;
     lprob.nuclt = nuclt;

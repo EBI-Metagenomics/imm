@@ -16,9 +16,9 @@ struct imm_result
     imm_float seconds;
 };
 
-static inline struct imm_result imm_result_init(void)
+static inline struct imm_result imm_result(void)
 {
-    return (struct imm_result){NULL, imm_path_init(), imm_lprob_nan(), 0};
+    return (struct imm_result){NULL, imm_path(), imm_lprob_nan(), 0};
 }
 
 static inline void imm_result_deinit(struct imm_result *result)

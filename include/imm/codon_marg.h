@@ -26,8 +26,7 @@ struct imm_codon_marg
                     [IMM_NUCLT_SIZE + 1];
 };
 
-IMM_API struct imm_codon_marg
-imm_codon_marg_init(struct imm_codon_lprob *codonp);
+IMM_API struct imm_codon_marg imm_codon_marg(struct imm_codon_lprob *codonp);
 
 /**
  * Calculate any of the marginalization forms of

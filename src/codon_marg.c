@@ -90,7 +90,7 @@ static void set_nonmarginal_lprobs(struct imm_codon_marg *codonm,
     }
 }
 
-struct imm_codon_marg imm_codon_marg_init(struct imm_codon_lprob *codonp)
+struct imm_codon_marg imm_codon_marg(struct imm_codon_lprob *codonp)
 {
     struct imm_codon_marg codonm;
     codonm.nuclt = codonp->nuclt;

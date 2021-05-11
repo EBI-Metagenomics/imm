@@ -15,10 +15,10 @@ void test_normal_state(void)
 {
     struct imm_abc abc = imm_abc_empty;
     imm_abc_init(&abc, IMM_STR("ACGT"), '*');
-    struct imm_seq A = imm_seq_init(IMM_STR("A"), &abc);
-    struct imm_seq C = imm_seq_init(IMM_STR("C"), &abc);
-    struct imm_seq G = imm_seq_init(IMM_STR("G"), &abc);
-    struct imm_seq T = imm_seq_init(IMM_STR("T"), &abc);
+    struct imm_seq A = imm_seq(IMM_STR("A"), &abc);
+    struct imm_seq C = imm_seq(IMM_STR("C"), &abc);
+    struct imm_seq G = imm_seq(IMM_STR("G"), &abc);
+    struct imm_seq T = imm_seq(IMM_STR("T"), &abc);
 
     imm_float lprobs[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5),
                           imm_lprob_zero()};
@@ -37,8 +37,8 @@ void test_mute_state(void)
 {
     struct imm_abc abc = imm_abc_empty;
     imm_abc_init(&abc, IMM_STR("ACGT"), '*');
-    struct imm_seq EMPTY = imm_seq_init(IMM_STR(""), &abc);
-    struct imm_seq A = imm_seq_init(IMM_STR("A"), &abc);
+    struct imm_seq EMPTY = imm_seq(IMM_STR(""), &abc);
+    struct imm_seq A = imm_seq(IMM_STR("A"), &abc);
 
     struct imm_mute_state *state = imm_mute_state_new(43, &abc);
 

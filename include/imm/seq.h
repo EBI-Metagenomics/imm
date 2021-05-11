@@ -26,8 +26,8 @@ static inline struct imm_abc const *imm_seq_abc(struct imm_seq const *seq)
     return seq->abc;
 }
 
-static inline struct imm_seq imm_seq_init(struct imm_str str,
-                                          struct imm_abc const *abc)
+static inline struct imm_seq imm_seq(struct imm_str str,
+                                     struct imm_abc const *abc)
 {
     for (unsigned i = 0; i < str.len; ++i)
     {

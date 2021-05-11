@@ -13,8 +13,8 @@ struct imm_nuclt_lprob
 };
 
 static inline struct imm_nuclt_lprob
-imm_nuclt_lprob_init(struct imm_nuclt const *nuclt,
-                     imm_float const lprobs[IMM_NUCLT_SIZE])
+imm_nuclt_lprob(struct imm_nuclt const *nuclt,
+                imm_float const lprobs[IMM_NUCLT_SIZE])
 {
     struct imm_nuclt_lprob lprob;
     lprob.nuclt = nuclt;

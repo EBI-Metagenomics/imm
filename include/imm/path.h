@@ -29,7 +29,7 @@ static inline void imm_path_add_unsafe(struct imm_path *path,
     *imm_path_step(path, (unsigned)path->nsteps++) = step;
 }
 
-static inline struct imm_path imm_path_init(void)
+static inline struct imm_path imm_path(void)
 {
     return (struct imm_path){0, 0, 1, 0, NULL};
 }

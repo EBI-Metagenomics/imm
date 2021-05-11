@@ -10,8 +10,7 @@ struct imm_str
 #define IMM_STR(str)                                                           \
     (struct imm_str) { sizeof(str) - 1, (str) }
 
-static inline void imm_str_init(struct imm_str *str, unsigned len,
-                                char const *data)
+static inline void imm_str(struct imm_str *str, unsigned len, char const *data)
 {
     str->len = len;
     str->data = data;

@@ -10,8 +10,8 @@ struct imm_abc_lprob
     imm_float const *lprobs;
 };
 
-static inline struct imm_abc_lprob imm_abc_lprob_init(struct imm_abc const *abc,
-                                                      imm_float const *lprobs)
+static inline struct imm_abc_lprob imm_abc_lprob(struct imm_abc const *abc,
+                                                 imm_float const *lprobs)
 {
     return (struct imm_abc_lprob){abc, lprobs};
 }

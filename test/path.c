@@ -16,7 +16,7 @@ void test_path(void)
     unsigned state_ids[] = {42, 19};
     uint8_t seqlens[] = {3, 5};
 
-    struct imm_path path = imm_path_init();
+    struct imm_path path = imm_path();
 
     imm_path_add(&path, IMM_STEP(state_ids[0], seqlens[0]));
     imm_path_add(&path, IMM_STEP(state_ids[1], seqlens[1]));
@@ -32,7 +32,7 @@ void test_path(void)
 
 void test_path_long(void)
 {
-    struct imm_path path = imm_path_init();
+    struct imm_path path = imm_path();
 
     for (uint16_t i = 0; i < 1 << 14; ++i)
         imm_path_add(&path, IMM_STEP(i, i % 16));

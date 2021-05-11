@@ -30,16 +30,16 @@ void test_hmm_frame_state_0eps(void)
     struct imm_nuclt const *nuclt = imm_super(dna);
     struct imm_abc const *abc = imm_super(nuclt);
     struct imm_nuclt_lprob nucltp =
-        imm_nuclt_lprob_init(nuclt, IMM_FARR(imm_log(0.25), imm_log(0.25),
-                                             imm_log(0.5), imm_lprob_zero()));
+        imm_nuclt_lprob(nuclt, IMM_FARR(imm_log(0.25), imm_log(0.25),
+                                        imm_log(0.5), imm_lprob_zero()));
 
-    struct imm_codon_lprob codonp = imm_codon_lprob_init(nuclt);
+    struct imm_codon_lprob codonp = imm_codon_lprob(nuclt);
 
     imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, 'A', 'T', 'G'), imm_log(0.8));
     imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, 'A', 'T', 'T'), imm_log(0.1));
     imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, 'C', 'C', 'C'), imm_log(0.1));
 
-    struct imm_codon_marg codonm = imm_codon_marg_init(&codonp);
+    struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
     struct imm_hmm *hmm = imm_hmm_new(imm_super(nuclt));
 
@@ -49,13 +49,13 @@ void test_hmm_frame_state_0eps(void)
     imm_hmm_add_state(hmm, imm_super(state));
     imm_hmm_set_start(hmm, imm_super(state), imm_log(1.0));
 
-    struct imm_path path = imm_path_init();
+    struct imm_path path = imm_path();
     imm_path_add(&path, IMM_STEP(imm_super(state)->id, 3));
-    struct imm_seq seq = imm_seq_init(IMM_STR("ATT"), abc);
+    struct imm_seq seq = imm_seq(IMM_STR("ATT"), abc);
     CLOSE(imm_hmm_loglik(hmm, &seq, &path), -2.3025850930);
-    seq = imm_seq_init(IMM_STR("ATG"), abc);
+    seq = imm_seq(IMM_STR("ATG"), abc);
     CLOSE(imm_hmm_loglik(hmm, &seq, &path), -0.2231435513142097);
-    seq = imm_seq_init(IMM_STR("AT"), abc);
+    seq = imm_seq(IMM_STR("AT"), abc);
     COND(!imm_lprob_is_nan(imm_hmm_loglik(hmm, &seq, &path)));
 
     imm_deinit(&path);
@@ -69,16 +69,16 @@ void test_hmm_frame_state_len1(void)
     struct imm_nuclt const *nuclt = imm_super(dna);
     struct imm_abc const *abc = imm_super(nuclt);
     struct imm_nuclt_lprob nucltp =
-        imm_nuclt_lprob_init(nuclt, IMM_FARR(imm_log(0.25), imm_log(0.25),
-                                             imm_log(0.5), imm_lprob_zero()));
+        imm_nuclt_lprob(nuclt, IMM_FARR(imm_log(0.25), imm_log(0.25),
+                                        imm_log(0.5), imm_lprob_zero()));
 
-    struct imm_codon_lprob codonp = imm_codon_lprob_init(nuclt);
+    struct imm_codon_lprob codonp = imm_codon_lprob(nuclt);
 
     imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, 'A', 'T', 'G'), imm_log(0.8));
     imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, 'A', 'T', 'T'), imm_log(0.1));
     imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, 'C', 'C', 'C'), imm_log(0.1));
 
-    struct imm_codon_marg codonm = imm_codon_marg_init(&codonp);
+    struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
     struct imm_hmm *hmm = imm_hmm_new(imm_super(nuclt));
 
@@ -88,28 +88,28 @@ void test_hmm_frame_state_len1(void)
     imm_hmm_add_state(hmm, imm_super(state));
     imm_hmm_set_start(hmm, imm_super(state), imm_log(1.0));
 
-    struct imm_path path = imm_path_init();
+    struct imm_path path = imm_path();
     imm_path_add(&path, IMM_STEP(imm_super(state)->id, 1));
-    struct imm_seq seq = imm_seq_init(IMM_STR("A"), abc);
+    struct imm_seq seq = imm_seq(IMM_STR("A"), abc);
     CLOSE(imm_hmm_loglik(hmm, &seq, &path), -6.0198640216);
 
-    path = imm_path_init();
+    path = imm_path();
     imm_path_add(&path, IMM_STEP(imm_super(state)->id, 1));
-    seq = imm_seq_init(IMM_STR("C"), abc);
+    seq = imm_seq(IMM_STR("C"), abc);
     CLOSE(imm_hmm_loglik(hmm, &seq, &path), -7.118476310297789);
 
     struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(state));
     struct imm_task *task = imm_task_new(dp);
-    struct imm_result result = imm_result_init();
+    struct imm_result result = imm_result();
 
-    seq = imm_seq_init(IMM_STR("A"), abc);
+    seq = imm_seq(IMM_STR("A"), abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
     EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     CLOSE(result.loglik, -6.0198640216);
 
     dp = imm_hmm_reset_dp(hmm, imm_super(state), dp);
     imm_task_reset(task, dp);
-    seq = imm_seq_init(IMM_STR("C"), abc);
+    seq = imm_seq(IMM_STR("C"), abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
     EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     CLOSE(result.loglik, -7.1184763103);

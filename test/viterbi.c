@@ -44,32 +44,32 @@ static struct imm_seq AAB_ab;
 int main(void)
 {
     imm_abc_init(&abc, IMM_STR("ACGT"), '*');
-    EMPTY = imm_seq_init(IMM_STR(""), &abc);
-    A = imm_seq_init(IMM_STR("A"), &abc);
-    C = imm_seq_init(IMM_STR("C"), &abc);
-    G = imm_seq_init(IMM_STR("G"), &abc);
-    T = imm_seq_init(IMM_STR("T"), &abc);
-    AA = imm_seq_init(IMM_STR("AA"), &abc);
-    AC = imm_seq_init(IMM_STR("AC"), &abc);
-    AG = imm_seq_init(IMM_STR("AG"), &abc);
-    AT = imm_seq_init(IMM_STR("AT"), &abc);
-    ACT = imm_seq_init(IMM_STR("ACT"), &abc);
-    AGT = imm_seq_init(IMM_STR("AGT"), &abc);
-    ATT = imm_seq_init(IMM_STR("ATT"), &abc);
-    AGTC = imm_seq_init(IMM_STR("AGTC"), &abc);
-    GA = imm_seq_init(IMM_STR("GA"), &abc);
-    GT = imm_seq_init(IMM_STR("GT"), &abc);
-    GTTTA = imm_seq_init(IMM_STR("GTTTA"), &abc);
-    GTTTAC = imm_seq_init(IMM_STR("GTTTAC"), &abc);
-    GTTTACA = imm_seq_init(IMM_STR("GTTTACA"), &abc);
+    EMPTY = imm_seq(IMM_STR(""), &abc);
+    A = imm_seq(IMM_STR("A"), &abc);
+    C = imm_seq(IMM_STR("C"), &abc);
+    G = imm_seq(IMM_STR("G"), &abc);
+    T = imm_seq(IMM_STR("T"), &abc);
+    AA = imm_seq(IMM_STR("AA"), &abc);
+    AC = imm_seq(IMM_STR("AC"), &abc);
+    AG = imm_seq(IMM_STR("AG"), &abc);
+    AT = imm_seq(IMM_STR("AT"), &abc);
+    ACT = imm_seq(IMM_STR("ACT"), &abc);
+    AGT = imm_seq(IMM_STR("AGT"), &abc);
+    ATT = imm_seq(IMM_STR("ATT"), &abc);
+    AGTC = imm_seq(IMM_STR("AGTC"), &abc);
+    GA = imm_seq(IMM_STR("GA"), &abc);
+    GT = imm_seq(IMM_STR("GT"), &abc);
+    GTTTA = imm_seq(IMM_STR("GTTTA"), &abc);
+    GTTTAC = imm_seq(IMM_STR("GTTTAC"), &abc);
+    GTTTACA = imm_seq(IMM_STR("GTTTACA"), &abc);
 
     imm_abc_init(&abc_ab, IMM_STR("AB"), '*');
-    EMPTY_ab = imm_seq_init(IMM_STR(""), &abc_ab);
-    A_ab = imm_seq_init(IMM_STR("A"), &abc_ab);
-    B_ab = imm_seq_init(IMM_STR("B"), &abc_ab);
-    AA_ab = imm_seq_init(IMM_STR("AA"), &abc_ab);
-    AB_ab = imm_seq_init(IMM_STR("AB"), &abc_ab);
-    AAB_ab = imm_seq_init(IMM_STR("AAB"), &abc_ab);
+    EMPTY_ab = imm_seq(IMM_STR(""), &abc_ab);
+    A_ab = imm_seq(IMM_STR("A"), &abc_ab);
+    B_ab = imm_seq(IMM_STR("B"), &abc_ab);
+    AA_ab = imm_seq(IMM_STR("AA"), &abc_ab);
+    AB_ab = imm_seq(IMM_STR("AB"), &abc_ab);
+    AAB_ab = imm_seq(IMM_STR("AAB"), &abc_ab);
 
     test_viterbi_one_mute_state();
     test_viterbi_two_mute_states();
@@ -102,7 +102,7 @@ static inline imm_float zero(void) { return imm_lprob_zero(); }
 void test_viterbi_one_mute_state(void)
 {
     struct imm_hmm *hmm = imm_hmm_new(&abc);
-    struct imm_result result = imm_result_init();
+    struct imm_result result = imm_result();
 
     struct imm_mute_state *state = imm_mute_state_new(0, &abc);
 
@@ -125,7 +125,7 @@ void test_viterbi_one_mute_state(void)
 void test_viterbi_two_mute_states(void)
 {
     struct imm_hmm *hmm = imm_hmm_new(&abc);
-    struct imm_result result = imm_result_init();
+    struct imm_result result = imm_result();
 
     struct imm_mute_state *state0 = imm_mute_state_new(0, &abc);
     struct imm_mute_state *state1 = imm_mute_state_new(1, &abc);
@@ -191,7 +191,7 @@ void test_viterbi_mute_cycle(void)
 void test_viterbi_one_normal_state(void)
 {
     struct imm_hmm *hmm = imm_hmm_new(&abc);
-    struct imm_result result = imm_result_init();
+    struct imm_result result = imm_result();
 
     imm_float lprobs0[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5), zero()};
     struct imm_normal_state *state = imm_normal_state_new(0, &abc, lprobs0);
@@ -233,7 +233,7 @@ void test_viterbi_one_normal_state(void)
 void test_viterbi_two_normal_states(void)
 {
     struct imm_hmm *hmm = imm_hmm_new(&abc);
-    struct imm_result result = imm_result_init();
+    struct imm_result result = imm_result();
 
     imm_float lprobs0[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5), zero()};
     struct imm_normal_state *state0 = imm_normal_state_new(0, &abc, lprobs0);
@@ -285,7 +285,7 @@ void test_viterbi_two_normal_states(void)
 void test_viterbi_normal_states(void)
 {
     struct imm_hmm *hmm = imm_hmm_new(&abc);
-    struct imm_result result = imm_result_init();
+    struct imm_result result = imm_result();
 
     imm_float const lprobs0[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5),
                                  zero()};
@@ -382,7 +382,7 @@ void test_viterbi_normal_states(void)
 void test_viterbi_profile1(void)
 {
     struct imm_hmm *hmm = imm_hmm_new(&abc_ab);
-    struct imm_result result = imm_result_init();
+    struct imm_result result = imm_result();
 
     struct imm_mute_state *start = imm_mute_state_new(0, &abc_ab);
     struct imm_mute_state *D0 = imm_mute_state_new(1, &abc_ab);
@@ -463,7 +463,7 @@ void test_viterbi_profile1(void)
 void test_viterbi_profile2(void)
 {
     struct imm_hmm *hmm = imm_hmm_new(&abc);
-    struct imm_result result = imm_result_init();
+    struct imm_result result = imm_result();
 
     struct imm_mute_state *start = imm_mute_state_new(0, &abc);
 
@@ -595,7 +595,7 @@ void test_viterbi_profile2(void)
 void test_viterbi_profile_delete(void)
 {
     struct imm_hmm *hmm = imm_hmm_new(&abc_ab);
-    struct imm_result result = imm_result_init();
+    struct imm_result result = imm_result();
 
     imm_float N0_lprobs[] = {imm_log(0.5), zero()};
     struct imm_normal_state *N0 = imm_normal_state_new(0, &abc_ab, N0_lprobs);
@@ -657,18 +657,18 @@ void test_viterbi_global_profile(void)
     struct imm_seq CCABA_z;
 
     imm_abc_init(&abc_z, IMM_STR("ABCZ"), '*');
-    AA_z = imm_seq_init(IMM_STR("AA"), &abc_z);
-    AAB_z = imm_seq_init(IMM_STR("AAB"), &abc_z);
-    C_z = imm_seq_init(IMM_STR("C"), &abc_z);
-    CC_z = imm_seq_init(IMM_STR("CC"), &abc_z);
-    CCC_z = imm_seq_init(IMM_STR("CCC"), &abc_z);
-    CCA_z = imm_seq_init(IMM_STR("CCA"), &abc_z);
-    CCAB_z = imm_seq_init(IMM_STR("CCAB"), &abc_z);
-    CCABB_z = imm_seq_init(IMM_STR("CCABB"), &abc_z);
-    CCABA_z = imm_seq_init(IMM_STR("CCABA"), &abc_z);
+    AA_z = imm_seq(IMM_STR("AA"), &abc_z);
+    AAB_z = imm_seq(IMM_STR("AAB"), &abc_z);
+    C_z = imm_seq(IMM_STR("C"), &abc_z);
+    CC_z = imm_seq(IMM_STR("CC"), &abc_z);
+    CCC_z = imm_seq(IMM_STR("CCC"), &abc_z);
+    CCA_z = imm_seq(IMM_STR("CCA"), &abc_z);
+    CCAB_z = imm_seq(IMM_STR("CCAB"), &abc_z);
+    CCABB_z = imm_seq(IMM_STR("CCABB"), &abc_z);
+    CCABA_z = imm_seq(IMM_STR("CCABA"), &abc_z);
 
     struct imm_hmm *hmm = imm_hmm_new(&abc_z);
-    struct imm_result result = imm_result_init();
+    struct imm_result result = imm_result();
 
     struct imm_mute_state *start = imm_mute_state_new(0, &abc_z);
 
@@ -805,7 +805,7 @@ void test_viterbi_global_profile(void)
 void test_viterbi_cycle_mute_ending(void)
 {
     struct imm_hmm *hmm = imm_hmm_new(&abc_ab);
-    struct imm_result result = imm_result_init();
+    struct imm_result result = imm_result();
 
     struct imm_mute_state *start = imm_mute_state_new(0, &abc_ab);
     imm_hmm_add_state(hmm, imm_super(start));

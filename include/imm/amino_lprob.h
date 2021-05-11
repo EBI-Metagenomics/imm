@@ -12,8 +12,8 @@ struct imm_amino_lprob
 };
 
 static inline struct imm_amino_lprob
-imm_amino_lprob_init(struct imm_amino const *amino,
-                     imm_float const lprobs[IMM_AMINO_SIZE])
+imm_amino_lprob(struct imm_amino const *amino,
+                imm_float const lprobs[IMM_AMINO_SIZE])
 {
     struct imm_amino_lprob lprob;
     lprob.amino = amino;

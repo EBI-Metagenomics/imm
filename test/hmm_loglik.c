@@ -20,13 +20,13 @@ static struct imm_seq GT;
 int main(void)
 {
     imm_abc_init(&abc, IMM_STR("ACGT"), '*');
-    EMPTY = imm_seq_init(IMM_STR(""), &abc);
-    A = imm_seq_init(IMM_STR("A"), &abc);
-    T = imm_seq_init(IMM_STR("T"), &abc);
-    G = imm_seq_init(IMM_STR("G"), &abc);
-    AG = imm_seq_init(IMM_STR("AG"), &abc);
-    AA = imm_seq_init(IMM_STR("AA"), &abc);
-    GT = imm_seq_init(IMM_STR("GT"), &abc);
+    EMPTY = imm_seq(IMM_STR(""), &abc);
+    A = imm_seq(IMM_STR("A"), &abc);
+    T = imm_seq(IMM_STR("T"), &abc);
+    G = imm_seq(IMM_STR("G"), &abc);
+    AG = imm_seq(IMM_STR("AG"), &abc);
+    AA = imm_seq(IMM_STR("AA"), &abc);
+    GT = imm_seq(IMM_STR("GT"), &abc);
 
     test_hmm_loglik_single_state();
     test_hmm_loglik_two_states();
@@ -49,7 +49,7 @@ void test_hmm_loglik_single_state(void)
     EQ(imm_hmm_set_start(hmm, imm_super(state), imm_log(0.5)), IMM_SUCCESS);
     EQ(imm_hmm_normalize_trans(hmm), IMM_SUCCESS);
 
-    struct imm_path path = imm_path_init();
+    struct imm_path path = imm_path();
     imm_path_add(&path, IMM_STEP(imm_id(imm_super(state)), 1));
     CLOSE(imm_hmm_loglik(hmm, &A, &path), imm_log(0.5) + imm_log(0.25));
     imm_path_reset(&path);
@@ -118,7 +118,7 @@ void test_hmm_loglik_two_states(void)
     imm_hmm_set_trans(hmm, imm_super(state0), imm_super(state1), imm_log(0.2));
     imm_hmm_set_trans(hmm, imm_super(state1), imm_super(state1), imm_log(1.0));
 
-    struct imm_path path = imm_path_init();
+    struct imm_path path = imm_path();
     imm_path_add(&path, IMM_STEP(imm_id(imm_super(state0)), 1));
     CLOSE(imm_hmm_loglik(hmm, &A, &path), -1.3862943611);
     imm_path_reset(&path);
@@ -158,7 +158,7 @@ void test_hmm_loglik_mute_state(void)
 
     imm_hmm_set_trans(hmm, imm_super(state), imm_super(state), imm_log(0.1));
 
-    struct imm_path path = imm_path_init();
+    struct imm_path path = imm_path();
     COND(!imm_lprob_is_nan(imm_hmm_loglik(hmm, &A, &path)));
     imm_path_reset(&path);
 
@@ -195,7 +195,7 @@ void test_hmm_loglik_two_mute_states(void)
 
     imm_hmm_set_trans(hmm, imm_super(S0), imm_super(S1), 0.0);
 
-    struct imm_path path = imm_path_init();
+    struct imm_path path = imm_path();
     imm_path_add(&path, IMM_STEP(imm_id(imm_super(S0)), 0));
     imm_path_add(&path, IMM_STEP(imm_id(imm_super(S1)), 0));
     CLOSE(imm_hmm_loglik(hmm, &EMPTY, &path), 0.0);
@@ -211,7 +211,7 @@ void test_hmm_loglik_invalid(void)
     struct imm_abc abc_ac = imm_abc_empty;
     imm_abc_init(&abc_ac, IMM_STR("AC"), '*');
 
-    struct imm_seq C = imm_seq_init(IMM_STR("C"), &abc_ac);
+    struct imm_seq C = imm_seq(IMM_STR("C"), &abc_ac);
 
     struct imm_hmm *hmm = imm_hmm_new(&abc_ac);
 
@@ -236,7 +236,7 @@ void test_hmm_loglik_invalid(void)
 
     imm_hmm_normalize_trans(hmm);
 
-    struct imm_path path = imm_path_init();
+    struct imm_path path = imm_path();
     imm_path_add(&path, IMM_STEP(imm_id(imm_super(S)), 0));
     imm_path_add(&path, IMM_STEP(imm_id(imm_super(M2)), 1));
     imm_path_add(&path, IMM_STEP(imm_id(imm_super(E)), 0));
@@ -254,7 +254,7 @@ void test_hmm_loglik_no_state(void)
 {
     struct imm_hmm *hmm = imm_hmm_new(&abc);
 
-    struct imm_path path = imm_path_init();
+    struct imm_path path = imm_path();
     COND(!imm_lprob_is_nan(imm_hmm_loglik(hmm, &EMPTY, &path)));
 
     imm_deinit(&path);

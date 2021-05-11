@@ -33,7 +33,7 @@ void test_amino_success(void)
 
 void test_amino_lprob(void)
 {
-    struct imm_amino_lprob lprob = imm_amino_lprob_init(
+    struct imm_amino_lprob lprob = imm_amino_lprob(
         &imm_amino_default,
         (imm_float[]){imm_lprob_zero(), imm_log(1), [19] = imm_log(19)});
 
