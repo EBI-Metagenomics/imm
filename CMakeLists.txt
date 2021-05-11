@@ -69,7 +69,7 @@ generate_export_header(imm BASE_NAME IMM
 if(${CMAKE_C_COMPILER_ID} MATCHES "MSVC")
     set(WARNING_FLAGS /W3)
 else()
-    set(WARNING_FLAGS -Wall -Wextra -pedantic -Wstrict-prototypes -Wshadow
+    set(WARNING_FLAGS -Wall -Wextra -Wno-pedantic -Wstrict-prototypes -Wshadow
         -Wconversion -Wmissing-prototypes -Wno-unused-parameter -Wsign-conversion
         -Wno-nullability-extension
         -Wno-gnu-statement-expression
