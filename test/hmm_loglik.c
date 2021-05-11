@@ -159,23 +159,23 @@ void test_hmm_loglik_mute_state(void)
     imm_hmm_set_trans(hmm, imm_super(state), imm_super(state), imm_log(0.1));
 
     struct imm_path path = imm_path();
-    COND(!imm_lprob_is_nan(imm_hmm_loglik(hmm, &A, &path)));
+    COND(imm_lprob_is_nan(imm_hmm_loglik(hmm, &A, &path)));
     imm_path_reset(&path);
 
-    COND(!imm_lprob_is_nan(imm_hmm_loglik(hmm, &T, &path)));
+    COND(imm_lprob_is_nan(imm_hmm_loglik(hmm, &T, &path)));
     imm_path_reset(&path);
 
-    COND(!imm_lprob_is_nan(imm_hmm_loglik(hmm, &G, &path)));
+    COND(imm_lprob_is_nan(imm_hmm_loglik(hmm, &G, &path)));
     imm_path_reset(&path);
 
     imm_path_add(&path, IMM_STEP(imm_id(imm_super(state)), 0));
     CLOSE(imm_hmm_loglik(hmm, &EMPTY, &path), 0.0);
     imm_path_reset(&path);
 
-    COND(!imm_lprob_is_nan(imm_hmm_loglik(hmm, &GT, &path)));
+    COND(imm_lprob_is_nan(imm_hmm_loglik(hmm, &GT, &path)));
     imm_path_reset(&path);
 
-    COND(!imm_lprob_is_nan(imm_hmm_loglik(hmm, &GT, &path)));
+    COND(imm_lprob_is_nan(imm_hmm_loglik(hmm, &GT, &path)));
 
     imm_deinit(&path);
     imm_del(hmm);
@@ -255,7 +255,7 @@ void test_hmm_loglik_no_state(void)
     struct imm_hmm *hmm = imm_hmm_new(&abc);
 
     struct imm_path path = imm_path();
-    COND(!imm_lprob_is_nan(imm_hmm_loglik(hmm, &EMPTY, &path)));
+    COND(imm_lprob_is_nan(imm_hmm_loglik(hmm, &EMPTY, &path)));
 
     imm_deinit(&path);
     imm_del(hmm);

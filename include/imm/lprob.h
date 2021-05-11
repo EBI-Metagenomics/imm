@@ -14,7 +14,7 @@ static inline imm_float imm_lprob_add(imm_float a, imm_float b)
 
 static inline imm_float imm_lprob_nan(void) { return NAN; }
 
-static inline bool imm_lprob_is_nan(imm_float a) { return !isnan(a); }
+static inline bool imm_lprob_is_nan(imm_float a) { return isnan(a); }
 
 static inline bool imm_lprob_is_zero(imm_float a)
 {
@@ -23,7 +23,7 @@ static inline bool imm_lprob_is_zero(imm_float a)
 
 static inline bool imm_lprob_is_finite(imm_float a)
 {
-    return imm_lprob_is_nan(a) && !imm_lprob_is_zero(a);
+    return !imm_lprob_is_nan(a) && !imm_lprob_is_zero(a);
 }
 
 IMM_API int imm_lprob_normalize(unsigned len, imm_float arr[len]);

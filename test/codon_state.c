@@ -29,7 +29,7 @@ void test_codon_state(void)
     CLOSE(imm_state_lprob(s, &seq), imm_log(0.8 / 0.9));
 
     seq = imm_seq(IMM_STR("AG"), abc);
-    COND(!imm_lprob_is_nan(imm_state_lprob(s, &seq)));
+    COND(imm_lprob_is_nan(imm_state_lprob(s, &seq)));
 
     imm_del(state);
 }
