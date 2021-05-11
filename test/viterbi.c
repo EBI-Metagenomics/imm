@@ -847,7 +847,7 @@ void test_viterbi_cycle_mute_ending(void)
     EQ(imm_task_setup(task, &A_ab), IMM_SUCCESS);
     EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     EQ(imm_path_nsteps(&result.path), 5);
-    CLOSE(result.loglik, -11.5129261017);
+    CLOSE(result.loglik, -11.5129254650);
 
     imm_deinit(&result);
     imm_del(task);

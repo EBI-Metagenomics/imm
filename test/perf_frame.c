@@ -101,7 +101,7 @@ void test_perf_viterbi(void)
     struct imm_seq seq = imm_seq(imm_str(seq_str), abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
     EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
-    CLOSE(result.loglik, -1622.8626708984);
+    CLOSE(result.loglik, -1622.8488101101);
 
     imm_del(task);
     imm_del(dp);
