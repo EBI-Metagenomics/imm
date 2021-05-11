@@ -182,7 +182,7 @@ void test_frame_state_lposterior(void)
         (imm_float[]){imm_log(0.1), imm_log(0.2), imm_log(0.3), imm_log(0.4)});
 
     char const *symbols = imm_abc_symbols(abc);
-    unsigned length = imm_abc_len(abc);
+    unsigned length = imm_abc_size(abc);
 
     struct imm_cartes codon_iter;
     imm_cartes_init(&codon_iter, symbols, length, 3);

@@ -30,8 +30,8 @@ void test_hmm_frame_state_0eps(void)
     struct imm_nuclt const *nuclt = imm_super(dna);
     struct imm_abc const *abc = imm_super(nuclt);
     struct imm_nuclt_lprob nucltp =
-        imm_nuclt_lprob(nuclt, IMM_FARR(imm_log(0.25), imm_log(0.25),
-                                        imm_log(0.5), imm_lprob_zero()));
+        imm_nuclt_lprob(nuclt, IMM_ARR(imm_log(0.25), imm_log(0.25),
+                                       imm_log(0.5), imm_lprob_zero()));
 
     struct imm_codon_lprob codonp = imm_codon_lprob(nuclt);
 
@@ -69,8 +69,8 @@ void test_hmm_frame_state_len1(void)
     struct imm_nuclt const *nuclt = imm_super(dna);
     struct imm_abc const *abc = imm_super(nuclt);
     struct imm_nuclt_lprob nucltp =
-        imm_nuclt_lprob(nuclt, IMM_FARR(imm_log(0.25), imm_log(0.25),
-                                        imm_log(0.5), imm_lprob_zero()));
+        imm_nuclt_lprob(nuclt, IMM_ARR(imm_log(0.25), imm_log(0.25),
+                                       imm_log(0.5), imm_lprob_zero()));
 
     struct imm_codon_lprob codonp = imm_codon_lprob(nuclt);
 

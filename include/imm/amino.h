@@ -24,4 +24,10 @@ imm_amino_super(struct imm_amino const *amino)
     return &amino->super;
 }
 
+static inline enum imm_abc_typeid
+imm_amino_typeid(struct imm_amino const *amino)
+{
+    return amino->super.vtable.typeid;
+}
+
 #endif

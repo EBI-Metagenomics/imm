@@ -16,7 +16,7 @@
  */
 struct imm_abc
 {
-    unsigned nsymbols;
+    unsigned size;
     char const *symbols;
     struct imm_sym sym;
     unsigned any_symbol_id;
@@ -40,7 +40,7 @@ static inline bool imm_abc_has_symbol_id(struct imm_abc const *abc, unsigned id)
     if (imm_unlikely(!imm_sym_valid_id(id)))
         return false;
 
-    return imm_sym_idx(&abc->sym, id) < abc->nsymbols;
+    return imm_sym_idx(&abc->sym, id) < abc->size;
 }
 
 static inline bool imm_abc_has_symbol(struct imm_abc const *abc, char symbol)
@@ -48,9 +48,9 @@ static inline bool imm_abc_has_symbol(struct imm_abc const *abc, char symbol)
     return imm_abc_has_symbol_id(abc, imm_sym_id(symbol));
 }
 
-static inline unsigned imm_abc_len(struct imm_abc const *abc)
+static inline unsigned imm_abc_size(struct imm_abc const *abc)
 {
-    return abc->nsymbols;
+    return abc->size;
 }
 
 static inline char imm_abc_symbol(struct imm_abc const *abc, char symbol)
@@ -75,7 +75,7 @@ static inline unsigned imm_abc_symbol_idx(struct imm_abc const *abc,
 
 static inline unsigned imm_abc_any_symbol_idx(struct imm_abc const *abc)
 {
-    return abc->nsymbols;
+    return abc->size;
 }
 
 static inline enum imm_sym_type __imm_abc_symbol_type(struct imm_abc const *abc,

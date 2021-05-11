@@ -26,9 +26,13 @@
              struct imm_nuclt * : imm_nuclt_super,                             \
              struct imm_nuclt const * : imm_nuclt_super)(x)
 
-#define imm_len(x)                                                             \
-    _Generic((x), struct imm_abc const * : imm_abc_len,                        \
-            struct imm_nuclt const * : imm_nuclt_len)(x)
+#define imm_typeid(x)                                                          \
+    _Generic((x),                                                              \
+             struct imm_abc const * : imm_abc_typeid,                          \
+             struct imm_amino const * : imm_amino_typeid,                      \
+             struct imm_nuclt const * : imm_nuclt_typeid,                      \
+             struct imm_dna const * : imm_dna_typeid,                          \
+             struct imm_rna const * : imm_rna_typeid)(x)
 
 #define imm_del(x)                                                             \
     _Generic((x),                                                              \

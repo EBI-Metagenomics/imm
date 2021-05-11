@@ -6,7 +6,7 @@
 
 static inline unsigned calc_size(struct code const *code)
 {
-    unsigned long ncombs = ipow(imm_abc_len(code->abc), code->seqlen.max);
+    unsigned long ncombs = ipow(imm_abc_size(code->abc), code->seqlen.max);
     IMM_BUG(ncombs > UINT16_MAX);
     return (unsigned)(code->offset[code->seqlen.max - code->seqlen.min] +
                       ncombs);
@@ -60,7 +60,7 @@ void code_init(struct code *code, struct imm_abc const *abc, unsigned min_seq,
     {
         for (unsigned len = max_seq - 2; 1 <= len + 1; --len)
             code->stride[len] =
-                (uint16_t)(code->stride[len + 1] * imm_abc_len(abc));
+                (uint16_t)(code->stride[len + 1] * imm_abc_size(abc));
     }
 
     code->offset = xmalloc(sizeof(*code->offset) * offset_size(code));

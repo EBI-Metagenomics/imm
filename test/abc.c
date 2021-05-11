@@ -23,7 +23,7 @@ void test_abc_normal(void)
     EQ(imm_abc_init(&abc, IMM_STR("ACGT"), '*'), IMM_SUCCESS);
     EQ(imm_abc_symbol(&abc, 'G'), 'G');
     EQ(imm_abc_symbol_idx(&abc, 'G'), 2);
-    EQ(imm_abc_len(&abc), 4);
+    EQ(imm_abc_size(&abc), 4);
     COND(imm_abc_has_symbol(&abc, 'C'));
     COND(!imm_abc_has_symbol(&abc, 'L'));
     EQ(imm_abc_symbol_type(&abc, 'A'), IMM_SYM_NORMAL);

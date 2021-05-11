@@ -29,14 +29,14 @@ static inline struct imm_abc const *imm_seq_abc(struct imm_seq const *seq)
 static inline struct imm_seq imm_seq(struct imm_str str,
                                      struct imm_abc const *abc)
 {
-    for (unsigned i = 0; i < str.len; ++i)
+    for (unsigned i = 0; i < str.size; ++i)
     {
         if (imm_unlikely(!imm_abc_has_symbol(abc, str.data[i]) &&
                          str.data[i] != imm_abc_any_symbol(abc)))
             __imm_log(IMM_FATAL, IMM_ILLEGALARG, "invalid sequence");
     }
 
-    return (struct imm_seq){str.len, str.data, abc};
+    return (struct imm_seq){str.size, str.data, abc};
 }
 
 static inline unsigned imm_seq_len(struct imm_seq const *seq)

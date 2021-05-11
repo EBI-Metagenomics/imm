@@ -17,7 +17,7 @@ static inline struct codon_iter codon_iter_begin(struct imm_nuclt const *nuclt)
 
 static inline struct imm_codon codon_iter_next(struct codon_iter *iter)
 {
-    unsigned n = imm_len(iter->nuclt);
+    unsigned n = imm_nuclt_len(iter->nuclt);
 
     struct imm_codon codon;
     codon.nuclt = iter->nuclt;

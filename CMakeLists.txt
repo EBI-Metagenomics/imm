@@ -27,11 +27,9 @@ find_package(containers REQUIRED)
 add_library(imm
     src/abc.c
     src/amino.c
-    src/arr3d.c
     src/cartes.c
     src/codon_marg.c
     src/codon_state.c
-    src/frame_state.c
     src/defaults.c
     src/dna.c
     src/dp/bitarr.c
@@ -43,6 +41,7 @@ add_library(imm
     src/dp/path.c
     src/dp/state_table.c
     src/dp/trans_table.c
+    src/frame_state.c
     src/hmm.c
     src/log.c
     src/lprob.c

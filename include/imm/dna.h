@@ -23,4 +23,9 @@ static inline struct imm_nuclt const *imm_dna_super(struct imm_dna const *dna)
     return &dna->super;
 }
 
+static inline enum imm_abc_typeid imm_dna_typeid(struct imm_dna const *dna)
+{
+    return dna->super.super.vtable.typeid;
+}
+
 #endif

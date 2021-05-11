@@ -27,4 +27,10 @@ imm_nuclt_super(struct imm_nuclt const *nuclt)
     return &nuclt->super;
 }
 
+static inline enum imm_abc_typeid
+imm_nuclt_typeid(struct imm_nuclt const *nuclt)
+{
+    return nuclt->super.vtable.typeid;
+}
+
 #endif

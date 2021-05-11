@@ -38,7 +38,7 @@ void emission_init(struct emission *emiss, struct code const *code,
 
     struct imm_abc const *abc = code->abc;
     char const *set = abc->symbols;
-    unsigned set_size = abc->nsymbols;
+    unsigned set_size = abc->size;
     struct imm_cartes cartes;
     imm_cartes_init(&cartes, set, set_size, code->seqlen.max);
 

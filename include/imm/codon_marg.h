@@ -1,9 +1,9 @@
 #ifndef IMM_CODON_MARG_H
 #define IMM_CODON_MARG_H
 
-#include "imm/arr3d.h"
 #include "imm/codon.h"
 #include "imm/export.h"
+#include "imm/float.h"
 
 /** @file codon_marg.h
  * Codon marginalization module.

@@ -16,7 +16,7 @@ struct imm_amino const
     imm_amino_default =
         {.super =
              {
-                 .nsymbols = IMM_AMINO_SIZE,
+                 .size = IMM_AMINO_SIZE,
                  .symbols = IMM_AMINO_SYMBOLS,
                  .sym = {.idx =
                              {
@@ -54,7 +54,7 @@ struct imm_amino const
 
 struct imm_nuclt const imm_nuclt_default = {
     .super = {
-        .nsymbols = IMM_NUCLT_SIZE,
+        .size = IMM_NUCLT_SIZE,
         .symbols = IMM_NUCLT_SYMBOLS,
         .sym = {.idx =
                     {
@@ -76,7 +76,7 @@ struct imm_nuclt const imm_nuclt_default = {
 
 struct imm_dna const imm_dna_default = {
     .super.super = {
-        .nsymbols = IMM_DNA_SIZE,
+        .size = IMM_DNA_SIZE,
         .symbols = IMM_DNA_SYMBOLS,
         .sym = {.idx =
                     {
@@ -98,7 +98,7 @@ struct imm_dna const imm_dna_default = {
 
 struct imm_rna const imm_rna_default = {
     .super.super = {
-        .nsymbols = IMM_RNA_SIZE,
+        .size = IMM_RNA_SIZE,
         .symbols = IMM_RNA_SYMBOLS,
         .sym = {.idx =
                     {

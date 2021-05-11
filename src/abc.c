@@ -3,7 +3,7 @@
 #include "imm/sym.h"
 
 struct imm_abc const imm_abc_empty = {
-    .nsymbols = 0,
+    .size = 0,
     .symbols = NULL,
     .sym = {.idx[0 ...(IMM_SYM_SIZE) - 1] = IMM_SYM_NULL_IDX},
     .any_symbol_id = IMM_SYM_ID('X'),
@@ -13,7 +13,7 @@ struct imm_abc const imm_abc_empty = {
 int imm_abc_init(struct imm_abc *abc, struct imm_str symbols, char any_symbol)
 {
     struct imm_abc_vtable vtable = {IMM_ABC, NULL};
-    return abc_init(abc, symbols.len, symbols.data, any_symbol, vtable);
+    return abc_init(abc, symbols.size, symbols.data, any_symbol, vtable);
 }
 
 int abc_init(struct imm_abc *abc, unsigned len, char const *symbols,
@@ -28,12 +28,12 @@ int abc_init(struct imm_abc *abc, unsigned len, char const *symbols,
     if (len > IMM_SYM_SIZE)
         return error(IMM_ILLEGALARG, "symbols length is too large");
 
-    abc->nsymbols = len;
+    abc->size = len;
     abc->symbols = symbols;
     imm_sym_init(&abc->sym);
     abc->any_symbol_id = imm_sym_id(any_symbol);
 
-    for (unsigned i = 0; i < abc->nsymbols; ++i)
+    for (unsigned i = 0; i < abc->size; ++i)
     {
         if (symbols[i] == any_symbol)
             return error(IMM_ILLEGALARG,
@@ -49,7 +49,7 @@ int abc_init(struct imm_abc *abc, unsigned len, char const *symbols,
 
         imm_sym_set_idx(&abc->sym, id, i);
     }
-    imm_sym_set_idx(&abc->sym, abc->any_symbol_id, abc->nsymbols);
+    imm_sym_set_idx(&abc->sym, abc->any_symbol_id, abc->size);
     abc->vtable = vtable;
     return IMM_SUCCESS;
 }
