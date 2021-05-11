@@ -17,8 +17,7 @@ static inline void *__memcpy(void *restrict dest, const void *restrict src,
     __attribute__((nonnull(1, 2)));
 
 static inline void *__realloc(void *ptr, size_t new_size,
-                              char const file[static 1], int line)
-    __attribute__((nonnull(1)));
+                              char const file[static 1], int line);
 
 static inline char *__strdup(char const *str, char const file[static 1],
                              int line) __attribute__((nonnull(1)));

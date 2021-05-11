@@ -30,7 +30,6 @@ add_library(imm
     src/cartes.c
     src/codon_marg.c
     src/codon_state.c
-    src/defaults.c
     src/dna.c
     src/dp/bitarr.c
     src/dp/code.c

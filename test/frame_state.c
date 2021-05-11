@@ -22,11 +22,11 @@ void test_frame_state1(void)
     struct imm_dna const *dna = &imm_dna_default;
     struct imm_nuclt const *nuclt = imm_super(dna);
     struct imm_abc const *abc = imm_super(nuclt);
-    struct imm_nuclt_lprob nucltp = imm_nuclt_lprob(
-        imm_super(dna), (imm_float[]){imm_log(0.25), imm_log(0.25),
-                                      imm_log(0.25), imm_log(0.25)});
+    struct imm_nuclt_lprob nucltp =
+        imm_nuclt_lprob(nuclt, IMM_ARR(imm_log(0.25), imm_log(0.25),
+                                       imm_log(0.25), imm_log(0.25)));
 
-    struct imm_codon_lprob codonp = imm_codon_lprob(imm_super(dna));
+    struct imm_codon_lprob codonp = imm_codon_lprob(nuclt);
     struct imm_codon codon = imm_codon(nuclt, 'A', 'T', 'G');
     imm_codon_lprob_set(&codonp, codon, imm_log(0.8 / 0.9));
     codon = imm_codon(nuclt, 'A', 'T', 'T');
@@ -63,10 +63,9 @@ void test_frame_state2(void)
     struct imm_nuclt const *nuclt = imm_super(dna);
     struct imm_abc const *abc = imm_super(nuclt);
     struct imm_nuclt_lprob nucltp = imm_nuclt_lprob(
-        imm_super(dna),
-        (imm_float[]){imm_log(0.1), imm_log(0.2), imm_log(0.3), imm_log(0.4)});
+        nuclt, IMM_ARR(imm_log(0.1), imm_log(0.2), imm_log(0.3), imm_log(0.4)));
 
-    struct imm_codon_lprob codonp = imm_codon_lprob(imm_super(dna));
+    struct imm_codon_lprob codonp = imm_codon_lprob(nuclt);
     struct imm_codon codon = imm_codon(nuclt, 'A', 'T', 'G');
     imm_codon_lprob_set(&codonp, codon, imm_log(0.8 / 0.9));
     codon = imm_codon(nuclt, 'A', 'T', 'T');
@@ -116,12 +115,11 @@ void test_frame_state3(void)
 {
     struct imm_dna const *dna = &imm_dna_default;
     struct imm_nuclt const *nuclt = imm_super(dna);
-    struct imm_abc const *abc = imm_super(imm_super(dna));
+    struct imm_abc const *abc = imm_super(nuclt);
     struct imm_nuclt_lprob nucltp = imm_nuclt_lprob(
-        imm_super(dna),
-        (imm_float[]){imm_log(0.1), imm_log(0.2), imm_log(0.3), imm_log(0.4)});
+        nuclt, IMM_ARR(imm_log(0.1), imm_log(0.2), imm_log(0.3), imm_log(0.4)));
 
-    struct imm_codon_lprob codonp = imm_codon_lprob(imm_super(dna));
+    struct imm_codon_lprob codonp = imm_codon_lprob(nuclt);
 
     struct imm_codon codon = imm_codon(nuclt, 'A', 'T', 'G');
     imm_codon_lprob_set(&codonp, codon, imm_log(0.8) - imm_log(1.3));
@@ -178,8 +176,7 @@ void test_frame_state_lposterior(void)
     struct imm_nuclt const *nuclt = imm_super(dna);
     struct imm_abc const *abc = imm_super(nuclt);
     struct imm_nuclt_lprob nucltp = imm_nuclt_lprob(
-        imm_super(dna),
-        (imm_float[]){imm_log(0.1), imm_log(0.2), imm_log(0.3), imm_log(0.4)});
+        nuclt, IMM_ARR(imm_log(0.1), imm_log(0.2), imm_log(0.3), imm_log(0.4)));
 
     char const *symbols = imm_abc_symbols(abc);
     unsigned length = imm_abc_size(abc);
@@ -188,12 +185,12 @@ void test_frame_state_lposterior(void)
     imm_cartes_init(&codon_iter, symbols, length, 3);
     char const *codon_item = NULL;
 
-    struct imm_codon_lprob codonp = imm_codon_lprob(imm_super(dna));
+    struct imm_codon_lprob codonp = imm_codon_lprob(nuclt);
 
     while ((codon_item = imm_cartes_next(&codon_iter)) != NULL)
     {
-        struct imm_codon codon = imm_codon(imm_super(dna), codon_item[0],
-                                           codon_item[1], codon_item[2]);
+        struct imm_codon codon =
+            imm_codon(nuclt, codon_item[0], codon_item[1], codon_item[2]);
         imm_codon_lprob_set(&codonp, codon, imm_log(0.001));
     }
     imm_cartes_deinit(&codon_iter);
@@ -246,12 +243,11 @@ void test_frame_state_decode(void)
 {
     struct imm_dna const *dna = &imm_dna_default;
     struct imm_nuclt const *nuclt = imm_super(dna);
-    struct imm_abc const *abc = imm_super(imm_super(dna));
+    struct imm_abc const *abc = imm_super(nuclt);
     struct imm_nuclt_lprob nucltp = imm_nuclt_lprob(
-        imm_super(dna),
-        (imm_float[]){imm_log(0.1), imm_log(0.2), imm_log(0.3), imm_log(0.4)});
+        nuclt, IMM_ARR(imm_log(0.1), imm_log(0.2), imm_log(0.3), imm_log(0.4)));
 
-    struct imm_codon_lprob codonp = imm_codon_lprob(imm_super(dna));
+    struct imm_codon_lprob codonp = imm_codon_lprob(nuclt);
 
     struct imm_codon codon = imm_codon(nuclt, 'A', 'T', 'G');
     imm_codon_lprob_set(&codonp, codon, imm_log(0.8) - imm_log(1.3));

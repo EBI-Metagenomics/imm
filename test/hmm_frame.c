@@ -4,7 +4,7 @@
 
 void test_hmm_frame_state_0eps(void);
 void test_hmm_frame_state_len1(void);
-/* void test_hmm_frame_state_len2(void); */
+void test_hmm_frame_state_len2(void);
 /* void test_hmm_frame_state_len3(void); */
 /* void test_hmm_frame_state_len4(void); */
 /* void test_hmm_frame_state_len5(void); */
@@ -13,11 +13,17 @@ void test_hmm_frame_state_len1(void);
  * seq, struct imm_state const* end_state, */
 /*                          struct imm_path* path); */
 
+struct imm_nuclt const *nuclt;
+struct imm_abc const *abc;
+
 int main(void)
 {
+    nuclt = imm_super(&imm_dna_default);
+    abc = imm_super(nuclt);
+
     test_hmm_frame_state_0eps();
     test_hmm_frame_state_len1();
-    /* test_hmm_frame_state_len2(); */
+    test_hmm_frame_state_len2();
     /* test_hmm_frame_state_len3(); */
     /* test_hmm_frame_state_len4(); */
     /* test_hmm_frame_state_len5(); */
@@ -26,9 +32,6 @@ int main(void)
 
 void test_hmm_frame_state_0eps(void)
 {
-    struct imm_dna const *dna = &imm_dna_default;
-    struct imm_nuclt const *nuclt = imm_super(dna);
-    struct imm_abc const *abc = imm_super(nuclt);
     struct imm_nuclt_lprob nucltp =
         imm_nuclt_lprob(nuclt, IMM_ARR(imm_log(0.25), imm_log(0.25),
                                        imm_log(0.5), imm_lprob_zero()));
@@ -41,7 +44,7 @@ void test_hmm_frame_state_0eps(void)
 
     struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
-    struct imm_hmm *hmm = imm_hmm_new(imm_super(nuclt));
+    struct imm_hmm *hmm = imm_hmm_new(abc);
 
     struct imm_frame_state *state =
         imm_frame_state_new(0, &nucltp, &codonm, (imm_float)0.0);
@@ -65,9 +68,6 @@ void test_hmm_frame_state_0eps(void)
 
 void test_hmm_frame_state_len1(void)
 {
-    struct imm_dna const *dna = &imm_dna_default;
-    struct imm_nuclt const *nuclt = imm_super(dna);
-    struct imm_abc const *abc = imm_super(nuclt);
     struct imm_nuclt_lprob nucltp =
         imm_nuclt_lprob(nuclt, IMM_ARR(imm_log(0.25), imm_log(0.25),
                                        imm_log(0.5), imm_lprob_zero()));
@@ -80,7 +80,7 @@ void test_hmm_frame_state_len1(void)
 
     struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
-    struct imm_hmm *hmm = imm_hmm_new(imm_super(nuclt));
+    struct imm_hmm *hmm = imm_hmm_new(abc);
 
     struct imm_frame_state *state =
         imm_frame_state_new(0, &nucltp, &codonm, (imm_float)0.1);
@@ -93,7 +93,7 @@ void test_hmm_frame_state_len1(void)
     struct imm_seq seq = imm_seq(IMM_STR("A"), abc);
     CLOSE(imm_hmm_loglik(hmm, &seq, &path), -6.0198640216);
 
-    path = imm_path();
+    imm_path_reset(&path);
     imm_path_add(&path, IMM_STEP(imm_super(state)->id, 1));
     seq = imm_seq(IMM_STR("C"), abc);
     CLOSE(imm_hmm_loglik(hmm, &seq, &path), -7.118476310297789);
@@ -115,100 +115,92 @@ void test_hmm_frame_state_len1(void)
     CLOSE(result.loglik, -7.1184763103);
 
     imm_deinit(&path);
+    imm_del(task);
     imm_del(dp);
     imm_del(hmm);
     imm_del(state);
 }
 
-#if 0
 void test_hmm_frame_state_len2(void)
 {
-    struct imm_nuclt const*   base = imm_base_abc_create("ACGT", 'X');
-    struct imm_abc const*        abc = imm_base_abc_super(base);
-    imm_float const              imm_lprob_zero() = imm_lprob_zero();
-    struct imm_nuclt_lprob const* nucltp = imm_base_lprob_create(base, imm_log(0.25), imm_log(0.25), imm_log(0.5), imm_lprob_zero());
+    struct imm_nuclt_lprob nucltp =
+        imm_nuclt_lprob(nuclt, IMM_ARR(imm_log(0.25), imm_log(0.25),
+                                       imm_log(0.5), imm_lprob_zero()));
 
-    struct imm_codon_lprob* codonp = imm_codon_lprob_create(base);
-    struct imm_codon*       codon = imm_codon_create(base);
-    COND(imm_codon_set(&codon, IMM_TRIPLET('A', 'T', 'G')) == 0);
-    imm_codon_lprob_set(&codonp, &codon, imm_log(0.8));
-    COND(imm_codon_set(&codon, IMM_TRIPLET('A', 'T', 'T')) == 0);
-    imm_codon_lprob_set(&codonp, &codon, imm_log(0.1));
-    COND(imm_codon_set(&codon, IMM_TRIPLET('C', 'C', 'C')) == 0);
-    imm_codon_lprob_set(&codonp, &codon, imm_log(0.1));
-    struct imm_codon_marg const* codonm = imm_codon_marg_create(codonp);
-    imm_codon_lprob_destroy(codonp);
+    struct imm_codon_lprob codonp = imm_codon_lprob(nuclt);
 
-    struct imm_hmm* hmm = imm_hmm_create(abc);
+    imm_codon_lprob_set(&codonp, imm_codon(nuclt, 'A', 'T', 'G'), imm_log(0.8));
+    imm_codon_lprob_set(&codonp, imm_codon(nuclt, 'A', 'T', 'T'), imm_log(0.1));
+    imm_codon_lprob_set(&codonp, imm_codon(nuclt, 'C', 'C', 'C'), imm_log(0.1));
 
-    struct imm_frame_state const* state = imm_frame_state_new("M", nucltp, codonm, (imm_float)0.1);
+    struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
-    imm_hmm_add_state(hmm, imm_super(state), imm_log(1.0));
+    struct imm_hmm *hmm = imm_hmm_new(abc);
 
-    struct imm_path* path = imm_path_init();
-    imm_path_append(path, imm_step_create(imm_super(state), 2));
-    struct imm_seq const* seq = imm_seq_init("AA", abc);
-    CLOSE(imm_hmm_loglik(hmm, seq, path), -8.910235779525845);
-    imm_seq_destroy(seq);
-    imm_path_destroy(path);
+    struct imm_frame_state *state =
+        imm_frame_state_new(0, &nucltp, &codonm, (imm_float)0.1);
 
-    path = imm_path_init();
-    imm_path_append(path, imm_step_create(imm_super(state), 2));
-    seq = imm_seq_init("TG", abc);
-    CLOSE(imm_hmm_loglik(hmm, seq, path), -3.2434246977896133);
-    imm_seq_destroy(seq);
-    imm_path_destroy(path);
+    imm_hmm_add_state(hmm, imm_super(state));
+    imm_hmm_set_start(hmm, imm_super(state), imm_log(1.0));
 
-    path = imm_path_init();
-    imm_path_append(path, imm_step_create(imm_super(state), 2));
-    seq = imm_seq_init("CC", abc);
-    CLOSE(imm_hmm_loglik(hmm, seq, path), -4.225022885864217);
-    imm_seq_destroy(seq);
-    imm_path_destroy(path);
+    struct imm_path path = imm_path();
+    imm_path_add(&path, IMM_STEP(imm_super(state)->id, 2));
+    struct imm_seq seq = imm_seq(IMM_STR("AA"), abc);
+    CLOSE(imm_hmm_loglik(hmm, &seq, &path), -8.910235779525845);
 
-    path = imm_path_init();
-    imm_path_append(path, imm_step_create(imm_super(state), 2));
-    seq = imm_seq_init("TT", abc);
-    CLOSE(imm_hmm_loglik(hmm, seq, path), -5.326716841069734);
-    imm_seq_destroy(seq);
-    imm_path_destroy(path);
+    imm_path_reset(&path);
+    imm_path_add(&path, IMM_STEP(imm_super(state)->id, 2));
+    seq = imm_seq(IMM_STR("TG"), abc);
+    CLOSE(imm_hmm_loglik(hmm, &seq, &path), -3.2434246977896133);
 
-    path = imm_path_init();
-    seq = imm_seq_init("AA", abc);
-    CLOSE(single_viterbi(hmm, seq, imm_super(state), path), -8.910235779525845);
-    CLOSE(imm_hmm_loglik(hmm, seq, path), -8.910235779525845);
-    imm_seq_destroy(seq);
-    imm_path_destroy(path);
+    imm_path_reset(&path);
+    imm_path_add(&path, IMM_STEP(imm_super(state)->id, 2));
+    seq = imm_seq(IMM_STR("CC"), abc);
+    CLOSE(imm_hmm_loglik(hmm, &seq, &path), -4.225022885864217);
 
-    path = imm_path_init();
-    seq = imm_seq_init("TG", abc);
-    CLOSE(single_viterbi(hmm, seq, imm_super(state), path), -3.2434246977896133);
-    CLOSE(imm_hmm_loglik(hmm, seq, path), -3.2434246977896133);
-    imm_seq_destroy(seq);
-    imm_path_destroy(path);
+    imm_path_reset(&path);
+    imm_path_add(&path, IMM_STEP(imm_super(state)->id, 2));
+    seq = imm_seq(IMM_STR("TT"), abc);
+    CLOSE(imm_hmm_loglik(hmm, &seq, &path), -5.326716841069734);
 
-    path = imm_path_init();
-    seq = imm_seq_init("CC", abc);
-    CLOSE(single_viterbi(hmm, seq, imm_super(state), path), -4.225022885864217);
-    CLOSE(imm_hmm_loglik(hmm, seq, path), -4.225022885864217);
-    imm_seq_destroy(seq);
-    imm_path_destroy(path);
+    struct imm_dp *dp = imm_hmm_new_dp(hmm, imm_super(state));
+    struct imm_task *task = imm_task_new(dp);
+    struct imm_result result = imm_result();
 
-    path = imm_path_init();
-    seq = imm_seq_init("TT", abc);
-    CLOSE(single_viterbi(hmm, seq, imm_super(state), path), -5.326716841069734);
-    CLOSE(imm_hmm_loglik(hmm, seq, path), -5.326716841069734);
-    imm_seq_destroy(seq);
-    imm_path_destroy(path);
+    seq = imm_seq(IMM_STR("AA"), abc);
+    EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
+    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    CLOSE(result.loglik, -8.910235779525845);
 
-    imm_base_abc_destroy(base);
-    imm_codon_destroy(codon);
-    imm_hmm_destroy(hmm);
-    imm_frame_state_destroy(state);
-    imm_codon_marg_destroy(codonm);
-    imm_base_lprob_destroy(nucltp);
+    dp = imm_hmm_reset_dp(hmm, imm_super(state), dp);
+    imm_task_reset(task, dp);
+    seq = imm_seq(IMM_STR("TG"), abc);
+    EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
+    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    CLOSE(result.loglik, -3.2434246977896133);
+
+    dp = imm_hmm_reset_dp(hmm, imm_super(state), dp);
+    imm_task_reset(task, dp);
+    seq = imm_seq(IMM_STR("CC"), abc);
+    EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
+    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    CLOSE(result.loglik, -4.225022885864217);
+
+    dp = imm_hmm_reset_dp(hmm, imm_super(state), dp);
+    imm_task_reset(task, dp);
+    seq = imm_seq(IMM_STR("TT"), abc);
+    EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
+    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    CLOSE(result.loglik, -5.326716841069734);
+
+    imm_del(task);
+    imm_del(dp);
+    imm_deinit(&path);
+    imm_del(hmm);
+    imm_del(state);
 }
 
+#if 0
 void test_hmm_frame_state_len3(void)
 {
     struct imm_nuclt const*   base = imm_base_abc_create("ACGT", 'X');

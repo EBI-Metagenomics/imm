@@ -11,10 +11,9 @@ int main(void)
 
 void test_codon_lprob(void)
 {
-    struct imm_dna const *dna = &imm_dna_default;
-    struct imm_nuclt const *nuclt = imm_super(dna);
+    struct imm_nuclt const *nuclt = imm_super(&imm_dna_default);
 
-    struct imm_codon_lprob codonp = imm_codon_lprob(imm_super(dna));
+    struct imm_codon_lprob codonp = imm_codon_lprob(nuclt);
 
     EQ(imm_codon_lprob_normalize(&codonp), IMM_ILLEGALARG);
 
