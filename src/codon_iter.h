@@ -3,7 +3,6 @@
 
 #include "imm/codon.h"
 #include "imm/generics.h"
-#include "imm/triplet.h"
 
 struct codon_iter
 {

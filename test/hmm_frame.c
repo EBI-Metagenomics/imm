@@ -35,9 +35,9 @@ void test_hmm_frame_state_0eps(void)
 
     struct imm_codon_lprob codonp = imm_codon_lprob(nuclt);
 
-    imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, 'A', 'T', 'G'), imm_log(0.8));
-    imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, 'A', 'T', 'T'), imm_log(0.1));
-    imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, 'C', 'C', 'C'), imm_log(0.1));
+    imm_codon_lprob_set(&codonp, imm_codon(nuclt, 'A', 'T', 'G'), imm_log(0.8));
+    imm_codon_lprob_set(&codonp, imm_codon(nuclt, 'A', 'T', 'T'), imm_log(0.1));
+    imm_codon_lprob_set(&codonp, imm_codon(nuclt, 'C', 'C', 'C'), imm_log(0.1));
 
     struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
@@ -74,9 +74,9 @@ void test_hmm_frame_state_len1(void)
 
     struct imm_codon_lprob codonp = imm_codon_lprob(nuclt);
 
-    imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, 'A', 'T', 'G'), imm_log(0.8));
-    imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, 'A', 'T', 'T'), imm_log(0.1));
-    imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, 'C', 'C', 'C'), imm_log(0.1));
+    imm_codon_lprob_set(&codonp, imm_codon(nuclt, 'A', 'T', 'G'), imm_log(0.8));
+    imm_codon_lprob_set(&codonp, imm_codon(nuclt, 'A', 'T', 'T'), imm_log(0.1));
+    imm_codon_lprob_set(&codonp, imm_codon(nuclt, 'C', 'C', 'C'), imm_log(0.1));
 
     struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 

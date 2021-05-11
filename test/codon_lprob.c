@@ -18,7 +18,7 @@ void test_codon_lprob(void)
 
     EQ(imm_codon_lprob_normalize(&codonp), IMM_ILLEGALARG);
 
-    struct imm_codon codon = imm_codon(nuclt, IMM_TRIPLET('A', 'C', 'C'));
+    struct imm_codon codon = imm_codon(nuclt, 'A', 'C', 'C');
 
     COND(imm_lprob_is_zero(imm_codon_lprob_get(&codonp, codon)));
     imm_codon_lprob_set(&codonp, codon, imm_log(0.5));
@@ -27,6 +27,6 @@ void test_codon_lprob(void)
     EQ(imm_codon_lprob_normalize(&codonp), IMM_SUCCESS);
     CLOSE(imm_codon_lprob_get(&codonp, codon), imm_log(1.0));
 
-    codon = imm_codon(nuclt, IMM_TRIPLET('A', 'C', 'X'));
+    codon = imm_codon(nuclt, 'A', 'C', 'X');
     COND(imm_lprob_is_zero(imm_codon_lprob_get(&codonp, codon)));
 }

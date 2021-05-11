@@ -32,7 +32,7 @@ static inline imm_float imm_amino_lprob_get(struct imm_amino_lprob const *lprob,
                                             char symbol)
 {
     struct imm_abc const *abc = imm_super(lprob->amino);
-    IMM_BUG(!imm_amino_has_symbol(abc, symbol));
+    IMM_BUG(!imm_abc_has_symbol(abc, symbol));
     return __imm_amino_lprob_get(lprob, imm_abc_symbol_idx(abc, symbol));
 }
 

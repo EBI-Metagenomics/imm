@@ -57,9 +57,6 @@ static void set_marginal_lprobs(struct imm_codon_marg *codonm)
     struct imm_codon codon;
     codon.nuclt = codonm->nuclt;
 
-    IMM_BUG(codonm->lprobs.shape[0] != codonm->lprobs.shape[1]);
-    IMM_BUG(codonm->lprobs.shape[1] != codonm->lprobs.shape[2]);
-
     unsigned size = IMM_NUCLT_SIZE + 1;
     for (unsigned k = 0; k < 3; ++k)
     {

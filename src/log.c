@@ -46,9 +46,9 @@ static void default_print(struct imm_log_event event)
     fputc('\n', stderr);
 }
 
-void __imm_bug(char const *file, char const *func, int line, char const *cond)
+void __imm_bug(char const *file, int line, char const *cond)
 {
-    fprintf(stderr, "BUG: %s: %s: %d: %s\n", file, func, line, cond);
+    fprintf(stderr, "BUG: %s:%d: %s\n", file, line, cond);
     fflush(stderr);
     exit(EXIT_FAILURE);
 }

@@ -53,13 +53,13 @@ IMM_API int __imm_log_impl(enum imm_level level, enum imm_code code,
 #define IMM_BUG(cond)                                                          \
     do                                                                         \
     {                                                                          \
-        if (!(int)(cond))                                                      \
+        if (!(cond))                                                           \
             break;                                                             \
-        imm_bug(__FILE__, __func__, __LINE__, #cond);                          \
+        __imm_bug(__FILE__, __LINE__, #cond);                                  \
     } while (0)
 #endif
 
-IMM_API void __imm_bug(char const *file, char const *func, int line,
-                       char const *cond) __attribute__((noreturn));
+IMM_API void __imm_bug(char const *file, int line, char const *cond)
+    __attribute__((noreturn));
 
 #endif
