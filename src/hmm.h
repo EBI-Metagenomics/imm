@@ -5,7 +5,7 @@
 #include "start.h"
 #include "trans.h"
 
-#define MAX_NTRANS_BITS 12
+#define MAX_NTRANS_BITS 13
 
 struct imm_abc;
 struct imm_hmm;

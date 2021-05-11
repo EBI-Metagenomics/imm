@@ -18,7 +18,9 @@ struct model
     struct imm_mute_state *end;
 };
 
-struct model create_model(void);
+extern struct model model;
+
+void create_model(void);
 void destroy_model(struct model model);
 char const *get_model_str(void);
 

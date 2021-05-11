@@ -18,16 +18,17 @@ void test_perf_viterbi(void)
 {
     char const *str = get_model_str();
     EQ(strlen(str), 2000);
-    struct model mo = create_model();
+    create_model();
 
-    /* struct imm_dp *dp = imm_hmm_new_dp(mo.hmm, imm_super(mo.end)); */
-    /* struct imm_task *task = imm_task_new(dp); */
-    /* struct imm_result result = imm_result(); */
+    struct imm_dp *dp = imm_hmm_new_dp(model.hmm, imm_super(model.end));
+    struct imm_task *task = imm_task_new(dp);
+    struct imm_result result = imm_result();
 
-    /* struct imm_seq seq = imm_seq(imm_str(str), &mo.abc); */
-    /* EQ(imm_task_setup(task, &seq), IMM_SUCCESS); */
-    /* EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS); */
-    /* CLOSE(result.loglik, -65826.0106185297); */
+    struct imm_seq seq = imm_seq(imm_str(str), &model.abc);
+    /* struct imm_seq seq = imm_seq(IMM_STR("BME"), &model.abc); */
+    EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
+    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    CLOSE(result.loglik, -65826.0106185297);
 
 #if 0
     struct imm_dp_task *task = imm_dp_task_create(dp);
@@ -35,14 +36,14 @@ void test_perf_viterbi(void)
     struct imm_result const *r = imm_dp_viterbi(dp, task);
     imm_dp_task_destroy(task);
 
-    imm_float score = imm_hmm_loglikelihood(mo.hmm, seq, imm_result_path(r));
+    imm_float score = imm_hmm_loglikelihood(model.hmm, seq, imm_result_path(r));
     cass_cond(imm_lprob_is_valid(score));
     cass_cond(!imm_lprob_is_zero(score));
     cass_close(score, -65826.0106185297);
     imm_result_destroy(r);
 
     imm_dp_destroy(dp);
-    destroy_model(mo);
+    destroy_model(model);
     imm_seq_destroy(seq);
 #endif
 }
