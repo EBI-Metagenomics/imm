@@ -2,17 +2,17 @@
 #include "imm/imm.h"
 #include "model_frame.h"
 
-void test_perf_viterbi(void);
+void test_large_frame(void);
 
 int main(void)
 {
     model_frame_init();
-    test_perf_viterbi();
+    test_large_frame();
     model_frame_deinit();
     return hope_status();
 }
 
-void test_perf_viterbi(void)
+void test_large_frame(void)
 {
     struct model_frame *m = &model_frame;
     struct imm_dp *dp = imm_hmm_new_dp(m->hmm, imm_super(m->end));

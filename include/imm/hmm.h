@@ -22,8 +22,6 @@ IMM_API struct imm_dp *imm_hmm_reset_dp(struct imm_hmm const *hmm,
                                         struct imm_state const *end_state,
                                         struct imm_dp *dp);
 
-IMM_API void imm_hmm_reset(struct imm_hmm *hmm, struct imm_abc const *abc);
-
 IMM_API void imm_hmm_del(struct imm_hmm const *hmm);
 
 IMM_API imm_float imm_hmm_start_lprob(struct imm_hmm const *hmm);

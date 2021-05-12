@@ -2,17 +2,17 @@
 #include "imm/imm.h"
 #include "model_normal.h"
 
-void test_perf_viterbi(void);
+void test_large_normal(void);
 
 int main(void)
 {
     model_normal_init();
-    test_perf_viterbi();
+    test_large_normal();
     model_normal_deinit();
     return hope_status();
 }
 
-void test_perf_viterbi(void)
+void test_large_normal(void)
 {
     struct model_normal *m = &model_normal;
     struct imm_dp *dp = imm_hmm_new_dp(model_normal.hmm, imm_super(m->end));
