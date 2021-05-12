@@ -2,6 +2,7 @@
 #define DP_CODE_H
 
 #include <stdint.h>
+#include <stdio.h>
 
 struct eseq;
 struct imm_abc;
@@ -39,5 +40,8 @@ static inline unsigned code_size(struct code const *code, unsigned min_seq)
 {
     return (unsigned)(code->size - code->offset[min_seq - code->seqlen.min]);
 }
+
+void code_write(struct code const *code, FILE *stream);
+int code_read(struct code *code, struct imm_abc const *abc, FILE *stream);
 
 #endif

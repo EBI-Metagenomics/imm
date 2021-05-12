@@ -1,6 +1,7 @@
 #ifndef SUPPORT_H
 #define SUPPORT_H
 
+#include "imm/compiler.h"
 #include "imm/log.h"
 #include <stdbool.h>
 #include <stddef.h>
@@ -28,7 +29,7 @@ static inline void __fwrite(const void *restrict buffer, size_t size,
                             size_t count, FILE *restrict stream,
                             char const *file, int line, char const *buffstr)
 {
-    if (fwrite(buffer, size, count, stream) < count)
+    if (imm_unlikely(fwrite(buffer, size, count, stream) < count))
         error(IMM_IOERROR, "failed to write %s", buffstr);
 }
 

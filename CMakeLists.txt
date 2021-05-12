@@ -37,6 +37,7 @@ add_library(imm
     src/dp/trans_table.c
     src/frame_state.c
     src/hmm.c
+    src/io.c
     src/log.c
     src/lprob.c
     src/mute_state.c
