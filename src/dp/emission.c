@@ -17,12 +17,28 @@ void emission_deinit(struct emission const *emission)
 {
     free(emission->score);
     free(emission->offset);
+    imm_cartes_deinit(&emission->cartes);
 }
 
 void emission_init(struct emission *emiss, struct code const *code,
                    struct imm_state **states, unsigned nstates)
 {
-    emiss->offset = xmalloc(sizeof(*emiss->offset) * offset_size(nstates));
+    emiss->capacity.score = 0;
+    emiss->capacity.offset = 0;
+    emiss->score = NULL;
+    emiss->offset = NULL;
+    emission_reset(emiss, code, states, nstates);
+}
+
+void emission_reset(struct emission *emiss, struct code const *code,
+                    struct imm_state **states, unsigned nstates)
+{
+    size_t offset_capacity = sizeof(*emiss->offset) * offset_size(nstates);
+    if (offset_capacity > emiss->capacity.offset)
+    {
+        emiss->offset = xrealloc(emiss->offset, offset_capacity);
+        emiss->capacity.offset = offset_capacity;
+    }
     emiss->offset[0] = 0;
 
     unsigned min = imm_state_span(states[0]).min;
@@ -34,13 +50,17 @@ void emission_init(struct emission *emiss, struct code const *code,
     }
     emiss->offset[nstates] = size;
 
-    emiss->score = xmalloc(sizeof(*emiss->score) * score_size(emiss, nstates));
+    size_t score_capacity = sizeof(*emiss->score) * score_size(emiss, nstates);
+    if (score_capacity > emiss->capacity.score)
+    {
+        emiss->score = xrealloc(emiss->score, score_capacity);
+        emiss->capacity.score = score_capacity;
+    }
 
     struct imm_abc const *abc = code->abc;
     char const *set = abc->symbols;
     unsigned set_size = abc->size;
-    struct imm_cartes cartes;
-    imm_cartes_init(&cartes, set, set_size, code->seqlen.max);
+    imm_cartes_init(&emiss->cartes, set, set_size, code->seqlen.max);
 
     for (unsigned i = 0; i < nstates; ++i)
     {
@@ -48,9 +68,9 @@ void emission_init(struct emission *emiss, struct code const *code,
         for (unsigned len = min_seq; len <= imm_state_span(states[i]).max;
              ++len)
         {
-            imm_cartes_setup(&cartes, len);
+            imm_cartes_setup(&emiss->cartes, len);
             char const *item = NULL;
-            while ((item = imm_cartes_next(&cartes)) != NULL)
+            while ((item = imm_cartes_next(&emiss->cartes)) != NULL)
             {
 
                 struct imm_seq seq = IMM_SEQ_UNSAFE(len, item, abc);
@@ -61,6 +81,4 @@ void emission_init(struct emission *emiss, struct code const *code,
             }
         }
     }
-
-    imm_cartes_deinit(&cartes);
 }

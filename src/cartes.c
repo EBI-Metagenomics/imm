@@ -6,12 +6,9 @@
 void imm_cartes_init(struct imm_cartes *cartes, char const *set,
                      unsigned set_size, unsigned max_times)
 {
-    cartes->set = set;
-    cartes->set_size = set_size;
-    cartes->times = 0;
-    cartes->iter_idx = 0;
-    cartes->item = xmalloc(sizeof(*cartes->item) * (unsigned)(max_times + 1));
-    cartes->nitems = 0;
+    cartes->capacity = 0;
+    cartes->item = NULL;
+    imm_cartes_reset(cartes, set, set_size, max_times);
 }
 
 void imm_cartes_deinit(struct imm_cartes const *cartes)
@@ -35,6 +32,22 @@ char const *imm_cartes_next(struct imm_cartes *cartes)
     }
 
     return item;
+}
+
+void imm_cartes_reset(struct imm_cartes *cartes, char const *set,
+                      unsigned set_size, unsigned max_times)
+{
+    cartes->set = set;
+    cartes->set_size = set_size;
+    cartes->times = 0;
+    cartes->iter_idx = 0;
+    size_t new_capacity = sizeof(*cartes->item) * (unsigned)(max_times + 1);
+    if (new_capacity > cartes->capacity)
+    {
+        cartes->item = xrealloc(cartes->item, new_capacity);
+        cartes->capacity = new_capacity;
+    }
+    cartes->nitems = 0;
 }
 
 void imm_cartes_setup(struct imm_cartes *cartes, unsigned times)
