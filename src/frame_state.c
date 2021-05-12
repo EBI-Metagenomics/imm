@@ -4,6 +4,7 @@
 #include "imm/generics.h"
 #include "imm/lprob.h"
 #include "imm/nuclt_lprob.h"
+#include "imm/support.h"
 #include "state.h"
 
 static void del(struct imm_state const *state);
@@ -63,7 +64,7 @@ static imm_float joint_seq_len1(struct imm_frame_state const *state,
     struct imm_abc const *abc = imm_super(state->codonm->nuclt);
     unsigned nucl[2] = {imm_abc_symbol_idx(abc, imm_seq_str(seq)[0]),
                         imm_abc_any_symbol_idx(abc)};
-    unsigned _ = ARRAY_SIZE(nucl) - 1;
+    unsigned _ = IMM_ARRAY_SIZE(nucl) - 1;
 
     imm_float c = 2 * state->leps + 2 * state->l1eps;
 
@@ -77,7 +78,7 @@ static imm_float joint_seq_len2(struct imm_frame_state const *state,
     unsigned nucl[3] = {imm_abc_symbol_idx(abc, imm_seq_str(seq)[0]),
                         imm_abc_symbol_idx(abc, imm_seq_str(seq)[1]),
                         imm_abc_any_symbol_idx(abc)};
-    unsigned _ = ARRAY_SIZE(nucl) - 1;
+    unsigned _ = IMM_ARRAY_SIZE(nucl) - 1;
 
     imm_float b_lp0 = __imm_nuclt_lprob_get(state->nucltp, nucl[0]);
     imm_float b_lp1 = __imm_nuclt_lprob_get(state->nucltp, nucl[1]);
@@ -101,7 +102,7 @@ static imm_float joint_seq_len3(struct imm_frame_state const *state,
                         imm_abc_symbol_idx(abc, imm_seq_str(seq)[1]),
                         imm_abc_symbol_idx(abc, imm_seq_str(seq)[2]),
                         imm_abc_any_symbol_idx(abc)};
-    unsigned _ = ARRAY_SIZE(nucl) - 1;
+    unsigned _ = IMM_ARRAY_SIZE(nucl) - 1;
 
     imm_float B[] = {__imm_nuclt_lprob_get(state->nucltp, nucl[0]),
                      __imm_nuclt_lprob_get(state->nucltp, nucl[1]),
@@ -133,7 +134,7 @@ static imm_float joint_seq_len4(struct imm_frame_state const *state,
                         imm_abc_symbol_idx(abc, imm_seq_str(seq)[2]),
                         imm_abc_symbol_idx(abc, imm_seq_str(seq)[3]),
                         imm_abc_any_symbol_idx(abc)};
-    unsigned _ = ARRAY_SIZE(nucl) - 1;
+    unsigned _ = IMM_ARRAY_SIZE(nucl) - 1;
 
     imm_float B[] = {__imm_nuclt_lprob_get(state->nucltp, nucl[0]),
                      __imm_nuclt_lprob_get(state->nucltp, nucl[1]),

@@ -37,6 +37,7 @@ extern "C" {
 #include "imm/step.h"
 #include "imm/str.h"
 #include "imm/subseq.h"
+#include "imm/support.h"
 #include "imm/sym.h"
 #include "imm/task.h"
 #include "imm/trans.h"
