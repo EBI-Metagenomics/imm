@@ -1,5 +1,4 @@
 #include "hmm.h"
-#include "common/common.h"
 #include "dp/dp.h"
 #include "imm/dp.h"
 #include "imm/hmm.h"
@@ -8,8 +7,10 @@
 #include "imm/path.h"
 #include "imm/state_types.h"
 #include "imm/subseq.h"
+#include "imm/support.h"
 #include "start.h"
 #include "state.h"
+#include "support.h"
 #include "tsort.h"
 
 static void detach_states(struct imm_hmm *hmm)

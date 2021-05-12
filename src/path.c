@@ -1,6 +1,6 @@
 #include "imm/path.h"
-#include "common/common.h"
 #include "imm/step.h"
+#include "support.h"
 
 static void path_setup(struct imm_path *path)
 {

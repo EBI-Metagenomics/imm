@@ -1,5 +1,5 @@
 #include "state.h"
-#include "common/common.h"
+#include "support.h"
 
 struct imm_state *state_new(unsigned id, struct imm_abc const *abc,
                             struct imm_state_vtable vtable,

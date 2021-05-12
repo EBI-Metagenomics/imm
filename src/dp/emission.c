@@ -1,9 +1,9 @@
 #include "dp/emission.h"
-#include "common/common.h"
 #include "dp/code.h"
 #include "imm/abc.h"
 #include "imm/cartes.h"
 #include "imm/state.h"
+#include "support.h"
 
 static inline unsigned offset_size(unsigned nstates) { return nstates + 1; }
 

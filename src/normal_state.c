@@ -1,7 +1,7 @@
 #include "imm/normal_state.h"
-#include "common/common.h"
 #include "imm/abc.h"
 #include "state.h"
+#include "support.h"
 
 static void del(struct imm_state const *state);
 

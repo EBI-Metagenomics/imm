@@ -1,6 +1,6 @@
 #include "imm/mute_state.h"
-#include "common/common.h"
 #include "state.h"
+#include "support.h"
 
 static void del(struct imm_state const *state);
 

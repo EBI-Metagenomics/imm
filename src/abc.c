@@ -1,6 +1,6 @@
 #include "abc.h"
-#include "common/common.h"
 #include "imm/sym.h"
+#include "support.h"
 
 struct imm_abc const imm_abc_empty = {
     .size = 0,

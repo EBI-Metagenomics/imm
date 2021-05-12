@@ -1,5 +1,5 @@
 #include "imm/lprob.h"
-#include "common/common.h"
+#include "support.h"
 
 int imm_lprob_normalize(unsigned len, imm_float arr[len])
 {

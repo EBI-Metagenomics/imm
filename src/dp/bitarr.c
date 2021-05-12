@@ -1,5 +1,5 @@
 #include "dp/bitarr.h"
-#include "common/common.h"
+#include "support.h"
 
 #define LONG_START(bit) (bit / (sizeof(long) * BITS_PER_BYTE))
 #define BIT_START(bit) (bit % (sizeof(long) * BITS_PER_BYTE))

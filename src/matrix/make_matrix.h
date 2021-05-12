@@ -1,7 +1,7 @@
 #ifndef MATRIX_MAKE_MATRIX_H
 #define MATRIX_MAKE_MATRIX_H
 
-#include "common/common.h"
+#include "support.h"
 
 #define MAKE_MATRIX_STRUCT(NAME, T)                                            \
     struct NAME                                                                \

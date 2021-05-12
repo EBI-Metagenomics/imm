@@ -1,5 +1,4 @@
 #include "dp/dp.h"
-#include "common/common.h"
 #include "dp/args.h"
 #include "dp/code.h"
 #include "dp/emission.h"
@@ -13,6 +12,7 @@
 #include "imm/lprob.h"
 #include "imm/trans.h"
 #include "result.h"
+#include "support.h"
 #include "task.h"
 
 struct final_score

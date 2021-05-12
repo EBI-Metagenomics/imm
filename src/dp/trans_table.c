@@ -1,8 +1,8 @@
 #include "trans_table.h"
 #include "args.h"
-#include "common/common.h"
 #include "containers/stack.h"
 #include "imm/trans.h"
+#include "support.h"
 #include "trans.h"
 
 static inline unsigned offset_size(unsigned nstates) { return nstates + 1; }

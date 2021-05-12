@@ -1,7 +1,7 @@
 #include "dp/path.h"
-#include "common/common.h"
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
+#include "support.h"
 
 void path_init(struct path *path, struct state_table const *state_tbl,
                struct trans_table const *trans_tbl)

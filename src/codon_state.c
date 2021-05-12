@@ -1,11 +1,11 @@
 #include "imm/codon_state.h"
-#include "common/common.h"
 #include "imm/abc.h"
 #include "imm/codon_lprob.h"
 #include "imm/compiler.h"
 #include "imm/generics.h"
 #include "imm/seq.h"
 #include "state.h"
+#include "support.h"
 
 static void del(struct imm_state const *state);
 

@@ -1,6 +1,6 @@
 #include "dp/state_table.h"
-#include "common/common.h"
 #include "dp/args.h"
+#include "support.h"
 
 void state_table_init(struct state_table *tbl, struct dp_args const *args)
 {

@@ -1,6 +1,6 @@
 #include "tsort.h"
-#include "common/common.h"
 #include "imm/state.h"
+#include "support.h"
 #include "trans.h"
 
 #define INITIAL_MARK 0

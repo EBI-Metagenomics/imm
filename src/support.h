@@ -1,9 +1,53 @@
-#ifndef COMMON_MEMORY_H
-#define COMMON_MEMORY_H
+#ifndef SUPPORT_H
+#define SUPPORT_H
 
-#include "common/log.h"
+#include "imm/log.h"
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
+#define MAX(x, y) ((x) > (y) ? (x) : (y))
+
+#define BITS_PER_BYTE 8
+#define BITS_TO_LONGS(nr) DIV_ROUND_UP(nr, BITS_PER_BYTE * sizeof(long))
+
+#define DIV_ROUND_UP(n, d) (((n) + (d)-1) / (d))
+
+#define warn(code, ...) __imm_log(IMM_WARN, code, __VA_ARGS__)
+#define error(code, ...) __imm_log(IMM_ERROR, code, __VA_ARGS__)
+#define fatal(code, ...) __imm_log(IMM_FATAL, code, __VA_ARGS__)
+
+#define xfwrite(buffer, size, count, stream)                                   \
+    __fwrite((buffer), (size), (count), (stream), __FILE__, __LINE__, #buffer)
+
+static inline void __fwrite(const void *restrict buffer, size_t size,
+                            size_t count, FILE *restrict stream,
+                            char const *file, int line, char const *buffstr)
+{
+    if (fwrite(buffer, size, count, stream) < count)
+        error(IMM_IOERROR, "failed to write %s", buffstr);
+}
+
+static inline void bits_clr(unsigned long *x, unsigned bit)
+{
+    *x &= ~(1UL << bit);
+}
+static inline bool bits_get(unsigned long *x, unsigned bit)
+{
+    return !!((*x >> bit) & 1UL);
+}
+static inline void bits_set(unsigned long *x, unsigned bit)
+{
+    *x |= 1UL << bit;
+}
+static inline unsigned bits_width(uint32_t v)
+{
+    return v ? ((unsigned)__builtin_clz(v) ^ 31) + 1 : 0;
+}
 
 #define xmalloc(x) __malloc((x), __FILE__, __LINE__)
 #define xmemcpy(d, s, c) __memcpy((d), (s), (c), __FILE__, __LINE__)
@@ -81,6 +125,21 @@ static inline void *__growmem(void *restrict ptr, size_t count, size_t size,
         ptr = __realloc(ptr, *capacity, file, line);
     }
     return ptr;
+}
+
+static inline unsigned long ipow(unsigned long base, unsigned exp)
+{
+    unsigned long result = 1;
+
+    while (exp)
+    {
+        if (exp & 1)
+            result *= base;
+        exp >>= 1;
+        base *= base;
+    }
+
+    return result;
 }
 
 #endif

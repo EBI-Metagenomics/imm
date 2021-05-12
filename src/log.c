@@ -1,7 +1,6 @@
 #include "imm/log.h"
 #include "imm/compiler.h"
-#include <stdio.h>
-#include <stdlib.h>
+#include "support.h"
 
 static char const *__msg[] = {
     [IMM_SUCCESS] = "success",          [IMM_FAILURE] = "failure",
