@@ -14,17 +14,17 @@ void eseq_init(struct eseq *eseq, struct code const *code)
 void eseq_setup(struct eseq *eseq, struct imm_seq const *seq)
 {
     unsigned ncols = matrixu16_ncols(&eseq->data);
-    matrixu16_resize(&eseq->data, imm_seq_len(seq) + 1, ncols);
+    matrixu16_resize(&eseq->data, imm_seq_size(seq) + 1, ncols);
 
-    for (unsigned i = 0; i <= imm_seq_len(seq); ++i)
+    for (unsigned i = 0; i <= imm_seq_size(seq); ++i)
     {
         for (unsigned j = 0; j < ncols; ++j)
         {
             unsigned len = eseq->code->seqlen.min + j;
-            if (i + len > imm_seq_len(seq))
+            if (i + len > imm_seq_size(seq))
                 continue;
 
-            struct imm_seq subseq = IMM_SUBSEQ(seq, i, len);
+            struct imm_seq subseq = imm_subseq(seq, i, len);
             unsigned min_seq = eseq->code->seqlen.min;
             unsigned code = code_encode(eseq->code, &subseq);
             code -= code_offset(eseq->code, min_seq);

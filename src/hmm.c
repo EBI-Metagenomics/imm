@@ -194,13 +194,13 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
         return imm_lprob_nan();
     }
 
-    if (step->seqlen > imm_seq_len(seq))
+    if (step->seqlen > imm_seq_size(seq))
     {
         error(IMM_ILLEGALARG, "path emits more symbols than sequence");
         return imm_lprob_nan();
     }
 
-    struct imm_seq subseq = IMM_SUBSEQ(seq, 0, step->seqlen);
+    struct imm_seq subseq = imm_subseq(seq, 0, step->seqlen);
     imm_float lprob = hmm->start.lprob + imm_state_lprob(state, &subseq);
 
     unsigned start = 0;
@@ -208,7 +208,7 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
     {
         start += step->seqlen;
         step = imm_path_step(path, i);
-        if (start + step->seqlen > imm_seq_len(seq))
+        if (start + step->seqlen > imm_seq_size(seq))
         {
             error(IMM_ILLEGALARG, "path emits more symbols than sequence");
             return imm_lprob_nan();
@@ -225,7 +225,7 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
         lprob += imm_state_lprob(state, &subseq);
     }
 
-    if (start + step->seqlen < imm_seq_len(seq))
+    if (start + step->seqlen < imm_seq_size(seq))
     {
         error(IMM_ILLEGALARG,
               "sequence is longer than symbols emitted by path");

@@ -29,7 +29,7 @@ static void del(struct imm_state const *state)
 
 static imm_float lprob(struct imm_state const *state, struct imm_seq const *seq)
 {
-    if (imm_seq_len(seq) == 0)
+    if (imm_seq_size(seq) == 0)
         return imm_log(1.0);
     return imm_lprob_zero();
 }

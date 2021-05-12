@@ -18,8 +18,8 @@ void test_path(void)
 
     struct imm_path path = imm_path();
 
-    imm_path_add(&path, IMM_STEP(state_ids[0], seqlens[0]));
-    imm_path_add(&path, IMM_STEP(state_ids[1], seqlens[1]));
+    imm_path_add(&path, imm_step(state_ids[0], seqlens[0]));
+    imm_path_add(&path, imm_step(state_ids[1], seqlens[1]));
 
     EQ(imm_path_step(&path, 0)->state_id, state_ids[0]);
     EQ(imm_path_step(&path, 1)->state_id, state_ids[1]);
@@ -35,7 +35,7 @@ void test_path_long(void)
     struct imm_path path = imm_path();
 
     for (imm_state_id_t i = 0; i < 1 << 14; ++i)
-        imm_path_add(&path, IMM_STEP(i, i % 16));
+        imm_path_add(&path, imm_step(i, i % 16));
 
     for (imm_state_id_t i = 0; i < 1 << 14; ++i)
     {
@@ -46,7 +46,7 @@ void test_path_long(void)
     imm_path_reset(&path);
 
     for (imm_state_id_t i = 0; i < 1 << 14; ++i)
-        imm_path_add(&path, IMM_STEP(i, i % 16));
+        imm_path_add(&path, imm_step(i, i % 16));
 
     for (imm_state_id_t i = 0; i < 1 << 14; ++i)
     {

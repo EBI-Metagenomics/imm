@@ -426,7 +426,7 @@ imm_float imm_frame_state_lposterior(struct imm_frame_state const *state,
 {
     imm_float lprob = imm_lprob_zero();
 
-    switch (imm_seq_len(seq))
+    switch (imm_seq_size(seq))
     {
     case 1:
         lprob = lprob_frag_given_codon1(state, seq, codon);
@@ -454,7 +454,7 @@ static imm_float lprob(struct imm_state const *state, struct imm_seq const *seq)
 {
     struct imm_frame_state const *f = state->vtable.derived;
 
-    switch (imm_seq_len(seq))
+    switch (imm_seq_size(seq))
     {
     case 1:
         return joint_seq_len1(f, seq);

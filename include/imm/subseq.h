@@ -3,14 +3,17 @@
 
 #include "imm/seq.h"
 
-#define IMM_SUBSEQ(seq, start, len)                                            \
-    (struct imm_seq) { (len), (seq)->str + (start), seq->abc, }
+static inline struct imm_seq imm_subseq(struct imm_seq const *seq,
+                                        unsigned start, unsigned size)
+{
+    return (struct imm_seq){(size), (seq)->str + (start), seq->abc};
+}
 
 static inline void imm_subseq_init(struct imm_seq *subseq,
                                    struct imm_seq const *seq, unsigned start,
-                                   unsigned len)
+                                   unsigned size)
 {
-    subseq->len = len;
+    subseq->size = size;
     subseq->str = seq->str + start;
     subseq->abc = seq->abc;
 }

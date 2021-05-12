@@ -30,8 +30,8 @@ void code_deinit(struct code const *code)
 
 unsigned code_encode(struct code const *code, struct imm_seq const *seq)
 {
-    unsigned c = code->offset[imm_seq_len(seq) - code->seqlen.min];
-    unsigned len = imm_seq_len(seq);
+    unsigned c = code->offset[imm_seq_size(seq) - code->seqlen.min];
+    unsigned len = imm_seq_size(seq);
     for (unsigned i = 0; i < len; ++i)
     {
         unsigned j = imm_abc_symbol_idx(code->abc, seq->str[i]);

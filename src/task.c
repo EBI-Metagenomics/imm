@@ -31,7 +31,7 @@ int imm_task_setup(struct imm_task *task, struct imm_seq const *seq)
 {
     task->seq = seq;
     eseq_setup(&task->eseq, seq);
-    path_setup(&task->path, imm_seq_len(seq) + 1);
+    path_setup(&task->path, imm_seq_size(seq) + 1);
     return IMM_SUCCESS;
 }
 

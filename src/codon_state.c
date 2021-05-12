@@ -38,7 +38,7 @@ static void del(struct imm_state const *state)
 static imm_float lprob(struct imm_state const *state, struct imm_seq const *seq)
 {
     struct imm_codon_state const *codon_state = state->vtable.derived;
-    if (imm_unlikely(imm_seq_len(seq) != 3))
+    if (imm_unlikely(imm_seq_size(seq) != 3))
         return imm_lprob_nan();
 
     struct imm_codon_lprob const *codonp = codon_state->codonp;

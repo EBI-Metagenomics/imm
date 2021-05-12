@@ -3,7 +3,7 @@
 #include "support.h"
 
 struct imm_seq const imm_seq_empty = {
-    .len = 0,
+    .size = 0,
     .str = "",
     .abc = &imm_abc_empty,
 };

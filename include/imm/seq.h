@@ -7,19 +7,17 @@
 #include "imm/log.h"
 #include "imm/str.h"
 
-struct imm_abc;
-
 struct imm_seq
 {
-    unsigned len;
+    unsigned size;
     char const *str;
     struct imm_abc const *abc;
 };
 
 extern struct imm_seq const imm_seq_empty;
 
-#define IMM_SEQ_UNSAFE(len, str, abc)                                          \
-    (struct imm_seq) { len, str, abc }
+#define IMM_SEQ_UNSAFE(size, str, abc)                                         \
+    (struct imm_seq) { size, str, abc }
 
 static inline struct imm_abc const *imm_seq_abc(struct imm_seq const *seq)
 {
@@ -39,9 +37,9 @@ static inline struct imm_seq imm_seq(struct imm_str str,
     return (struct imm_seq){str.size, str.data, abc};
 }
 
-static inline unsigned imm_seq_len(struct imm_seq const *seq)
+static inline unsigned imm_seq_size(struct imm_seq const *seq)
 {
-    return seq->len;
+    return seq->size;
 }
 static inline char const *imm_seq_str(struct imm_seq const *seq)
 {

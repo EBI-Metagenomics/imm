@@ -110,7 +110,7 @@ int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
 
     unsigned end_state = dp->state_table.end_state;
     unsigned min = state_table_span(&dp->state_table, end_state).min;
-    if (imm_seq_len(task->seq) < min)
+    if (imm_seq_size(task->seq) < min)
         return error(IMM_ILLEGALARG,
                      "seq is shorter than end_state's lower bound");
 
@@ -413,7 +413,7 @@ static void viterbi_path(struct imm_dp const *dp, struct imm_task const *task,
     while (valid)
     {
         imm_state_id_t id = dp->state_table.ids[state];
-        struct imm_step step = IMM_STEP(id, seqlen);
+        struct imm_step step = imm_step(id, seqlen);
         imm_path_add(path, step);
         row -= seqlen;
 

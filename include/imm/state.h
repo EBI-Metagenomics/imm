@@ -58,7 +58,8 @@ static inline struct imm_span imm_state_span(struct imm_state const *state)
     return state->span;
 }
 
-static inline enum state_typeid imm_state_typeid(struct imm_state const *state)
+static inline enum imm_state_typeid
+imm_state_typeid(struct imm_state const *state)
 {
     return state->vtable.typeid;
 }

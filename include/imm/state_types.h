@@ -11,7 +11,7 @@ typedef uint16_t imm_state_id_t;
 typedef uint16_t imm_state_idx_t;
 typedef uint8_t imm_state_seqlen_t;
 
-enum state_typeid
+enum imm_state_typeid
 {
     IMM_NULL_STATE = 0,
     IMM_MUTE_STATE = 1,
@@ -28,7 +28,7 @@ struct imm_state_vtable
     void (*del)(struct imm_state const *state);
     imm_float (*lprob)(struct imm_state const *state,
                        struct imm_seq const *seq);
-    enum state_typeid typeid;
+    enum imm_state_typeid typeid;
     void *derived;
 };
 

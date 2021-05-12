@@ -29,7 +29,7 @@ static void del(struct imm_state const *state)
 static imm_float lprob(struct imm_state const *state, struct imm_seq const *seq)
 {
     struct imm_normal_state const *normal = state->vtable.derived;
-    if (imm_seq_len(seq) == 1)
+    if (imm_seq_size(seq) == 1)
     {
         struct imm_abc const *abc = imm_state_abc(state);
         unsigned idx = imm_abc_symbol_idx(abc, seq->str[0]);
