@@ -16,11 +16,6 @@ struct imm_mute_state *imm_mute_state_new(unsigned id,
     return mute;
 }
 
-void imm_mute_state_del(struct imm_mute_state const *mute)
-{
-    mute->super->vtable.del(mute->super);
-}
-
 static void del(struct imm_state const *state)
 {
     free((void *)state->vtable.derived);

@@ -3,7 +3,6 @@
 
 #include "imm/export.h"
 #include "imm/state.h"
-#include "imm/state_types.h"
 
 struct imm_abc;
 

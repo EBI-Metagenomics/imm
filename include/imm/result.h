@@ -1,7 +1,6 @@
 #ifndef IMM_RESULT_H
 #define IMM_RESULT_H
 
-#include "imm/export.h"
 #include "imm/float.h"
 #include "imm/lprob.h"
 #include "imm/path.h"
@@ -18,7 +17,7 @@ struct imm_result
 
 static inline struct imm_result imm_result(void)
 {
-    return (struct imm_result){NULL, imm_path(), imm_lprob_nan(), 0};
+    return (struct imm_result){NULL, imm_path(), IMM_LPROB_NAN, 0};
 }
 
 static inline void imm_result_deinit(struct imm_result *result)

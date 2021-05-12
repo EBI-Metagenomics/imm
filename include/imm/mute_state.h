@@ -2,7 +2,7 @@
 #define IMM_MUTE_STATE_H
 
 #include "imm/export.h"
-#include "imm/state_types.h"
+#include "imm/state.h"
 
 struct imm_abc;
 
@@ -14,7 +14,10 @@ struct imm_mute_state
 IMM_API struct imm_mute_state *imm_mute_state_new(unsigned id,
                                                   struct imm_abc const *abc);
 
-IMM_API void imm_mute_state_del(struct imm_mute_state const *mute);
+static inline void imm_mute_state_del(struct imm_mute_state const *mute)
+{
+    mute->super->vtable.del(mute->super);
+}
 
 static inline struct imm_state *
 imm_mute_state_super(struct imm_mute_state *mute)

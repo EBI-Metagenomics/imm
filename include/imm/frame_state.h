@@ -4,11 +4,10 @@
 #include "imm/export.h"
 #include "imm/float.h"
 #include "imm/state.h"
-#include "imm/state_types.h"
 
-struct imm_nuclt_lprob;
 struct imm_codon;
 struct imm_codon_marg;
+struct imm_nuclt_lprob;
 
 struct imm_frame_state
 {

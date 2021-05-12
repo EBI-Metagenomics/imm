@@ -23,11 +23,6 @@ imm_codon_state_new(unsigned id, struct imm_codon_lprob const *codonp)
     return codon_state;
 }
 
-void imm_codon_state_del(struct imm_codon_state const *codon_state)
-{
-    codon_state->super->vtable.del(codon_state->super);
-}
-
 static void del(struct imm_state const *state)
 {
     struct imm_codon_state const *codon_state = state->vtable.derived;
