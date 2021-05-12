@@ -8,6 +8,8 @@
 #include "imm/str.h"
 #include "imm/sym.h"
 
+#define IMM_MAX_SYMBOLS_SIZE (31U)
+
 /**
  * Alphabet.
  *
@@ -17,7 +19,7 @@
 struct imm_abc
 {
     unsigned size;
-    char const *symbols;
+    char symbols[IMM_MAX_SYMBOLS_SIZE + 1];
     struct imm_sym sym;
     unsigned any_symbol_id;
     struct imm_abc_vtable vtable;
@@ -49,13 +51,6 @@ static inline bool imm_abc_has_symbol(struct imm_abc const *abc, char symbol)
 static inline unsigned imm_abc_size(struct imm_abc const *abc)
 {
     return abc->size;
-}
-
-static inline char imm_abc_symbol(struct imm_abc const *abc, char symbol)
-{
-    unsigned id = imm_sym_id(symbol);
-    IMM_BUG(!imm_abc_has_symbol_id(abc, id) && abc->any_symbol_id != id);
-    return abc->symbols[imm_sym_idx(&abc->sym, id)];
 }
 
 static inline unsigned __imm_abc_symbol_idx(struct imm_abc const *abc,

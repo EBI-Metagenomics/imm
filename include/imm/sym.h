@@ -20,10 +20,10 @@ enum imm_sym_type
 #define IMM_SYM_FIRST_CHAR '!'
 #define IMM_SYM_LAST_CHAR '~'
 
+#define IMM_SYM_SIZE ((size_t)((IMM_SYM_LAST_CHAR - IMM_SYM_FIRST_CHAR) + 1))
+
 #define IMM_SYM_NULL_ID UINT8_MAX
 #define IMM_SYM_NULL_IDX UINT8_MAX
-
-#define IMM_SYM_SIZE ((size_t)((IMM_SYM_LAST_CHAR - IMM_SYM_FIRST_CHAR) + 1))
 
 #define IMM_SYM_ID(c) ((unsigned)(c - IMM_SYM_FIRST_CHAR))
 #define IMM_SYM_CHAR(x) ((char)(x + IMM_SYM_FIRST_CHAR))

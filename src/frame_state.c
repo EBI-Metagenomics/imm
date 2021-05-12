@@ -389,7 +389,7 @@ imm_float imm_frame_state_decode(struct imm_frame_state const *state,
                                  struct imm_seq const *seq,
                                  struct imm_codon *codon)
 {
-    unsigned const n = imm_nuclt_len(state->nucltp->nuclt);
+    unsigned const n = imm_nuclt_size(state->nucltp->nuclt);
 
     imm_float max_lprob = imm_lprob_zero();
     struct imm_codon tmp;

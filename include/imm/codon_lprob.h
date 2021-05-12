@@ -32,7 +32,7 @@ imm_codon_lprob(struct imm_nuclt const *nuclt)
     for (unsigned a = 0; a < IMM_NUCLT_SIZE; ++a)
         for (unsigned b = 0; b < IMM_NUCLT_SIZE; ++b)
             for (unsigned c = 0; c < IMM_NUCLT_SIZE; ++c)
-                lprob.lprobs[a][b][c] = imm_lprob_zero();
+                lprob.lprobs[a][b][c] = IMM_LPROB_ZERO;
 
     return lprob;
 }

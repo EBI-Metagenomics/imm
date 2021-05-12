@@ -19,7 +19,7 @@ static imm_float marginalization(struct imm_codon_marg const *codonm,
         if (codon->idx[i] == any)
         {
             arr[i] = symbol_idx;
-            shape[i] = imm_nuclt_len(codonm->nuclt);
+            shape[i] = imm_nuclt_size(codonm->nuclt);
         }
         else
         {
@@ -52,7 +52,7 @@ static void set_marginal_lprobs(struct imm_codon_marg *codonm)
 {
     struct imm_abc const *abc = imm_super(codonm->nuclt);
     unsigned any = imm_abc_any_symbol_idx(abc);
-    IMM_BUG(any != imm_nuclt_len(codonm->nuclt));
+    IMM_BUG(any != imm_nuclt_size(codonm->nuclt));
 
     struct imm_codon codon;
     codon.nuclt = codonm->nuclt;

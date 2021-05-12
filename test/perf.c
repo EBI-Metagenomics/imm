@@ -58,8 +58,6 @@ char const seq_str[] = "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
                        "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
                        "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMME";
 
-char const abc_str[] = "BMIEJ";
-
 imm_float b_lprobs[] = {ONE, ZERO, ZERO, ZERO, ZERO};
 imm_float m_lprobs[] = {ZERO, ONE, ZERO, ZERO, ZERO};
 imm_float i_lprobs[] = {ZERO, ZERO, ONE, ZERO, ZERO};
@@ -114,7 +112,7 @@ void test_perf_viterbi(void)
 
 void init_model(void)
 {
-    imm_abc_init(&model.abc, imm_str(abc_str), '*');
+    imm_abc_init(&model.abc, imm_str("BMIEJ"), '*');
     model.hmm = imm_hmm_new(&model.abc);
 
     model.start = imm_mute_state_new(START, &model.abc);

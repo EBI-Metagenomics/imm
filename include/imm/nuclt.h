@@ -16,7 +16,7 @@ struct imm_nuclt
 IMM_API int imm_nuclt_init(struct imm_nuclt *nuclt,
                            char const symbols[IMM_NUCLT_SIZE], char any_symbol);
 
-static inline unsigned imm_nuclt_len(struct imm_nuclt const *nuclt)
+static inline unsigned imm_nuclt_size(struct imm_nuclt const *nuclt)
 {
     return IMM_NUCLT_SIZE;
 }

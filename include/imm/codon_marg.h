@@ -36,7 +36,7 @@ IMM_API struct imm_codon_marg imm_codon_marg(struct imm_codon_lprob *codonp);
  * over the corresponding random variable. Let `"ACGT"` be a set of nucleotides
  * and let `'X`' be the any-symbol of the given alphabet. The code
  *
- *     imm_codon_set(&codon, IMM_TRIPLET_INIT('A', 'X', 'G'));
+ *     imm_codon_set(&codon, 0, 5, 2);
  *     imm_codon_marg_lprob(&codonm, &codon);
  *
  * will evaluate the probability p(𝑋₁=𝙰,𝑋₃=𝙶).

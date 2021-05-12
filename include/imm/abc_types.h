@@ -1,8 +1,6 @@
 #ifndef IMM_ABC_TYPES_H
 #define IMM_ABC_TYPES_H
 
-#include <stdint.h>
-
 enum imm_abc_typeid
 {
     IMM_NULL_ABC = 0,
@@ -12,8 +10,6 @@ enum imm_abc_typeid
     IMM_DNA = 4,
     IMM_RNA = 5,
 };
-
-struct imm_abc;
 
 struct imm_abc_vtable
 {
