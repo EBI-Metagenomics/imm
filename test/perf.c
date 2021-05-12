@@ -105,6 +105,7 @@ void test_perf_viterbi(void)
     CLOSE(result.loglik, -65826.0106185297);
 
     imm_del(task);
+    imm_deinit(&result);
     imm_del(dp);
 }
 

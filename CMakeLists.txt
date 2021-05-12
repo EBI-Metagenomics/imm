@@ -92,9 +92,9 @@ endif()
 
 option(IMM_DOUBLE_PRECISION "Enable double-precision floating-point format for internals" Off)
 if(IMM_DOUBLE_PRECISION)
-    message(STATUS "Double-precision floating-point format for internals - On")
+    message(STATUS "Double-precision floating-point - On")
 else()
-    message(STATUS "Double-precision floating-point format for internals - Off")
+    message(STATUS "Double-precision floating-point - Off")
 endif()
 
 target_include_directories(imm

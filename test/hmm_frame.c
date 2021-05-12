@@ -98,8 +98,9 @@ void test_hmm_frame_state_len1(void)
     EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     CLOSE(result.loglik, -7.1184763103);
 
-    imm_deinit(&path);
     imm_del(task);
+    imm_deinit(&path);
+    imm_deinit(&result);
     imm_del(dp);
     imm_del(hmm);
     imm_del(state);
@@ -167,6 +168,7 @@ void test_hmm_frame_state_len2(void)
 
     imm_del(task);
     imm_del(dp);
+    imm_deinit(&result);
     imm_deinit(&path);
     imm_del(hmm);
     imm_del(state);
@@ -210,6 +212,7 @@ void test_hmm_frame_state_len3(void)
 
     imm_del(task);
     imm_del(dp);
+    imm_deinit(&result);
     imm_deinit(&path);
     imm_del(hmm);
     imm_del(state);
@@ -241,6 +244,7 @@ void test_hmm_frame_state_len4(void)
 
     imm_del(task);
     imm_del(dp);
+    imm_deinit(&result);
     imm_deinit(&path);
     imm_del(hmm);
     imm_del(state);
@@ -284,6 +288,7 @@ void test_hmm_frame_state_len5(void)
 
     imm_del(task);
     imm_del(dp);
+    imm_deinit(&result);
     imm_deinit(&path);
     imm_del(hmm);
     imm_del(state);
