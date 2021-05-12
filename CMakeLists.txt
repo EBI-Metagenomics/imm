@@ -1,7 +1,5 @@
-cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 project(imm VERSION 0.0.10 LANGUAGES C)
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 # Generate compile_commands.json file
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -13,12 +11,9 @@ if("${isSystemDir}" STREQUAL "-1")
     set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 endif()
 
-# merge request fix: https://gitlab.kitware.com/cmake/cmake/-/merge_requests/1799
-if(CMAKE_VERSION VERSION_GREATER 3.12.0)
-    # Hide things by default
-    set(CMAKE_C_VISIBILITY_PRESET hidden)
-    set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
-endif()
+# Hide things by default
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
 
 find_package(logaddexp REQUIRED)
 find_package(elapsed REQUIRED)
@@ -178,19 +173,3 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/imm-config.cmake
 
 enable_testing()
 add_subdirectory(test)
-# add_subdirectory(perf)
-
-option(COVERAGE "Enable coverage")
-if(COVERAGE)
-    string(TOUPPER "${CMAKE_BUILD_TYPE}" uppercase_CMAKE_BUILD_TYPE)
-    if(NOT ${uppercase_CMAKE_BUILD_TYPE} MATCHES "DEBUG")
-        message(FATAL_ERROR "CMAKE_BUILD_TYPE must be set to Debug.")
-    endif()
-
-    include(CodeCoverage)
-    append_coverage_compiler_flags()
-    setup_target_for_coverage_lcov(
-        NAME coverage
-        EXECUTABLE ctest
-        DEPENDENCIES all_tests)
-endif()
