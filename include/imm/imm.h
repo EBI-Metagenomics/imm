@@ -41,6 +41,7 @@ extern "C" {
 #include "imm/sym.h"
 #include "imm/task.h"
 #include "imm/trans.h"
+#include "imm/types.h"
 
 #ifdef __cplusplus
 }

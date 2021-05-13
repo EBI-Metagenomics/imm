@@ -41,7 +41,14 @@ static inline unsigned code_size(struct code const *code, unsigned min_seq)
     return (unsigned)(code->size - code->offset[min_seq - code->seqlen.min]);
 }
 
-void code_write(struct code const *code, FILE *stream);
-int code_read(struct code *code, struct imm_abc const *abc, FILE *stream);
+static inline unsigned code_offset_size(struct code const *code)
+{
+    return (unsigned)(code->seqlen.max - code->seqlen.min + 1);
+}
+
+static inline unsigned code_stride_size(struct code const *code)
+{
+    return code->seqlen.max;
+}
 
 #endif

@@ -31,13 +31,13 @@ add_library(imm
     src/dp/dp.c
     src/dp/emission.c
     src/dp/eseq.c
+    src/dp/io.c
     src/dp/matrix.c
     src/dp/path.c
     src/dp/state_table.c
     src/dp/trans_table.c
     src/frame_state.c
     src/hmm.c
-    src/io.c
     src/log.c
     src/lprob.c
     src/mute_state.c
@@ -50,6 +50,7 @@ add_library(imm
     src/sym.c
     src/task.c
     src/tsort.c
+    third-party/cmp.c
 )
 add_library(IMM::imm ALIAS imm)
 
@@ -100,6 +101,7 @@ target_include_directories(imm
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/third-party
 )
 target_link_libraries(imm PUBLIC LOGADDEXP::logaddexp)
 target_link_libraries(imm PUBLIC ELAPSED::elapsed)

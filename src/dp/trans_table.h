@@ -50,4 +50,9 @@ static inline unsigned trans_table_source_state(struct trans_table const *tbl,
     return tbl->trans[tbl->offset[dst] + trans].src;
 }
 
+static inline unsigned trans_table_offset_size(unsigned nstates)
+{
+    return nstates + 1;
+}
+
 #endif

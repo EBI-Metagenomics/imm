@@ -5,8 +5,6 @@
 #include "support.h"
 #include "trans.h"
 
-static inline unsigned offset_size(unsigned nstates) { return nstates + 1; }
-
 unsigned trans_table_idx(struct trans_table *trans_tbl, unsigned src_idx,
                          unsigned dst_idx)
 {
@@ -22,7 +20,8 @@ unsigned trans_table_idx(struct trans_table *trans_tbl, unsigned src_idx,
 void trans_table_init(struct trans_table *tbl, struct dp_args const *args)
 {
     tbl->ntrans = args->ntransitions;
-    tbl->offset = xmalloc(sizeof(*tbl->offset) * offset_size(args->nstates));
+    tbl->offset =
+        xmalloc(sizeof(*tbl->offset) * trans_table_offset_size(args->nstates));
     tbl->offset[0] = 0;
 
     if (tbl->ntrans > 0)

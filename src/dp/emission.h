@@ -21,14 +21,21 @@ void emission_init(struct emission *emission, struct code const *code,
 void emission_reset(struct emission *emission, struct code const *code,
                     struct imm_state **states, unsigned nstates);
 
-void emission_write(struct emission const *e, unsigned nstates, FILE *stream);
-
-int emission_read(struct emission *e, FILE *stream);
-
 static inline imm_float emission_score(struct emission const *emission,
                                        unsigned state, unsigned seq_code)
 {
     return emission->score[emission->offset[state] + seq_code];
+}
+
+static inline unsigned emission_score_size(struct emission const *emission,
+                                           unsigned nstates)
+{
+    return emission->offset[nstates];
+}
+
+static inline unsigned emission_offset_size(unsigned nstates)
+{
+    return nstates + 1;
 }
 
 #endif

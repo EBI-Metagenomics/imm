@@ -7,14 +7,6 @@
 #include "io.h"
 #include "support.h"
 
-static inline unsigned offset_size(unsigned nstates) { return nstates + 1; }
-
-static inline unsigned score_size(struct emission const *emission,
-                                  unsigned nstates)
-{
-    return emission->offset[nstates];
-}
-
 void emission_deinit(struct emission const *emission)
 {
     free(emission->score);
@@ -32,8 +24,8 @@ void emission_init(struct emission *emiss, struct code const *code,
 void emission_reset(struct emission *emiss, struct code const *code,
                     struct imm_state **states, unsigned nstates)
 {
-    emiss->offset =
-        xrealloc(emiss->offset, sizeof(*emiss->offset) * offset_size(nstates));
+    emiss->offset = xrealloc(emiss->offset, sizeof(*emiss->offset) *
+                                                emission_offset_size(nstates));
     emiss->offset[0] = 0;
 
     unsigned min = imm_state_span(states[0]).min;
@@ -45,8 +37,9 @@ void emission_reset(struct emission *emiss, struct code const *code,
     }
     emiss->offset[nstates] = size;
 
-    emiss->score = xrealloc(emiss->score,
-                            sizeof(*emiss->score) * score_size(emiss, nstates));
+    emiss->score =
+        xrealloc(emiss->score,
+                 sizeof(*emiss->score) * emission_score_size(emiss, nstates));
 
     struct imm_abc const *abc = code->abc;
     char const *set = abc->symbols;
@@ -74,34 +67,4 @@ void emission_reset(struct emission *emiss, struct code const *code,
         }
     }
     imm_cartes_deinit(&cartes);
-}
-
-struct chunk
-{
-    struct
-    {
-        uint32_t size;
-        imm_float *data;
-    } score;
-    struct
-    {
-        uint32_t size;
-        uint32_t *data;
-    } offset;
-};
-
-void emission_write(struct emission const *e, unsigned nstates, FILE *stream)
-{
-    struct chunk c;
-    c.score.size = score_size(e, nstates);
-    c.offset.size = offset_size(nstates);
-    write_array_u32_flt(&c.score.size, e->score, stream);
-    write_array_u32_u32(&c.offset.size, e->offset, stream);
-}
-
-int emission_read(struct emission *e, FILE *stream)
-{
-    e->score = read_array_u32_flt(e->score, stream);
-    e->offset = read_array_u32_u32(e->offset, stream);
-    return IMM_SUCCESS;
 }
