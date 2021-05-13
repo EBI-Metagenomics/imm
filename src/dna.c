@@ -9,6 +9,16 @@ int imm_dna_init(struct imm_dna *dna, char const symbols[IMM_DNA_SIZE],
                     vtable);
 }
 
+int imm_dna_write(struct imm_dna const *dna, FILE *file)
+{
+    return imm_abc_write(&dna->super.super, file);
+}
+
+int imm_dna_read(struct imm_dna *dna, FILE *file)
+{
+    return imm_abc_read(&dna->super.super, file);
+}
+
 #define ID(c) IMM_SYM_ID(c)
 #define SET(c, idx) [ID(c)] = idx
 #define NIL(x, y) [ID(x)... ID(y) - 1] = IMM_SYM_NULL_IDX

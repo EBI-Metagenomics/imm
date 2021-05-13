@@ -1,5 +1,6 @@
 #include "abc.h"
 #include "cmp.h"
+#include "imm/log.h"
 #include "imm/support.h"
 #include "imm/sym.h"
 #include "io.h"
@@ -19,6 +20,18 @@ int imm_abc_init(struct imm_abc *abc, struct imm_str symbols, char any_symbol)
 {
     struct imm_abc_vtable vtable = {IMM_ABC, NULL};
     return abc_init(abc, symbols.size, symbols.data, any_symbol, vtable);
+}
+
+int imm_abc_write(struct imm_abc const *abc, FILE *file)
+{
+    abc_write(abc, file);
+    return IMM_SUCCESS;
+}
+
+int imm_abc_read(struct imm_abc *abc, FILE *file)
+{
+    abc_read(abc, file);
+    return IMM_SUCCESS;
 }
 
 int abc_init(struct imm_abc *abc, unsigned len, char const *symbols,

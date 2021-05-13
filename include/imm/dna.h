@@ -18,6 +18,10 @@ extern struct imm_dna const imm_dna_default;
 IMM_API int imm_dna_init(struct imm_dna *dna, char const symbols[IMM_DNA_SIZE],
                          char any_symbol);
 
+IMM_API int imm_dna_write(struct imm_dna const *dna, FILE *file);
+
+IMM_API int imm_dna_read(struct imm_dna *dna, FILE *file);
+
 static inline struct imm_nuclt const *imm_dna_super(struct imm_dna const *dna)
 {
     return &dna->super;

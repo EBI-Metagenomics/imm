@@ -7,6 +7,7 @@
 #include "imm/log.h"
 #include "imm/str.h"
 #include "imm/sym.h"
+#include <stdio.h>
 
 #define IMM_MAX_SYMBOLS_SIZE (31U)
 
@@ -34,6 +35,10 @@ static inline char imm_abc_any_symbol(struct imm_abc const *abc)
 
 IMM_API int imm_abc_init(struct imm_abc *abc, struct imm_str symbols,
                          char any_symbol_id);
+
+IMM_API int imm_abc_write(struct imm_abc const *abc, FILE *file);
+
+IMM_API int imm_abc_read(struct imm_abc *abc, FILE *file);
 
 static inline bool imm_abc_has_symbol_id(struct imm_abc const *abc, unsigned id)
 {
