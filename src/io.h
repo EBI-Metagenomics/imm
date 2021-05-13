@@ -7,6 +7,7 @@
 #include "imm/types.h"
 #include "support.h"
 #include <assert.h>
+#include <limits.h>
 #include <stdint.h>
 
 static bool read_bytes(void *data, size_t sz, FILE *fh)

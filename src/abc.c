@@ -1,6 +1,11 @@
 #include "abc.h"
+#include "cmp.h"
+#include "imm/support.h"
 #include "imm/sym.h"
+#include "io.h"
 #include "support.h"
+#include <assert.h>
+#include <stdint.h>
 
 struct imm_abc const imm_abc_empty = {
     .size = 0,
@@ -53,4 +58,46 @@ int abc_init(struct imm_abc *abc, unsigned len, char const *symbols,
     imm_sym_set_idx(&abc->sym, abc->any_symbol_id, abc->size);
     abc->vtable = vtable;
     return IMM_SUCCESS;
+}
+
+static_assert(sizeof(imm_sym_id_t) == sizeof(uint8_t), "wrong types");
+static_assert(sizeof(imm_sym_idx_t) == sizeof(uint8_t), "wrong types");
+static_assert(sizeof(imm_abc_typeid_t) == sizeof(uint8_t), "wrong types");
+
+void abc_write(struct imm_abc const *abc, FILE *file)
+{
+    cmp_ctx_t cmp = {0};
+    cmp_init(&cmp, file, file_reader, file_skipper, file_writer);
+
+    cmp_write_str(&cmp, abc->symbols, abc->size);
+
+    cmp_write_array(&cmp, IMM_ARRAY_SIZE(abc->sym.idx));
+    for (unsigned i = 0; i < IMM_ARRAY_SIZE(abc->sym.idx); ++i)
+        cmp_write_u8(&cmp, abc->sym.idx[i]);
+
+    cmp_write_u8(&cmp, (uint8_t)abc->any_symbol_id);
+    cmp_write_u8(&cmp, (uint8_t)abc->vtable.typeid);
+}
+
+void abc_read(struct imm_abc *abc, FILE *file)
+{
+    cmp_ctx_t cmp = {0};
+    cmp_init(&cmp, file, file_reader, file_skipper, file_writer);
+
+    uint32_t u32 = IMM_ARRAY_SIZE(abc->symbols) - 1;
+    cmp_read_str(&cmp, abc->symbols, &u32);
+    abc->size = u32;
+    abc->symbols[abc->size] = '\0';
+
+    cmp_read_array(&cmp, &u32);
+    IMM_BUG(IMM_ARRAY_SIZE(abc->sym.idx) != u32);
+    for (unsigned i = 0; i < IMM_ARRAY_SIZE(abc->sym.idx); ++i)
+        cmp_read_u8(&cmp, abc->sym.idx + i);
+
+    uint8_t u8 = 0;
+    cmp_read_u8(&cmp, &u8);
+    abc->any_symbol_id = u8;
+
+    cmp_read_u8(&cmp, &u8);
+    abc->vtable.typeid = u8;
 }
