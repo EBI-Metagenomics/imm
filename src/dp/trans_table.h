@@ -10,7 +10,7 @@ struct dp_args;
 struct trans_table
 {
     unsigned ntrans; /**< Number of transitions. */
-    struct __attribute__((__packed__))
+    struct
     {
         imm_float score;     /**< Transition score. */
         imm_state_idx_t src; /**< Source state. */

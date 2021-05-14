@@ -83,6 +83,21 @@ static void _viterbi(struct imm_dp const *dp, struct imm_task *task,
 static void _viterbi_safe(struct imm_dp const *dp, struct imm_task *task,
                           unsigned const start_row, unsigned const stop_row);
 
+struct imm_dp *imm_dp_new(struct imm_abc const *abc)
+{
+    struct imm_dp *dp = xmalloc(sizeof(*dp));
+    dp->code.offset = NULL;
+    dp->code.stride = NULL;
+    dp->code.abc = abc;
+    dp->emission.score = NULL;
+    dp->emission.offset = NULL;
+    dp->trans_table.trans = NULL;
+    dp->trans_table.offset = NULL;
+    dp->state_table.ids = NULL;
+    dp->state_table.span = NULL;
+    return dp;
+}
+
 void imm_dp_del(struct imm_dp const *dp)
 {
     code_deinit(&dp->code);

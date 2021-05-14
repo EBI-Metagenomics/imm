@@ -5,10 +5,14 @@
 #include "imm/float.h"
 #include "imm/state_types.h"
 #include "imm/trans.h"
+#include <stdio.h>
 
+struct imm_abc;
 struct imm_dp;
 struct imm_result;
 struct imm_task;
+
+IMM_API struct imm_dp *imm_dp_new(struct imm_abc const *abc);
 
 IMM_API void imm_dp_del(struct imm_dp const *dp);
 
@@ -20,6 +24,10 @@ IMM_API int imm_dp_change_trans(struct imm_dp *dp, unsigned trans_idx,
 
 IMM_API int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
                            struct imm_result *result);
+
+IMM_API int imm_dp_write(struct imm_dp const *dp, FILE *file);
+
+IMM_API int imm_dp_read(struct imm_dp *dp, FILE *file);
 
 #ifndef NDEBUG
 IMM_API void dp_dump_state_table(struct imm_dp const *dp);

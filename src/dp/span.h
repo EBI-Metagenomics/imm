@@ -29,7 +29,7 @@ static inline void span_unzip(struct span span[static 1], uint16_t v)
 {
     span->max = (imm_state_seqlen_t)v;
     span->min = (imm_state_seqlen_t)(v >> 8);
-    IMM_BUG(span->min <= span->max);
+    IMM_BUG(span->min > span->max);
 }
 
 #endif
