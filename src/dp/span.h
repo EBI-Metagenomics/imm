@@ -19,10 +19,7 @@ static_assert(sizeof(struct span) == 2, "struct span must be packed");
 
 static inline uint16_t span_zip(struct span const *span)
 {
-    uint16_t v = span->min;
-    v <<= 8;
-    v |= (uint16_t)span->max;
-    return v;
+    return (uint16_t)((span->min << 8) | span->max);
 }
 
 static inline void span_unzip(struct span span[static 1], uint16_t v)

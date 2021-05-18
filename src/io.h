@@ -4,6 +4,7 @@
 #include "cmp.h"
 #include "support.h"
 #include <assert.h>
+#include <limits.h>
 
 static bool read_bytes(void *data, size_t sz, FILE *fh)
 {

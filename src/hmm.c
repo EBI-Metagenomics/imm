@@ -87,7 +87,7 @@ struct imm_hmm *imm_hmm_new(struct imm_abc const *abc)
 {
     struct imm_hmm *hmm = xmalloc(sizeof(*hmm));
     hmm->abc = abc;
-    start_init(&hmm);
+    start_init(hmm);
     init_states_table(hmm);
     init_transitions_table(hmm);
     return hmm;
