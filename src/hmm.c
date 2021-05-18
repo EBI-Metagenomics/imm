@@ -133,10 +133,9 @@ int imm_hmm_reset_dp(struct imm_hmm const *hmm,
     }
     set_state_indices(hmm, states);
 
-    struct dp_args args;
-    dp_args_init(&args, hmm->transitions.size, hmm->states.size, states,
-                 hmm_state(hmm, hmm->start.state_id), hmm->start.lprob,
-                 end_state);
+    struct dp_args args = dp_args(hmm->transitions.size, hmm->states.size,
+                                  states, hmm_state(hmm, hmm->start.state_id),
+                                  hmm->start.lprob, end_state);
 
     dp_reset(dp, &args);
 

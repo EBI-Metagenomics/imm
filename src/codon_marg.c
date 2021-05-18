@@ -1,11 +1,40 @@
 #include "imm/codon_marg.h"
-#include "codon_iter.h"
 #include "imm/abc.h"
 #include "imm/codon_lprob.h"
 #include "imm/generics.h"
 #include "imm/nuclt.h"
 
 static_assert(IMM_NUCLT_SIZE == 4, "nuclt size expected to be four");
+
+struct codon_iter
+{
+    struct imm_nuclt const *nuclt;
+    unsigned pos;
+};
+
+static inline struct codon_iter codon_iter_begin(struct imm_nuclt const *nuclt)
+{
+    return (struct codon_iter){nuclt, 0};
+}
+
+static inline struct imm_codon codon_iter_next(struct codon_iter *iter)
+{
+    unsigned n = IMM_NUCLT_SIZE;
+
+    struct imm_codon codon = {.nuclt = iter->nuclt,
+                              .a = (iter->pos / (n * n)) % n,
+                              .b = (iter->pos / n) % n,
+                              .c = iter->pos % n};
+    iter->pos++;
+
+    return codon;
+}
+
+static inline bool codon_iter_end(struct codon_iter const iter)
+{
+    unsigned n = IMM_NUCLT_SIZE;
+    return iter.pos >= n * n * n;
+}
 
 static imm_float marginalization(struct imm_codon_marg const *codonm,
                                  struct imm_codon const *codon)
@@ -19,7 +48,7 @@ static imm_float marginalization(struct imm_codon_marg const *codonm,
         if (codon->idx[i] == any)
         {
             arr[i] = symbol_idx;
-            shape[i] = imm_nuclt_size(codonm->nuclt);
+            shape[i] = IMM_NUCLT_SIZE;
         }
         else
         {

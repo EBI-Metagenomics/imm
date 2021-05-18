@@ -1,5 +1,5 @@
 #include "dp/state_table.h"
-#include "dp/args.h"
+#include "dp/dp.h"
 #include "imm/state.h"
 #include "imm/types.h"
 #include "support.h"

@@ -1,6 +1,6 @@
 #include "dp/trans_table.h"
-#include "args.h"
 #include "containers/stack.h"
+#include "dp/dp.h"
 #include "support.h"
 #include "trans.h"
 #include <limits.h>
