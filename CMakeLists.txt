@@ -47,7 +47,6 @@ add_library(imm
     src/rna.c
     src/seq.c
     src/state.c
-    src/sym.c
     src/task.c
     src/tsort.c
     third-party/cmp.c

@@ -8,10 +8,15 @@
 #include "imm/state_types.h"
 #include "imm/subseq.h"
 #include "imm/support.h"
-#include "start.h"
 #include "state.h"
 #include "support.h"
 #include "tsort.h"
+
+static inline void start_init(struct imm_hmm *hmm)
+{
+    hmm->start.lprob = IMM_LPROB_NAN;
+    hmm->start.state_id = IMM_STATE_NULL_ID;
+}
 
 static void detach_states(struct imm_hmm *hmm)
 {
@@ -82,7 +87,7 @@ struct imm_hmm *imm_hmm_new(struct imm_abc const *abc)
 {
     struct imm_hmm *hmm = xmalloc(sizeof(*hmm));
     hmm->abc = abc;
-    start_init(&hmm->start);
+    start_init(&hmm);
     init_states_table(hmm);
     init_transitions_table(hmm);
     return hmm;

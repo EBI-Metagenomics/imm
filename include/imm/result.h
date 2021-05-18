@@ -27,4 +27,11 @@ static inline void imm_result_del(struct imm_result *result)
     result->seconds = 0;
 }
 
+static inline void result_reset(struct imm_result *result)
+{
+    imm_path_reset(&result->path);
+    result->loglik = IMM_LPROB_NAN;
+    result->seconds = 0;
+}
+
 #endif

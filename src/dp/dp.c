@@ -9,9 +9,10 @@
 #include "imm/compiler.h"
 #include "imm/dp.h"
 #include "imm/lprob.h"
+#include "imm/path.h"
+#include "imm/result.h"
 #include "imm/state.h"
 #include "imm/trans.h"
-#include "result.h"
 #include "support.h"
 #include "task.h"
 

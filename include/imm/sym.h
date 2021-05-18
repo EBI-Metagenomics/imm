@@ -3,6 +3,7 @@
 
 #include "imm/compiler.h"
 #include "imm/export.h"
+#include "imm/support.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -33,7 +34,11 @@ struct imm_sym
     imm_sym_idx_t idx[IMM_SYM_SIZE];
 };
 
-IMM_API void imm_sym_init(struct imm_sym *sym);
+static inline void imm_sym_init(struct imm_sym *sym)
+{
+    for (unsigned i = 0; i < IMM_ARRAY_SIZE(sym->idx); ++i)
+        sym->idx[i] = IMM_SYM_NULL_IDX;
+}
 
 static inline unsigned imm_sym_id(char c) { return IMM_SYM_ID(c); }
 

@@ -2,7 +2,6 @@
 #define HMM_H
 
 #include "pair.h"
-#include "start.h"
 #include "trans.h"
 
 #define MAX_NTRANS_BITS 13
@@ -14,7 +13,12 @@ struct imm_state;
 struct imm_hmm
 {
     struct imm_abc const *abc;
-    struct start start;
+
+    struct
+    {
+        imm_float lprob;
+        unsigned state_id;
+    } start;
 
     struct
     {
