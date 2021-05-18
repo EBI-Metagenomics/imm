@@ -22,17 +22,6 @@
 #define error(code, ...) __imm_log(IMM_ERROR, code, __VA_ARGS__)
 #define fatal(code, ...) __imm_log(IMM_FATAL, code, __VA_ARGS__)
 
-#define xfwrite(buffer, size, count, stream)                                   \
-    __fwrite((buffer), (size), (count), (stream), __FILE__, __LINE__, #buffer)
-
-static inline void __fwrite(const void *restrict buffer, size_t size,
-                            size_t count, FILE *restrict stream,
-                            char const *file, int line, char const *buffstr)
-{
-    if (imm_unlikely(fwrite(buffer, size, count, stream) < count))
-        error(IMM_IOERROR, "failed to write %s", buffstr);
-}
-
 static inline void bits_clr(unsigned long *x, unsigned bit)
 {
     *x &= ~(1UL << bit);
