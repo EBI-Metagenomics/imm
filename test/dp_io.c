@@ -37,7 +37,7 @@ void test_dp_io_large_normal(void)
     CLOSE(result.loglik, -65826.0106185297);
 
     imm_del(task);
-    imm_deinit(&result);
+    imm_del(&result);
     imm_del(dp);
     model_normal_deinit();
 }
@@ -66,7 +66,7 @@ void test_dp_io_large_frame(void)
     EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     CLOSE(result.loglik, -1622.8488101101);
 
-    imm_deinit(&result);
+    imm_del(&result);
     imm_del(task);
     imm_del(dp);
     model_frame_deinit();

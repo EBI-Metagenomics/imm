@@ -93,7 +93,7 @@ void test_hmm_loglik_single_state(void)
     imm_path_add(&path, imm_step(imm_id(imm_super(state)), 1));
     CLOSE(imm_hmm_loglik(hmm, &AA, &path), imm_log(0.5) + 2 * imm_log(0.25));
 
-    imm_deinit(&path);
+    imm_del(&path);
     imm_del(hmm);
     imm_del(state);
 }
@@ -141,7 +141,7 @@ void test_hmm_loglik_two_states(void)
     imm_path_add(&path, imm_step(imm_id(imm_super(state1)), 1));
     CLOSE(imm_hmm_loglik(hmm, &GT, &path), -1.0986122887);
 
-    imm_deinit(&path);
+    imm_del(&path);
     imm_del(hmm);
     imm_del(state0);
     imm_del(state1);
@@ -177,7 +177,7 @@ void test_hmm_loglik_mute_state(void)
 
     COND(imm_lprob_is_nan(imm_hmm_loglik(hmm, &GT, &path)));
 
-    imm_deinit(&path);
+    imm_del(&path);
     imm_del(hmm);
     imm_del(state);
 }
@@ -200,7 +200,7 @@ void test_hmm_loglik_two_mute_states(void)
     imm_path_add(&path, imm_step(imm_id(imm_super(S1)), 0));
     CLOSE(imm_hmm_loglik(hmm, &EMPTY, &path), 0.0);
 
-    imm_deinit(&path);
+    imm_del(&path);
     imm_del(hmm);
     imm_del(S0);
     imm_del(S1);
@@ -242,7 +242,7 @@ void test_hmm_loglik_invalid(void)
     imm_path_add(&path, imm_step(imm_id(imm_super(E)), 0));
     COND(!imm_lprob_is_finite(imm_hmm_loglik(hmm, &C, &path)));
 
-    imm_deinit(&path);
+    imm_del(&path);
     imm_del(hmm);
     imm_del(S);
     imm_del(M1);
@@ -257,6 +257,6 @@ void test_hmm_loglik_no_state(void)
     struct imm_path path = imm_path();
     COND(imm_lprob_is_nan(imm_hmm_loglik(hmm, &EMPTY, &path)));
 
-    imm_deinit(&path);
+    imm_del(&path);
     imm_del(hmm);
 }

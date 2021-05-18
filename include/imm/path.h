@@ -35,7 +35,7 @@ static inline struct imm_path imm_path(void)
     return (struct imm_path){0, 0, 1, 0, NULL};
 }
 
-IMM_API void imm_path_deinit(struct imm_path *path);
+IMM_API void imm_path_del(struct imm_path *path);
 
 static inline void imm_path_reset(struct imm_path *path)
 {

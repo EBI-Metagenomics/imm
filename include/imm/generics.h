@@ -42,12 +42,9 @@
              : imm_frame_state_del, struct imm_task *                          \
              : imm_task_del, struct imm_hmm *                                  \
              : imm_hmm_del, struct imm_dp *                                    \
-             : imm_dp_del)(x)
-
-#define imm_deinit(x)                                                          \
-    _Generic((x), struct imm_path *                                            \
-             : imm_path_deinit, struct imm_result *                            \
-             : imm_result_deinit)(x)
+             : imm_dp_del, struct imm_path *                                   \
+             : imm_path_del, struct imm_result *                               \
+             : imm_result_del)(x)
 
 #define imm_id(x) _Generic((x), struct imm_state * : imm_state_id)(x)
 

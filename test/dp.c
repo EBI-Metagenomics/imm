@@ -95,7 +95,7 @@ void test_dp_one_mute(void)
     EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     EQ(imm_path_nsteps(&result.path), 0);
 
-    imm_deinit(&result);
+    imm_del(&result);
     imm_del(task);
     imm_del(dp);
     imm_del(hmm);
@@ -138,7 +138,7 @@ void test_dp_two_mutes(void)
     EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     EQ(imm_path_nsteps(&result.path), 0);
 
-    imm_deinit(&result);
+    imm_del(&result);
     imm_del(dp);
     imm_del(task);
     imm_del(hmm);

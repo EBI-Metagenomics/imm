@@ -20,10 +20,10 @@ static inline struct imm_result imm_result(void)
     return (struct imm_result){NULL, imm_path(), IMM_LPROB_NAN, 0};
 }
 
-static inline void imm_result_deinit(struct imm_result *result)
+static inline void imm_result_del(struct imm_result *result)
 {
     result->seq = NULL;
-    imm_path_deinit(&result->path);
+    imm_path_del(&result->path);
     result->seconds = 0;
 }
 

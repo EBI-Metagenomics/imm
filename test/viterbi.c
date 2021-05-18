@@ -115,7 +115,7 @@ void test_viterbi_one_mute_state(void)
     VITERBI_CHECK(&EMPTY, IMM_SUCCESS, 1, imm_log(0.5));
     VITERBI_CHECK(&C, IMM_SUCCESS, 0, imm_lprob_nan());
 
-    imm_deinit(&result);
+    imm_del(&result);
     imm_del(dp);
     imm_del(task);
     imm_del(hmm);
@@ -157,7 +157,7 @@ void test_viterbi_two_mute_states(void)
           imm_log(0.5) + imm_log(0.1));
     CLOSE(result.loglik, imm_log(0.5) + imm_log(0.1));
 
-    imm_deinit(&result);
+    imm_del(&result);
     imm_del(hmm);
     imm_del(state0);
     imm_del(state1);
@@ -223,7 +223,7 @@ void test_viterbi_one_normal_state(void)
     VITERBI_CHECK(&AA, IMM_SUCCESS, 2, 2 * imm_log(0.25));
     VITERBI_CHECK(&ACT, IMM_SUCCESS, 0, imm_lprob_nan());
 
-    imm_deinit(&result);
+    imm_del(&result);
     imm_del(task);
     imm_del(dp);
     imm_del(hmm);
@@ -274,7 +274,7 @@ void test_viterbi_two_normal_states(void)
                   imm_log(0.1) + imm_log(0.25) + imm_log(0.3) +
                       3 * imm_log(0.5));
 
-    imm_deinit(&result);
+    imm_del(&result);
     imm_del(task);
     imm_del(dp);
     imm_del(hmm);
@@ -371,7 +371,7 @@ void test_viterbi_normal_states(void)
     VITERBI_CHECK(&A, IMM_SUCCESS, 1, imm_log(0.25));
     VITERBI_CHECK(&AA, IMM_SUCCESS, 2, 2 * imm_log(0.25) + imm_log(0.9));
 
-    imm_deinit(&result);
+    imm_del(&result);
     imm_del(task);
     imm_del(dp);
     imm_del(hmm);
@@ -449,7 +449,7 @@ void test_viterbi_profile1(void)
                   imm_log(0.5) + imm_log(0.4) + imm_log(0.1) + imm_log(0.2) +
                       2 * imm_log(0.5));
 
-    imm_deinit(&result);
+    imm_del(&result);
     imm_del(dp);
     imm_del(task);
     imm_del(hmm);
@@ -577,7 +577,7 @@ void test_viterbi_profile2(void)
                   imm_log(0.6) + imm_log(0.2) + 5 * imm_log(0.5) +
                       3 * imm_log(0.7) + 2 * imm_log(0.1) + imm_log(0.6));
 
-    imm_deinit(&result);
+    imm_del(&result);
     imm_del(task);
     imm_del(dp);
     imm_del(hmm);
@@ -633,7 +633,7 @@ void test_viterbi_profile_delete(void)
     DP_RESET(M, IMM_SUCCESS);
     VITERBI_CHECK(&A_ab, IMM_SUCCESS, 2, 2 * imm_log(0.5));
 
-    imm_deinit(&result);
+    imm_del(&result);
     imm_del(task);
     imm_del(dp);
     imm_del(hmm);
@@ -784,7 +784,7 @@ void test_viterbi_global_profile(void)
     VITERBI_CHECK(&AAB_z, IMM_SUCCESS, 5,
                   imm_log(0.01) + imm_log(0.9) + imm_log(0.5));
 
-    imm_deinit(&result);
+    imm_del(&result);
     imm_del(task);
     imm_del(dp);
     imm_del(hmm);
@@ -849,7 +849,7 @@ void test_viterbi_cycle_mute_ending(void)
     EQ(imm_path_nsteps(&result.path), 5);
     CLOSE(result.loglik, -11.5129254650);
 
-    imm_deinit(&result);
+    imm_del(&result);
     imm_del(task);
     imm_del(dp);
     imm_del(hmm);

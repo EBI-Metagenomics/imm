@@ -25,6 +25,6 @@ void test_large_normal(void)
     CLOSE(result.loglik, -65826.0106185297);
 
     imm_del(task);
-    imm_deinit(&result);
+    imm_del(&result);
     imm_del(dp);
 }

@@ -23,4 +23,4 @@ void imm_path_add(struct imm_path *path, struct imm_step step)
     imm_path_add_unsafe(path, step);
 }
 
-void imm_path_deinit(struct imm_path *path) { free(path->steps); }
+void imm_path_del(struct imm_path *path) { free(path->steps); }

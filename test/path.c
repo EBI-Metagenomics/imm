@@ -27,7 +27,7 @@ void test_path(void)
     EQ(imm_path_step(&path, 0)->seqlen, seqlens[0]);
     EQ(imm_path_step(&path, 1)->seqlen, seqlens[1]);
 
-    imm_deinit(&path);
+    imm_del(&path);
 }
 
 void test_path_long(void)
@@ -54,5 +54,5 @@ void test_path_long(void)
         EQ(imm_path_step(&path, i)->seqlen, i % 16);
     }
 
-    imm_deinit(&path);
+    imm_del(&path);
 }
