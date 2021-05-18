@@ -1,7 +1,6 @@
-#include "trans_table.h"
+#include "dp/trans_table.h"
 #include "args.h"
 #include "containers/stack.h"
-#include "imm/trans.h"
 #include "support.h"
 #include "trans.h"
 #include <limits.h>
@@ -27,10 +26,10 @@ void trans_table_init(struct trans_table *tbl)
 
 void trans_table_reset(struct trans_table *tbl, struct dp_args const *args)
 {
-    tbl->ntrans = args->ntransitions;
-    tbl->offset =
-        xrealloc(tbl->offset,
-                 sizeof(*tbl->offset) * trans_table_offset_size(args->nstates));
+    IMM_BUG(args->nstates == 0);
+    tbl->ntrans = args->ntrans;
+    tbl->offset = xrealloc(tbl->offset, sizeof(*tbl->offset) *
+                                            trans_table_offsize(args->nstates));
     tbl->offset[0] = 0;
 
     if (tbl->ntrans > 0)

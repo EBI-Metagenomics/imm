@@ -10,6 +10,7 @@
 #include "imm/compiler.h"
 #include "imm/dp.h"
 #include "imm/lprob.h"
+#include "imm/state.h"
 #include "imm/trans.h"
 #include "result.h"
 #include "support.h"
@@ -121,7 +122,7 @@ int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
     if (dp->code.abc != imm_seq_abc(task->seq))
         return error(IMM_ILLEGALARG, "dp and seq must have the same alphabet");
 
-    unsigned end_state = dp->state_table.end_state;
+    unsigned end_state = dp->state_table.end_state_idx;
     unsigned min = state_table_span(&dp->state_table, end_state).min;
     if (imm_seq_size(task->seq) < min)
         return error(IMM_ILLEGALARG,
@@ -235,7 +236,7 @@ static struct final_score final_score(struct imm_dp const *dp,
                                       struct imm_task *task)
 {
     imm_float score = imm_lprob_zero();
-    unsigned end_state = dp->state_table.end_state;
+    unsigned end_state = dp->state_table.end_state_idx;
 
     unsigned final_state = IMM_STATE_NULL_IDX;
     unsigned final_seq_len = IMM_STATE_NULL_SEQLEN;
@@ -270,11 +271,11 @@ static void viterbi(struct imm_dp const *dp, struct imm_task *task,
 {
     unsigned len = eseq_len(&task->eseq);
 
-    if (len >= 1 + STATE_TABLE_MAX_SEQ)
+    if (len >= 1 + IMM_STATE_MAX_SEQLEN)
     {
         viterbi_first_row_safe(dp, task);
-        _viterbi_safe(dp, task, 1, len - STATE_TABLE_MAX_SEQ);
-        _viterbi(dp, task, len - STATE_TABLE_MAX_SEQ + 1, len);
+        _viterbi_safe(dp, task, 1, len - IMM_STATE_MAX_SEQLEN);
+        _viterbi(dp, task, len - IMM_STATE_MAX_SEQLEN + 1, len);
     }
     else
     {

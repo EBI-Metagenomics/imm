@@ -22,11 +22,11 @@ find_package(containers REQUIRED)
 add_library(imm
     src/abc.c
     src/amino.c
+    src/bitmap.c
     src/cartes.c
     src/codon_marg.c
     src/codon_state.c
     src/dna.c
-    src/dp/bitarr.c
     src/dp/code.c
     src/dp/dp.c
     src/dp/emission.c

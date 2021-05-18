@@ -2,9 +2,7 @@
 #include "dp/code.h"
 #include "imm/abc.h"
 #include "imm/cartes.h"
-#include "imm/log.h"
 #include "imm/state.h"
-#include "io.h"
 #include "support.h"
 
 void emission_del(struct emission const *emission)
@@ -43,6 +41,7 @@ void emission_reset(struct emission *emiss, struct code const *code,
     char const *set = abc->symbols;
     unsigned set_size = abc->size;
     struct imm_cartes cartes;
+    /* TODO: consider to avoid initing this everytime */
     imm_cartes_init(&cartes, set, set_size, code->seqlen.max);
 
     for (unsigned i = 0; i < nstates; ++i)

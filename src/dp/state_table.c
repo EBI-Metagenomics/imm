@@ -1,16 +1,17 @@
 #include "dp/state_table.h"
 #include "dp/args.h"
-#include "imm/state_types.h"
+#include "imm/state.h"
+#include "imm/types.h"
 #include "support.h"
 #include <limits.h>
 
 void state_table_init(struct state_table *tbl)
 {
-    tbl->nstates = UINT_MAX;
+    tbl->nstates = IMM_NULL_NSTATES;
     tbl->ids = NULL;
     tbl->start.state = IMM_STATE_NULL_IDX;
     tbl->start.lprob = IMM_LPROB_NAN;
-    tbl->end_state = UINT_MAX;
+    tbl->end_state_idx = IMM_STATE_NULL_IDX;
     tbl->span = NULL;
 }
 
@@ -29,7 +30,7 @@ void state_table_reset(struct state_table *tbl, struct dp_args const *args)
 
     tbl->start.lprob = args->start.lprob;
     tbl->start.state = (imm_state_idx_t)args->start.state->idx;
-    tbl->end_state = args->end_state->idx;
+    tbl->end_state_idx = args->end_state->idx;
 }
 
 void state_table_del(struct state_table const *tbl)

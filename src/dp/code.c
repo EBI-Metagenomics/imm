@@ -1,12 +1,8 @@
 #include "dp/code.h"
-#include "dp/eseq.h"
-#include "imm/abc.h"
-#include "imm/log.h"
 #include "imm/seq.h"
-#include "io.h"
+#include "imm/types.h"
 #include "matrix/matrix.h"
 #include "support.h"
-#include <assert.h>
 #include <limits.h>
 
 static inline unsigned calc_size(struct code const *code)

@@ -2,7 +2,7 @@
 #define DP_STATE_TABLE_H
 
 #include "dp/span.h"
-#include "imm/state.h"
+#include "imm/state_types.h"
 
 struct dp_args;
 
@@ -15,11 +15,9 @@ struct state_table
         imm_state_idx_t state;
         imm_float lprob;
     } start;
-    unsigned end_state;
+    unsigned end_state_idx;
     struct span *span;
 };
-
-#define STATE_TABLE_MAX_SEQ 5
 
 void state_table_del(struct state_table const *tbl);
 

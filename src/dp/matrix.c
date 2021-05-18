@@ -1,8 +1,9 @@
 #include "dp/matrix.h"
 #include "dp/state_table.h"
+#include "imm/types.h"
 #include "support.h"
 
-#define MAX_LOOKUP 16
+#define MAX_LOOKUP (2 * IMM_STATE_MAX_SEQLEN)
 
 void matrix_init(struct matrix *matrix, struct state_table const *tbl)
 {

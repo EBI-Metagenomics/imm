@@ -16,7 +16,7 @@ struct trans_table
         imm_state_idx_t src; /**< Source state. */
     } * trans;
     imm_trans_idx_t *offset; /**< Maps (dest. state, local trans) to score
-                            and src. state indices. */
+                                  and src. state indices. */
 };
 
 unsigned trans_table_idx(struct trans_table *tbl, unsigned src_idx,
@@ -52,7 +52,7 @@ static inline unsigned trans_table_source_state(struct trans_table const *tbl,
     return tbl->trans[tbl->offset[dst] + trans].src;
 }
 
-static inline unsigned trans_table_offset_size(unsigned nstates)
+static inline unsigned trans_table_offsize(unsigned nstates)
 {
     return nstates + 1;
 }

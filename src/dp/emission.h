@@ -2,7 +2,6 @@
 #define DP_EMISSION_H
 
 #include "imm/float.h"
-#include <stdio.h>
 
 struct imm_state;
 struct code;

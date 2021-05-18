@@ -2,9 +2,7 @@
 #define DP_CODE_H
 
 #include <stdint.h>
-#include <stdio.h>
 
-struct eseq;
 struct imm_abc;
 struct imm_seq;
 

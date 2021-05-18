@@ -2,7 +2,7 @@
 #define DP_SPAN_H
 
 #include "imm/log.h"
-#include "imm/state_types.h"
+#include "imm/types.h"
 #include <assert.h>
 #include <stdint.h>
 

@@ -56,5 +56,5 @@ void path_del(struct path const *path)
 void path_setup(struct path *path, unsigned len)
 {
     size_t size = path->state_offset[path->nstates] * len;
-    path->bit = bitarr_realloc(path->bit, size);
+    path->bit = bitmap_realloc(path->bit, size);
 }

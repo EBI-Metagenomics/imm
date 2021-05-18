@@ -1,7 +1,7 @@
 #ifndef DP_PATH_H
 #define DP_PATH_H
 
-#include "dp/bitarr.h"
+#include "bitmap.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -88,7 +88,7 @@ static inline unsigned path_seqlen(struct path const *path, unsigned pos,
                                    unsigned state)
 {
     uint64_t start = start_bit(path, pos, state) + path->trans_bits[state];
-    return (unsigned)bitarr_get(path->bit, start,
+    return (unsigned)bitmap_get(path->bit, start,
                                 __path_seqlen_bits(path, pos, state));
 }
 
@@ -96,7 +96,7 @@ static inline unsigned path_trans(struct path const *path, unsigned pos,
                                   unsigned state)
 {
     uint64_t start = start_bit(path, pos, state);
-    return (unsigned)bitarr_get(path->bit, start, path->trans_bits[state]);
+    return (unsigned)bitmap_get(path->bit, start, path->trans_bits[state]);
 }
 
 static inline bool path_valid(struct path const *path, unsigned pos,
@@ -110,7 +110,7 @@ static inline void path_set_seqlen(struct path *path, unsigned pos,
                                    unsigned state, unsigned len)
 {
     uint64_t start = start_bit(path, pos, state) + path->trans_bits[state];
-    bitarr_set(path->bit, (unsigned long)len, start,
+    bitmap_set(path->bit, (unsigned long)len, start,
                __path_seqlen_bits(path, pos, state));
 }
 
@@ -118,7 +118,7 @@ static inline void path_set_trans(struct path *path, unsigned pos,
                                   unsigned state, unsigned trans)
 {
     uint64_t start = start_bit(path, pos, state);
-    bitarr_set(path->bit, (unsigned long)trans, start, path->trans_bits[state]);
+    bitmap_set(path->bit, (unsigned long)trans, start, path->trans_bits[state]);
 }
 
 static inline void path_invalidate(struct path *path, unsigned pos,

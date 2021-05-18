@@ -1,5 +1,6 @@
 #include "task.h"
 #include "dp/imm_dp.h"
+#include "imm/seq.h"
 #include "imm/task.h"
 
 struct imm_task *imm_task_new(struct imm_dp const *dp)

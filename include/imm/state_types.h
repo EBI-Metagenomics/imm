@@ -2,15 +2,8 @@
 #define IMM_STATE_TYPES_H
 
 #include "imm/float.h"
+#include "imm/types.h"
 #include <stdint.h>
-
-#define IMM_STATE_NULL_ID UINT16_MAX
-#define IMM_STATE_NULL_IDX UINT16_MAX
-#define IMM_STATE_NULL_SEQLEN UINT8_MAX
-
-typedef uint16_t imm_state_id_t;
-typedef uint16_t imm_state_idx_t;
-typedef uint8_t imm_state_seqlen_t;
 
 enum imm_state_typeid
 {
