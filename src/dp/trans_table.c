@@ -4,6 +4,7 @@
 #include "imm/trans.h"
 #include "support.h"
 #include "trans.h"
+#include <limits.h>
 
 unsigned trans_table_idx(struct trans_table *trans_tbl, unsigned src_idx,
                          unsigned dst_idx)
@@ -17,15 +18,23 @@ unsigned trans_table_idx(struct trans_table *trans_tbl, unsigned src_idx,
     return IMM_TRANS_NULL_IDX;
 }
 
-void trans_table_init(struct trans_table *tbl, struct dp_args const *args)
+void trans_table_init(struct trans_table *tbl)
+{
+    tbl->ntrans = UINT_MAX;
+    tbl->trans = NULL;
+    tbl->offset = NULL;
+}
+
+void trans_table_reset(struct trans_table *tbl, struct dp_args const *args)
 {
     tbl->ntrans = args->ntransitions;
     tbl->offset =
-        xmalloc(sizeof(*tbl->offset) * trans_table_offset_size(args->nstates));
+        xrealloc(tbl->offset,
+                 sizeof(*tbl->offset) * trans_table_offset_size(args->nstates));
     tbl->offset[0] = 0;
 
     if (tbl->ntrans > 0)
-        tbl->trans = xmalloc(sizeof(*tbl->trans) * tbl->ntrans);
+        tbl->trans = xrealloc(tbl->trans, sizeof(*tbl->trans) * tbl->ntrans);
     else
         tbl->trans = NULL;
 
@@ -44,7 +53,7 @@ void trans_table_init(struct trans_table *tbl, struct dp_args const *args)
     }
 }
 
-void trans_table_deinit(struct trans_table const *tbl)
+void trans_table_del(struct trans_table const *tbl)
 {
     free(tbl->trans);
     free(tbl->offset);

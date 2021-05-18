@@ -74,10 +74,13 @@ static inline uint64_t start_bit(struct path const *path, unsigned pos,
            path->state_offset[state];
 }
 
-void path_deinit(struct path const *path);
+void path_del(struct path const *path);
 
 void path_init(struct path *path, struct state_table const *state_tbl,
                struct trans_table const *trans_tbl);
+
+void path_reset(struct path *path, struct state_table const *state_tbl,
+                struct trans_table const *trans_tbl);
 
 void path_setup(struct path *path, unsigned len);
 

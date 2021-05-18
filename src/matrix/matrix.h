@@ -7,6 +7,7 @@
 #define MAKE_MATRIX(name, type)                                                \
     MAKE_MATRIX_STRUCT(name, type)                                             \
     MAKE_MATRIX_INIT(name, type)                                               \
+    MAKE_MATRIX_EMPTY(name, type)                                              \
     MAKE_MATRIX_GET(name, type)                                                \
     MAKE_MATRIX_GET_PTR(name, type)                                            \
     MAKE_MATRIX_GET_PTR_C(name, type)                                          \

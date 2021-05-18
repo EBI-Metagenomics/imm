@@ -13,7 +13,9 @@ struct eseq
     struct code const *code;
 };
 
-void eseq_deinit(struct eseq const *eseq);
+void eseq_del(struct eseq const *eseq);
+
+void eseq_reset(struct eseq *eseq, struct code const *code);
 
 static inline unsigned eseq_get(struct eseq const *eseq, unsigned pos,
                                 unsigned len)

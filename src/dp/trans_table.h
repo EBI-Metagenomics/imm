@@ -28,9 +28,11 @@ static inline void trans_table_change(struct trans_table *trans_tbl,
     trans_tbl->trans[trans_idx].score = score;
 }
 
-void trans_table_init(struct trans_table *tbl, struct dp_args const *args);
+void trans_table_init(struct trans_table *tbl);
 
-void trans_table_deinit(struct trans_table const *tbl);
+void trans_table_reset(struct trans_table *tbl, struct dp_args const *args);
+
+void trans_table_del(struct trans_table const *tbl);
 
 static inline unsigned trans_table_ntrans(struct trans_table const *tbl,
                                           unsigned dst)

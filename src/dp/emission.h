@@ -13,10 +13,9 @@ struct emission
     unsigned *offset; /**< Maps state to score array offset. */
 };
 
-void emission_deinit(struct emission const *emission);
+void emission_del(struct emission const *emission);
 
-void emission_init(struct emission *emission, struct code const *code,
-                   struct imm_state **states, unsigned nstates);
+void emission_init(struct emission *emission);
 
 void emission_reset(struct emission *emission, struct code const *code,
                     struct imm_state **states, unsigned nstates);

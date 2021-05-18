@@ -91,7 +91,7 @@ void test_hmm_frame_state_len1(void)
     EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     CLOSE(result.loglik, -6.0198640216);
 
-    dp = imm_hmm_reset_dp(hmm, imm_super(state), dp);
+    imm_hmm_reset_dp(hmm, imm_super(state), dp);
     imm_task_reset(task, dp);
     seq = imm_seq(IMM_STR("C"), abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
@@ -145,21 +145,21 @@ void test_hmm_frame_state_len2(void)
     EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     CLOSE(result.loglik, -8.910235779525845);
 
-    dp = imm_hmm_reset_dp(hmm, imm_super(state), dp);
+    imm_hmm_reset_dp(hmm, imm_super(state), dp);
     imm_task_reset(task, dp);
     seq = imm_seq(IMM_STR("TG"), abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
     EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     CLOSE(result.loglik, -3.2434246977896133);
 
-    dp = imm_hmm_reset_dp(hmm, imm_super(state), dp);
+    imm_hmm_reset_dp(hmm, imm_super(state), dp);
     imm_task_reset(task, dp);
     seq = imm_seq(IMM_STR("CC"), abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
     EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     CLOSE(result.loglik, -4.225022885864217);
 
-    dp = imm_hmm_reset_dp(hmm, imm_super(state), dp);
+    imm_hmm_reset_dp(hmm, imm_super(state), dp);
     imm_task_reset(task, dp);
     seq = imm_seq(IMM_STR("TT"), abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
@@ -203,7 +203,7 @@ void test_hmm_frame_state_len3(void)
     EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     CLOSE(result.loglik, -7.012344487235739);
 
-    dp = imm_hmm_reset_dp(hmm, imm_super(state), dp);
+    imm_hmm_reset_dp(hmm, imm_super(state), dp);
     imm_task_reset(task, dp);
     seq = imm_seq(IMM_STR("ATG"), abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
@@ -279,7 +279,7 @@ void test_hmm_frame_state_len5(void)
     EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     COND(imm_lprob_is_nan(result.loglik));
 
-    dp = imm_hmm_reset_dp(hmm, imm_super(state), dp);
+    imm_hmm_reset_dp(hmm, imm_super(state), dp);
     imm_task_reset(task, dp);
     seq = imm_seq(IMM_STR("ACTAG"), abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);

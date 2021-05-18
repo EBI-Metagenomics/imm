@@ -7,18 +7,16 @@
 #include "io.h"
 #include "support.h"
 
-void emission_deinit(struct emission const *emission)
+void emission_del(struct emission const *emission)
 {
     free(emission->score);
     free(emission->offset);
 }
 
-void emission_init(struct emission *emiss, struct code const *code,
-                   struct imm_state **states, unsigned nstates)
+void emission_init(struct emission *emiss)
 {
     emiss->score = NULL;
     emiss->offset = NULL;
-    emission_reset(emiss, code, states, nstates);
 }
 
 void emission_reset(struct emission *emiss, struct code const *code,

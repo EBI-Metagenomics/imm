@@ -3,17 +3,22 @@
 #include "imm/seq.h"
 #include "imm/subseq.h"
 
-void eseq_deinit(struct eseq const *eseq) { matrixu16_deinit(&eseq->data); }
+void eseq_del(struct eseq const *eseq) { matrixu16_deinit(&eseq->data); }
 
 void eseq_init(struct eseq *eseq, struct code const *code)
 {
+    matrixu16_empty(&eseq->data);
+    eseq_reset(eseq, code);
+}
+
+void eseq_reset(struct eseq *eseq, struct code const *code)
+{
     eseq->code = code;
-    matrixu16_init(&eseq->data, 1, code->seqlen.max - code->seqlen.min + 1);
 }
 
 void eseq_setup(struct eseq *eseq, struct imm_seq const *seq)
 {
-    unsigned ncols = matrixu16_ncols(&eseq->data);
+    unsigned ncols = eseq->code->seqlen.max - eseq->code->seqlen.min + 1;
     matrixu16_resize(&eseq->data, imm_seq_size(seq) + 1, ncols);
 
     for (unsigned i = 0; i <= imm_seq_size(seq); ++i)

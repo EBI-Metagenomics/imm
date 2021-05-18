@@ -14,12 +14,11 @@ struct matrix
     int16_t *state_col;
 };
 
-#define INVALID_STATE UINT16_MAX
-#define INVALID_SEQLEN UINT8_MAX
-
-void matrix_deinit(struct matrix const *matrix);
+void matrix_del(struct matrix const *matrix);
 
 void matrix_init(struct matrix *matrix, struct state_table const *tbl);
+
+void matrix_reset(struct matrix *matrix, struct state_table const *tbl);
 
 static inline imm_float matrix_get_score(struct matrix const *matrix,
                                          unsigned row, unsigned state,

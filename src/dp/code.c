@@ -5,7 +5,9 @@
 #include "imm/seq.h"
 #include "io.h"
 #include "matrix/matrix.h"
+#include "support.h"
 #include <assert.h>
+#include <limits.h>
 
 static inline unsigned calc_size(struct code const *code)
 {
@@ -15,7 +17,7 @@ static inline unsigned calc_size(struct code const *code)
                       ncombs);
 }
 
-void code_deinit(struct code const *code)
+void code_del(struct code const *code)
 {
     free(code->offset);
     free(code->stride);
@@ -34,18 +36,31 @@ unsigned code_encode(struct code const *code, struct imm_seq const *seq)
     return c;
 }
 
-void code_init(struct code *code, struct imm_abc const *abc, unsigned min_seq,
-               unsigned max_seq)
+void code_init(struct code *code, struct imm_abc const *abc)
 {
+    code->seqlen.min = IMM_STATE_NULL_SEQLEN;
+    code->seqlen.max = IMM_STATE_NULL_SEQLEN;
+    code->offset = NULL;
+    code->stride = NULL;
+    code->size = UINT_MAX;
+    code->abc = abc;
+}
+
+void code_reset(struct code *code, unsigned min_seq, unsigned max_seq)
+{
+    IMM_BUG(!code->abc);
+    if (code->seqlen.min == min_seq && code->seqlen.max == max_seq)
+        return;
+
     code->seqlen.min = min_seq;
     code->seqlen.max = max_seq;
-    code->abc = abc;
 
     if (max_seq == 0)
         code->stride = NULL;
     else
     {
-        code->stride = xmalloc(sizeof(*code->stride) * code_stride_size(code));
+        code->stride = xrealloc(code->stride,
+                                sizeof(*code->stride) * code_stride_size(code));
         code->stride[max_seq - 1] = 1;
     }
 
@@ -53,10 +68,11 @@ void code_init(struct code *code, struct imm_abc const *abc, unsigned min_seq,
     {
         for (unsigned len = max_seq - 2; 1 <= len + 1; --len)
             code->stride[len] =
-                (uint16_t)(code->stride[len + 1] * imm_abc_size(abc));
+                (uint16_t)(code->stride[len + 1] * imm_abc_size(code->abc));
     }
 
-    code->offset = xmalloc(sizeof(*code->offset) * code_offset_size(code));
+    code->offset =
+        xrealloc(code->offset, sizeof(*code->offset) * code_offset_size(code));
     code->offset[0] = 0;
     for (unsigned len = min_seq + 1; len <= max_seq; ++len)
     {
@@ -65,20 +81,5 @@ void code_init(struct code *code, struct imm_abc const *abc, unsigned min_seq,
         code->offset[i] = (uint16_t)(code->offset[i - 1] +
                                      code->stride[max_seq - (len - 1) - 1]);
     }
-
     code->size = calc_size(code);
-}
-
-void code_reset(struct code *code, struct imm_abc const *abc, unsigned min_seq,
-                unsigned max_seq)
-{
-    if (code->seqlen.min == min_seq && code->seqlen.max == max_seq)
-    {
-        if (code->abc == abc)
-            return;
-        code->size = calc_size(code);
-        return;
-    }
-    code_deinit(code);
-    code_init(code, abc, min_seq, max_seq);
 }

@@ -21,9 +21,11 @@ struct state_table
 
 #define STATE_TABLE_MAX_SEQ 5
 
-void state_table_deinit(struct state_table const *tbl);
+void state_table_del(struct state_table const *tbl);
 
-void state_table_init(struct state_table *tbl, struct dp_args const *args);
+void state_table_init(struct state_table *tbl);
+
+void state_table_reset(struct state_table *tbl, struct dp_args const *args);
 
 static inline struct span state_table_span(struct state_table const *tbl,
                                            unsigned state)

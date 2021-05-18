@@ -93,17 +93,29 @@ void imm_hmm_del(struct imm_hmm const *hmm) { free((void *)hmm); }
 struct imm_dp *imm_hmm_new_dp(struct imm_hmm const *hmm,
                               struct imm_state const *end_state)
 {
-    struct imm_dp *dp = NULL;
+    struct imm_dp *dp = imm_dp_new(hmm->abc);
+    if (imm_hmm_reset_dp(hmm, end_state, dp))
+    {
+        free(dp);
+        return NULL;
+    }
+    return dp;
+}
+
+int imm_hmm_reset_dp(struct imm_hmm const *hmm,
+                     struct imm_state const *end_state, struct imm_dp *dp)
+{
+    int status = IMM_SUCCESS;
     struct imm_state **states = xmalloc(sizeof(*states) * hmm->states.size);
 
     if (!hmm_state(hmm, end_state->id))
     {
-        error(IMM_ILLEGALARG, "end state not found");
+        status = error(IMM_ILLEGALARG, "end state not found");
         goto cleanup;
     }
     if (!has_start_state(hmm))
     {
-        error(IMM_ILLEGALARG, "start state not found");
+        status = error(IMM_ILLEGALARG, "start state not found");
         goto cleanup;
     }
 
@@ -116,7 +128,7 @@ struct imm_dp *imm_hmm_new_dp(struct imm_hmm const *hmm,
     unsigned start_idx = hmm_state(hmm, hmm->start.state_id)->idx;
     if (tsort(hmm->states.size, states, start_idx))
     {
-        error(IMM_RUNTIMEERROR, "failed to sort states");
+        status = error(IMM_RUNTIMEERROR, "failed to sort states");
         goto cleanup;
     }
     set_state_indices(hmm, states);
@@ -126,19 +138,11 @@ struct imm_dp *imm_hmm_new_dp(struct imm_hmm const *hmm,
                  hmm_state(hmm, hmm->start.state_id), hmm->start.lprob,
                  end_state);
 
-    dp = dp_new(&args);
+    dp_reset(dp, &args);
 
 cleanup:
     free(states);
-    return dp;
-}
-
-struct imm_dp *imm_hmm_reset_dp(struct imm_hmm const *hmm,
-                                struct imm_state const *end_state,
-                                struct imm_dp *dp)
-{
-    imm_dp_del(dp);
-    return imm_hmm_new_dp(hmm, end_state);
+    return status;
 }
 
 imm_float imm_hmm_start_lprob(struct imm_hmm const *hmm)

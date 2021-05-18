@@ -21,20 +21,18 @@ struct code
     struct imm_abc const *abc;
 };
 
-void code_deinit(struct code const *code);
+void code_del(struct code const *code);
 
 unsigned code_encode(struct code const *code, struct imm_seq const *seq);
 
-void code_init(struct code *code, struct imm_abc const *abc, unsigned min_seq,
-               unsigned max_seq);
+void code_init(struct code *code, struct imm_abc const *abc);
 
 static inline unsigned code_offset(struct code const *code, unsigned min_seq)
 {
     return (unsigned)(code->offset[min_seq - code->seqlen.min]);
 }
 
-void code_reset(struct code *code, struct imm_abc const *abc, unsigned min_seq,
-                unsigned max_seq);
+void code_reset(struct code *code, unsigned min_seq, unsigned max_seq);
 
 static inline unsigned code_size(struct code const *code, unsigned min_seq)
 {

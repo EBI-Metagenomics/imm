@@ -6,10 +6,20 @@
 void path_init(struct path *path, struct state_table const *state_tbl,
                struct trans_table const *trans_tbl)
 {
+    path->state_offset = NULL;
+    path->trans_bits = NULL;
+    path_reset(path, state_tbl, trans_tbl);
+    path->bit = NULL;
+}
+
+void path_reset(struct path *path, struct state_table const *state_tbl,
+                struct trans_table const *trans_tbl)
+{
     path->nstates = state_tbl->nstates;
-    path->state_offset =
-        xmalloc(sizeof(*path->state_offset) * (path->nstates + 1));
-    path->trans_bits = xmalloc(sizeof(*path->trans_bits) * path->nstates);
+    path->state_offset = xrealloc(
+        path->state_offset, sizeof(*path->state_offset) * (path->nstates + 1));
+    path->trans_bits =
+        xrealloc(path->trans_bits, sizeof(*path->trans_bits) * path->nstates);
     path->state_offset[0] = 0;
 
     for (unsigned dst = 0; dst < path->nstates; ++dst)
@@ -33,10 +43,9 @@ void path_init(struct path *path, struct state_table const *state_tbl,
             (uint16_t)(path->state_offset[dst + 1] +
                        bits_width((uint32_t)((unsigned)depth + 1)));
     }
-    path->bit = NULL;
 }
 
-void path_deinit(struct path const *path)
+void path_del(struct path const *path)
 {
     free(path->state_offset);
     free(path->trans_bits);

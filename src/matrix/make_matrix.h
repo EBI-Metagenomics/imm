@@ -20,6 +20,14 @@
         matrix->cols = cols;                                                   \
     }
 
+#define MAKE_MATRIX_EMPTY(NAME, T)                                             \
+    static inline void NAME##_empty(struct NAME *matrix)                       \
+    {                                                                          \
+        matrix->data = NULL;                                                   \
+        matrix->rows = 0;                                                      \
+        matrix->cols = 0;                                                      \
+    }
+
 #define MAKE_MATRIX_GET(NAME, T)                                               \
     static inline T NAME##_get(struct NAME const *matrix, unsigned r,          \
                                unsigned c)                                     \
