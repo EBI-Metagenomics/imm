@@ -7,12 +7,12 @@ int main(void)
 
     imm_abc_init(&abc_out, IMM_STR("ACGT"), '*');
     FILE *file = fopen(TMPDIR "/abc.imm", "wb");
-    imm_abc_write(&abc_out, file);
+    EQ(imm_abc_write(&abc_out, file), IMM_SUCCESS);
     fclose(file);
 
     struct imm_abc abc_in = imm_abc_empty;
     file = fopen(TMPDIR "/abc.imm", "rb");
-    imm_abc_read(&abc_in, file);
+    EQ(imm_abc_read(&abc_in, file), IMM_SUCCESS);
     fclose(file);
 
     EQ(abc_in.any_symbol_id, abc_out.any_symbol_id);
