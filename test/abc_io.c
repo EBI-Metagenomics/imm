@@ -18,7 +18,7 @@ int main(void)
     EQ(abc_in.any_symbol_id, abc_out.any_symbol_id);
     EQ(abc_in.size, abc_out.size);
     EQ(abc_in.vtable.typeid, abc_out.vtable.typeid);
-    /* EQ(abc_in.symbols, abc_out.symbols); */
+    EQ(abc_in.symbols, abc_out.symbols);
 
     return hope_status();
 }
