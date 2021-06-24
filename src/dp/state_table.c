@@ -1,7 +1,7 @@
 #include "dp/state_table.h"
 #include "dp/dp.h"
 #include "imm/state.h"
-#include "imm/types.h"
+#include "imm/state_types.h"
 #include "support.h"
 #include <limits.h>
 

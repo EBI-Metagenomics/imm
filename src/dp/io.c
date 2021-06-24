@@ -2,7 +2,6 @@
 #include "cmp.h"
 #include "dp/imm_dp.h"
 #include "imm/dp.h"
-#include "imm/types.h"
 #include "support.h"
 
 #define write_imm_float(ctx, v)                                                \

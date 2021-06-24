@@ -2,7 +2,6 @@
 #define IMM_STATE_TYPES_H
 
 #include "imm/float.h"
-#include "imm/types.h"
 #include <stdint.h>
 
 typedef uint16_t imm_nstates_t;

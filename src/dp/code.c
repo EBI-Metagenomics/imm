@@ -1,6 +1,6 @@
 #include "dp/code.h"
 #include "imm/seq.h"
-#include "imm/types.h"
+#include "imm/state_types.h"
 #include "matrix/matrix.h"
 #include "support.h"
 #include <limits.h>
