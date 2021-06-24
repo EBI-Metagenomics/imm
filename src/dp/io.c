@@ -23,7 +23,7 @@ int imm_dp_write(struct imm_dp const *dp, FILE *file)
     unsigned nstates = dp->state_table.nstates;
 
     cmp_ctx_t ctx = {0};
-    cmp_init(&ctx, file, file_reader, file_skipper, file_writer);
+    io_init(&ctx, file);
 
     /* code */
     cmp_write_u8(&ctx, (uint8_t)dp->code.seqlen.min);
@@ -97,7 +97,7 @@ int imm_dp_read(struct imm_dp *dp, FILE *file)
     uint32_t u32 = 0;
     uint32_t size = 0;
     cmp_ctx_t ctx = {0};
-    cmp_init(&ctx, file, file_reader, file_skipper, file_writer);
+    io_init(&ctx, file);
 
     /* code */
     struct code *code = &dp->code;

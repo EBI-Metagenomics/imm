@@ -2,14 +2,14 @@
 #define IMM_ABC_H
 
 #include "imm/abc_types.h"
-#include "imm/compiler.h"
 #include "imm/export.h"
 #include "imm/log.h"
 #include "imm/str.h"
+#include "imm/support.h"
 #include "imm/sym.h"
 #include <stdio.h>
 
-#define IMM_MAX_SYMBOLS_SIZE (31U)
+#define IMM_ABC_MAX_SIZE (31U)
 
 /**
  * Alphabet.
@@ -20,7 +20,7 @@
 struct imm_abc
 {
     unsigned size;
-    char symbols[IMM_MAX_SYMBOLS_SIZE + 1];
+    char symbols[IMM_ABC_MAX_SIZE + 1];
     struct imm_sym sym;
     unsigned any_symbol_id;
     struct imm_abc_vtable vtable;

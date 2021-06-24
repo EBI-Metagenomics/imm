@@ -2,10 +2,10 @@
 #define IMM_SEQ_H
 
 #include "imm/abc.h"
-#include "imm/compiler.h"
 #include "imm/export.h"
 #include "imm/log.h"
 #include "imm/str.h"
+#include "imm/support.h"
 
 struct imm_seq
 {

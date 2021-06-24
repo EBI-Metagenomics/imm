@@ -41,7 +41,7 @@ int abc_init(struct imm_abc *abc, unsigned len, char const *symbols,
     if (len == 0)
         return error(IMM_ILLEGALARG, "alphabet cannot be empty");
 
-    if (len > IMM_MAX_SYMBOLS_SIZE || len > IMM_SYM_SIZE)
+    if (len > IMM_ABC_MAX_SIZE || len > IMM_SYM_SIZE)
         return error(IMM_ILLEGALARG, "symbols length is too large");
 
     abc->size = len;
@@ -85,7 +85,7 @@ static_assert(sizeof(imm_abc_typeid_t) == sizeof(uint8_t), "wrong types");
 int abc_write(struct imm_abc const *abc, FILE *file)
 {
     cmp_ctx_t cmp = {0};
-    cmp_init(&cmp, file, file_reader, file_skipper, file_writer);
+    io_init(&cmp, file);
 
     ERETURN(cmp_write_str(&cmp, abc->symbols, abc->size));
     ERETURN(cmp_write_array(&cmp, IMM_ARRAY_SIZE(abc->sym.idx)));
@@ -102,7 +102,7 @@ int abc_write(struct imm_abc const *abc, FILE *file)
 int abc_read(struct imm_abc *abc, FILE *file)
 {
     cmp_ctx_t cmp = {0};
-    cmp_init(&cmp, file, file_reader, file_skipper, file_writer);
+    io_init(&cmp, file);
 
     uint32_t u32 = IMM_ARRAY_SIZE(abc->symbols) - 1;
     ERETURN(cmp_read_str(&cmp, abc->symbols, &u32));

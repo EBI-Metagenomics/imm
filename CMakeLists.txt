@@ -3,6 +3,7 @@ project(imm VERSION 0.0.10 LANGUAGES C)
 
 # Generate compile_commands.json file
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+message(STATUS "COMPILER ID ${CMAKE_C_COMPILER_ID}")
 
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # Set RPATH only if it's not a system directory
@@ -11,7 +12,7 @@ if("${isSystemDir}" STREQUAL "-1")
     set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 endif()
 
-# Hide things by default
+# Hide functions by default.
 set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
 
@@ -53,7 +54,7 @@ add_library(imm
 )
 add_library(IMM::imm ALIAS imm)
 
-# Write out mytools_export.h to the current binary directory
+# Write out imm/export.h to the current binary directory
 # Must include ${CMAKE_CURRENT_BINARY_DIR} in the target's
 # search path.
 include(GenerateExportHeader)
@@ -62,16 +63,18 @@ generate_export_header(imm BASE_NAME IMM
     EXPORT_MACRO_NAME IMM_API
     EXPORT_FILE_NAME ${CMAKE_CURRENT_BINARY_DIR}/imm/export.h)
 
-if(${CMAKE_C_COMPILER_ID} MATCHES "MSVC")
-    list(APPEND WARNING_FLAGS /W3)
+if(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+    # /wd5105: https://docs.microsoft.com/en-us/cpp/error-messages/compiler-warnings/c5105?view=msvc-160
+    set(WARNING_FLAGS /W3 /wd5105)
 else()
-    list(APPEND WARNING_FLAGS -Wall -Wextra -Wno-pedantic -Wstrict-prototypes -Wshadow
+    set(WARNING_FLAGS -Wall -Wextra -pedantic -Wstrict-prototypes -Wshadow
         -Wconversion -Wmissing-prototypes -Wno-unused-parameter -Wsign-conversion
-        -Wno-unused-function
+        -Wno-unused-function # TODO: added only to please clangd for now
+        -Wno-empty-translation-unit # TODO: added only to please clangd for now
     )
 endif()
 
-if(NOT ${CMAKE_C_COMPILER_ID} MATCHES "GNU")
+if(NOT CMAKE_C_COMPILER_ID STREQUAL "GNU")
     list(APPEND WARNING_FLAGS
         -Wno-gnu-designator
         -Wno-empty-translation-unit

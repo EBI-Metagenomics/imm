@@ -7,7 +7,7 @@
 
 void state_table_init(struct state_table *tbl)
 {
-    tbl->nstates = IMM_NULL_NSTATES;
+    tbl->nstates = IMM_NSTATES_NULL;
     tbl->ids = NULL;
     tbl->start.state = IMM_STATE_NULL_IDX;
     tbl->start.lprob = IMM_LPROB_NAN;

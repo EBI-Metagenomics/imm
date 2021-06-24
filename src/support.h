@@ -1,8 +1,8 @@
 #ifndef SUPPORT_H
 #define SUPPORT_H
 
-#include "imm/compiler.h"
 #include "imm/log.h"
+#include "imm/support.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>

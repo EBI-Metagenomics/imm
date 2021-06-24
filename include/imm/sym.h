@@ -1,7 +1,6 @@
 #ifndef IMM_SYM_H
 #define IMM_SYM_H
 
-#include "imm/compiler.h"
 #include "imm/export.h"
 #include "imm/support.h"
 #include <stdbool.h>

@@ -1,0 +1,51 @@
+IMM file chunks
+===============
+
+ ABC
+|--------------------------------|
+| symbols      : mp-string       |
+| sym_idx      : mp-array[mp-u8] |
+| any_symbol_id: mp-u8           |
+| typeid       : mp-u8           |
+|--------------------------------|
+
+ DP.code
+|------------------------------|
+| seqlen.min: mp-u8            |
+| seqlen.max: mp-u8            |
+| offset    : mp-array[mp-u16] |
+| stride    : mp-array[mp-u16] |
+| size      : mp-u16           |
+|------------------------------|
+
+ DP.emission
+|----------------------------|
+| score : mp-array[mp-float] |
+| offset: mp-array[mp-u32]   |
+|----------------------------|
+
+ DP.trans_table
+|---------------------------------|
+| ntrans     : mp-u16             |
+| trans.score: mp-array[mp-float] |
+| trans.src  : mp-array[mp-u16]   |
+| offset     : mp-array[mp-u16]   |
+|---------------------------------|
+
+ DP.state_table
+|---------------------------------|
+| nstates      : mp-u16           |
+| ids          : mp-array[mp-u16] |
+| start.state  : mp-u16           |
+| start.lprob  : mp-float         |
+| end_state_idx: mp-u16           |
+| span         : mp-array[mp-u16] |
+|---------------------------------|
+
+ DP
+|-----------------------------|
+| code       : DP.code        |
+| emission   : DP.emission    |
+| trans_table: DP.trans_table |
+| state_table: DP.state_table |
+|-----------------------------|

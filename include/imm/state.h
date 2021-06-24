@@ -3,7 +3,6 @@
 
 #include "containers/hash.h"
 #include "containers/stack.h"
-#include "imm/compiler.h"
 #include "imm/export.h"
 #include "imm/float.h"
 #include "imm/log.h"
@@ -11,6 +10,7 @@
 #include "imm/seq.h"
 #include "imm/span.h"
 #include "imm/state_types.h"
+#include "imm/support.h"
 
 struct imm_state
 {
