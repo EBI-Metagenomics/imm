@@ -44,7 +44,7 @@ static void init_transitions_table(struct imm_hmm *hmm)
 static void add_transition(struct imm_hmm *hmm, struct imm_state *src,
                            struct imm_state *dst, imm_float lprob)
 {
-    IMM_BUG(hmm->transitions.size >= ARRAY_SIZE(hmm->transitions.data));
+    IMM_BUG(hmm->transitions.size >= IMM_ARRAY_SIZE(hmm->transitions.data));
     struct trans *trans = hmm->transitions.data + hmm->transitions.size++;
     trans_init(trans, src->id, dst->id, lprob);
     hash_add(hmm->transitions.tbl, &trans->hnode, trans->pair.id.key);

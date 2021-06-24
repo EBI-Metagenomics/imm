@@ -3,6 +3,7 @@
 
 #include "cmp.h"
 #include "support.h"
+#include <limits.h>
 
 static bool __file_reader(cmp_ctx_t *ctx, void *data, size_t limit)
 {
