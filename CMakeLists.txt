@@ -75,7 +75,7 @@ else()
 endif()
 
 if(CMAKE_C_COMPILER_ID MATCHES "(Apple)?Clang")
-    set(WARNING_FLAGS -Wno-empty-translation-unit)
+    set(WARNING_FLAGS ${WARNING_FLAGS} -Wno-empty-translation-unit)
 endif()
 
 if(NOT CMAKE_C_COMPILER_ID STREQUAL "GNU")
