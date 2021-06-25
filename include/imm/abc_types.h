@@ -1,6 +1,7 @@
 #ifndef IMM_ABC_TYPES_H
 #define IMM_ABC_TYPES_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 enum imm_abc_typeid
@@ -12,6 +13,11 @@ enum imm_abc_typeid
     IMM_DNA = 4,
     IMM_RNA = 5,
 };
+
+static inline bool imm_abc_typeid_valid(unsigned typeid)
+{
+    return typeid > IMM_NULL_ABC && typeid <= IMM_RNA;
+}
 
 typedef uint8_t imm_abc_typeid_t;
 

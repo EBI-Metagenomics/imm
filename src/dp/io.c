@@ -89,8 +89,19 @@ int imm_dp_write(struct imm_dp const *dp, FILE *file)
     return IMM_SUCCESS;
 }
 
+#define ERETURN(expr, e)                                                       \
+    do                                                                         \
+    {                                                                          \
+        if (!!(expr))                                                          \
+        {                                                                      \
+            err = e;                                                           \
+            goto cleanup;                                                      \
+        }                                                                      \
+    } while (0)
+
 int imm_dp_read(struct imm_dp *dp, FILE *file)
 {
+    int err = IMM_SUCCESS;
     uint8_t u8 = 0;
     uint16_t u16 = 0;
     uint32_t u32 = 0;
@@ -98,94 +109,119 @@ int imm_dp_read(struct imm_dp *dp, FILE *file)
     cmp_ctx_t ctx = {0};
     io_init(&ctx, file);
 
+    struct emission *e = NULL;
+    struct trans_table *tt = NULL;
+    struct state_table *st = NULL;
+
     /* code */
     struct code *code = &dp->code;
-    cmp_read_u8(&ctx, &u8);
+    ERETURN(!cmp_read_u8(&ctx, &u8), IMM_IOERROR);
     code->seqlen.min = u8;
-    cmp_read_u8(&ctx, &u8);
+    ERETURN(!cmp_read_u8(&ctx, &u8), IMM_IOERROR);
     code->seqlen.max = u8;
+    ERETURN(code->seqlen.min > code->seqlen.min, IMM_PARSEERROR);
+    ERETURN(code->seqlen.max > IMM_STATE_MAX_SEQLEN, IMM_PARSEERROR);
 
-    cmp_read_array(&ctx, &size);
-    IMM_BUG(size > UINT16_MAX);
-    code->offset = xrealloc(code->offset, sizeof(*code->offset) * size);
+    ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
+    ERETURN(size > UINT16_MAX, IMM_PARSEERROR);
+    code->offset = reallocf(code->offset, sizeof(*code->offset) * size);
+    ERETURN(!code->offset, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
-        cmp_read_u16(&ctx, code->offset + i);
+        ERETURN(!cmp_read_u16(&ctx, code->offset + i), IMM_IOERROR);
 
-    cmp_read_array(&ctx, &size);
-    IMM_BUG(size > UINT16_MAX);
-    code->stride = xrealloc(code->stride, sizeof(*code->stride) * size);
+    ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
+    ERETURN(size > UINT16_MAX, IMM_PARSEERROR);
+    code->stride = reallocf(code->stride, sizeof(*code->stride) * size);
+    ERETURN(!code->stride, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
-        cmp_read_u16(&ctx, code->stride + i);
+        ERETURN(!cmp_read_u16(&ctx, code->stride + i), IMM_IOERROR);
 
-    cmp_read_u16(&ctx, &u16);
+    ERETURN(!cmp_read_u16(&ctx, &u16), IMM_IOERROR);
     code->size = u16;
 
     /* emission */
-    struct emission *e = &dp->emission;
-    cmp_read_array(&ctx, &size);
-    e->score = xrealloc(e->score, sizeof(*e->score) * size);
+    e = &dp->emission;
+    ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
+    e->score = reallocf(e->score, sizeof(*e->score) * size);
+    ERETURN(!e->score, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
-        read_imm_float(&ctx, e->score + i);
+        ERETURN(!read_imm_float(&ctx, e->score + i), IMM_IOERROR);
 
-    cmp_read_array(&ctx, &size);
-    e->offset = xrealloc(e->offset, sizeof(*e->offset) * size);
+    ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
+    e->offset = reallocf(e->offset, sizeof(*e->offset) * size);
+    ERETURN(!e->offset, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
     {
-        cmp_read_u32(&ctx, &u32);
+        ERETURN(!cmp_read_u32(&ctx, &u32), IMM_IOERROR);
         e->offset[i] = u32;
     }
 
     /* trans_table */
-    struct trans_table *tt = &dp->trans_table;
-    cmp_read_u16(&ctx, &u16);
+    tt = &dp->trans_table;
+    ERETURN(!cmp_read_u16(&ctx, &u16), IMM_IOERROR);
     tt->ntrans = u16;
 
-    cmp_read_array(&ctx, &size);
-    IMM_BUG(tt->ntrans != size);
-    tt->trans = xrealloc(tt->trans, sizeof(*tt->trans) * size);
+    ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
+    ERETURN(tt->ntrans != size, IMM_PARSEERROR);
+    tt->trans = reallocf(tt->trans, sizeof(*tt->trans) * size);
+    ERETURN(!tt->trans, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
-        read_imm_float(&ctx, &tt->trans[i].score);
+        ERETURN(!read_imm_float(&ctx, &tt->trans[i].score), IMM_IOERROR);
 
-    cmp_read_array(&ctx, &size);
-    IMM_BUG(tt->ntrans != size);
+    ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
+    ERETURN(tt->ntrans != size, IMM_PARSEERROR);
     for (unsigned i = 0; i < size; ++i)
     {
-        cmp_read_u16(&ctx, &u16);
+        ERETURN(!cmp_read_u16(&ctx, &u16), IMM_IOERROR);
         tt->trans[i].src = u16;
     }
 
-    cmp_read_array(&ctx, &size);
-    tt->offset = xrealloc(tt->offset, sizeof(*tt->offset) * size);
+    ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
+    tt->offset = reallocf(tt->offset, sizeof(*tt->offset) * size);
+    ERETURN(!tt->offset, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
     {
-        cmp_read_u16(&ctx, &u16);
+        ERETURN(!cmp_read_u16(&ctx, &u16), IMM_IOERROR);
         tt->offset[i] = u16;
     }
 
     /* state_table */
-    struct state_table *st = &dp->state_table;
-    cmp_read_u16(&ctx, &u16);
+    st = &dp->state_table;
+    ERETURN(!cmp_read_u16(&ctx, &u16), IMM_IOERROR);
     st->nstates = u16;
 
-    cmp_read_array(&ctx, &size);
-    IMM_BUG(st->nstates != size);
-    st->ids = xrealloc(st->ids, sizeof(*st->ids) * size);
+    ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
+    ERETURN(st->nstates != size, IMM_PARSEERROR);
+    st->ids = reallocf(st->ids, sizeof(*st->ids) * size);
+    ERETURN(!st->ids, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
-        cmp_read_u16(&ctx, st->ids + i);
+        ERETURN(!cmp_read_u16(&ctx, st->ids + i), IMM_IOERROR);
 
-    cmp_read_u16(&ctx, &st->start.state);
-    read_imm_float(&ctx, &st->start.lprob);
-    cmp_read_u16(&ctx, &u16);
+    ERETURN(!cmp_read_u16(&ctx, &st->start.state), IMM_IOERROR);
+    ERETURN(!read_imm_float(&ctx, &st->start.lprob), IMM_IOERROR);
+    ERETURN(!cmp_read_u16(&ctx, &u16), IMM_IOERROR);
     st->end_state_idx = u16;
 
-    cmp_read_array(&ctx, &size);
-    IMM_BUG(st->nstates != size);
-    st->span = xrealloc(st->span, sizeof(*st->span) * size);
+    ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
+    ERETURN(st->nstates != size, IMM_PARSEERROR);
+    st->span = reallocf(st->span, sizeof(*st->span) * size);
+    ERETURN(!st->span, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
     {
-        cmp_read_u16(&ctx, &u16);
+        ERETURN(!cmp_read_u16(&ctx, &u16), IMM_IOERROR);
         span_unzip(st->span + i, u16);
     }
 
-    return IMM_SUCCESS;
+    return err;
+
+cleanup:
+    free(code->offset);
+    free(code->stride);
+    free(e->score);
+    free(e->offset);
+    free(tt->trans);
+    free(tt->offset);
+    free(st->ids);
+    free(st->span);
+    return err;
 }

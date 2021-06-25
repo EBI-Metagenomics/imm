@@ -14,3 +14,4 @@ function(imm_add_fuzz name srcs)
 endfunction()
 
 imm_add_fuzz(abc_fuzz abc_fuzz.c)
+imm_add_fuzz(dp_fuzz dp_fuzz.c)

@@ -1,0 +1,17 @@
+#include "imm/imm.h"
+#include <stdio.h>
+
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size);
+
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+{
+    FILE *file = fmemopen((void *)data, size, "r");
+    if (!file)
+        return 0;
+    struct imm_abc abc = imm_abc_empty;
+    struct imm_dp *dp = imm_dp_new(&abc);
+    if (!imm_dp_read(dp, file))
+        imm_del(dp);
+    fclose(file);
+    return 0;
+}

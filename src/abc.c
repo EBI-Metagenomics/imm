@@ -24,12 +24,18 @@ int imm_abc_init(struct imm_abc *abc, struct imm_str symbols, char any_symbol)
 
 int imm_abc_write(struct imm_abc const *abc, FILE *file)
 {
-    return abc_write(abc, file);
+    int err = abc_write(abc, file);
+    if (err)
+        return error((enum imm_code)err, "failed to write alphabet");
+    return err;
 }
 
 int imm_abc_read(struct imm_abc *abc, FILE *file)
 {
-    return abc_read(abc, file);
+    int err = abc_read(abc, file);
+    if (err)
+        return error((enum imm_code)err, "failed to read alphabet");
+    return err;
 }
 
 int abc_init(struct imm_abc *abc, unsigned len, char const *symbols,
@@ -75,11 +81,11 @@ static_assert(sizeof(imm_sym_id_t) == sizeof(uint8_t), "wrong types");
 static_assert(sizeof(imm_sym_idx_t) == sizeof(uint8_t), "wrong types");
 static_assert(sizeof(imm_abc_typeid_t) == sizeof(uint8_t), "wrong types");
 
-#define ERETURN(expr)                                                          \
+#define ERETURN(expr, e)                                                       \
     do                                                                         \
     {                                                                          \
-        if (!(expr))                                                           \
-            return IMM_IOERROR;                                                \
+        if (!!(expr))                                                          \
+            return e;                                                          \
     } while (0)
 
 int abc_write(struct imm_abc const *abc, FILE *file)
@@ -87,14 +93,14 @@ int abc_write(struct imm_abc const *abc, FILE *file)
     cmp_ctx_t cmp = {0};
     io_init(&cmp, file);
 
-    ERETURN(cmp_write_str(&cmp, abc->symbols, abc->size));
-    ERETURN(cmp_write_array(&cmp, IMM_ARRAY_SIZE(abc->sym.idx)));
+    ERETURN(!cmp_write_str(&cmp, abc->symbols, abc->size), IMM_IOERROR);
+    ERETURN(!cmp_write_array(&cmp, IMM_ARRAY_SIZE(abc->sym.idx)), IMM_IOERROR);
 
     for (unsigned i = 0; i < IMM_ARRAY_SIZE(abc->sym.idx); ++i)
-        ERETURN(cmp_write_u8(&cmp, abc->sym.idx[i]));
+        ERETURN(!cmp_write_u8(&cmp, abc->sym.idx[i]), IMM_IOERROR);
 
-    ERETURN(cmp_write_u8(&cmp, (uint8_t)abc->any_symbol_id));
-    ERETURN(cmp_write_u8(&cmp, (uint8_t)abc->vtable.typeid));
+    ERETURN(!cmp_write_u8(&cmp, (uint8_t)abc->any_symbol_id), IMM_IOERROR);
+    ERETURN(!cmp_write_u8(&cmp, (uint8_t)abc->vtable.typeid), IMM_IOERROR);
 
     return IMM_SUCCESS;
 }
@@ -105,20 +111,21 @@ int abc_read(struct imm_abc *abc, FILE *file)
     io_init(&cmp, file);
 
     uint32_t u32 = IMM_ARRAY_SIZE(abc->symbols) - 1;
-    ERETURN(cmp_read_str(&cmp, abc->symbols, &u32));
+    ERETURN(!cmp_read_str(&cmp, abc->symbols, &u32), IMM_IOERROR);
     abc->size = u32;
     abc->symbols[abc->size] = '\0';
 
-    ERETURN(cmp_read_array(&cmp, &u32));
-    ERETURN(IMM_ARRAY_SIZE(abc->sym.idx) == u32);
+    ERETURN(!cmp_read_array(&cmp, &u32), IMM_IOERROR);
+    ERETURN(IMM_ARRAY_SIZE(abc->sym.idx) != u32, IMM_PARSEERROR);
     for (unsigned i = 0; i < IMM_ARRAY_SIZE(abc->sym.idx); ++i)
-        ERETURN(cmp_read_u8(&cmp, abc->sym.idx + i));
+        ERETURN(!cmp_read_u8(&cmp, abc->sym.idx + i), IMM_IOERROR);
 
     uint8_t u8 = 0;
-    ERETURN(cmp_read_u8(&cmp, &u8));
+    ERETURN(!cmp_read_u8(&cmp, &u8), IMM_IOERROR);
     abc->any_symbol_id = u8;
 
-    cmp_read_u8(&cmp, &u8);
+    ERETURN(!cmp_read_u8(&cmp, &u8), IMM_IOERROR);
+    ERETURN(!imm_abc_typeid_valid(u8), IMM_PARSEERROR);
     abc->vtable.typeid = u8;
     return IMM_SUCCESS;
 }
