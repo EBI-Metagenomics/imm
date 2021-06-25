@@ -67,11 +67,15 @@ if(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
     # /wd5105: https://docs.microsoft.com/en-us/cpp/error-messages/compiler-warnings/c5105?view=msvc-160
     set(WARNING_FLAGS /W3 /wd5105)
 else()
-    set(WARNING_FLAGS -Wall -Wextra -pedantic -Wstrict-prototypes -Wshadow
-        -Wconversion -Wmissing-prototypes -Wno-unused-parameter -Wsign-conversion
-        -Wno-unused-function # TODO: added only to please clangd for now
-        -Wno-empty-translation-unit # TODO: added only to please clangd for now
+    set(WARNING_FLAGS -Wall -Wextra -Wstrict-prototypes -Wshadow
+        -Wconversion -Wmissing-prototypes -Wno-unused-parameter
+        -Wsign-conversion
+        -Wno-unused-function
     )
+endif()
+
+if(CMAKE_C_COMPILER_ID MATCHES "(Apple)?Clang")
+    set(WARNING_FLAGS -Wno-empty-translation-unit)
 endif()
 
 if(NOT CMAKE_C_COMPILER_ID STREQUAL "GNU")
@@ -184,4 +188,6 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/imm-config.cmake
 
 enable_testing()
 add_subdirectory(test)
-add_subdirectory(fuzz)
+if(FUZZ)
+    add_subdirectory(fuzz)
+endif()
