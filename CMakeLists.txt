@@ -83,17 +83,23 @@ if(NOT CMAKE_C_COMPILER_ID STREQUAL "GNU")
 endif()
 
 option(CI_BUILD "CI, extra flags will be set" OFF)
-
 if(CI_BUILD)
     message(STATUS "CI build enabled")
     add_compile_options(-Werror)
 endif()
 
-option(IMM_DOUBLE_PRECISION "Enable double-precision floating-point format for internals" Off)
+option(IMM_DOUBLE_PRECISION "Enable double-precision floating-point format for internals" OFF)
 if(IMM_DOUBLE_PRECISION)
-    message(STATUS "Double-precision floating-point - On")
+    message(STATUS "Double-precision floating-point - ON")
 else()
-    message(STATUS "Double-precision floating-point - Off")
+    message(STATUS "Double-precision floating-point - OFF")
+endif()
+
+option(FUZZ "Enable fuzz testing." OFF)
+if(FUZZ)
+    message(STATUS "Fuzz testing - ON")
+else()
+    message(STATUS "Fuzz testing - OFF")
 endif()
 
 target_include_directories(imm
@@ -178,3 +184,4 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/imm-config.cmake
 
 enable_testing()
 add_subdirectory(test)
+add_subdirectory(fuzz)

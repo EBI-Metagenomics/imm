@@ -39,26 +39,3 @@ imm_add_test(path path.c)
 imm_add_test(rna_io rna_io.c)
 imm_add_test(state state.c)
 imm_add_test(viterbi viterbi.c)
-
-function(imm_add_test2 name srcs)
-    add_executable(${name} ${srcs})
-    add_dependencies(all_tests ${name})
-    target_link_libraries(${name} PRIVATE IMM::imm)
-    target_link_libraries(${name} PUBLIC HOPE::hope)
-    # target_link_libraries(${name} PRIVATE $<$<CMAKE_C_COMPILER_ID:Clang>:-fsanitize=fuzzer>)
-    target_link_libraries(${name} PRIVATE -fsanitize=fuzzer)
-    target_compile_options(${name} PRIVATE ${WARNING_FLAGS})
-    # target_compile_options(${name} PRIVATE $<$<CMAKE_C_COMPILER_ID:Clang>:-fsanitize=fuzzer>)
-    target_compile_options(${name} PRIVATE -fsanitize=fuzzer)
-    target_compile_features(${name} PRIVATE c_std_11)
-    add_test(NAME ${name} COMMAND ${name})
-
-    set(TMPDIR "${CMAKE_CURRENT_BINARY_DIR}/${name}.tmp")
-    add_custom_command(TARGET ${name} PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${TMPDIR}
-    )
-    target_compile_definitions(${name} PUBLIC "TMPDIR=\"${TMPDIR}\"")
-endfunction()
-
-message(STATUS "CMAKE_C_COMPILER_ID: ${CMAKE_C_COMPILER_ID}")
-imm_add_test2(abc_fuzzer abc_fuzzer.c)

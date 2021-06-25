@@ -110,7 +110,7 @@ int abc_read(struct imm_abc *abc, FILE *file)
     abc->symbols[abc->size] = '\0';
 
     ERETURN(cmp_read_array(&cmp, &u32));
-    IMM_BUG(IMM_ARRAY_SIZE(abc->sym.idx) != u32);
+    ERETURN(IMM_ARRAY_SIZE(abc->sym.idx) == u32);
     for (unsigned i = 0; i < IMM_ARRAY_SIZE(abc->sym.idx); ++i)
         ERETURN(cmp_read_u8(&cmp, abc->sym.idx + i));
 
