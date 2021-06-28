@@ -48,6 +48,7 @@ add_library(imm
     src/rna.c
     src/seq.c
     src/state.c
+    src/support.c
     src/task.c
     src/tsort.c
     third-party/cmp.c
@@ -137,6 +138,15 @@ check_c_source_compiles(
     HAVE_ATTR_FMT
 )
 target_compile_definitions(imm PRIVATE $<$<BOOL:${HAVE_ATTR_FMT}>:HAVE_ATTR_FMT>)
+
+check_c_source_compiles(
+    "
+        #include <stdlib.h>
+        int main(void) { void *p = reallofc(NULL, 1); free(p); return 0; }
+    "
+    HAVE_REALLOFC
+)
+target_compile_definitions(imm PRIVATE $<$<BOOL:${HAVE_REALLOFC}>:HAVE_REALLOFC>)
 
 include(CheckTypeSize)
 

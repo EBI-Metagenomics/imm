@@ -126,4 +126,8 @@ static inline unsigned long ipow(unsigned long base, unsigned exp)
     return result;
 }
 
+#ifndef HAVE_REALLOFC
+void *reallocf(void *ptr, size_t size);
+#endif
+
 #endif
