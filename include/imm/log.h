@@ -38,6 +38,7 @@ struct imm_log_event
 
 typedef void (*imm_log_callback)(struct imm_log_event event);
 
+IMM_API void imm_log_default_callback(struct imm_log_event event);
 IMM_API void imm_log_setup(imm_log_callback cb, enum imm_level level);
 
 #define __imm_log(lvl, code, ...)                                              \

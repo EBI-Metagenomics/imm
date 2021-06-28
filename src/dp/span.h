@@ -4,6 +4,7 @@
 #include "imm/log.h"
 #include "imm/state_types.h"
 #include <assert.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 struct span
@@ -22,11 +23,11 @@ static inline uint16_t span_zip(struct span const *span)
     return (uint16_t)((span->min << 8) | span->max);
 }
 
-static inline void span_unzip(struct span span[static 1], uint16_t v)
+static inline bool span_unzip(struct span span[static 1], uint16_t v)
 {
     span->max = (imm_state_seqlen_t)v;
     span->min = (imm_state_seqlen_t)(v >> 8);
-    IMM_BUG(span->min > span->max);
+    return span->min <= span->max;
 }
 
 #endif

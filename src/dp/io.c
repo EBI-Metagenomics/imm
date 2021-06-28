@@ -209,19 +209,40 @@ int imm_dp_read(struct imm_dp *dp, FILE *file)
     for (unsigned i = 0; i < size; ++i)
     {
         ERETURN(!cmp_read_u16(&ctx, &u16), IMM_IOERROR);
-        span_unzip(st->span + i, u16);
+        ERETURN(!span_unzip(st->span + i, u16), IMM_PARSEERROR);
+        ERETURN(st->span[i].max > IMM_STATE_MAX_SEQLEN, IMM_PARSEERROR);
     }
 
     return err;
 
 cleanup:
-    free(code->offset);
-    free(code->stride);
-    free(e->score);
-    free(e->offset);
-    free(tt->trans);
-    free(tt->offset);
-    free(st->ids);
-    free(st->span);
+    if (code)
+    {
+        free(code->offset);
+        code->offset = NULL;
+        free(code->stride);
+        code->stride = NULL;
+    }
+    if (e)
+    {
+        free(e->score);
+        e->score = NULL;
+        free(e->offset);
+        e->offset = NULL;
+    }
+    if (tt)
+    {
+        free(tt->trans);
+        tt->trans = NULL;
+        free(tt->offset);
+        tt->offset = NULL;
+    }
+    if (st)
+    {
+        free(st->ids);
+        st->ids = NULL;
+        free(st->span);
+        st->span = NULL;
+    }
     return err;
 }

@@ -9,9 +9,7 @@ static char const *__msg[] = {
     [IMM_RUNTIMEERROR] "runtime error",
 };
 
-static void default_print(struct imm_log_event event);
-
-static imm_log_callback log_callback = default_print;
+static imm_log_callback log_callback = imm_log_default_callback;
 enum imm_level log_level = IMM_WARN;
 
 void imm_log_setup(imm_log_callback cb, enum imm_level level)
@@ -38,7 +36,7 @@ int __imm_log_impl(enum imm_level level, enum imm_code code, char const *file,
     return (int)code;
 }
 
-static void default_print(struct imm_log_event event)
+void imm_log_default_callback(struct imm_log_event event)
 {
     fprintf(stderr, "%s:%d:%s: ", event.file, event.line, __msg[event.code]);
     vfprintf(stderr, event.fmt, event.va);
