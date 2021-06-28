@@ -3,7 +3,6 @@ project(imm VERSION 0.0.10 LANGUAGES C)
 
 # Generate compile_commands.json file
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-message(STATUS "COMPILER ID ${CMAKE_C_COMPILER_ID}")
 
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # Set RPATH only if it's not a system directory
@@ -73,10 +72,6 @@ else()
         -Wsign-conversion
         -Wno-unused-function
     )
-endif()
-
-if(CMAKE_C_COMPILER_ID MATCHES "(Apple)?Clang")
-    set(WARNING_FLAGS ${WARNING_FLAGS} -Wno-empty-translation-unit)
 endif()
 
 if(NOT CMAKE_C_COMPILER_ID STREQUAL "GNU")

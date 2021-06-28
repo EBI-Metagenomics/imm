@@ -13,7 +13,7 @@ struct imm_rna
     struct imm_nuclt super;
 };
 
-extern struct imm_rna const imm_rna_default;
+IMM_API extern struct imm_rna const imm_rna_default;
 
 IMM_API int imm_rna_init(struct imm_rna *rna, char const symbols[IMM_RNA_SIZE],
                          char any_symbol);
