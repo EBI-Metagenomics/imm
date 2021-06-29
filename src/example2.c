@@ -1,4 +1,4 @@
-#include "model_frame.h"
+#include "imm/imm.h"
 
 /* State IDs */
 #define START ((imm_state_id_t)(0U << 11))
@@ -10,7 +10,7 @@
 #define J ((imm_state_id_t)(6U << 11))
 #define END ((imm_state_id_t)(7U << 11))
 
-char const model_frame_str[] =
+char const imm_example2_str[] =
     "AAAACGCGTGTCACGACAACGCGTACGTTTCGACGAGTACGACGCCCGGG"
     "AAAACGCGTGTCGACGACGAACGCGTACGTTTACGACGAGTACGACGCCC"
     "AAAACGCGTGTCACGACAACGCGTACGTTTCGACGAGTACGACGCCCGGG"
@@ -52,7 +52,7 @@ char const model_frame_str[] =
     "AAAACGCGTGTCACGACAACGCGTACGTTTCGACGAGTACGACGCCCGGG"
     "AAAACGCGTGTCGACGACGAACGCGTACGTTTACGACGAGTACGACGCCC";
 
-struct model_frame model_frame = {.dna = &imm_dna_default};
+struct imm_example2 imm_example2 = {.dna = &imm_dna_default};
 
 #define SET_TRANS(hmm, a, b, v)                                                \
     imm_hmm_set_trans(hmm, imm_super(a), imm_super(b), v)
@@ -124,9 +124,9 @@ static struct imm_codon_marg codonm(struct imm_codon codon, imm_float lprob)
     return imm_codon_marg(&codonp);
 }
 
-void model_frame_init(void)
+void imm_example2_init(void)
 {
-    struct model_frame *m = &model_frame;
+    struct imm_example2 *m = &imm_example2;
     struct imm_nuclt const *nuclt = imm_super(m->dna);
     struct imm_abc const *abc = imm_super(nuclt);
     m->hmm = imm_hmm_new(abc);
@@ -165,7 +165,7 @@ void model_frame_init(void)
     SET_TRANS(m->hmm, m->j, m->b, imm_log(0.2));
     SET_TRANS(m->hmm, m->e, m->end, imm_log(0.2));
 
-    for (unsigned k = 0; k < MODEL_FRAME_SIZE; ++k)
+    for (unsigned k = 0; k < IMM_EXAMPLE2_SIZE; ++k)
     {
         m->m[k] = imm_frame_state_new(M | k, &m->nucltp, &m->m_marg, epsilon);
         m->i[k] = imm_frame_state_new(I | k, &m->nucltp, &m->i_marg, epsilon);
@@ -191,7 +191,7 @@ void model_frame_init(void)
             SET_TRANS(m->hmm, m->d[k - 1], m->d[k], imm_log(0.2));
         }
 
-        if (k == MODEL_FRAME_SIZE - 1)
+        if (k == IMM_EXAMPLE2_SIZE - 1)
         {
             SET_TRANS(m->hmm, m->m[k], m->e, imm_log(0.2));
             SET_TRANS(m->hmm, m->d[k], m->e, imm_log(0.2));
@@ -200,18 +200,18 @@ void model_frame_init(void)
     }
 }
 
-void model_frame_deinit(void)
+void imm_example2_deinit(void)
 {
-    imm_del(model_frame.hmm);
-    imm_del(model_frame.start);
-    imm_del(model_frame.b);
-    imm_del(model_frame.j);
-    for (unsigned k = 0; k < MODEL_FRAME_SIZE; ++k)
+    imm_del(imm_example2.hmm);
+    imm_del(imm_example2.start);
+    imm_del(imm_example2.b);
+    imm_del(imm_example2.j);
+    for (unsigned k = 0; k < IMM_EXAMPLE2_SIZE; ++k)
     {
-        imm_del(model_frame.m[k]);
-        imm_del(model_frame.i[k]);
-        imm_del(model_frame.d[k]);
+        imm_del(imm_example2.m[k]);
+        imm_del(imm_example2.i[k]);
+        imm_del(imm_example2.d[k]);
     }
-    imm_del(model_frame.e);
-    imm_del(model_frame.end);
+    imm_del(imm_example2.e);
+    imm_del(imm_example2.end);
 }

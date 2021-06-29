@@ -1,12 +1,12 @@
 add_custom_target(all_fuzzs)
 
-function(imm_add_fuzz tgt tgt_srcs seed seed_srcs max_len runs)
-    add_executable(${tgt} ${tgt_srcs})
+function(imm_add_fuzz tgt seed max_len runs)
+    add_executable(${tgt} ${tgt}.c)
     target_link_libraries(${tgt} PRIVATE IMM::imm)
     target_compile_options(${tgt} PRIVATE ${WARNING_FLAGS})
     target_compile_features(${tgt} PRIVATE c_std_11)
 
-    add_executable(${seed} ${seed_srcs})
+    add_executable(${seed} ${seed}.c)
     target_link_libraries(${seed} PRIVATE IMM::imm)
     target_compile_options(${seed} PRIVATE ${WARNING_FLAGS})
     target_compile_features(${seed} PRIVATE c_std_11)
@@ -45,11 +45,8 @@ function(imm_add_fuzz tgt tgt_srcs seed seed_srcs max_len runs)
 endfunction()
 
 imm_add_fuzz(
-    abc_fuzz abc_fuzz.c abc_seed abc_seed.c
-    512 1000000
+    abc_fuzz abc_seed 512 1000000
 )
 imm_add_fuzz(
-    dp_fuzz dp_fuzz.c dp_seed
-    "dp_seed.c;model_normal.c;model_frame.c"
-    33554432 10000
+    dp_fuzz dp_seed 33554432 10000
 )

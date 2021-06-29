@@ -1,4 +1,4 @@
-#include "model_normal.h"
+#include "imm/imm.h"
 
 /* Log-probabilities */
 #define ZERO IMM_LPROB_ZERO
@@ -14,7 +14,7 @@
 #define J ((imm_state_id_t)(6U << 11))
 #define END ((imm_state_id_t)(7U << 11))
 
-char const model_normal_str[] =
+char const imm_example1_str[] =
     "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
     "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
     "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
@@ -62,14 +62,14 @@ imm_float i_lprobs[] = {ZERO, ZERO, ONE, ZERO, ZERO};
 imm_float e_lprobs[] = {ZERO, ZERO, ZERO, ONE, ZERO};
 imm_float j_lprobs[] = {ZERO, ZERO, ZERO, ZERO, ONE};
 
-struct model_normal model_normal;
+struct imm_example1 imm_example1;
 
 #define SET_TRANS(hmm, a, b, v)                                                \
     imm_hmm_set_trans(hmm, imm_super(a), imm_super(b), v)
 
-void model_normal_init(void)
+void imm_example1_init(void)
 {
-    struct model_normal *m = &model_normal;
+    struct imm_example1 *m = &imm_example1;
     imm_abc_init(&m->abc, imm_str("BMIEJ"), '*');
     m->hmm = imm_hmm_new(&m->abc);
 
@@ -97,7 +97,7 @@ void model_normal_init(void)
     SET_TRANS(m->hmm, m->j, m->b, imm_log(0.2));
     SET_TRANS(m->hmm, m->e, m->end, imm_log(0.2));
 
-    for (unsigned k = 0; k < MODEL_NORMAL_SIZE; ++k)
+    for (unsigned k = 0; k < IMM_EXAMPLE1_SIZE; ++k)
     {
         m->m[k] = imm_normal_state_new(M | k, &m->abc, m_lprobs);
         m->i[k] = imm_normal_state_new(I | k, &m->abc, i_lprobs);
@@ -123,7 +123,7 @@ void model_normal_init(void)
             SET_TRANS(m->hmm, m->d[k - 1], m->d[k], imm_log(0.2));
         }
 
-        if (k == MODEL_NORMAL_SIZE - 1)
+        if (k == IMM_EXAMPLE1_SIZE - 1)
         {
             SET_TRANS(m->hmm, m->m[k], m->e, imm_log(0.2));
             SET_TRANS(m->hmm, m->d[k], m->e, imm_log(0.2));
@@ -132,18 +132,18 @@ void model_normal_init(void)
     }
 }
 
-void model_normal_deinit(void)
+void imm_example1_deinit(void)
 {
-    imm_del(model_normal.hmm);
-    imm_del(model_normal.start);
-    imm_del(model_normal.b);
-    imm_del(model_normal.j);
-    for (unsigned k = 0; k < MODEL_NORMAL_SIZE; ++k)
+    imm_del(imm_example1.hmm);
+    imm_del(imm_example1.start);
+    imm_del(imm_example1.b);
+    imm_del(imm_example1.j);
+    for (unsigned k = 0; k < IMM_EXAMPLE1_SIZE; ++k)
     {
-        imm_del(model_normal.m[k]);
-        imm_del(model_normal.i[k]);
-        imm_del(model_normal.d[k]);
+        imm_del(imm_example1.m[k]);
+        imm_del(imm_example1.i[k]);
+        imm_del(imm_example1.d[k]);
     }
-    imm_del(model_normal.e);
-    imm_del(model_normal.end);
+    imm_del(imm_example1.e);
+    imm_del(imm_example1.end);
 }

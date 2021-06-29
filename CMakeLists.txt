@@ -36,6 +36,8 @@ add_library(imm
     src/dp/path.c
     src/dp/state_table.c
     src/dp/trans_table.c
+    src/example1.c
+    src/example2.c
     src/frame_state.c
     src/hmm.c
     src/log.c

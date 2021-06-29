@@ -17,6 +17,8 @@ extern "C" {
 #include "imm/codon_state.h"
 #include "imm/dna.h"
 #include "imm/dp.h"
+#include "imm/example1.h"
+#include "imm/example2.h"
 #include "imm/float.h"
 #include "imm/frame_state.h"
 #include "imm/generics.h"
