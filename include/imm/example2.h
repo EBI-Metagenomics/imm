@@ -29,6 +29,12 @@ struct imm_example2
     struct imm_codon_marg b_marg;
     struct imm_codon_marg e_marg;
     struct imm_codon_marg j_marg;
+    struct
+    {
+        struct imm_hmm *hmm;
+        struct imm_frame_state *n;
+        struct imm_codon_marg n_marg;
+    } null;
 };
 
 IMM_API extern char const imm_example2_str[];

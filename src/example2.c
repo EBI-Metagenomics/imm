@@ -9,6 +9,7 @@
 #define E ((imm_state_id_t)(5U << 11))
 #define J ((imm_state_id_t)(6U << 11))
 #define END ((imm_state_id_t)(7U << 11))
+#define N ((imm_state_id_t)(8U << 11))
 
 char const imm_example2_str[] =
     "AAAACGCGTGTCACGACAACGCGTACGTTTCGACGAGTACGACGCCCGGG"
@@ -140,6 +141,7 @@ void imm_example2_init(void)
     m->b_marg = codonm(imm_codon(nuclt, 'A', 'A', 'A'), imm_log(100.0));
     m->e_marg = codonm(imm_codon(nuclt, 'C', 'C', 'C'), imm_log(100.0));
     m->j_marg = codonm(imm_codon(nuclt, 'G', 'G', 'G'), imm_log(100.0));
+    m->null.n_marg = codonm(imm_codon(nuclt, 'G', 'T', 'G'), imm_log(13.0));
 
     m->start = imm_mute_state_new(START, abc);
     imm_hmm_add_state(m->hmm, imm_super(m->start));
@@ -198,6 +200,12 @@ void imm_example2_init(void)
             SET_TRANS(m->hmm, m->i[k], m->e, imm_log(0.2));
         }
     }
+
+    m->null.hmm = imm_hmm_new(abc);
+    m->null.n = imm_frame_state_new(N, &m->nucltp, &m->null.n_marg, epsilon);
+    imm_hmm_add_state(m->null.hmm, imm_super(m->null.n));
+    imm_hmm_set_start(m->null.hmm, imm_super(m->null.n), imm_log(1.0));
+    SET_TRANS(m->null.hmm, m->null.n, m->null.n, imm_log(0.2));
 }
 
 void imm_example2_deinit(void)
@@ -214,4 +222,7 @@ void imm_example2_deinit(void)
     }
     imm_del(imm_example2.e);
     imm_del(imm_example2.end);
+
+    imm_del(imm_example2.null.hmm);
+    imm_del(imm_example2.null.n);
 }

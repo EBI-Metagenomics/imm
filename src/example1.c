@@ -13,6 +13,7 @@
 #define E ((imm_state_id_t)(5U << 11))
 #define J ((imm_state_id_t)(6U << 11))
 #define END ((imm_state_id_t)(7U << 11))
+#define N ((imm_state_id_t)(8U << 11))
 
 char const imm_example1_str[] =
     "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
@@ -61,6 +62,7 @@ imm_float m_lprobs[] = {ZERO, ONE, ZERO, ZERO, ZERO};
 imm_float i_lprobs[] = {ZERO, ZERO, ONE, ZERO, ZERO};
 imm_float e_lprobs[] = {ZERO, ZERO, ZERO, ONE, ZERO};
 imm_float j_lprobs[] = {ZERO, ZERO, ZERO, ZERO, ONE};
+imm_float n_lprobs[] = {ONE, ZERO, ONE, ZERO, ONE};
 
 struct imm_example1 imm_example1;
 
@@ -130,6 +132,12 @@ void imm_example1_init(void)
             SET_TRANS(m->hmm, m->i[k], m->e, imm_log(0.2));
         }
     }
+
+    m->null.hmm = imm_hmm_new(&m->abc);
+    m->null.n = imm_normal_state_new(N, &m->abc, n_lprobs);
+    imm_hmm_add_state(m->null.hmm, imm_super(m->null.n));
+    imm_hmm_set_start(m->null.hmm, imm_super(m->null.n), imm_log(1.0));
+    SET_TRANS(m->null.hmm, m->null.n, m->null.n, imm_log(0.2));
 }
 
 void imm_example1_deinit(void)
@@ -146,4 +154,7 @@ void imm_example1_deinit(void)
     }
     imm_del(imm_example1.e);
     imm_del(imm_example1.end);
+
+    imm_del(imm_example1.null.hmm);
+    imm_del(imm_example1.null.n);
 }

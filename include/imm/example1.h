@@ -21,6 +21,11 @@ struct imm_example1
     struct imm_mute_state *d[IMM_EXAMPLE1_SIZE];
     struct imm_normal_state *e;
     struct imm_mute_state *end;
+    struct
+    {
+        struct imm_hmm *hmm;
+        struct imm_normal_state *n;
+    } null;
 };
 
 IMM_API extern char const imm_example1_str[];
