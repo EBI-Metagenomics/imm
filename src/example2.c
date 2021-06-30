@@ -11,7 +11,7 @@
 #define END ((imm_state_id_t)(7U << 11))
 #define N ((imm_state_id_t)(8U << 11))
 
-char const imm_example2_str[] =
+char const imm_example2_seq[] =
     "AAAACGCGTGTCACGACAACGCGTACGTTTCGACGAGTACGACGCCCGGG"
     "AAAACGCGTGTCGACGACGAACGCGTACGTTTACGACGAGTACGACGCCC"
     "AAAACGCGTGTCACGACAACGCGTACGTTTCGACGAGTACGACGCCCGGG"

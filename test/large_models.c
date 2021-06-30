@@ -24,7 +24,7 @@ void test_large_normal(void)
     struct imm_task *task = imm_task_new(dp);
     struct imm_result result = imm_result();
 
-    struct imm_seq seq = imm_seq(imm_str(imm_example1_str), &m->abc);
+    struct imm_seq seq = imm_seq(imm_str(imm_example1_seq), &m->abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
     EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     CLOSE(result.loglik, -65826.0106185297);
@@ -44,7 +44,7 @@ void test_large_frame(void)
     struct imm_nuclt const *nuclt = imm_super(m->dna);
     struct imm_abc const *abc = imm_super(nuclt);
 
-    struct imm_seq seq = imm_seq(imm_str(imm_example2_str), abc);
+    struct imm_seq seq = imm_seq(imm_str(imm_example2_seq), abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
     EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
     CLOSE(result.loglik, -1622.8488101101);

@@ -125,14 +125,14 @@ int imm_dp_read(struct imm_dp *dp, FILE *file)
     ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
     ERETURN(size > UINT16_MAX, IMM_PARSEERROR);
     code->offset = reallocf(code->offset, sizeof(*code->offset) * size);
-    ERETURN(!code->offset, IMM_IOERROR);
+    ERETURN(!code->offset && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
         ERETURN(!cmp_read_u16(&ctx, code->offset + i), IMM_IOERROR);
 
     ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
     ERETURN(size > UINT16_MAX, IMM_PARSEERROR);
     code->stride = reallocf(code->stride, sizeof(*code->stride) * size);
-    ERETURN(!code->stride, IMM_IOERROR);
+    ERETURN(!code->stride && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
         ERETURN(!cmp_read_u16(&ctx, code->stride + i), IMM_IOERROR);
 
@@ -143,13 +143,13 @@ int imm_dp_read(struct imm_dp *dp, FILE *file)
     e = &dp->emission;
     ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
     e->score = reallocf(e->score, sizeof(*e->score) * size);
-    ERETURN(!e->score, IMM_IOERROR);
+    ERETURN(!e->score && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
         ERETURN(!read_imm_float(&ctx, e->score + i), IMM_IOERROR);
 
     ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
     e->offset = reallocf(e->offset, sizeof(*e->offset) * size);
-    ERETURN(!e->offset, IMM_IOERROR);
+    ERETURN(!e->offset && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
     {
         ERETURN(!cmp_read_u32(&ctx, &u32), IMM_IOERROR);
@@ -164,7 +164,7 @@ int imm_dp_read(struct imm_dp *dp, FILE *file)
     ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
     ERETURN(tt->ntrans != size, IMM_PARSEERROR);
     tt->trans = reallocf(tt->trans, sizeof(*tt->trans) * size);
-    ERETURN(!tt->trans, IMM_IOERROR);
+    ERETURN(!tt->trans && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
         ERETURN(!read_imm_float(&ctx, &tt->trans[i].score), IMM_IOERROR);
 
@@ -178,7 +178,7 @@ int imm_dp_read(struct imm_dp *dp, FILE *file)
 
     ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
     tt->offset = reallocf(tt->offset, sizeof(*tt->offset) * size);
-    ERETURN(!tt->offset, IMM_IOERROR);
+    ERETURN(!tt->offset && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
     {
         ERETURN(!cmp_read_u16(&ctx, &u16), IMM_IOERROR);
@@ -193,7 +193,7 @@ int imm_dp_read(struct imm_dp *dp, FILE *file)
     ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
     ERETURN(st->nstates != size, IMM_PARSEERROR);
     st->ids = reallocf(st->ids, sizeof(*st->ids) * size);
-    ERETURN(!st->ids, IMM_IOERROR);
+    ERETURN(!st->ids && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
         ERETURN(!cmp_read_u16(&ctx, st->ids + i), IMM_IOERROR);
 
@@ -205,7 +205,7 @@ int imm_dp_read(struct imm_dp *dp, FILE *file)
     ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
     ERETURN(st->nstates != size, IMM_PARSEERROR);
     st->span = reallocf(st->span, sizeof(*st->span) * size);
-    ERETURN(!st->span, IMM_IOERROR);
+    ERETURN(!st->span && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
     {
         ERETURN(!cmp_read_u16(&ctx, &u16), IMM_IOERROR);

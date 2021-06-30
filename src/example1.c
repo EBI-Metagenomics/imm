@@ -15,7 +15,7 @@
 #define END ((imm_state_id_t)(7U << 11))
 #define N ((imm_state_id_t)(8U << 11))
 
-char const imm_example1_str[] =
+char const imm_example1_seq[] =
     "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
     "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMEJ"
     "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"

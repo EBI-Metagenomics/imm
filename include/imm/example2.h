@@ -37,7 +37,7 @@ struct imm_example2
     } null;
 };
 
-IMM_API extern char const imm_example2_str[];
+IMM_API extern char const imm_example2_seq[];
 IMM_API extern struct imm_example2 imm_example2;
 
 #endif
