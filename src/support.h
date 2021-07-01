@@ -66,7 +66,7 @@ static inline void *__growmem(void *restrict ptr, size_t count, size_t size,
 static inline void *__malloc(size_t size, char const file[static 1], int line)
 {
     void *ptr = malloc(size);
-    if (!ptr)
+    if (!ptr && size > 0)
         __imm_log_impl(IMM_FATAL, IMM_IOERROR, file, line, "failed to malloc");
     return ptr;
 }
@@ -84,7 +84,7 @@ static inline void *__realloc(void *ptr, size_t new_size,
                               char const file[static 1], int line)
 {
     void *new_ptr = realloc(ptr, new_size);
-    if (!new_ptr)
+    if (!new_ptr && new_size > 0)
         __imm_log_impl(IMM_FATAL, IMM_IOERROR, file, line, "failed to realloc");
     return new_ptr;
 }

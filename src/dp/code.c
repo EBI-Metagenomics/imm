@@ -51,14 +51,11 @@ void code_reset(struct code *code, unsigned min_seq, unsigned max_seq)
     code->seqlen.min = min_seq;
     code->seqlen.max = max_seq;
 
-    if (max_seq == 0)
-        code->stride = NULL;
-    else
-    {
-        code->stride = xrealloc(code->stride,
-                                sizeof(*code->stride) * code_stride_size(code));
+    code->stride =
+        xrealloc(code->stride, sizeof(*code->stride) * code_stride_size(code));
+
+    if (code_stride_size(code) > 0)
         code->stride[max_seq - 1] = 1;
-    }
 
     if (max_seq > 1)
     {

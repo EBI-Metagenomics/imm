@@ -32,10 +32,7 @@ void trans_table_reset(struct trans_table *tbl, struct dp_args const *args)
                                             trans_table_offsize(args->nstates));
     tbl->offset[0] = 0;
 
-    if (tbl->ntrans > 0)
-        tbl->trans = xrealloc(tbl->trans, sizeof(*tbl->trans) * tbl->ntrans);
-    else
-        tbl->trans = NULL;
+    tbl->trans = xrealloc(tbl->trans, sizeof(*tbl->trans) * tbl->ntrans);
 
     for (unsigned i = 0; i < args->nstates; ++i)
     {
