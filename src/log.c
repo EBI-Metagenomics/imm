@@ -10,7 +10,7 @@ static char const *__msg[] = {
 };
 
 static imm_log_callback log_callback = imm_log_default_callback;
-enum imm_level log_level = IMM_WARN;
+static enum imm_level log_level = IMM_WARN;
 
 void imm_log_setup(imm_log_callback cb, enum imm_level level)
 {
