@@ -5,6 +5,7 @@
 #include "imm/generics.h"
 
 extern struct gc const gencode[];
+struct imm_nuclt const *nuclt = &imm_dna_default.super;
 
 char const *imm_gc_name1(unsigned id) { return gencode[id - 1].name1; }
 
@@ -35,6 +36,26 @@ struct imm_codon imm_gc_codon(unsigned id, char aa, unsigned idx)
         }
         i++;
     }
-    struct imm_nuclt const *nuclt = imm_super(&imm_dna_default);
     return imm_codon(nuclt, gc->base1[i], gc->base2[i], gc->base3[i]);
+}
+
+char imm_gc_decode(unsigned id, char a, char b, char c)
+{
+    struct gc const *gc = &gencode[id - 1];
+
+    char const *aa = gc->ncbieaa;
+    char const *b1 = gc->base1;
+    char const *b2 = gc->base2;
+    char const *b3 = gc->base3;
+
+    while (*aa)
+    {
+        if (*b1 == a && *b2 == b && *b3 == c)
+            break;
+        ++aa;
+        ++b1;
+        ++b2;
+        ++b3;
+    }
+    return *aa;
 }

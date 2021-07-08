@@ -4,12 +4,14 @@
 void test_gc_f(void);
 void test_gc_l(void);
 void test_gc_p(void);
+void test_gc_decode(void);
 
 int main(void)
 {
     test_gc_f();
     test_gc_l();
     test_gc_p();
+    test_gc_decode();
     return hope_status();
 }
 
@@ -79,4 +81,12 @@ void test_gc_p(void)
     EQ(imm_codon_asym(codons + 3), 'C');
     EQ(imm_codon_bsym(codons + 3), 'C');
     EQ(imm_codon_csym(codons + 3), 'G');
+}
+
+void test_gc_decode(void)
+{
+    EQ(imm_gc_name1(1), "Standard");
+    EQ(imm_gc_name2(1), "SGC0");
+    EQ(imm_gc_decode(1, 'C', 'C', 'G'), 'P');
+    EQ(imm_gc_decode(1, 'T', 'A', 'G'), '*');
 }
