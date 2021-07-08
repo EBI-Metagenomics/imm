@@ -1,12 +1,16 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
-project(imm VERSION 0.0.10 LANGUAGES C)
+project(
+    imm
+    VERSION 0.0.10
+    LANGUAGES C)
 
 # Generate compile_commands.json file
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # Set RPATH only if it's not a system directory
-list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
+list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
+     "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
 if("${isSystemDir}" STREQUAL "-1")
     set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 endif()
@@ -19,7 +23,8 @@ find_package(logaddexp REQUIRED)
 find_package(elapsed REQUIRED)
 find_package(containers REQUIRED)
 
-add_library(imm
+add_library(
+    imm
     src/abc.c
     src/amino.c
     src/bitmap.c
@@ -54,36 +59,43 @@ add_library(imm
     src/support.c
     src/task.c
     src/tsort.c
-    third-party/cmp.c
-)
+    third-party/cmp.c)
 add_library(IMM::imm ALIAS imm)
 
-# Write out imm/export.h to the current binary directory
-# Must include ${CMAKE_CURRENT_BINARY_DIR} in the target's
-# search path.
+# Write out imm/export.h to the current binary directory Must include
+# ${CMAKE_CURRENT_BINARY_DIR} in the target's search path.
 include(GenerateExportHeader)
-generate_export_header(imm BASE_NAME IMM
-    INCLUDE_GUARD_NAME IMM_EXPORT_H
-    EXPORT_MACRO_NAME IMM_API
-    EXPORT_FILE_NAME ${CMAKE_CURRENT_BINARY_DIR}/imm/export.h)
+generate_export_header(
+    imm
+    BASE_NAME
+    IMM
+    INCLUDE_GUARD_NAME
+    IMM_EXPORT_H
+    EXPORT_MACRO_NAME
+    IMM_API
+    EXPORT_FILE_NAME
+    ${CMAKE_CURRENT_BINARY_DIR}/imm/export.h)
 
 if(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
-    # /wd5105: https://docs.microsoft.com/en-us/cpp/error-messages/compiler-warnings/c5105?view=msvc-160
+    # /wd5105:
+    # https://docs.microsoft.com/en-us/cpp/error-messages/compiler-warnings/c5105?view=msvc-160
     set(WARNING_FLAGS /W3 /wd5105)
 else()
-    set(WARNING_FLAGS -Wall -Wextra -Wstrict-prototypes -Wshadow
-        -Wconversion -Wmissing-prototypes -Wno-unused-parameter
+    set(WARNING_FLAGS
+        -Wall
+        -Wextra
+        -Wstrict-prototypes
+        -Wshadow
+        -Wconversion
+        -Wmissing-prototypes
+        -Wno-unused-parameter
         -Wsign-conversion
-        -Wno-unused-function
-    )
+        -Wno-unused-function)
 endif()
 
 if(NOT CMAKE_C_COMPILER_ID STREQUAL "GNU")
-    list(APPEND WARNING_FLAGS
-        -Wno-gnu-designator
-        -Wno-empty-translation-unit
-        -Wno-gnu-statement-expression
-        -Wno-nullability-extension)
+    list(APPEND WARNING_FLAGS -Wno-gnu-designator -Wno-empty-translation-unit
+         -Wno-gnu-statement-expression -Wno-nullability-extension)
 endif()
 
 option(CI_BUILD "CI, extra flags will be set" OFF)
@@ -92,7 +104,8 @@ if(CI_BUILD)
     add_compile_options(-Werror)
 endif()
 
-option(IMM_DOUBLE_PRECISION "Enable double-precision floating-point format for internals" OFF)
+option(IMM_DOUBLE_PRECISION
+       "Enable double-precision floating-point format for internals" OFF)
 if(IMM_DOUBLE_PRECISION)
     message(STATUS "Double-precision floating-point - ON")
 else()
@@ -106,27 +119,27 @@ else()
     message(STATUS "Fuzz testing - OFF")
 endif()
 
-target_include_directories(imm
-    PUBLIC
-        $<INSTALL_INTERFACE:include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
-        ${CMAKE_CURRENT_SOURCE_DIR}/third-party
-)
+target_include_directories(
+    imm
+    PUBLIC $<INSTALL_INTERFACE:include>
+           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+           $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+            ${CMAKE_CURRENT_SOURCE_DIR}/third-party)
 target_link_libraries(imm PUBLIC LOGADDEXP::logaddexp)
 target_link_libraries(imm PUBLIC ELAPSED::elapsed)
 target_link_libraries(imm PUBLIC CONTAINERS::containers)
 set_target_properties(imm PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
 target_compile_features(imm PRIVATE c_std_11)
-target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRECATE>)
+target_compile_definitions(
+    imm PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRECATE>)
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:__extension__>)
 target_compile_options(imm PRIVATE ${WARNING_FLAGS})
 target_compile_options(imm PRIVATE "-fverbose-asm")
 target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/imm/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/imm/config.h @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/imm/config.h.in
+               ${CMAKE_CURRENT_BINARY_DIR}/imm/config.h @ONLY)
 
 include(CheckCSourceCompiles)
 check_c_source_compiles(
@@ -134,18 +147,18 @@ check_c_source_compiles(
         static void f(char const* err, ...) __attribute__((format(printf, 1, 2)));
         int main(void) {return 0;}
     "
-    HAVE_ATTR_FMT
-)
-target_compile_definitions(imm PRIVATE $<$<BOOL:${HAVE_ATTR_FMT}>:HAVE_ATTR_FMT>)
+    HAVE_ATTR_FMT)
+target_compile_definitions(imm
+                           PRIVATE $<$<BOOL:${HAVE_ATTR_FMT}>:HAVE_ATTR_FMT>)
 
 check_c_source_compiles(
     "
         #include <stdlib.h>
         int main(void) { void *p = reallofc(NULL, 1); free(p); return 0; }
     "
-    HAVE_REALLOFC
-)
-target_compile_definitions(imm PRIVATE $<$<BOOL:${HAVE_REALLOFC}>:HAVE_REALLOFC>)
+    HAVE_REALLOFC)
+target_compile_definitions(imm
+                           PRIVATE $<$<BOOL:${HAVE_REALLOFC}>:HAVE_REALLOFC>)
 
 include(CheckTypeSize)
 
@@ -154,7 +167,7 @@ if(NOT HAVE_SIZEOF_INT)
     message(FATAL_ERROR "Could not determine the size of int.")
 else()
     message(STATUS "Size of int: ${SIZEOF_INT} bytes.")
-    if (SIZEOF_INT LESS 4)
+    if(SIZEOF_INT LESS 4)
         message(FATAL_ERROR "Int is too small.")
     endif()
 endif()
@@ -168,32 +181,28 @@ else()
 endif()
 target_compile_definitions(imm PRIVATE SIZEOF_LONG=${SIZEOF_LONG})
 
-install(TARGETS imm EXPORT imm-targets
+install(
+    TARGETS imm
+    EXPORT imm-targets
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
-    PUBLIC_HEADER DESTINATION include
-)
+    PUBLIC_HEADER DESTINATION include)
 install(DIRECTORY include/ DESTINATION include)
-install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/imm/export.h
-    ${CMAKE_CURRENT_BINARY_DIR}/imm/config.h
-    DESTINATION include/imm
-)
-install(EXPORT imm-targets
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/imm/export.h
+              ${CMAKE_CURRENT_BINARY_DIR}/imm/config.h DESTINATION include/imm)
+install(
+    EXPORT imm-targets
     FILE imm-targets.cmake
     NAMESPACE IMM::
-    DESTINATION lib/cmake/imm
-)
+    DESTINATION lib/cmake/imm)
 include(CMakePackageConfigHelpers)
-configure_package_config_file(imm-config.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/imm-config.cmake
+configure_package_config_file(
+    imm-config.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/imm-config.cmake
     INSTALL_DESTINATION lib/cmake/imm
-    NO_SET_AND_CHECK_MACRO
-)
+    NO_SET_AND_CHECK_MACRO)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/imm-config.cmake
-    DESTINATION lib/cmake/imm
-)
+        DESTINATION lib/cmake/imm)
 
 enable_testing()
 add_subdirectory(test)
