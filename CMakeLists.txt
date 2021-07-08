@@ -39,6 +39,8 @@ add_library(imm
     src/example1.c
     src/example2.c
     src/frame_state.c
+    src/gc.c
+    src/gc_auto.c
     src/hmm.c
     src/log.c
     src/lprob.c

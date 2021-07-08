@@ -32,6 +32,21 @@ static inline void imm_codon_set(struct imm_codon *codon, unsigned id_a,
     codon->c = __imm_abc_symbol_idx(abc, id_c);
 }
 
+static inline char imm_codon_asym(struct imm_codon const *codon)
+{
+    return imm_abc_symbols(&codon->nuclt->super)[codon->a];
+}
+
+static inline char imm_codon_bsym(struct imm_codon const *codon)
+{
+    return imm_abc_symbols(&codon->nuclt->super)[codon->b];
+}
+
+static inline char imm_codon_csym(struct imm_codon const *codon)
+{
+    return imm_abc_symbols(&codon->nuclt->super)[codon->c];
+}
+
 static inline struct imm_codon
 __imm_codon_from_id(struct imm_nuclt const *nuclt, unsigned a, unsigned b,
                     unsigned c)

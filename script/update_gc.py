@@ -30,7 +30,7 @@ def fix_newline_between_quotes(rows):
             new_rows.append(r)
         else:
             new_rows[-1] += " " + r
-        open_quote ^= r.count("\"") % 2 == 1
+        open_quote ^= r.count('"') % 2 == 1
     return new_rows
 
 
@@ -39,25 +39,25 @@ def make_json(rows):
     name_idx = 1
     for r in rows:
         if r.startswith("name "):
-            r = r.replace("name ", f"\"name{name_idx}\":")
+            r = r.replace("name ", f'"name{name_idx}":')
             name_idx += 1
         if r.startswith("id "):
-            r = r.replace("id ", "\"id\":\"").strip()
-            r = r.replace(" ,", "\",")
+            r = r.replace("id ", '"id":"').strip()
+            r = r.replace(" ,", '",')
             name_idx = 1
         r = r.replace(" ,", ",")
-        r = r.replace("ncbieaa  ", "\"ncbieaa\":")
+        r = r.replace("ncbieaa  ", '"ncbieaa":')
         if r.startswith("sncbieaa"):
-            r = r.replace("sncbieaa ", "\"sncbieaa\":")
+            r = r.replace("sncbieaa ", '"sncbieaa":')
             r += ","
         if r.startswith("-- Base"):
-            r = r.replace("-- Base1  ", "\"base1\":\"")
-            r = r.replace("-- Base2  ", "\"base2\":\"")
-            r = r.replace("-- Base3  ", "\"base3\":\"")
-            if r.startswith("\"base3\""):
-                r += "\""
+            r = r.replace("-- Base1  ", '"base1":"')
+            r = r.replace("-- Base2  ", '"base2":"')
+            r = r.replace("-- Base3  ", '"base3":"')
+            if r.startswith('"base3"'):
+                r += '"'
             else:
-                r += "\","
+                r += '",'
         new_rows.append(r)
 
     new_rows.insert(0, "[")
@@ -106,8 +106,8 @@ def src_dir(prj: Path):
 def write_c_file(src: Path, gc):
     print(f"Generating {src}... ", end="")
     with open(src, "w") as file:
-        file.write("#include \"gc.h\"\n\n")
-        file.write("struct gc gc[] = {\n")
+        file.write('#include "gc.h"\n\n')
+        file.write("struct gc const gc[] = {\n")
         for d in gc:
             name1 = d["name1"]
             name2 = d["name2"]
@@ -117,12 +117,12 @@ def write_c_file(src: Path, gc):
             base1 = d["base1"]
             base2 = d["base2"]
             base3 = d["base3"]
-            file.write(f"    {{\"{name1}\", \"{name2}\", {_id},\n")
-            file.write(f"     \"{ncbieaa}\",\n")
-            file.write(f"     \"{sncbieaa}\",\n")
-            file.write(f"     \"{base1}\",\n")
-            file.write(f"     \"{base2}\",\n")
-            file.write(f"     \"{base3}\"}},\n")
+            file.write(f'    {{"{name1}", "{name2}", {_id},\n')
+            file.write(f'     "{ncbieaa}",\n')
+            file.write(f'     "{sncbieaa}",\n')
+            file.write(f'     "{base1}",\n')
+            file.write(f'     "{base2}",\n')
+            file.write(f'     "{base3}"}},\n')
         file.write("};\n")
     print("done.")
 

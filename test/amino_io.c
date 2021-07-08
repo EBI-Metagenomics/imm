@@ -3,7 +3,7 @@
 
 int main(void)
 {
-    struct imm_amino const *amino_out = &imm_amino_default;
+    struct imm_amino const *amino_out = &imm_amino_iupac;
 
     FILE *file = fopen(TMPDIR "/amino.imm", "wb");
     imm_amino_write(amino_out, file);

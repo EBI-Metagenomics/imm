@@ -11,7 +11,7 @@ int main(void)
 
 void test_amino_lprob(void)
 {
-    struct imm_amino const *amino = &imm_amino_default;
+    struct imm_amino const *amino = &imm_amino_iupac;
 
     imm_float const lprobs[IMM_AMINO_SIZE] = {imm_lprob_zero(),
                                               imm_log(1), [19] = imm_log(19)};

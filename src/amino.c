@@ -24,7 +24,7 @@ int imm_amino_read(struct imm_amino *amino, FILE *file)
 #define NIL(x, y) [ID(x)... ID(y) - 1] = IMM_SYM_NULL_IDX
 
 struct imm_amino const
-    imm_amino_default =
+    imm_amino_iupac =
         {.super =
              {
                  .size = IMM_AMINO_SIZE,

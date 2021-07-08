@@ -1,5 +1,5 @@
-#ifndef IMM_GC_H
-#define IMM_GC_H
+#ifndef GC_H
+#define GC_H
 
 struct gc
 {
