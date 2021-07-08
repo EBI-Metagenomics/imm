@@ -39,23 +39,25 @@ struct imm_codon imm_gc_codon(unsigned id, char aa, unsigned idx)
     return imm_codon(nuclt, gc->base1[i], gc->base2[i], gc->base3[i]);
 }
 
+static unsigned perfect_hash(char key);
+
 char imm_gc_decode(unsigned id, char a, char b, char c)
 {
     struct gc const *gc = &gencode[id - 1];
-
     char const *aa = gc->ncbieaa;
-    char const *b1 = gc->base1;
-    char const *b2 = gc->base2;
-    char const *b3 = gc->base3;
+    unsigned const i[3] = {perfect_hash(a), perfect_hash(b), perfect_hash(c)};
+    return aa[i[0] * 4 * 4 + i[1] * 4 + i[2]];
+}
 
-    while (*aa)
-    {
-        if (*b1 == a && *b2 == b && *b3 == c)
-            break;
-        ++aa;
-        ++b1;
-        ++b2;
-        ++b3;
-    }
-    return *aa;
+static inline unsigned hash_f(unsigned key, unsigned t)
+{
+    return (t * key) % 8;
+}
+
+static unsigned perfect_hash(char key)
+{
+    /* Generated using perfect-hash Python package */
+    unsigned k = (unsigned)key;
+    static unsigned const G[] = {0, 1, 0, 2, 0, 3, 0, 0};
+    return (G[hash_f(k, 'D')] + G[hash_f(k, 's')]) % 8;
 }
