@@ -16,7 +16,10 @@ IMM_API struct imm_mute_state *imm_mute_state_new(unsigned id,
 
 static inline void imm_mute_state_del(struct imm_mute_state const *mute)
 {
-    mute->super->vtable.del(mute->super);
+    if (mute)
+    {
+        mute->super->vtable.del(mute->super);
+    }
 }
 
 static inline struct imm_state *

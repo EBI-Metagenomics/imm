@@ -19,7 +19,10 @@ imm_codon_state_new(unsigned id, struct imm_codon_lprob const *codonp);
 static inline void
 imm_codon_state_del(struct imm_codon_state const *codon_state)
 {
-    codon_state->super->vtable.del(codon_state->super);
+    if (codon_state)
+    {
+        codon_state->super->vtable.del(codon_state->super);
+    }
 }
 
 static inline struct imm_state *

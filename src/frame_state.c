@@ -32,9 +32,12 @@ imm_frame_state_new(unsigned id, struct imm_nuclt_lprob const *nucltp,
 
 static void del(struct imm_state const *state)
 {
-    struct imm_frame_state const *frame = state->vtable.derived;
-    free((void *)frame);
-    state_del(state);
+    if (state)
+    {
+        struct imm_frame_state const *frame = state->vtable.derived;
+        free((void *)frame);
+        state_del(state);
+    }
 }
 
 static inline imm_float logaddexp3(imm_float const a, imm_float const b,

@@ -18,7 +18,10 @@ imm_normal_state_new(unsigned id, struct imm_abc const *abc,
 
 static inline void imm_normal_state_del(struct imm_normal_state const *normal)
 {
-    normal->super->vtable.del(normal->super);
+    if (normal)
+    {
+        normal->super->vtable.del(normal->super);
+    }
 }
 
 static inline struct imm_state *

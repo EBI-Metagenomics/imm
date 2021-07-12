@@ -21,9 +21,12 @@ struct imm_normal_state *imm_normal_state_new(unsigned id,
 
 static void del(struct imm_state const *state)
 {
-    struct imm_normal_state const *normal = state->vtable.derived;
-    free((void *)normal);
-    state_del(state);
+    if (state)
+    {
+        struct imm_normal_state const *normal = state->vtable.derived;
+        free((void *)normal);
+        state_del(state);
+    }
 }
 
 static imm_float lprob(struct imm_state const *state, struct imm_seq const *seq)

@@ -96,11 +96,14 @@ struct imm_dp *imm_dp_new(struct imm_abc const *abc)
 
 void imm_dp_del(struct imm_dp const *dp)
 {
-    code_del(&dp->code);
-    emission_del(&dp->emission);
-    trans_table_del(&dp->trans_table);
-    state_table_del(&dp->state_table);
-    free((void *)dp);
+    if (dp)
+    {
+        code_del(&dp->code);
+        emission_del(&dp->emission);
+        trans_table_del(&dp->trans_table);
+        state_table_del(&dp->state_table);
+        free((void *)dp);
+    }
 }
 
 void dp_reset(struct imm_dp *dp, struct dp_args const *args)

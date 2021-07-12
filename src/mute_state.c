@@ -18,8 +18,11 @@ struct imm_mute_state *imm_mute_state_new(unsigned id,
 
 static void del(struct imm_state const *state)
 {
-    free((void *)state->vtable.derived);
-    state_del(state);
+    if (state)
+    {
+        free((void *)state->vtable.derived);
+        state_del(state);
+    }
 }
 
 static imm_float lprob(struct imm_state const *state, struct imm_seq const *seq)

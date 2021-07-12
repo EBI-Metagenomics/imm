@@ -22,9 +22,12 @@ static inline struct imm_result imm_result(void)
 
 static inline void imm_result_del(struct imm_result *result)
 {
-    result->seq = NULL;
-    imm_path_del(&result->path);
-    result->seconds = 0;
+    if (result)
+    {
+        result->seq = NULL;
+        imm_path_del(&result->path);
+        result->seconds = 0;
+    }
 }
 
 static inline void result_reset(struct imm_result *result)

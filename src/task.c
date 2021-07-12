@@ -1,7 +1,7 @@
-#include "task.h"
+#include "imm/task.h"
 #include "dp/imm_dp.h"
 #include "imm/seq.h"
-#include "imm/task.h"
+#include "task.h"
 
 struct imm_task *imm_task_new(struct imm_dp const *dp)
 {
@@ -32,8 +32,11 @@ int imm_task_setup(struct imm_task *task, struct imm_seq const *seq)
 
 void imm_task_del(struct imm_task const *task)
 {
-    matrix_del(&task->matrix);
-    path_del(&task->path);
-    eseq_del(&task->eseq);
-    free((void *)task);
+    if (task)
+    {
+        matrix_del(&task->matrix);
+        path_del(&task->path);
+        eseq_del(&task->eseq);
+        free((void *)task);
+    }
 }

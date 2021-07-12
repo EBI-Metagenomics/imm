@@ -25,7 +25,10 @@ imm_frame_state_new(unsigned id, struct imm_nuclt_lprob const *nucltp,
 
 static inline void imm_frame_state_del(struct imm_frame_state const *frame)
 {
-    frame->super->vtable.del(frame->super);
+    if (frame)
+    {
+        frame->super->vtable.del(frame->super);
+    }
 }
 
 IMM_API imm_float imm_frame_state_lposterior(
