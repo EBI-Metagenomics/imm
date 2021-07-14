@@ -74,6 +74,24 @@ static void set_state_indices(struct imm_hmm const *hmm,
     }
 }
 
+void imm_hmm_write_dot(struct imm_hmm *hmm, FILE *fp, imm_state_name state_name)
+{
+    fprintf(fp, "digraph hmm {\n");
+    struct trans *t = NULL;
+    unsigned bkt = 0;
+    hash_for_each(hmm->transitions.tbl, bkt, t, hnode)
+    {
+        char src_name[8] = {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'};
+        char dst_name[8] = {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'};
+        struct imm_state *src = hmm_state(hmm, t->pair.id.src);
+        struct imm_state *dst = hmm_state(hmm, t->pair.id.dst);
+        state_name(src->id, src_name);
+        state_name(dst->id, dst_name);
+        fprintf(fp, "%s -> %s [label=%.4f];\n", src_name, dst_name, t->lprob);
+    }
+    fprintf(fp, "}\n");
+}
+
 int imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
 {
     if (hash_hashed(&state->hnode))

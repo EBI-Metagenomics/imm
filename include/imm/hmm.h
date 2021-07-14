@@ -3,6 +3,8 @@
 
 #include "imm/export.h"
 #include "imm/float.h"
+#include "imm/state.h"
+#include <stdio.h>
 
 struct imm_abc;
 struct imm_dp;
@@ -10,6 +12,9 @@ struct imm_hmm;
 struct imm_path;
 struct imm_seq;
 struct imm_state;
+
+IMM_API void imm_hmm_write_dot(struct imm_hmm *hmm, FILE *fp,
+                               imm_state_name state_name);
 
 IMM_API int imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state);
 
