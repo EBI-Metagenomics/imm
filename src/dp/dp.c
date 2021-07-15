@@ -118,7 +118,7 @@ void dp_reset(struct imm_dp *dp, struct dp_args const *args)
 int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
                    struct imm_result *result)
 {
-    result_reset(result);
+    imm_result_reset(result);
     if (!task->seq)
         return error(IMM_ILLEGALARG, "seq has not been set");
 
