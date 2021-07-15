@@ -45,6 +45,11 @@ static inline unsigned imm_state_id(struct imm_state const *state)
     return state->id;
 }
 
+static inline unsigned imm_state_idx(struct imm_state const *state)
+{
+    return state->idx;
+}
+
 static inline imm_float imm_state_lprob(struct imm_state const *state,
                                         struct imm_seq const *seq)
 {

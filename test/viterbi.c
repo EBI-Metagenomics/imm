@@ -839,8 +839,8 @@ void test_viterbi_cycle_mute_ending(void)
 
     VITERBI_CHECK(&A_ab, IMM_SUCCESS, 5, -13.815510557964272);
 
-    unsigned BM = imm_dp_trans_idx(dp, imm_state_id(imm_super(B)),
-                                   imm_state_id(imm_super(M)));
+    unsigned BM = imm_dp_trans_idx(dp, imm_state_idx(imm_super(B)),
+                                   imm_state_idx(imm_super(M)));
 
     imm_dp_change_trans(dp, BM, imm_log(1.0));
 
