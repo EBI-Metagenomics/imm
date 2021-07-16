@@ -10,8 +10,10 @@
 
 #ifdef IMM_DOUBLE_PRECISION
 typedef double imm_float;
+#define IMM_FLOAT_BYTES 8
 #else
 typedef float imm_float;
+#define IMM_FLOAT_BYTES 4
 #endif
 
 #define imm_log(x) ((imm_float)log(x))
