@@ -54,11 +54,11 @@ void emission_reset(struct emission *emiss, struct code const *code,
             char const *item = NULL;
             while ((item = imm_cartes_next(&cartes)) != NULL)
             {
-
                 struct imm_seq seq = IMM_SEQ_UNSAFE(len, item, abc);
                 unsigned j = code_encode(code, &seq);
                 j -= code_offset(code, min_seq);
                 imm_float score = imm_state_lprob(states[i], &seq);
+                IMM_BUG(imm_lprob_is_nan(score));
                 emiss->score[emiss->offset[i] + j] = score;
             }
         }
