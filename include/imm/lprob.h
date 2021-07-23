@@ -7,12 +7,14 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#define IMM_LPROB_NAN NAN
+#define IMM_LPROB_ONE 0.0f
+#define IMM_LPROB_ZERO -INFINITY
+
 static inline imm_float imm_lprob_add(imm_float a, imm_float b)
 {
     return logaddexp(a, b);
 }
-
-#define IMM_LPROB_NAN NAN
 
 static inline imm_float imm_lprob_nan(void) { return IMM_LPROB_NAN; }
 
@@ -37,8 +39,6 @@ static inline imm_float imm_lprob_sum(unsigned len, imm_float const arr[len])
         r = logaddexp(r, arr[i]);
     return r;
 }
-
-#define IMM_LPROB_ZERO -INFINITY
 
 static inline imm_float imm_lprob_zero(void) { return IMM_LPROB_ZERO; }
 
