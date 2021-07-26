@@ -23,6 +23,8 @@ IMM_API struct imm_hmm *imm_hmm_new(struct imm_abc const *abc);
 IMM_API struct imm_dp *imm_hmm_new_dp(struct imm_hmm const *hmm,
                                       struct imm_state const *end_state);
 
+IMM_API void imm_hmm_reset(struct imm_hmm *hmm);
+
 IMM_API int imm_hmm_reset_dp(struct imm_hmm const *hmm,
                              struct imm_state const *end_state,
                              struct imm_dp *dp);

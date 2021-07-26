@@ -105,9 +105,7 @@ struct imm_hmm *imm_hmm_new(struct imm_abc const *abc)
 {
     struct imm_hmm *hmm = xmalloc(sizeof(*hmm));
     hmm->abc = abc;
-    start_init(hmm);
-    init_states_table(hmm);
-    init_transitions_table(hmm);
+    imm_hmm_reset(hmm);
     return hmm;
 }
 
@@ -123,6 +121,13 @@ struct imm_dp *imm_hmm_new_dp(struct imm_hmm const *hmm,
         return NULL;
     }
     return dp;
+}
+
+void imm_hmm_reset(struct imm_hmm *hmm)
+{
+    start_init(hmm);
+    init_states_table(hmm);
+    init_transitions_table(hmm);
 }
 
 int imm_hmm_reset_dp(struct imm_hmm const *hmm,
