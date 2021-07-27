@@ -21,7 +21,7 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
 
 find_package(logaddexp REQUIRED)
 find_package(elapsed REQUIRED)
-find_package(containers REQUIRED)
+find_package(cco REQUIRED)
 
 add_library(
     imm
@@ -128,7 +128,7 @@ target_include_directories(
             ${CMAKE_CURRENT_SOURCE_DIR}/third-party)
 target_link_libraries(imm PUBLIC LOGADDEXP::logaddexp)
 target_link_libraries(imm PUBLIC ELAPSED::elapsed)
-target_link_libraries(imm PUBLIC CONTAINERS::containers)
+target_link_libraries(imm PUBLIC CCO::cco)
 set_target_properties(imm PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
 target_compile_features(imm PRIVATE c_std_11)
