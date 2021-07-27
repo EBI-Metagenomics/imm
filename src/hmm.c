@@ -22,8 +22,8 @@ static void detach_states(struct imm_hmm *hmm)
 {
     unsigned bkt = 0;
     struct imm_state *state = NULL;
-    struct hnode *tmp = NULL;
-    hash_for_each_safe(hmm->states.tbl, bkt, tmp, state, hnode)
+    struct cco_hnode *tmp = NULL;
+    cco_hash_for_each_safe(hmm->states.tbl, bkt, tmp, state, hnode)
     {
         state_detach(state);
     }
@@ -32,13 +32,13 @@ static void detach_states(struct imm_hmm *hmm)
 static void init_states_table(struct imm_hmm *hmm)
 {
     hmm->states.size = 0;
-    hash_init(hmm->states.tbl);
+    cco_hash_init(hmm->states.tbl);
 }
 
 static void init_transitions_table(struct imm_hmm *hmm)
 {
     hmm->transitions.size = 0;
-    hash_init(hmm->transitions.tbl);
+    cco_hash_init(hmm->transitions.tbl);
 }
 
 static void add_transition(struct imm_hmm *hmm, struct imm_state *src,
@@ -47,9 +47,9 @@ static void add_transition(struct imm_hmm *hmm, struct imm_state *src,
     IMM_BUG(hmm->transitions.size >= IMM_ARRAY_SIZE(hmm->transitions.data));
     struct trans *trans = hmm->transitions.data + hmm->transitions.size++;
     trans_init(trans, src->id, dst->id, lprob);
-    hash_add(hmm->transitions.tbl, &trans->hnode, trans->pair.id.key);
-    stack_put(&src->trans.outgoing, &trans->outgoing);
-    stack_put(&dst->trans.incoming, &trans->incoming);
+    cco_hash_add(hmm->transitions.tbl, &trans->hnode, trans->pair.id.key);
+    cco_stack_put(&src->trans.outgoing, &trans->outgoing);
+    cco_stack_put(&dst->trans.incoming, &trans->incoming);
 }
 
 static inline bool has_start_state(struct imm_hmm const *hmm)
@@ -65,7 +65,7 @@ static void set_state_indices(struct imm_hmm const *hmm,
 
     struct trans *trans = NULL;
     unsigned bkt = 0;
-    hash_for_each(hmm->transitions.tbl, bkt, trans, hnode)
+    cco_hash_for_each(hmm->transitions.tbl, bkt, trans, hnode)
     {
         struct imm_state *src = hmm_state(hmm, trans->pair.id.src);
         struct imm_state *dst = hmm_state(hmm, trans->pair.id.dst);
@@ -79,7 +79,7 @@ void imm_hmm_write_dot(struct imm_hmm *hmm, FILE *fp, imm_state_name state_name)
     fprintf(fp, "digraph hmm {\n");
     struct trans *t = NULL;
     unsigned bkt = 0;
-    hash_for_each(hmm->transitions.tbl, bkt, t, hnode)
+    cco_hash_for_each(hmm->transitions.tbl, bkt, t, hnode)
     {
         char src_name[8] = {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'};
         char dst_name[8] = {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'};
@@ -94,7 +94,7 @@ void imm_hmm_write_dot(struct imm_hmm *hmm, FILE *fp, imm_state_name state_name)
 
 int imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
 {
-    if (hash_hashed(&state->hnode))
+    if (cco_hash_hashed(&state->hnode))
         return error(IMM_ILLEGALARG, "state already belongs to a hmm");
     IMM_BUG(hmm_state(hmm, state->id));
     hmm_add_state(hmm, state);
@@ -150,7 +150,10 @@ int imm_hmm_reset_dp(struct imm_hmm const *hmm,
     unsigned bkt = 0;
     unsigned i = 0;
     struct imm_state *state = NULL;
-    hash_for_each(hmm->states.tbl, bkt, state, hnode) { states[i++] = state; }
+    cco_hash_for_each(hmm->states.tbl, bkt, state, hnode)
+    {
+        states[i++] = state;
+    }
     set_state_indices(hmm, states);
 
     unsigned start_idx = hmm_state(hmm, hmm->start.state_id)->idx;
@@ -180,7 +183,7 @@ imm_float imm_hmm_start_lprob(struct imm_hmm const *hmm)
 imm_float imm_hmm_trans(struct imm_hmm const *hmm, struct imm_state const *src,
                         struct imm_state const *dst)
 {
-    if (!hash_hashed(&src->hnode) || !hash_hashed(&dst->hnode))
+    if (!cco_hash_hashed(&src->hnode) || !cco_hash_hashed(&dst->hnode))
     {
         warn(IMM_ILLEGALARG, "state(s) not found");
         return imm_lprob_nan();
@@ -261,7 +264,7 @@ int imm_hmm_normalize_trans(struct imm_hmm const *hmm)
     struct imm_state *state = NULL;
     unsigned bkt = 0;
     int err = IMM_SUCCESS;
-    hash_for_each(hmm->states.tbl, bkt, state, hnode)
+    cco_hash_for_each(hmm->states.tbl, bkt, state, hnode)
     {
         if ((err = imm_hmm_normalize_state_trans(hmm, state)))
             break;
@@ -272,16 +275,16 @@ int imm_hmm_normalize_trans(struct imm_hmm const *hmm)
 int imm_hmm_normalize_state_trans(struct imm_hmm const *hmm,
                                   struct imm_state *src)
 {
-    if (!hash_hashed(&src->hnode))
+    if (!cco_hash_hashed(&src->hnode))
         return error(IMM_ILLEGALARG, "state not found");
 
-    if (stack_empty(&src->trans.outgoing))
+    if (cco_stack_empty(&src->trans.outgoing))
         return IMM_SUCCESS;
 
     struct trans *trans = NULL;
-    struct iter it = stack_iter(&src->trans.outgoing);
+    struct cco_iter it = cco_stack_iter(&src->trans.outgoing);
     imm_float lnorm = imm_lprob_zero();
-    iter_for_each_entry(trans, &it, outgoing)
+    cco_iter_for_each_entry(trans, &it, outgoing)
     {
         lnorm = logaddexp(lnorm, trans->lprob);
     }
@@ -289,8 +292,8 @@ int imm_hmm_normalize_state_trans(struct imm_hmm const *hmm,
     if (!imm_lprob_is_finite(lnorm))
         return error(IMM_ILLEGALARG, "non-finite normalization denominator");
 
-    it = stack_iter(&src->trans.outgoing);
-    iter_for_each_entry(trans, &it, outgoing) { trans->lprob -= lnorm; }
+    it = cco_stack_iter(&src->trans.outgoing);
+    cco_iter_for_each_entry(trans, &it, outgoing) { trans->lprob -= lnorm; }
     return IMM_SUCCESS;
 }
 
@@ -300,7 +303,7 @@ int imm_hmm_set_start(struct imm_hmm *hmm, struct imm_state const *state,
     if (!imm_lprob_is_finite(lprob))
         return error(IMM_ILLEGALARG, "probability must be finite");
 
-    if (!hash_hashed(&state->hnode))
+    if (!cco_hash_hashed(&state->hnode))
         return error(IMM_ILLEGALARG, "state not found");
 
     hmm->start.lprob = lprob;
@@ -314,10 +317,10 @@ int imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state *src,
     if (!imm_lprob_is_finite(lprob))
         return error(IMM_ILLEGALARG, "probability must be finite");
 
-    if (!hash_hashed(&src->hnode))
+    if (!cco_hash_hashed(&src->hnode))
         return error(IMM_ILLEGALARG, "source state not found");
 
-    if (!hash_hashed(&dst->hnode))
+    if (!cco_hash_hashed(&dst->hnode))
         return error(IMM_ILLEGALARG, "destination state not found");
 
     struct trans *trans = hmm_trans(hmm, src, dst);
@@ -333,7 +336,7 @@ int imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state *src,
 struct imm_state *hmm_state(struct imm_hmm const *hmm, unsigned state_id)
 {
     struct imm_state *state = NULL;
-    hash_for_each_possible(hmm->states.tbl, state, hnode, state_id)
+    cco_hash_for_each_possible(hmm->states.tbl, state, hnode, state_id)
     {
         if (state->id == state_id)
             return state;
@@ -346,7 +349,7 @@ struct trans *hmm_trans(struct imm_hmm const *hmm, struct imm_state const *src,
 {
     struct trans *trans = NULL;
     struct pair pair = PAIR_INIT(src->id, dst->id);
-    hash_for_each_possible(hmm->transitions.tbl, trans, hnode, pair.id.key)
+    cco_hash_for_each_possible(hmm->transitions.tbl, trans, hnode, pair.id.key)
     {
         if (trans->pair.id.src == src->id && trans->pair.id.dst == dst->id)
             return trans;

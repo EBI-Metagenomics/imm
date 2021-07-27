@@ -9,9 +9,9 @@ struct imm_state *state_new(unsigned id, struct imm_abc const *abc,
 
 static inline void state_detach(struct imm_state *state)
 {
-    stack_init(&state->trans.outgoing);
-    stack_init(&state->trans.incoming);
-    hash_del(&state->hnode);
+    cco_stack_init(&state->trans.outgoing);
+    cco_stack_init(&state->trans.incoming);
+    cco_hash_del(&state->hnode);
 }
 
 void state_del(struct imm_state const *state);

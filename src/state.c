@@ -12,9 +12,9 @@ struct imm_state *state_new(unsigned id, struct imm_abc const *abc,
     state->abc = abc;
     state->span = span;
     state->vtable = vtable;
-    stack_init(&state->trans.outgoing);
-    stack_init(&state->trans.incoming);
-    hnode_init(&state->hnode);
+    cco_stack_init(&state->trans.outgoing);
+    cco_stack_init(&state->trans.incoming);
+    cco_hnode_init(&state->hnode);
     state->mark = 0;
     return state;
 }

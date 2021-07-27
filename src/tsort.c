@@ -21,8 +21,8 @@ static bool check_mute_visit(struct imm_state **states, struct imm_state *state)
     state->mark = TEMPORARY_MARK;
 
     struct trans *trans = NULL;
-    struct iter it = stack_iter(&state->trans.outgoing);
-    iter_for_each_entry(trans, &it, outgoing)
+    struct cco_iter it = cco_stack_iter(&state->trans.outgoing);
+    cco_iter_for_each_entry(trans, &it, outgoing)
     {
         if (check_mute_visit(states, states[trans->pair.idx.dst]))
             return true;
@@ -58,8 +58,8 @@ static void visit(struct imm_state *state, struct imm_state **states,
 
     state->mark = TEMPORARY_MARK;
     struct trans const *trans = NULL;
-    struct iter it = stack_iter(&state->trans.outgoing);
-    iter_for_each_entry(trans, &it, outgoing)
+    struct cco_iter it = cco_stack_iter(&state->trans.outgoing);
+    cco_iter_for_each_entry(trans, &it, outgoing)
     {
         visit(states[trans->pair.idx.dst], states, end, tmp);
     }

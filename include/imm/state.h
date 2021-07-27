@@ -1,8 +1,8 @@
 #ifndef IMM_STATE_H
 #define IMM_STATE_H
 
-#include "containers/hash.h"
-#include "containers/stack.h"
+#include "cco/hash.h"
+#include "cco/stack.h"
 #include "imm/export.h"
 #include "imm/float.h"
 #include "imm/log.h"
@@ -21,10 +21,10 @@ struct imm_state
     struct imm_state_vtable vtable;
     struct
     {
-        struct stack outgoing;
-        struct stack incoming;
+        struct cco_stack outgoing;
+        struct cco_stack incoming;
     } trans;
-    struct hnode hnode;
+    struct cco_hnode hnode;
     int mark;
 };
 

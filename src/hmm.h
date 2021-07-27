@@ -23,20 +23,20 @@ struct imm_hmm
     struct
     {
         unsigned size;
-        HASH_DECLARE(tbl, MAX_NTRANS_BITS - 1);
+        CCO_HASH_DECLARE(tbl, MAX_NTRANS_BITS - 1);
     } states;
 
     struct
     {
         unsigned size;
-        HASH_DECLARE(tbl, MAX_NTRANS_BITS - 1);
+        CCO_HASH_DECLARE(tbl, MAX_NTRANS_BITS - 1);
         struct trans data[(1 << MAX_NTRANS_BITS)];
     } transitions;
 };
 
 static inline void hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
 {
-    hash_add(hmm->states.tbl, &state->hnode, state->id);
+    cco_hash_add(hmm->states.tbl, &state->hnode, state->id);
     hmm->states.size++;
 }
 
