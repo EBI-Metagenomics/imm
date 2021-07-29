@@ -55,7 +55,6 @@ add_library(
     src/path.c
     src/rna.c
     src/seq.c
-    src/state.c
     src/support.c
     src/task.c
     src/tsort.c

@@ -8,7 +8,7 @@ struct imm_abc;
 
 struct imm_mute_state
 {
-    struct imm_state *super;
+    struct imm_state super;
 };
 
 IMM_API struct imm_mute_state *imm_mute_state_new(unsigned id,
@@ -18,14 +18,14 @@ static inline void imm_mute_state_del(struct imm_mute_state const *mute)
 {
     if (mute)
     {
-        mute->super->vtable.del(mute->super);
+        mute->super.vtable.del(&mute->super);
     }
 }
 
 static inline struct imm_state *
 imm_mute_state_super(struct imm_mute_state *mute)
 {
-    return mute->super;
+    return &mute->super;
 }
 
 #endif

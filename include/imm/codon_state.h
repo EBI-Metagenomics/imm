@@ -9,7 +9,7 @@ struct imm_codon_lprob;
 
 struct imm_codon_state
 {
-    struct imm_state *super;
+    struct imm_state super;
     struct imm_codon_lprob const *codonp;
 };
 
@@ -21,14 +21,14 @@ imm_codon_state_del(struct imm_codon_state const *codon_state)
 {
     if (codon_state)
     {
-        codon_state->super->vtable.del(codon_state->super);
+        codon_state->super.vtable.del(&codon_state->super);
     }
 }
 
 static inline struct imm_state *
 imm_codon_state_super(struct imm_codon_state *codon_state)
 {
-    return codon_state->super;
+    return &codon_state->super;
 }
 
 #endif

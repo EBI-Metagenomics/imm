@@ -26,7 +26,7 @@ imm_frame_state_new(unsigned id, struct imm_nuclt_lprob const *nucltp,
 
     struct imm_state_vtable vtable = {del, lprob, IMM_FRAME_STATE, state};
     struct imm_abc const *abc = imm_super(codonm->nuclt);
-    state->super = state_new(id, abc, vtable, IMM_SPAN(1, 5));
+    state->super = state_init(id, abc, vtable, IMM_SPAN(1, 5));
     return state;
 }
 
@@ -36,7 +36,6 @@ static void del(struct imm_state const *state)
     {
         struct imm_frame_state const *frame = state->vtable.derived;
         free((void *)frame);
-        state_del(state);
     }
 }
 
