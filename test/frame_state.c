@@ -33,9 +33,9 @@ void test_frame_state1(void)
     imm_codon_lprob_set(&codonp, codon, imm_log(0.1 / 0.9));
     struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
-    struct imm_frame_state *state =
-        imm_frame_state_new(0, &nucltp, &codonm, (imm_float)0.1);
-    struct imm_state *s = imm_frame_state_super(state);
+    struct imm_frame_state state;
+    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
+    struct imm_state *s = imm_frame_state_super(&state);
 
     struct imm_seq seq = imm_seq(IMM_STR("A"), abc);
     CLOSE(imm_state_lprob(s, &seq), -5.914503505971854);
@@ -53,8 +53,6 @@ void test_frame_state1(void)
     CLOSE(imm_state_lprob(s, &seq), -12.08828960987379);
     seq = imm_seq(IMM_STR("ATTAAT"), abc);
     COND(imm_lprob_is_zero(imm_state_lprob(s, &seq)));
-
-    imm_frame_state_del(state);
 }
 
 void test_frame_state2(void)
@@ -72,9 +70,9 @@ void test_frame_state2(void)
     imm_codon_lprob_set(&codonp, codon, imm_log(0.1 / 0.9));
     struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
-    struct imm_frame_state *state =
-        imm_frame_state_new(0, &nucltp, &codonm, (imm_float)0.1);
-    struct imm_state *s = imm_frame_state_super(state);
+    struct imm_frame_state state;
+    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
+    struct imm_state *s = imm_frame_state_super(&state);
 
     struct imm_seq seq;
     seq = imm_seq(IMM_STR("A"), abc);
@@ -107,8 +105,6 @@ void test_frame_state2(void)
 
     seq = imm_seq(IMM_STR("ATTAAT"), abc);
     COND(imm_lprob_is_zero(imm_state_lprob(s, &seq)));
-
-    imm_frame_state_del(state);
 }
 
 void test_frame_state3(void)
@@ -129,9 +125,9 @@ void test_frame_state3(void)
     imm_codon_lprob_set(&codonp, codon, imm_log(0.4) - imm_log(1.3));
     struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
-    struct imm_frame_state *state =
-        imm_frame_state_new(0, &nucltp, &codonm, (imm_float)0.1);
-    struct imm_state *s = imm_frame_state_super(state);
+    struct imm_frame_state state;
+    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
+    struct imm_state *s = imm_frame_state_super(&state);
 
     struct imm_seq seq;
     seq = imm_seq(IMM_STR("A"), abc);
@@ -166,8 +162,6 @@ void test_frame_state3(void)
     CLOSE(imm_state_lprob(s, &seq), -14.288595853747417);
     seq = imm_seq(IMM_STR("GTCAA"), abc);
     CLOSE(imm_state_lprob(s, &seq), -12.902301492627526);
-
-    imm_frame_state_del(state);
 }
 
 void test_frame_state_lposterior(void)
@@ -205,8 +199,8 @@ void test_frame_state_lposterior(void)
     COND(imm_codon_lprob_normalize(&codonp) == 0);
     struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
-    struct imm_frame_state *state =
-        imm_frame_state_new(0, &nucltp, &codonm, (imm_float)0.1);
+    struct imm_frame_state state;
+    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
 
     imm_cartes_init(&codon_iter, symbols, length, 3);
 
@@ -226,7 +220,7 @@ void test_frame_state_lposterior(void)
             {
                 struct imm_seq tmp = imm_seq((struct imm_str){times, seq}, abc);
                 imm_float lprob =
-                    imm_frame_state_lposterior(state, &codon, &tmp);
+                    imm_frame_state_lposterior(&state, &codon, &tmp);
                 lprob -= imm_codon_marg_lprob(&codonm, codon);
                 total = imm_lprob_add(total, lprob);
             }
@@ -235,8 +229,6 @@ void test_frame_state_lposterior(void)
         CLOSE((imm_float)exp(total), 1.0);
     }
     imm_cartes_deinit(&codon_iter);
-
-    imm_frame_state_del(state);
 }
 
 void test_frame_state_decode(void)
@@ -258,69 +250,67 @@ void test_frame_state_decode(void)
 
     struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
-    struct imm_frame_state const *state =
-        imm_frame_state_new(0, &nucltp, &codonm, (imm_float)0.1);
+    struct imm_frame_state state;
+    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
 
     struct imm_seq seq;
     seq = imm_seq(IMM_STR("ATG"), abc);
-    CLOSE(imm_frame_state_decode(state, &seq, &codon), -0.902566706136);
+    CLOSE(imm_frame_state_decode(&state, &seq, &codon), -0.902566706136);
     COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
          codon.b == imm_abc_symbol_idx(abc, 'T') &&
          codon.c == imm_abc_symbol_idx(abc, 'G'));
 
     seq = imm_seq(IMM_STR("ATGT"), abc);
-    CLOSE(imm_frame_state_decode(state, &seq, &codon), -4.710599080052);
+    CLOSE(imm_frame_state_decode(&state, &seq, &codon), -4.710599080052);
     COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
          codon.b == imm_abc_symbol_idx(abc, 'T') &&
          codon.c == imm_abc_symbol_idx(abc, 'G'));
 
     seq = imm_seq(IMM_STR("ATGA"), abc);
-    CLOSE(imm_frame_state_decode(state, &seq, &codon), -6.097714346951);
+    CLOSE(imm_frame_state_decode(&state, &seq, &codon), -6.097714346951);
     COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
          codon.b == imm_abc_symbol_idx(abc, 'T') &&
          codon.c == imm_abc_symbol_idx(abc, 'G'));
 
     seq = imm_seq(IMM_STR("ATGGT"), abc);
-    CLOSE(imm_frame_state_decode(state, &seq, &codon), -9.031100481720);
+    CLOSE(imm_frame_state_decode(&state, &seq, &codon), -9.031100481720);
     COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
          codon.b == imm_abc_symbol_idx(abc, 'T') &&
          codon.c == imm_abc_symbol_idx(abc, 'G'));
 
     seq = imm_seq(IMM_STR("ATT"), abc);
-    CLOSE(imm_frame_state_decode(state, &seq, &codon), -2.977101440300);
+    CLOSE(imm_frame_state_decode(&state, &seq, &codon), -2.977101440300);
     COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
          codon.b == imm_abc_symbol_idx(abc, 'T') &&
          codon.c == imm_abc_symbol_idx(abc, 'T'));
 
     seq = imm_seq(IMM_STR("ATC"), abc);
-    CLOSE(imm_frame_state_decode(state, &seq, &codon), -7.720225141384);
+    CLOSE(imm_frame_state_decode(&state, &seq, &codon), -7.720225141384);
     COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
          codon.b == imm_abc_symbol_idx(abc, 'T') &&
          codon.c == imm_abc_symbol_idx(abc, 'G'));
 
     seq = imm_seq(IMM_STR("TC"), abc);
-    CLOSE(imm_frame_state_decode(state, &seq, &codon), -4.199089882536);
+    CLOSE(imm_frame_state_decode(&state, &seq, &codon), -4.199089882536);
     COND(codon.a == imm_abc_symbol_idx(abc, 'G') &&
          codon.b == imm_abc_symbol_idx(abc, 'T') &&
          codon.c == imm_abc_symbol_idx(abc, 'C'));
 
     seq = imm_seq(IMM_STR("A"), abc);
-    CLOSE(imm_frame_state_decode(state, &seq, &codon), -6.400011321754);
+    CLOSE(imm_frame_state_decode(&state, &seq, &codon), -6.400011321754);
     COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
          codon.b == imm_abc_symbol_idx(abc, 'T') &&
          codon.c == imm_abc_symbol_idx(abc, 'G'));
 
     seq = imm_seq(IMM_STR("AG"), abc);
-    CLOSE(imm_frame_state_decode(state, &seq, &codon), -3.507173471362);
+    CLOSE(imm_frame_state_decode(&state, &seq, &codon), -3.507173471362);
     COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
          codon.b == imm_abc_symbol_idx(abc, 'T') &&
          codon.c == imm_abc_symbol_idx(abc, 'G'));
 
     seq = imm_seq(IMM_STR("GC"), abc);
-    CLOSE(imm_frame_state_decode(state, &seq, &codon), -4.199705077880);
+    CLOSE(imm_frame_state_decode(&state, &seq, &codon), -4.199705077880);
     COND(codon.a == imm_abc_symbol_idx(abc, 'G') &&
          codon.b == imm_abc_symbol_idx(abc, 'T') &&
          codon.c == imm_abc_symbol_idx(abc, 'C'));
-
-    imm_frame_state_del(state);
 }

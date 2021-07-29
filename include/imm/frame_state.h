@@ -1,8 +1,10 @@
 #ifndef IMM_FRAME_STATE_H
 #define IMM_FRAME_STATE_H
 
+#include "imm/codon_marg.h"
 #include "imm/export.h"
 #include "imm/float.h"
+#include "imm/nuclt_lprob.h"
 #include "imm/state.h"
 
 struct imm_codon;
@@ -19,17 +21,10 @@ struct imm_frame_state
     imm_float l1eps;
 };
 
-IMM_API struct imm_frame_state *
-imm_frame_state_new(unsigned id, struct imm_nuclt_lprob const *nucltp,
-                    struct imm_codon_marg const *codonm, imm_float epsilon);
-
-static inline void imm_frame_state_del(struct imm_frame_state const *frame)
-{
-    if (frame)
-    {
-        frame->super.vtable.del(&frame->super);
-    }
-}
+IMM_API void imm_frame_state_init(struct imm_frame_state *state, unsigned id,
+                                  struct imm_nuclt_lprob const *nucltp,
+                                  struct imm_codon_marg const *codonm,
+                                  imm_float epsilon);
 
 IMM_API imm_float imm_frame_state_lposterior(
     struct imm_frame_state const *state, struct imm_codon const *codon,

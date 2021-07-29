@@ -56,7 +56,7 @@ char const imm_example2_seq[] =
 struct imm_example2 imm_example2 = {.dna = &imm_dna_default};
 
 #define SET_TRANS(hmm, a, b, v)                                                \
-    imm_hmm_set_trans(&hmm, imm_super(a), imm_super(b), v)
+    imm_hmm_set_trans(&hmm, imm_super(&a), imm_super(&b), v)
 
 #define SET_CODONP(codonp, codon, v) imm_codon_lprob_set(codonp, codon, v)
 
@@ -143,21 +143,21 @@ void imm_example2_init(void)
     m->j_marg = codonm(imm_codon(nuclt, 'G', 'G', 'G'), imm_log(100.0));
     m->null.n_marg = codonm(imm_codon(nuclt, 'G', 'T', 'G'), imm_log(13.0));
 
-    m->start = imm_mute_state_new(START, abc);
-    imm_hmm_add_state(&m->hmm, imm_super(m->start));
-    imm_hmm_set_start(&m->hmm, imm_super(m->start), imm_log(1.0));
+    imm_mute_state_init(&m->start, START, abc);
+    imm_hmm_add_state(&m->hmm, imm_super(&m->start));
+    imm_hmm_set_start(&m->hmm, imm_super(&m->start), imm_log(1.0));
 
-    m->end = imm_mute_state_new(END, abc);
-    imm_hmm_add_state(&m->hmm, imm_super(m->end));
+    imm_mute_state_init(&m->end, END, abc);
+    imm_hmm_add_state(&m->hmm, imm_super(&m->end));
 
-    m->b = imm_frame_state_new(B, &m->nucltp, &m->b_marg, epsilon);
-    imm_hmm_add_state(&m->hmm, imm_super(m->b));
+    imm_frame_state_init(&m->b, B, &m->nucltp, &m->b_marg, epsilon);
+    imm_hmm_add_state(&m->hmm, imm_super(&m->b));
 
-    m->e = imm_frame_state_new(E, &m->nucltp, &m->e_marg, epsilon);
-    imm_hmm_add_state(&m->hmm, imm_super(m->e));
+    imm_frame_state_init(&m->e, E, &m->nucltp, &m->e_marg, epsilon);
+    imm_hmm_add_state(&m->hmm, imm_super(&m->e));
 
-    m->j = imm_frame_state_new(J, &m->nucltp, &m->j_marg, epsilon);
-    imm_hmm_add_state(&m->hmm, imm_super(m->j));
+    imm_frame_state_init(&m->j, J, &m->nucltp, &m->j_marg, epsilon);
+    imm_hmm_add_state(&m->hmm, imm_super(&m->j));
 
     SET_TRANS(m->hmm, m->start, m->b, imm_log(0.2));
     SET_TRANS(m->hmm, m->b, m->b, imm_log(0.2));
@@ -169,13 +169,13 @@ void imm_example2_init(void)
 
     for (unsigned k = 0; k < IMM_EXAMPLE2_SIZE; ++k)
     {
-        m->m[k] = imm_frame_state_new(M | k, &m->nucltp, &m->m_marg, epsilon);
-        m->i[k] = imm_frame_state_new(I | k, &m->nucltp, &m->i_marg, epsilon);
-        m->d[k] = imm_mute_state_new(D | k, abc);
+        imm_frame_state_init(m->m + k, M | k, &m->nucltp, &m->m_marg, epsilon);
+        imm_frame_state_init(m->i + k, I | k, &m->nucltp, &m->i_marg, epsilon);
+        imm_mute_state_init(m->d + k, D | k, abc);
 
-        imm_hmm_add_state(&m->hmm, imm_super(m->m[k]));
-        imm_hmm_add_state(&m->hmm, imm_super(m->i[k]));
-        imm_hmm_add_state(&m->hmm, imm_super(m->d[k]));
+        imm_hmm_add_state(&m->hmm, imm_super(&m->m[k]));
+        imm_hmm_add_state(&m->hmm, imm_super(&m->i[k]));
+        imm_hmm_add_state(&m->hmm, imm_super(&m->d[k]));
 
         if (k == 0)
             SET_TRANS(m->hmm, m->b, m->m[0], imm_log(0.2));
@@ -202,25 +202,8 @@ void imm_example2_init(void)
     }
 
     m->null.hmm = imm_hmm_init(abc);
-    m->null.n = imm_frame_state_new(N, &m->nucltp, &m->null.n_marg, epsilon);
-    imm_hmm_add_state(&m->null.hmm, imm_super(m->null.n));
-    imm_hmm_set_start(&m->null.hmm, imm_super(m->null.n), imm_log(1.0));
+    imm_frame_state_init(&m->null.n, N, &m->nucltp, &m->null.n_marg, epsilon);
+    imm_hmm_add_state(&m->null.hmm, imm_super(&m->null.n));
+    imm_hmm_set_start(&m->null.hmm, imm_super(&m->null.n), imm_log(1.0));
     SET_TRANS(m->null.hmm, m->null.n, m->null.n, imm_log(0.2));
-}
-
-void imm_example2_deinit(void)
-{
-    imm_del(imm_example2.start);
-    imm_del(imm_example2.b);
-    imm_del(imm_example2.j);
-    for (unsigned k = 0; k < IMM_EXAMPLE2_SIZE; ++k)
-    {
-        imm_del(imm_example2.m[k]);
-        imm_del(imm_example2.i[k]);
-        imm_del(imm_example2.d[k]);
-    }
-    imm_del(imm_example2.e);
-    imm_del(imm_example2.end);
-
-    imm_del(imm_example2.null.n);
 }

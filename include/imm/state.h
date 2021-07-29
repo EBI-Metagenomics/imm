@@ -35,11 +35,6 @@ static inline struct imm_abc const *imm_state_abc(struct imm_state const *state)
     return state->abc;
 }
 
-static inline void imm_state_del(struct imm_state const *state)
-{
-    state->vtable.del(state);
-}
-
 static inline unsigned imm_state_id(struct imm_state const *state)
 {
     return state->id;
@@ -48,6 +43,24 @@ static inline unsigned imm_state_id(struct imm_state const *state)
 static inline unsigned imm_state_idx(struct imm_state const *state)
 {
     return state->idx;
+}
+
+static struct imm_state __imm_state_init(unsigned id, struct imm_abc const *abc,
+                                         struct imm_state_vtable vtable,
+                                         struct imm_span span)
+{
+    IMM_BUG(id >= IMM_STATE_NULL_ID);
+    struct imm_state state;
+    state.id = id;
+    state.idx = IMM_STATE_NULL_IDX;
+    state.abc = abc;
+    state.span = span;
+    state.vtable = vtable;
+    cco_stack_init(&state.trans.outgoing);
+    cco_stack_init(&state.trans.incoming);
+    cco_hnode_init(&state.hnode);
+    state.mark = 0;
+    return state;
 }
 
 static inline imm_float imm_state_lprob(struct imm_state const *state,

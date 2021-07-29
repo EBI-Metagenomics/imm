@@ -15,7 +15,7 @@ void test_dp_io_large_normal(void)
 {
     imm_example1_init();
     struct imm_example1 *m = &imm_example1;
-    struct imm_dp *dp = imm_hmm_new_dp(&imm_example1.hmm, imm_super(m->end));
+    struct imm_dp *dp = imm_hmm_new_dp(&imm_example1.hmm, imm_super(&m->end));
 
     FILE *file = fopen(TMPDIR "/dp_normal.imm", "wb");
     imm_dp_write(dp, file);
@@ -37,14 +37,13 @@ void test_dp_io_large_normal(void)
     imm_del(task);
     imm_del(&result);
     imm_del(dp);
-    imm_example1_deinit();
 }
 
 void test_dp_io_large_frame(void)
 {
     imm_example2_init();
     struct imm_example2 *m = &imm_example2;
-    struct imm_dp *dp = imm_hmm_new_dp(&m->hmm, imm_super(m->end));
+    struct imm_dp *dp = imm_hmm_new_dp(&m->hmm, imm_super(&m->end));
 
     FILE *file = fopen(TMPDIR "/dp_frame.imm", "wb");
     imm_dp_write(dp, file);
@@ -67,5 +66,4 @@ void test_dp_io_large_frame(void)
     imm_del(&result);
     imm_del(task);
     imm_del(dp);
-    imm_example2_deinit();
 }

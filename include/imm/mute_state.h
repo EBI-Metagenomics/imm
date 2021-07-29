@@ -11,16 +11,8 @@ struct imm_mute_state
     struct imm_state super;
 };
 
-IMM_API struct imm_mute_state *imm_mute_state_new(unsigned id,
-                                                  struct imm_abc const *abc);
-
-static inline void imm_mute_state_del(struct imm_mute_state const *mute)
-{
-    if (mute)
-    {
-        mute->super.vtable.del(&mute->super);
-    }
-}
+IMM_API void imm_mute_state_init(struct imm_mute_state *state, unsigned id,
+                                 struct imm_abc const *abc);
 
 static inline struct imm_state *
 imm_mute_state_super(struct imm_mute_state *mute)

@@ -13,17 +13,8 @@ struct imm_codon_state
     struct imm_codon_lprob const *codonp;
 };
 
-IMM_API struct imm_codon_state *
-imm_codon_state_new(unsigned id, struct imm_codon_lprob const *codonp);
-
-static inline void
-imm_codon_state_del(struct imm_codon_state const *codon_state)
-{
-    if (codon_state)
-    {
-        codon_state->super.vtable.del(&codon_state->super);
-    }
-}
+IMM_API void imm_codon_state_init(struct imm_codon_state *state, unsigned id,
+                                  struct imm_codon_lprob const *codonp);
 
 static inline struct imm_state *
 imm_codon_state_super(struct imm_codon_state *codon_state)

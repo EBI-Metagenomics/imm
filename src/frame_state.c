@@ -12,11 +12,11 @@ static void del(struct imm_state const *state);
 static imm_float lprob(struct imm_state const *state,
                        struct imm_seq const *seq);
 
-struct imm_frame_state *
-imm_frame_state_new(unsigned id, struct imm_nuclt_lprob const *nucltp,
-                    struct imm_codon_marg const *codonm, imm_float epsilon)
+void imm_frame_state_init(struct imm_frame_state *state, unsigned id,
+                          struct imm_nuclt_lprob const *nucltp,
+                          struct imm_codon_marg const *codonm,
+                          imm_float epsilon)
 {
-    struct imm_frame_state *state = xmalloc(sizeof(*state));
     IMM_BUG(nucltp->nuclt != codonm->nuclt);
     state->nucltp = nucltp;
     state->codonm = codonm;
@@ -24,19 +24,9 @@ imm_frame_state_new(unsigned id, struct imm_nuclt_lprob const *nucltp,
     state->leps = imm_log(epsilon);
     state->l1eps = imm_log(1 - epsilon);
 
-    struct imm_state_vtable vtable = {del, lprob, IMM_FRAME_STATE, state};
+    struct imm_state_vtable vtable = {lprob, IMM_FRAME_STATE, state};
     struct imm_abc const *abc = imm_super(codonm->nuclt);
-    state->super = state_init(id, abc, vtable, IMM_SPAN(1, 5));
-    return state;
-}
-
-static void del(struct imm_state const *state)
-{
-    if (state)
-    {
-        struct imm_frame_state const *frame = state->vtable.derived;
-        free((void *)frame);
-    }
+    state->super = __imm_state_init(id, abc, vtable, IMM_SPAN(1, 5));
 }
 
 static inline imm_float logaddexp3(imm_float const a, imm_float const b,

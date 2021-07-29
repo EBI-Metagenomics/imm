@@ -32,7 +32,6 @@ struct imm_state;
 
 struct imm_state_vtable
 {
-    void (*del)(struct imm_state const *state);
     imm_float (*lprob)(struct imm_state const *state,
                        struct imm_seq const *seq);
     enum imm_state_typeid typeid;

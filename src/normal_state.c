@@ -3,29 +3,16 @@
 #include "state.h"
 #include "support.h"
 
-static void del(struct imm_state const *state);
-
 static imm_float lprob(struct imm_state const *state,
                        struct imm_seq const *seq);
 
-struct imm_normal_state *imm_normal_state_new(unsigned id,
-                                              struct imm_abc const *abc,
-                                              imm_float const lprobs[static 1])
+void imm_normal_state_init(struct imm_normal_state *state, unsigned id,
+                           struct imm_abc const *abc,
+                           imm_float const lprobs[static 1])
 {
-    struct imm_normal_state *normal = xmalloc(sizeof(*normal));
-    normal->lprobs = lprobs;
-    struct imm_state_vtable vtable = {del, lprob, IMM_NORMAL_STATE, normal};
-    normal->super = state_init(id, abc, vtable, IMM_SPAN(1, 1));
-    return normal;
-}
-
-static void del(struct imm_state const *state)
-{
-    if (state)
-    {
-        struct imm_normal_state const *normal = state->vtable.derived;
-        free((void *)normal);
-    }
+    state->lprobs = lprobs;
+    struct imm_state_vtable vtable = {lprob, IMM_NORMAL_STATE, state};
+    state->super = __imm_state_init(id, abc, vtable, IMM_SPAN(1, 1));
 }
 
 static imm_float lprob(struct imm_state const *state, struct imm_seq const *seq)

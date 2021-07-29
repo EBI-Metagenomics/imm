@@ -12,17 +12,9 @@ struct imm_normal_state
     imm_float const *lprobs;
 };
 
-IMM_API struct imm_normal_state *
-imm_normal_state_new(unsigned id, struct imm_abc const *abc,
-                     imm_float const lprobs[static 1]);
-
-static inline void imm_normal_state_del(struct imm_normal_state const *normal)
-{
-    if (normal)
-    {
-        normal->super.vtable.del(&normal->super);
-    }
-}
+IMM_API void imm_normal_state_init(struct imm_normal_state *state, unsigned id,
+                                   struct imm_abc const *abc,
+                                   imm_float const lprobs[static 1]);
 
 static inline struct imm_state *
 imm_normal_state_super(struct imm_normal_state *normal)
