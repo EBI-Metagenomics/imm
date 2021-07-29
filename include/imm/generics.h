@@ -40,8 +40,7 @@
              : imm_mute_state_del, struct imm_codon_state *                    \
              : imm_codon_state_del, struct imm_frame_state *                   \
              : imm_frame_state_del, struct imm_task *                          \
-             : imm_task_del, struct imm_hmm *                                  \
-             : imm_hmm_del, struct imm_dp *                                    \
+             : imm_task_del, struct imm_dp *                                   \
              : imm_dp_del, struct imm_path *                                   \
              : imm_path_del, struct imm_result *                               \
              : imm_result_del)(x)

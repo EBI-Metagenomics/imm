@@ -30,6 +30,7 @@ extern "C" {
 #include "imm/normal_state.h"
 #include "imm/nuclt.h"
 #include "imm/nuclt_lprob.h"
+#include "imm/pair.h"
 #include "imm/path.h"
 #include "imm/result.h"
 #include "imm/rna.h"

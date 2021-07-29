@@ -1,8 +1,8 @@
 #include "dp/trans_table.h"
 #include "cco/stack.h"
 #include "dp/dp.h"
+#include "imm/trans.h"
 #include "support.h"
-#include "trans.h"
 #include <limits.h>
 
 unsigned trans_table_idx(struct trans_table *trans_tbl, unsigned src_idx,
@@ -37,7 +37,7 @@ void trans_table_reset(struct trans_table *tbl, struct dp_args const *args)
     for (unsigned i = 0; i < args->nstates; ++i)
     {
         struct cco_iter it = cco_stack_iter(&args->states[i]->trans.incoming);
-        struct trans *trans = NULL;
+        struct imm_trans *trans = NULL;
         unsigned j = 0;
         cco_iter_for_each_entry(trans, &it, incoming)
         {

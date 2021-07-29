@@ -67,29 +67,29 @@ imm_float n_lprobs[] = {ONE, ZERO, ONE, ZERO, ONE};
 struct imm_example1 imm_example1;
 
 #define SET_TRANS(hmm, a, b, v)                                                \
-    imm_hmm_set_trans(hmm, imm_super(a), imm_super(b), v)
+    imm_hmm_set_trans(&hmm, imm_super(a), imm_super(b), v)
 
 void imm_example1_init(void)
 {
     struct imm_example1 *m = &imm_example1;
     imm_abc_init(&m->abc, imm_str("BMIEJ"), '*');
-    m->hmm = imm_hmm_new(&m->abc);
+    m->hmm = imm_hmm_init(&m->abc);
 
     m->start = imm_mute_state_new(START, &m->abc);
-    imm_hmm_add_state(m->hmm, imm_super(m->start));
-    imm_hmm_set_start(m->hmm, imm_super(m->start), imm_log(1.0));
+    imm_hmm_add_state(&m->hmm, imm_super(m->start));
+    imm_hmm_set_start(&m->hmm, imm_super(m->start), imm_log(1.0));
 
     m->end = imm_mute_state_new(END, &m->abc);
-    imm_hmm_add_state(m->hmm, imm_super(m->end));
+    imm_hmm_add_state(&m->hmm, imm_super(m->end));
 
     m->b = imm_normal_state_new(B, &m->abc, b_lprobs);
-    imm_hmm_add_state(m->hmm, imm_super(m->b));
+    imm_hmm_add_state(&m->hmm, imm_super(m->b));
 
     m->e = imm_normal_state_new(E, &m->abc, e_lprobs);
-    imm_hmm_add_state(m->hmm, imm_super(m->e));
+    imm_hmm_add_state(&m->hmm, imm_super(m->e));
 
     m->j = imm_normal_state_new(J, &m->abc, j_lprobs);
-    imm_hmm_add_state(m->hmm, imm_super(m->j));
+    imm_hmm_add_state(&m->hmm, imm_super(m->j));
 
     SET_TRANS(m->hmm, m->start, m->b, imm_log(0.2));
     SET_TRANS(m->hmm, m->b, m->b, imm_log(0.2));
@@ -105,9 +105,9 @@ void imm_example1_init(void)
         m->i[k] = imm_normal_state_new(I | k, &m->abc, i_lprobs);
         m->d[k] = imm_mute_state_new(D | k, &m->abc);
 
-        imm_hmm_add_state(m->hmm, imm_super(m->m[k]));
-        imm_hmm_add_state(m->hmm, imm_super(m->i[k]));
-        imm_hmm_add_state(m->hmm, imm_super(m->d[k]));
+        imm_hmm_add_state(&m->hmm, imm_super(m->m[k]));
+        imm_hmm_add_state(&m->hmm, imm_super(m->i[k]));
+        imm_hmm_add_state(&m->hmm, imm_super(m->d[k]));
 
         if (k == 0)
             SET_TRANS(m->hmm, m->b, m->m[0], imm_log(0.2));
@@ -133,16 +133,15 @@ void imm_example1_init(void)
         }
     }
 
-    m->null.hmm = imm_hmm_new(&m->abc);
+    m->null.hmm = imm_hmm_init(&m->abc);
     m->null.n = imm_normal_state_new(N, &m->abc, n_lprobs);
-    imm_hmm_add_state(m->null.hmm, imm_super(m->null.n));
-    imm_hmm_set_start(m->null.hmm, imm_super(m->null.n), imm_log(1.0));
+    imm_hmm_add_state(&m->null.hmm, imm_super(m->null.n));
+    imm_hmm_set_start(&m->null.hmm, imm_super(m->null.n), imm_log(1.0));
     SET_TRANS(m->null.hmm, m->null.n, m->null.n, imm_log(0.2));
 }
 
 void imm_example1_deinit(void)
 {
-    imm_del(imm_example1.hmm);
     imm_del(imm_example1.start);
     imm_del(imm_example1.b);
     imm_del(imm_example1.j);
@@ -155,6 +154,5 @@ void imm_example1_deinit(void)
     imm_del(imm_example1.e);
     imm_del(imm_example1.end);
 
-    imm_del(imm_example1.null.hmm);
     imm_del(imm_example1.null.n);
 }

@@ -3,6 +3,7 @@
 
 #include "imm/abc.h"
 #include "imm/export.h"
+#include "imm/hmm.h"
 
 #define IMM_EXAMPLE1_SIZE 1000U
 
@@ -12,7 +13,7 @@ IMM_API void imm_example1_deinit(void);
 struct imm_example1
 {
     struct imm_abc abc;
-    struct imm_hmm *hmm;
+    struct imm_hmm hmm;
     struct imm_mute_state *start;
     struct imm_normal_state *b;
     struct imm_normal_state *j;
@@ -23,7 +24,7 @@ struct imm_example1
     struct imm_mute_state *end;
     struct
     {
-        struct imm_hmm *hmm;
+        struct imm_hmm hmm;
         struct imm_normal_state *n;
     } null;
 };

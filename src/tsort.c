@@ -1,7 +1,7 @@
 #include "tsort.h"
 #include "imm/state.h"
+#include "imm/trans.h"
 #include "support.h"
-#include "trans.h"
 
 #define INITIAL_MARK 0
 #define TEMPORARY_MARK 1
@@ -20,7 +20,7 @@ static bool check_mute_visit(struct imm_state **states, struct imm_state *state)
 
     state->mark = TEMPORARY_MARK;
 
-    struct trans *trans = NULL;
+    struct imm_trans *trans = NULL;
     struct cco_iter it = cco_stack_iter(&state->trans.outgoing);
     cco_iter_for_each_entry(trans, &it, outgoing)
     {
@@ -57,7 +57,7 @@ static void visit(struct imm_state *state, struct imm_state **states,
         return;
 
     state->mark = TEMPORARY_MARK;
-    struct trans const *trans = NULL;
+    struct imm_trans const *trans = NULL;
     struct cco_iter it = cco_stack_iter(&state->trans.outgoing);
     cco_iter_for_each_entry(trans, &it, outgoing)
     {

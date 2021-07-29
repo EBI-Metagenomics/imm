@@ -20,7 +20,7 @@ int main(void)
 void test_large_normal(void)
 {
     struct imm_example1 *m = &imm_example1;
-    struct imm_dp *dp = imm_hmm_new_dp(imm_example1.hmm, imm_super(m->end));
+    struct imm_dp *dp = imm_hmm_new_dp(&imm_example1.hmm, imm_super(m->end));
     struct imm_task *task = imm_task_new(dp);
     struct imm_result result = imm_result();
 
@@ -37,7 +37,7 @@ void test_large_normal(void)
 void test_large_frame(void)
 {
     struct imm_example2 *m = &imm_example2;
-    struct imm_dp *dp = imm_hmm_new_dp(m->hmm, imm_super(m->end));
+    struct imm_dp *dp = imm_hmm_new_dp(&m->hmm, imm_super(m->end));
     struct imm_task *task = imm_task_new(dp);
     struct imm_result result = imm_result();
 
