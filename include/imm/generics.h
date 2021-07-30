@@ -17,6 +17,10 @@
              struct imm_mute_state * : imm_mute_state_super,                   \
              struct imm_frame_state * : imm_frame_state_super,                 \
              struct imm_codon_state * : imm_codon_state_super,                 \
+             struct imm_normal_state const * : imm_normal_state_super_c,       \
+             struct imm_mute_state const * : imm_mute_state_super_c,           \
+             struct imm_frame_state const * : imm_frame_state_super_c,         \
+             struct imm_codon_state const * : imm_codon_state_super_c,         \
              struct imm_amino * : imm_amino_super,                             \
              struct imm_amino const * : imm_amino_super,                       \
              struct imm_dna * : imm_dna_super,                                 \

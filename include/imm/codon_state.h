@@ -22,4 +22,10 @@ imm_codon_state_super(struct imm_codon_state *codon_state)
     return &codon_state->super;
 }
 
+static inline struct imm_state const *
+imm_codon_state_super_c(struct imm_codon_state const *codon_state)
+{
+    return &codon_state->super;
+}
+
 #endif

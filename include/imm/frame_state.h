@@ -40,4 +40,10 @@ imm_frame_state_super(struct imm_frame_state *frame)
     return &frame->super;
 }
 
+static inline struct imm_state const *
+imm_frame_state_super_c(struct imm_frame_state const *frame)
+{
+    return &frame->super;
+}
+
 #endif

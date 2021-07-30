@@ -68,9 +68,7 @@ void test_hmm_wrong_states(void)
                          imm_log(0.3)),
        IMM_ILLEGALARG);
 
-    EQ(imm_hmm_normalize_state_trans(&hmm, imm_mute_state_super(&state1)),
-       IMM_ILLEGALARG);
+    EQ(imm_hmm_normalize_state_trans(&hmm, imm_super(&state1)), IMM_ILLEGALARG);
 
-    EQ(imm_hmm_normalize_state_trans(&hmm, imm_mute_state_super(&state0)),
-       IMM_SUCCESS);
+    EQ(imm_hmm_normalize_state_trans(&hmm, imm_super(&state0)), IMM_SUCCESS);
 }

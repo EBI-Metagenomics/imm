@@ -22,4 +22,10 @@ imm_normal_state_super(struct imm_normal_state *normal)
     return &normal->super;
 }
 
+static inline struct imm_state const *
+imm_normal_state_super_c(struct imm_normal_state const *normal)
+{
+    return &normal->super;
+}
+
 #endif

@@ -35,7 +35,7 @@ void test_frame_state1(void)
 
     struct imm_frame_state state;
     imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
-    struct imm_state *s = imm_frame_state_super(&state);
+    struct imm_state *s = imm_super(&state);
 
     struct imm_seq seq = imm_seq(IMM_STR("A"), abc);
     CLOSE(imm_state_lprob(s, &seq), -5.9145034795);
@@ -72,7 +72,7 @@ void test_frame_state2(void)
 
     struct imm_frame_state state;
     imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
-    struct imm_state *s = imm_frame_state_super(&state);
+    struct imm_state *s = imm_super(&state);
 
     struct imm_seq seq;
     seq = imm_seq(IMM_STR("A"), abc);
@@ -127,7 +127,7 @@ void test_frame_state3(void)
 
     struct imm_frame_state state;
     imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
-    struct imm_state *s = imm_frame_state_super(&state);
+    struct imm_state *s = imm_super(&state);
 
     struct imm_seq seq;
     seq = imm_seq(IMM_STR("A"), abc);

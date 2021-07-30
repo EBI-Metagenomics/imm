@@ -20,4 +20,10 @@ imm_mute_state_super(struct imm_mute_state *mute)
     return &mute->super;
 }
 
+static inline struct imm_state const *
+imm_mute_state_super_c(struct imm_mute_state const *mute)
+{
+    return &mute->super;
+}
+
 #endif
