@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 project(
     imm
-    VERSION 0.0.13
+    VERSION 0.0.14
     LANGUAGES C)
 
 # Generate compile_commands.json file
@@ -103,8 +103,13 @@ if(CI_BUILD)
     add_compile_options(-Werror)
 endif()
 
-option(IMM_DOUBLE_PRECISION
-       "Enable double-precision floating-point format for internals" OFF)
+if(DEFINED ENV{IMM_DOUBLE_PRECISION})
+    set(IMM_DOUBLE_PRECISION "$ENV{IMM_DOUBLE_PRECISION}")
+else()
+    option(IMM_DOUBLE_PRECISION
+           "Enable double-precision floating-point format for internals" OFF)
+endif()
+
 if(IMM_DOUBLE_PRECISION)
     message(STATUS "Double-precision floating-point - ON")
 else()
