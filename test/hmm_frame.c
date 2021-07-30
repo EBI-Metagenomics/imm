@@ -40,7 +40,8 @@ int main(void)
 
 void test_hmm_frame_state_0eps(void)
 {
-    struct imm_hmm hmm = imm_hmm_init(abc);
+    struct imm_hmm hmm;
+    imm_hmm_init(&hmm, abc);
 
     struct imm_frame_state state;
     imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.0f);
@@ -62,7 +63,8 @@ void test_hmm_frame_state_0eps(void)
 
 void test_hmm_frame_state_len1(void)
 {
-    struct imm_hmm hmm = imm_hmm_init(abc);
+    struct imm_hmm hmm;
+    imm_hmm_init(&hmm, abc);
 
     struct imm_frame_state state;
     imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
@@ -104,7 +106,8 @@ void test_hmm_frame_state_len1(void)
 
 void test_hmm_frame_state_len2(void)
 {
-    struct imm_hmm hmm = imm_hmm_init(abc);
+    struct imm_hmm hmm;
+    imm_hmm_init(&hmm, abc);
 
     struct imm_frame_state state;
     imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
@@ -170,7 +173,8 @@ void test_hmm_frame_state_len2(void)
 
 void test_hmm_frame_state_len3(void)
 {
-    struct imm_hmm hmm = imm_hmm_init(abc);
+    struct imm_hmm hmm;
+    imm_hmm_init(&hmm, abc);
 
     struct imm_frame_state state;
     imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
@@ -212,7 +216,8 @@ void test_hmm_frame_state_len3(void)
 
 void test_hmm_frame_state_len4(void)
 {
-    struct imm_hmm hmm = imm_hmm_init(abc);
+    struct imm_hmm hmm;
+    imm_hmm_init(&hmm, abc);
 
     struct imm_frame_state state;
     imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
@@ -242,7 +247,8 @@ void test_hmm_frame_state_len4(void)
 
 void test_hmm_frame_state_len5(void)
 {
-    struct imm_hmm hmm = imm_hmm_init(abc);
+    struct imm_hmm hmm;
+    imm_hmm_init(&hmm, abc);
 
     struct imm_frame_state state;
     imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);

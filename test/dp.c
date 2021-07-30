@@ -29,7 +29,8 @@ void test_dp_illegal(void)
 {
     struct imm_mute_state state;
     imm_mute_state_init(&state, 3, &abc);
-    struct imm_hmm hmm = imm_hmm_init(&abc);
+    struct imm_hmm hmm;
+    imm_hmm_init(&hmm, &abc);
 
     struct imm_dp *dp = imm_hmm_new_dp(&hmm, imm_super(&state));
     ISNULL(dp);
@@ -54,7 +55,8 @@ void test_dp_empty_path(void)
 {
     struct imm_mute_state state;
     imm_mute_state_init(&state, 3, &abc);
-    struct imm_hmm hmm = imm_hmm_init(&abc);
+    struct imm_hmm hmm;
+    imm_hmm_init(&hmm, &abc);
     struct imm_result result = imm_result();
 
     EQ(imm_hmm_add_state(&hmm, imm_super(&state)), IMM_SUCCESS);
@@ -75,7 +77,8 @@ void test_dp_one_mute(void)
 {
     struct imm_mute_state state;
     imm_mute_state_init(&state, 3, &abc);
-    struct imm_hmm hmm = imm_hmm_init(&abc);
+    struct imm_hmm hmm;
+    imm_hmm_init(&hmm, &abc);
     struct imm_result result = imm_result();
 
     EQ(imm_hmm_add_state(&hmm, imm_super(&state)), IMM_SUCCESS);
@@ -105,7 +108,8 @@ void test_dp_two_mutes(void)
     imm_mute_state_init(&state0, 0, &abc);
     struct imm_mute_state state1;
     imm_mute_state_init(&state1, 12, &abc);
-    struct imm_hmm hmm = imm_hmm_init(&abc);
+    struct imm_hmm hmm;
+    imm_hmm_init(&hmm, &abc);
     struct imm_result result = imm_result();
 
     EQ(imm_hmm_add_state(&hmm, imm_super(&state0)), IMM_SUCCESS);

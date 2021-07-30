@@ -21,7 +21,8 @@ void test_hmm_state_id(void)
 {
     struct imm_mute_state state;
     imm_mute_state_init(&state, 0, &abc);
-    struct imm_hmm hmm = imm_hmm_init(&abc);
+    struct imm_hmm hmm;
+    imm_hmm_init(&hmm, &abc);
 
     EQ(imm_hmm_add_state(&hmm, imm_super(&state)), IMM_SUCCESS);
     EQ(imm_hmm_add_state(&hmm, imm_super(&state)), IMM_ILLEGALARG);
@@ -33,7 +34,8 @@ void test_hmm_set_trans(void)
     imm_mute_state_init(&state0, 0, &abc);
     struct imm_mute_state state1;
     imm_mute_state_init(&state1, 1, &abc);
-    struct imm_hmm hmm = imm_hmm_init(&abc);
+    struct imm_hmm hmm;
+    imm_hmm_init(&hmm, &abc);
 
     EQ(imm_hmm_add_state(&hmm, imm_super(&state0)), IMM_SUCCESS);
     EQ(imm_hmm_add_state(&hmm, imm_super(&state1)), IMM_SUCCESS);
@@ -45,7 +47,8 @@ void test_hmm_set_trans(void)
 
 void test_hmm_wrong_states(void)
 {
-    struct imm_hmm hmm = imm_hmm_init(&abc);
+    struct imm_hmm hmm;
+    imm_hmm_init(&hmm, &abc);
 
     struct imm_mute_state state0;
     imm_mute_state_init(&state0, 0, &abc);

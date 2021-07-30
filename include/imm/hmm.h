@@ -48,11 +48,10 @@ IMM_API struct imm_dp *imm_hmm_new_dp(struct imm_hmm const *hmm,
                                       struct imm_state const *end_state);
 IMM_API void imm_hmm_reset(struct imm_hmm *hmm);
 
-static inline struct imm_hmm imm_hmm_init(struct imm_abc const *abc)
+static inline void imm_hmm_init(struct imm_hmm *hmm, struct imm_abc const *abc)
 {
-    struct imm_hmm hmm = {.abc = abc};
-    imm_hmm_reset(&hmm);
-    return hmm;
+    hmm->abc = abc;
+    imm_hmm_reset(hmm);
 }
 
 IMM_API int imm_hmm_reset_dp(struct imm_hmm const *hmm,
