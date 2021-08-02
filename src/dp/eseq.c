@@ -5,13 +5,13 @@
 
 void eseq_del(struct eseq const *eseq) { matrixu16_deinit(&eseq->data); }
 
-void eseq_init(struct eseq *eseq, struct code const *code)
+void eseq_init(struct eseq *eseq, struct imm_dp_code const *code)
 {
     matrixu16_empty(&eseq->data);
     eseq_reset(eseq, code);
 }
 
-void eseq_reset(struct eseq *eseq, struct code const *code)
+void eseq_reset(struct eseq *eseq, struct imm_dp_code const *code)
 {
     eseq->code = code;
 }

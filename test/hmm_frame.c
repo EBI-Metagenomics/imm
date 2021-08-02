@@ -82,26 +82,27 @@ void test_hmm_frame_state_len1(void)
     seq = imm_seq(IMM_STR("C"), abc);
     CLOSE(imm_hmm_loglik(&hmm, &seq, &path), -7.1184762838);
 
-    struct imm_dp *dp = imm_hmm_new_dp(&hmm, imm_super(&state));
-    struct imm_task *task = imm_task_new(dp);
+    struct imm_dp dp;
+    imm_hmm_init_dp(&hmm, imm_super(&state), &dp);
+    struct imm_task *task = imm_task_new(&dp);
     struct imm_result result = imm_result();
 
     seq = imm_seq(IMM_STR("A"), abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
-    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
     CLOSE(result.loglik, -6.0198639951);
 
-    imm_hmm_reset_dp(&hmm, imm_super(&state), dp);
-    imm_task_reset(task, dp);
+    imm_hmm_reset_dp(&hmm, imm_super(&state), &dp);
+    imm_task_reset(task, &dp);
     seq = imm_seq(IMM_STR("C"), abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
-    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
     CLOSE(result.loglik, -7.1184762838);
 
     imm_del(task);
     imm_del(&path);
     imm_del(&result);
-    imm_del(dp);
+    imm_del(&dp);
 }
 
 void test_hmm_frame_state_len2(void)
@@ -135,38 +136,39 @@ void test_hmm_frame_state_len2(void)
     seq = imm_seq(IMM_STR("TT"), abc);
     CLOSE(imm_hmm_loglik(&hmm, &seq, &path), -5.3267168311);
 
-    struct imm_dp *dp = imm_hmm_new_dp(&hmm, imm_super(&state));
-    struct imm_task *task = imm_task_new(dp);
+    struct imm_dp dp;
+    imm_hmm_init_dp(&hmm, imm_super(&state), &dp);
+    struct imm_task *task = imm_task_new(&dp);
     struct imm_result result = imm_result();
 
     seq = imm_seq(IMM_STR("AA"), abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
-    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
     CLOSE(result.loglik, -8.9102357365);
 
-    imm_hmm_reset_dp(&hmm, imm_super(&state), dp);
-    imm_task_reset(task, dp);
+    imm_hmm_reset_dp(&hmm, imm_super(&state), &dp);
+    imm_task_reset(task, &dp);
     seq = imm_seq(IMM_STR("TG"), abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
-    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
     CLOSE(result.loglik, -3.2434246877);
 
-    imm_hmm_reset_dp(&hmm, imm_super(&state), dp);
-    imm_task_reset(task, dp);
+    imm_hmm_reset_dp(&hmm, imm_super(&state), &dp);
+    imm_task_reset(task, &dp);
     seq = imm_seq(IMM_STR("CC"), abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
-    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
     CLOSE(result.loglik, -4.2250228758);
 
-    imm_hmm_reset_dp(&hmm, imm_super(&state), dp);
-    imm_task_reset(task, dp);
+    imm_hmm_reset_dp(&hmm, imm_super(&state), &dp);
+    imm_task_reset(task, &dp);
     seq = imm_seq(IMM_STR("TT"), abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
-    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
     CLOSE(result.loglik, -5.3267168311);
 
     imm_del(task);
-    imm_del(dp);
+    imm_del(&dp);
     imm_del(&result);
     imm_del(&path);
 }
@@ -192,24 +194,25 @@ void test_hmm_frame_state_len3(void)
     seq = imm_seq(IMM_STR("ATG"), abc);
     CLOSE(imm_hmm_loglik(&hmm, &seq, &path), -0.6397933781);
 
-    struct imm_dp *dp = imm_hmm_new_dp(&hmm, imm_super(&state));
-    struct imm_task *task = imm_task_new(dp);
+    struct imm_dp dp;
+    imm_hmm_init_dp(&hmm, imm_super(&state), &dp);
+    struct imm_task *task = imm_task_new(&dp);
     struct imm_result result = imm_result();
 
     seq = imm_seq(IMM_STR("ATC"), abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
-    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
     CLOSE(result.loglik, -7.0123444607);
 
-    imm_hmm_reset_dp(&hmm, imm_super(&state), dp);
-    imm_task_reset(task, dp);
+    imm_hmm_reset_dp(&hmm, imm_super(&state), &dp);
+    imm_task_reset(task, &dp);
     seq = imm_seq(IMM_STR("ATG"), abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
-    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
     CLOSE(result.loglik, -0.6397933781);
 
     imm_del(task);
-    imm_del(dp);
+    imm_del(&dp);
     imm_del(&result);
     imm_del(&path);
 }
@@ -230,17 +233,18 @@ void test_hmm_frame_state_len4(void)
     struct imm_seq seq = imm_seq(IMM_STR("ATCC"), abc);
     CLOSE(imm_hmm_loglik(&hmm, &seq, &path), -11.9829290512);
 
-    struct imm_dp *dp = imm_hmm_new_dp(&hmm, imm_super(&state));
-    struct imm_task *task = imm_task_new(dp);
+    struct imm_dp dp;
+    imm_hmm_init_dp(&hmm, imm_super(&state), &dp);
+    struct imm_task *task = imm_task_new(&dp);
     struct imm_result result = imm_result();
 
     seq = imm_seq(IMM_STR("ATCC"), abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
-    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
     CLOSE(result.loglik, -11.9829290512);
 
     imm_del(task);
-    imm_del(dp);
+    imm_del(&dp);
     imm_del(&result);
     imm_del(&path);
 }
@@ -266,24 +270,25 @@ void test_hmm_frame_state_len5(void)
     seq = imm_seq(IMM_STR("ACTAG"), abc);
     CLOSE(imm_hmm_loglik(&hmm, &seq, &path), -10.1142085574);
 
-    struct imm_dp *dp = imm_hmm_new_dp(&hmm, imm_super(&state));
-    struct imm_task *task = imm_task_new(dp);
+    struct imm_dp dp;
+    imm_hmm_init_dp(&hmm, imm_super(&state), &dp);
+    struct imm_task *task = imm_task_new(&dp);
     struct imm_result result = imm_result();
 
     seq = imm_seq(IMM_STR("ACGTA"), abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
-    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
     COND(imm_lprob_is_nan(result.loglik));
 
-    imm_hmm_reset_dp(&hmm, imm_super(&state), dp);
-    imm_task_reset(task, dp);
+    imm_hmm_reset_dp(&hmm, imm_super(&state), &dp);
+    imm_task_reset(task, &dp);
     seq = imm_seq(IMM_STR("ACTAG"), abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
-    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
     CLOSE(result.loglik, -10.1142085574);
 
     imm_del(task);
-    imm_del(dp);
+    imm_del(&dp);
     imm_del(&result);
     imm_del(&path);
 }

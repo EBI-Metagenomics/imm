@@ -5,7 +5,7 @@
 #include "support.h"
 #include <limits.h>
 
-void state_table_init(struct state_table *tbl)
+void state_table_init(struct imm_dp_state_table *tbl)
 {
     tbl->nstates = IMM_NSTATES_NULL;
     tbl->ids = NULL;
@@ -15,7 +15,8 @@ void state_table_init(struct state_table *tbl)
     tbl->span = NULL;
 }
 
-void state_table_reset(struct state_table *tbl, struct dp_args const *args)
+void state_table_reset(struct imm_dp_state_table *tbl,
+                       struct dp_args const *args)
 {
     tbl->nstates = args->nstates;
     tbl->ids = xrealloc(tbl->ids, sizeof(*tbl->ids) * args->nstates);
@@ -33,14 +34,14 @@ void state_table_reset(struct state_table *tbl, struct dp_args const *args)
     tbl->end_state_idx = args->end_state->idx;
 }
 
-void state_table_del(struct state_table const *tbl)
+void state_table_del(struct imm_dp_state_table const *tbl)
 {
     free(tbl->ids);
     free(tbl->span);
 }
 
 #ifndef NDEBUG
-void state_table_dump(struct state_table const *tbl)
+void state_table_dump(struct imm_dp_state_table const *tbl)
 {
     for (unsigned i = 0; i < tbl->nstates; ++i)
     {

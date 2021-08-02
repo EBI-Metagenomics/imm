@@ -32,23 +32,23 @@ void test_dp_illegal(void)
     struct imm_hmm hmm;
     imm_hmm_init(&hmm, &abc);
 
-    struct imm_dp *dp = imm_hmm_new_dp(&hmm, imm_super(&state));
-    ISNULL(dp);
+    struct imm_dp dp;
+    EQ(imm_hmm_init_dp(&hmm, imm_super(&state), &dp), IMM_ILLEGALARG);
+    imm_del(&dp);
 
     EQ(imm_hmm_add_state(&hmm, imm_super(&state)), IMM_SUCCESS);
-    dp = imm_hmm_new_dp(&hmm, imm_super(&state));
-    ISNULL(dp);
+    EQ(imm_hmm_init_dp(&hmm, imm_super(&state), &dp), IMM_ILLEGALARG);
+    imm_del(&dp);
 
     EQ(imm_hmm_set_start(&hmm, imm_super(&state), imm_log(0.1)), IMM_SUCCESS);
-    dp = imm_hmm_new_dp(&hmm, imm_super(&state));
-    NOTNULL(dp);
-    imm_del(dp);
+    EQ(imm_hmm_init_dp(&hmm, imm_super(&state), &dp), IMM_SUCCESS);
+    imm_del(&dp);
 
     EQ(imm_hmm_set_trans(&hmm, imm_super(&state), imm_super(&state),
                          imm_log(0.5)),
        IMM_SUCCESS);
-    dp = imm_hmm_new_dp(&hmm, imm_super(&state));
-    ISNULL(dp);
+    EQ(imm_hmm_init_dp(&hmm, imm_super(&state), &dp), IMM_RUNTIMEERROR);
+    imm_del(&dp);
 }
 
 void test_dp_empty_path(void)
@@ -61,16 +61,16 @@ void test_dp_empty_path(void)
 
     EQ(imm_hmm_add_state(&hmm, imm_super(&state)), IMM_SUCCESS);
     EQ(imm_hmm_set_start(&hmm, imm_super(&state), imm_log(0.1)), IMM_SUCCESS);
-    struct imm_dp *dp = imm_hmm_new_dp(&hmm, imm_super(&state));
-    NOTNULL(dp);
+    struct imm_dp dp;
+    EQ(imm_hmm_init_dp(&hmm, imm_super(&state), &dp), IMM_SUCCESS);
 
-    struct imm_task *task = imm_task_new(dp);
+    struct imm_task *task = imm_task_new(&dp);
     imm_task_setup(task, &A);
-    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
     EQ(imm_path_nsteps(&result.path), 0);
 
     imm_del(task);
-    imm_del(dp);
+    imm_del(&dp);
 }
 
 void test_dp_one_mute(void)
@@ -84,22 +84,23 @@ void test_dp_one_mute(void)
     EQ(imm_hmm_add_state(&hmm, imm_super(&state)), IMM_SUCCESS);
 
     EQ(imm_hmm_set_start(&hmm, imm_super(&state), imm_log(0.3)), IMM_SUCCESS);
-    struct imm_dp *dp = imm_hmm_new_dp(&hmm, imm_super(&state));
+    struct imm_dp dp;
+    EQ(imm_hmm_init_dp(&hmm, imm_super(&state), &dp), IMM_SUCCESS);
 
-    struct imm_task *task = imm_task_new(dp);
-    EQ(imm_dp_viterbi(dp, task, &result), IMM_ILLEGALARG);
+    struct imm_task *task = imm_task_new(&dp);
+    EQ(imm_dp_viterbi(&dp, task, &result), IMM_ILLEGALARG);
 
     imm_task_setup(task, &EMPTY);
-    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
     EQ(imm_path_nsteps(&result.path), 1);
 
     imm_task_setup(task, &ATT);
-    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
     EQ(imm_path_nsteps(&result.path), 0);
 
     imm_del(&result);
     imm_del(task);
-    imm_del(dp);
+    imm_del(&dp);
 }
 
 void test_dp_two_mutes(void)
@@ -119,18 +120,18 @@ void test_dp_two_mutes(void)
                          imm_log(0.5)),
        IMM_SUCCESS);
 
-    struct imm_dp *dp = imm_hmm_new_dp(&hmm, imm_super(&state1));
-    ISNULL(dp);
+    struct imm_dp dp;
+    EQ(imm_hmm_init_dp(&hmm, imm_super(&state1), &dp), IMM_ILLEGALARG);
 
     EQ(imm_hmm_set_start(&hmm, imm_super(&state0), imm_log(0.3)), IMM_SUCCESS);
-    dp = imm_hmm_new_dp(&hmm, imm_super(&state1));
+    EQ(imm_hmm_init_dp(&hmm, imm_super(&state1), &dp), IMM_SUCCESS);
 
-    struct imm_task *task = imm_task_new(dp);
+    struct imm_task *task = imm_task_new(&dp);
 
-    EQ(imm_dp_viterbi(dp, task, &result), IMM_ILLEGALARG);
+    EQ(imm_dp_viterbi(&dp, task, &result), IMM_ILLEGALARG);
 
     imm_task_setup(task, &EMPTY);
-    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
     EQ(imm_path_nsteps(&result.path), 2);
     EQ(imm_path_step(&result.path, 0)->seqlen, 0);
     EQ(imm_path_step(&result.path, 0)->state_id, 0);
@@ -138,10 +139,10 @@ void test_dp_two_mutes(void)
     EQ(imm_path_step(&result.path, 1)->state_id, 12);
 
     imm_task_setup(task, &ATT);
-    EQ(imm_dp_viterbi(dp, task, &result), IMM_SUCCESS);
+    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
     EQ(imm_path_nsteps(&result.path), 0);
 
     imm_del(&result);
-    imm_del(dp);
+    imm_del(&dp);
     imm_del(task);
 }

@@ -44,8 +44,9 @@ IMM_API void imm_hmm_write_dot(struct imm_hmm *hmm, FILE *fp,
 
 IMM_API int imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state);
 
-IMM_API struct imm_dp *imm_hmm_new_dp(struct imm_hmm const *hmm,
-                                      struct imm_state const *end_state);
+IMM_API int imm_hmm_init_dp(struct imm_hmm const *hmm,
+                            struct imm_state const *end_state,
+                            struct imm_dp *dp);
 IMM_API void imm_hmm_reset(struct imm_hmm *hmm);
 
 static inline void imm_hmm_init(struct imm_hmm *hmm, struct imm_abc const *abc)

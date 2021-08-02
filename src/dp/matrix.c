@@ -4,14 +4,14 @@
 
 #define MAX_LOOKUP (2 * IMM_STATE_MAX_SEQLEN)
 
-void matrix_init(struct matrix *matrix, struct state_table const *tbl)
+void matrix_init(struct matrix *matrix, struct imm_dp_state_table const *tbl)
 {
     matrix->state_col = NULL;
     matrixf_init(&matrix->score, MAX_LOOKUP, 1);
     matrix_reset(matrix, tbl);
 }
 
-void matrix_reset(struct matrix *matrix, struct state_table const *tbl)
+void matrix_reset(struct matrix *matrix, struct imm_dp_state_table const *tbl)
 {
     matrix->state_col =
         xrealloc(matrix->state_col, sizeof(*matrix->state_col) * tbl->nstates);

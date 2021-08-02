@@ -101,16 +101,11 @@ int imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
     return IMM_SUCCESS;
 }
 
-struct imm_dp *imm_hmm_new_dp(struct imm_hmm const *hmm,
-                              struct imm_state const *end_state)
+int imm_hmm_init_dp(struct imm_hmm const *hmm,
+                    struct imm_state const *end_state, struct imm_dp *dp)
 {
-    struct imm_dp *dp = imm_dp_new(hmm->abc);
-    if (imm_hmm_reset_dp(hmm, end_state, dp))
-    {
-        free(dp);
-        return NULL;
-    }
-    return dp;
+    imm_dp_init(dp, hmm->abc);
+    return imm_hmm_reset_dp(hmm, end_state, dp);
 }
 
 void imm_hmm_reset(struct imm_hmm *hmm)

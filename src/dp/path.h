@@ -6,8 +6,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-struct state_table;
-struct trans_table;
+struct imm_dp_state_table;
+struct imm_dp_trans_table;
 
 /*
  * It compactly encodes the optimal step to every `(pos, state)`, where
@@ -76,11 +76,11 @@ static inline uint64_t start_bit(struct path const *path, unsigned pos,
 
 void path_del(struct path const *path);
 
-void path_init(struct path *path, struct state_table const *state_tbl,
-               struct trans_table const *trans_tbl);
+void path_init(struct path *path, struct imm_dp_state_table const *state_tbl,
+               struct imm_dp_trans_table const *trans_tbl);
 
-void path_reset(struct path *path, struct state_table const *state_tbl,
-                struct trans_table const *trans_tbl);
+void path_reset(struct path *path, struct imm_dp_state_table const *state_tbl,
+                struct imm_dp_trans_table const *trans_tbl);
 
 void path_setup(struct path *path, unsigned len);
 

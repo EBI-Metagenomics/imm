@@ -5,17 +5,17 @@
 #include "matrix/matrix.h"
 
 struct imm_seq;
-struct code;
+struct imm_dp_code;
 
 struct eseq
 {
     struct matrixu16 data;
-    struct code const *code;
+    struct imm_dp_code const *code;
 };
 
 void eseq_del(struct eseq const *eseq);
 
-void eseq_reset(struct eseq *eseq, struct code const *code);
+void eseq_reset(struct eseq *eseq, struct imm_dp_code const *code);
 
 static inline unsigned eseq_get(struct eseq const *eseq, unsigned pos,
                                 unsigned len)
@@ -28,7 +28,7 @@ static inline unsigned eseq_len(struct eseq const *eseq)
     return matrixu16_nrows(&eseq->data) - 1;
 }
 
-void eseq_init(struct eseq *eseq, struct code const *code);
+void eseq_init(struct eseq *eseq, struct imm_dp_code const *code);
 
 void eseq_setup(struct eseq *eseq, struct imm_seq const *seq);
 

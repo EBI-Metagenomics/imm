@@ -1,6 +1,9 @@
 #include "io.h"
 #include "cmp.h"
-#include "dp/imm_dp.h"
+#include "dp/code.h"
+#include "dp/emis.h"
+#include "dp/state_table.h"
+#include "dp/trans_table.h"
 #include "imm/dp.h"
 #include "support.h"
 
@@ -42,15 +45,15 @@ int imm_dp_write(struct imm_dp const *dp, FILE *file)
     cmp_write_u16(&ctx, (uint16_t)dp->code.size);
 
     /* emission */
-    size = emission_score_size(&dp->emission, nstates);
+    size = emis_score_size(&dp->emis, nstates);
     cmp_write_array(&ctx, size);
     for (unsigned i = 0; i < size; ++i)
-        write_imm_float(&ctx, dp->emission.score[i]);
+        write_imm_float(&ctx, dp->emis.score[i]);
 
-    size = emission_offset_size(nstates);
+    size = emis_offset_size(nstates);
     cmp_write_array(&ctx, size);
     for (unsigned i = 0; i < size; ++i)
-        cmp_write_u32(&ctx, (uint32_t)dp->emission.offset[i]);
+        cmp_write_u32(&ctx, (uint32_t)dp->emis.offset[i]);
 
     /* trans_table */
     cmp_write_u16(&ctx, (uint16_t)dp->trans_table.ntrans);
@@ -109,12 +112,12 @@ int imm_dp_read(struct imm_dp *dp, FILE *file)
     cmp_ctx_t ctx = {0};
     io_init(&ctx, file);
 
-    struct emission *e = NULL;
-    struct trans_table *tt = NULL;
-    struct state_table *st = NULL;
+    struct imm_dp_emis *e = NULL;
+    struct imm_dp_trans_table *tt = NULL;
+    struct imm_dp_state_table *st = NULL;
 
     /* code */
-    struct code *code = &dp->code;
+    struct imm_dp_code *code = &dp->code;
     ERETURN(!cmp_read_u8(&ctx, &u8), IMM_IOERROR);
     code->seqlen.min = u8;
     ERETURN(!cmp_read_u8(&ctx, &u8), IMM_IOERROR);
@@ -140,7 +143,7 @@ int imm_dp_read(struct imm_dp *dp, FILE *file)
     code->size = u16;
 
     /* emission */
-    e = &dp->emission;
+    e = &dp->emis;
     ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
     e->score = reallocf(e->score, sizeof(*e->score) * size);
     ERETURN(!e->score && size > 0, IMM_IOERROR);

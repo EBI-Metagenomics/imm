@@ -34,7 +34,7 @@ add_library(
     src/dna.c
     src/dp/code.c
     src/dp/dp.c
-    src/dp/emission.c
+    src/dp/emis.c
     src/dp/eseq.c
     src/dp/io.c
     src/dp/matrix.c

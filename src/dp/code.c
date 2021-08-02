@@ -5,7 +5,7 @@
 #include "support.h"
 #include <limits.h>
 
-static inline unsigned calc_size(struct code const *code)
+static inline unsigned calc_size(struct imm_dp_code const *code)
 {
     unsigned long ncombs = ipow(imm_abc_size(code->abc), code->seqlen.max);
     IMM_BUG(ncombs > UINT16_MAX);
@@ -13,13 +13,13 @@ static inline unsigned calc_size(struct code const *code)
                       ncombs);
 }
 
-void code_del(struct code const *code)
+void code_del(struct imm_dp_code const *code)
 {
     free(code->offset);
     free(code->stride);
 }
 
-unsigned code_encode(struct code const *code, struct imm_seq const *seq)
+unsigned code_encode(struct imm_dp_code const *code, struct imm_seq const *seq)
 {
     unsigned c = code->offset[imm_seq_size(seq) - code->seqlen.min];
     unsigned len = imm_seq_size(seq);
@@ -32,7 +32,7 @@ unsigned code_encode(struct code const *code, struct imm_seq const *seq)
     return c;
 }
 
-void code_init(struct code *code, struct imm_abc const *abc)
+void code_init(struct imm_dp_code *code, struct imm_abc const *abc)
 {
     code->seqlen.min = IMM_STATE_NULL_SEQLEN;
     code->seqlen.max = IMM_STATE_NULL_SEQLEN;
@@ -42,7 +42,7 @@ void code_init(struct code *code, struct imm_abc const *abc)
     code->abc = abc;
 }
 
-void code_reset(struct code *code, unsigned min_seq, unsigned max_seq)
+void code_reset(struct imm_dp_code *code, unsigned min_seq, unsigned max_seq)
 {
     IMM_BUG(!code->abc);
     if (code->seqlen.min == min_seq && code->seqlen.max == max_seq)

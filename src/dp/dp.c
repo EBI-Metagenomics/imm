@@ -1,7 +1,6 @@
 #include "dp/dp.h"
 #include "dp/code.h"
-#include "dp/emission.h"
-#include "dp/imm_dp.h"
+#include "dp/emis.h"
 #include "dp/matrix.h"
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
@@ -64,8 +63,7 @@ static void set_score(struct imm_dp const *dp, struct imm_task *task,
         unsigned seq_code = eseq_get(&task->eseq, row, len);
         seq_code -= code_offset(&dp->code, min_len);
 
-        imm_float score =
-            trans_score + emission_score(&dp->emission, state, seq_code);
+        imm_float score = trans_score + emis_score(&dp->emis, state, seq_code);
         matrix_set_score(&task->matrix, row, state, len, score);
     }
 }
@@ -84,14 +82,12 @@ static void _viterbi(struct imm_dp const *dp, struct imm_task *task,
 static void _viterbi_safe(struct imm_dp const *dp, struct imm_task *task,
                           unsigned const start_row, unsigned const stop_row);
 
-struct imm_dp *imm_dp_new(struct imm_abc const *abc)
+void imm_dp_init(struct imm_dp *dp, struct imm_abc const *abc)
 {
-    struct imm_dp *dp = xmalloc(sizeof(*dp));
     code_init(&dp->code, abc);
-    emission_init(&dp->emission);
+    emis_init(&dp->emis);
     trans_table_init(&dp->trans_table);
     state_table_init(&dp->state_table);
-    return dp;
 }
 
 void imm_dp_del(struct imm_dp const *dp)
@@ -99,10 +95,9 @@ void imm_dp_del(struct imm_dp const *dp)
     if (dp)
     {
         code_del(&dp->code);
-        emission_del(&dp->emission);
+        emis_del(&dp->emis);
         trans_table_del(&dp->trans_table);
         state_table_del(&dp->state_table);
-        free((void *)dp);
     }
 }
 
@@ -110,7 +105,7 @@ void dp_reset(struct imm_dp *dp, struct dp_args const *args)
 {
     code_reset(&dp->code, min_seq(args->nstates, args->states),
                max_seq(args->nstates, args->states));
-    emission_reset(&dp->emission, &dp->code, args->states, args->nstates);
+    emis_reset(&dp->emis, &dp->code, args->states, args->nstates);
     trans_table_reset(&dp->trans_table, args);
     state_table_reset(&dp->state_table, args);
 }

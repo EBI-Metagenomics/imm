@@ -5,7 +5,7 @@
 #include "support.h"
 #include <limits.h>
 
-unsigned trans_table_idx(struct trans_table *trans_tbl, unsigned src_idx,
+unsigned trans_table_idx(struct imm_dp_trans_table *trans_tbl, unsigned src_idx,
                          unsigned dst_idx)
 {
     for (unsigned i = 0; i < trans_table_ntrans(trans_tbl, dst_idx); ++i)
@@ -17,14 +17,15 @@ unsigned trans_table_idx(struct trans_table *trans_tbl, unsigned src_idx,
     return IMM_TRANS_NULL_IDX;
 }
 
-void trans_table_init(struct trans_table *tbl)
+void trans_table_init(struct imm_dp_trans_table *tbl)
 {
     tbl->ntrans = UINT_MAX;
     tbl->trans = NULL;
     tbl->offset = NULL;
 }
 
-void trans_table_reset(struct trans_table *tbl, struct dp_args const *args)
+void trans_table_reset(struct imm_dp_trans_table *tbl,
+                       struct dp_args const *args)
 {
     IMM_BUG(args->nstates == 0);
     tbl->ntrans = args->ntrans;
@@ -49,7 +50,7 @@ void trans_table_reset(struct trans_table *tbl, struct dp_args const *args)
     }
 }
 
-void trans_table_del(struct trans_table const *tbl)
+void trans_table_del(struct imm_dp_trans_table const *tbl)
 {
     free(tbl->trans);
     free(tbl->offset);

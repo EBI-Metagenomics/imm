@@ -1,5 +1,5 @@
 #include "imm/task.h"
-#include "dp/imm_dp.h"
+#include "imm/dp.h"
 #include "imm/seq.h"
 #include "task.h"
 

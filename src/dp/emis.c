@@ -1,27 +1,27 @@
-#include "dp/emission.h"
+#include "dp/emis.h"
 #include "dp/code.h"
 #include "imm/abc.h"
 #include "imm/cartes.h"
 #include "imm/state.h"
 #include "support.h"
 
-void emission_del(struct emission const *emission)
+void emis_del(struct imm_dp_emis const *emis)
 {
-    free(emission->score);
-    free(emission->offset);
+    free(emis->score);
+    free(emis->offset);
 }
 
-void emission_init(struct emission *emiss)
+void emis_init(struct imm_dp_emis *emiss)
 {
     emiss->score = NULL;
     emiss->offset = NULL;
 }
 
-void emission_reset(struct emission *emiss, struct code const *code,
-                    struct imm_state **states, unsigned nstates)
+void emis_reset(struct imm_dp_emis *emiss, struct imm_dp_code const *code,
+                struct imm_state **states, unsigned nstates)
 {
     emiss->offset = xrealloc(emiss->offset, sizeof(*emiss->offset) *
-                                                emission_offset_size(nstates));
+                                                emis_offset_size(nstates));
     emiss->offset[0] = 0;
 
     unsigned min = imm_state_span(states[0]).min;
@@ -33,9 +33,8 @@ void emission_reset(struct emission *emiss, struct code const *code,
     }
     emiss->offset[nstates] = size;
 
-    emiss->score =
-        xrealloc(emiss->score,
-                 sizeof(*emiss->score) * emission_score_size(emiss, nstates));
+    emiss->score = xrealloc(emiss->score, sizeof(*emiss->score) *
+                                              emis_score_size(emiss, nstates));
 
     struct imm_abc const *abc = code->abc;
     char const *set = abc->symbols;

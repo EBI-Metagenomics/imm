@@ -3,8 +3,8 @@
 #include "dp/trans_table.h"
 #include "support.h"
 
-void path_init(struct path *path, struct state_table const *state_tbl,
-               struct trans_table const *trans_tbl)
+void path_init(struct path *path, struct imm_dp_state_table const *state_tbl,
+               struct imm_dp_trans_table const *trans_tbl)
 {
     path->state_offset = NULL;
     path->trans_bits = NULL;
@@ -12,8 +12,8 @@ void path_init(struct path *path, struct state_table const *state_tbl,
     path->bit = NULL;
 }
 
-void path_reset(struct path *path, struct state_table const *state_tbl,
-                struct trans_table const *trans_tbl)
+void path_reset(struct path *path, struct imm_dp_state_table const *state_tbl,
+                struct imm_dp_trans_table const *trans_tbl)
 {
     path->nstates = state_tbl->nstates;
     path->state_offset = xrealloc(
