@@ -25,7 +25,7 @@ struct imm_dp
 
 IMM_API void imm_dp_init(struct imm_dp *dp, struct imm_abc const *abc);
 
-IMM_API void imm_dp_del(struct imm_dp const *dp);
+IMM_API void imm_dp_del(struct imm_dp *dp);
 
 IMM_API unsigned imm_dp_trans_idx(struct imm_dp *dp, unsigned src_idx,
                                   unsigned dst_idx);

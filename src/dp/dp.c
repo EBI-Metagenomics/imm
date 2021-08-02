@@ -90,7 +90,7 @@ void imm_dp_init(struct imm_dp *dp, struct imm_abc const *abc)
     state_table_init(&dp->state_table);
 }
 
-void imm_dp_del(struct imm_dp const *dp)
+void imm_dp_del(struct imm_dp *dp)
 {
     if (dp)
     {
