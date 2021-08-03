@@ -34,6 +34,7 @@ extern "C" {
 #include "imm/path.h"
 #include "imm/result.h"
 #include "imm/rna.h"
+#include "imm/rnd.h"
 #include "imm/seq.h"
 #include "imm/span.h"
 #include "imm/state.h"

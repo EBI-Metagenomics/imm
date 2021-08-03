@@ -1,11 +1,11 @@
 #include "io.h"
-#include "cmp.h"
 #include "dp/code.h"
 #include "dp/emis.h"
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
 #include "imm/dp.h"
 #include "support.h"
+#include "third-party/cmp.h"
 
 #define write_imm_float(ctx, v)                                                \
     _Generic((v), float : cmp_write_float, double : cmp_write_double)(ctx, v)

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 project(
     imm
-    VERSION 0.0.15
+    VERSION 0.0.16
     LANGUAGES C)
 
 # Generate compile_commands.json file
@@ -54,11 +54,12 @@ add_library(
     src/nuclt.c
     src/path.c
     src/rna.c
+    src/rnd.c
     src/seq.c
     src/support.c
     src/task.c
     src/tsort.c
-    third-party/cmp.c)
+    src/third-party/cmp.c)
 add_library(IMM::imm ALIAS imm)
 
 # Write out imm/export.h to the current binary directory Must include
@@ -128,8 +129,7 @@ target_include_directories(
     PUBLIC $<INSTALL_INTERFACE:include>
            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
-            ${CMAKE_CURRENT_SOURCE_DIR}/third-party)
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(imm PUBLIC LOGADDEXP::logaddexp)
 target_link_libraries(imm PUBLIC ELAPSED::elapsed)
 target_link_libraries(imm PUBLIC CCO::cco)

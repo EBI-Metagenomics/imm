@@ -1,8 +1,8 @@
 #ifndef IO_H
 #define IO_H
 
-#include "cmp.h"
 #include "support.h"
+#include "third-party/cmp.h"
 #include <limits.h>
 
 static bool __file_reader(cmp_ctx_t *ctx, void *data, size_t limit)

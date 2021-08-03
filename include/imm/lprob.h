@@ -3,6 +3,7 @@
 
 #include "imm/export.h"
 #include "imm/float.h"
+#include "imm/rnd.h"
 #include "logaddexp/logaddexp.h"
 #include <stdbool.h>
 #include <stddef.h>
@@ -10,6 +11,8 @@
 #define IMM_LPROB_NAN NAN
 #define IMM_LPROB_ONE 0.0f
 #define IMM_LPROB_ZERO -INFINITY
+
+struct imm_rnd;
 
 static inline imm_float imm_lprob_add(imm_float a, imm_float b)
 {
@@ -31,6 +34,9 @@ static inline bool imm_lprob_is_finite(imm_float a)
 }
 
 IMM_API int imm_lprob_normalize(unsigned len, imm_float arr[len]);
+
+IMM_API void imm_lprob_sample(struct imm_rnd *rnd, unsigned len,
+                              imm_float arr[len]);
 
 static inline imm_float imm_lprob_sum(unsigned len, imm_float const arr[len])
 {
