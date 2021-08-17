@@ -28,8 +28,6 @@ struct imm_state
     int mark;
 };
 
-typedef void (*imm_state_name)(unsigned id, char name[8]);
-
 static inline struct imm_abc const *imm_state_abc(struct imm_state const *state)
 {
     return state->abc;

@@ -39,8 +39,8 @@ struct imm_hmm
     } transitions;
 };
 
-IMM_API void imm_hmm_write_dot(struct imm_hmm *hmm, FILE *fp,
-                               imm_state_name state_name);
+IMM_API void imm_hmm_write_dot(struct imm_hmm const *hmm, FILE *restrict fp,
+                               imm_state_name *name);
 
 IMM_API int imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state);
 

@@ -74,19 +74,22 @@ static void set_state_indices(struct imm_hmm const *hmm,
     }
 }
 
-void imm_hmm_write_dot(struct imm_hmm *hmm, FILE *fp, imm_state_name state_name)
+void imm_hmm_write_dot(struct imm_hmm const *hmm, FILE *restrict fp,
+                       imm_state_name *name)
 {
     fprintf(fp, "digraph hmm {\n");
     struct imm_trans *t = NULL;
     unsigned bkt = 0;
     cco_hash_for_each(hmm->transitions.tbl, bkt, t, hnode)
     {
-        char src_name[8] = {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'};
-        char dst_name[8] = {'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0'};
+        char src_name[IMM_STATE_NAME_SIZE] = {'\0', '\0', '\0', '\0',
+                                              '\0', '\0', '\0', '\0'};
+        char dst_name[IMM_STATE_NAME_SIZE] = {'\0', '\0', '\0', '\0',
+                                              '\0', '\0', '\0', '\0'};
         struct imm_state *src = hmm_state(hmm, t->pair.id.src);
         struct imm_state *dst = hmm_state(hmm, t->pair.id.dst);
-        state_name(src->id, src_name);
-        state_name(dst->id, dst_name);
+        name(src->id, src_name);
+        name(dst->id, dst_name);
         fprintf(fp, "%s -> %s [label=%.4f];\n", src_name, dst_name, t->lprob);
     }
     fprintf(fp, "}\n");
