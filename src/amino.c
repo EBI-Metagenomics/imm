@@ -2,19 +2,19 @@
 #include "abc.h"
 #include "imm/abc.h"
 
-int imm_amino_init(struct imm_amino *amino, char const symbols[IMM_AMINO_SIZE],
-                   char any_symbol)
+enum imm_rc imm_amino_init(struct imm_amino *amino,
+                           char const symbols[IMM_AMINO_SIZE], char any_symbol)
 {
     struct imm_abc_vtable vtable = {IMM_AMINO, amino};
     return abc_init(&amino->super, IMM_AMINO_SIZE, symbols, any_symbol, vtable);
 }
 
-int imm_amino_write(struct imm_amino const *amino, FILE *file)
+enum imm_rc imm_amino_write(struct imm_amino const *amino, FILE *file)
 {
     return imm_abc_write(&amino->super, file);
 }
 
-int imm_amino_read(struct imm_amino *amino, FILE *file)
+enum imm_rc imm_amino_read(struct imm_amino *amino, FILE *file)
 {
     return imm_abc_read(&amino->super, file);
 }

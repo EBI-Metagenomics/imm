@@ -32,6 +32,7 @@ extern "C" {
 #include "imm/nuclt_lprob.h"
 #include "imm/pair.h"
 #include "imm/path.h"
+#include "imm/rc.h"
 #include "imm/result.h"
 #include "imm/rna.h"
 #include "imm/rnd.h"

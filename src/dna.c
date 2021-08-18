@@ -1,20 +1,20 @@
 #include "imm/dna.h"
 #include "abc.h"
 
-int imm_dna_init(struct imm_dna *dna, char const symbols[IMM_DNA_SIZE],
-                 char any_symbol)
+enum imm_rc imm_dna_init(struct imm_dna *dna, char const symbols[IMM_DNA_SIZE],
+                         char any_symbol)
 {
     struct imm_abc_vtable vtable = {IMM_DNA, dna};
     return abc_init(&dna->super.super, IMM_DNA_SIZE, symbols, any_symbol,
                     vtable);
 }
 
-int imm_dna_write(struct imm_dna const *dna, FILE *file)
+enum imm_rc imm_dna_write(struct imm_dna const *dna, FILE *file)
 {
     return imm_abc_write(&dna->super.super, file);
 }
 
-int imm_dna_read(struct imm_dna *dna, FILE *file)
+enum imm_rc imm_dna_read(struct imm_dna *dna, FILE *file)
 {
     return imm_abc_read(&dna->super.super, file);
 }

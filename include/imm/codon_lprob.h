@@ -5,6 +5,7 @@
 #include "imm/log.h"
 #include "imm/lprob.h"
 #include "imm/nuclt.h"
+#include "imm/rc.h"
 
 /** @file codon_lprob.h
  * Codon probability module.
@@ -52,7 +53,8 @@ static inline void imm_codon_lprob_set(struct imm_codon_lprob *codonp,
     codonp->lprobs[codon.a][codon.b][codon.c] = lprob;
 }
 
-static inline int imm_codon_lprob_normalize(struct imm_codon_lprob *codonp)
+static inline enum imm_rc
+imm_codon_lprob_normalize(struct imm_codon_lprob *codonp)
 {
     return imm_lprob_normalize(IMM_NUCLT_SIZE * IMM_NUCLT_SIZE * IMM_NUCLT_SIZE,
                                &codonp->lprobs[0][0][0]);

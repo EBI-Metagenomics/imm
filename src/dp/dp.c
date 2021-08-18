@@ -110,8 +110,8 @@ void dp_reset(struct imm_dp *dp, struct dp_args const *args)
     state_table_reset(&dp->state_table, args);
 }
 
-int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
-                   struct imm_result *result)
+enum imm_rc imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
+                           struct imm_result *result)
 {
     imm_result_reset(result);
     if (!task->seq)
@@ -140,7 +140,8 @@ unsigned imm_dp_trans_idx(struct imm_dp *dp, unsigned src_idx, unsigned dst_idx)
     return trans_table_idx(&dp->trans_table, src_idx, dst_idx);
 }
 
-int imm_dp_change_trans(struct imm_dp *dp, unsigned trans_idx, imm_float lprob)
+enum imm_rc imm_dp_change_trans(struct imm_dp *dp, unsigned trans_idx,
+                                imm_float lprob)
 {
     if (imm_unlikely(!imm_lprob_is_finite(lprob)))
         return error(IMM_ILLEGALARG, "lprob must be finite");

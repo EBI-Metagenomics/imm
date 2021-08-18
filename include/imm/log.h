@@ -2,6 +2,7 @@
 #define IMM_LOG_H
 
 #include "imm/export.h"
+#include "imm/rc.h"
 #include <stdarg.h>
 
 enum imm_level
@@ -14,18 +15,6 @@ enum imm_level
     IMM_FATAL
 };
 
-enum imm_code
-{
-    IMM_SUCCESS = 0,
-    IMM_FAILURE,
-    IMM_OUTOFMEM,
-    IMM_ILLEGALARG,
-    IMM_IOERROR,
-    IMM_NOTIMPLEMENTED,
-    IMM_RUNTIMEERROR,
-    IMM_PARSEERROR,
-};
-
 struct imm_log_event
 {
     va_list va;
@@ -33,7 +22,7 @@ struct imm_log_event
     char const *file;
     int line;
     enum imm_level level;
-    enum imm_code code;
+    enum imm_rc rc;
 };
 
 typedef void (*imm_log_callback)(struct imm_log_event event);
@@ -41,12 +30,12 @@ typedef void (*imm_log_callback)(struct imm_log_event event);
 IMM_API void imm_log_default_callback(struct imm_log_event event);
 IMM_API void imm_log_setup(imm_log_callback cb, enum imm_level level);
 
-#define __imm_log(lvl, code, ...)                                              \
-    __imm_log_impl(lvl, code, __FILE__, __LINE__, __VA_ARGS__)
+#define __imm_log(lvl, rc, ...)                                                \
+    __imm_log_impl(lvl, rc, __FILE__, __LINE__, __VA_ARGS__)
 
-IMM_API int __imm_log_impl(enum imm_level level, enum imm_code code,
-                           char const *file, int line, char const *fmt, ...)
-    __attribute__((format(printf, 5, 6)));
+IMM_API enum imm_rc __imm_log_impl(enum imm_level level, enum imm_rc rc,
+                                   char const *file, int line, char const *fmt,
+                                   ...) __attribute__((format(printf, 5, 6)));
 
 #ifdef NDEBUG
 #define IMM_BUG(cond)

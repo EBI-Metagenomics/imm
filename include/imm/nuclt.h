@@ -3,6 +3,7 @@
 
 #include "imm/abc.h"
 #include "imm/export.h"
+#include "imm/rc.h"
 
 #define IMM_NUCLT_ANY_SYMBOL 'X'
 #define IMM_NUCLT_SYMBOLS "ACGT"
@@ -13,8 +14,9 @@ struct imm_nuclt
     struct imm_abc super;
 };
 
-IMM_API int imm_nuclt_init(struct imm_nuclt *nuclt,
-                           char const symbols[IMM_NUCLT_SIZE], char any_symbol);
+IMM_API enum imm_rc imm_nuclt_init(struct imm_nuclt *nuclt,
+                                   char const symbols[IMM_NUCLT_SIZE],
+                                   char any_symbol);
 
 static inline unsigned imm_nuclt_size(struct imm_nuclt const *nuclt)
 {

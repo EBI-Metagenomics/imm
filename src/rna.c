@@ -1,20 +1,20 @@
 #include "imm/rna.h"
 #include "abc.h"
 
-int imm_rna_init(struct imm_rna *rna, char const symbols[IMM_RNA_SIZE],
-                 char any_symbol)
+enum imm_rc imm_rna_init(struct imm_rna *rna, char const symbols[IMM_RNA_SIZE],
+                         char any_symbol)
 {
     struct imm_abc_vtable vtable = {IMM_RNA, rna};
     return abc_init(&rna->super.super, IMM_RNA_SIZE, symbols, any_symbol,
                     vtable);
 }
 
-int imm_rna_write(struct imm_rna const *rna, FILE *file)
+enum imm_rc imm_rna_write(struct imm_rna const *rna, FILE *file)
 {
     return imm_abc_write(&rna->super.super, file);
 }
 
-int imm_rna_read(struct imm_rna *rna, FILE *file)
+enum imm_rc imm_rna_read(struct imm_rna *rna, FILE *file)
 {
     return imm_abc_read(&rna->super.super, file);
 }

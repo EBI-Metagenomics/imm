@@ -32,7 +32,8 @@ static bool check_mute_visit(struct imm_state **states, struct imm_state *state)
     return false;
 }
 
-static int check_mute_cycles(unsigned nstates, struct imm_state **states)
+static enum imm_rc check_mute_cycles(unsigned nstates,
+                                     struct imm_state **states)
 {
     for (unsigned i = 0; i < nstates; ++i)
     {
@@ -68,7 +69,8 @@ static void visit(struct imm_state *state, struct imm_state **states,
     tmp[*end] = state;
 }
 
-int tsort(unsigned nstates, struct imm_state **states, unsigned start_idx)
+enum imm_rc tsort(unsigned nstates, struct imm_state **states,
+                  unsigned start_idx)
 {
     clear_marks(nstates, states);
 

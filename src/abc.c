@@ -16,30 +16,31 @@ struct imm_abc const imm_abc_empty = {
     .vtable = {IMM_ABC, NULL},
 };
 
-int imm_abc_init(struct imm_abc *abc, struct imm_str symbols, char any_symbol)
+enum imm_rc imm_abc_init(struct imm_abc *abc, struct imm_str symbols,
+                         char any_symbol)
 {
     struct imm_abc_vtable vtable = {IMM_ABC, NULL};
     return abc_init(abc, symbols.size, symbols.data, any_symbol, vtable);
 }
 
-int imm_abc_write(struct imm_abc const *abc, FILE *file)
+enum imm_rc imm_abc_write(struct imm_abc const *abc, FILE *file)
 {
-    int err = abc_write(abc, file);
-    if (err)
-        return error((enum imm_code)err, "failed to write alphabet");
-    return err;
+    enum imm_rc rc = abc_write(abc, file);
+    if (rc)
+        return error(rc, "failed to write alphabet");
+    return rc;
 }
 
-int imm_abc_read(struct imm_abc *abc, FILE *file)
+enum imm_rc imm_abc_read(struct imm_abc *abc, FILE *file)
 {
-    int err = abc_read(abc, file);
-    if (err)
-        return error((enum imm_code)err, "failed to read alphabet");
-    return err;
+    enum imm_rc rc = abc_read(abc, file);
+    if (rc)
+        return error(rc, "failed to read alphabet");
+    return rc;
 }
 
-int abc_init(struct imm_abc *abc, unsigned len, char const *symbols,
-             char any_symbol, struct imm_abc_vtable vtable)
+enum imm_rc abc_init(struct imm_abc *abc, unsigned len, char const *symbols,
+                     char any_symbol, struct imm_abc_vtable vtable)
 {
     if (!imm_sym_valid_char(any_symbol))
         return error(IMM_ILLEGALARG, "any_symbol outside range");
@@ -88,7 +89,7 @@ static_assert(sizeof(imm_abc_typeid_t) == sizeof(uint8_t), "wrong types");
             return e;                                                          \
     } while (0)
 
-int abc_write(struct imm_abc const *abc, FILE *file)
+enum imm_rc abc_write(struct imm_abc const *abc, FILE *file)
 {
     cmp_ctx_t cmp = {0};
     io_init(&cmp, file);
@@ -105,7 +106,7 @@ int abc_write(struct imm_abc const *abc, FILE *file)
     return IMM_SUCCESS;
 }
 
-int abc_read(struct imm_abc *abc, FILE *file)
+enum imm_rc abc_read(struct imm_abc *abc, FILE *file)
 {
     cmp_ctx_t cmp = {0};
     io_init(&cmp, file);

@@ -95,7 +95,7 @@ void imm_hmm_write_dot(struct imm_hmm const *hmm, FILE *restrict fp,
     fprintf(fp, "}\n");
 }
 
-int imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
+enum imm_rc imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
 {
     if (cco_hash_hashed(&state->hnode))
         return error(IMM_ILLEGALARG, "state already belongs to a hmm");
@@ -104,8 +104,9 @@ int imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
     return IMM_SUCCESS;
 }
 
-int imm_hmm_init_dp(struct imm_hmm const *hmm,
-                    struct imm_state const *end_state, struct imm_dp *dp)
+enum imm_rc imm_hmm_init_dp(struct imm_hmm const *hmm,
+                            struct imm_state const *end_state,
+                            struct imm_dp *dp)
 {
     imm_dp_init(dp, hmm->abc);
     return imm_hmm_reset_dp(hmm, end_state, dp);
@@ -118,20 +119,21 @@ void imm_hmm_reset(struct imm_hmm *hmm)
     init_transitions_table(hmm);
 }
 
-int imm_hmm_reset_dp(struct imm_hmm const *hmm,
-                     struct imm_state const *end_state, struct imm_dp *dp)
+enum imm_rc imm_hmm_reset_dp(struct imm_hmm const *hmm,
+                             struct imm_state const *end_state,
+                             struct imm_dp *dp)
 {
-    int status = IMM_SUCCESS;
+    enum imm_rc rc = IMM_SUCCESS;
     struct imm_state **states = xmalloc(sizeof(*states) * hmm->states.size);
 
     if (!hmm_state(hmm, end_state->id))
     {
-        status = error(IMM_ILLEGALARG, "end state not found");
+        rc = error(IMM_ILLEGALARG, "end state not found");
         goto cleanup;
     }
     if (!has_start_state(hmm))
     {
-        status = error(IMM_ILLEGALARG, "start state not found");
+        rc = error(IMM_ILLEGALARG, "start state not found");
         goto cleanup;
     }
 
@@ -147,7 +149,7 @@ int imm_hmm_reset_dp(struct imm_hmm const *hmm,
     unsigned start_idx = hmm_state(hmm, hmm->start.state_id)->idx;
     if (tsort(hmm->states.size, states, start_idx))
     {
-        status = error(IMM_RUNTIMEERROR, "failed to sort states");
+        rc = error(IMM_RUNTIMEERROR, "failed to sort states");
         goto cleanup;
     }
     set_state_indices(hmm, states);
@@ -160,7 +162,7 @@ int imm_hmm_reset_dp(struct imm_hmm const *hmm,
 
 cleanup:
     free(states);
-    return status;
+    return rc;
 }
 
 imm_float imm_hmm_start_lprob(struct imm_hmm const *hmm)
@@ -247,21 +249,21 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
     return lprob;
 }
 
-int imm_hmm_normalize_trans(struct imm_hmm const *hmm)
+enum imm_rc imm_hmm_normalize_trans(struct imm_hmm const *hmm)
 {
     struct imm_state *state = NULL;
     unsigned bkt = 0;
-    int err = IMM_SUCCESS;
+    enum imm_rc rc = IMM_SUCCESS;
     cco_hash_for_each(hmm->states.tbl, bkt, state, hnode)
     {
-        if ((err = imm_hmm_normalize_state_trans(hmm, state)))
+        if ((rc = imm_hmm_normalize_state_trans(hmm, state)))
             break;
     }
-    return err;
+    return rc;
 }
 
-int imm_hmm_normalize_state_trans(struct imm_hmm const *hmm,
-                                  struct imm_state *src)
+enum imm_rc imm_hmm_normalize_state_trans(struct imm_hmm const *hmm,
+                                          struct imm_state *src)
 {
     if (!cco_hash_hashed(&src->hnode))
         return error(IMM_ILLEGALARG, "state not found");
@@ -285,8 +287,8 @@ int imm_hmm_normalize_state_trans(struct imm_hmm const *hmm,
     return IMM_SUCCESS;
 }
 
-int imm_hmm_set_start(struct imm_hmm *hmm, struct imm_state const *state,
-                      imm_float lprob)
+enum imm_rc imm_hmm_set_start(struct imm_hmm *hmm,
+                              struct imm_state const *state, imm_float lprob)
 {
     if (!imm_lprob_is_finite(lprob))
         return error(IMM_ILLEGALARG, "probability must be finite");
@@ -299,8 +301,8 @@ int imm_hmm_set_start(struct imm_hmm *hmm, struct imm_state const *state,
     return IMM_SUCCESS;
 }
 
-int imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state *src,
-                      struct imm_state *dst, imm_float lprob)
+enum imm_rc imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state *src,
+                              struct imm_state *dst, imm_float lprob)
 {
     if (!imm_lprob_is_finite(lprob))
         return error(IMM_ILLEGALARG, "probability must be finite");

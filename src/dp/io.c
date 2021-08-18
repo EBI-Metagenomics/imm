@@ -19,7 +19,7 @@ static_assert(sizeof(imm_trans_idx_t) == sizeof(uint16_t), "wrong types");
 static_assert(sizeof(imm_state_id_t) == sizeof(uint16_t), "wrong types");
 static_assert(sizeof(imm_state_idx_t) == sizeof(uint16_t), "wrong types");
 
-int imm_dp_write(struct imm_dp const *dp, FILE *file)
+enum imm_rc imm_dp_write(struct imm_dp const *dp, FILE *file)
 {
     unsigned size = 0;
     unsigned nstates = dp->state_table.nstates;
@@ -97,14 +97,14 @@ int imm_dp_write(struct imm_dp const *dp, FILE *file)
     {                                                                          \
         if (!!(expr))                                                          \
         {                                                                      \
-            err = e;                                                           \
+            rc = e;                                                            \
             goto cleanup;                                                      \
         }                                                                      \
     } while (0)
 
-int imm_dp_read(struct imm_dp *dp, FILE *file)
+enum imm_rc imm_dp_read(struct imm_dp *dp, FILE *file)
 {
-    int err = IMM_SUCCESS;
+    enum imm_rc rc = IMM_SUCCESS;
     uint8_t u8 = 0;
     uint16_t u16 = 0;
     uint32_t u32 = 0;
@@ -216,7 +216,7 @@ int imm_dp_read(struct imm_dp *dp, FILE *file)
         ERETURN(st->span[i].max > IMM_STATE_MAX_SEQLEN, IMM_PARSEERROR);
     }
 
-    return err;
+    return rc;
 
 cleanup:
     if (code)
@@ -247,5 +247,5 @@ cleanup:
         free(st->span);
         st->span = NULL;
     }
-    return err;
+    return rc;
 }

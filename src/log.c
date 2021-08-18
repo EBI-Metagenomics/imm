@@ -18,14 +18,14 @@ void imm_log_setup(imm_log_callback cb, enum imm_level level)
     log_level = level;
 }
 
-int __imm_log_impl(enum imm_level level, enum imm_code code, char const *file,
-                   int line, char const *fmt, ...)
+enum imm_rc __imm_log_impl(enum imm_level level, enum imm_rc rc,
+                           char const *file, int line, char const *fmt, ...)
 {
     if (level < log_level)
-        return (int)code;
+        return rc;
 
     struct imm_log_event e = {
-        .fmt = fmt, .file = file, .line = line, .level = level, .code = code};
+        .fmt = fmt, .file = file, .line = line, .level = level, .rc = rc};
     va_start(e.va, fmt);
     log_callback(e);
     va_end(e.va);
@@ -33,12 +33,12 @@ int __imm_log_impl(enum imm_level level, enum imm_code code, char const *file,
     if (imm_unlikely(level == IMM_FATAL))
         exit(EXIT_FAILURE);
 
-    return (int)code;
+    return rc;
 }
 
 void imm_log_default_callback(struct imm_log_event event)
 {
-    fprintf(stderr, "%s:%d:%s: ", event.file, event.line, __msg[event.code]);
+    fprintf(stderr, "%s:%d:%s: ", event.file, event.line, __msg[event.rc]);
     vfprintf(stderr, event.fmt, event.va);
     fputc('\n', stderr);
 }

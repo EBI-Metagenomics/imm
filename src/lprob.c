@@ -2,7 +2,7 @@
 #include "imm/rnd.h"
 #include "support.h"
 
-int imm_lprob_normalize(unsigned len, imm_float arr[len])
+enum imm_rc imm_lprob_normalize(unsigned len, imm_float arr[len])
 {
     imm_float lnorm = imm_lprob_sum(len, arr);
     if (!isfinite(lnorm))
