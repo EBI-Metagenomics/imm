@@ -1,8 +1,8 @@
 #ifndef SUPPORT_H
 #define SUPPORT_H
 
-#include "imm/log.h"
 #include "imm/support.h"
+#include "log.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -17,10 +17,6 @@
 #define BITS_TO_LONGS(nr) DIV_ROUND_UP(nr, BITS_PER_BYTE * sizeof(long))
 
 #define DIV_ROUND_UP(n, d) (((n) + (d)-1) / (d))
-
-#define warn(rc, ...) __imm_log(IMM_WARN, rc, __VA_ARGS__)
-#define error(rc, ...) __imm_log(IMM_ERROR, rc, __VA_ARGS__)
-#define fatal(rc, ...) __imm_log(IMM_FATAL, rc, __VA_ARGS__)
 
 static inline void bits_clr(unsigned long *x, unsigned bit)
 {
@@ -67,7 +63,7 @@ static inline void *__malloc(size_t size, char const file[static 1], int line)
 {
     void *ptr = malloc(size);
     if (!ptr && size > 0)
-        __imm_log_impl(IMM_FATAL, IMM_IOERROR, file, line, "failed to malloc");
+        fatal(IMM_IOERROR, "failed to malloc");
     return ptr;
 }
 
@@ -76,7 +72,7 @@ static inline void *__memcpy(void *restrict dest, const void *restrict src,
 {
     void *ptr = memcpy(dest, src, count);
     if (!ptr)
-        __imm_log_impl(IMM_FATAL, IMM_IOERROR, file, line, "failed to memcpy");
+        fatal(IMM_IOERROR, "failed to memcpy");
     return ptr;
 }
 
@@ -85,7 +81,7 @@ static inline void *__realloc(void *ptr, size_t new_size,
 {
     void *new_ptr = realloc(ptr, new_size);
     if (!new_ptr && new_size > 0)
-        __imm_log_impl(IMM_FATAL, IMM_IOERROR, file, line, "failed to realloc");
+        fatal(IMM_IOERROR, "failed to realloc");
     return new_ptr;
 }
 
@@ -94,7 +90,7 @@ static inline char *__strdup(char const *str, char const file[static 1],
 {
     char *new = strdup(str);
     if (!new)
-        __imm_log_impl(IMM_FATAL, IMM_IOERROR, file, line, "failed to strdup");
+        fatal(IMM_IOERROR, "failed to strdup");
     return new;
 }
 

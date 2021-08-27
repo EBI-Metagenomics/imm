@@ -3,9 +3,7 @@
 
 #include "imm/abc.h"
 #include "imm/export.h"
-#include "imm/log.h"
 #include "imm/str.h"
-#include "imm/support.h"
 
 struct imm_seq
 {
@@ -24,18 +22,7 @@ static inline struct imm_abc const *imm_seq_abc(struct imm_seq const *seq)
     return seq->abc;
 }
 
-static inline struct imm_seq imm_seq(struct imm_str str,
-                                     struct imm_abc const *abc)
-{
-    for (unsigned i = 0; i < str.size; ++i)
-    {
-        if (imm_unlikely(!imm_abc_has_symbol(abc, str.data[i]) &&
-                         str.data[i] != imm_abc_any_symbol(abc)))
-            __imm_log(IMM_FATAL, IMM_ILLEGALARG, "invalid sequence");
-    }
-
-    return (struct imm_seq){str.size, str.data, abc};
-}
+IMM_API struct imm_seq imm_seq(struct imm_str str, struct imm_abc const *abc);
 
 static inline unsigned imm_seq_size(struct imm_seq const *seq)
 {

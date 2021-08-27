@@ -175,13 +175,13 @@ imm_float imm_hmm_trans(struct imm_hmm const *hmm, struct imm_state const *src,
 {
     if (!cco_hash_hashed(&src->hnode) || !cco_hash_hashed(&dst->hnode))
     {
-        warn(IMM_ILLEGALARG, "state(s) not found");
+        error(IMM_ILLEGALARG, "state(s) not found");
         return imm_lprob_nan();
     }
     struct imm_trans const *trans = hmm_trans(hmm, src, dst);
     if (trans)
         return trans->lprob;
-    warn(IMM_ILLEGALARG, "transition not found");
+    error(IMM_ILLEGALARG, "transition not found");
     return imm_lprob_nan();
 }
 

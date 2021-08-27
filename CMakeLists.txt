@@ -22,7 +22,6 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
 find_package(logaddexp REQUIRED)
 find_package(elapsed REQUIRED)
 find_package(cco REQUIRED)
-find_package(log REQUIRED)
 
 add_library(
     imm
@@ -57,6 +56,7 @@ add_library(
     src/rna.c
     src/rnd.c
     src/seq.c
+    src/state.c
     src/support.c
     src/task.c
     src/tsort.c
@@ -134,7 +134,6 @@ target_include_directories(
 target_link_libraries(imm PUBLIC LOGADDEXP::logaddexp)
 target_link_libraries(imm PUBLIC ELAPSED::elapsed)
 target_link_libraries(imm PUBLIC CCO::cco)
-target_link_libraries(imm PUBLIC LOG::log)
 target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
 set_target_properties(imm PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})

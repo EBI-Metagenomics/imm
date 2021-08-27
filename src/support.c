@@ -1,4 +1,6 @@
 #include "support.h"
+#include "imm/rc.h"
+#include "log.h"
 
 #ifndef HAVE_REALLOFC
 void *reallocf(void *ptr, size_t size)
@@ -18,3 +20,10 @@ void *reallocf(void *ptr, size_t size)
     return (nptr);
 }
 #endif
+
+void __imm_bug(char const *file, int line, char const *cond)
+{
+    fprintf(stderr, "BUG: %s:%d: %s\n", file, line, cond);
+    fflush(stderr);
+    exit(EXIT_FAILURE);
+}

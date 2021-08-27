@@ -61,16 +61,8 @@ static struct imm_state __imm_state_init(unsigned id, struct imm_abc const *abc,
     return state;
 }
 
-static inline imm_float imm_state_lprob(struct imm_state const *state,
-                                        struct imm_seq const *seq)
-{
-    if (imm_unlikely(state->abc != imm_seq_abc(seq)))
-    {
-        __imm_log(IMM_ERROR, IMM_ILLEGALARG, "alphabets must be the same");
-        return IMM_LPROB_NAN;
-    }
-    return state->vtable.lprob(state, seq);
-}
+IMM_API imm_float imm_state_lprob(struct imm_state const *state,
+                                  struct imm_seq const *seq);
 
 static inline struct imm_span imm_state_span(struct imm_state const *state)
 {
