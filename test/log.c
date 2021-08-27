@@ -65,7 +65,8 @@ void test_log_setup(void)
 
     desired_tok = strtok_r(NULL, ":", &desired_ctx);
     line_tok = strtok_r(NULL, ":", &line_ctx);
-    EQ(line_tok, desired_tok);
+    /* C lang bug: http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2322.htm */
+    /* EQ(line_tok, desired_tok); */
 
     desired_tok = strtok_r(NULL, ":", &desired_ctx);
     line_tok = strtok_r(NULL, ":", &line_ctx);
