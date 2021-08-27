@@ -18,9 +18,9 @@
 
 #define DIV_ROUND_UP(n, d) (((n) + (d)-1) / (d))
 
-#define warn(code, ...) __imm_log(IMM_WARN, code, __VA_ARGS__)
-#define error(code, ...) __imm_log(IMM_ERROR, code, __VA_ARGS__)
-#define fatal(code, ...) __imm_log(IMM_FATAL, code, __VA_ARGS__)
+#define warn(rc, ...) __imm_log(IMM_WARN, rc, __VA_ARGS__)
+#define error(rc, ...) __imm_log(IMM_ERROR, rc, __VA_ARGS__)
+#define fatal(rc, ...) __imm_log(IMM_FATAL, rc, __VA_ARGS__)
 
 static inline void bits_clr(unsigned long *x, unsigned bit)
 {

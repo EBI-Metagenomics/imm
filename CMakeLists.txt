@@ -22,6 +22,7 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
 find_package(logaddexp REQUIRED)
 find_package(elapsed REQUIRED)
 find_package(cco REQUIRED)
+find_package(log REQUIRED)
 
 add_library(
     imm
@@ -133,6 +134,8 @@ target_include_directories(
 target_link_libraries(imm PUBLIC LOGADDEXP::logaddexp)
 target_link_libraries(imm PUBLIC ELAPSED::elapsed)
 target_link_libraries(imm PUBLIC CCO::cco)
+target_link_libraries(imm PUBLIC LOG::log)
+target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
 set_target_properties(imm PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
 target_compile_features(imm PRIVATE c_std_11)
@@ -141,7 +144,6 @@ target_compile_definitions(
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:__extension__>)
 target_compile_options(imm PRIVATE ${WARNING_FLAGS})
 target_compile_options(imm PRIVATE "-fverbose-asm")
-target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/imm/config.h.in
                ${CMAKE_CURRENT_BINARY_DIR}/imm/config.h @ONLY)
 
