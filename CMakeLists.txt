@@ -128,7 +128,7 @@ endif()
 target_include_directories(
     imm
     PUBLIC $<INSTALL_INTERFACE:include>
-           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(imm PUBLIC LOGADDEXP::logaddexp)
@@ -144,7 +144,7 @@ target_compile_definitions(
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:__extension__>)
 target_compile_options(imm PRIVATE ${WARNING_FLAGS})
 target_compile_options(imm PRIVATE "-fverbose-asm")
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/imm/config.h.in
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/imm/config.h.in
                ${CMAKE_CURRENT_BINARY_DIR}/imm/config.h @ONLY)
 
 include(CheckCSourceCompiles)
@@ -194,7 +194,7 @@ install(
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     PUBLIC_HEADER DESTINATION include)
-install(DIRECTORY include/ DESTINATION include)
+install(DIRECTORY src/imm/ DESTINATION include/imm)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/imm/export.h
               ${CMAKE_CURRENT_BINARY_DIR}/imm/config.h DESTINATION include/imm)
 install(
