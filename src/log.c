@@ -1,6 +1,7 @@
 #include "log.h"
 #include "imm/log.h"
 #include "imm/support.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -25,12 +26,13 @@ void imm_log_setup(imm_log_error_t *error, imm_log_fatal_t *fatal,
     log_arg = arg;
 }
 
-enum imm_rc __imm_log_impl(int lvl, enum imm_rc rc, char const *msg)
+enum imm_rc __log_impl(int lvl, enum imm_rc rc, char const *msg)
 {
-    if (lvl == IMM_ERROR)
+    if (lvl == LOG_ERROR)
         log_error(msg, log_arg);
     else
     {
+        assert(lvl == LOG_FATAL);
         log_fatal(msg, log_arg);
         log_flush(log_arg);
         exit(EXIT_FAILURE);
