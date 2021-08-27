@@ -26,7 +26,7 @@ void imm_log_setup(imm_log_error_t *error, imm_log_fatal_t *fatal,
     log_arg = arg;
 }
 
-enum imm_rc __log_impl(int lvl, enum imm_rc rc, char const *msg)
+enum imm_rc __log_it(int lvl, enum imm_rc rc, char const *msg)
 {
     if (lvl == LOG_ERROR)
         log_error(msg, log_arg);

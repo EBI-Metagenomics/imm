@@ -15,10 +15,6 @@ if("${isSystemDir}" STREQUAL "-1")
     set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 endif()
 
-# Hide functions by default.
-set(CMAKE_C_VISIBILITY_PRESET hidden)
-set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
-
 find_package(logaddexp REQUIRED)
 find_package(elapsed REQUIRED)
 find_package(cco REQUIRED)
@@ -62,6 +58,10 @@ add_library(
     src/tsort.c
     src/third-party/cmp.c)
 add_library(IMM::imm ALIAS imm)
+
+# Hide functions by default.
+set_property(TARGET imm PROPERTY C_VISIBILITY_PRESET hidden)
+set_property(TARGET imm PROPERTY VISIBILITY_INLINES_HIDDEN ON)
 
 # Write out imm/export.h to the current binary directory Must include
 # ${CMAKE_CURRENT_BINARY_DIR} in the target's search path.
