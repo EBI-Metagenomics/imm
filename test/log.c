@@ -60,19 +60,19 @@ void test_log_setup(void)
 
     EQ(line_tok, desired_tok);
 
-    strtok_r(desired, ":", &desired_ctx);
-    strtok_r(actual, ":", &line_ctx);
+    strtok_r(NULL, ":", &desired_ctx);
+    strtok_r(NULL, ":", &line_ctx);
 
-    desired_tok = strtok_r(desired, ":", &desired_ctx);
-    line_tok = strtok_r(actual, ":", &line_ctx);
+    desired_tok = strtok_r(NULL, ":", &desired_ctx);
+    line_tok = strtok_r(NULL, ":", &line_ctx);
     EQ(line_tok, desired_tok);
 
-    desired_tok = strtok_r(desired, ":", &desired_ctx);
-    line_tok = strtok_r(actual, ":", &line_ctx);
+    desired_tok = strtok_r(NULL, ":", &desired_ctx);
+    line_tok = strtok_r(NULL, ":", &line_ctx);
     EQ(line_tok, desired_tok);
 
-    desired_tok = strtok_r(desired, ":", &desired_ctx);
-    line_tok = strtok_r(actual, ":", &line_ctx);
+    desired_tok = strtok_r(NULL, ":", &desired_ctx);
+    line_tok = strtok_r(NULL, ":", &line_ctx);
     EQ(line_tok, desired_tok);
 }
 
@@ -124,18 +124,14 @@ void test_log_third_party(void)
     char *line_ctx = NULL;
     char *line_tok = strtok_r(actual, ":", &line_ctx);
 
-    strtok_r(desired, ":", &desired_ctx);
-    strtok_r(actual, ":", &line_ctx);
+    strtok_r(NULL, ":", &desired_ctx);
+    strtok_r(NULL, ":", &line_ctx);
 
-    desired_tok = strtok_r(desired, ":", &desired_ctx);
-    line_tok = strtok_r(actual, ":", &line_ctx);
+    desired_tok = strtok_r(NULL, ":", &desired_ctx);
+    line_tok = strtok_r(NULL, ":", &line_ctx);
     EQ(line_tok, desired_tok);
 
-    desired_tok = strtok_r(desired, ":", &desired_ctx);
-    line_tok = strtok_r(actual, ":", &line_ctx);
-    EQ(line_tok, desired_tok);
-
-    desired_tok = strtok_r(desired, ":", &desired_ctx);
-    line_tok = strtok_r(actual, ":", &line_ctx);
+    desired_tok = strtok_r(NULL, ":", &desired_ctx);
+    line_tok = strtok_r(NULL, ":", &line_ctx);
     EQ(line_tok, desired_tok);
 }
