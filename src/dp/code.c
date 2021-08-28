@@ -47,7 +47,7 @@ void code_init(struct imm_dp_code *code, struct imm_abc const *abc)
 enum imm_rc code_reset(struct imm_dp_code *c, unsigned min_seq,
                        unsigned max_seq)
 {
-    BUG(!code->abc);
+    BUG(!c->abc);
     if (c->seqlen.min == min_seq && c->seqlen.max == max_seq)
         return IMM_SUCCESS;
 
