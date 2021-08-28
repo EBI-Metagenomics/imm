@@ -100,13 +100,24 @@ void imm_dp_del(struct imm_dp *dp)
     }
 }
 
-void dp_reset(struct imm_dp *dp, struct dp_args const *args)
+enum imm_rc dp_reset(struct imm_dp *dp, struct dp_args const *args)
 {
-    code_reset(&dp->code, min_seq(args->nstates, args->states),
-               max_seq(args->nstates, args->states));
-    emis_reset(&dp->emis, &dp->code, args->states, args->nstates);
-    trans_table_reset(&dp->trans_table, args);
-    state_table_reset(&dp->state_table, args);
+    enum imm_rc rc = IMM_SUCCESS;
+
+    if ((rc = code_reset(&dp->code, min_seq(args->nstates, args->states),
+                         max_seq(args->nstates, args->states))))
+        return rc;
+
+    if ((rc = emis_reset(&dp->emis, &dp->code, args->states, args->nstates)))
+        return rc;
+
+    if ((rc = trans_table_reset(&dp->trans_table, args)))
+        return rc;
+
+    if ((rc = state_table_reset(&dp->state_table, args)))
+        return rc;
+
+    return rc;
 }
 
 enum imm_rc imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,

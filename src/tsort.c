@@ -1,7 +1,8 @@
 #include "tsort.h"
 #include "imm/state.h"
 #include "imm/trans.h"
-#include "xmem.h"
+#include "log.h"
+#include <stdlib.h>
 
 #define INITIAL_MARK 0
 #define TEMPORARY_MARK 1
@@ -79,7 +80,10 @@ enum imm_rc tsort(unsigned nstates, struct imm_state **states,
 
     clear_marks(nstates, states);
 
-    struct imm_state **tmp = xmalloc(sizeof(*tmp) * nstates);
+    struct imm_state **tmp = malloc(sizeof(*tmp) * nstates);
+    if (!tmp)
+        return error(IMM_OUTOFMEM, "failed to malloc");
+
     unsigned end = nstates;
     visit(states[start_idx], states, &end, tmp);
 
@@ -89,7 +93,7 @@ enum imm_rc tsort(unsigned nstates, struct imm_state **states,
     for (unsigned i = start_idx + 1; i < nstates; ++i)
         visit(states[i], states, &end, tmp);
 
-    xmemcpy(states, tmp, sizeof(*tmp) * nstates);
+    memcpy(states, tmp, sizeof(*tmp) * nstates);
     free(tmp);
 
     return IMM_SUCCESS;

@@ -1,9 +1,11 @@
 #include "dp/trans_table.h"
+#include "bug.h"
 #include "cco/stack.h"
 #include "dp/dp.h"
 #include "imm/trans.h"
-#include "xmem.h"
+#include "log.h"
 #include <limits.h>
+#include <stdlib.h>
 
 unsigned trans_table_idx(struct imm_dp_trans_table *trans_tbl, unsigned src_idx,
                          unsigned dst_idx)
@@ -24,16 +26,26 @@ void trans_table_init(struct imm_dp_trans_table *tbl)
     tbl->offset = NULL;
 }
 
-void trans_table_reset(struct imm_dp_trans_table *tbl,
-                       struct dp_args const *args)
+enum imm_rc trans_table_reset(struct imm_dp_trans_table *tbl,
+                              struct dp_args const *args)
 {
     BUG(args->nstates == 0);
     tbl->ntrans = args->ntrans;
-    tbl->offset = xrealloc(tbl->offset, sizeof(*tbl->offset) *
-                                            trans_table_offsize(args->nstates));
+
+    unsigned offsize = trans_table_offsize(args->nstates);
+    tbl->offset = realloc(tbl->offset, sizeof(*tbl->offset) * offsize);
+    if (!tbl->offset && offsize > 0)
+        return error(IMM_OUTOFMEM, "failed to realloc");
+
     tbl->offset[0] = 0;
 
-    tbl->trans = xrealloc(tbl->trans, sizeof(*tbl->trans) * tbl->ntrans);
+    tbl->trans = realloc(tbl->trans, sizeof(*tbl->trans) * tbl->ntrans);
+    if (!tbl->trans && tbl->ntrans > 0)
+    {
+        tbl->offset = NULL;
+        free(tbl->offset);
+        return error(IMM_OUTOFMEM, "failed to realloc");
+    }
 
     for (unsigned i = 0; i < args->nstates; ++i)
     {
@@ -48,6 +60,7 @@ void trans_table_reset(struct imm_dp_trans_table *tbl,
         }
         tbl->offset[i + 1] = (imm_trans_idx_t)(tbl->offset[i] + j);
     }
+    return IMM_SUCCESS;
 }
 
 void trans_table_del(struct imm_dp_trans_table const *tbl)

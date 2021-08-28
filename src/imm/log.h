@@ -3,7 +3,6 @@
 
 #include "imm/export.h"
 #include "imm/rc.h"
-#include "imm/support.h"
 
 typedef void imm_log_error_t(char const *msg, void *arg);
 typedef void imm_log_fatal_t(char const *msg, void *arg);

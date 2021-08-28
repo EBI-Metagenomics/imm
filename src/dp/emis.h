@@ -10,8 +10,8 @@ void emis_del(struct imm_dp_emis const *emis);
 
 void emis_init(struct imm_dp_emis *emis);
 
-void emis_reset(struct imm_dp_emis *emis, struct imm_dp_code const *code,
-                struct imm_state **states, unsigned nstates);
+enum imm_rc emis_reset(struct imm_dp_emis *emis, struct imm_dp_code const *code,
+                       struct imm_state **states, unsigned nstates);
 
 static inline imm_float emis_score(struct imm_dp_emis const *emis,
                                    unsigned state, unsigned seq_code)

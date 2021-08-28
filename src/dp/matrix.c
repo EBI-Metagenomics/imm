@@ -3,27 +3,34 @@
 
 #define MAX_LOOKUP (2 * IMM_STATE_MAX_SEQLEN)
 
-void matrix_init(struct matrix *matrix, struct imm_dp_state_table const *tbl)
+enum imm_rc matrix_init(struct matrix *matrix,
+                        struct imm_dp_state_table const *tbl)
 {
     matrix->state_col = NULL;
-    matrixf_init(&matrix->score, MAX_LOOKUP, 1);
-    matrix_reset(matrix, tbl);
+    if (matrixf_init(&matrix->score, MAX_LOOKUP, 1))
+        return error(IMM_OUTOFMEM, "failed to matrix init");
+
+    return matrix_reset(matrix, tbl);
 }
 
-void matrix_reset(struct matrix *matrix, struct imm_dp_state_table const *tbl)
+enum imm_rc matrix_reset(struct matrix *m, struct imm_dp_state_table const *tbl)
 {
-    matrix->state_col =
-        xrealloc(matrix->state_col, sizeof(*matrix->state_col) * tbl->nstates);
+    unsigned n = tbl->nstates;
+    m->state_col = realloc(m->state_col, sizeof(*m->state_col) * n);
+    if (!m->state_col && n > 0)
+        return error(IMM_OUTOFMEM, "failed to realloc");
 
     unsigned next_col = 0;
-    for (unsigned i = 0; i < tbl->nstates; ++i)
+    for (unsigned i = 0; i < n; ++i)
     {
         unsigned min = state_table_span(tbl, i).min;
         unsigned max = state_table_span(tbl, i).max;
-        matrix->state_col[i] = (int16_t)(next_col - min);
+        m->state_col[i] = (int16_t)(next_col - min);
         next_col += (unsigned)(max - min + 1);
     }
-    matrixf_resize(&matrix->score, MAX_LOOKUP, next_col);
+    if (matrixf_resize(&m->score, MAX_LOOKUP, next_col))
+        return error(IMM_OUTOFMEM, "failed to resize");
+    return IMM_SUCCESS;
 }
 
 void matrix_del(struct matrix const *matrix)

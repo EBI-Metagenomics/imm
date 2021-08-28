@@ -14,7 +14,7 @@ struct imm_path
     struct imm_step *steps;
 };
 
-IMM_API void imm_path_add(struct imm_path *path, struct imm_step step);
+IMM_API enum imm_rc imm_path_add(struct imm_path *path, struct imm_step step);
 
 static inline struct imm_step *imm_path_step(struct imm_path const *path,
                                              unsigned step)

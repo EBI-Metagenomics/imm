@@ -1,4 +1,5 @@
 #include "hmm.h"
+#include "bug.h"
 #include "dp/dp.h"
 #include "imm/dp.h"
 #include "imm/hmm.h"
@@ -10,7 +11,7 @@
 #include "log.h"
 #include "state.h"
 #include "tsort.h"
-#include "xmem.h"
+#include <stdlib.h>
 
 static inline void start_init(struct imm_hmm *hmm)
 {
@@ -124,7 +125,9 @@ enum imm_rc imm_hmm_reset_dp(struct imm_hmm const *hmm,
                              struct imm_dp *dp)
 {
     enum imm_rc rc = IMM_SUCCESS;
-    struct imm_state **states = xmalloc(sizeof(*states) * hmm->states.size);
+    struct imm_state **states = malloc(sizeof(*states) * hmm->states.size);
+    if (!states)
+        return error(IMM_OUTOFMEM, "failed to malloc");
 
     if (!hmm_state(hmm, end_state->id))
     {

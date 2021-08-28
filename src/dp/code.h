@@ -17,7 +17,8 @@ static inline unsigned code_offset(struct imm_dp_code const *code,
     return (unsigned)(code->offset[min_seq - code->seqlen.min]);
 }
 
-void code_reset(struct imm_dp_code *code, unsigned min_seq, unsigned max_seq);
+enum imm_rc code_reset(struct imm_dp_code *code, unsigned min_seq,
+                       unsigned max_seq);
 
 static inline unsigned code_size(struct imm_dp_code const *code,
                                  unsigned min_seq)

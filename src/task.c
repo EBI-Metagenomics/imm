@@ -1,13 +1,29 @@
 #include "imm/task.h"
 #include "imm/dp.h"
 #include "imm/seq.h"
+#include "log.h"
 #include "task.h"
+#include <stdio.h>
 
 struct imm_task *imm_task_new(struct imm_dp const *dp)
 {
-    struct imm_task *task = xmalloc(sizeof(*task));
-    matrix_init(&task->matrix, &dp->state_table);
-    path_init(&task->path, &dp->state_table, &dp->trans_table);
+    struct imm_task *task = malloc(sizeof(*task));
+    if (!task)
+    {
+        error(IMM_OUTOFMEM, "failed to malloc");
+        return NULL;
+    }
+    if (matrix_init(&task->matrix, &dp->state_table))
+    {
+        free(task);
+        return NULL;
+    }
+    if (path_init(&task->path, &dp->state_table, &dp->trans_table))
+    {
+        matrix_del(&task->matrix);
+        free(task);
+        return NULL;
+    }
     eseq_init(&task->eseq, &dp->code);
     task->seq = NULL;
     return task;
@@ -15,8 +31,11 @@ struct imm_task *imm_task_new(struct imm_dp const *dp)
 
 enum imm_rc imm_task_reset(struct imm_task *task, struct imm_dp const *dp)
 {
-    matrix_reset(&task->matrix, &dp->state_table);
-    path_reset(&task->path, &dp->state_table, &dp->trans_table);
+    enum imm_rc rc = matrix_reset(&task->matrix, &dp->state_table);
+    if (rc)
+        return rc;
+    if ((rc = path_reset(&task->path, &dp->state_table, &dp->trans_table)))
+        return rc;
     eseq_reset(&task->eseq, &dp->code);
     task->seq = NULL;
     return IMM_SUCCESS;

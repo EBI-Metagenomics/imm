@@ -16,9 +16,11 @@ struct matrix
 
 void matrix_del(struct matrix const *matrix);
 
-void matrix_init(struct matrix *matrix, struct imm_dp_state_table const *tbl);
+enum imm_rc matrix_init(struct matrix *matrix,
+                        struct imm_dp_state_table const *tbl);
 
-void matrix_reset(struct matrix *matrix, struct imm_dp_state_table const *tbl);
+enum imm_rc matrix_reset(struct matrix *matrix,
+                         struct imm_dp_state_table const *tbl);
 
 static inline imm_float matrix_get_score(struct matrix const *matrix,
                                          unsigned row, unsigned state,

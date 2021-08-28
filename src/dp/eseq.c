@@ -2,6 +2,7 @@
 #include "dp/code.h"
 #include "imm/seq.h"
 #include "imm/subseq.h"
+#include "log.h"
 
 void eseq_del(struct eseq const *eseq) { matrixu16_deinit(&eseq->data); }
 
@@ -16,10 +17,11 @@ void eseq_reset(struct eseq *eseq, struct imm_dp_code const *code)
     eseq->code = code;
 }
 
-void eseq_setup(struct eseq *eseq, struct imm_seq const *seq)
+enum imm_rc eseq_setup(struct eseq *eseq, struct imm_seq const *seq)
 {
     unsigned ncols = eseq->code->seqlen.max - eseq->code->seqlen.min + 1;
-    matrixu16_resize(&eseq->data, imm_seq_size(seq) + 1, ncols);
+    if (matrixu16_resize(&eseq->data, imm_seq_size(seq) + 1, ncols))
+        return error(IMM_OUTOFMEM, "failed to resize");
 
     for (unsigned i = 0; i <= imm_seq_size(seq); ++i)
     {
@@ -37,4 +39,5 @@ void eseq_setup(struct eseq *eseq, struct imm_seq const *seq)
             matrixu16_set(&eseq->data, i, j, (uint16_t)code);
         }
     }
+    return IMM_SUCCESS;
 }

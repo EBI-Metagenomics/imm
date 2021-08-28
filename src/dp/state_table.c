@@ -2,8 +2,9 @@
 #include "dp/dp.h"
 #include "imm/state.h"
 #include "imm/state_types.h"
-#include "xmem.h"
+#include "log.h"
 #include <limits.h>
+#include <stdlib.h>
 
 void state_table_init(struct imm_dp_state_table *tbl)
 {
@@ -15,12 +16,18 @@ void state_table_init(struct imm_dp_state_table *tbl)
     tbl->span = NULL;
 }
 
-void state_table_reset(struct imm_dp_state_table *tbl,
-                       struct dp_args const *args)
+enum imm_rc state_table_reset(struct imm_dp_state_table *tbl,
+                              struct dp_args const *args)
 {
     tbl->nstates = args->nstates;
-    tbl->ids = xrealloc(tbl->ids, sizeof(*tbl->ids) * args->nstates);
-    tbl->span = xrealloc(tbl->span, sizeof(*tbl->span) * args->nstates);
+    tbl->ids = realloc(tbl->ids, sizeof(*tbl->ids) * args->nstates);
+    tbl->span = realloc(tbl->span, sizeof(*tbl->span) * args->nstates);
+
+    if (args->nstates > 0)
+    {
+        if (!tbl->ids || !tbl->span)
+            return error(IMM_OUTOFMEM, "failed to realloc");
+    }
 
     for (unsigned i = 0; i < args->nstates; ++i)
     {
@@ -32,6 +39,7 @@ void state_table_reset(struct imm_dp_state_table *tbl,
     tbl->start.lprob = args->start.lprob;
     tbl->start.state = (imm_state_idx_t)args->start.state->idx;
     tbl->end_state_idx = args->end_state->idx;
+    return IMM_SUCCESS;
 }
 
 void state_table_del(struct imm_dp_state_table const *tbl)

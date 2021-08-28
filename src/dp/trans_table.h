@@ -16,8 +16,8 @@ static inline void trans_table_change(struct imm_dp_trans_table *trans_tbl,
 
 void trans_table_init(struct imm_dp_trans_table *tbl);
 
-void trans_table_reset(struct imm_dp_trans_table *tbl,
-                       struct dp_args const *args);
+enum imm_rc trans_table_reset(struct imm_dp_trans_table *tbl,
+                              struct dp_args const *args);
 
 void trans_table_del(struct imm_dp_trans_table const *tbl);
 

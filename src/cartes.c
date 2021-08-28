@@ -1,8 +1,10 @@
 #include "imm/cartes.h"
+#include "bug.h"
 #include "imm/imm.h"
 #include "ipow.h"
-#include "xmem.h"
+#include "log.h"
 #include <limits.h>
+#include <stdlib.h>
 
 void imm_cartes_init(struct imm_cartes *cartes, char const *set,
                      unsigned set_size, unsigned max_times)
@@ -35,8 +37,8 @@ char const *imm_cartes_next(struct imm_cartes *cartes)
     return item;
 }
 
-void imm_cartes_reset(struct imm_cartes *cartes, char const *set,
-                      unsigned set_size, unsigned max_times)
+enum imm_rc imm_cartes_reset(struct imm_cartes *cartes, char const *set,
+                             unsigned set_size, unsigned max_times)
 {
     cartes->set = set;
     cartes->set_size = set_size;
@@ -45,10 +47,13 @@ void imm_cartes_reset(struct imm_cartes *cartes, char const *set,
     size_t new_capacity = sizeof(*cartes->item) * (unsigned)(max_times + 1);
     if (new_capacity > cartes->capacity)
     {
-        cartes->item = xrealloc(cartes->item, new_capacity);
+        cartes->item = realloc(cartes->item, new_capacity);
+        if (new_capacity > 0 && !cartes->item)
+            return error(IMM_OUTOFMEM, "failed to realloc");
         cartes->capacity = new_capacity;
     }
     cartes->nitems = 0;
+    return IMM_SUCCESS;
 }
 
 void imm_cartes_setup(struct imm_cartes *cartes, unsigned times)

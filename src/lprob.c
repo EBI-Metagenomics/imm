@@ -1,6 +1,6 @@
 #include "imm/lprob.h"
 #include "imm/rnd.h"
-#include "xmem.h"
+#include "log.h"
 
 enum imm_rc imm_lprob_normalize(unsigned len, imm_float arr[len])
 {

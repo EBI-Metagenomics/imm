@@ -10,8 +10,8 @@ void state_table_del(struct imm_dp_state_table const *tbl);
 
 void state_table_init(struct imm_dp_state_table *tbl);
 
-void state_table_reset(struct imm_dp_state_table *tbl,
-                       struct dp_args const *args);
+enum imm_rc state_table_reset(struct imm_dp_state_table *tbl,
+                              struct dp_args const *args);
 
 static inline struct span state_table_span(struct imm_dp_state_table const *tbl,
                                            unsigned state)

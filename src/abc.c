@@ -2,8 +2,8 @@
 #include "imm/log.h"
 #include "imm/sym.h"
 #include "io.h"
+#include "log.h"
 #include "third-party/cmp.h"
-#include "xmem.h"
 #include <assert.h>
 #include <stdint.h>
 
@@ -51,7 +51,7 @@ enum imm_rc abc_init(struct imm_abc *abc, unsigned len, char const *symbols,
         return error(IMM_ILLEGALARG, "symbols length is too large");
 
     abc->size = len;
-    xmemcpy(abc->symbols, symbols, sizeof(*abc->symbols) * len);
+    memcpy(abc->symbols, symbols, sizeof *abc->symbols * len);
     abc->symbols[abc->size] = '\0';
     imm_sym_init(&abc->sym);
     abc->any_symbol_id = imm_sym_id(any_symbol);

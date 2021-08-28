@@ -2,9 +2,10 @@
 #include "imm/seq.h"
 #include "imm/state_types.h"
 #include "ipow.h"
+#include "log.h"
 #include "matrix/matrix.h"
-#include "xmem.h"
 #include <limits.h>
+#include <stdlib.h>
 
 static inline unsigned calc_size(struct imm_dp_code const *code)
 {
@@ -43,37 +44,46 @@ void code_init(struct imm_dp_code *code, struct imm_abc const *abc)
     code->abc = abc;
 }
 
-void code_reset(struct imm_dp_code *code, unsigned min_seq, unsigned max_seq)
+enum imm_rc code_reset(struct imm_dp_code *c, unsigned min_seq,
+                       unsigned max_seq)
 {
     BUG(!code->abc);
-    if (code->seqlen.min == min_seq && code->seqlen.max == max_seq)
-        return;
+    if (c->seqlen.min == min_seq && c->seqlen.max == max_seq)
+        return IMM_SUCCESS;
 
-    code->seqlen.min = min_seq;
-    code->seqlen.max = max_seq;
+    c->seqlen.min = min_seq;
+    c->seqlen.max = max_seq;
 
-    code->stride =
-        xrealloc(code->stride, sizeof(*code->stride) * code_stride_size(code));
+    c->stride = realloc(c->stride, sizeof *c->stride * code_stride_size(c));
+    if (!c->stride && code_stride_size(c) > 0)
+        return error(IMM_OUTOFMEM, "failed to realloc");
 
-    if (code_stride_size(code) > 0)
-        code->stride[max_seq - 1] = 1;
+    if (code_stride_size(c) > 0)
+        c->stride[max_seq - 1] = 1;
 
     if (max_seq > 1)
     {
         for (unsigned len = max_seq - 2; 1 <= len + 1; --len)
-            code->stride[len] =
-                (uint16_t)(code->stride[len + 1] * imm_abc_size(code->abc));
+            c->stride[len] =
+                (uint16_t)(c->stride[len + 1] * imm_abc_size(c->abc));
     }
 
-    code->offset =
-        xrealloc(code->offset, sizeof(*code->offset) * code_offset_size(code));
-    code->offset[0] = 0;
+    c->offset = realloc(c->offset, sizeof *c->offset * code_offset_size(c));
+    if (!c->offset && code_offset_size(c) > 0)
+    {
+        free(c->stride);
+        c->stride = NULL;
+        return error(IMM_OUTOFMEM, "failed to realloc");
+    }
+
+    c->offset[0] = 0;
     for (unsigned len = min_seq + 1; len <= max_seq; ++len)
     {
 
         unsigned i = len - min_seq;
-        code->offset[i] = (uint16_t)(code->offset[i - 1] +
-                                     code->stride[max_seq - (len - 1) - 1]);
+        c->offset[i] =
+            (uint16_t)(c->offset[i - 1] + c->stride[max_seq - (len - 1) - 1]);
     }
-    code->size = calc_size(code);
+    c->size = calc_size(c);
+    return IMM_SUCCESS;
 }

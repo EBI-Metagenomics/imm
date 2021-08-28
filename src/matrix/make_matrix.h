@@ -12,12 +12,15 @@
     };
 
 #define MAKE_MATRIX_INIT(NAME, T)                                              \
-    static inline void NAME##_init(struct NAME *matrix, unsigned rows,         \
-                                   unsigned cols)                              \
+    static inline int NAME##_init(struct NAME *matrix, unsigned rows,          \
+                                  unsigned cols)                               \
     {                                                                          \
-        matrix->data = xmalloc(sizeof(T) * (rows * cols));                     \
+        matrix->data = malloc(sizeof(T) * (rows * cols));                      \
+        if (!matrix->data)                                                     \
+            return 1;                                                          \
         matrix->rows = rows;                                                   \
         matrix->cols = cols;                                                   \
+        return 0;                                                              \
     }
 
 #define MAKE_MATRIX_EMPTY(NAME, T)                                             \
@@ -82,13 +85,15 @@
     }
 
 #define MAKE_MATRIX_RESIZE(NAME, T)                                            \
-    static inline struct NAME *NAME##_resize(struct NAME *matrix,              \
-                                             unsigned rows, unsigned cols)     \
+    static inline int NAME##_resize(struct NAME *matrix, unsigned rows,        \
+                                    unsigned cols)                             \
     {                                                                          \
-        matrix->data = xrealloc(matrix->data, sizeof(T) * (rows * cols));      \
+        matrix->data = realloc(matrix->data, sizeof(T) * (rows * cols));       \
+        if (!matrix->data && rows * cols > 0)                                  \
+            return 1;                                                          \
         matrix->rows = rows;                                                   \
         matrix->cols = cols;                                                   \
-        return matrix;                                                         \
+        return 0;                                                              \
     }
 
 #endif

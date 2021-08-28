@@ -76,13 +76,15 @@ static inline uint64_t start_bit(struct path const *path, unsigned pos,
 
 void path_del(struct path const *path);
 
-void path_init(struct path *path, struct imm_dp_state_table const *state_tbl,
-               struct imm_dp_trans_table const *trans_tbl);
+enum imm_rc path_init(struct path *path,
+                      struct imm_dp_state_table const *state_tbl,
+                      struct imm_dp_trans_table const *trans_tbl);
 
-void path_reset(struct path *path, struct imm_dp_state_table const *state_tbl,
-                struct imm_dp_trans_table const *trans_tbl);
+enum imm_rc path_reset(struct path *path,
+                       struct imm_dp_state_table const *state_tbl,
+                       struct imm_dp_trans_table const *trans_tbl);
 
-void path_setup(struct path *path, unsigned len);
+enum imm_rc path_setup(struct path *path, unsigned len);
 
 static inline unsigned path_seqlen(struct path const *path, unsigned pos,
                                    unsigned state)

@@ -1,26 +1,40 @@
 #include "imm/path.h"
 #include "imm/step.h"
+#include "log.h"
 #include "xmem.h"
+#include <stdlib.h>
 
-static void path_setup(struct imm_path *path)
+static enum imm_rc path_setup(struct imm_path *path)
 {
     path->capacity = sizeof(*path->steps) * (1 << 4);
     path->nsteps = 0;
     path->dir = 1;
     path->start = 0;
-    path->steps = xmalloc((size_t)path->capacity);
+    path->steps = malloc((size_t)path->capacity);
+    if (!path->steps)
+        return error(IMM_OUTOFMEM, "failed to malloc");
+    return IMM_SUCCESS;
 }
 
-void imm_path_add(struct imm_path *path, struct imm_step step)
+enum imm_rc imm_path_add(struct imm_path *path, struct imm_step step)
 {
+    enum imm_rc rc = IMM_SUCCESS;
     if (path->capacity == 0)
-        path_setup(path);
+    {
+        if ((rc = path_setup(path)))
+            return rc;
+    }
 
     size_t count = (unsigned)path->nsteps + 1;
     size_t capacity = (size_t)path->capacity;
-    path->steps = xgrowmem(path->steps, count, sizeof(*path->steps), &capacity);
+
+    path->steps = growmem(path->steps, count, sizeof *path->steps, &capacity);
+    if (!path->steps && capacity > 0)
+        return error(IMM_OUTOFMEM, "failed to grow memory");
+
     path->capacity = (int)capacity;
     imm_path_add_unsafe(path, step);
+    return rc;
 }
 
 void imm_path_del(struct imm_path *path)

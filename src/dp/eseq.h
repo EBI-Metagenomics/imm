@@ -30,6 +30,6 @@ static inline unsigned eseq_len(struct eseq const *eseq)
 
 void eseq_init(struct eseq *eseq, struct imm_dp_code const *code);
 
-void eseq_setup(struct eseq *eseq, struct imm_seq const *seq);
+enum imm_rc eseq_setup(struct eseq *eseq, struct imm_seq const *seq);
 
 #endif

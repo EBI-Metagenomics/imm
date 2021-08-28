@@ -14,7 +14,7 @@ struct imm_seq imm_seq(struct imm_str str, struct imm_abc const *abc)
     {
         if (imm_unlikely(!imm_abc_has_symbol(abc, str.data[i]) &&
                          str.data[i] != imm_abc_any_symbol(abc)))
-            fatal(IMM_ILLEGALARG, "invalid sequence");
+            error(IMM_ILLEGALARG, "invalid sequence");
     }
 
     return (struct imm_seq){str.size, str.data, abc};
