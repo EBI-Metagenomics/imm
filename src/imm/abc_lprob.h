@@ -19,7 +19,7 @@ static inline struct imm_abc_lprob imm_abc_lprob(struct imm_abc const *abc,
 static inline imm_float imm_abc_lprob_get(struct imm_abc_lprob const *lprob,
                                           char symbol)
 {
-    IMM_BUG(!imm_abc_has_symbol(lprob->abc, symbol));
+    __IMM_BUG(!imm_abc_has_symbol(lprob->abc, symbol));
     return lprob->lprobs[imm_abc_symbol_idx(lprob->abc, symbol)];
 }
 

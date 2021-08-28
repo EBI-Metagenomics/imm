@@ -1,6 +1,7 @@
 #ifndef IO_H
 #define IO_H
 
+#include "bug.h"
 #include "imm/support.h"
 #include "support.h"
 #include "third-party/cmp.h"
@@ -14,7 +15,7 @@ static bool __file_reader(cmp_ctx_t *ctx, void *data, size_t limit)
 
 static bool __file_skipper(cmp_ctx_t *ctx, size_t count)
 {
-    IMM_BUG(count > ULONG_MAX);
+    BUG(count > ULONG_MAX);
     return fseek((FILE *)ctx->buf, (long)count, SEEK_CUR);
 }
 

@@ -57,6 +57,6 @@ void imm_cartes_setup(struct imm_cartes *cartes, unsigned times)
     cartes->item[times] = '\0';
     cartes->iter_idx = 0;
     unsigned long nitems = ipow(cartes->set_size, times);
-    IMM_BUG(nitems > UINT_MAX);
+    BUG(nitems > UINT_MAX);
     cartes->nitems = (unsigned)nitems;
 }

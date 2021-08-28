@@ -9,7 +9,7 @@
 static inline unsigned calc_size(struct imm_dp_code const *code)
 {
     unsigned long ncombs = ipow(imm_abc_size(code->abc), code->seqlen.max);
-    IMM_BUG(ncombs > UINT16_MAX);
+    BUG(ncombs > UINT16_MAX);
     return (unsigned)(code->offset[code->seqlen.max - code->seqlen.min] +
                       ncombs);
 }
@@ -45,7 +45,7 @@ void code_init(struct imm_dp_code *code, struct imm_abc const *abc)
 
 void code_reset(struct imm_dp_code *code, unsigned min_seq, unsigned max_seq)
 {
-    IMM_BUG(!code->abc);
+    BUG(!code->abc);
     if (code->seqlen.min == min_seq && code->seqlen.max == max_seq)
         return;
 

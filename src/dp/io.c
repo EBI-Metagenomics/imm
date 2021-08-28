@@ -41,7 +41,7 @@ enum imm_rc imm_dp_write(struct imm_dp const *dp, FILE *file)
     for (unsigned i = 0; i < size; ++i)
         cmp_write_u16(&ctx, dp->code.stride[i]);
 
-    IMM_BUG(dp->code.size > UINT16_MAX);
+    BUG(dp->code.size > UINT16_MAX);
     cmp_write_u16(&ctx, (uint16_t)dp->code.size);
 
     /* emission */

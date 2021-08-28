@@ -46,7 +46,7 @@ static void init_transitions_table(struct imm_hmm *hmm)
 static void add_transition(struct imm_hmm *hmm, struct imm_state *src,
                            struct imm_state *dst, imm_float lprob)
 {
-    IMM_BUG(hmm->transitions.size >= IMM_ARRAY_SIZE(hmm->transitions.data));
+    BUG(hmm->transitions.size >= IMM_ARRAY_SIZE(hmm->transitions.data));
     struct imm_trans *trans = hmm->transitions.data + hmm->transitions.size++;
     trans_init(trans, src->id, dst->id, lprob);
     cco_hash_add(hmm->transitions.tbl, &trans->hnode, trans->pair.id.key);
@@ -101,7 +101,7 @@ enum imm_rc imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
 {
     if (cco_hash_hashed(&state->hnode))
         return error(IMM_ILLEGALARG, "state already belongs to a hmm");
-    IMM_BUG(hmm_state(hmm, state->id));
+    BUG(hmm_state(hmm, state->id));
     hmm_add_state(hmm, state);
     return IMM_SUCCESS;
 }

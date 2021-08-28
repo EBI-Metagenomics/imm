@@ -28,7 +28,7 @@ void trans_table_init(struct imm_dp_trans_table *tbl)
 void trans_table_reset(struct imm_dp_trans_table *tbl,
                        struct dp_args const *args)
 {
-    IMM_BUG(args->nstates == 0);
+    BUG(args->nstates == 0);
     tbl->ntrans = args->ntrans;
     tbl->offset = xrealloc(tbl->offset, sizeof(*tbl->offset) *
                                             trans_table_offsize(args->nstates));

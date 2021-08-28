@@ -23,9 +23,9 @@ static inline void imm_codon_set(struct imm_codon *codon, unsigned id_a,
 {
     struct imm_abc const *abc = imm_nuclt_super(codon->nuclt);
 
-    IMM_BUG(__imm_abc_symbol_type(abc, id_a) == IMM_SYM_NULL ||
-            __imm_abc_symbol_type(abc, id_b) == IMM_SYM_NULL ||
-            __imm_abc_symbol_type(abc, id_c) == IMM_SYM_NULL);
+    __IMM_BUG(__imm_abc_symbol_type(abc, id_a) == IMM_SYM_NULL ||
+              __imm_abc_symbol_type(abc, id_b) == IMM_SYM_NULL ||
+              __imm_abc_symbol_type(abc, id_c) == IMM_SYM_NULL);
 
     codon->a = __imm_abc_symbol_idx(abc, id_a);
     codon->b = __imm_abc_symbol_idx(abc, id_b);

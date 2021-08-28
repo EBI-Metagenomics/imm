@@ -1,6 +1,7 @@
 #ifndef XMEM_H
 #define XMEM_H
 
+#include "bug.h"
 #include "imm/support.h"
 #include "log.h"
 #include <stdlib.h>
@@ -37,7 +38,7 @@ static inline void *xgrowmem(void *restrict ptr, size_t count, size_t size,
     if (size * count > *capacity)
     {
         (*capacity) <<= 1;
-        IMM_BUG(*capacity < size * count);
+        BUG(*capacity < size * count);
         ptr = xrealloc(ptr, *capacity);
     }
     return ptr;

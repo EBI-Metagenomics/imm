@@ -11,19 +11,4 @@
 
 #define IMM_ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
-#ifdef NDEBUG
-#define IMM_BUG(cond)
-#else
-#define IMM_BUG(cond)                                                          \
-    do                                                                         \
-    {                                                                          \
-        if (!(cond))                                                           \
-            break;                                                             \
-        __imm_bug(__FILE__, __LINE__, #cond);                                  \
-    } while (0)
-#endif
-
-void __imm_bug(char const *file, int line, char const *cond)
-    __attribute__((noreturn));
-
 #endif

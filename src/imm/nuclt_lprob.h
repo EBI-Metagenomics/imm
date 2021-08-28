@@ -32,7 +32,7 @@ static inline imm_float imm_nuclt_lprob_get(struct imm_nuclt_lprob const *lprob,
                                             char symbol)
 {
     struct imm_abc const *abc = imm_nuclt_super(lprob->nuclt);
-    IMM_BUG(!imm_abc_has_symbol(abc, symbol));
+    __IMM_BUG(!imm_abc_has_symbol(abc, symbol));
     return __imm_nuclt_lprob_get(lprob, imm_abc_symbol_idx(abc, symbol));
 }
 

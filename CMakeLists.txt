@@ -24,6 +24,7 @@ add_library(
     src/abc.c
     src/amino.c
     src/bitmap.c
+    src/bug.c
     src/cartes.c
     src/codon_marg.c
     src/codon_state.c

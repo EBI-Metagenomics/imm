@@ -58,7 +58,7 @@ void emis_reset(struct imm_dp_emis *emiss, struct imm_dp_code const *code,
                 unsigned j = code_encode(code, &seq);
                 j -= code_offset(code, min_seq);
                 imm_float score = imm_state_lprob(states[i], &seq);
-                IMM_BUG(imm_lprob_is_nan(score));
+                BUG(imm_lprob_is_nan(score));
                 emiss->score[emiss->offset[i] + j] = score;
             }
         }

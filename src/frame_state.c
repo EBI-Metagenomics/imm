@@ -1,4 +1,5 @@
 #include "imm/frame_state.h"
+#include "bug.h"
 #include "imm/codon_marg.h"
 #include "imm/generics.h"
 #include "imm/lprob.h"
@@ -18,7 +19,7 @@ void imm_frame_state_init(struct imm_frame_state *state, unsigned id,
                           struct imm_codon_marg const *codonm,
                           imm_float epsilon)
 {
-    IMM_BUG(nucltp->nuclt != codonm->nuclt);
+    BUG(nucltp->nuclt != codonm->nuclt);
     state->nucltp = nucltp;
     state->codonm = codonm;
     state->epsilon = epsilon;

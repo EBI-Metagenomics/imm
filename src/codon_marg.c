@@ -1,4 +1,5 @@
 #include "imm/codon_marg.h"
+#include "bug.h"
 #include "imm/abc.h"
 #include "imm/codon_lprob.h"
 #include "imm/generics.h"
@@ -81,7 +82,7 @@ static void set_marginal_lprobs(struct imm_codon_marg *codonm)
 {
     struct imm_abc const *abc = imm_super(codonm->nuclt);
     unsigned any = imm_abc_any_symbol_idx(abc);
-    IMM_BUG(any != imm_nuclt_size(codonm->nuclt));
+    BUG(any != imm_nuclt_size(codonm->nuclt));
 
     struct imm_codon codon;
     codon.nuclt = codonm->nuclt;
