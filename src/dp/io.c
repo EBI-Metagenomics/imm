@@ -6,6 +6,7 @@
 #include "imm/dp.h"
 #include "support.h"
 #include "third-party/cmp.h"
+#include "xmem.h"
 
 #define write_imm_float(ctx, v)                                                \
     _Generic((v), float : cmp_write_float, double : cmp_write_double)(ctx, v)
