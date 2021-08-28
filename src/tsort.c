@@ -2,6 +2,7 @@
 #include "imm/state.h"
 #include "imm/trans.h"
 #include "support.h"
+#include "xmem.h"
 
 #define INITIAL_MARK 0
 #define TEMPORARY_MARK 1

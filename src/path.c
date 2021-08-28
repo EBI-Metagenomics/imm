@@ -1,6 +1,8 @@
 #include "imm/path.h"
 #include "imm/step.h"
+#include "imm/support.h"
 #include "support.h"
+#include "xmem.h"
 
 static void path_setup(struct imm_path *path)
 {
@@ -18,7 +20,7 @@ void imm_path_add(struct imm_path *path, struct imm_step step)
 
     size_t count = (unsigned)path->nsteps + 1;
     size_t capacity = (size_t)path->capacity;
-    path->steps = growmem(path->steps, count, sizeof(*path->steps), &capacity);
+    path->steps = xgrowmem(path->steps, count, sizeof(*path->steps), &capacity);
     path->capacity = (int)capacity;
     imm_path_add_unsafe(path, step);
 }

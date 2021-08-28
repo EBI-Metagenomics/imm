@@ -1,6 +1,8 @@
 #include "support.h"
 #include "imm/rc.h"
+#include "imm/support.h"
 #include "log.h"
+#include <stdio.h>
 
 #ifndef HAVE_REALLOFC
 void *reallocf(void *ptr, size_t size)

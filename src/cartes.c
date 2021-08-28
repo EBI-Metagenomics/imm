@@ -1,6 +1,7 @@
 #include "imm/cartes.h"
 #include "imm/imm.h"
 #include "support.h"
+#include "xmem.h"
 #include <limits.h>
 
 void imm_cartes_init(struct imm_cartes *cartes, char const *set,

@@ -3,6 +3,7 @@
 #include "imm/state.h"
 #include "imm/state_types.h"
 #include "support.h"
+#include "xmem.h"
 #include <limits.h>
 
 void state_table_init(struct imm_dp_state_table *tbl)

@@ -3,6 +3,7 @@
 #include "dp/dp.h"
 #include "imm/trans.h"
 #include "support.h"
+#include "xmem.h"
 #include <limits.h>
 
 unsigned trans_table_idx(struct imm_dp_trans_table *trans_tbl, unsigned src_idx,

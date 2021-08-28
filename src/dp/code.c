@@ -3,6 +3,7 @@
 #include "imm/state_types.h"
 #include "matrix/matrix.h"
 #include "support.h"
+#include "xmem.h"
 #include <limits.h>
 
 static inline unsigned calc_size(struct imm_dp_code const *code)

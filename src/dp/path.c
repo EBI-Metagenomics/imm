@@ -2,6 +2,7 @@
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
 #include "support.h"
+#include "xmem.h"
 
 void path_init(struct path *path, struct imm_dp_state_table const *state_tbl,
                struct imm_dp_trans_table const *trans_tbl)

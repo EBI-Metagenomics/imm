@@ -5,6 +5,7 @@
 #include "io.h"
 #include "support.h"
 #include "third-party/cmp.h"
+#include "xmem.h"
 #include <assert.h>
 #include <stdint.h>
 

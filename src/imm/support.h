@@ -11,9 +11,6 @@
 
 #define IMM_ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
-#define IMM_XSTR(s) __IMM_STR(s)
-#define __IMM_STR(s) #s
-
 #ifdef NDEBUG
 #define IMM_BUG(cond)
 #else

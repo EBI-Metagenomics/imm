@@ -8,9 +8,11 @@
 #include "imm/state_types.h"
 #include "imm/subseq.h"
 #include "imm/support.h"
+#include "log.h"
 #include "state.h"
 #include "support.h"
 #include "tsort.h"
+#include "xmem.h"
 
 static inline void start_init(struct imm_hmm *hmm)
 {
