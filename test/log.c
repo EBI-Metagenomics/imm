@@ -49,7 +49,7 @@ void test_log_setup(void)
     fclose(fd);
 
     char desired[] =
-        "MY_ERROR: /Users/horta/code/imm/src/abc.c:72:IMM_ILLEGALARG: alphabet "
+        "MY_ERROR: /Users/horta/code/imm/src/abc.c:71:IMM_ILLEGALARG: alphabet "
         "cannot have duplicated symbols";
 
     char *desired_ctx = NULL;
@@ -65,7 +65,8 @@ void test_log_setup(void)
 
     desired_tok = strtok_r(NULL, ":", &desired_ctx);
     line_tok = strtok_r(NULL, ":", &line_ctx);
-    /* C lang bug: http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2322.htm */
+    /* C language: http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2322.htm */
+    /* So we skip the __LINE__ check as its value varies across compilers */
     /* EQ(line_tok, desired_tok); */
 
     desired_tok = strtok_r(NULL, ":", &desired_ctx);
