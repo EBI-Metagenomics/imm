@@ -43,4 +43,8 @@ static inline void *xgrowmem(void *restrict ptr, size_t count, size_t size,
     return ptr;
 }
 
+#ifndef HAVE_REALLOFC
+void *reallocf(void *ptr, size_t size);
+#endif
+
 #endif

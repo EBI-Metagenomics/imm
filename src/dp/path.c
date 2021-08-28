@@ -1,4 +1,5 @@
 #include "dp/path.h"
+#include "bits.h"
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
 #include "support.h"
