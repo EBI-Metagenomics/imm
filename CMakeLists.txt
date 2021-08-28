@@ -57,7 +57,8 @@ add_library(
     src/support.c
     src/task.c
     src/tsort.c
-    src/third-party/cmp.c)
+    src/third-party/cmp.c
+    src/xmem.c)
 add_library(IMM::imm ALIAS imm)
 
 # Hide functions by default.
