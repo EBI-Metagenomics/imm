@@ -1,5 +1,5 @@
 #include "imm/state.h"
-#include "log.h"
+#include "error.h"
 
 imm_float imm_state_lprob(struct imm_state const *state,
                           struct imm_seq const *seq)

@@ -1,7 +1,7 @@
 #include "tsort.h"
+#include "error.h"
 #include "imm/state.h"
 #include "imm/trans.h"
-#include "log.h"
 #include <stdlib.h>
 
 #define INITIAL_MARK 0

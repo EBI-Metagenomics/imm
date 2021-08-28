@@ -3,7 +3,7 @@
 #include "dp/minmax.h"
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
-#include "log.h"
+#include "error.h"
 #include <stdlib.h>
 
 enum imm_rc path_init(struct path *path,

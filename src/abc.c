@@ -1,8 +1,7 @@
 #include "abc.h"
-#include "imm/log.h"
+#include "error.h"
 #include "imm/sym.h"
 #include "io.h"
-#include "log.h"
 #include "third-party/cmp.h"
 #include <assert.h>
 #include <stdint.h>

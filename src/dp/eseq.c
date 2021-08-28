@@ -1,8 +1,8 @@
 #include "dp/eseq.h"
 #include "dp/code.h"
+#include "error.h"
 #include "imm/seq.h"
 #include "imm/subseq.h"
-#include "log.h"
 
 void eseq_del(struct eseq const *eseq) { matrixu16_deinit(&eseq->data); }
 

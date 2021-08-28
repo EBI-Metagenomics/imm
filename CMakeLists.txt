@@ -38,6 +38,7 @@ add_library(
     src/dp/path.c
     src/dp/state_table.c
     src/dp/trans_table.c
+    src/error.c
     src/example1.c
     src/example2.c
     src/frame_state.c
@@ -55,8 +56,8 @@ add_library(
     src/seq.c
     src/state.c
     src/task.c
-    src/tsort.c
     src/third-party/cmp.c
+    src/tsort.c
     src/xmem.c)
 add_library(IMM::imm ALIAS imm)
 

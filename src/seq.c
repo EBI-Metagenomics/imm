@@ -1,6 +1,6 @@
 #include "imm/seq.h"
+#include "error.h"
 #include "imm/abc.h"
-#include "log.h"
 
 struct imm_seq const imm_seq_empty = {
     .size = 0,

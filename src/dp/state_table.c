@@ -1,8 +1,8 @@
 #include "dp/state_table.h"
 #include "dp/dp.h"
+#include "error.h"
 #include "imm/state.h"
 #include "imm/state_types.h"
-#include "log.h"
 #include <limits.h>
 #include <stdlib.h>
 

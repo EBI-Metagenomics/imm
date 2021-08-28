@@ -2,7 +2,7 @@
 #define XMEM_H
 
 #include "bug.h"
-#include "log.h"
+#include "error.h"
 #include <stdlib.h>
 #include <string.h>
 

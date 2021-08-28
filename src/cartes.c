@@ -1,8 +1,8 @@
 #include "imm/cartes.h"
 #include "bug.h"
+#include "error.h"
 #include "imm/imm.h"
 #include "ipow.h"
-#include "log.h"
 #include <limits.h>
 #include <stdlib.h>
 

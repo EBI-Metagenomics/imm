@@ -1,6 +1,6 @@
 #include "imm/path.h"
+#include "error.h"
 #include "imm/step.h"
-#include "log.h"
 #include "xmem.h"
 #include <stdlib.h>
 

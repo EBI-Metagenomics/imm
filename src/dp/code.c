@@ -1,8 +1,8 @@
 #include "dp/code.h"
+#include "error.h"
 #include "imm/seq.h"
 #include "imm/state_types.h"
 #include "ipow.h"
-#include "log.h"
 #include "matrix/matrix.h"
 #include <limits.h>
 #include <stdlib.h>

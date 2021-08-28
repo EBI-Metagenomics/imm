@@ -1,10 +1,10 @@
 #include "imm/frame_state.h"
 #include "bug.h"
+#include "error.h"
 #include "imm/codon_marg.h"
 #include "imm/generics.h"
 #include "imm/lprob.h"
 #include "imm/nuclt_lprob.h"
-#include "log.h"
 #include "state.h"
 
 static void del(struct imm_state const *state);

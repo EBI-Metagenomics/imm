@@ -1,10 +1,10 @@
 #include "dp/emis.h"
 #include "bug.h"
 #include "dp/code.h"
+#include "error.h"
 #include "imm/abc.h"
 #include "imm/cartes.h"
 #include "imm/state.h"
-#include "log.h"
 #include <stdlib.h>
 
 void emis_del(struct imm_dp_emis const *emis)

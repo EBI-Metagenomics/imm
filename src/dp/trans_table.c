@@ -2,8 +2,8 @@
 #include "bug.h"
 #include "cco/stack.h"
 #include "dp/dp.h"
+#include "error.h"
 #include "imm/trans.h"
-#include "log.h"
 #include <limits.h>
 #include <stdlib.h>
 

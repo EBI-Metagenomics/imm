@@ -1,7 +1,6 @@
 #ifndef DP_SPAN_H
 #define DP_SPAN_H
 
-#include "imm/log.h"
 #include "imm/state_types.h"
 #include <assert.h>
 #include <stdbool.h>
