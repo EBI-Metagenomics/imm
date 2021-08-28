@@ -3,7 +3,6 @@
 #include "imm/abc.h"
 #include "imm/cartes.h"
 #include "imm/state.h"
-#include "support.h"
 #include "xmem.h"
 
 void emis_del(struct imm_dp_emis const *emis)

@@ -1,8 +1,8 @@
 #include "dp/path.h"
 #include "bits.h"
+#include "dp/minmax.h"
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
-#include "support.h"
 #include "xmem.h"
 
 void path_init(struct path *path, struct imm_dp_state_table const *state_tbl,

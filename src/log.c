@@ -1,6 +1,5 @@
 #include "log.h"
 #include "imm/log.h"
-#include "imm/support.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>

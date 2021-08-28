@@ -54,7 +54,6 @@ add_library(
     src/rnd.c
     src/seq.c
     src/state.c
-    src/support.c
     src/task.c
     src/tsort.c
     src/third-party/cmp.c

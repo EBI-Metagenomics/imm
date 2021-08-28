@@ -1,11 +1,5 @@
-#ifndef SUPPORT_H
-#define SUPPORT_H
-
-#include <stdbool.h>
-#include <stdlib.h>
-
-#define MIN(x, y) ((x) < (y) ? (x) : (y))
-#define MAX(x, y) ((x) > (y) ? (x) : (y))
+#ifndef IPOW_H
+#define IPOW_H
 
 static inline unsigned long ipow(unsigned long base, unsigned exp)
 {

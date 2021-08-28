@@ -2,6 +2,7 @@
 #include "dp/code.h"
 #include "dp/emis.h"
 #include "dp/matrix.h"
+#include "dp/minmax.h"
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
 #include "elapsed/elapsed.h"
@@ -10,9 +11,7 @@
 #include "imm/path.h"
 #include "imm/result.h"
 #include "imm/state.h"
-#include "imm/support.h"
 #include "imm/trans.h"
-#include "support.h"
 #include "task.h"
 
 struct final_score

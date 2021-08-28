@@ -1,6 +1,5 @@
 #include "imm/mute_state.h"
 #include "state.h"
-#include "support.h"
 
 static imm_float lprob(struct imm_state const *state,
                        struct imm_seq const *seq);

@@ -1,7 +1,6 @@
 #ifndef MATRIX_MAKE_MATRIX_H
 #define MATRIX_MAKE_MATRIX_H
 
-#include "support.h"
 #include "xmem.h"
 
 #define MAKE_MATRIX_STRUCT(NAME, T)                                            \

@@ -1,7 +1,5 @@
 #include "imm/path.h"
 #include "imm/step.h"
-#include "imm/support.h"
-#include "support.h"
 #include "xmem.h"
 
 static void path_setup(struct imm_path *path)

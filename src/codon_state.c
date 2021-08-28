@@ -3,9 +3,7 @@
 #include "imm/codon_lprob.h"
 #include "imm/generics.h"
 #include "imm/seq.h"
-#include "imm/support.h"
 #include "state.h"
-#include "support.h"
 
 static imm_float lprob(struct imm_state const *state,
                        struct imm_seq const *seq);

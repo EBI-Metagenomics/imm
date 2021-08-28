@@ -4,7 +4,6 @@
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
 #include "imm/dp.h"
-#include "support.h"
 #include "third-party/cmp.h"
 #include "xmem.h"
 

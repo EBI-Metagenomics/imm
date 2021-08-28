@@ -1,6 +1,6 @@
 #include "imm/cartes.h"
 #include "imm/imm.h"
-#include "support.h"
+#include "ipow.h"
 #include "xmem.h"
 #include <limits.h>
 

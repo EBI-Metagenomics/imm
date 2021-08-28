@@ -2,7 +2,6 @@
 #include "cco/stack.h"
 #include "dp/dp.h"
 #include "imm/trans.h"
-#include "support.h"
 #include "xmem.h"
 #include <limits.h>
 

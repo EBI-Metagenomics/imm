@@ -4,10 +4,8 @@
 #include "imm/generics.h"
 #include "imm/lprob.h"
 #include "imm/nuclt_lprob.h"
-#include "imm/support.h"
 #include "log.h"
 #include "state.h"
-#include "support.h"
 
 static void del(struct imm_state const *state);
 

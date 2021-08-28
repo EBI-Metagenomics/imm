@@ -2,7 +2,6 @@
 #include "dp/dp.h"
 #include "imm/state.h"
 #include "imm/state_types.h"
-#include "support.h"
 #include "xmem.h"
 #include <limits.h>
 
