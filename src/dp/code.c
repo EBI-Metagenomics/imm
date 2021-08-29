@@ -1,4 +1,5 @@
 #include "dp/code.h"
+#include "bug.h"
 #include "error.h"
 #include "imm/seq.h"
 #include "imm/state_types.h"

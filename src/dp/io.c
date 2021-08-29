@@ -5,7 +5,6 @@
 #include "dp/trans_table.h"
 #include "imm/dp.h"
 #include "third-party/cmp.h"
-#include "xmem.h"
 
 #define write_imm_float(ctx, v)                                                \
     _Generic((v), float : cmp_write_float, double : cmp_write_double)(ctx, v)
@@ -127,14 +126,14 @@ enum imm_rc imm_dp_read(struct imm_dp *dp, FILE *file)
 
     ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
     ERETURN(size > UINT16_MAX, IMM_PARSEERROR);
-    code->offset = reallocf(code->offset, sizeof(*code->offset) * size);
+    code->offset = realloc(code->offset, sizeof(*code->offset) * size);
     ERETURN(!code->offset && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
         ERETURN(!cmp_read_u16(&ctx, code->offset + i), IMM_IOERROR);
 
     ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
     ERETURN(size > UINT16_MAX, IMM_PARSEERROR);
-    code->stride = reallocf(code->stride, sizeof(*code->stride) * size);
+    code->stride = realloc(code->stride, sizeof(*code->stride) * size);
     ERETURN(!code->stride && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
         ERETURN(!cmp_read_u16(&ctx, code->stride + i), IMM_IOERROR);
@@ -145,13 +144,13 @@ enum imm_rc imm_dp_read(struct imm_dp *dp, FILE *file)
     /* emission */
     e = &dp->emis;
     ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
-    e->score = reallocf(e->score, sizeof(*e->score) * size);
+    e->score = realloc(e->score, sizeof(*e->score) * size);
     ERETURN(!e->score && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
         ERETURN(!read_imm_float(&ctx, e->score + i), IMM_IOERROR);
 
     ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
-    e->offset = reallocf(e->offset, sizeof(*e->offset) * size);
+    e->offset = realloc(e->offset, sizeof(*e->offset) * size);
     ERETURN(!e->offset && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
     {
@@ -166,7 +165,7 @@ enum imm_rc imm_dp_read(struct imm_dp *dp, FILE *file)
 
     ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
     ERETURN(tt->ntrans != size, IMM_PARSEERROR);
-    tt->trans = reallocf(tt->trans, sizeof(*tt->trans) * size);
+    tt->trans = realloc(tt->trans, sizeof(*tt->trans) * size);
     ERETURN(!tt->trans && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
         ERETURN(!read_imm_float(&ctx, &tt->trans[i].score), IMM_IOERROR);
@@ -180,7 +179,7 @@ enum imm_rc imm_dp_read(struct imm_dp *dp, FILE *file)
     }
 
     ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
-    tt->offset = reallocf(tt->offset, sizeof(*tt->offset) * size);
+    tt->offset = realloc(tt->offset, sizeof(*tt->offset) * size);
     ERETURN(!tt->offset && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
     {
@@ -195,7 +194,7 @@ enum imm_rc imm_dp_read(struct imm_dp *dp, FILE *file)
 
     ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
     ERETURN(st->nstates != size, IMM_PARSEERROR);
-    st->ids = reallocf(st->ids, sizeof(*st->ids) * size);
+    st->ids = realloc(st->ids, sizeof(*st->ids) * size);
     ERETURN(!st->ids && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
         ERETURN(!cmp_read_u16(&ctx, st->ids + i), IMM_IOERROR);
@@ -207,7 +206,7 @@ enum imm_rc imm_dp_read(struct imm_dp *dp, FILE *file)
 
     ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
     ERETURN(st->nstates != size, IMM_PARSEERROR);
-    st->span = reallocf(st->span, sizeof(*st->span) * size);
+    st->span = realloc(st->span, sizeof(*st->span) * size);
     ERETURN(!st->span && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
     {

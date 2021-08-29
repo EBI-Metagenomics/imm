@@ -57,8 +57,7 @@ add_library(
     src/state.c
     src/task.c
     src/third-party/cmp.c
-    src/tsort.c
-    src/xmem.c)
+    src/tsort.c)
 add_library(IMM::imm ALIAS imm)
 
 # Hide functions by default.
@@ -147,25 +146,6 @@ target_compile_options(imm PRIVATE ${WARNING_FLAGS})
 target_compile_options(imm PRIVATE "-fverbose-asm")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/imm/config.h.in
                ${CMAKE_CURRENT_BINARY_DIR}/imm/config.h @ONLY)
-
-include(CheckCSourceCompiles)
-check_c_source_compiles(
-    "
-        static void f(char const* err, ...) __attribute__((format(printf, 1, 2)));
-        int main(void) {return 0;}
-    "
-    HAVE_ATTR_FMT)
-target_compile_definitions(imm
-                           PRIVATE $<$<BOOL:${HAVE_ATTR_FMT}>:HAVE_ATTR_FMT>)
-
-check_c_source_compiles(
-    "
-        #include <stdlib.h>
-        int main(void) { void *p = reallofc(NULL, 1); free(p); return 0; }
-    "
-    HAVE_REALLOFC)
-target_compile_definitions(imm
-                           PRIVATE $<$<BOOL:${HAVE_REALLOFC}>:HAVE_REALLOFC>)
 
 include(CheckTypeSize)
 

@@ -1,4 +1,5 @@
 #include "dp/dp.h"
+#include "bug.h"
 #include "dp/code.h"
 #include "dp/emis.h"
 #include "dp/matrix.h"
@@ -6,6 +7,7 @@
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
 #include "elapsed/elapsed.h"
+#include "error.h"
 #include "imm/dp.h"
 #include "imm/lprob.h"
 #include "imm/path.h"

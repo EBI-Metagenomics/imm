@@ -1,7 +1,7 @@
 #include "imm/path.h"
+#include "bug.h"
 #include "error.h"
 #include "imm/step.h"
-#include "xmem.h"
 #include <stdlib.h>
 
 static enum imm_rc path_setup(struct imm_path *path)
@@ -28,9 +28,14 @@ enum imm_rc imm_path_add(struct imm_path *path, struct imm_step step)
     size_t count = (unsigned)path->nsteps + 1;
     size_t capacity = (size_t)path->capacity;
 
-    path->steps = growmem(path->steps, count, sizeof *path->steps, &capacity);
-    if (!path->steps && capacity > 0)
-        return error(IMM_OUTOFMEM, "failed to grow memory");
+    if (sizeof *path->steps * count > capacity)
+    {
+        capacity <<= 1;
+        BUG(capacity < sizeof *path->steps * count);
+        path->steps = realloc(path->steps, capacity);
+        if (!path->steps && capacity > 0)
+            return error(IMM_OUTOFMEM, "failed to realloc");
+    }
 
     path->capacity = (int)capacity;
     imm_path_add_unsafe(path, step);

@@ -1,5 +1,7 @@
 #include "dp/matrix.h"
 #include "dp/state_table.h"
+#include "error.h"
+#include "imm/rc.h"
 
 #define MAX_LOOKUP (2 * IMM_STATE_MAX_SEQLEN)
 
