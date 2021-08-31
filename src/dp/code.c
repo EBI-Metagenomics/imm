@@ -1,17 +1,17 @@
 #include "dp/code.h"
-#include "bug.h"
 #include "error.h"
 #include "imm/seq.h"
 #include "imm/state_types.h"
 #include "ipow.h"
 #include "matrix/matrix.h"
+#include <assert.h>
 #include <limits.h>
 #include <stdlib.h>
 
 static inline unsigned calc_size(struct imm_dp_code const *code)
 {
     unsigned long ncombs = ipow(imm_abc_size(code->abc), code->seqlen.max);
-    BUG(ncombs > UINT16_MAX);
+    assert(ncombs <= UINT16_MAX);
     return (unsigned)(code->offset[code->seqlen.max - code->seqlen.min] +
                       ncombs);
 }
@@ -48,7 +48,7 @@ void code_init(struct imm_dp_code *code, struct imm_abc const *abc)
 enum imm_rc code_reset(struct imm_dp_code *c, unsigned min_seq,
                        unsigned max_seq)
 {
-    BUG(!c->abc);
+    assert(c->abc);
     if (c->seqlen.min == min_seq && c->seqlen.max == max_seq)
         return IMM_SUCCESS;
 

@@ -1,10 +1,10 @@
 #include "dp/emis.h"
-#include "bug.h"
 #include "dp/code.h"
 #include "error.h"
 #include "imm/abc.h"
 #include "imm/cartes.h"
 #include "imm/state.h"
+#include <assert.h>
 #include <stdlib.h>
 
 void emis_del(struct imm_dp_emis const *emis)
@@ -68,7 +68,7 @@ enum imm_rc emis_reset(struct imm_dp_emis *emiss,
                 unsigned j = code_encode(code, &seq);
                 j -= code_offset(code, min_seq);
                 imm_float score = imm_state_lprob(states[i], &seq);
-                BUG(imm_lprob_is_nan(score));
+                assert(!imm_lprob_is_nan(score));
                 emiss->score[emiss->offset[i] + j] = score;
             }
         }

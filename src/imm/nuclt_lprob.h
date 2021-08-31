@@ -4,6 +4,7 @@
 #include "imm/log.h"
 #include "imm/lprob.h"
 #include "imm/nuclt.h"
+#include <assert.h>
 
 struct imm_nuclt_lprob
 {
@@ -32,7 +33,7 @@ static inline imm_float imm_nuclt_lprob_get(struct imm_nuclt_lprob const *lprob,
                                             char symbol)
 {
     struct imm_abc const *abc = imm_nuclt_super(lprob->nuclt);
-    __IMM_BUG(!imm_abc_has_symbol(abc, symbol));
+    assert(imm_abc_has_symbol(abc, symbol));
     return __imm_nuclt_lprob_get(lprob, imm_abc_symbol_idx(abc, symbol));
 }
 

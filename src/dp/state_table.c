@@ -48,7 +48,6 @@ void state_table_del(struct imm_dp_state_table const *tbl)
     free(tbl->span);
 }
 
-#ifndef NDEBUG
 void state_table_dump(struct imm_dp_state_table const *tbl)
 {
     for (unsigned i = 0; i < tbl->nstates; ++i)
@@ -67,4 +66,3 @@ void state_table_dump(struct imm_dp_state_table const *tbl)
     }
     putc('\n', stdout);
 }
-#endif

@@ -5,6 +5,7 @@
 #include "dp/trans_table.h"
 #include "imm/dp.h"
 #include "third-party/cmp.h"
+#include <assert.h>
 
 #define write_imm_float(ctx, v)                                                \
     _Generic((v), float : cmp_write_float, double : cmp_write_double)(ctx, v)
@@ -40,7 +41,7 @@ enum imm_rc imm_dp_write(struct imm_dp const *dp, FILE *file)
     for (unsigned i = 0; i < size; ++i)
         cmp_write_u16(&ctx, dp->code.stride[i]);
 
-    BUG(dp->code.size > UINT16_MAX);
+    assert(dp->code.size <= UINT16_MAX);
     cmp_write_u16(&ctx, (uint16_t)dp->code.size);
 
     /* emission */

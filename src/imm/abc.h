@@ -2,12 +2,12 @@
 #define IMM_ABC_H
 
 #include "imm/abc_types.h"
-#include "imm/bug.h"
 #include "imm/export.h"
 #include "imm/log.h"
 #include "imm/str.h"
 #include "imm/support.h"
 #include "imm/sym.h"
+#include <assert.h>
 #include <stdio.h>
 
 #define IMM_ABC_MAX_SIZE (31U)
@@ -62,7 +62,7 @@ static inline unsigned imm_abc_size(struct imm_abc const *abc)
 static inline unsigned __imm_abc_symbol_idx(struct imm_abc const *abc,
                                             unsigned id)
 {
-    __IMM_BUG(!imm_abc_has_symbol_id(abc, id) && id != abc->any_symbol_id);
+    assert(imm_abc_has_symbol_id(abc, id) || id == abc->any_symbol_id);
     return imm_sym_idx(&abc->sym, id);
 }
 

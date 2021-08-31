@@ -1,11 +1,11 @@
 #include "imm/frame_state.h"
-#include "bug.h"
 #include "error.h"
 #include "imm/codon_marg.h"
 #include "imm/generics.h"
 #include "imm/lprob.h"
 #include "imm/nuclt_lprob.h"
 #include "state.h"
+#include <assert.h>
 
 static void del(struct imm_state const *state);
 
@@ -17,7 +17,7 @@ void imm_frame_state_init(struct imm_frame_state *state, unsigned id,
                           struct imm_codon_marg const *codonm,
                           imm_float epsilon)
 {
-    BUG(nucltp->nuclt != codonm->nuclt);
+    assert(nucltp->nuclt == codonm->nuclt);
     state->nucltp = nucltp;
     state->codonm = codonm;
     state->epsilon = epsilon;

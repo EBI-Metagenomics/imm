@@ -6,6 +6,7 @@
 #include "imm/lprob.h"
 #include "imm/nuclt.h"
 #include "imm/rc.h"
+#include <assert.h>
 
 /** @file codon_lprob.h
  * Codon probability module.
@@ -42,14 +43,14 @@ static inline imm_float
 imm_codon_lprob_get(struct imm_codon_lprob const *codonp,
                     struct imm_codon codon)
 {
-    __IMM_BUG(codonp->nuclt != codon.nuclt);
+    assert(codonp->nuclt == codon.nuclt);
     return codonp->lprobs[codon.a][codon.b][codon.c];
 }
 
 static inline void imm_codon_lprob_set(struct imm_codon_lprob *codonp,
                                        struct imm_codon codon, imm_float lprob)
 {
-    __IMM_BUG(codonp->nuclt != codon.nuclt);
+    assert(codonp->nuclt == codon.nuclt);
     codonp->lprobs[codon.a][codon.b][codon.c] = lprob;
 }
 

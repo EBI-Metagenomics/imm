@@ -1,9 +1,9 @@
 #include "gc.h"
-#include "bug.h"
 #include "imm/codon.h"
 #include "imm/dna.h"
 #include "imm/gc.h"
 #include "imm/generics.h"
+#include <assert.h>
 
 extern struct gc const gencode[];
 struct imm_dna const *dna = &imm_dna_default;
@@ -37,7 +37,7 @@ static unsigned perfect_hash_id1(char key);
 
 char imm_gc_decode(unsigned id, char a, char b, char c)
 {
-    BUG(id != 1);
+    assert(id == 1);
     struct gc const *gc = &gencode[id - 1];
     char const *aa = gc->ncbieaa;
     unsigned const i[3] = {perfect_hash_id1(a), perfect_hash_id1(b),

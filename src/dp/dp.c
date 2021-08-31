@@ -1,5 +1,4 @@
 #include "dp/dp.h"
-#include "bug.h"
 #include "dp/code.h"
 #include "dp/emis.h"
 #include "dp/matrix.h"
@@ -15,6 +14,7 @@
 #include "imm/state.h"
 #include "imm/trans.h"
 #include "task.h"
+#include <assert.h>
 
 struct final_score
 {
@@ -313,13 +313,13 @@ static void viterbi_first_row(struct imm_dp const *dp, struct imm_task *task,
         {
             path_set_trans(&task->path, 0, i, trans);
             path_set_seqlen(&task->path, 0, i, len);
-            BUG(path_trans(&task->path, 0, i) != trans);
-            BUG(path_seqlen(&task->path, 0, i) != len);
+            assert(path_trans(&task->path, 0, i) == trans);
+            assert(path_seqlen(&task->path, 0, i) == len);
         }
         else
         {
             path_invalidate(&task->path, 0, i);
-            BUG(path_valid(&task->path, 0, i));
+            assert(!path_valid(&task->path, 0, i));
         }
 
         unsigned min_len = state_table_span(&dp->state_table, i).min;
@@ -347,13 +347,13 @@ static void viterbi_first_row_safe(struct imm_dp const *dp,
         {
             path_set_trans(&task->path, 0, i, trans);
             path_set_seqlen(&task->path, 0, i, len);
-            BUG(path_trans(&task->path, 0, i) != trans);
-            BUG(path_seqlen(&task->path, 0, i) != len);
+            assert(path_trans(&task->path, 0, i) == trans);
+            assert(path_seqlen(&task->path, 0, i) == len);
         }
         else
         {
             path_invalidate(&task->path, 0, i);
-            BUG(path_valid(&task->path, 0, i));
+            assert(!path_valid(&task->path, 0, i));
         }
 
         unsigned min_len = state_table_span(&dp->state_table, i).min;
@@ -411,13 +411,13 @@ static void _viterbi(struct imm_dp const *dp, struct imm_task *task,
             {
                 path_set_trans(&task->path, r, i, trans);
                 path_set_seqlen(&task->path, r, i, len);
-                BUG(path_trans(&task->path, r, i) != trans);
-                BUG(path_seqlen(&task->path, r, i) != len);
+                assert(path_trans(&task->path, r, i) == trans);
+                assert(path_seqlen(&task->path, r, i) == len);
             }
             else
             {
                 path_invalidate(&task->path, r, i);
-                BUG(path_valid(&task->path, r, i));
+                assert(!path_valid(&task->path, r, i));
             }
 
             unsigned min_len = state_table_span(&dp->state_table, i).min;
@@ -446,13 +446,13 @@ static void _viterbi_safe(struct imm_dp const *dp, struct imm_task *task,
             {
                 path_set_trans(&task->path, r, i, trans);
                 path_set_seqlen(&task->path, r, i, len);
-                BUG(path_trans(&task->path, r, i) != trans);
-                BUG(path_seqlen(&task->path, r, i) != len);
+                assert(path_trans(&task->path, r, i) == trans);
+                assert(path_seqlen(&task->path, r, i) == len);
             }
             else
             {
                 path_invalidate(&task->path, r, i);
-                BUG(path_valid(&task->path, r, i));
+                assert(!path_valid(&task->path, r, i));
             }
 
             unsigned min_len = state_table_span(&dp->state_table, i).min;
@@ -463,9 +463,7 @@ static void _viterbi_safe(struct imm_dp const *dp, struct imm_task *task,
     }
 }
 
-#ifndef NDEBUG
-void dp_dump_state_table(struct imm_dp const *dp)
+void imm_dp_dump_state_table(struct imm_dp const *dp)
 {
     state_table_dump(&dp->state_table);
 }
-#endif

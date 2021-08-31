@@ -3,7 +3,7 @@
 
 enum imm_rc
 {
-    IMM_SUCCESS = 0,
+    IMM_SUCCESS,
     IMM_FAILURE,
     IMM_OUTOFMEM,
     IMM_ILLEGALARG,

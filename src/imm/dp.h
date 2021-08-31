@@ -41,8 +41,6 @@ IMM_API enum imm_rc imm_dp_write(struct imm_dp const *dp, FILE *file);
 
 IMM_API enum imm_rc imm_dp_read(struct imm_dp *dp, FILE *file);
 
-#ifndef NDEBUG
-IMM_API void dp_dump_state_table(struct imm_dp const *dp);
-#endif
+IMM_API void imm_dp_dump_state_table(struct imm_dp const *dp);
 
 #endif

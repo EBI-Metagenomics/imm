@@ -1,7 +1,7 @@
 #include "imm/path.h"
-#include "bug.h"
 #include "error.h"
 #include "imm/step.h"
+#include <assert.h>
 #include <stdlib.h>
 
 static enum imm_rc path_setup(struct imm_path *path)
@@ -31,7 +31,7 @@ enum imm_rc imm_path_add(struct imm_path *path, struct imm_step step)
     if (sizeof *path->steps * count > capacity)
     {
         capacity <<= 1;
-        BUG(capacity < sizeof *path->steps * count);
+        assert(capacity >= sizeof *path->steps * count);
         path->steps = realloc(path->steps, capacity);
         if (!path->steps && capacity > 0)
             return error(IMM_OUTOFMEM, "failed to realloc");

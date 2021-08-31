@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 project(
     imm
-    VERSION 0.0.18
+    VERSION 0.0.19
     LANGUAGES C)
 
 # Generate compile_commands.json file
@@ -24,7 +24,6 @@ add_library(
     src/abc.c
     src/amino.c
     src/bitmap.c
-    src/bug.c
     src/cartes.c
     src/codon_marg.c
     src/codon_state.c

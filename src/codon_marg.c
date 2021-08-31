@@ -1,9 +1,9 @@
 #include "imm/codon_marg.h"
-#include "bug.h"
 #include "imm/abc.h"
 #include "imm/codon_lprob.h"
 #include "imm/generics.h"
 #include "imm/nuclt.h"
+#include <assert.h>
 
 static_assert(IMM_NUCLT_SIZE == 4, "nuclt size expected to be four");
 
@@ -82,7 +82,7 @@ static void set_marginal_lprobs(struct imm_codon_marg *codonm)
 {
     struct imm_abc const *abc = imm_super(codonm->nuclt);
     unsigned any = imm_abc_any_symbol_idx(abc);
-    BUG(any != imm_nuclt_size(codonm->nuclt));
+    assert(any == imm_nuclt_size(codonm->nuclt));
 
     struct imm_codon codon;
     codon.nuclt = codonm->nuclt;

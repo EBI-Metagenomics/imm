@@ -19,8 +19,6 @@ static inline struct span state_table_span(struct imm_dp_state_table const *tbl,
     return tbl->span[state];
 }
 
-#ifndef NDEBUG
 void state_table_dump(struct imm_dp_state_table const *tbl);
-#endif
 
 #endif

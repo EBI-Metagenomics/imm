@@ -1,8 +1,8 @@
 #ifndef IO_H
 #define IO_H
 
-#include "bug.h"
 #include "third-party/cmp.h"
+#include <assert.h>
 #include <limits.h>
 
 static bool __file_reader(cmp_ctx_t *ctx, void *data, size_t limit)
@@ -13,7 +13,7 @@ static bool __file_reader(cmp_ctx_t *ctx, void *data, size_t limit)
 
 static bool __file_skipper(cmp_ctx_t *ctx, size_t count)
 {
-    BUG(count > ULONG_MAX);
+    assert(count <= ULONG_MAX);
     return fseek((FILE *)ctx->buf, (long)count, SEEK_CUR);
 }
 

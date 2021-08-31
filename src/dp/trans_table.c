@@ -1,9 +1,9 @@
 #include "dp/trans_table.h"
-#include "bug.h"
 #include "cco/stack.h"
 #include "dp/dp.h"
 #include "error.h"
 #include "imm/trans.h"
+#include <assert.h>
 #include <limits.h>
 #include <stdlib.h>
 
@@ -29,7 +29,7 @@ void trans_table_init(struct imm_dp_trans_table *tbl)
 enum imm_rc trans_table_reset(struct imm_dp_trans_table *tbl,
                               struct dp_args const *args)
 {
-    BUG(args->nstates == 0);
+    assert(args->nstates > 0);
     tbl->ntrans = args->ntrans;
 
     unsigned offsize = trans_table_offsize(args->nstates);
