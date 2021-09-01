@@ -22,6 +22,12 @@ static inline struct span state_table_span(struct imm_dp_state_table const *tbl,
 unsigned state_table_idx(struct imm_dp_state_table const *tbl,
                          unsigned state_id);
 
+static inline unsigned state_table_id(struct imm_dp_state_table const *tbl,
+                                      unsigned state_idx)
+{
+    return tbl->ids[state_idx];
+}
+
 void state_table_dump(struct imm_dp_state_table const *tbl);
 
 #endif

@@ -198,6 +198,30 @@ imm_float imm_dp_trans_score(struct imm_dp const *dp, unsigned src,
     return IMM_LPROB_NAN;
 }
 
+void imm_dp_write_dot(struct imm_dp const *dp, FILE *restrict fd,
+                      imm_state_name *name)
+{
+    fprintf(fd, "digraph hmm {\n");
+    for (unsigned dst = 0; dst < dp->state_table.nstates; ++dst)
+    {
+        for (unsigned t = 0; t < trans_table_ntrans(&dp->trans_table, dst); ++t)
+        {
+            unsigned src = trans_table_source_state(&dp->trans_table, dst, t);
+
+            char src_name[IMM_STATE_NAME_SIZE] = {'\0', '\0', '\0', '\0',
+                                                  '\0', '\0', '\0', '\0'};
+            char dst_name[IMM_STATE_NAME_SIZE] = {'\0', '\0', '\0', '\0',
+                                                  '\0', '\0', '\0', '\0'};
+
+            name(state_table_id(&dp->state_table, src), src_name);
+            name(state_table_id(&dp->state_table, dst), dst_name);
+            fprintf(fd, "%s -> %s [label=%.4f];\n", src_name, dst_name,
+                    trans_table_score(&dp->trans_table, dst, t));
+        }
+    }
+    fprintf(fd, "}\n");
+}
+
 static struct final_score best_trans_score(struct imm_dp const *dp,
                                            struct matrix const *matrix,
                                            unsigned dst, unsigned row,
