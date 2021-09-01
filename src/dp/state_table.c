@@ -48,21 +48,29 @@ void state_table_del(struct imm_dp_state_table const *tbl)
     free(tbl->span);
 }
 
+unsigned state_table_idx(struct imm_dp_state_table const *tbl,
+                         unsigned state_id)
+{
+    for (unsigned idx = 0; idx < tbl->nstates; ++idx)
+    {
+        if (tbl->ids[idx] == state_id) return idx;
+    }
+    return UINT_MAX;
+}
+
 void state_table_dump(struct imm_dp_state_table const *tbl)
 {
     for (unsigned i = 0; i < tbl->nstates; ++i)
     {
         printf("%u", i);
-        if (i + 1 < tbl->nstates)
-            putc('\t', stdout);
+        if (i + 1 < tbl->nstates) putc('\t', stdout);
     }
     putc('\n', stdout);
 
     for (unsigned i = 0; i < tbl->nstates; ++i)
     {
         printf("%u", tbl->ids[i]);
-        if (i + 1 < tbl->nstates)
-            putc('\t', stdout);
+        if (i + 1 < tbl->nstates) putc('\t', stdout);
     }
     putc('\n', stdout);
 }

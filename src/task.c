@@ -32,8 +32,7 @@ struct imm_task *imm_task_new(struct imm_dp const *dp)
 enum imm_rc imm_task_reset(struct imm_task *task, struct imm_dp const *dp)
 {
     enum imm_rc rc = matrix_reset(&task->matrix, &dp->state_table);
-    if (rc)
-        return rc;
+    if (rc) return rc;
     if ((rc = path_reset(&task->path, &dp->state_table, &dp->trans_table)))
         return rc;
     eseq_reset(&task->eseq, &dp->code);
@@ -44,9 +43,9 @@ enum imm_rc imm_task_reset(struct imm_task *task, struct imm_dp const *dp)
 enum imm_rc imm_task_setup(struct imm_task *task, struct imm_seq const *seq)
 {
     task->seq = seq;
-    eseq_setup(&task->eseq, seq);
-    path_setup(&task->path, imm_seq_size(seq) + 1);
-    return IMM_SUCCESS;
+    enum imm_rc rc = path_setup(&task->path, imm_seq_size(seq) + 1);
+    if (rc) return rc;
+    return eseq_setup(&task->eseq, seq);
 }
 
 void imm_task_del(struct imm_task const *task)

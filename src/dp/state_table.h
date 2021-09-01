@@ -19,6 +19,9 @@ static inline struct span state_table_span(struct imm_dp_state_table const *tbl,
     return tbl->span[state];
 }
 
+unsigned state_table_idx(struct imm_dp_state_table const *tbl,
+                         unsigned state_id);
+
 void state_table_dump(struct imm_dp_state_table const *tbl);
 
 #endif

@@ -74,10 +74,10 @@ static void set_state_indices(struct imm_hmm const *hmm,
     }
 }
 
-void imm_hmm_write_dot(struct imm_hmm const *hmm, FILE *restrict fp,
+void imm_hmm_write_dot(struct imm_hmm const *hmm, FILE *restrict fd,
                        imm_state_name *name)
 {
-    fprintf(fp, "digraph hmm {\n");
+    fprintf(fd, "digraph hmm {\n");
     struct imm_trans *t = NULL;
     unsigned bkt = 0;
     cco_hash_for_each(hmm->transitions.tbl, bkt, t, hnode)
@@ -90,9 +90,9 @@ void imm_hmm_write_dot(struct imm_hmm const *hmm, FILE *restrict fp,
         struct imm_state *dst = hmm_state(hmm, t->pair.id.dst);
         name(src->id, src_name);
         name(dst->id, dst_name);
-        fprintf(fp, "%s -> %s [label=%.4f];\n", src_name, dst_name, t->lprob);
+        fprintf(fd, "%s -> %s [label=%.4f];\n", src_name, dst_name, t->lprob);
     }
-    fprintf(fp, "}\n");
+    fprintf(fd, "}\n");
 }
 
 enum imm_rc imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
@@ -125,8 +125,7 @@ enum imm_rc imm_hmm_reset_dp(struct imm_hmm const *hmm,
 {
     enum imm_rc rc = IMM_SUCCESS;
     struct imm_state **states = malloc(sizeof(*states) * hmm->states.size);
-    if (!states)
-        return error(IMM_OUTOFMEM, "failed to malloc");
+    if (!states) return error(IMM_OUTOFMEM, "failed to malloc");
 
     if (!hmm_state(hmm, end_state->id))
     {
@@ -181,8 +180,7 @@ imm_float imm_hmm_trans(struct imm_hmm const *hmm, struct imm_state const *src,
         return imm_lprob_nan();
     }
     struct imm_trans const *trans = hmm_trans(hmm, src, dst);
-    if (trans)
-        return trans->lprob;
+    if (trans) return trans->lprob;
     error(IMM_ILLEGALARG, "transition not found");
     return imm_lprob_nan();
 }
@@ -258,8 +256,7 @@ enum imm_rc imm_hmm_normalize_trans(struct imm_hmm const *hmm)
     enum imm_rc rc = IMM_SUCCESS;
     cco_hash_for_each(hmm->states.tbl, bkt, state, hnode)
     {
-        if ((rc = imm_hmm_normalize_state_trans(hmm, state)))
-            break;
+        if ((rc = imm_hmm_normalize_state_trans(hmm, state))) break;
     }
     return rc;
 }
@@ -270,8 +267,7 @@ enum imm_rc imm_hmm_normalize_state_trans(struct imm_hmm const *hmm,
     if (!cco_hash_hashed(&src->hnode))
         return error(IMM_ILLEGALARG, "state not found");
 
-    if (cco_stack_empty(&src->trans.outgoing))
-        return IMM_SUCCESS;
+    if (cco_stack_empty(&src->trans.outgoing)) return IMM_SUCCESS;
 
     struct imm_trans *trans = NULL;
     struct cco_iter it = cco_stack_iter(&src->trans.outgoing);
@@ -330,8 +326,7 @@ struct imm_state *hmm_state(struct imm_hmm const *hmm, unsigned state_id)
     struct imm_state *state = NULL;
     cco_hash_for_each_possible(hmm->states.tbl, state, hnode, state_id)
     {
-        if (state->id == state_id)
-            return state;
+        if (state->id == state_id) return state;
     }
     return NULL;
 }

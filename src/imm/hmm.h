@@ -40,7 +40,7 @@ struct imm_hmm
     } transitions;
 };
 
-IMM_API void imm_hmm_write_dot(struct imm_hmm const *hmm, FILE *restrict fp,
+IMM_API void imm_hmm_write_dot(struct imm_hmm const *hmm, FILE *restrict fd,
                                imm_state_name *name);
 
 IMM_API enum imm_rc imm_hmm_add_state(struct imm_hmm *hmm,

@@ -13,6 +13,7 @@
 
 struct imm_abc;
 struct imm_result;
+struct imm_seq;
 struct imm_task;
 
 struct imm_dp
@@ -26,6 +27,12 @@ struct imm_dp
 IMM_API void imm_dp_init(struct imm_dp *dp, struct imm_abc const *abc);
 
 IMM_API void imm_dp_del(struct imm_dp *dp);
+
+IMM_API void imm_dp_dump_state_table(struct imm_dp const *dp);
+
+IMM_API void imm_dp_dump_path(struct imm_dp const *dp,
+                              struct imm_task const *task,
+                              struct imm_result const *result);
 
 IMM_API unsigned imm_dp_trans_idx(struct imm_dp *dp, unsigned src_idx,
                                   unsigned dst_idx);
@@ -41,6 +48,10 @@ IMM_API enum imm_rc imm_dp_write(struct imm_dp const *dp, FILE *file);
 
 IMM_API enum imm_rc imm_dp_read(struct imm_dp *dp, FILE *file);
 
-IMM_API void imm_dp_dump_state_table(struct imm_dp const *dp);
+IMM_API imm_float imm_dp_emis_score(struct imm_dp const *dp, unsigned state_id,
+                                    struct imm_seq const *seq);
+
+IMM_API imm_float imm_dp_trans_score(struct imm_dp const *dp, unsigned src,
+                                     unsigned dst);
 
 #endif

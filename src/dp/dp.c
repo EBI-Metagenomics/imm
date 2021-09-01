@@ -9,12 +9,13 @@
 #include "error.h"
 #include "imm/dp.h"
 #include "imm/lprob.h"
-#include "imm/path.h"
 #include "imm/result.h"
 #include "imm/state.h"
+#include "imm/subseq.h"
 #include "imm/trans.h"
 #include "task.h"
 #include <assert.h>
+#include <limits.h>
 
 struct final_score
 {
@@ -69,15 +70,16 @@ static void set_score(struct imm_dp const *dp, struct imm_task *task,
     }
 }
 
-static void viterbi(struct imm_dp const *dp, struct imm_task *task,
-                    struct imm_result *result);
+static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
+                           struct imm_result *result);
 static void viterbi_first_row(struct imm_dp const *dp, struct imm_task *task,
                               unsigned remain);
 static void viterbi_first_row_safe(struct imm_dp const *dp,
                                    struct imm_task *task);
-static void viterbi_path(struct imm_dp const *dp, struct imm_task const *task,
-                         struct imm_path *path, unsigned end_state,
-                         unsigned end_seq_len);
+static enum imm_rc viterbi_path(struct imm_dp const *dp,
+                                struct imm_task const *task,
+                                struct imm_path *path, unsigned end_state,
+                                unsigned end_seq_len);
 static void _viterbi(struct imm_dp const *dp, struct imm_task *task,
                      unsigned const start_row, unsigned const stop_row);
 static void _viterbi_safe(struct imm_dp const *dp, struct imm_task *task,
@@ -113,11 +115,9 @@ enum imm_rc dp_reset(struct imm_dp *dp, struct dp_args const *args)
     if ((rc = emis_reset(&dp->emis, &dp->code, args->states, args->nstates)))
         return rc;
 
-    if ((rc = trans_table_reset(&dp->trans_table, args)))
-        return rc;
+    if ((rc = trans_table_reset(&dp->trans_table, args))) return rc;
 
-    if ((rc = state_table_reset(&dp->state_table, args)))
-        return rc;
+    if ((rc = state_table_reset(&dp->state_table, args))) return rc;
 
     return rc;
 }
@@ -126,8 +126,7 @@ enum imm_rc imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
                            struct imm_result *result)
 {
     imm_result_reset(result);
-    if (!task->seq)
-        return error(IMM_ILLEGALARG, "seq has not been set");
+    if (!task->seq) return error(IMM_ILLEGALARG, "seq has not been set");
 
     if (dp->code.abc != imm_seq_abc(task->seq))
         return error(IMM_ILLEGALARG, "dp and seq must have the same alphabet");
@@ -140,11 +139,11 @@ enum imm_rc imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
 
     struct elapsed elapsed = elapsed_init();
     elapsed_start(&elapsed);
-    viterbi(dp, task, result);
+    enum imm_rc rc = viterbi(dp, task, result);
     elapsed_end(&elapsed);
     result->seconds = (imm_float)elapsed_seconds(&elapsed);
 
-    return IMM_SUCCESS;
+    return rc;
 }
 
 unsigned imm_dp_trans_idx(struct imm_dp *dp, unsigned src_idx, unsigned dst_idx)
@@ -160,6 +159,43 @@ enum imm_rc imm_dp_change_trans(struct imm_dp *dp, unsigned trans_idx,
 
     trans_table_change(&dp->trans_table, trans_idx, lprob);
     return IMM_SUCCESS;
+}
+
+imm_float imm_dp_emis_score(struct imm_dp const *dp, unsigned state_id,
+                            struct imm_seq const *seq)
+{
+    struct eseq eseq;
+    eseq_init(&eseq, &dp->code);
+    imm_float score = IMM_LPROB_NAN;
+    if (eseq_setup(&eseq, seq)) goto cleanup;
+
+    unsigned state_idx = state_table_idx(&dp->state_table, state_id);
+    unsigned min_len = state_table_span(&dp->state_table, state_idx).min;
+
+    unsigned seq_code = eseq_get(&eseq, 0, imm_seq_size(seq));
+    seq_code -= code_offset(&dp->code, min_len);
+
+    score = emis_score(&dp->emis, state_idx, seq_code);
+
+cleanup:
+    eseq_del(&eseq);
+    return score;
+}
+
+imm_float imm_dp_trans_score(struct imm_dp const *dp, unsigned src,
+                             unsigned dst)
+{
+    unsigned src_idx = state_table_idx(&dp->state_table, src);
+    unsigned dst_idx = state_table_idx(&dp->state_table, dst);
+
+    if (src_idx == UINT_MAX || dst_idx == UINT_MAX) return IMM_LPROB_NAN;
+
+    for (unsigned i = 0; i < dp->trans_table.ntrans; ++i)
+    {
+        if (trans_table_source_state(&dp->trans_table, dst_idx, i) == src_idx)
+            return trans_table_score(&dp->trans_table, dst_idx, i);
+    }
+    return IMM_LPROB_NAN;
 }
 
 static struct final_score best_trans_score(struct imm_dp const *dp,
@@ -223,8 +259,7 @@ best_trans_score_first_row(struct imm_dp const *dp, struct matrix const *matrix,
         unsigned src = trans_table_source_state(&dp->trans_table, dst, i);
         unsigned min_seq = state_table_span(&dp->state_table, src).min;
 
-        if (min_seq > 0 || src > dst)
-            continue;
+        if (min_seq > 0 || src > dst) continue;
 
         imm_float v0 = matrix_get_score(matrix, 0, src, 0);
         imm_float v1 = trans_table_score(&dp->trans_table, dst, i);
@@ -267,8 +302,7 @@ static struct final_score final_score(struct imm_dp const *dp,
             final_seq_len = len;
         }
 
-        if (state_table_span(&dp->state_table, end_state).min == len)
-            break;
+        if (state_table_span(&dp->state_table, end_state).min == len) break;
     }
     struct final_score fscore = {score, final_state, final_seq_len};
     if (final_state == IMM_STATE_NULL_IDX)
@@ -277,8 +311,8 @@ static struct final_score final_score(struct imm_dp const *dp,
     return fscore;
 }
 
-static void viterbi(struct imm_dp const *dp, struct imm_task *task,
-                    struct imm_result *result)
+static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
+                           struct imm_result *result)
 {
     unsigned len = eseq_len(&task->eseq);
 
@@ -296,7 +330,7 @@ static void viterbi(struct imm_dp const *dp, struct imm_task *task,
 
     struct final_score const fscore = final_score(dp, task);
     result->loglik = fscore.score;
-    viterbi_path(dp, task, &result->path, fscore.state, fscore.seq_len);
+    return viterbi_path(dp, task, &result->path, fscore.state, fscore.seq_len);
 }
 
 static void viterbi_first_row(struct imm_dp const *dp, struct imm_task *task,
@@ -366,9 +400,10 @@ static void viterbi_first_row_safe(struct imm_dp const *dp,
     }
 }
 
-static void viterbi_path(struct imm_dp const *dp, struct imm_task const *task,
-                         struct imm_path *path, unsigned end_state,
-                         unsigned end_seq_len)
+static enum imm_rc viterbi_path(struct imm_dp const *dp,
+                                struct imm_task const *task,
+                                struct imm_path *path, unsigned end_state,
+                                unsigned end_seq_len)
 {
     unsigned row = eseq_len(&task->eseq);
     unsigned state = end_state;
@@ -377,9 +412,10 @@ static void viterbi_path(struct imm_dp const *dp, struct imm_task const *task,
 
     while (valid)
     {
-        imm_state_id_t id = dp->state_table.ids[state];
+        unsigned id = dp->state_table.ids[state];
         struct imm_step step = imm_step(id, seqlen);
-        imm_path_add(path, step);
+        enum imm_rc rc = imm_path_add(path, step);
+        if (rc) return rc;
         row -= seqlen;
 
         valid = path_valid(&task->path, row, state);
@@ -392,6 +428,7 @@ static void viterbi_path(struct imm_dp const *dp, struct imm_task const *task,
         }
     }
     imm_path_reverse(path);
+    return IMM_SUCCESS;
 }
 
 static void _viterbi(struct imm_dp const *dp, struct imm_task *task,
@@ -466,4 +503,24 @@ static void _viterbi_safe(struct imm_dp const *dp, struct imm_task *task,
 void imm_dp_dump_state_table(struct imm_dp const *dp)
 {
     state_table_dump(&dp->state_table);
+}
+
+void imm_dp_dump_path(struct imm_dp const *dp, struct imm_task const *task,
+                      struct imm_result const *result)
+{
+    unsigned begin = 0;
+    for (unsigned i = 0; i < task->path.nstates; ++i)
+    {
+        struct imm_step const *step = imm_path_step(&result->path, i);
+        unsigned state_idx = state_table_idx(&dp->state_table, step->state_id);
+
+        unsigned min_len = state_table_span(&dp->state_table, state_idx).min;
+        unsigned seq_code = eseq_get(&task->eseq, begin, step->seqlen);
+        seq_code -= code_offset(&dp->code, min_len);
+
+        imm_float score = emis_score(&dp->emis, state_idx, seq_code);
+        struct imm_seq subseq = imm_subseq(task->seq, begin, step->seqlen);
+        printf("<%.*s,%.4f>\n", subseq.size, subseq.str, score);
+        begin += step->seqlen;
+    }
 }
