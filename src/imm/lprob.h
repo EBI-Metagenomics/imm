@@ -34,7 +34,7 @@ static inline bool imm_lprob_is_finite(imm_float a)
     return !imm_lprob_is_nan(a) && !imm_lprob_is_zero(a);
 }
 
-IMM_API enum imm_rc imm_lprob_normalize(unsigned len, imm_float arr[len]);
+IMM_API void imm_lprob_normalize(unsigned len, imm_float arr[len]);
 
 IMM_API void imm_lprob_sample(struct imm_rnd *rnd, unsigned len,
                               imm_float arr[len]);

@@ -196,7 +196,7 @@ void test_frame_state_lposterior(void)
     codon = imm_codon(nuclt, 'G', 'T', 'C');
     imm_codon_lprob_set(&codonp, codon, imm_log(0.4));
 
-    COND(imm_codon_lprob_normalize(&codonp) == 0);
+    imm_codon_lprob_normalize(&codonp);
     struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
     struct imm_frame_state state;
