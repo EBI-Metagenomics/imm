@@ -18,7 +18,7 @@ static inline void start_init(struct imm_hmm *hmm)
     hmm->start.state_id = IMM_STATE_NULL_ID;
 }
 
-static void detach_states(struct imm_hmm *hmm)
+static void detach_states(struct imm_hmm const *hmm)
 {
     unsigned bkt = 0;
     struct imm_state *state = NULL;

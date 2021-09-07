@@ -76,4 +76,6 @@ imm_state_typeid(struct imm_state const *state)
     return state->vtable.typeid;
 }
 
+IMM_API void imm_state_detach(struct imm_state *state);
+
 #endif

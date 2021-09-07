@@ -11,3 +11,10 @@ imm_float imm_state_lprob(struct imm_state const *state,
     }
     return state->vtable.lprob(state, seq);
 }
+
+void imm_state_detach(struct imm_state *state)
+{
+    cco_stack_init(&state->trans.outgoing);
+    cco_stack_init(&state->trans.incoming);
+    cco_hash_del(&state->hnode);
+}
