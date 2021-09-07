@@ -1,6 +1,8 @@
 #include "imm/rna.h"
 #include "abc.h"
 
+struct imm_rna const imm_rna_empty = {{ABC_EMPTY}};
+
 enum imm_rc imm_rna_init(struct imm_rna *rna, char const symbols[IMM_RNA_SIZE],
                          char any_symbol)
 {

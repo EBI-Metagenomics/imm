@@ -1,6 +1,8 @@
 #include "imm/dna.h"
 #include "abc.h"
 
+struct imm_dna const imm_dna_empty = {{ABC_EMPTY}};
+
 enum imm_rc imm_dna_init(struct imm_dna *dna, char const symbols[IMM_DNA_SIZE],
                          char any_symbol)
 {

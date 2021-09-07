@@ -6,13 +6,7 @@
 #include <assert.h>
 #include <stdint.h>
 
-struct imm_abc const imm_abc_empty = {
-    .size = 0,
-    .symbols = {'\0'},
-    .sym = {.idx[0 ...(IMM_SYM_SIZE) - 1] = IMM_SYM_NULL_IDX},
-    .any_symbol_id = IMM_SYM_ID('X'),
-    .vtable = {IMM_ABC, NULL},
-};
+struct imm_abc const imm_abc_empty = ABC_EMPTY;
 
 enum imm_rc imm_abc_init(struct imm_abc *abc, struct imm_str symbols,
                          char any_symbol)
@@ -24,16 +18,14 @@ enum imm_rc imm_abc_init(struct imm_abc *abc, struct imm_str symbols,
 enum imm_rc imm_abc_write(struct imm_abc const *abc, FILE *file)
 {
     enum imm_rc rc = abc_write(abc, file);
-    if (rc)
-        return error(rc, "failed to write alphabet");
+    if (rc) return error(rc, "failed to write alphabet");
     return rc;
 }
 
 enum imm_rc imm_abc_read(struct imm_abc *abc, FILE *file)
 {
     enum imm_rc rc = abc_read(abc, file);
-    if (rc)
-        return error(rc, "failed to read alphabet");
+    if (rc) return error(rc, "failed to read alphabet");
     return rc;
 }
 
@@ -43,8 +35,7 @@ enum imm_rc abc_init(struct imm_abc *abc, unsigned len, char const *symbols,
     if (!imm_sym_valid_char(any_symbol))
         return error(IMM_ILLEGALARG, "any_symbol outside range");
 
-    if (len == 0)
-        return error(IMM_ILLEGALARG, "alphabet cannot be empty");
+    if (len == 0) return error(IMM_ILLEGALARG, "alphabet cannot be empty");
 
     if (len > IMM_ABC_MAX_SIZE || len > IMM_SYM_SIZE)
         return error(IMM_ILLEGALARG, "symbols length is too large");
@@ -83,8 +74,7 @@ static_assert(sizeof(imm_abc_typeid_t) == sizeof(uint8_t), "wrong types");
 #define ERETURN(expr, e)                                                       \
     do                                                                         \
     {                                                                          \
-        if (!!(expr))                                                          \
-            return e;                                                          \
+        if (!!(expr)) return e;                                                \
     } while (0)
 
 enum imm_rc abc_write(struct imm_abc const *abc, FILE *file)

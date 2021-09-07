@@ -8,4 +8,14 @@ enum imm_rc abc_init(struct imm_abc *abc, unsigned len, char const *symbols,
 enum imm_rc abc_write(struct imm_abc const *abc, FILE *file);
 enum imm_rc abc_read(struct imm_abc *abc, FILE *file);
 
+#define ABC_EMPTY                                                              \
+    {                                                                          \
+        .size = 0, .symbols = {'\0'},                                          \
+        .sym = {.idx[0 ...(IMM_SYM_SIZE) - 1] = IMM_SYM_NULL_IDX},             \
+        .any_symbol_id = IMM_SYM_ID('X'), .vtable = {                          \
+            IMM_ABC,                                                           \
+            NULL                                                               \
+        }                                                                      \
+    }
+
 #endif

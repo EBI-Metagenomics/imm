@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 project(
     imm
-    VERSION 0.0.22
+    VERSION 0.0.23
     LANGUAGES C)
 
 # Generate compile_commands.json file

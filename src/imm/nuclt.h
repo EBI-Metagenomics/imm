@@ -14,6 +14,8 @@ struct imm_nuclt
     struct imm_abc super;
 };
 
+IMM_API extern struct imm_nuclt const imm_nuclt_empty;
+
 IMM_API enum imm_rc imm_nuclt_init(struct imm_nuclt *nuclt,
                                    char const symbols[IMM_NUCLT_SIZE],
                                    char any_symbol);

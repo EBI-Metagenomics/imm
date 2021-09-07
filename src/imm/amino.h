@@ -14,6 +14,7 @@ struct imm_amino
     struct imm_abc super;
 };
 
+IMM_API extern struct imm_amino const imm_amino_empty;
 IMM_API extern struct imm_amino const imm_amino_iupac;
 
 IMM_API enum imm_rc imm_amino_init(struct imm_amino *amino,

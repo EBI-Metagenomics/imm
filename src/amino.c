@@ -2,6 +2,8 @@
 #include "abc.h"
 #include "imm/abc.h"
 
+struct imm_amino const imm_amino_empty = {ABC_EMPTY};
+
 enum imm_rc imm_amino_init(struct imm_amino *amino,
                            char const symbols[IMM_AMINO_SIZE], char any_symbol)
 {

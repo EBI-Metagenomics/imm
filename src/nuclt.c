@@ -1,6 +1,8 @@
 #include "imm/nuclt.h"
 #include "abc.h"
 
+struct imm_nuclt const imm_nuclt_empty = {ABC_EMPTY};
+
 enum imm_rc imm_nuclt_init(struct imm_nuclt *nuclt,
                            char const symbols[IMM_NUCLT_SIZE], char any_symbol)
 {

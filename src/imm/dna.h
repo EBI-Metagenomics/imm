@@ -14,6 +14,7 @@ struct imm_dna
     struct imm_nuclt super;
 };
 
+IMM_API extern struct imm_dna const imm_dna_empty;
 IMM_API extern struct imm_dna const imm_dna_iupac;
 
 IMM_API enum imm_rc imm_dna_init(struct imm_dna *dna,
