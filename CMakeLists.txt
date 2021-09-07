@@ -63,8 +63,7 @@ add_library(IMM::imm ALIAS imm)
 set_property(TARGET imm PROPERTY C_VISIBILITY_PRESET hidden)
 set_property(TARGET imm PROPERTY VISIBILITY_INLINES_HIDDEN ON)
 
-# Write out imm/export.h to the current binary directory Must include
-# ${CMAKE_CURRENT_BINARY_DIR} in the target's search path.
+# Write out imm/export.h to the current binary directory.
 include(GenerateExportHeader)
 generate_export_header(
     imm
