@@ -19,7 +19,7 @@ int main(void)
 
 void test_frame_state1(void)
 {
-    struct imm_dna const *dna = &imm_dna_default;
+    struct imm_dna const *dna = &imm_dna_iupac;
     struct imm_nuclt const *nuclt = imm_super(dna);
     struct imm_abc const *abc = imm_super(nuclt);
     struct imm_nuclt_lprob nucltp =
@@ -57,7 +57,7 @@ void test_frame_state1(void)
 
 void test_frame_state2(void)
 {
-    struct imm_dna const *dna = &imm_dna_default;
+    struct imm_dna const *dna = &imm_dna_iupac;
     struct imm_nuclt const *nuclt = imm_super(dna);
     struct imm_abc const *abc = imm_super(nuclt);
     struct imm_nuclt_lprob nucltp = imm_nuclt_lprob(
@@ -109,7 +109,7 @@ void test_frame_state2(void)
 
 void test_frame_state3(void)
 {
-    struct imm_dna const *dna = &imm_dna_default;
+    struct imm_dna const *dna = &imm_dna_iupac;
     struct imm_nuclt const *nuclt = imm_super(dna);
     struct imm_abc const *abc = imm_super(nuclt);
     struct imm_nuclt_lprob nucltp = imm_nuclt_lprob(
@@ -166,7 +166,7 @@ void test_frame_state3(void)
 
 void test_frame_state_lposterior(void)
 {
-    struct imm_dna const *dna = &imm_dna_default;
+    struct imm_dna const *dna = &imm_dna_iupac;
     struct imm_nuclt const *nuclt = imm_super(dna);
     struct imm_abc const *abc = imm_super(nuclt);
     struct imm_nuclt_lprob nucltp = imm_nuclt_lprob(
@@ -233,7 +233,7 @@ void test_frame_state_lposterior(void)
 
 void test_frame_state_decode(void)
 {
-    struct imm_dna const *dna = &imm_dna_default;
+    struct imm_dna const *dna = &imm_dna_iupac;
     struct imm_nuclt const *nuclt = imm_super(dna);
     struct imm_abc const *abc = imm_super(nuclt);
     struct imm_nuclt_lprob nucltp = imm_nuclt_lprob(

@@ -3,7 +3,7 @@
 
 int main(void)
 {
-    struct imm_rna const *rna_out = &imm_rna_default;
+    struct imm_rna const *rna_out = &imm_rna_iupac;
 
     FILE *file = fopen(TMPDIR "/rna.imm", "wb");
     imm_rna_write(rna_out, file);

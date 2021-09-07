@@ -6,7 +6,7 @@
 #include <assert.h>
 
 extern struct gc const gencode[];
-struct imm_dna const *dna = &imm_dna_default;
+struct imm_dna const *dna = &imm_dna_iupac;
 
 struct imm_dna const *imm_gc_dna(void) { return dna; }
 

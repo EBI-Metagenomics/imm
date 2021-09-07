@@ -23,7 +23,7 @@ enum imm_rc imm_dna_read(struct imm_dna *dna, FILE *file)
 #define SET(c, idx) [ID(c)] = idx
 #define NIL(x, y) [ID(x)... ID(y) - 1] = IMM_SYM_NULL_IDX
 
-struct imm_dna const imm_dna_default = {
+struct imm_dna const imm_dna_iupac = {
     .super.super = {
         .size = IMM_DNA_SIZE,
         .symbols = IMM_DNA_SYMBOLS,

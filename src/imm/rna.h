@@ -14,7 +14,7 @@ struct imm_rna
     struct imm_nuclt super;
 };
 
-IMM_API extern struct imm_rna const imm_rna_default;
+IMM_API extern struct imm_rna const imm_rna_iupac;
 
 IMM_API enum imm_rc imm_rna_init(struct imm_rna *rna,
                                  char const symbols[IMM_RNA_SIZE],

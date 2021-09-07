@@ -3,7 +3,7 @@
 
 int main(void)
 {
-    struct imm_dna const *dna_out = &imm_dna_default;
+    struct imm_dna const *dna_out = &imm_dna_iupac;
 
     FILE *file = fopen(TMPDIR "/dna.imm", "wb");
     imm_dna_write(dna_out, file);

@@ -53,7 +53,7 @@ char const imm_example2_seq[] =
     "AAAACGCGTGTCACGACAACGCGTACGTTTCGACGAGTACGACGCCCGGG"
     "AAAACGCGTGTCGACGACGAACGCGTACGTTTACGACGAGTACGACGCCC";
 
-struct imm_example2 imm_example2 = {.dna = &imm_dna_default};
+struct imm_example2 imm_example2 = {.dna = &imm_dna_iupac};
 
 #define SET_TRANS(hmm, a, b, v)                                                \
     imm_hmm_set_trans(&hmm, imm_super(&a), imm_super(&b), v)
@@ -177,8 +177,7 @@ void imm_example2_init(void)
         imm_hmm_add_state(&m->hmm, imm_super(&m->i[k]));
         imm_hmm_add_state(&m->hmm, imm_super(&m->d[k]));
 
-        if (k == 0)
-            SET_TRANS(m->hmm, m->b, m->m[0], imm_log(0.2));
+        if (k == 0) SET_TRANS(m->hmm, m->b, m->m[0], imm_log(0.2));
 
         SET_TRANS(m->hmm, m->m[k], m->i[k], imm_log(0.2));
         SET_TRANS(m->hmm, m->i[k], m->i[k], imm_log(0.2));

@@ -16,7 +16,7 @@ struct imm_codon_marg codonm;
 
 int main(void)
 {
-    nuclt = imm_super(&imm_dna_default);
+    nuclt = imm_super(&imm_dna_iupac);
     abc = imm_super(nuclt);
 
     nucltp = imm_nuclt_lprob(nuclt, IMM_ARR(imm_log(0.25), imm_log(0.25),
