@@ -10,7 +10,7 @@ typedef uint16_t imm_trans_idx_t;
 
 #define IMM_TRANS_NULL_IDX UINT16_MAX
 
-#define IMM_TRANS_MAX_SIZE 13
+#define IMM_TRANS_MAX_SIZE 15
 
 struct imm_trans
 {

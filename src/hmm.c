@@ -41,15 +41,17 @@ static void init_transitions_table(struct imm_hmm *hmm)
     cco_hash_init(hmm->transitions.tbl);
 }
 
-static void add_transition(struct imm_hmm *hmm, struct imm_state *src,
-                           struct imm_state *dst, imm_float lprob)
+static enum imm_rc add_transition(struct imm_hmm *hmm, struct imm_state *src,
+                                  struct imm_state *dst, imm_float lprob)
 {
-    assert(hmm->transitions.size < IMM_ARRAY_SIZE(hmm->transitions.data));
+    if (hmm->transitions.size >= IMM_ARRAY_SIZE(hmm->transitions.data))
+        return error(IMM_RUNTIMEERROR, "max number of trans has been reached");
     struct imm_trans *trans = hmm->transitions.data + hmm->transitions.size++;
     trans_init(trans, src->id, dst->id, lprob);
     cco_hash_add(hmm->transitions.tbl, &trans->hnode, trans->pair.id.key);
     cco_stack_put(&src->trans.outgoing, &trans->outgoing);
     cco_stack_put(&dst->trans.incoming, &trans->incoming);
+    return IMM_SUCCESS;
 }
 
 static inline bool has_start_state(struct imm_hmm const *hmm)
@@ -316,7 +318,7 @@ enum imm_rc imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state *src,
     if (trans)
         trans->lprob = lprob;
     else
-        add_transition(hmm, src, dst, lprob);
+        return add_transition(hmm, src, dst, lprob);
 
     return IMM_SUCCESS;
 }
