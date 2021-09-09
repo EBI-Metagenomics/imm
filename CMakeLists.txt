@@ -50,6 +50,7 @@ add_library(
     src/mute_state.c
     src/normal_state.c
     src/nuclt.c
+    src/nuclt_lprob.c
     src/path.c
     src/rna.c
     src/rnd.c

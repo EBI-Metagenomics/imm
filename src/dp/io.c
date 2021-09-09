@@ -7,12 +7,6 @@
 #include "third-party/cmp.h"
 #include <assert.h>
 
-#define write_imm_float(ctx, v)                                                \
-    _Generic((v), float : cmp_write_float, double : cmp_write_double)(ctx, v)
-
-#define read_imm_float(ctx, v)                                                 \
-    _Generic((v), float * : cmp_read_float, double * : cmp_read_double)(ctx, v)
-
 static_assert(sizeof(imm_nstates_t) == sizeof(uint16_t), "wrong types");
 static_assert(sizeof(imm_state_seqlen_t) == sizeof(uint8_t), "wrong types");
 static_assert(sizeof(imm_trans_idx_t) == sizeof(uint16_t), "wrong types");
@@ -48,7 +42,7 @@ enum imm_rc imm_dp_write(struct imm_dp const *dp, FILE *file)
     size = emis_score_size(&dp->emis, nstates);
     cmp_write_array(&ctx, size);
     for (unsigned i = 0; i < size; ++i)
-        write_imm_float(&ctx, dp->emis.score[i]);
+        io_write_imm_float(&ctx, dp->emis.score[i]);
 
     size = emis_offset_size(nstates);
     cmp_write_array(&ctx, size);
@@ -61,7 +55,7 @@ enum imm_rc imm_dp_write(struct imm_dp const *dp, FILE *file)
     size = dp->trans_table.ntrans;
     cmp_write_array(&ctx, size);
     for (unsigned i = 0; i < size; ++i)
-        write_imm_float(&ctx, dp->trans_table.trans[i].score);
+        io_write_imm_float(&ctx, dp->trans_table.trans[i].score);
 
     size = dp->trans_table.ntrans;
     cmp_write_array(&ctx, size);
@@ -82,7 +76,7 @@ enum imm_rc imm_dp_write(struct imm_dp const *dp, FILE *file)
         cmp_write_u16(&ctx, dp->state_table.ids[i]);
 
     cmp_write_u16(&ctx, dp->state_table.start.state);
-    write_imm_float(&ctx, dp->state_table.start.lprob);
+    io_write_imm_float(&ctx, dp->state_table.start.lprob);
     cmp_write_u16(&ctx, (uint16_t)dp->state_table.end_state_idx);
 
     cmp_write_array(&ctx, size);
@@ -148,7 +142,7 @@ enum imm_rc imm_dp_read(struct imm_dp *dp, FILE *file)
     e->score = realloc(e->score, sizeof(*e->score) * size);
     ERETURN(!e->score && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
-        ERETURN(!read_imm_float(&ctx, e->score + i), IMM_IOERROR);
+        ERETURN(!io_read_imm_float(&ctx, e->score + i), IMM_IOERROR);
 
     ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
     e->offset = realloc(e->offset, sizeof(*e->offset) * size);
@@ -169,7 +163,7 @@ enum imm_rc imm_dp_read(struct imm_dp *dp, FILE *file)
     tt->trans = realloc(tt->trans, sizeof(*tt->trans) * size);
     ERETURN(!tt->trans && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
-        ERETURN(!read_imm_float(&ctx, &tt->trans[i].score), IMM_IOERROR);
+        ERETURN(!io_read_imm_float(&ctx, &tt->trans[i].score), IMM_IOERROR);
 
     ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
     ERETURN(tt->ntrans != size, IMM_PARSEERROR);
@@ -201,7 +195,7 @@ enum imm_rc imm_dp_read(struct imm_dp *dp, FILE *file)
         ERETURN(!cmp_read_u16(&ctx, st->ids + i), IMM_IOERROR);
 
     ERETURN(!cmp_read_u16(&ctx, &st->start.state), IMM_IOERROR);
-    ERETURN(!read_imm_float(&ctx, &st->start.lprob), IMM_IOERROR);
+    ERETURN(!io_read_imm_float(&ctx, &st->start.lprob), IMM_IOERROR);
     ERETURN(!cmp_read_u16(&ctx, &u16), IMM_IOERROR);
     st->end_state_idx = u16;
 

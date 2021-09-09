@@ -48,4 +48,7 @@ imm_codon_marg_lprob(struct imm_codon_marg const *codonm,
     return codonm->lprobs[codon.idx[0]][codon.idx[1]][codon.idx[2]];
 }
 
+IMM_API enum imm_rc imm_codon_marg_write(struct imm_codon_marg const *codonm,
+                                         FILE *file);
+
 #endif

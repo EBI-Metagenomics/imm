@@ -27,4 +27,10 @@ static inline void io_init(cmp_ctx_t *cmp, FILE *file)
     cmp_init(cmp, file, __file_reader, __file_skipper, __file_writer);
 }
 
+#define io_write_imm_float(ctx, v)                                             \
+    _Generic((v), float : cmp_write_float, double : cmp_write_double)(ctx, v)
+
+#define io_read_imm_float(ctx, v)                                              \
+    _Generic((v), float * : cmp_read_float, double * : cmp_read_double)(ctx, v)
+
 #endif

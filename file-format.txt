@@ -49,3 +49,15 @@ IMM file chunks
 | trans_table: DP.trans_table |
 | state_table: DP.state_table |
 |-----------------------------|
+
+ NUCLT_LPROB
+|----------------------------------|
+| lprobs: mp-float[IMM_NUCLT_SIZE] |
+|----------------------------------|
+
+CODON_SIZE = (IMM_NUCLT_SIZE + 1) * (IMM_NUCLT_SIZE + 1) * (IMM_NUCLT_SIZE + 1)
+
+ CODON_MARG
+|------------------------------|
+| lprobs: mp-float[CODON_SIZE] |
+|------------------------------|

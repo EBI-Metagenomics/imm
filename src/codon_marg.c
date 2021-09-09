@@ -1,8 +1,10 @@
 #include "imm/codon_marg.h"
+#include "error.h"
 #include "imm/abc.h"
 #include "imm/codon_lprob.h"
 #include "imm/generics.h"
 #include "imm/nuclt.h"
+#include "io.h"
 #include <assert.h>
 
 static_assert(IMM_NUCLT_SIZE == 4, "nuclt size expected to be four");
@@ -124,4 +126,21 @@ struct imm_codon_marg imm_codon_marg(struct imm_codon_lprob *codonp)
     set_nonmarginal_lprobs(&codonm, codonp);
     set_marginal_lprobs(&codonm);
     return codonm;
+}
+
+enum imm_rc imm_codon_marg_write(struct imm_codon_marg const *codonm,
+                                 FILE *file)
+{
+    cmp_ctx_t ctx = {0};
+    io_init(&ctx, file);
+    unsigned n =
+        (IMM_NUCLT_SIZE + 1) * (IMM_NUCLT_SIZE + 1) * (IMM_NUCLT_SIZE + 1);
+    imm_float const *lprobs = &codonm->lprobs[0][0][0];
+
+    for (unsigned i = 0; i < n; ++i)
+    {
+        if (!io_write_imm_float(&ctx, lprobs[i]))
+            return error(IMM_IOERROR, "failed to write imm_float");
+    }
+    return IMM_SUCCESS;
 }
