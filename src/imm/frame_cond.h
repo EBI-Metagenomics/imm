@@ -3,6 +3,7 @@
 
 #include "imm/export.h"
 #include "imm/float.h"
+#include "imm/frame_epsilon.h"
 #include "imm/frame_state.h"
 
 struct imm_codon;
@@ -11,8 +12,7 @@ struct imm_seq;
 
 struct imm_frame_cond
 {
-    imm_float loge;
-    imm_float log1e;
+    struct imm_frame_epsilon eps;
     struct imm_nuclt_lprob const *nucltp;
     struct imm_codon_marg const *codonm;
 };
@@ -20,7 +20,7 @@ struct imm_frame_cond
 static inline struct imm_frame_cond
 imm_frame_cond_init(struct imm_frame_state const *s)
 {
-    return (struct imm_frame_cond){s->leps, s->l1eps, s->nucltp, s->codonm};
+    return (struct imm_frame_cond){s->eps, s->nucltp, s->codonm};
 }
 
 IMM_API imm_float imm_frame_cond_decode(struct imm_frame_cond const *cond,

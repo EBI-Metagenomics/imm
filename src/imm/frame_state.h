@@ -4,6 +4,7 @@
 #include "imm/codon_marg.h"
 #include "imm/export.h"
 #include "imm/float.h"
+#include "imm/frame_epsilon.h"
 #include "imm/nuclt_lprob.h"
 #include "imm/state.h"
 
@@ -17,8 +18,7 @@ struct imm_frame_state
     struct imm_nuclt_lprob const *nucltp;
     struct imm_codon_marg const *codonm;
     imm_float epsilon;
-    imm_float leps;
-    imm_float l1eps;
+    struct imm_frame_epsilon eps;
 };
 
 IMM_API void imm_frame_state_init(struct imm_frame_state *state, unsigned id,

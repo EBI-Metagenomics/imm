@@ -23,8 +23,7 @@ void imm_frame_state_init(struct imm_frame_state *state, unsigned id,
     state->nucltp = nucltp;
     state->codonm = codonm;
     state->epsilon = epsilon;
-    state->leps = imm_log(epsilon);
-    state->l1eps = imm_log(1 - epsilon);
+    state->eps = imm_frame_epsilon(epsilon);
 
     struct imm_state_vtable vtable = {lprob, IMM_FRAME_STATE, state};
     struct imm_abc const *abc = imm_super(codonm->nuclt);
@@ -45,7 +44,7 @@ static imm_float joint_seq_len1(struct imm_frame_state const *state,
                         imm_abc_any_symbol_idx(abc)};
     unsigned _ = IMM_ARRAY_SIZE(nucl) - 1;
 
-    imm_float c = 2 * state->leps + 2 * state->l1eps;
+    imm_float c = 2 * state->eps.loge + 2 * state->eps.log1e;
 
     return c + LOGSUM(LP(0, _, _), LP(_, 0, _), LP(_, _, 0)) - imm_log(3);
 }
@@ -62,8 +61,9 @@ static imm_float joint_seq_len2(struct imm_frame_state const *state,
     imm_float b_lp0 = __imm_nuclt_lprob_get(state->nucltp, nucl[0]);
     imm_float b_lp1 = __imm_nuclt_lprob_get(state->nucltp, nucl[1]);
 
-    imm_float c0 = imm_log(2) + state->leps + state->l1eps * 3 - imm_log(3);
-    imm_float c1 = 3 * state->leps + state->l1eps - imm_log(3);
+    imm_float c0 =
+        imm_log(2) + state->eps.loge + state->eps.log1e * 3 - imm_log(3);
+    imm_float c1 = 3 * state->eps.loge + state->eps.log1e - imm_log(3);
 
     imm_float v[3] = {
         c0 + LOGSUM(LP(_, 0, 1), LP(0, _, 1), LP(0, 1, _)),
@@ -87,10 +87,11 @@ static imm_float joint_seq_len3(struct imm_frame_state const *state,
                      __imm_nuclt_lprob_get(state->nucltp, nucl[1]),
                      __imm_nuclt_lprob_get(state->nucltp, nucl[2])};
 
-    imm_float v0 = 4 * state->l1eps + LP(0, 1, 2);
+    imm_float v0 = 4 * state->eps.log1e + LP(0, 1, 2);
 
-    imm_float c1 = imm_log(4) + 2 * state->leps + 2 * state->l1eps - imm_log(9);
-    imm_float c2 = 4 * state->leps - imm_log(9);
+    imm_float c1 =
+        imm_log(4) + 2 * state->eps.loge + 2 * state->eps.log1e - imm_log(9);
+    imm_float c2 = 4 * state->eps.loge - imm_log(9);
 
     imm_float v1 = LOGSUM(LOGSUM(LP(_, 1, 2), LP(1, _, 2), LP(1, 2, _)) + B[0],
                           LOGSUM(LP(_, 0, 2), LP(0, _, 2), LP(0, 2, _)) + B[1],
@@ -120,11 +121,11 @@ static imm_float joint_seq_len4(struct imm_frame_state const *state,
                      __imm_nuclt_lprob_get(state->nucltp, nucl[2]),
                      __imm_nuclt_lprob_get(state->nucltp, nucl[3])};
 
-    imm_float c0 = state->leps + state->l1eps * 3 - imm_log(2);
+    imm_float c0 = state->eps.loge + state->eps.log1e * 3 - imm_log(2);
     imm_float v0 = LOGSUM(LP(1, 2, 3) + B[0], LP(0, 2, 3) + B[1],
                           LP(0, 1, 3) + B[2], LP(0, 1, 2) + B[3]);
 
-    imm_float c1 = 3 * state->leps + state->l1eps - imm_log(9);
+    imm_float c1 = 3 * state->eps.loge + state->eps.log1e - imm_log(9);
     imm_float v1 = LOGSUM(LP(_, 2, 3) + B[0] + B[1], LP(_, 1, 3) + B[0] + B[2],
                           LP(_, 1, 2) + B[0] + B[3], LP(_, 0, 3) + B[1] + B[2],
                           LP(_, 0, 2) + B[1] + B[3], LP(_, 0, 1) + B[2] + B[3],
@@ -162,7 +163,7 @@ static imm_float joint_seq_len5(struct imm_frame_state const *state,
                LOGSUM(B[1] + B[4] + LP(0, 2, 3), B[2] + B[3] + LP(0, 1, 4)),
                LOGSUM(B[2] + B[4] + LP(0, 1, 3), B[3] + B[4] + LP(0, 1, 2)));
 
-    return 2 * state->leps + 2 * state->l1eps - imm_log(10) + v;
+    return 2 * state->eps.loge + 2 * state->eps.log1e - imm_log(10) + v;
 }
 
 imm_float imm_frame_state_decode(struct imm_frame_state const *state,
