@@ -128,19 +128,34 @@ struct imm_codon_marg imm_codon_marg(struct imm_codon_lprob *codonp)
     return codonm;
 }
 
+#define CODON_SIZE                                                             \
+    ((IMM_NUCLT_SIZE + 1) * (IMM_NUCLT_SIZE + 1) * (IMM_NUCLT_SIZE + 1))
+
 enum imm_rc imm_codon_marg_write(struct imm_codon_marg const *codonm,
                                  FILE *file)
 {
     cmp_ctx_t ctx = {0};
     io_init(&ctx, file);
-    unsigned n =
-        (IMM_NUCLT_SIZE + 1) * (IMM_NUCLT_SIZE + 1) * (IMM_NUCLT_SIZE + 1);
     imm_float const *lprobs = &codonm->lprobs[0][0][0];
 
-    for (unsigned i = 0; i < n; ++i)
+    for (unsigned i = 0; i < CODON_SIZE; ++i)
     {
         if (!io_write_imm_float(&ctx, lprobs[i]))
             return error(IMM_IOERROR, "failed to write imm_float");
+    }
+    return IMM_SUCCESS;
+}
+
+enum imm_rc imm_codon_marg_read(struct imm_codon_marg *codonm, FILE *file)
+{
+    cmp_ctx_t ctx = {0};
+    io_init(&ctx, file);
+    imm_float *lprobs = &codonm->lprobs[0][0][0];
+
+    for (unsigned i = 0; i < CODON_SIZE; ++i)
+    {
+        if (!io_read_imm_float(&ctx, lprobs + i))
+            return error(IMM_IOERROR, "failed to read imm_float");
     }
     return IMM_SUCCESS;
 }

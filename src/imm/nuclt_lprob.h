@@ -40,4 +40,7 @@ static inline imm_float imm_nuclt_lprob_get(struct imm_nuclt_lprob const *lprob,
 IMM_API enum imm_rc imm_nuclt_lprob_write(struct imm_nuclt_lprob const *nucltp,
                                           FILE *file);
 
+IMM_API enum imm_rc imm_nuclt_lprob_read(struct imm_nuclt_lprob *nucltp,
+                                         FILE *file);
+
 #endif

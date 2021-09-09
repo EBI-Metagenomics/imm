@@ -51,4 +51,7 @@ imm_codon_marg_lprob(struct imm_codon_marg const *codonm,
 IMM_API enum imm_rc imm_codon_marg_write(struct imm_codon_marg const *codonm,
                                          FILE *file);
 
+IMM_API enum imm_rc imm_codon_marg_read(struct imm_codon_marg *codonm,
+                                        FILE *file);
+
 #endif
