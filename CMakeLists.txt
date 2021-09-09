@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 project(
     imm
-    VERSION 0.0.25
+    VERSION 0.0.26
     LANGUAGES C)
 
 # Generate compile_commands.json file
@@ -40,6 +40,7 @@ add_library(
     src/error.c
     src/example1.c
     src/example2.c
+    src/frame_cond.c
     src/frame_state.c
     src/gc.c
     src/gc_auto.c

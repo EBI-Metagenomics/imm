@@ -20,6 +20,7 @@ extern "C" {
 #include "imm/example1.h"
 #include "imm/example2.h"
 #include "imm/float.h"
+#include "imm/frame_cond.h"
 #include "imm/frame_state.h"
 #include "imm/gc.h"
 #include "imm/generics.h"

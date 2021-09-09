@@ -1,9 +1,11 @@
 #include "imm/frame_state.h"
 #include "error.h"
 #include "imm/codon_marg.h"
+#include "imm/frame_cond.h"
 #include "imm/generics.h"
 #include "imm/lprob.h"
 #include "imm/nuclt_lprob.h"
+#include "logsum.h"
 #include "state.h"
 #include <assert.h>
 
@@ -29,26 +31,11 @@ void imm_frame_state_init(struct imm_frame_state *state, unsigned id,
     state->super = __imm_state_init(id, abc, vtable, IMM_SPAN(1, 5));
 }
 
-static inline imm_float logaddexp3(imm_float const a, imm_float const b,
-                                   imm_float const c)
-{
-    return imm_lprob_add(imm_lprob_add(a, b), c);
-}
-
 #define CODON(A, B, C)                                                         \
     (struct imm_codon) { .a = (A), .b = (B), .c = (C) }
 
 #define LP(A, B, C)                                                            \
     imm_codon_marg_lprob(state->codonm, CODON(nucl[A], nucl[B], nucl[C]))
-
-#define NUMARGS(...) (sizeof((int[]){__VA_ARGS__}) / sizeof(int))
-
-#define ARR(...)                                                               \
-    NUMARGS(__VA_ARGS__), (imm_float[NUMARGS(__VA_ARGS__)]) { __VA_ARGS__ }
-
-#define LOGSUM(...)                                                            \
-    imm_lprob_sum(NUMARGS(__VA_ARGS__),                                        \
-                  (imm_float[NUMARGS(__VA_ARGS__)]){__VA_ARGS__})
 
 static imm_float joint_seq_len1(struct imm_frame_state const *state,
                                 struct imm_seq const *seq)
@@ -178,268 +165,20 @@ static imm_float joint_seq_len5(struct imm_frame_state const *state,
     return 2 * state->leps + 2 * state->l1eps - imm_log(10) + v;
 }
 
-static imm_float lprob_frag_given_codon1(struct imm_frame_state const *state,
-                                         struct imm_seq const *seq,
-                                         struct imm_codon const *codon)
-{
-    imm_float loge = state->leps;
-    imm_float log1e = state->l1eps;
-
-    unsigned const *x = codon->idx;
-
-    unsigned z[1] = {imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[0])};
-
-    imm_float c = 2 * loge + 2 * log1e;
-
-    return c + imm_log((x[0] == z[0]) + (x[1] == z[0]) + (x[2] == z[0])) -
-           imm_log(3);
-}
-
-static imm_float lprob_frag_given_codon2(struct imm_frame_state const *state,
-                                         struct imm_seq const *seq,
-                                         struct imm_codon const *codon)
-{
-    imm_float loge = state->leps;
-    imm_float log1e = state->l1eps;
-
-    unsigned const *x = codon->idx;
-
-    unsigned z[2] = {imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[0]),
-                     imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[1])};
-
-    imm_float lprob_z1 = __imm_nuclt_lprob_get(state->nucltp, z[0]);
-    imm_float lprob_z2 = __imm_nuclt_lprob_get(state->nucltp, z[1]);
-
-    imm_float c1 = imm_log(2) + loge + log1e * 3 - imm_log(3);
-    imm_float v0 = c1 + imm_log((x[1] == z[0]) * (x[2] == z[1]) +
-                                (x[0] == z[0]) * (x[2] == z[1]) +
-                                (x[0] == z[0]) * (x[1] == z[1]));
-
-    imm_float c2 = 3 * loge + log1e - imm_log(3);
-
-    imm_float v1 = c2 +
-                   imm_log((x[0] == z[0]) + (x[1] == z[0]) + (x[2] == z[0])) +
-                   lprob_z2;
-    imm_float v2 = c2 +
-                   imm_log((x[0] == z[1]) + (x[1] == z[1]) + (x[2] == z[1])) +
-                   lprob_z1;
-
-    return logaddexp3(v0, v1, v2);
-}
-
-static imm_float lprob_frag_given_codon3(struct imm_frame_state const *state,
-                                         struct imm_seq const *seq,
-                                         struct imm_codon const *codon)
-{
-    imm_float loge = state->leps;
-    imm_float log1e = state->l1eps;
-
-    unsigned const *x = codon->idx;
-
-    unsigned z[3] = {imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[0]),
-                     imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[1]),
-                     imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[2])};
-
-    imm_float lprob_z1 = __imm_nuclt_lprob_get(state->nucltp, z[0]);
-    imm_float lprob_z2 = __imm_nuclt_lprob_get(state->nucltp, z[1]);
-    imm_float lprob_z3 = __imm_nuclt_lprob_get(state->nucltp, z[2]);
-
-    imm_float v0 =
-        4 * log1e + imm_log((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[2]));
-
-    imm_float c1 = imm_log(4) + 2 * loge + 2 * log1e - imm_log(9);
-
-    imm_float v1 = c1 +
-                   imm_log((x[1] == z[1]) * (x[2] == z[2]) +
-                           (x[0] == z[1]) * (x[2] == z[2]) +
-                           (x[0] == z[1]) * (x[1] == z[2])) +
-                   lprob_z1;
-
-    imm_float v2 = c1 +
-                   imm_log((x[1] == z[0]) * (x[2] == z[2]) +
-                           (x[0] == z[0]) * (x[2] == z[2]) +
-                           (x[0] == z[0]) * (x[1] == z[2])) +
-                   lprob_z2;
-
-    imm_float v3 = c1 +
-                   imm_log((x[1] == z[0]) * (x[2] == z[1]) +
-                           (x[0] == z[0]) * (x[2] == z[1]) +
-                           (x[0] == z[0]) * (x[1] == z[1])) +
-                   lprob_z3;
-
-    imm_float c2 = 4 * loge - imm_log(9);
-
-    imm_float v4 = c2 +
-                   imm_log((x[0] == z[2]) + (x[1] == z[2]) + (x[2] == z[2])) +
-                   lprob_z1 + lprob_z2;
-    imm_float v5 = c2 +
-                   imm_log((x[0] == z[1]) + (x[1] == z[1]) + (x[2] == z[1])) +
-                   lprob_z1 + lprob_z3;
-    imm_float v6 = c2 +
-                   imm_log((x[0] == z[0]) + (x[1] == z[0]) + (x[2] == z[0])) +
-                   lprob_z2 + lprob_z3;
-
-    return LOGSUM(v0, v1, v2, v3, v4, v5, v6);
-}
-
-static imm_float lprob_frag_given_codon4(struct imm_frame_state const *state,
-                                         struct imm_seq const *seq,
-                                         struct imm_codon const *codon)
-{
-    imm_float loge = state->leps;
-    imm_float log1e = state->l1eps;
-
-    unsigned const *x = codon->idx;
-
-    unsigned z[4] = {imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[0]),
-                     imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[1]),
-                     imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[2]),
-                     imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[3])};
-
-    imm_float lprob_z1 = __imm_nuclt_lprob_get(state->nucltp, z[0]);
-    imm_float lprob_z2 = __imm_nuclt_lprob_get(state->nucltp, z[1]);
-    imm_float lprob_z3 = __imm_nuclt_lprob_get(state->nucltp, z[2]);
-    imm_float lprob_z4 = __imm_nuclt_lprob_get(state->nucltp, z[3]);
-
-    imm_float v0 = LOGSUM(
-        imm_log((x[0] == z[1]) * (x[1] == z[2]) * (x[2] == z[3])) + lprob_z1,
-        imm_log((x[0] == z[0]) * (x[1] == z[2]) * (x[2] == z[3])) + lprob_z2,
-        imm_log((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[3])) + lprob_z3,
-        imm_log((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[2])) + lprob_z4);
-
-    imm_float v1 =
-        LOGSUM(imm_log((x[1] == z[2]) * (x[2] == z[3])) + lprob_z1 + lprob_z2,
-               imm_log((x[1] == z[1]) * (x[2] == z[3])) + lprob_z1 + lprob_z3,
-               imm_log((x[1] == z[1]) * (x[2] == z[2])) + lprob_z1 + lprob_z4,
-               imm_log((x[1] == z[0]) * (x[2] == z[3])) + lprob_z2 + lprob_z3,
-               imm_log((x[1] == z[0]) * (x[2] == z[2])) + lprob_z2 + lprob_z4,
-               imm_log((x[1] == z[0]) * (x[2] == z[1])) + lprob_z3 + lprob_z4,
-               imm_log((x[0] == z[2]) * (x[2] == z[3])) + lprob_z1 + lprob_z2,
-               imm_log((x[0] == z[1]) * (x[2] == z[3])) + lprob_z1 + lprob_z3,
-               imm_log((x[0] == z[1]) * (x[2] == z[2])) + lprob_z1 + lprob_z4,
-               imm_log((x[0] == z[0]) * (x[2] == z[3])) + lprob_z2 + lprob_z3,
-               imm_log((x[0] == z[0]) * (x[2] == z[2])) + lprob_z2 + lprob_z4,
-               imm_log((x[0] == z[0]) * (x[2] == z[1])) + lprob_z3 + lprob_z4,
-               imm_log((x[0] == z[2]) * (x[1] == z[3])) + lprob_z1 + lprob_z2,
-               imm_log((x[0] == z[1]) * (x[1] == z[3])) + lprob_z1 + lprob_z3,
-               imm_log((x[0] == z[1]) * (x[1] == z[2])) + lprob_z1 + lprob_z4,
-               imm_log((x[0] == z[0]) * (x[1] == z[3])) + lprob_z2 + lprob_z3,
-               imm_log((x[0] == z[0]) * (x[1] == z[2])) + lprob_z2 + lprob_z4,
-               imm_log((x[0] == z[0]) * (x[1] == z[1])) + lprob_z3 + lprob_z4);
-
-    return imm_lprob_add(loge + log1e * 3 - imm_log(2) + v0,
-                         3 * loge + log1e - imm_log(9) + v1);
-}
-
-static imm_float lprob_frag_given_codon5(struct imm_frame_state const *state,
-                                         struct imm_seq const *seq,
-                                         struct imm_codon const *codon)
-{
-    imm_float loge = state->leps;
-    imm_float log1e = state->l1eps;
-
-    unsigned const *x = codon->idx;
-
-    unsigned z[5] = {imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[0]),
-                     imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[1]),
-                     imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[2]),
-                     imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[3]),
-                     imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[4])};
-
-    imm_float lprob_z1 = __imm_nuclt_lprob_get(state->nucltp, z[0]);
-    imm_float lprob_z2 = __imm_nuclt_lprob_get(state->nucltp, z[1]);
-    imm_float lprob_z3 = __imm_nuclt_lprob_get(state->nucltp, z[2]);
-    imm_float lprob_z4 = __imm_nuclt_lprob_get(state->nucltp, z[3]);
-    imm_float lprob_z5 = __imm_nuclt_lprob_get(state->nucltp, z[4]);
-
-    imm_float v =
-        LOGSUM(lprob_z1 + lprob_z2 +
-                   imm_log((x[0] == z[2]) * (x[1] == z[3]) * (x[2] == z[4])),
-               lprob_z1 + lprob_z3 +
-                   imm_log((x[0] == z[1]) * (x[1] == z[3]) * (x[2] == z[4])),
-               lprob_z1 + lprob_z4 +
-                   imm_log((x[0] == z[1]) * (x[1] == z[2]) * (x[2] == z[4])),
-               lprob_z1 + lprob_z5 +
-                   imm_log((x[0] == z[1]) * (x[1] == z[2]) * (x[2] == z[3])),
-               lprob_z2 + lprob_z3 +
-                   imm_log((x[0] == z[0]) * (x[1] == z[3]) * (x[2] == z[4])),
-               lprob_z2 + lprob_z4 +
-                   imm_log((x[0] == z[0]) * (x[1] == z[2]) * (x[2] == z[4])),
-               lprob_z2 + lprob_z5 +
-                   imm_log((x[0] == z[0]) * (x[1] == z[2]) * (x[2] == z[3])),
-               lprob_z3 + lprob_z4 +
-                   imm_log((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[4])),
-               lprob_z3 + lprob_z5 +
-                   imm_log((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[3])),
-               lprob_z4 + lprob_z5 +
-                   imm_log((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[2])), );
-
-    return 2 * loge + 2 * log1e - imm_log(10) + v;
-}
-
 imm_float imm_frame_state_decode(struct imm_frame_state const *state,
                                  struct imm_seq const *seq,
                                  struct imm_codon *codon)
 {
-    unsigned const n = imm_nuclt_size(state->nucltp->nuclt);
-
-    imm_float max_lprob = imm_lprob_zero();
-    struct imm_codon tmp;
-    tmp.nuclt = state->nucltp->nuclt;
-
-    for (unsigned i0 = 0; i0 < n; ++i0)
-    {
-        for (unsigned i1 = 0; i1 < n; ++i1)
-        {
-            for (unsigned i2 = 0; i2 < n; ++i2)
-            {
-
-                tmp.a = i0;
-                tmp.b = i1;
-                tmp.c = i2;
-                imm_float lprob = imm_frame_state_lposterior(state, &tmp, seq);
-
-                if (lprob >= max_lprob)
-                {
-                    max_lprob = lprob;
-                    codon->a = tmp.a;
-                    codon->b = tmp.b;
-                    codon->c = tmp.c;
-                }
-            }
-        }
-    }
-    return max_lprob;
+    struct imm_frame_cond cond = imm_frame_cond_init(state);
+    return imm_frame_cond_decode(&cond, seq, codon);
 }
 
 imm_float imm_frame_state_lposterior(struct imm_frame_state const *state,
                                      struct imm_codon const *codon,
                                      struct imm_seq const *seq)
 {
-    imm_float lprob = imm_lprob_zero();
-
-    switch (imm_seq_size(seq))
-    {
-    case 1:
-        lprob = lprob_frag_given_codon1(state, seq, codon);
-        break;
-    case 2:
-        lprob = lprob_frag_given_codon2(state, seq, codon);
-        break;
-    case 3:
-        lprob = lprob_frag_given_codon3(state, seq, codon);
-        break;
-    case 4:
-        lprob = lprob_frag_given_codon4(state, seq, codon);
-        break;
-    case 5:
-        lprob = lprob_frag_given_codon5(state, seq, codon);
-        break;
-    default:
-        return imm_lprob_nan();
-    }
-
-    return lprob + imm_codon_marg_lprob(state->codonm, *codon);
+    struct imm_frame_cond cond = imm_frame_cond_init(state);
+    return imm_frame_cond_lprob(&cond, codon, seq);
 }
 
 static imm_float lprob(struct imm_state const *state, struct imm_seq const *seq)
