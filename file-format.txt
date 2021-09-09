@@ -18,7 +18,7 @@ IMM file chunks
 | size      : mp-u16           |
 |------------------------------|
 
- DP.emission
+ DP.emis
 |----------------------------|
 | score : mp-array[mp-float] |
 | offset: mp-array[mp-u32]   |
