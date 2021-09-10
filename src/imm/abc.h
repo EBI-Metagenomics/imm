@@ -43,8 +43,7 @@ IMM_API enum imm_rc imm_abc_read(struct imm_abc *abc, FILE *file);
 
 static inline bool imm_abc_has_symbol_id(struct imm_abc const *abc, unsigned id)
 {
-    if (imm_unlikely(!imm_sym_valid_id(id)))
-        return false;
+    if (imm_unlikely(!imm_sym_valid_id(id))) return false;
 
     return imm_sym_idx(&abc->sym, id) < abc->size;
 }
@@ -72,6 +71,11 @@ static inline unsigned imm_abc_symbol_idx(struct imm_abc const *abc,
     return __imm_abc_symbol_idx(abc, imm_sym_id(symbol));
 }
 
+static inline unsigned imm_abc_any_symbol_id(struct imm_abc const *abc)
+{
+    return abc->any_symbol_id;
+}
+
 static inline unsigned imm_abc_any_symbol_idx(struct imm_abc const *abc)
 {
     return abc->size;
@@ -80,11 +84,9 @@ static inline unsigned imm_abc_any_symbol_idx(struct imm_abc const *abc)
 static inline enum imm_sym_type __imm_abc_symbol_type(struct imm_abc const *abc,
                                                       unsigned id)
 {
-    if (id == abc->any_symbol_id)
-        return IMM_SYM_ANY;
+    if (id == abc->any_symbol_id) return IMM_SYM_ANY;
 
-    if (imm_abc_has_symbol_id(abc, id))
-        return IMM_SYM_NORMAL;
+    if (imm_abc_has_symbol_id(abc, id)) return IMM_SYM_NORMAL;
 
     return IMM_SYM_NULL;
 }
