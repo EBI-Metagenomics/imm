@@ -23,9 +23,9 @@ int main(void)
                                             imm_log(0.5), imm_lprob_zero()));
 
     codonp = imm_codon_lprob(nuclt);
-    imm_codon_lprob_set(&codonp, imm_codon(nuclt, 'A', 'T', 'G'), imm_log(0.8));
-    imm_codon_lprob_set(&codonp, imm_codon(nuclt, 'A', 'T', 'T'), imm_log(0.1));
-    imm_codon_lprob_set(&codonp, imm_codon(nuclt, 'C', 'C', 'C'), imm_log(0.1));
+    imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, "ATG"), imm_log(0.8));
+    imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, "ATT"), imm_log(0.1));
+    imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, "CCC"), imm_log(0.1));
 
     codonm = imm_codon_marg(&codonp);
 

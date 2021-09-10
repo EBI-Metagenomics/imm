@@ -48,26 +48,21 @@ static inline char imm_codon_csym(struct imm_codon const *codon)
     return imm_abc_symbols(&codon->nuclt->super)[codon->c];
 }
 
-static inline struct imm_codon
-__imm_codon_from_id(struct imm_nuclt const *nuclt, unsigned a, unsigned b,
-                    unsigned c)
+static inline struct imm_codon imm_codon(struct imm_nuclt const *nuclt,
+                                         unsigned id_a, unsigned id_b,
+                                         unsigned id_c)
 {
     struct imm_codon codon = {.nuclt = nuclt};
-    imm_codon_set(&codon, a, b, c);
+    imm_codon_set(&codon, id_a, id_b, id_c);
     return codon;
 }
 
 static inline struct imm_codon
-__imm_codon_from_char(struct imm_nuclt const *nuclt, char a, char b, char c)
+imm_codon_from_symbols(struct imm_nuclt const *nuclt, char a, char b, char c)
 {
-    return __imm_codon_from_id(nuclt, imm_sym_id(a), imm_sym_id(b),
-                               imm_sym_id(c));
+    return imm_codon(nuclt, imm_sym_id(a), imm_sym_id(b), imm_sym_id(c));
 }
 
-#define imm_codon(n, a, b, c)                                                  \
-    _Generic((a), char                                                         \
-             : __imm_codon_from_char, int                                      \
-             : __imm_codon_from_char, unsigned                                 \
-             : __imm_codon_from_id)(n, a, b, c)
+#define IMM_CODON(n, x) imm_codon_from_symbols(n, x[0], x[1], x[2])
 
 #endif

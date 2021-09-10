@@ -17,6 +17,6 @@ IMM_API struct imm_codon imm_gc_codon(unsigned id, unsigned idx);
 
 IMM_API char imm_gc_aa(unsigned id, unsigned idx);
 
-IMM_API char imm_gc_decode(unsigned id, char a, char b, char c);
+IMM_API char imm_gc_decode(unsigned id, char const codon[3]);
 
 #endif

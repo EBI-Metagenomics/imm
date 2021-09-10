@@ -24,7 +24,8 @@ struct imm_codon imm_gc_codon(unsigned id, unsigned idx)
 {
     struct gc const *gc = &gencode[id - 1];
     struct imm_nuclt const *nuclt = &dna->super;
-    return imm_codon(nuclt, gc->base1[idx], gc->base2[idx], gc->base3[idx]);
+    return imm_codon_from_symbols(nuclt, gc->base1[idx], gc->base2[idx],
+                                  gc->base3[idx]);
 }
 
 char imm_gc_aa(unsigned id, unsigned idx)
@@ -35,13 +36,14 @@ char imm_gc_aa(unsigned id, unsigned idx)
 
 static unsigned perfect_hash_id1(char key);
 
-char imm_gc_decode(unsigned id, char a, char b, char c)
+char imm_gc_decode(unsigned id, char const codon[3])
 {
     assert(id == 1);
     struct gc const *gc = &gencode[id - 1];
     char const *aa = gc->ncbieaa;
-    unsigned const i[3] = {perfect_hash_id1(a), perfect_hash_id1(b),
-                           perfect_hash_id1(c)};
+    unsigned const i[3] = {perfect_hash_id1(codon[0]),
+                           perfect_hash_id1(codon[1]),
+                           perfect_hash_id1(codon[2])};
     return aa[i[0] * 4 * 4 + i[1] * 4 + i[2]];
 }
 
