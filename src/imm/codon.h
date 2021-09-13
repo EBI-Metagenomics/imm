@@ -57,6 +57,12 @@ static inline struct imm_codon imm_codon(struct imm_nuclt const *nuclt,
     return codon;
 }
 
+static inline struct imm_codon imm_codon_any(struct imm_nuclt const *nuclt)
+{
+    unsigned any = imm_abc_any_symbol_id(&nuclt->super);
+    return imm_codon(nuclt, any, any, any);
+}
+
 static inline struct imm_codon
 imm_codon_from_symbols(struct imm_nuclt const *nuclt, char a, char b, char c)
 {
