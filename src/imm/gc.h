@@ -5,7 +5,7 @@
 #include "imm/dna.h"
 #include "imm/export.h"
 
-IMM_API struct imm_dna const *imm_gc_dna(void);
+IMM_API extern struct imm_dna const *const imm_gc_dna;
 
 IMM_API char const *imm_gc_name1(unsigned id);
 
@@ -17,6 +17,6 @@ IMM_API struct imm_codon imm_gc_codon(unsigned id, unsigned idx);
 
 IMM_API char imm_gc_aa(unsigned id, unsigned idx);
 
-IMM_API char imm_gc_decode(unsigned id, char const codon[3]);
+IMM_API char imm_gc_decode(unsigned id, struct imm_codon codon);
 
 #endif
