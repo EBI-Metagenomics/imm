@@ -12,7 +12,7 @@ struct imm_result
     struct imm_seq const *seq;
     struct imm_path path;
     imm_float loglik;
-    imm_float seconds;
+    uint64_t seconds;
 };
 
 static inline struct imm_result imm_result(void)

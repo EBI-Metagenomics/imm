@@ -1,7 +1,9 @@
 #!/bin/bash
 
-/bin/bash -c "$(curl -fsSL https://git.io/JerYI)" -s EBI-Metagenomics/c-containers
-/bin/bash -c "$(curl -fsSL https://git.io/JerYI)" -s horta/logaddexp
-/bin/bash -c "$(curl -fsSL https://git.io/JerYI)" -s horta/elapsed
-/bin/bash -c "$(curl -fsSL https://git.io/JerYI)" -s horta/hope
-/bin/bash -c "$(curl -fsSL https://git.io/JerYI)" -s EBI-Metagenomics/log
+set -e
+
+bash -c "$(curl -fsSL https://git.io/JerYI)" -s horta/hope
+bash -c "$(curl -fsSL https://git.io/JerYI)" -s horta/logaddexp
+bash -c "$(curl -fsSL https://git.io/JerYI)" -s horta/elapsed
+bash -c "$(curl -fsSL https://git.io/JerYI)" -s EBI-Metagenomics/c-containers
+bash -c "$(curl -fsSL https://git.io/JerYI)" -s EBI-Metagenomics/log

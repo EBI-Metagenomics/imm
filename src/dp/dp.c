@@ -137,11 +137,16 @@ enum imm_rc imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
         return error(IMM_ILLEGALARG,
                      "seq is shorter than end_state's lower bound");
 
-    struct elapsed elapsed = elapsed_init();
-    elapsed_start(&elapsed);
+    struct elapsed elapsed = ELAPSED_INIT;
+    if (elapsed_start(&elapsed))
+        return error(IMM_RUNTIMEERROR, "elapsed_start has failed");
+
     enum imm_rc rc = viterbi(dp, task, result);
-    elapsed_end(&elapsed);
-    result->seconds = (imm_float)elapsed_seconds(&elapsed);
+
+    if (elapsed_stop(&elapsed))
+        return error(IMM_RUNTIMEERROR, "elapsed_stop has failed");
+
+    result->seconds = elapsed_milliseconds(&elapsed);
 
     return rc;
 }
