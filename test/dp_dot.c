@@ -44,6 +44,7 @@ int main(void)
     NOTNULL(fd);
     imm_dp_write_dot(&dp, fd, state_name);
     fclose(fd);
+    imm_del(&dp);
 
     FILE *a = fopen(TMPDIR "/hmm.dot", "r");
     NOTNULL(a);
