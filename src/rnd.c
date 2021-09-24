@@ -3,12 +3,12 @@
 
 static inline struct xrandom to_xrandom(struct imm_rnd r)
 {
-    return (struct xrandom){r.data[0], r.data[1], r.data[2], r.data[3]};
+    return (struct xrandom){{r.data[0], r.data[1], r.data[2], r.data[3]}};
 }
 
 static inline struct imm_rnd from_xrandom(struct xrandom x)
 {
-    return (struct imm_rnd){x.data[0], x.data[1], x.data[2], x.data[3]};
+    return (struct imm_rnd){{x.data[0], x.data[1], x.data[2], x.data[3]}};
 }
 
 struct imm_rnd imm_rnd(uint64_t seed) { return from_xrandom(xrandom(seed)); }
