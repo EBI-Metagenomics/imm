@@ -1,10 +1,8 @@
-add_custom_target(all_tests)
 find_package(hope REQUIRED)
 find_package(log REQUIRED)
 
 function(imm_add_test name)
     add_executable(${name} ${name}.c)
-    add_dependencies(all_tests ${name})
     target_link_libraries(${name} PRIVATE IMM::imm)
     target_link_libraries(${name} PRIVATE HOPE::hope)
     target_link_libraries(${name} PRIVATE LOG::log)

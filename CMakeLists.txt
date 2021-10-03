@@ -1,19 +1,15 @@
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 project(
     imm
-    VERSION 0.0.32
+    VERSION 0.0.33
     LANGUAGES C)
 
 # Generate compile_commands.json file
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-# Set RPATH only if it's not a system directory
-list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
-     "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-if("${isSystemDir}" STREQUAL "-1")
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-endif()
+include(external/cmake-boilerplate/cpb.cmake)
+
+cbp_set_rpath()
 
 find_package(logaddexp REQUIRED)
 find_package(elapsed REQUIRED)
@@ -61,50 +57,10 @@ add_library(
     src/tsort.c)
 add_library(IMM::imm ALIAS imm)
 
-# Hide functions by default.
-set_property(TARGET imm PROPERTY C_VISIBILITY_PRESET hidden)
-set_property(TARGET imm PROPERTY VISIBILITY_INLINES_HIDDEN ON)
-
-# Write out imm/export.h to the current binary directory.
-include(GenerateExportHeader)
-generate_export_header(
-    imm
-    BASE_NAME
-    IMM
-    INCLUDE_GUARD_NAME
-    IMM_EXPORT_H
-    EXPORT_MACRO_NAME
-    IMM_API
-    EXPORT_FILE_NAME
-    ${CMAKE_CURRENT_BINARY_DIR}/imm/export.h)
-
-if(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
-    # /wd5105:
-    # https://docs.microsoft.com/en-us/cpp/error-messages/compiler-warnings/c5105?view=msvc-160
-    set(WARNING_FLAGS /W3 /wd5105)
-else()
-    set(WARNING_FLAGS
-        -Wall
-        -Wextra
-        -Wstrict-prototypes
-        -Wshadow
-        -Wconversion
-        -Wmissing-prototypes
-        -Wno-unused-parameter
-        -Wsign-conversion
-        -Wno-unused-function)
-endif()
-
-if(NOT CMAKE_C_COMPILER_ID STREQUAL "GNU")
-    list(APPEND WARNING_FLAGS -Wno-gnu-designator -Wno-empty-translation-unit
-         -Wno-gnu-statement-expression -Wno-nullability-extension)
-endif()
-
-option(CI_BUILD "CI, extra flags will be set" OFF)
-if(CI_BUILD)
-    message(STATUS "CI build enabled")
-    add_compile_options(-Werror)
-endif()
+cbp_hide_functions(imm)
+cbp_set_warning_flags()
+cbp_ci_build_option()
+cbp_generate_export_header(imm EXPORT_FILE)
 
 if(DEFINED ENV{IMM_DOUBLE_PRECISION})
     set(IMM_DOUBLE_PRECISION "$ENV{IMM_DOUBLE_PRECISION}")
@@ -144,8 +100,10 @@ target_compile_definitions(
 target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:__extension__>)
 target_compile_options(imm PRIVATE ${WARNING_FLAGS})
 target_compile_options(imm PRIVATE "-fverbose-asm")
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/imm/config.h.in
-               ${CMAKE_CURRENT_BINARY_DIR}/imm/config.h @ONLY)
+
+set(CONFIG_FILE ${CMAKE_CURRENT_BINARY_DIR}/imm/config.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/imm/config.h.in ${CONFIG_FILE}
+               @ONLY)
 
 include(CheckTypeSize)
 
@@ -168,28 +126,8 @@ else()
 endif()
 target_compile_definitions(imm PRIVATE SIZEOF_LONG=${SIZEOF_LONG})
 
-install(
-    TARGETS imm
-    EXPORT imm-targets
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-    PUBLIC_HEADER DESTINATION include)
-install(DIRECTORY src/imm/ DESTINATION include/imm)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/imm/export.h
-              ${CMAKE_CURRENT_BINARY_DIR}/imm/config.h DESTINATION include/imm)
-install(
-    EXPORT imm-targets
-    FILE imm-targets.cmake
-    NAMESPACE IMM::
-    DESTINATION lib/cmake/imm)
-include(CMakePackageConfigHelpers)
-configure_package_config_file(
-    imm-config.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/imm-config.cmake
-    INSTALL_DESTINATION lib/cmake/imm
-    NO_SET_AND_CHECK_MACRO)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/imm-config.cmake
-        DESTINATION lib/cmake/imm)
+cbp_install(imm MERGED)
+install(FILES ${EXPORT_FILE} ${CONFIG_FILE} DESTINATION include/imm)
 
 enable_testing()
 add_subdirectory(test)
