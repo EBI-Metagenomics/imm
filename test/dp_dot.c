@@ -1,7 +1,7 @@
 #include "hope/hope.h"
 #include "imm/imm.h"
 
-static void state_name(unsigned id, char name[IMM_STATE_NAME_SIZE])
+static unsigned state_name(unsigned id, char name[IMM_STATE_NAME_SIZE])
 {
     name[0] = 'M';
     if (id == 0)
@@ -9,6 +9,7 @@ static void state_name(unsigned id, char name[IMM_STATE_NAME_SIZE])
     else
         name[1] = '1';
     name[2] = '\0';
+    return 2;
 }
 
 int main(void)

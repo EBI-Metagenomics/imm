@@ -40,6 +40,6 @@ struct imm_state_vtable
 
 #define IMM_STATE_NAME_SIZE 8
 
-typedef void(imm_state_name)(unsigned id, char name[IMM_STATE_NAME_SIZE]);
+typedef unsigned(imm_state_name)(unsigned id, char name[IMM_STATE_NAME_SIZE]);
 
 #endif
