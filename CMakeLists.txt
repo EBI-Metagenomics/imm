@@ -8,7 +8,6 @@ project(
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include(external/cmake-boilerplate/cbp.cmake)
-
 cbp_set_rpath()
 
 find_package(logaddexp REQUIRED)
