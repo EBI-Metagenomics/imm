@@ -30,14 +30,14 @@ void test_dp_io_large_normal(void)
     fclose(file);
 
     struct imm_task *task = imm_task_new(&dp);
-    struct imm_result result = imm_result();
+    struct imm_prod prod = imm_prod();
     struct imm_seq seq = imm_seq(imm_str(imm_example1_seq), &m->abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
-    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
-    CLOSE(result.loglik, -65826.0106185297);
+    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_SUCCESS);
+    CLOSE(prod.loglik, -65826.0106185297);
 
     imm_del(task);
-    imm_del(&result);
+    imm_del(&prod);
     imm_del(&dp);
 }
 
@@ -60,13 +60,13 @@ void test_dp_io_large_frame(void)
     fclose(file);
 
     struct imm_task *task = imm_task_new(&dp);
-    struct imm_result result = imm_result();
+    struct imm_prod prod = imm_prod();
     struct imm_seq seq = imm_seq(imm_str(imm_example2_seq), abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
-    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
-    CLOSE(result.loglik, -1622.8488101101);
+    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_SUCCESS);
+    CLOSE(prod.loglik, -1622.8488101101);
 
-    imm_del(&result);
+    imm_del(&prod);
     imm_del(task);
     imm_del(&dp);
 }

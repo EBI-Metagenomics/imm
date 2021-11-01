@@ -57,7 +57,7 @@ void test_dp_empty_path(void)
     imm_mute_state_init(&state, 3, &abc);
     struct imm_hmm hmm;
     imm_hmm_init(&hmm, &abc);
-    struct imm_result result = imm_result();
+    struct imm_prod prod = imm_prod();
 
     EQ(imm_hmm_add_state(&hmm, imm_super(&state)), IMM_SUCCESS);
     EQ(imm_hmm_set_start(&hmm, imm_super(&state), imm_log(0.1)), IMM_SUCCESS);
@@ -66,8 +66,8 @@ void test_dp_empty_path(void)
 
     struct imm_task *task = imm_task_new(&dp);
     imm_task_setup(task, &A);
-    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
-    EQ(imm_path_nsteps(&result.path), 0);
+    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_SUCCESS);
+    EQ(imm_path_nsteps(&prod.path), 0);
 
     imm_del(task);
     imm_del(&dp);
@@ -79,7 +79,7 @@ void test_dp_one_mute(void)
     imm_mute_state_init(&state, 3, &abc);
     struct imm_hmm hmm;
     imm_hmm_init(&hmm, &abc);
-    struct imm_result result = imm_result();
+    struct imm_prod prod = imm_prod();
 
     EQ(imm_hmm_add_state(&hmm, imm_super(&state)), IMM_SUCCESS);
 
@@ -88,17 +88,17 @@ void test_dp_one_mute(void)
     EQ(imm_hmm_init_dp(&hmm, imm_super(&state), &dp), IMM_SUCCESS);
 
     struct imm_task *task = imm_task_new(&dp);
-    EQ(imm_dp_viterbi(&dp, task, &result), IMM_ILLEGALARG);
+    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_ILLEGALARG);
 
     imm_task_setup(task, &EMPTY);
-    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
-    EQ(imm_path_nsteps(&result.path), 1);
+    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_SUCCESS);
+    EQ(imm_path_nsteps(&prod.path), 1);
 
     imm_task_setup(task, &ATT);
-    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
-    EQ(imm_path_nsteps(&result.path), 0);
+    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_SUCCESS);
+    EQ(imm_path_nsteps(&prod.path), 0);
 
-    imm_del(&result);
+    imm_del(&prod);
     imm_del(task);
     imm_del(&dp);
 }
@@ -111,7 +111,7 @@ void test_dp_two_mutes(void)
     imm_mute_state_init(&state1, 12, &abc);
     struct imm_hmm hmm;
     imm_hmm_init(&hmm, &abc);
-    struct imm_result result = imm_result();
+    struct imm_prod prod = imm_prod();
 
     EQ(imm_hmm_add_state(&hmm, imm_super(&state0)), IMM_SUCCESS);
     EQ(imm_hmm_add_state(&hmm, imm_super(&state1)), IMM_SUCCESS);
@@ -128,21 +128,21 @@ void test_dp_two_mutes(void)
 
     struct imm_task *task = imm_task_new(&dp);
 
-    EQ(imm_dp_viterbi(&dp, task, &result), IMM_ILLEGALARG);
+    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_ILLEGALARG);
 
     imm_task_setup(task, &EMPTY);
-    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
-    EQ(imm_path_nsteps(&result.path), 2);
-    EQ(imm_path_step(&result.path, 0)->seqlen, 0);
-    EQ(imm_path_step(&result.path, 0)->state_id, 0);
-    EQ(imm_path_step(&result.path, 1)->seqlen, 0);
-    EQ(imm_path_step(&result.path, 1)->state_id, 12);
+    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_SUCCESS);
+    EQ(imm_path_nsteps(&prod.path), 2);
+    EQ(imm_path_step(&prod.path, 0)->seqlen, 0);
+    EQ(imm_path_step(&prod.path, 0)->state_id, 0);
+    EQ(imm_path_step(&prod.path, 1)->seqlen, 0);
+    EQ(imm_path_step(&prod.path, 1)->state_id, 12);
 
     imm_task_setup(task, &ATT);
-    EQ(imm_dp_viterbi(&dp, task, &result), IMM_SUCCESS);
-    EQ(imm_path_nsteps(&result.path), 0);
+    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_SUCCESS);
+    EQ(imm_path_nsteps(&prod.path), 0);
 
-    imm_del(&result);
+    imm_del(&prod);
     imm_del(&dp);
     imm_del(task);
 }

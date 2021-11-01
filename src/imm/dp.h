@@ -12,7 +12,7 @@
 #include <stdio.h>
 
 struct imm_abc;
-struct imm_result;
+struct imm_prod;
 struct imm_seq;
 struct imm_task;
 
@@ -32,7 +32,7 @@ IMM_API void imm_dp_dump_state_table(struct imm_dp const *dp);
 
 IMM_API void imm_dp_dump_path(struct imm_dp const *dp,
                               struct imm_task const *task,
-                              struct imm_result const *result);
+                              struct imm_prod const *prod);
 
 IMM_API unsigned imm_dp_trans_idx(struct imm_dp *dp, unsigned src_idx,
                                   unsigned dst_idx);
@@ -42,7 +42,7 @@ IMM_API enum imm_rc imm_dp_change_trans(struct imm_dp *dp, unsigned trans_idx,
 
 IMM_API enum imm_rc imm_dp_viterbi(struct imm_dp const *dp,
                                    struct imm_task *task,
-                                   struct imm_result *result);
+                                   struct imm_prod *prod);
 
 IMM_API enum imm_rc imm_dp_write(struct imm_dp const *dp, FILE *file);
 

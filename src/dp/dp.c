@@ -9,7 +9,7 @@
 #include "error.h"
 #include "imm/dp.h"
 #include "imm/lprob.h"
-#include "imm/result.h"
+#include "imm/prod.h"
 #include "imm/state.h"
 #include "imm/subseq.h"
 #include "imm/trans.h"
@@ -71,7 +71,7 @@ static void set_score(struct imm_dp const *dp, struct imm_task *task,
 }
 
 static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
-                           struct imm_result *result);
+                           struct imm_prod *prod);
 static void viterbi_first_row(struct imm_dp const *dp, struct imm_task *task,
                               unsigned remain);
 static void viterbi_first_row_safe(struct imm_dp const *dp,
@@ -123,9 +123,9 @@ enum imm_rc dp_reset(struct imm_dp *dp, struct dp_args const *args)
 }
 
 enum imm_rc imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
-                           struct imm_result *result)
+                           struct imm_prod *prod)
 {
-    imm_result_reset(result);
+    imm_prod_reset(prod);
     if (!task->seq) return error(IMM_ILLEGALARG, "seq has not been set");
 
     if (dp->code.abc != imm_seq_abc(task->seq))
@@ -141,12 +141,12 @@ enum imm_rc imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
     if (elapsed_start(&elapsed))
         return error(IMM_RUNTIMEERROR, "elapsed_start has failed");
 
-    enum imm_rc rc = viterbi(dp, task, result);
+    enum imm_rc rc = viterbi(dp, task, prod);
 
     if (elapsed_stop(&elapsed))
         return error(IMM_RUNTIMEERROR, "elapsed_stop has failed");
 
-    result->seconds = elapsed_milliseconds(&elapsed);
+    prod->seconds = elapsed_milliseconds(&elapsed);
 
     return rc;
 }
@@ -341,7 +341,7 @@ static struct final_score final_score(struct imm_dp const *dp,
 }
 
 static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
-                           struct imm_result *result)
+                           struct imm_prod *prod)
 {
     unsigned len = eseq_len(&task->eseq);
 
@@ -358,8 +358,8 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
     }
 
     struct final_score const fscore = final_score(dp, task);
-    result->loglik = fscore.score;
-    return viterbi_path(dp, task, &result->path, fscore.state, fscore.seq_len);
+    prod->loglik = fscore.score;
+    return viterbi_path(dp, task, &prod->path, fscore.state, fscore.seq_len);
 }
 
 static void viterbi_first_row(struct imm_dp const *dp, struct imm_task *task,
@@ -535,12 +535,12 @@ void imm_dp_dump_state_table(struct imm_dp const *dp)
 }
 
 void imm_dp_dump_path(struct imm_dp const *dp, struct imm_task const *task,
-                      struct imm_result const *result)
+                      struct imm_prod const *prod)
 {
     unsigned begin = 0;
     for (unsigned i = 0; i < task->path.nstates; ++i)
     {
-        struct imm_step const *step = imm_path_step(&result->path, i);
+        struct imm_step const *step = imm_path_step(&prod->path, i);
         unsigned state_idx = state_table_idx(&dp->state_table, step->state_id);
 
         unsigned min_len = state_table_span(&dp->state_table, state_idx).min;

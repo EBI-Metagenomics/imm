@@ -42,7 +42,7 @@
     _Generic((x), struct imm_task *                                            \
              : imm_task_del, struct imm_dp *                                   \
              : imm_dp_del, struct imm_path *                                   \
-             : imm_path_del, struct imm_result *                               \
-             : imm_result_del)(x)
+             : imm_path_del, struct imm_prod *                                 \
+             : imm_prod_del)(x)
 
 #endif
