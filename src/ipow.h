@@ -18,12 +18,4 @@ static inline unsigned long ipow(unsigned long base, unsigned exp)
     return result;
 }
 
-static inline uint16_t u16pow(unsigned base, unsigned exp)
-{
-    assert(base > 0);
-    unsigned long r = ipow(base, exp);
-    assert(r <= UINT16_MAX);
-    return (uint16_t)r;
-}
-
 #endif
