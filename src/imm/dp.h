@@ -1,6 +1,7 @@
 #ifndef IMM_DP_H
 #define IMM_DP_H
 
+#include "imm/code.h"
 #include "imm/dp/code.h"
 #include "imm/dp/emis.h"
 #include "imm/dp/state_table.h"
@@ -18,6 +19,7 @@ struct imm_task;
 
 struct imm_dp
 {
+    struct imm_code code2;
     struct imm_dp_code code;
     struct imm_dp_emis emis;
     struct imm_dp_trans_table trans_table;

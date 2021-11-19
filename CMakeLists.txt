@@ -20,6 +20,7 @@ add_library(
     src/amino.c
     src/bitmap.c
     src/cartes.c
+    src/code2.c
     src/codon_marg.c
     src/codon_state.c
     src/dna.c

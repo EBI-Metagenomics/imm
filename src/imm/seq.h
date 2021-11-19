@@ -33,4 +33,9 @@ static inline char const *imm_seq_str(struct imm_seq const *seq)
     return seq->str;
 }
 
+static inline unsigned imm_seq_symbol_idx(struct imm_seq const *seq, unsigned i)
+{
+    return imm_abc_symbol_idx(seq->abc, seq->str[i]);
+}
+
 #endif
