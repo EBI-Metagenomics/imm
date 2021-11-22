@@ -23,4 +23,9 @@ static inline unsigned code_size(struct imm_code const *code, unsigned min_seq,
     return (unsigned)(code->offset[max_seq + 1] - code->offset[min_seq]);
 }
 
+#define CODE_EMPTY                                                             \
+    {                                                                          \
+        .offset = {0}, .stride = {0}, .abc = NULL                              \
+    }
+
 #endif
