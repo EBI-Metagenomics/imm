@@ -8,6 +8,14 @@
 #include <assert.h>
 #include <stdlib.h>
 
+static inline void cleanup(struct imm_dp_emis *emis)
+{
+    free(emis->score);
+    free(emis->offset);
+    emis->score = NULL;
+    emis->offset = NULL;
+}
+
 void emis_del(struct imm_dp_emis const *emis)
 {
     free(emis->score);
@@ -20,15 +28,27 @@ void emis_init(struct imm_dp_emis *emis)
     emis->offset = NULL;
 }
 
-enum imm_rc emis_reset(struct imm_dp_emis *emis, struct imm_code const *code,
-                       struct imm_state **states, unsigned nstates)
+static enum imm_rc realloc_offset(struct imm_dp_emis *emis, unsigned nstates)
 {
     unsigned offsize = emis_offset_size(nstates);
     emis->offset = realloc(emis->offset, sizeof(*emis->offset) * offsize);
-    if (!emis->offset && offsize > 0)
-        return error(IMM_OUTOFMEM, "failed to resize");
-    emis->offset[0] = 0;
+    if (!emis->offset) return error(IMM_OUTOFMEM, "failed to resize");
+    return IMM_SUCCESS;
+}
 
+static enum imm_rc realloc_score(struct imm_dp_emis *emis, unsigned nstates)
+{
+    unsigned score_size = emis_score_size(emis, nstates);
+    emis->score = realloc(emis->score, sizeof(*emis->score) * score_size);
+    if (!emis->score && score_size > 0)
+        return error(IMM_OUTOFMEM, "failed to resize");
+    return IMM_SUCCESS;
+}
+
+static void calc_offset(struct imm_dp_emis *emis, struct imm_code const *code,
+                        unsigned nstates, struct imm_state **states)
+{
+    emis->offset[0] = 0;
     unsigned min = imm_state_span(states[0]).min;
     unsigned max = imm_state_span(states[0]).max;
     unsigned size = code_size(code, min, max);
@@ -40,16 +60,11 @@ enum imm_rc emis_reset(struct imm_dp_emis *emis, struct imm_code const *code,
         size += code_size(code, min, max);
     }
     emis->offset[nstates] = size;
+}
 
-    unsigned score_size = emis_score_size(emis, nstates);
-    emis->score = realloc(emis->score, sizeof(*emis->score) * score_size);
-    if (!emis->score && score_size > 0)
-    {
-        free(emis->offset);
-        emis->offset = NULL;
-        return error(IMM_OUTOFMEM, "failed to resize");
-    }
-
+static void calc_score(struct imm_dp_emis *emis, struct imm_code const *code,
+                       unsigned nstates, struct imm_state **states)
+{
     struct imm_abc const *abc = code->abc;
     char const *set = abc->symbols;
     unsigned set_size = abc->size;
@@ -59,8 +74,8 @@ enum imm_rc emis_reset(struct imm_dp_emis *emis, struct imm_code const *code,
 
     for (unsigned i = 0; i < nstates; ++i)
     {
-        min = imm_state_span(states[i]).min;
-        max = imm_state_span(states[i]).max;
+        unsigned min = imm_state_span(states[i]).min;
+        unsigned max = imm_state_span(states[i]).max;
         for (unsigned len = min; len <= max; ++len)
         {
             imm_cartes_setup(&cartes, len);
@@ -76,5 +91,21 @@ enum imm_rc emis_reset(struct imm_dp_emis *emis, struct imm_code const *code,
         }
     }
     imm_cartes_deinit(&cartes);
+}
+
+enum imm_rc emis_reset(struct imm_dp_emis *emis, struct imm_code const *code,
+                       struct imm_state **states, unsigned nstates)
+{
+    enum imm_rc rc = IMM_SUCCESS;
+    if ((rc = realloc_offset(emis, nstates))) goto cleanup;
+    calc_offset(emis, code, nstates, states);
+
+    if ((rc = realloc_score(emis, nstates))) goto cleanup;
+    calc_score(emis, code, nstates, states);
+
     return IMM_SUCCESS;
+
+cleanup:
+    cleanup(emis);
+    return rc;
 }

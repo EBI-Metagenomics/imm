@@ -8,7 +8,7 @@ struct imm_abc;
 
 struct imm_code
 {
-    uint16_t offset[IMM_STATE_MAX_SEQLEN + 1];
+    uint16_t offset[IMM_STATE_MAX_SEQLEN + 2];
     uint16_t stride[IMM_STATE_MAX_SEQLEN];
     struct imm_abc const *abc;
 };
