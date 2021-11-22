@@ -9,15 +9,6 @@ IMM file chunks
 | typeid       : mp-u8           |
 |--------------------------------|
 
- DP.code
-|------------------------------|
-| seqlen.min: mp-u8            |
-| seqlen.max: mp-u8            |
-| offset    : mp-array[mp-u16] |
-| stride    : mp-array[mp-u16] |
-| size      : mp-u16           |
-|------------------------------|
-
  DP.emis
 |----------------------------|
 | score : mp-array[mp-float] |
@@ -44,7 +35,6 @@ IMM file chunks
 
  DP
 |-----------------------------|
-| code       : DP.code        |
 | emission   : DP.emission    |
 | trans_table: DP.trans_table |
 | state_table: DP.state_table |

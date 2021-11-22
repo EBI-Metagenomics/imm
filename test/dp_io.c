@@ -57,7 +57,6 @@ void test_dp_io_large_frame(void)
     CLOSE(prod.loglik, -1622.8488101101);
     imm_del(&prod);
     imm_del(task);
-    return;
 
     FILE *file = fopen(TMPDIR "/dp_frame.imm", "wb");
     imm_dp_write(&dp, file);
