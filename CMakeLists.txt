@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 project(
   imm
-  VERSION 0.0.37
+  VERSION 0.0.38
   LANGUAGES C
 )
 
@@ -27,13 +27,13 @@ add_library(
   src/dna.c
   src/dp/dp.c
   src/dp/emis.c
-  src/eseq.c
   src/dp/io.c
   src/dp/matrix.c
   src/dp/path.c
   src/dp/state_table.c
   src/dp/trans_table.c
   src/error.c
+  src/eseq.c
   src/example1.c
   src/example2.c
   src/frame_cond.c
@@ -46,6 +46,7 @@ add_library(
   src/mute_state.c
   src/normal_state.c
   src/nuclt.c
+  src/nuclt_code.c
   src/nuclt_lprob.c
   src/path.c
   src/rna.c
