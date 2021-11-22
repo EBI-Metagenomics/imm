@@ -28,9 +28,9 @@ static void calc_offsets(uint16_t *offset, unsigned abc_size)
 
 void imm_code_init(struct imm_code *code, struct imm_abc const *abc)
 {
+    code->abc = abc;
     calc_strides(code->stride, imm_abc_size(code->abc));
     calc_offsets(code->offset, imm_abc_size(code->abc));
-    code->abc = abc;
 }
 
 unsigned code_encode(struct imm_code const *code, struct imm_seq const *seq)
