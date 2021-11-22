@@ -19,14 +19,13 @@ struct imm_task;
 
 struct imm_dp
 {
-    struct imm_code code2;
-    struct imm_dp_code code;
+    struct imm_code const *code;
     struct imm_dp_emis emis;
     struct imm_dp_trans_table trans_table;
     struct imm_dp_state_table state_table;
 };
 
-IMM_API void imm_dp_init(struct imm_dp *dp, struct imm_abc const *abc);
+IMM_API void imm_dp_init(struct imm_dp *dp, struct imm_code const *code);
 
 IMM_API void imm_dp_del(struct imm_dp *dp);
 

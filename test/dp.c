@@ -7,6 +7,7 @@ void test_dp_one_mute(void);
 void test_dp_two_mutes(void);
 
 static struct imm_abc abc;
+static struct imm_code code;
 static struct imm_seq EMPTY;
 static struct imm_seq A;
 static struct imm_seq ATT;
@@ -14,6 +15,7 @@ static struct imm_seq ATT;
 int main(void)
 {
     imm_abc_init(&abc, IMM_STR("ACGT"), '*');
+    imm_code_init(&code, &abc);
     EMPTY = imm_seq(IMM_STR(""), &abc);
     A = imm_seq(IMM_STR("A"), &abc);
     ATT = imm_seq(IMM_STR("ATT"), &abc);
@@ -30,7 +32,7 @@ void test_dp_illegal(void)
     struct imm_mute_state state;
     imm_mute_state_init(&state, 3, &abc);
     struct imm_hmm hmm;
-    imm_hmm_init(&hmm, &abc);
+    imm_hmm_init(&hmm, &code);
 
     struct imm_dp dp;
     EQ(imm_hmm_init_dp(&hmm, imm_super(&state), &dp), IMM_ILLEGALARG);
@@ -56,7 +58,7 @@ void test_dp_empty_path(void)
     struct imm_mute_state state;
     imm_mute_state_init(&state, 3, &abc);
     struct imm_hmm hmm;
-    imm_hmm_init(&hmm, &abc);
+    imm_hmm_init(&hmm, &code);
     struct imm_prod prod = imm_prod();
 
     EQ(imm_hmm_add_state(&hmm, imm_super(&state)), IMM_SUCCESS);
@@ -78,7 +80,7 @@ void test_dp_one_mute(void)
     struct imm_mute_state state;
     imm_mute_state_init(&state, 3, &abc);
     struct imm_hmm hmm;
-    imm_hmm_init(&hmm, &abc);
+    imm_hmm_init(&hmm, &code);
     struct imm_prod prod = imm_prod();
 
     EQ(imm_hmm_add_state(&hmm, imm_super(&state)), IMM_SUCCESS);
@@ -110,7 +112,7 @@ void test_dp_two_mutes(void)
     struct imm_mute_state state1;
     imm_mute_state_init(&state1, 12, &abc);
     struct imm_hmm hmm;
-    imm_hmm_init(&hmm, &abc);
+    imm_hmm_init(&hmm, &code);
     struct imm_prod prod = imm_prod();
 
     EQ(imm_hmm_add_state(&hmm, imm_super(&state0)), IMM_SUCCESS);

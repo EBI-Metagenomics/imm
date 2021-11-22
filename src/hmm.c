@@ -110,7 +110,7 @@ enum imm_rc imm_hmm_init_dp(struct imm_hmm const *hmm,
                             struct imm_state const *end_state,
                             struct imm_dp *dp)
 {
-    imm_dp_init(dp, hmm->abc);
+    imm_dp_init(dp, hmm->code);
     return imm_hmm_reset_dp(hmm, end_state, dp);
 }
 
@@ -126,7 +126,8 @@ enum imm_rc imm_hmm_reset_dp(struct imm_hmm const *hmm,
                              struct imm_dp *dp)
 {
     enum imm_rc rc = IMM_SUCCESS;
-    struct imm_state **states = malloc(sizeof(*states) * hmm->states.size);
+    struct imm_state **states =
+        malloc(sizeof(struct imm_state *) * hmm->states.size);
     if (!states) return error(IMM_OUTOFMEM, "failed to malloc");
 
     if (!hmm_state(hmm, end_state->id))
@@ -190,7 +191,7 @@ imm_float imm_hmm_trans(struct imm_hmm const *hmm, struct imm_state const *src,
 imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
                          struct imm_path const *path)
 {
-    if (hmm->abc != seq->abc)
+    if (hmm->code->abc != seq->abc)
     {
         error(IMM_ILLEGALARG, "hmm and seq must have the same alphabet");
         return imm_lprob_nan();

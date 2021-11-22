@@ -24,7 +24,7 @@ struct imm_task *imm_task_new(struct imm_dp const *dp)
         free(task);
         return NULL;
     }
-    eseq_init(&task->eseq, &dp->code);
+    eseq_init(&task->eseq, dp->code);
     task->seq = NULL;
     return task;
 }
@@ -35,7 +35,7 @@ enum imm_rc imm_task_reset(struct imm_task *task, struct imm_dp const *dp)
     if (rc) return rc;
     if ((rc = path_reset(&task->path, &dp->state_table, &dp->trans_table)))
         return rc;
-    eseq_reset(&task->eseq, &dp->code);
+    eseq_reset(&task->eseq, dp->code);
     task->seq = NULL;
     return IMM_SUCCESS;
 }

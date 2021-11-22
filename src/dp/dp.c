@@ -1,5 +1,4 @@
 #include "dp/dp.h"
-#include "dp/code.h"
 #include "dp/emis.h"
 #include "dp/matrix.h"
 #include "dp/minmax.h"
@@ -62,9 +61,7 @@ static void set_score(struct imm_dp const *dp, struct imm_task *task,
 {
     for (unsigned len = min_len; len <= max_len; ++len)
     {
-        unsigned seq_code = eseq_get(&task->eseq, row, len);
-        seq_code -= code_offset(&dp->code, min_len);
-
+        unsigned seq_code = eseq_get(&task->eseq, row, len, min_len);
         imm_float score = trans_score + emis_score(&dp->emis, state, seq_code);
         matrix_set_score(&task->matrix, row, state, len, score);
     }
@@ -85,9 +82,9 @@ static void _viterbi(struct imm_dp const *dp, struct imm_task *task,
 static void _viterbi_safe(struct imm_dp const *dp, struct imm_task *task,
                           unsigned const start_row, unsigned const stop_row);
 
-void imm_dp_init(struct imm_dp *dp, struct imm_abc const *abc)
+void imm_dp_init(struct imm_dp *dp, struct imm_code const *code)
 {
-    code_init(&dp->code, abc);
+    dp->code = code;
     emis_init(&dp->emis);
     trans_table_init(&dp->trans_table);
     state_table_init(&dp->state_table);
@@ -97,7 +94,6 @@ void imm_dp_del(struct imm_dp *dp)
 {
     if (dp)
     {
-        code_del(&dp->code);
         emis_del(&dp->emis);
         trans_table_del(&dp->trans_table);
         state_table_del(&dp->state_table);
@@ -108,11 +104,7 @@ enum imm_rc dp_reset(struct imm_dp *dp, struct dp_args const *args)
 {
     enum imm_rc rc = IMM_SUCCESS;
 
-    if ((rc = code_reset(&dp->code, min_seq(args->nstates, args->states),
-                         max_seq(args->nstates, args->states))))
-        return rc;
-
-    if ((rc = emis_reset(&dp->emis, &dp->code, args->states, args->nstates)))
+    if ((rc = emis_reset(&dp->emis, dp->code, args->states, args->nstates)))
         return rc;
 
     if ((rc = trans_table_reset(&dp->trans_table, args))) return rc;
@@ -128,7 +120,7 @@ enum imm_rc imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
     imm_prod_reset(prod);
     if (!task->seq) return error(IMM_ILLEGALARG, "seq has not been set");
 
-    if (dp->code.abc != imm_seq_abc(task->seq))
+    if (dp->code->abc != imm_seq_abc(task->seq))
         return error(IMM_ILLEGALARG, "dp and seq must have the same alphabet");
 
     unsigned end_state = dp->state_table.end_state_idx;
@@ -170,16 +162,14 @@ imm_float imm_dp_emis_score(struct imm_dp const *dp, unsigned state_id,
                             struct imm_seq const *seq)
 {
     struct eseq eseq;
-    eseq_init(&eseq, &dp->code);
+    eseq_init(&eseq, dp->code);
     imm_float score = IMM_LPROB_NAN;
     if (eseq_setup(&eseq, seq)) goto cleanup;
 
     unsigned state_idx = state_table_idx(&dp->state_table, state_id);
-    unsigned min_len = state_table_span(&dp->state_table, state_idx).min;
+    unsigned min = state_table_span(&dp->state_table, state_idx).min;
 
-    unsigned seq_code = eseq_get(&eseq, 0, imm_seq_size(seq));
-    seq_code -= code_offset(&dp->code, min_len);
-
+    unsigned seq_code = eseq_get(&eseq, 0, imm_seq_size(seq), min);
     score = emis_score(&dp->emis, state_idx, seq_code);
 
 cleanup:
@@ -543,9 +533,8 @@ void imm_dp_dump_path(struct imm_dp const *dp, struct imm_task const *task,
         struct imm_step const *step = imm_path_step(&prod->path, i);
         unsigned state_idx = state_table_idx(&dp->state_table, step->state_id);
 
-        unsigned min_len = state_table_span(&dp->state_table, state_idx).min;
-        unsigned seq_code = eseq_get(&task->eseq, begin, step->seqlen);
-        seq_code -= code_offset(&dp->code, min_len);
+        unsigned min = state_table_span(&dp->state_table, state_idx).min;
+        unsigned seq_code = eseq_get(&task->eseq, begin, step->seqlen, min);
 
         imm_float score = emis_score(&dp->emis, state_idx, seq_code);
         struct imm_seq subseq = imm_subseq(task->seq, begin, step->seqlen);

@@ -16,13 +16,15 @@ int main(void)
 {
     struct imm_abc abc;
     imm_abc_init(&abc, IMM_STR("ACGT"), '*');
+    struct imm_code code;
+    imm_code_init(&code, &abc);
 
     struct imm_mute_state state0;
     imm_mute_state_init(&state0, 0, &abc);
     struct imm_mute_state state1;
     imm_mute_state_init(&state1, 1, &abc);
     struct imm_hmm hmm;
-    imm_hmm_init(&hmm, &abc);
+    imm_hmm_init(&hmm, &code);
 
     EQ(imm_hmm_add_state(&hmm, imm_super(&state0)), IMM_SUCCESS);
     EQ(imm_hmm_add_state(&hmm, imm_super(&state1)), IMM_SUCCESS);

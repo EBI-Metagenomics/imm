@@ -1,5 +1,5 @@
 #include "io.h"
-#include "dp/code.h"
+#include "code.h"
 #include "dp/emis.h"
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
@@ -22,21 +22,21 @@ enum imm_rc imm_dp_write(struct imm_dp const *dp, FILE *file)
     io_init(&ctx, file);
 
     /* code */
-    cmp_write_u8(&ctx, (uint8_t)dp->code.seqlen.min);
-    cmp_write_u8(&ctx, (uint8_t)dp->code.seqlen.max);
-
-    size = code_offset_size(&dp->code);
-    cmp_write_array(&ctx, size);
-    for (unsigned i = 0; i < size; ++i)
-        cmp_write_u16(&ctx, dp->code.offset[i]);
-
-    size = code_stride_size(&dp->code);
-    cmp_write_array(&ctx, size);
-    for (unsigned i = 0; i < size; ++i)
-        cmp_write_u16(&ctx, dp->code.stride[i]);
-
-    assert(dp->code.size <= UINT16_MAX);
-    cmp_write_u16(&ctx, (uint16_t)dp->code.size);
+    /*     cmp_write_u8(&ctx, (uint8_t)dp->code.seqlen.min); */
+    /*     cmp_write_u8(&ctx, (uint8_t)dp->code.seqlen.max); */
+    /*  */
+    /*     size = code_offset_size(&dp->code); */
+    /*     cmp_write_array(&ctx, size); */
+    /*     for (unsigned i = 0; i < size; ++i) */
+    /*         cmp_write_u16(&ctx, dp->code.offset[i]); */
+    /*  */
+    /*     size = code_stride_size(&dp->code); */
+    /*     cmp_write_array(&ctx, size); */
+    /*     for (unsigned i = 0; i < size; ++i) */
+    /*         cmp_write_u16(&ctx, dp->code.stride[i]); */
+    /*  */
+    /*     assert(dp->code.size <= UINT16_MAX); */
+    /*     cmp_write_u16(&ctx, (uint16_t)dp->code.size); */
 
     /* emission */
     size = emis_score_size(&dp->emis, nstates);
@@ -99,7 +99,7 @@ enum imm_rc imm_dp_write(struct imm_dp const *dp, FILE *file)
 enum imm_rc imm_dp_read(struct imm_dp *dp, FILE *file)
 {
     enum imm_rc rc = IMM_SUCCESS;
-    uint8_t u8 = 0;
+    /* uint8_t u8 = 0; */
     uint16_t u16 = 0;
     uint32_t u32 = 0;
     uint32_t size = 0;
@@ -111,30 +111,32 @@ enum imm_rc imm_dp_read(struct imm_dp *dp, FILE *file)
     struct imm_dp_state_table *st = NULL;
 
     /* code */
-    struct imm_dp_code *code = &dp->code;
-    ERETURN(!cmp_read_u8(&ctx, &u8), IMM_IOERROR);
-    code->seqlen.min = u8;
-    ERETURN(!cmp_read_u8(&ctx, &u8), IMM_IOERROR);
-    code->seqlen.max = u8;
-    ERETURN(code->seqlen.min > code->seqlen.min, IMM_PARSEERROR);
-    ERETURN(code->seqlen.max > IMM_STATE_MAX_SEQLEN, IMM_PARSEERROR);
+    /* struct imm_dp_code *code = &dp->code; */
+    /* ERETURN(!cmp_read_u8(&ctx, &u8), IMM_IOERROR); */
+    /* code->seqlen.min = u8; */
+    /* ERETURN(!cmp_read_u8(&ctx, &u8), IMM_IOERROR); */
+    /* code->seqlen.max = u8; */
+    /* ERETURN(code->seqlen.min > code->seqlen.min, IMM_PARSEERROR); */
+    /* ERETURN(code->seqlen.max > IMM_STATE_MAX_SEQLEN, IMM_PARSEERROR); */
 
-    ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
-    ERETURN(size > UINT16_MAX, IMM_PARSEERROR);
-    code->offset = realloc(code->offset, sizeof(*code->offset) * size);
-    ERETURN(!code->offset && size > 0, IMM_IOERROR);
-    for (unsigned i = 0; i < size; ++i)
-        ERETURN(!cmp_read_u16(&ctx, code->offset + i), IMM_IOERROR);
-
-    ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR);
-    ERETURN(size > UINT16_MAX, IMM_PARSEERROR);
-    code->stride = realloc(code->stride, sizeof(*code->stride) * size);
-    ERETURN(!code->stride && size > 0, IMM_IOERROR);
-    for (unsigned i = 0; i < size; ++i)
-        ERETURN(!cmp_read_u16(&ctx, code->stride + i), IMM_IOERROR);
-
-    ERETURN(!cmp_read_u16(&ctx, &u16), IMM_IOERROR);
-    code->size = u16;
+    /*     ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR); */
+    /*     ERETURN(size > UINT16_MAX, IMM_PARSEERROR); */
+    /*     code->offset = realloc(code->offset, sizeof(*code->offset) * size);
+     */
+    /*     ERETURN(!code->offset && size > 0, IMM_IOERROR); */
+    /*     for (unsigned i = 0; i < size; ++i) */
+    /*         ERETURN(!cmp_read_u16(&ctx, code->offset + i), IMM_IOERROR); */
+    /*  */
+    /*     ERETURN(!cmp_read_array(&ctx, &size), IMM_IOERROR); */
+    /*     ERETURN(size > UINT16_MAX, IMM_PARSEERROR); */
+    /*     code->stride = realloc(code->stride, sizeof(*code->stride) * size);
+     */
+    /*     ERETURN(!code->stride && size > 0, IMM_IOERROR); */
+    /*     for (unsigned i = 0; i < size; ++i) */
+    /*         ERETURN(!cmp_read_u16(&ctx, code->stride + i), IMM_IOERROR); */
+    /*  */
+    /*     ERETURN(!cmp_read_u16(&ctx, &u16), IMM_IOERROR); */
+    /*     code->size = u16; */
 
     /* emission */
     e = &dp->emis;
@@ -213,13 +215,6 @@ enum imm_rc imm_dp_read(struct imm_dp *dp, FILE *file)
     return rc;
 
 cleanup:
-    if (code)
-    {
-        free(code->offset);
-        code->offset = NULL;
-        free(code->stride);
-        code->stride = NULL;
-    }
     if (e)
     {
         free(e->score);

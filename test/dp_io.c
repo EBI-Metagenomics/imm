@@ -24,7 +24,7 @@ void test_dp_io_large_normal(void)
     fclose(file);
     imm_del(&dp);
 
-    imm_dp_init(&dp, &m->abc);
+    imm_dp_init(&dp, &m->code);
     file = fopen(TMPDIR "/dp_normal.imm", "rb");
     imm_dp_read(&dp, file);
     fclose(file);
@@ -54,7 +54,7 @@ void test_dp_io_large_frame(void)
     imm_del(&dp);
 
     struct imm_abc const *abc = imm_super(imm_super(m->dna));
-    imm_dp_init(&dp, abc);
+    imm_dp_init(&dp, &m->code);
     file = fopen(TMPDIR "/dp_frame.imm", "rb");
     imm_dp_read(&dp, file);
     fclose(file);

@@ -10,6 +10,7 @@ void test_hmm_frame_state_len5(void);
 
 struct imm_nuclt const *nuclt;
 struct imm_abc const *abc;
+static struct imm_code code;
 struct imm_nuclt_lprob nucltp;
 struct imm_codon_lprob codonp;
 struct imm_codon_marg codonm;
@@ -18,6 +19,7 @@ int main(void)
 {
     nuclt = imm_super(&imm_dna_iupac);
     abc = imm_super(nuclt);
+    imm_code_init(&code, abc);
 
     nucltp = imm_nuclt_lprob(nuclt, IMM_ARR(imm_log(0.25), imm_log(0.25),
                                             imm_log(0.5), imm_lprob_zero()));
@@ -41,7 +43,7 @@ int main(void)
 void test_hmm_frame_state_0eps(void)
 {
     struct imm_hmm hmm;
-    imm_hmm_init(&hmm, abc);
+    imm_hmm_init(&hmm, &code);
 
     struct imm_frame_state state;
     imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.0f);
@@ -64,7 +66,7 @@ void test_hmm_frame_state_0eps(void)
 void test_hmm_frame_state_len1(void)
 {
     struct imm_hmm hmm;
-    imm_hmm_init(&hmm, abc);
+    imm_hmm_init(&hmm, &code);
 
     struct imm_frame_state state;
     imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
@@ -108,7 +110,7 @@ void test_hmm_frame_state_len1(void)
 void test_hmm_frame_state_len2(void)
 {
     struct imm_hmm hmm;
-    imm_hmm_init(&hmm, abc);
+    imm_hmm_init(&hmm, &code);
 
     struct imm_frame_state state;
     imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
@@ -176,7 +178,7 @@ void test_hmm_frame_state_len2(void)
 void test_hmm_frame_state_len3(void)
 {
     struct imm_hmm hmm;
-    imm_hmm_init(&hmm, abc);
+    imm_hmm_init(&hmm, &code);
 
     struct imm_frame_state state;
     imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
@@ -220,7 +222,7 @@ void test_hmm_frame_state_len3(void)
 void test_hmm_frame_state_len4(void)
 {
     struct imm_hmm hmm;
-    imm_hmm_init(&hmm, abc);
+    imm_hmm_init(&hmm, &code);
 
     struct imm_frame_state state;
     imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
@@ -252,7 +254,7 @@ void test_hmm_frame_state_len4(void)
 void test_hmm_frame_state_len5(void)
 {
     struct imm_hmm hmm;
-    imm_hmm_init(&hmm, abc);
+    imm_hmm_init(&hmm, &code);
 
     struct imm_frame_state state;
     imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);

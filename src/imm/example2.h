@@ -16,6 +16,7 @@ IMM_API void imm_example2_init(void);
 struct imm_example2
 {
     struct imm_dna const *dna;
+    struct imm_code code;
     struct imm_hmm hmm;
     struct imm_mute_state start;
     struct imm_frame_state b;

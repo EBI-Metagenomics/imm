@@ -9,6 +9,7 @@ void test_hmm_loglik_invalid(void);
 void test_hmm_loglik_no_state(void);
 
 static struct imm_abc abc;
+static struct imm_code code;
 static struct imm_seq EMPTY;
 static struct imm_seq A;
 static struct imm_seq T;
@@ -20,6 +21,7 @@ static struct imm_seq GT;
 int main(void)
 {
     imm_abc_init(&abc, IMM_STR("ACGT"), '*');
+    imm_code_init(&code, &abc);
     EMPTY = imm_seq(IMM_STR(""), &abc);
     A = imm_seq(IMM_STR("A"), &abc);
     T = imm_seq(IMM_STR("T"), &abc);
@@ -45,7 +47,7 @@ void test_hmm_loglik_single_state(void)
     struct imm_normal_state state;
     imm_normal_state_init(&state, 0, &abc, lprobs);
     struct imm_hmm hmm;
-    imm_hmm_init(&hmm, &abc);
+    imm_hmm_init(&hmm, &code);
 
     EQ(imm_hmm_add_state(&hmm, imm_super(&state)), IMM_SUCCESS);
     EQ(imm_hmm_set_start(&hmm, imm_super(&state), imm_log(0.5)), IMM_SUCCESS);
@@ -102,7 +104,8 @@ void test_hmm_loglik_single_state(void)
 void test_hmm_loglik_two_states(void)
 {
     struct imm_hmm hmm;
-    imm_hmm_init(&hmm, &abc);
+    imm_code_init(&code, &abc);
+    imm_hmm_init(&hmm, &code);
 
     imm_float lprobs0[] = {imm_log(0.25), imm_log(0.25), imm_log(0.5),
                            imm_lprob_zero()};
@@ -154,7 +157,8 @@ void test_hmm_loglik_two_states(void)
 void test_hmm_loglik_mute_state(void)
 {
     struct imm_hmm hmm;
-    imm_hmm_init(&hmm, &abc);
+    imm_code_init(&code, &abc);
+    imm_hmm_init(&hmm, &code);
 
     struct imm_mute_state state;
     imm_mute_state_init(&state, 0, &abc);
@@ -189,7 +193,8 @@ void test_hmm_loglik_mute_state(void)
 void test_hmm_loglik_two_mute_states(void)
 {
     struct imm_hmm hmm;
-    imm_hmm_init(&hmm, &abc);
+    imm_code_init(&code, &abc);
+    imm_hmm_init(&hmm, &code);
 
     struct imm_mute_state S0;
     imm_mute_state_init(&S0, 0, &abc);
@@ -218,7 +223,8 @@ void test_hmm_loglik_invalid(void)
     struct imm_seq C = imm_seq(IMM_STR("C"), &abc_ac);
 
     struct imm_hmm hmm;
-    imm_hmm_init(&hmm, &abc_ac);
+    imm_code_init(&code, &abc_ac);
+    imm_hmm_init(&hmm, &code);
 
     struct imm_mute_state S;
     imm_mute_state_init(&S, 0, &abc_ac);
@@ -257,7 +263,8 @@ void test_hmm_loglik_invalid(void)
 void test_hmm_loglik_no_state(void)
 {
     struct imm_hmm hmm;
-    imm_hmm_init(&hmm, &abc);
+    imm_code_init(&code, &abc);
+    imm_hmm_init(&hmm, &code);
 
     struct imm_path path = imm_path();
     COND(imm_lprob_is_nan(imm_hmm_loglik(&hmm, &EMPTY, &path)));

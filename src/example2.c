@@ -130,7 +130,8 @@ void imm_example2_init(void)
     struct imm_example2 *m = &imm_example2;
     struct imm_nuclt const *nuclt = imm_super(m->dna);
     struct imm_abc const *abc = imm_super(nuclt);
-    imm_hmm_init(&m->hmm, abc);
+    imm_code_init(&m->code, abc);
+    imm_hmm_init(&m->hmm, &m->code);
 
     imm_float epsilon = (imm_float)0.01;
     m->nucltp = imm_nuclt_lprob(nuclt, IMM_ARR(imm_log(0.25), imm_log(0.25),
@@ -200,7 +201,7 @@ void imm_example2_init(void)
         }
     }
 
-    imm_hmm_init(&m->null.hmm, abc);
+    imm_hmm_init(&m->null.hmm, &m->code);
     imm_frame_state_init(&m->null.n, N, &m->nucltp, &m->null.n_marg, epsilon);
     imm_hmm_add_state(&m->null.hmm, imm_super(&m->null.n));
     imm_hmm_set_start(&m->null.hmm, imm_super(&m->null.n), imm_log(1.0));

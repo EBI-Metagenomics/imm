@@ -73,7 +73,8 @@ void imm_example1_init(void)
 {
     struct imm_example1 *m = &imm_example1;
     imm_abc_init(&m->abc, imm_str("BMIEJ"), '*');
-    imm_hmm_init(&m->hmm, &m->abc);
+    imm_code_init(&m->code, &m->abc);
+    imm_hmm_init(&m->hmm, &m->code);
 
     imm_mute_state_init(&m->start, START, &m->abc);
     imm_hmm_add_state(&m->hmm, imm_super(&m->start));
@@ -109,8 +110,7 @@ void imm_example1_init(void)
         imm_hmm_add_state(&m->hmm, imm_super(&m->i[k]));
         imm_hmm_add_state(&m->hmm, imm_super(&m->d[k]));
 
-        if (k == 0)
-            SET_TRANS(&m->hmm, &m->b, &m->m[0], imm_log(0.2));
+        if (k == 0) SET_TRANS(&m->hmm, &m->b, &m->m[0], imm_log(0.2));
 
         SET_TRANS(&m->hmm, &m->m[k], &m->i[k], imm_log(0.2));
         SET_TRANS(&m->hmm, &m->i[k], &m->i[k], imm_log(0.2));
@@ -133,7 +133,7 @@ void imm_example1_init(void)
         }
     }
 
-    imm_hmm_init(&m->null.hmm, &m->abc);
+    imm_hmm_init(&m->null.hmm, &m->code);
     imm_normal_state_init(&m->null.n, N, &m->abc, n_lprobs);
     imm_hmm_add_state(&m->null.hmm, imm_super(&m->null.n));
     imm_hmm_set_start(&m->null.hmm, imm_super(&m->null.n), imm_log(1.0));

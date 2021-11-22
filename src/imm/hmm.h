@@ -1,6 +1,7 @@
 #ifndef IMM_HMM_H
 #define IMM_HMM_H
 
+#include "imm/code.h"
 #include "imm/export.h"
 #include "imm/float.h"
 #include "imm/pair.h"
@@ -9,7 +10,6 @@
 #include "imm/trans.h"
 #include <stdio.h>
 
-struct imm_abc;
 struct imm_dp;
 struct imm_hmm;
 struct imm_path;
@@ -18,7 +18,7 @@ struct imm_state;
 
 struct imm_hmm
 {
-    struct imm_abc const *abc;
+    struct imm_code const *code;
 
     struct
     {
@@ -51,9 +51,10 @@ IMM_API enum imm_rc imm_hmm_init_dp(struct imm_hmm const *hmm,
                                     struct imm_dp *dp);
 IMM_API void imm_hmm_reset(struct imm_hmm *hmm);
 
-static inline void imm_hmm_init(struct imm_hmm *hmm, struct imm_abc const *abc)
+static inline void imm_hmm_init(struct imm_hmm *hmm,
+                                struct imm_code const *code)
 {
-    hmm->abc = abc;
+    hmm->code = code;
     imm_hmm_reset(hmm);
 }
 
