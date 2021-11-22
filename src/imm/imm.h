@@ -32,6 +32,7 @@ extern "C" {
 #include "imm/mute_state.h"
 #include "imm/normal_state.h"
 #include "imm/nuclt.h"
+#include "imm/nuclt_code.h"
 #include "imm/nuclt_lprob.h"
 #include "imm/pair.h"
 #include "imm/path.h"
