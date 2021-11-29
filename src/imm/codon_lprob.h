@@ -22,8 +22,11 @@ struct imm_codon_lprob
     /**
      * Pre-computed probability p(𝑋₁=𝚡₁,𝑋₂=𝚡₂,𝑋₃=𝚡₃).
      */
-    imm_float lprobs[IMM_NUCLT_SIZE][IMM_NUCLT_SIZE][IMM_NUCLT_SIZE];
+    imm_float lprobs[IMM_NUCLT_SIZE * IMM_NUCLT_SIZE * IMM_NUCLT_SIZE];
 };
+
+#define IMM_CODON_STRIDE(a, b, c)                                              \
+    (a * IMM_NUCLT_SIZE * IMM_NUCLT_SIZE + b * IMM_NUCLT_SIZE + c)
 
 static inline struct imm_codon_lprob
 imm_codon_lprob(struct imm_nuclt const *nuclt)
@@ -31,10 +34,9 @@ imm_codon_lprob(struct imm_nuclt const *nuclt)
     struct imm_codon_lprob lprob;
     lprob.nuclt = nuclt;
 
-    for (unsigned a = 0; a < IMM_NUCLT_SIZE; ++a)
-        for (unsigned b = 0; b < IMM_NUCLT_SIZE; ++b)
-            for (unsigned c = 0; c < IMM_NUCLT_SIZE; ++c)
-                lprob.lprobs[a][b][c] = IMM_LPROB_ZERO;
+    unsigned i = 0;
+    for (; i < IMM_NUCLT_SIZE * IMM_NUCLT_SIZE * IMM_NUCLT_SIZE; ++i)
+        lprob.lprobs[i] = IMM_LPROB_ZERO;
 
     return lprob;
 }
@@ -44,20 +46,20 @@ imm_codon_lprob_get(struct imm_codon_lprob const *codonp,
                     struct imm_codon codon)
 {
     assert(codonp->nuclt == codon.nuclt);
-    return codonp->lprobs[codon.a][codon.b][codon.c];
+    return codonp->lprobs[IMM_CODON_STRIDE(codon.a, codon.b, codon.c)];
 }
 
 static inline void imm_codon_lprob_set(struct imm_codon_lprob *codonp,
                                        struct imm_codon codon, imm_float lprob)
 {
     assert(codonp->nuclt == codon.nuclt);
-    codonp->lprobs[codon.a][codon.b][codon.c] = lprob;
+    codonp->lprobs[IMM_CODON_STRIDE(codon.a, codon.b, codon.c)] = lprob;
 }
 
 static inline void imm_codon_lprob_normalize(struct imm_codon_lprob *codonp)
 {
     imm_lprob_normalize(IMM_NUCLT_SIZE * IMM_NUCLT_SIZE * IMM_NUCLT_SIZE,
-                        &codonp->lprobs[0][0][0]);
+                        codonp->lprobs);
 }
 
 #endif
