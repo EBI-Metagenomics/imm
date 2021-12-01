@@ -12,7 +12,7 @@ enum imm_rc imm_abc_init(struct imm_abc *abc, struct imm_str symbols,
                          char any_symbol)
 {
     struct imm_abc_vtable vtable = {IMM_ABC, NULL};
-    return abc_init(abc, symbols.size, symbols.data, any_symbol, vtable);
+    return abc_init(abc, symbols.len, symbols.data, any_symbol, vtable);
 }
 
 enum imm_rc imm_abc_write(struct imm_abc const *abc, FILE *file)
@@ -32,7 +32,7 @@ enum imm_rc imm_abc_read(struct imm_abc *abc, FILE *file)
 unsigned imm_abc_union_size(struct imm_abc const *abc, struct imm_str seq)
 {
     unsigned size = 0;
-    for (unsigned i = 0; i < seq.size; ++i)
+    for (unsigned i = 0; i < seq.len; ++i)
     {
         char const any = imm_abc_any_symbol(abc);
         size += !imm_abc_has_symbol(abc, seq.data[i]) && seq.data[i] != any;

@@ -5,7 +5,7 @@
 
 struct imm_str
 {
-    unsigned size;
+    unsigned len;
     char const *data;
 };
 

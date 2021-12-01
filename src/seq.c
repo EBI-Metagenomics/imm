@@ -13,12 +13,12 @@ struct imm_seq const imm_seq_empty = {
 
 struct imm_seq imm_seq(struct imm_str str, struct imm_abc const *abc)
 {
-    for (unsigned i = 0; i < str.size; ++i)
+    for (unsigned i = 0; i < str.len; ++i)
     {
         char const any = imm_abc_any_symbol(abc);
         assert(imm_abc_has_symbol(abc, str.data[i]) || str.data[i] == any);
         UNUSED(any);
     }
 
-    return (struct imm_seq){str.size, str.data, abc};
+    return (struct imm_seq){str.len, str.data, abc};
 }
