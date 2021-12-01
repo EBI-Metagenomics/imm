@@ -107,4 +107,6 @@ static inline enum imm_abc_typeid imm_abc_typeid(struct imm_abc const *abc)
     return abc->vtable.typeid;
 }
 
+unsigned imm_abc_union_size(struct imm_abc const *abc, struct imm_str seq);
+
 #endif

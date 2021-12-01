@@ -6,6 +6,7 @@ void test_abc_duplicated_alphabet(void);
 void test_abc_duplicated_any_symbol(void);
 void test_abc_symbol_outside_range(void);
 void test_abc_any_symbol_outside_range(void);
+void test_abc_union_size(void);
 
 int main(void)
 {
@@ -14,6 +15,7 @@ int main(void)
     test_abc_duplicated_any_symbol();
     test_abc_symbol_outside_range();
     test_abc_any_symbol_outside_range();
+    test_abc_union_size();
     return hope_status();
 }
 
@@ -54,4 +56,12 @@ void test_abc_any_symbol_outside_range(void)
 {
     struct imm_abc abc = imm_abc_empty;
     EQ(imm_abc_init(&abc, IMM_STR("ACGT"), 3), IMM_ILLEGALARG);
+}
+
+void test_abc_union_size(void)
+{
+    struct imm_abc abc = imm_abc_empty;
+    EQ(imm_abc_init(&abc, IMM_STR("ACT"), '*'), IMM_SUCCESS);
+    char data[] = "ACAAAAAAAAC*AATT*G";
+    EQ(imm_abc_union_size(&abc, imm_str(data)), 1);
 }

@@ -29,6 +29,17 @@ enum imm_rc imm_abc_read(struct imm_abc *abc, FILE *file)
     return rc;
 }
 
+unsigned imm_abc_union_size(struct imm_abc const *abc, struct imm_str seq)
+{
+    unsigned size = 0;
+    for (unsigned i = 0; i < seq.size; ++i)
+    {
+        char const any = imm_abc_any_symbol(abc);
+        size += !imm_abc_has_symbol(abc, seq.data[i]) && seq.data[i] != any;
+    }
+    return size;
+}
+
 enum imm_rc abc_init(struct imm_abc *abc, unsigned len, char const *symbols,
                      char any_symbol, struct imm_abc_vtable vtable)
 {
