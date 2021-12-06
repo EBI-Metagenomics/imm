@@ -1,8 +1,8 @@
 #include "abc.h"
+#include "cmp/cmp.h"
 #include "error.h"
 #include "imm/sym.h"
 #include "io.h"
-#include "third-party/cmp.h"
 #include <assert.h>
 #include <stdint.h>
 
@@ -111,7 +111,7 @@ enum imm_rc abc_read(struct imm_abc *abc, FILE *file)
     io_init(&cmp, file);
 
     uint32_t u32 = IMM_ARRAY_SIZE(abc->symbols) - 1;
-    ERETURN(!cmp_read_str(&cmp, abc->symbols, &u32), IMM_IOERROR);
+    ERETURN(!cmp_read_cstr(&cmp, abc->symbols, &u32), IMM_IOERROR);
     abc->size = u32;
     abc->symbols[abc->size] = '\0';
 

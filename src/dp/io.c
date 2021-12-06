@@ -1,11 +1,12 @@
 #include "io.h"
+#include "cmp/cmp.h"
 #include "code.h"
 #include "dp/emis.h"
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
 #include "imm/dp.h"
-#include "third-party/cmp.h"
 #include <assert.h>
+#include <stdlib.h>
 
 static_assert(sizeof(imm_nstates_t) == sizeof(uint16_t), "wrong types");
 static_assert(sizeof(imm_state_seqlen_t) == sizeof(uint8_t), "wrong types");

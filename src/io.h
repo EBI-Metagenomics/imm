@@ -1,7 +1,7 @@
 #ifndef IO_H
 #define IO_H
 
-#include "third-party/cmp.h"
+#include "cmp/cmp.h"
 #include <assert.h>
 #include <limits.h>
 

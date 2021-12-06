@@ -14,6 +14,7 @@ cbp_set_rpath()
 find_package(logaddexp REQUIRED)
 find_package(elapsed REQUIRED)
 find_package(cco REQUIRED)
+find_package(cmp REQUIRED)
 
 add_library(
   imm
@@ -54,7 +55,6 @@ add_library(
   src/seq.c
   src/state.c
   src/task.c
-  src/third-party/cmp.c
   src/tsort.c
 )
 add_library(IMM::imm ALIAS imm)
@@ -96,6 +96,7 @@ target_include_directories(
 target_link_libraries(imm PUBLIC LOGADDEXP::logaddexp)
 target_link_libraries(imm PUBLIC ELAPSED::elapsed)
 target_link_libraries(imm PUBLIC CCO::cco)
+target_link_libraries(imm PUBLIC CMP::cmp)
 target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
 set_target_properties(imm PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
