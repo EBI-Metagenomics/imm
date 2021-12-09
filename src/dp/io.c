@@ -83,7 +83,6 @@ enum imm_rc imm_dp_write(struct imm_dp const *dp, FILE *file)
 enum imm_rc imm_dp_read(struct imm_dp *dp, FILE *file)
 {
     enum imm_rc rc = IMM_SUCCESS;
-    /* uint8_t u8 = 0; */
     uint16_t u16 = 0;
     uint32_t u32 = 0;
     uint32_t size = 0;
