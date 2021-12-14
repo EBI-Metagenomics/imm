@@ -18,9 +18,9 @@ enum imm_rc matrix_init(struct matrix *matrix,
 enum imm_rc matrix_reset(struct matrix *m, struct imm_dp_state_table const *tbl)
 {
     unsigned n = tbl->nstates;
+    /* TODO: use reallocf */
     m->state_col = realloc(m->state_col, sizeof(*m->state_col) * n);
-    if (!m->state_col && n > 0)
-        return error(IMM_OUTOFMEM, "failed to realloc");
+    if (!m->state_col && n > 0) return error(IMM_OUTOFMEM, "failed to realloc");
 
     unsigned next_col = 0;
     for (unsigned i = 0; i < n; ++i)
