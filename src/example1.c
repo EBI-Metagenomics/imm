@@ -1,4 +1,5 @@
 #include "imm/imm.h"
+#include <string.h>
 
 /* Log-probabilities */
 #define ZERO IMM_LPROB_ZERO
@@ -14,6 +15,20 @@
 #define J ((imm_state_id_t)(6U << 11))
 #define END ((imm_state_id_t)(7U << 11))
 #define N ((imm_state_id_t)(8U << 11))
+
+unsigned imm_example1_state_name(unsigned id, char name[IMM_STATE_NAME_SIZE])
+{
+    if (id == START) strcpy(name, "START");
+    if (id == B) strcpy(name, "B");
+    if (id == M) strcpy(name, "M");
+    if (id == I) strcpy(name, "I");
+    if (id == D) strcpy(name, "D");
+    if (id == E) strcpy(name, "E");
+    if (id == J) strcpy(name, "J");
+    if (id == END) strcpy(name, "END");
+    if (id == N) strcpy(name, "N");
+    return (unsigned)strlen(name);
+}
 
 char const imm_example1_seq[] =
     "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
@@ -62,7 +77,7 @@ imm_float m_lprobs[] = {ZERO, ONE, ZERO, ZERO, ZERO};
 imm_float i_lprobs[] = {ZERO, ZERO, ONE, ZERO, ZERO};
 imm_float e_lprobs[] = {ZERO, ZERO, ZERO, ONE, ZERO};
 imm_float j_lprobs[] = {ZERO, ZERO, ZERO, ZERO, ONE};
-imm_float n_lprobs[] = {ONE, ZERO, ONE, ZERO, ONE};
+imm_float n_lprobs[] = {-1e3f, -1e3f, -1e3f, -1e3f, -1e3f};
 
 struct imm_example1 imm_example1;
 
