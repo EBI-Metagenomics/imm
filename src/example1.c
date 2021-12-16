@@ -84,12 +84,15 @@ struct imm_example1 imm_example1;
 #define SET_TRANS(hmm, a, b, v)                                                \
     imm_hmm_set_trans(hmm, imm_super(a), imm_super(b), v)
 
-void imm_example1_init(void)
+void imm_example1_init(unsigned core_size)
 {
+    assert(core_size > 0);
+    assert(core_size <= IMM_EXAMPLE1_SIZE);
     struct imm_example1 *m = &imm_example1;
     imm_abc_init(&m->abc, imm_str("BMIEJ"), '*');
     imm_code_init(&m->code, &m->abc);
     imm_hmm_init(&m->hmm, &m->code);
+    m->core_size = core_size;
 
     imm_mute_state_init(&m->start, START, &m->abc);
     imm_hmm_add_state(&m->hmm, imm_super(&m->start));
@@ -115,7 +118,7 @@ void imm_example1_init(void)
     SET_TRANS(&m->hmm, &m->j, &m->b, imm_log(0.2));
     SET_TRANS(&m->hmm, &m->e, &m->end, imm_log(0.2));
 
-    for (unsigned k = 0; k < IMM_EXAMPLE1_SIZE; ++k)
+    for (unsigned k = 0; k < core_size; ++k)
     {
         imm_normal_state_init(&m->m[k], M | k, &m->abc, m_lprobs);
         imm_normal_state_init(&m->i[k], I | k, &m->abc, i_lprobs);
@@ -140,7 +143,7 @@ void imm_example1_init(void)
             SET_TRANS(&m->hmm, &m->d[k - 1], &m->d[k], imm_log(0.2));
         }
 
-        if (k == IMM_EXAMPLE1_SIZE - 1)
+        if (k == core_size - 1)
         {
             SET_TRANS(&m->hmm, &m->m[k], &m->e, imm_log(0.2));
             SET_TRANS(&m->hmm, &m->d[k], &m->e, imm_log(0.2));

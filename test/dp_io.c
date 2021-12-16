@@ -13,7 +13,7 @@ int main(void)
 
 void test_dp_io_large_normal(void)
 {
-    imm_example1_init();
+    imm_example1_init(IMM_EXAMPLE1_SIZE);
     struct imm_example1 *m = &imm_example1;
     struct imm_dp dp;
     EQ(imm_hmm_init_dp(&imm_example1.hmm, imm_super(&m->end), &dp),

@@ -10,13 +10,14 @@
 
 #define IMM_EXAMPLE1_SIZE 1000U
 
-IMM_API void imm_example1_init(void);
+IMM_API void imm_example1_init(unsigned core_size);
 
 struct imm_example1
 {
     struct imm_abc abc;
     struct imm_code code;
     struct imm_hmm hmm;
+    unsigned core_size;
     struct imm_mute_state start;
     struct imm_normal_state b;
     struct imm_normal_state j;

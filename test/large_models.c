@@ -6,7 +6,7 @@ void test_large_frame(void);
 
 int main(void)
 {
-    imm_example1_init();
+    imm_example1_init(IMM_EXAMPLE1_SIZE);
     test_large_normal();
 
     imm_example2_init();
