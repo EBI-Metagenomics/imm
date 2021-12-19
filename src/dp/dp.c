@@ -151,8 +151,8 @@ unsigned imm_dp_trans_idx(struct imm_dp *dp, unsigned src_idx, unsigned dst_idx)
 enum imm_rc imm_dp_change_trans(struct imm_dp *dp, unsigned trans_idx,
                                 imm_float lprob)
 {
-    if (imm_unlikely(!imm_lprob_is_finite(lprob)))
-        return error(IMM_ILLEGALARG, "lprob must be finite");
+    if (imm_unlikely(imm_lprob_is_nan(lprob)))
+        return error(IMM_ILLEGALARG, "lprob cannot be NaN");
 
     trans_table_change(&dp->trans_table, trans_idx, lprob);
     return IMM_SUCCESS;
