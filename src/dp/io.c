@@ -20,7 +20,7 @@ enum imm_rc imm_dp_write(struct imm_dp const *dp, FILE *file)
     unsigned nstates = dp->state_table.nstates;
 
     cmp_ctx_t ctx = {0};
-    io_init(&ctx, file);
+    cmp_setup(&ctx, file);
 
     /* emission */
     size = emis_score_size(&dp->emis, nstates);
@@ -87,7 +87,7 @@ enum imm_rc imm_dp_read(struct imm_dp *dp, FILE *file)
     uint32_t u32 = 0;
     uint32_t size = 0;
     cmp_ctx_t ctx = {0};
-    io_init(&ctx, file);
+    cmp_setup(&ctx, file);
 
     struct imm_dp_emis *e = NULL;
     struct imm_dp_trans_table *tt = NULL;

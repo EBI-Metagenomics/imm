@@ -1,4 +1,5 @@
 #include "imm/codon_marg.h"
+#include "cmp/cmp.h"
 #include "error.h"
 #include "imm/abc.h"
 #include "imm/codon_lprob.h"
@@ -135,7 +136,7 @@ enum imm_rc imm_codon_marg_write(struct imm_codon_marg const *codonm,
                                  FILE *file)
 {
     cmp_ctx_t ctx = {0};
-    io_init(&ctx, file);
+    cmp_setup(&ctx, file);
     imm_float const *lprobs = &codonm->lprobs[0][0][0];
 
     for (unsigned i = 0; i < CODON_SIZE; ++i)
@@ -149,7 +150,7 @@ enum imm_rc imm_codon_marg_write(struct imm_codon_marg const *codonm,
 enum imm_rc imm_codon_marg_read(struct imm_codon_marg *codonm, FILE *file)
 {
     cmp_ctx_t ctx = {0};
-    io_init(&ctx, file);
+    cmp_setup(&ctx, file);
     imm_float *lprobs = &codonm->lprobs[0][0][0];
 
     for (unsigned i = 0; i < CODON_SIZE; ++i)

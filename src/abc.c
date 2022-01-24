@@ -2,7 +2,6 @@
 #include "cmp/cmp.h"
 #include "error.h"
 #include "imm/sym.h"
-#include "io.h"
 #include <assert.h>
 #include <stdint.h>
 
@@ -91,7 +90,7 @@ static_assert(sizeof(imm_abc_typeid_t) == sizeof(uint8_t), "wrong types");
 enum imm_rc abc_write(struct imm_abc const *abc, FILE *file)
 {
     cmp_ctx_t cmp = {0};
-    io_init(&cmp, file);
+    cmp_setup(&cmp, file);
 
     ERETURN(!cmp_write_str(&cmp, abc->symbols, abc->size), IMM_IOERROR);
     ERETURN(!cmp_write_array(&cmp, IMM_ARRAY_SIZE(abc->sym.idx)), IMM_IOERROR);
@@ -108,7 +107,7 @@ enum imm_rc abc_write(struct imm_abc const *abc, FILE *file)
 enum imm_rc abc_read(struct imm_abc *abc, FILE *file)
 {
     cmp_ctx_t cmp = {0};
-    io_init(&cmp, file);
+    cmp_setup(&cmp, file);
 
     uint32_t u32 = IMM_ARRAY_SIZE(abc->symbols) - 1;
     ERETURN(!cmp_read_cstr(&cmp, abc->symbols, &u32), IMM_IOERROR);
