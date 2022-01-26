@@ -139,6 +139,7 @@ enum imm_rc imm_codon_marg_write(struct imm_codon_marg const *codonm,
     cmp_setup(&ctx, file);
     imm_float const *lprobs = &codonm->lprobs[0][0][0];
 
+    cmp_write_array(&ctx, CODON_SIZE);
     for (unsigned i = 0; i < CODON_SIZE; ++i)
     {
         if (!io_write_imm_float(&ctx, lprobs[i]))
@@ -153,6 +154,9 @@ enum imm_rc imm_codon_marg_read(struct imm_codon_marg *codonm, FILE *file)
     cmp_setup(&ctx, file);
     imm_float *lprobs = &codonm->lprobs[0][0][0];
 
+    uint32_t size = 0;
+    cmp_read_array(&ctx, &size);
+    assert(size == CODON_SIZE);
     for (unsigned i = 0; i < CODON_SIZE; ++i)
     {
         if (!io_read_imm_float(&ctx, lprobs + i))

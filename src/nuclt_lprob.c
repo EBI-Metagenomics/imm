@@ -9,6 +9,7 @@ enum imm_rc imm_nuclt_lprob_write(struct imm_nuclt_lprob const *nucltp,
     cmp_ctx_t ctx = {0};
     cmp_setup(&ctx, file);
 
+    cmp_write_array(&ctx, IMM_NUCLT_SIZE);
     for (unsigned i = 0; i < IMM_NUCLT_SIZE; ++i)
     {
         if (!io_write_imm_float(&ctx, nucltp->lprobs[i]))
@@ -22,6 +23,9 @@ enum imm_rc imm_nuclt_lprob_read(struct imm_nuclt_lprob *nucltp, FILE *file)
     cmp_ctx_t ctx = {0};
     cmp_setup(&ctx, file);
 
+    uint32_t size = 0;
+    cmp_read_array(&ctx, &size);
+    assert(size == IMM_NUCLT_SIZE);
     for (unsigned i = 0; i < IMM_NUCLT_SIZE; ++i)
     {
         if (!io_read_imm_float(&ctx, nucltp->lprobs + i))
