@@ -1,7 +1,7 @@
 #include "abc.h"
-#include "cmp/cmp.h"
 #include "error.h"
 #include "imm/sym.h"
+#include "xcmp.h"
 #include <assert.h>
 #include <stdint.h>
 
@@ -81,7 +81,7 @@ static_assert(sizeof(imm_sym_id_t) == sizeof(uint8_t), "wrong types");
 static_assert(sizeof(imm_sym_idx_t) == sizeof(uint8_t), "wrong types");
 static_assert(sizeof(imm_abc_typeid_t) == sizeof(uint8_t), "wrong types");
 
-#define ERETURN(expr, e)                                                       \
+#define ERET(expr, e)                                                          \
     do                                                                         \
     {                                                                          \
         if (!!(expr)) return e;                                                \
@@ -92,21 +92,21 @@ enum imm_rc abc_write(struct imm_abc const *abc, FILE *file)
     cmp_ctx_t cmp = {0};
     cmp_setup(&cmp, file);
 
-    cmp_write_map(&cmp, 4);
+    ERET(!cmp_write_map(&cmp, 4), IMM_IOERROR);
 
-    CMP_WRITE_STR(&cmp, "symbols");
-    ERETURN(!cmp_write_str(&cmp, abc->symbols, abc->size), IMM_IOERROR);
+    ERET(!XCMP_WRITE_STR(&cmp, "symbols"), IMM_IOERROR);
+    ERET(!cmp_write_str(&cmp, abc->symbols, abc->size), IMM_IOERROR);
 
-    CMP_WRITE_STR(&cmp, "idx");
-    ERETURN(!cmp_write_array(&cmp, IMM_ARRAY_SIZE(abc->sym.idx)), IMM_IOERROR);
+    ERET(!XCMP_WRITE_STR(&cmp, "idx"), IMM_IOERROR);
+    ERET(!cmp_write_array(&cmp, IMM_ARRAY_SIZE(abc->sym.idx)), IMM_IOERROR);
 
     for (unsigned i = 0; i < IMM_ARRAY_SIZE(abc->sym.idx); ++i)
-        ERETURN(!cmp_write_u8(&cmp, abc->sym.idx[i]), IMM_IOERROR);
+        ERET(!cmp_write_u8(&cmp, abc->sym.idx[i]), IMM_IOERROR);
 
-    CMP_WRITE_STR(&cmp, "any_symbol_id");
-    ERETURN(!cmp_write_u8(&cmp, (uint8_t)abc->any_symbol_id), IMM_IOERROR);
-    CMP_WRITE_STR(&cmp, "typeid");
-    ERETURN(!cmp_write_u8(&cmp, (uint8_t)abc->vtable.typeid), IMM_IOERROR);
+    ERET(!XCMP_WRITE_STR(&cmp, "any_symbol_id"), IMM_IOERROR);
+    ERET(!cmp_write_u8(&cmp, (uint8_t)abc->any_symbol_id), IMM_IOERROR);
+    ERET(!XCMP_WRITE_STR(&cmp, "typeid"), IMM_IOERROR);
+    ERET(!cmp_write_u8(&cmp, (uint8_t)abc->vtable.typeid), IMM_IOERROR);
 
     return IMM_SUCCESS;
 }
@@ -117,29 +117,28 @@ enum imm_rc abc_read(struct imm_abc *abc, FILE *file)
     cmp_setup(&cmp, file);
 
     uint32_t u32 = 0;
-    cmp_read_map(&cmp, &u32);
-    assert(u32 == 4);
+    ERET(!xcmp_expect_map(&cmp, 4), IMM_IOERROR);
 
-    ERETURN(!cmp_skip_str(&cmp), IMM_IOERROR);
+    ERET(!XCMP_READ_KEY(&cmp, "symbols"), IMM_IOERROR);
     u32 = IMM_ARRAY_SIZE(abc->symbols) - 1;
-    ERETURN(!cmp_read_cstr(&cmp, abc->symbols, &u32), IMM_IOERROR);
+    ERET(!cmp_read_str(&cmp, abc->symbols, &u32), IMM_IOERROR);
     abc->size = u32;
     abc->symbols[abc->size] = '\0';
 
-    ERETURN(!cmp_skip_str(&cmp), IMM_IOERROR);
-    ERETURN(!cmp_read_array(&cmp, &u32), IMM_IOERROR);
-    ERETURN(IMM_ARRAY_SIZE(abc->sym.idx) != u32, IMM_PARSEERROR);
+    ERET(!XCMP_READ_KEY(&cmp, "idx"), IMM_IOERROR);
+    ERET(!cmp_read_array(&cmp, &u32), IMM_IOERROR);
+    ERET(IMM_ARRAY_SIZE(abc->sym.idx) != u32, IMM_PARSEERROR);
     for (unsigned i = 0; i < IMM_ARRAY_SIZE(abc->sym.idx); ++i)
-        ERETURN(!cmp_read_u8(&cmp, abc->sym.idx + i), IMM_IOERROR);
+        ERET(!cmp_read_u8(&cmp, abc->sym.idx + i), IMM_IOERROR);
 
     uint8_t u8 = 0;
-    ERETURN(!cmp_skip_str(&cmp), IMM_IOERROR);
-    ERETURN(!cmp_read_u8(&cmp, &u8), IMM_IOERROR);
+    ERET(!XCMP_READ_KEY(&cmp, "any_symbol_id"), IMM_IOERROR);
+    ERET(!cmp_read_u8(&cmp, &u8), IMM_IOERROR);
     abc->any_symbol_id = u8;
 
-    ERETURN(!cmp_skip_str(&cmp), IMM_IOERROR);
-    ERETURN(!cmp_read_u8(&cmp, &u8), IMM_IOERROR);
-    ERETURN(!imm_abc_typeid_valid(u8), IMM_PARSEERROR);
+    ERET(!XCMP_READ_KEY(&cmp, "typeid"), IMM_IOERROR);
+    ERET(!cmp_read_u8(&cmp, &u8), IMM_IOERROR);
+    ERET(!imm_abc_typeid_valid(u8), IMM_PARSEERROR);
     abc->vtable.typeid = u8;
     return IMM_SUCCESS;
 }

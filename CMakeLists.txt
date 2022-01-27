@@ -56,6 +56,7 @@ add_library(
   src/state.c
   src/task.c
   src/tsort.c
+  src/xcmp.c
 )
 add_library(IMM::imm ALIAS imm)
 
