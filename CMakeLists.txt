@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 project(
   imm
-  VERSION 0.0.46
+  VERSION 0.0.47
   LANGUAGES C
 )
 
