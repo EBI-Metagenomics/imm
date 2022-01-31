@@ -97,7 +97,7 @@ static_assert(sizeof(imm_abc_typeid_t) == sizeof(uint8_t), "wrong types");
 enum imm_rc abc_write(struct imm_abc const *abc, FILE *file)
 {
     cmp_ctx_t cmp = {0};
-    cmp_setup(&cmp, file);
+    xcmp_fsetup(&cmp, file);
 
     ERET(!cmp_write_map(&cmp, 4), IMM_IOERROR);
 
@@ -121,7 +121,7 @@ enum imm_rc abc_write(struct imm_abc const *abc, FILE *file)
 enum imm_rc abc_read(struct imm_abc *abc, FILE *file)
 {
     cmp_ctx_t cmp = {0};
-    cmp_setup(&cmp, file);
+    xcmp_fsetup(&cmp, file);
     return abc_read_cmp(abc, &cmp);
 }
 

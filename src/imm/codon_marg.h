@@ -26,6 +26,8 @@ struct imm_codon_marg
                     [IMM_NUCLT_SIZE + 1];
 };
 
+struct cmp_ctx_s;
+
 IMM_API struct imm_codon_marg imm_codon_marg(struct imm_codon_lprob *codonp);
 
 /**
@@ -53,5 +55,8 @@ IMM_API enum imm_rc imm_codon_marg_write(struct imm_codon_marg const *codonm,
 
 IMM_API enum imm_rc imm_codon_marg_read(struct imm_codon_marg *codonm,
                                         FILE *file);
+
+IMM_API enum imm_rc imm_codon_marg_read_cmp(struct imm_codon_marg *codonm,
+                                            struct cmp_ctx_s *cmp);
 
 #endif

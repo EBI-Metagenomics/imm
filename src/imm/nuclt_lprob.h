@@ -12,6 +12,8 @@ struct imm_nuclt_lprob
     imm_float lprobs[IMM_NUCLT_SIZE];
 };
 
+struct cmp_ctx_s;
+
 static inline struct imm_nuclt_lprob
 imm_nuclt_lprob(struct imm_nuclt const *nuclt,
                 imm_float const lprobs[IMM_NUCLT_SIZE])
@@ -42,5 +44,8 @@ IMM_API enum imm_rc imm_nuclt_lprob_write(struct imm_nuclt_lprob const *nucltp,
 
 IMM_API enum imm_rc imm_nuclt_lprob_read(struct imm_nuclt_lprob *nucltp,
                                          FILE *file);
+
+IMM_API enum imm_rc imm_nuclt_lprob_read_cmp(struct imm_nuclt_lprob *nucltp,
+                                             struct cmp_ctx_s *cmp);
 
 #endif

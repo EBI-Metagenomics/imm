@@ -1,11 +1,11 @@
 #include "imm/codon_marg.h"
-#include "cmp/cmp.h"
 #include "error.h"
 #include "imm/abc.h"
 #include "imm/codon_lprob.h"
 #include "imm/generics.h"
 #include "imm/nuclt.h"
 #include "io.h"
+#include "xcmp.h"
 #include <assert.h>
 
 static_assert(IMM_NUCLT_SIZE == 4, "nuclt size expected to be four");
@@ -136,7 +136,7 @@ enum imm_rc imm_codon_marg_write(struct imm_codon_marg const *codonm,
                                  FILE *file)
 {
     cmp_ctx_t ctx = {0};
-    cmp_setup(&ctx, file);
+    xcmp_fsetup(&ctx, file);
     imm_float const *lprobs = &codonm->lprobs[0][0][0];
 
     cmp_write_array(&ctx, CODON_SIZE);
@@ -150,16 +150,22 @@ enum imm_rc imm_codon_marg_write(struct imm_codon_marg const *codonm,
 
 enum imm_rc imm_codon_marg_read(struct imm_codon_marg *codonm, FILE *file)
 {
-    cmp_ctx_t ctx = {0};
-    cmp_setup(&ctx, file);
+    cmp_ctx_t cmp = {0};
+    xcmp_fsetup(&cmp, file);
+    return imm_codon_marg_read_cmp(codonm, &cmp);
+}
+
+enum imm_rc imm_codon_marg_read_cmp(struct imm_codon_marg *codonm,
+                                    struct cmp_ctx_s *cmp)
+{
     imm_float *lprobs = &codonm->lprobs[0][0][0];
 
     uint32_t size = 0;
-    cmp_read_array(&ctx, &size);
+    cmp_read_array(cmp, &size);
     assert(size == CODON_SIZE);
     for (unsigned i = 0; i < CODON_SIZE; ++i)
     {
-        if (!io_read_imm_float(&ctx, lprobs + i))
+        if (!io_read_imm_float(cmp, lprobs + i))
             return error(IMM_IOERROR, "failed to read imm_float");
     }
     return IMM_SUCCESS;

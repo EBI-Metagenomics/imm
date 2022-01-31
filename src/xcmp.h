@@ -17,4 +17,6 @@ bool xcmp_expect_map(struct cmp_ctx_s *ctx, uint32_t size);
 #define XCMP_READ_KEY(ctx, key)                                                \
     xcmp_expect_str(ctx, __STRADDR(key), (uint32_t)(__STRSIZE(key)))
 
+void xcmp_fsetup(struct cmp_ctx_s *ctx, FILE *fp);
+
 #endif

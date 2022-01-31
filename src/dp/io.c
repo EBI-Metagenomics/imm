@@ -44,7 +44,7 @@ enum imm_rc imm_dp_write(struct imm_dp const *dp, FILE *file)
     unsigned nstates = dp->state_table.nstates;
 
     cmp_ctx_t ctx = {0};
-    cmp_setup(&ctx, file);
+    xcmp_fsetup(&ctx, file);
 
     ERET(!cmp_write_map(&ctx, 12), IMM_IOERROR);
 
@@ -115,7 +115,7 @@ cleanup:
 enum imm_rc imm_dp_read(struct imm_dp *dp, FILE *file)
 {
     cmp_ctx_t cmp = {0};
-    cmp_setup(&cmp, file);
+    xcmp_fsetup(&cmp, file);
     return imm_dp_read_cmp(dp, &cmp);
 }
 
