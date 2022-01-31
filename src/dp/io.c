@@ -114,104 +114,108 @@ cleanup:
 
 enum imm_rc imm_dp_read(struct imm_dp *dp, FILE *file)
 {
+    cmp_ctx_t cmp = {0};
+    cmp_setup(&cmp, file);
+    return imm_dp_read_cmp(dp, &cmp);
+}
+
+enum imm_rc imm_dp_read_cmp(struct imm_dp *dp, struct cmp_ctx_s *cmp)
+{
     enum imm_rc rc = IMM_SUCCESS;
     uint64_t u64 = 0;
     uint32_t size = 0;
-    cmp_ctx_t ctx = {0};
     struct imm_dp_emis *e = NULL;
     struct imm_dp_trans_table *tt = NULL;
     struct imm_dp_state_table *st = NULL;
 
-    cmp_setup(&ctx, file);
-
-    ERET(!xcmp_expect_map(&ctx, 12), IMM_IOERROR);
+    ERET(!xcmp_expect_map(cmp, 12), IMM_IOERROR);
 
     /* emission */
-    ERET(!XCMP_READ_KEY(&ctx, KEY_EMIS_SCORE), IMM_IOERROR);
+    ERET(!XCMP_READ_KEY(cmp, KEY_EMIS_SCORE), IMM_IOERROR);
     e = &dp->emis;
-    ERET(!cmp_read_array(&ctx, &size), IMM_IOERROR);
+    ERET(!cmp_read_array(cmp, &size), IMM_IOERROR);
     e->score = realloc(e->score, sizeof(*e->score) * size);
     ERET(!e->score && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
-        ERET(!io_read_imm_float(&ctx, e->score + i), IMM_IOERROR);
+        ERET(!io_read_imm_float(cmp, e->score + i), IMM_IOERROR);
 
-    ERET(!XCMP_READ_KEY(&ctx, KEY_EMIS_OFFSET), IMM_IOERROR);
-    ERET(!cmp_read_array(&ctx, &size), IMM_IOERROR);
+    ERET(!XCMP_READ_KEY(cmp, KEY_EMIS_OFFSET), IMM_IOERROR);
+    ERET(!cmp_read_array(cmp, &size), IMM_IOERROR);
     e->offset = realloc(e->offset, sizeof(*e->offset) * size);
     ERET(!e->offset && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
     {
-        ERET(!cmp_read_uinteger(&ctx, &u64), IMM_IOERROR);
+        ERET(!cmp_read_uinteger(cmp, &u64), IMM_IOERROR);
         e->offset[i] = (unsigned)u64;
     }
 
     /* trans_table */
-    ERET(!XCMP_READ_KEY(&ctx, KEY_TRANS_SIZE), IMM_IOERROR);
+    ERET(!XCMP_READ_KEY(cmp, KEY_TRANS_SIZE), IMM_IOERROR);
     tt = &dp->trans_table;
-    ERET(!cmp_read_uinteger(&ctx, &u64), IMM_IOERROR);
+    ERET(!cmp_read_uinteger(cmp, &u64), IMM_IOERROR);
     tt->ntrans = (unsigned)u64;
 
-    ERET(!XCMP_READ_KEY(&ctx, KEY_TRANS_SCORE), IMM_IOERROR);
-    ERET(!cmp_read_array(&ctx, &size), IMM_IOERROR);
+    ERET(!XCMP_READ_KEY(cmp, KEY_TRANS_SCORE), IMM_IOERROR);
+    ERET(!cmp_read_array(cmp, &size), IMM_IOERROR);
     ERET(tt->ntrans != size, IMM_PARSEERROR);
     tt->trans = realloc(tt->trans, sizeof(*tt->trans) * size);
     ERET(!tt->trans && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
-        ERET(!io_read_imm_float(&ctx, &tt->trans[i].score), IMM_IOERROR);
+        ERET(!io_read_imm_float(cmp, &tt->trans[i].score), IMM_IOERROR);
 
-    ERET(!XCMP_READ_KEY(&ctx, KEY_TRANS_SRC), IMM_IOERROR);
-    ERET(!cmp_read_array(&ctx, &size), IMM_IOERROR);
+    ERET(!XCMP_READ_KEY(cmp, KEY_TRANS_SRC), IMM_IOERROR);
+    ERET(!cmp_read_array(cmp, &size), IMM_IOERROR);
     ERET(tt->ntrans != size, IMM_PARSEERROR);
     for (unsigned i = 0; i < size; ++i)
     {
-        ERET(!cmp_read_uinteger(&ctx, &u64), IMM_IOERROR);
+        ERET(!cmp_read_uinteger(cmp, &u64), IMM_IOERROR);
         tt->trans[i].src = (imm_state_idx_t)u64;
     }
 
-    ERET(!XCMP_READ_KEY(&ctx, KEY_TRANS_OFFSET), IMM_IOERROR);
-    ERET(!cmp_read_array(&ctx, &size), IMM_IOERROR);
+    ERET(!XCMP_READ_KEY(cmp, KEY_TRANS_OFFSET), IMM_IOERROR);
+    ERET(!cmp_read_array(cmp, &size), IMM_IOERROR);
     tt->offset = realloc(tt->offset, sizeof(*tt->offset) * size);
     ERET(!tt->offset && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
     {
-        ERET(!cmp_read_uinteger(&ctx, &u64), IMM_IOERROR);
+        ERET(!cmp_read_uinteger(cmp, &u64), IMM_IOERROR);
         tt->offset[i] = (imm_trans_idx_t)u64;
     }
 
     /* state_table */
-    ERET(!XCMP_READ_KEY(&ctx, KEY_STATE_SIZE), IMM_IOERROR);
+    ERET(!XCMP_READ_KEY(cmp, KEY_STATE_SIZE), IMM_IOERROR);
     st = &dp->state_table;
-    ERET(!cmp_read_uinteger(&ctx, &u64), IMM_IOERROR);
+    ERET(!cmp_read_uinteger(cmp, &u64), IMM_IOERROR);
     st->nstates = (unsigned)u64;
 
-    ERET(!XCMP_READ_KEY(&ctx, KEY_STATE_IDS), IMM_IOERROR);
-    ERET(!cmp_read_array(&ctx, &size), IMM_IOERROR);
+    ERET(!XCMP_READ_KEY(cmp, KEY_STATE_IDS), IMM_IOERROR);
+    ERET(!cmp_read_array(cmp, &size), IMM_IOERROR);
     ERET(st->nstates != size, IMM_PARSEERROR);
     st->ids = realloc(st->ids, sizeof(*st->ids) * size);
     ERET(!st->ids && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
     {
-        ERET(!cmp_read_uinteger(&ctx, &u64), IMM_IOERROR);
+        ERET(!cmp_read_uinteger(cmp, &u64), IMM_IOERROR);
         st->ids[i] = (imm_state_id_t)u64;
     }
 
-    ERET(!XCMP_READ_KEY(&ctx, KEY_STATE_START), IMM_IOERROR);
-    ERET(!cmp_read_uinteger(&ctx, &u64), IMM_IOERROR);
+    ERET(!XCMP_READ_KEY(cmp, KEY_STATE_START), IMM_IOERROR);
+    ERET(!cmp_read_uinteger(cmp, &u64), IMM_IOERROR);
     st->start.state = (imm_state_idx_t)u64;
-    ERET(!XCMP_READ_KEY(&ctx, KEY_STATE_LPROB), IMM_IOERROR);
-    ERET(!io_read_imm_float(&ctx, &st->start.lprob), IMM_IOERROR);
-    ERET(!XCMP_READ_KEY(&ctx, KEY_STATE_END), IMM_IOERROR);
-    ERET(!cmp_read_uinteger(&ctx, &u64), IMM_IOERROR);
+    ERET(!XCMP_READ_KEY(cmp, KEY_STATE_LPROB), IMM_IOERROR);
+    ERET(!io_read_imm_float(cmp, &st->start.lprob), IMM_IOERROR);
+    ERET(!XCMP_READ_KEY(cmp, KEY_STATE_END), IMM_IOERROR);
+    ERET(!cmp_read_uinteger(cmp, &u64), IMM_IOERROR);
     st->end_state_idx = (unsigned)u64;
 
-    ERET(!XCMP_READ_KEY(&ctx, KEY_STATE_SPAN), IMM_IOERROR);
-    ERET(!cmp_read_array(&ctx, &size), IMM_IOERROR);
+    ERET(!XCMP_READ_KEY(cmp, KEY_STATE_SPAN), IMM_IOERROR);
+    ERET(!cmp_read_array(cmp, &size), IMM_IOERROR);
     ERET(st->nstates != size, IMM_PARSEERROR);
     st->span = realloc(st->span, sizeof(*st->span) * size);
     ERET(!st->span && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
     {
-        ERET(!cmp_read_uinteger(&ctx, &u64), IMM_IOERROR);
+        ERET(!cmp_read_uinteger(cmp, &u64), IMM_IOERROR);
         ERET(!span_unzip(st->span + i, (uint16_t)u64), IMM_PARSEERROR);
         ERET(st->span[i].max > IMM_STATE_MAX_SEQLEN, IMM_PARSEERROR);
     }

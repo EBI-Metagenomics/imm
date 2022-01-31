@@ -28,6 +28,13 @@ enum imm_rc imm_abc_read(struct imm_abc *abc, FILE *file)
     return rc;
 }
 
+enum imm_rc imm_abc_read_cmp(struct imm_abc *abc, struct cmp_ctx_s *cmp)
+{
+    enum imm_rc rc = abc_read_cmp(abc, cmp);
+    if (rc) return error(rc, "failed to read alphabet");
+    return rc;
+}
+
 unsigned imm_abc_union_size(struct imm_abc const *abc, struct imm_str seq)
 {
     unsigned size = 0;
@@ -115,29 +122,33 @@ enum imm_rc abc_read(struct imm_abc *abc, FILE *file)
 {
     cmp_ctx_t cmp = {0};
     cmp_setup(&cmp, file);
+    return abc_read_cmp(abc, &cmp);
+}
 
+enum imm_rc abc_read_cmp(struct imm_abc *abc, struct cmp_ctx_s *cmp)
+{
     uint32_t u32 = 0;
-    ERET(!xcmp_expect_map(&cmp, 4), IMM_IOERROR);
+    ERET(!xcmp_expect_map(cmp, 4), IMM_IOERROR);
 
-    ERET(!XCMP_READ_KEY(&cmp, "symbols"), IMM_IOERROR);
+    ERET(!XCMP_READ_KEY(cmp, "symbols"), IMM_IOERROR);
     u32 = IMM_ARRAY_SIZE(abc->symbols) - 1;
-    ERET(!cmp_read_str(&cmp, abc->symbols, &u32), IMM_IOERROR);
+    ERET(!cmp_read_str(cmp, abc->symbols, &u32), IMM_IOERROR);
     abc->size = u32;
     abc->symbols[abc->size] = '\0';
 
-    ERET(!XCMP_READ_KEY(&cmp, "idx"), IMM_IOERROR);
-    ERET(!cmp_read_array(&cmp, &u32), IMM_IOERROR);
+    ERET(!XCMP_READ_KEY(cmp, "idx"), IMM_IOERROR);
+    ERET(!cmp_read_array(cmp, &u32), IMM_IOERROR);
     ERET(IMM_ARRAY_SIZE(abc->sym.idx) != u32, IMM_PARSEERROR);
     for (unsigned i = 0; i < IMM_ARRAY_SIZE(abc->sym.idx); ++i)
-        ERET(!cmp_read_u8(&cmp, abc->sym.idx + i), IMM_IOERROR);
+        ERET(!cmp_read_u8(cmp, abc->sym.idx + i), IMM_IOERROR);
 
     uint8_t u8 = 0;
-    ERET(!XCMP_READ_KEY(&cmp, "any_symbol_id"), IMM_IOERROR);
-    ERET(!cmp_read_u8(&cmp, &u8), IMM_IOERROR);
+    ERET(!XCMP_READ_KEY(cmp, "any_symbol_id"), IMM_IOERROR);
+    ERET(!cmp_read_u8(cmp, &u8), IMM_IOERROR);
     abc->any_symbol_id = u8;
 
-    ERET(!XCMP_READ_KEY(&cmp, "typeid"), IMM_IOERROR);
-    ERET(!cmp_read_u8(&cmp, &u8), IMM_IOERROR);
+    ERET(!XCMP_READ_KEY(cmp, "typeid"), IMM_IOERROR);
+    ERET(!cmp_read_u8(cmp, &u8), IMM_IOERROR);
     ERET(!imm_abc_typeid_valid(u8), IMM_PARSEERROR);
     abc->vtable.typeid = u8;
     return IMM_SUCCESS;

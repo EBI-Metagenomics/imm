@@ -21,6 +21,11 @@ enum imm_rc imm_amino_read(struct imm_amino *amino, FILE *file)
     return imm_abc_read(&amino->super, file);
 }
 
+enum imm_rc imm_amino_read_cmp(struct imm_amino *amino, struct cmp_ctx_s *cmp)
+{
+    return imm_abc_read_cmp(&amino->super, cmp);
+}
+
 #define ID(c) IMM_SYM_ID(c)
 #define SET(c, idx) [ID(c)] = idx
 #define NIL(x, y) [ID(x)... ID(y) - 1] = IMM_SYM_NULL_IDX

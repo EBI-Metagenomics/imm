@@ -27,6 +27,8 @@ struct imm_abc
     struct imm_abc_vtable vtable;
 };
 
+struct cmp_ctx_s;
+
 IMM_API extern struct imm_abc const imm_abc_empty;
 
 static inline char imm_abc_any_symbol(struct imm_abc const *abc)
@@ -40,6 +42,9 @@ IMM_API enum imm_rc imm_abc_init(struct imm_abc *abc, struct imm_str symbols,
 IMM_API enum imm_rc imm_abc_write(struct imm_abc const *abc, FILE *file);
 
 IMM_API enum imm_rc imm_abc_read(struct imm_abc *abc, FILE *file);
+
+IMM_API enum imm_rc imm_abc_read_cmp(struct imm_abc *abc,
+                                     struct cmp_ctx_s *cmp);
 
 static inline bool imm_abc_has_symbol_id(struct imm_abc const *abc, unsigned id)
 {

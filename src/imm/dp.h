@@ -25,6 +25,8 @@ struct imm_dp
     struct imm_dp_state_table state_table;
 };
 
+struct cmp_ctx_s;
+
 IMM_API void imm_dp_init(struct imm_dp *dp, struct imm_code const *code);
 
 IMM_API void imm_dp_del(struct imm_dp *dp);
@@ -48,6 +50,8 @@ IMM_API enum imm_rc imm_dp_viterbi(struct imm_dp const *dp,
 IMM_API enum imm_rc imm_dp_write(struct imm_dp const *dp, FILE *file);
 
 IMM_API enum imm_rc imm_dp_read(struct imm_dp *dp, FILE *file);
+
+IMM_API enum imm_rc imm_dp_read_cmp(struct imm_dp *dp, struct cmp_ctx_s *cmp);
 
 IMM_API imm_float imm_dp_emis_score(struct imm_dp const *dp, unsigned state_id,
                                     struct imm_seq const *seq);
