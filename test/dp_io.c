@@ -1,3 +1,4 @@
+#include "cwpack_stream_context.h"
 #include "hope/hope.h"
 #include "imm/imm.h"
 
@@ -19,15 +20,15 @@ void test_dp_io_large_normal(void)
     EQ(imm_hmm_init_dp(&imm_example1.hmm, imm_super(&m->end), &dp),
        IMM_SUCCESS);
 
-    FILE *file = fopen(TMPDIR "/dp_normal.imm", "wb");
-    imm_dp_write(&dp, file);
-    fclose(file);
+    new_pack_ctx(TMPDIR "/dp_normal.imm");
+    EQ(imm_dp_pack(&dp, pack_ctx), IMM_SUCCESS);
+    del_pack_ctx();
     imm_del(&dp);
 
     imm_dp_init(&dp, &m->code);
-    file = fopen(TMPDIR "/dp_normal.imm", "rb");
-    imm_dp_read(&dp, file);
-    fclose(file);
+    new_unpack_ctx(TMPDIR "/dp_normal.imm");
+    EQ(imm_dp_unpack(&dp, unpack_ctx), IMM_SUCCESS);
+    del_unpack_ctx();
 
     struct imm_task *task = imm_task_new(&dp);
     struct imm_prod prod = imm_prod();
@@ -58,15 +59,15 @@ void test_dp_io_large_frame(void)
     imm_del(&prod);
     imm_del(task);
 
-    FILE *file = fopen(TMPDIR "/dp_frame.imm", "wb");
-    imm_dp_write(&dp, file);
-    fclose(file);
+    new_pack_ctx(TMPDIR "/dp_frame.imm");
+    EQ(imm_dp_pack(&dp, pack_ctx), IMM_SUCCESS);
+    del_pack_ctx();
     imm_del(&dp);
 
     imm_dp_init(&dp, &m->code);
-    file = fopen(TMPDIR "/dp_frame.imm", "rb");
-    imm_dp_read(&dp, file);
-    fclose(file);
+    new_unpack_ctx(TMPDIR "/dp_frame.imm");
+    EQ(imm_dp_unpack(&dp, unpack_ctx), IMM_SUCCESS);
+    del_unpack_ctx();
 
     task = imm_task_new(&dp);
     prod = imm_prod();

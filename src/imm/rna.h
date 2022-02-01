@@ -21,13 +21,6 @@ IMM_API enum imm_rc imm_rna_init(struct imm_rna *rna,
                                  char const symbols[IMM_RNA_SIZE],
                                  char any_symbol);
 
-IMM_API enum imm_rc imm_rna_write(struct imm_rna const *rna, FILE *file);
-
-IMM_API enum imm_rc imm_rna_read(struct imm_rna *rna, FILE *file);
-
-IMM_API enum imm_rc imm_rna_read_cmp(struct imm_rna *rna,
-                                     struct cmp_ctx_s *cmp);
-
 static inline struct imm_nuclt const *imm_rna_super(struct imm_rna const *rna)
 {
     return &rna->super;

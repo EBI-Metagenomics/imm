@@ -26,7 +26,8 @@ struct imm_codon_marg
                     [IMM_NUCLT_SIZE + 1];
 };
 
-struct cmp_ctx_s;
+struct cw_pack_context;
+struct cw_unpack_context;
 
 IMM_API struct imm_codon_marg imm_codon_marg(struct imm_codon_lprob *codonp);
 
@@ -50,13 +51,10 @@ imm_codon_marg_lprob(struct imm_codon_marg const *codonm,
     return codonm->lprobs[codon.idx[0]][codon.idx[1]][codon.idx[2]];
 }
 
-IMM_API enum imm_rc imm_codon_marg_write(struct imm_codon_marg const *codonm,
-                                         FILE *file);
+IMM_API enum imm_rc imm_codon_marg_pack(struct imm_codon_marg const *codonm,
+                                        struct cw_pack_context *ctx);
 
-IMM_API enum imm_rc imm_codon_marg_read(struct imm_codon_marg *codonm,
-                                        FILE *file);
-
-IMM_API enum imm_rc imm_codon_marg_read_cmp(struct imm_codon_marg *codonm,
-                                            struct cmp_ctx_s *cmp);
+IMM_API enum imm_rc imm_codon_marg_unpack(struct imm_codon_marg *codonm,
+                                          struct cw_unpack_context *ctx);
 
 #endif

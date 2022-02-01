@@ -11,21 +11,6 @@ enum imm_rc imm_rna_init(struct imm_rna *rna, char const symbols[IMM_RNA_SIZE],
                     vtable);
 }
 
-enum imm_rc imm_rna_write(struct imm_rna const *rna, FILE *file)
-{
-    return imm_abc_write(&rna->super.super, file);
-}
-
-enum imm_rc imm_rna_read(struct imm_rna *rna, FILE *file)
-{
-    return imm_abc_read(&rna->super.super, file);
-}
-
-enum imm_rc imm_rna_read_cmp(struct imm_rna *rna, struct cmp_ctx_s *cmp)
-{
-    return imm_abc_read_cmp(&rna->super.super, cmp);
-}
-
 #define ID(c) IMM_SYM_ID(c)
 #define SET(c, idx) [ID(c)] = idx
 #define NIL(x, y) [ID(x)... ID(y) - 1] = IMM_SYM_NULL_IDX

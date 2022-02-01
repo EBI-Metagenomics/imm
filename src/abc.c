@@ -1,4 +1,6 @@
 #include "abc.h"
+#include "cwpack.h"
+#include "cwpack_utils.h"
 #include "error.h"
 #include "imm/sym.h"
 #include "xcmp.h"
@@ -14,23 +16,16 @@ enum imm_rc imm_abc_init(struct imm_abc *abc, struct imm_str symbols,
     return abc_init(abc, symbols.len, symbols.data, any_symbol, vtable);
 }
 
-enum imm_rc imm_abc_write(struct imm_abc const *abc, FILE *file)
+enum imm_rc imm_abc_pack(struct imm_abc const *abc, struct cw_pack_context *ctx)
 {
-    enum imm_rc rc = abc_write(abc, file);
+    enum imm_rc rc = abc_pack(abc, ctx);
     if (rc) return error(rc, "failed to write alphabet");
     return rc;
 }
 
-enum imm_rc imm_abc_read(struct imm_abc *abc, FILE *file)
+enum imm_rc imm_abc_unpack(struct imm_abc *abc, struct cw_unpack_context *ctx)
 {
-    enum imm_rc rc = abc_read(abc, file);
-    if (rc) return error(rc, "failed to read alphabet");
-    return rc;
-}
-
-enum imm_rc imm_abc_read_cmp(struct imm_abc *abc, struct cmp_ctx_s *cmp)
-{
-    enum imm_rc rc = abc_read_cmp(abc, cmp);
+    enum imm_rc rc = abc_unpack(abc, ctx);
     if (rc) return error(rc, "failed to read alphabet");
     return rc;
 }
@@ -94,62 +89,52 @@ static_assert(sizeof(imm_abc_typeid_t) == sizeof(uint8_t), "wrong types");
         if (!!(expr)) return e;                                                \
     } while (0)
 
-enum imm_rc abc_write(struct imm_abc const *abc, FILE *file)
+enum imm_rc abc_pack(struct imm_abc const *abc, struct cw_pack_context *ctx)
 {
-    cmp_ctx_t cmp = {0};
-    xcmp_fsetup(&cmp, file);
+    cw_pack_map_size(ctx, 4);
 
-    ERET(!cmp_write_map(&cmp, 4), IMM_IOERROR);
+    cw_pack_cstr(ctx, "symbols");
+    cw_pack_str(ctx, abc->symbols, abc->size);
 
-    ERET(!XCMP_WRITE_STR(&cmp, "symbols"), IMM_IOERROR);
-    ERET(!cmp_write_str(&cmp, abc->symbols, abc->size), IMM_IOERROR);
-
-    ERET(!XCMP_WRITE_STR(&cmp, "idx"), IMM_IOERROR);
-    ERET(!cmp_write_array(&cmp, IMM_ARRAY_SIZE(abc->sym.idx)), IMM_IOERROR);
+    cw_pack_cstr(ctx, "idx");
+    cw_pack_array_size(ctx, IMM_ARRAY_SIZE(abc->sym.idx));
 
     for (unsigned i = 0; i < IMM_ARRAY_SIZE(abc->sym.idx); ++i)
-        ERET(!cmp_write_u8(&cmp, abc->sym.idx[i]), IMM_IOERROR);
+        cw_pack_unsigned(ctx, abc->sym.idx[i]);
 
-    ERET(!XCMP_WRITE_STR(&cmp, "any_symbol_id"), IMM_IOERROR);
-    ERET(!cmp_write_u8(&cmp, (uint8_t)abc->any_symbol_id), IMM_IOERROR);
-    ERET(!XCMP_WRITE_STR(&cmp, "typeid"), IMM_IOERROR);
-    ERET(!cmp_write_u8(&cmp, (uint8_t)abc->vtable.typeid), IMM_IOERROR);
+    cw_pack_cstr(ctx, "any_symbol_id");
+    cw_pack_unsigned(ctx, abc->any_symbol_id);
+    cw_pack_cstr(ctx, "typeid");
+    cw_pack_unsigned(ctx, abc->vtable.typeid);
 
-    return IMM_SUCCESS;
+    return ctx->return_code == CWP_RC_OK ? IMM_SUCCESS : IMM_FAILURE;
 }
 
-enum imm_rc abc_read(struct imm_abc *abc, FILE *file)
+enum imm_rc abc_unpack(struct imm_abc *abc, struct cw_unpack_context *ctx)
 {
-    cmp_ctx_t cmp = {0};
-    xcmp_fsetup(&cmp, file);
-    return abc_read_cmp(abc, &cmp);
-}
+    if (cw_unpack_next_map_size(ctx) != 4) return IMM_FAILURE;
 
-enum imm_rc abc_read_cmp(struct imm_abc *abc, struct cmp_ctx_s *cmp)
-{
-    uint32_t u32 = 0;
-    ERET(!xcmp_expect_map(cmp, 4), IMM_IOERROR);
+    if (!cw_unpack_next_cstr_expect(ctx, "symbols")) return IMM_FAILURE;
 
-    ERET(!XCMP_READ_KEY(cmp, "symbols"), IMM_IOERROR);
-    u32 = IMM_ARRAY_SIZE(abc->symbols) - 1;
-    ERET(!cmp_read_str(cmp, abc->symbols, &u32), IMM_IOERROR);
-    abc->size = u32;
-    abc->symbols[abc->size] = '\0';
+    if (cw_unpack_next_str_lengh(ctx) + 1 > IMM_ARRAY_SIZE(abc->symbols))
+        return IMM_FAILURE;
+    abc->size = ctx->item.as.str.length;
+    cw_unpack_cstr(ctx, abc->symbols);
 
-    ERET(!XCMP_READ_KEY(cmp, "idx"), IMM_IOERROR);
-    ERET(!cmp_read_array(cmp, &u32), IMM_IOERROR);
-    ERET(IMM_ARRAY_SIZE(abc->sym.idx) != u32, IMM_PARSEERROR);
+    if (!cw_unpack_next_cstr_expect(ctx, "idx")) return IMM_FAILURE;
+
+    if (cw_unpack_next_array_size(ctx) != IMM_ARRAY_SIZE(abc->sym.idx))
+        return IMM_PARSEERROR;
+
     for (unsigned i = 0; i < IMM_ARRAY_SIZE(abc->sym.idx); ++i)
-        ERET(!cmp_read_u8(cmp, abc->sym.idx + i), IMM_IOERROR);
+        abc->sym.idx[i] = cw_unpack_next_unsigned8(ctx);
 
-    uint8_t u8 = 0;
-    ERET(!XCMP_READ_KEY(cmp, "any_symbol_id"), IMM_IOERROR);
-    ERET(!cmp_read_u8(cmp, &u8), IMM_IOERROR);
-    abc->any_symbol_id = u8;
+    if (!cw_unpack_next_cstr_expect(ctx, "any_symbol_id")) return IMM_FAILURE;
+    abc->any_symbol_id = cw_unpack_next_unsigned8(ctx);
 
-    ERET(!XCMP_READ_KEY(cmp, "typeid"), IMM_IOERROR);
-    ERET(!cmp_read_u8(cmp, &u8), IMM_IOERROR);
-    ERET(!imm_abc_typeid_valid(u8), IMM_PARSEERROR);
-    abc->vtable.typeid = u8;
+    if (!cw_unpack_next_cstr_expect(ctx, "typeid")) return IMM_FAILURE;
+    abc->vtable.typeid = cw_unpack_next_unsigned8(ctx);
+    if (!imm_abc_typeid_valid(abc->vtable.typeid)) return IMM_PARSEERROR;
+
     return IMM_SUCCESS;
 }

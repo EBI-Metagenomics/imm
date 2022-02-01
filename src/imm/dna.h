@@ -21,13 +21,6 @@ IMM_API enum imm_rc imm_dna_init(struct imm_dna *dna,
                                  char const symbols[IMM_DNA_SIZE],
                                  char any_symbol);
 
-IMM_API enum imm_rc imm_dna_write(struct imm_dna const *dna, FILE *file);
-
-IMM_API enum imm_rc imm_dna_read(struct imm_dna *dna, FILE *file);
-
-IMM_API enum imm_rc imm_dna_read_cmp(struct imm_dna *dna,
-                                     struct cmp_ctx_s *cmp);
-
 static inline struct imm_nuclt const *imm_dna_super(struct imm_dna const *dna)
 {
     return &dna->super;

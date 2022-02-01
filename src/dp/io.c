@@ -1,10 +1,9 @@
-#include "io.h"
 #include "code.h"
 #include "dp/emis.h"
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
 #include "imm/dp.h"
-#include "xcmp.h"
+#include "xcw.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -37,190 +36,160 @@ static_assert(sizeof(imm_state_idx_t) == sizeof(uint16_t), "wrong types");
         }                                                                      \
     } while (0)
 
-enum imm_rc imm_dp_write(struct imm_dp const *dp, FILE *file)
+enum imm_rc imm_dp_pack(struct imm_dp const *dp, struct cw_pack_context *ctx)
 {
-    enum imm_rc rc = IMM_SUCCESS;
     unsigned size = 0;
     unsigned nstates = dp->state_table.nstates;
 
-    cmp_ctx_t ctx = {0};
-    xcmp_fsetup(&ctx, file);
-
-    ERET(!cmp_write_map(&ctx, 12), IMM_IOERROR);
+    cw_pack_map_size(ctx, 12);
 
     /* emission */
-    ERET(!XCMP_WRITE_STR(&ctx, KEY_EMIS_SCORE), IMM_IOERROR);
+    cw_pack_cstr(ctx, KEY_EMIS_SCORE);
     size = emis_score_size(&dp->emis, nstates);
-    ERET(!cmp_write_array(&ctx, size), IMM_IOERROR);
+    cw_pack_array_size(ctx, size);
     for (unsigned i = 0; i < size; ++i)
-        ERET(!io_write_imm_float(&ctx, dp->emis.score[i]), IMM_IOERROR);
+        cw_pack_imm_float(ctx, dp->emis.score[i]);
 
-    ERET(!XCMP_WRITE_STR(&ctx, KEY_EMIS_OFFSET), IMM_IOERROR);
+    cw_pack_cstr(ctx, KEY_EMIS_OFFSET);
     size = emis_offset_size(nstates);
-    ERET(!cmp_write_array(&ctx, size), IMM_IOERROR);
+    cw_pack_array_size(ctx, size);
     for (unsigned i = 0; i < size; ++i)
-        cmp_write_uinteger(&ctx, dp->emis.offset[i]);
+        cw_pack_unsigned(ctx, dp->emis.offset[i]);
 
     /* trans_table */
-    ERET(!XCMP_WRITE_STR(&ctx, KEY_TRANS_SIZE), IMM_IOERROR);
-    ERET(!cmp_write_uinteger(&ctx, dp->trans_table.ntrans), IMM_IOERROR);
+    cw_pack_cstr(ctx, KEY_TRANS_SIZE);
+    cw_pack_unsigned(ctx, dp->trans_table.ntrans);
 
     size = dp->trans_table.ntrans;
-    ERET(!XCMP_WRITE_STR(&ctx, KEY_TRANS_SCORE), IMM_IOERROR);
-    ERET(!cmp_write_array(&ctx, size), IMM_IOERROR);
+    cw_pack_cstr(ctx, KEY_TRANS_SCORE);
+    cw_pack_array_size(ctx, size);
     for (unsigned i = 0; i < size; ++i)
-        ERET(!io_write_imm_float(&ctx, dp->trans_table.trans[i].score),
-             IMM_IOERROR);
+        cw_pack_imm_float(ctx, dp->trans_table.trans[i].score);
 
     size = dp->trans_table.ntrans;
-    ERET(!XCMP_WRITE_STR(&ctx, KEY_TRANS_SRC), IMM_IOERROR);
-    ERET(!cmp_write_array(&ctx, size), IMM_IOERROR);
+    cw_pack_cstr(ctx, KEY_TRANS_SRC);
+    cw_pack_array_size(ctx, size);
     for (unsigned i = 0; i < size; ++i)
-        ERET(!cmp_write_uinteger(&ctx, dp->trans_table.trans[i].src),
-             IMM_IOERROR);
+        cw_pack_unsigned(ctx, dp->trans_table.trans[i].src);
 
     size = trans_table_offsize(nstates);
-    ERET(!XCMP_WRITE_STR(&ctx, KEY_TRANS_OFFSET), IMM_IOERROR);
-    ERET(!cmp_write_array(&ctx, size), IMM_IOERROR);
+    cw_pack_cstr(ctx, KEY_TRANS_OFFSET);
+    cw_pack_array_size(ctx, size);
     for (unsigned i = 0; i < size; ++i)
-        ERET(!cmp_write_uinteger(&ctx, dp->trans_table.offset[i]), IMM_IOERROR);
+        cw_pack_unsigned(ctx, dp->trans_table.offset[i]);
 
     /* state_table */
-    ERET(!XCMP_WRITE_STR(&ctx, KEY_STATE_SIZE), IMM_IOERROR);
-    ERET(!cmp_write_uinteger(&ctx, dp->state_table.nstates), IMM_IOERROR);
+    cw_pack_cstr(ctx, KEY_STATE_SIZE);
+    cw_pack_unsigned(ctx, dp->state_table.nstates);
 
     size = dp->state_table.nstates;
-    ERET(!XCMP_WRITE_STR(&ctx, KEY_STATE_IDS), IMM_IOERROR);
-    ERET(!cmp_write_array(&ctx, size), IMM_IOERROR);
+    cw_pack_cstr(ctx, KEY_STATE_IDS);
+    cw_pack_array_size(ctx, size);
     for (unsigned i = 0; i < size; ++i)
-        ERET(!cmp_write_uinteger(&ctx, dp->state_table.ids[i]), IMM_IOERROR);
+        cw_pack_unsigned(ctx, dp->state_table.ids[i]);
 
-    ERET(!XCMP_WRITE_STR(&ctx, KEY_STATE_START), IMM_IOERROR);
-    ERET(!cmp_write_uinteger(&ctx, dp->state_table.start.state), IMM_IOERROR);
-    ERET(!XCMP_WRITE_STR(&ctx, KEY_STATE_LPROB), IMM_IOERROR);
-    ERET(!io_write_imm_float(&ctx, dp->state_table.start.lprob), IMM_IOERROR);
-    ERET(!XCMP_WRITE_STR(&ctx, KEY_STATE_END), IMM_IOERROR);
-    ERET(!cmp_write_uinteger(&ctx, dp->state_table.end_state_idx), IMM_IOERROR);
+    cw_pack_cstr(ctx, KEY_STATE_START);
+    cw_pack_unsigned(ctx, dp->state_table.start.state);
+    cw_pack_cstr(ctx, KEY_STATE_LPROB);
+    cw_pack_imm_float(ctx, dp->state_table.start.lprob);
+    cw_pack_cstr(ctx, KEY_STATE_END);
+    cw_pack_unsigned(ctx, dp->state_table.end_state_idx);
 
-    ERET(!XCMP_WRITE_STR(&ctx, KEY_STATE_SPAN), IMM_IOERROR);
-    ERET(!cmp_write_array(&ctx, size), IMM_IOERROR);
+    cw_pack_cstr(ctx, KEY_STATE_SPAN);
+    cw_pack_array_size(ctx, size);
     for (unsigned i = 0; i < size; ++i)
-        ERET(!cmp_write_uinteger(&ctx, span_zip(dp->state_table.span + i)),
-             IMM_IOERROR);
+        cw_pack_unsigned(ctx, span_zip(dp->state_table.span + i));
 
-cleanup:
-    return rc;
+    return ctx->return_code ? IMM_IOERROR : IMM_SUCCESS;
 }
 
-enum imm_rc imm_dp_read(struct imm_dp *dp, FILE *file)
-{
-    cmp_ctx_t cmp = {0};
-    xcmp_fsetup(&cmp, file);
-    return imm_dp_read_cmp(dp, &cmp);
-}
-
-enum imm_rc imm_dp_read_cmp(struct imm_dp *dp, struct cmp_ctx_s *cmp)
+enum imm_rc imm_dp_unpack(struct imm_dp *dp, struct cw_unpack_context *ctx)
 {
     enum imm_rc rc = IMM_SUCCESS;
-    uint64_t u64 = 0;
-    uint32_t size = 0;
+    unsigned size = 0;
     struct imm_dp_emis *e = NULL;
     struct imm_dp_trans_table *tt = NULL;
     struct imm_dp_state_table *st = NULL;
 
-    ERET(!xcmp_expect_map(cmp, 12), IMM_IOERROR);
+    if (cw_unpack_next_map_size(ctx) != 12) return IMM_FAILURE;
 
     /* emission */
-    ERET(!XCMP_READ_KEY(cmp, KEY_EMIS_SCORE), IMM_IOERROR);
+    if (!cw_unpack_next_cstr_expect(ctx, KEY_EMIS_SCORE)) return IMM_FAILURE;
     e = &dp->emis;
-    ERET(!cmp_read_array(cmp, &size), IMM_IOERROR);
+    size = cw_unpack_next_array_size(ctx);
     e->score = realloc(e->score, sizeof(*e->score) * size);
     ERET(!e->score && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
-        ERET(!io_read_imm_float(cmp, e->score + i), IMM_IOERROR);
+        e->score[i] = cw_unpack_next_imm_float(ctx);
 
-    ERET(!XCMP_READ_KEY(cmp, KEY_EMIS_OFFSET), IMM_IOERROR);
-    ERET(!cmp_read_array(cmp, &size), IMM_IOERROR);
+    if (!cw_unpack_next_cstr_expect(ctx, KEY_EMIS_OFFSET)) return IMM_FAILURE;
+    size = cw_unpack_next_array_size(ctx);
     e->offset = realloc(e->offset, sizeof(*e->offset) * size);
     ERET(!e->offset && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
-    {
-        ERET(!cmp_read_uinteger(cmp, &u64), IMM_IOERROR);
-        e->offset[i] = (unsigned)u64;
-    }
+        e->offset[i] = cw_unpack_next_unsigned(ctx);
 
     /* trans_table */
-    ERET(!XCMP_READ_KEY(cmp, KEY_TRANS_SIZE), IMM_IOERROR);
+    if (!cw_unpack_next_cstr_expect(ctx, KEY_TRANS_SIZE)) return IMM_FAILURE;
     tt = &dp->trans_table;
-    ERET(!cmp_read_uinteger(cmp, &u64), IMM_IOERROR);
-    tt->ntrans = (unsigned)u64;
+    tt->ntrans = cw_unpack_next_unsigned(ctx);
 
-    ERET(!XCMP_READ_KEY(cmp, KEY_TRANS_SCORE), IMM_IOERROR);
-    ERET(!cmp_read_array(cmp, &size), IMM_IOERROR);
+    if (!cw_unpack_next_cstr_expect(ctx, KEY_TRANS_SCORE)) return IMM_FAILURE;
+    size = cw_unpack_next_array_size(ctx);
     ERET(tt->ntrans != size, IMM_PARSEERROR);
     tt->trans = realloc(tt->trans, sizeof(*tt->trans) * size);
     ERET(!tt->trans && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
-        ERET(!io_read_imm_float(cmp, &tt->trans[i].score), IMM_IOERROR);
+        tt->trans[i].score = cw_unpack_next_imm_float(ctx);
 
-    ERET(!XCMP_READ_KEY(cmp, KEY_TRANS_SRC), IMM_IOERROR);
-    ERET(!cmp_read_array(cmp, &size), IMM_IOERROR);
+    if (!cw_unpack_next_cstr_expect(ctx, KEY_TRANS_SRC)) return IMM_FAILURE;
+    size = cw_unpack_next_array_size(ctx);
     ERET(tt->ntrans != size, IMM_PARSEERROR);
     for (unsigned i = 0; i < size; ++i)
-    {
-        ERET(!cmp_read_uinteger(cmp, &u64), IMM_IOERROR);
-        tt->trans[i].src = (imm_state_idx_t)u64;
-    }
+        tt->trans[i].src = cw_unpack_next_unsigned16(ctx);
 
-    ERET(!XCMP_READ_KEY(cmp, KEY_TRANS_OFFSET), IMM_IOERROR);
-    ERET(!cmp_read_array(cmp, &size), IMM_IOERROR);
+    if (!cw_unpack_next_cstr_expect(ctx, KEY_TRANS_OFFSET)) return IMM_FAILURE;
+    size = cw_unpack_next_array_size(ctx);
     tt->offset = realloc(tt->offset, sizeof(*tt->offset) * size);
     ERET(!tt->offset && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
-    {
-        ERET(!cmp_read_uinteger(cmp, &u64), IMM_IOERROR);
-        tt->offset[i] = (imm_trans_idx_t)u64;
-    }
+        tt->offset[i] = cw_unpack_next_unsigned16(ctx);
 
     /* state_table */
-    ERET(!XCMP_READ_KEY(cmp, KEY_STATE_SIZE), IMM_IOERROR);
+    if (!cw_unpack_next_cstr_expect(ctx, KEY_STATE_SIZE)) return IMM_FAILURE;
     st = &dp->state_table;
-    ERET(!cmp_read_uinteger(cmp, &u64), IMM_IOERROR);
-    st->nstates = (unsigned)u64;
+    st->nstates = cw_unpack_next_unsigned(ctx);
 
-    ERET(!XCMP_READ_KEY(cmp, KEY_STATE_IDS), IMM_IOERROR);
-    ERET(!cmp_read_array(cmp, &size), IMM_IOERROR);
+    if (!cw_unpack_next_cstr_expect(ctx, KEY_STATE_IDS)) return IMM_FAILURE;
+    size = cw_unpack_next_array_size(ctx);
     ERET(st->nstates != size, IMM_PARSEERROR);
     st->ids = realloc(st->ids, sizeof(*st->ids) * size);
     ERET(!st->ids && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
-    {
-        ERET(!cmp_read_uinteger(cmp, &u64), IMM_IOERROR);
-        st->ids[i] = (imm_state_id_t)u64;
-    }
+        st->ids[i] = cw_unpack_next_unsigned16(ctx);
 
-    ERET(!XCMP_READ_KEY(cmp, KEY_STATE_START), IMM_IOERROR);
-    ERET(!cmp_read_uinteger(cmp, &u64), IMM_IOERROR);
-    st->start.state = (imm_state_idx_t)u64;
-    ERET(!XCMP_READ_KEY(cmp, KEY_STATE_LPROB), IMM_IOERROR);
-    ERET(!io_read_imm_float(cmp, &st->start.lprob), IMM_IOERROR);
-    ERET(!XCMP_READ_KEY(cmp, KEY_STATE_END), IMM_IOERROR);
-    ERET(!cmp_read_uinteger(cmp, &u64), IMM_IOERROR);
-    st->end_state_idx = (unsigned)u64;
+    if (!cw_unpack_next_cstr_expect(ctx, KEY_STATE_START)) return IMM_FAILURE;
+    st->start.state = cw_unpack_next_unsigned16(ctx);
 
-    ERET(!XCMP_READ_KEY(cmp, KEY_STATE_SPAN), IMM_IOERROR);
-    ERET(!cmp_read_array(cmp, &size), IMM_IOERROR);
+    if (!cw_unpack_next_cstr_expect(ctx, KEY_STATE_LPROB)) return IMM_FAILURE;
+    st->start.lprob = cw_unpack_next_imm_float(ctx);
+
+    if (!cw_unpack_next_cstr_expect(ctx, KEY_STATE_END)) return IMM_FAILURE;
+    st->end_state_idx = cw_unpack_next_unsigned(ctx);
+
+    if (!cw_unpack_next_cstr_expect(ctx, KEY_STATE_SPAN)) return IMM_FAILURE;
+    size = cw_unpack_next_array_size(ctx);
     ERET(st->nstates != size, IMM_PARSEERROR);
     st->span = realloc(st->span, sizeof(*st->span) * size);
     ERET(!st->span && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
     {
-        ERET(!cmp_read_uinteger(cmp, &u64), IMM_IOERROR);
-        ERET(!span_unzip(st->span + i, (uint16_t)u64), IMM_PARSEERROR);
+        ERET(!span_unzip(st->span + i, cw_unpack_next_unsigned16(ctx)),
+             IMM_PARSEERROR);
         ERET(st->span[i].max > IMM_STATE_MAX_SEQLEN, IMM_PARSEERROR);
     }
 
-    return rc;
+    if (!ctx->return_code) return IMM_SUCCESS;
 
 cleanup:
     if (e)

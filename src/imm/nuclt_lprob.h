@@ -12,7 +12,8 @@ struct imm_nuclt_lprob
     imm_float lprobs[IMM_NUCLT_SIZE];
 };
 
-struct cmp_ctx_s;
+struct cw_pack_context;
+struct cw_unpack_context;
 
 static inline struct imm_nuclt_lprob
 imm_nuclt_lprob(struct imm_nuclt const *nuclt,
@@ -39,13 +40,10 @@ static inline imm_float imm_nuclt_lprob_get(struct imm_nuclt_lprob const *lprob,
     return __imm_nuclt_lprob_get(lprob, imm_abc_symbol_idx(abc, symbol));
 }
 
-IMM_API enum imm_rc imm_nuclt_lprob_write(struct imm_nuclt_lprob const *nucltp,
-                                          FILE *file);
+IMM_API enum imm_rc imm_nuclt_lprob_pack(struct imm_nuclt_lprob const *nucltp,
+                                         struct cw_pack_context *ctx);
 
-IMM_API enum imm_rc imm_nuclt_lprob_read(struct imm_nuclt_lprob *nucltp,
-                                         FILE *file);
-
-IMM_API enum imm_rc imm_nuclt_lprob_read_cmp(struct imm_nuclt_lprob *nucltp,
-                                             struct cmp_ctx_s *cmp);
+IMM_API enum imm_rc imm_nuclt_lprob_unpack(struct imm_nuclt_lprob *nucltp,
+                                           struct cw_unpack_context *ctx);
 
 #endif

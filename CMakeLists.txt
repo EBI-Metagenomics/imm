@@ -18,6 +18,8 @@ find_package(cmp REQUIRED)
 
 add_library(
   imm
+  cwpack/cwpack.c
+  cwpack/cwpack_utils.c
   src/abc.c
   src/amino.c
   src/bitmap.c
@@ -40,6 +42,7 @@ add_library(
   src/frame_cond.c
   src/frame_state.c
   src/gc.c
+  src/xcmp.c
   src/gc_auto.c
   src/hmm.c
   src/log.c
@@ -56,7 +59,6 @@ add_library(
   src/state.c
   src/task.c
   src/tsort.c
-  src/xcmp.c
 )
 add_library(IMM::imm ALIAS imm)
 
@@ -91,6 +93,7 @@ target_include_directories(
   imm
   PUBLIC $<INSTALL_INTERFACE:include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/cwpack>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )

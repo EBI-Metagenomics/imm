@@ -4,8 +4,7 @@
 #include "imm/codon_lprob.h"
 #include "imm/generics.h"
 #include "imm/nuclt.h"
-#include "io.h"
-#include "xcmp.h"
+#include "xcw.h"
 #include <assert.h>
 
 static_assert(IMM_NUCLT_SIZE == 4, "nuclt size expected to be four");
@@ -132,41 +131,30 @@ struct imm_codon_marg imm_codon_marg(struct imm_codon_lprob *codonp)
 #define CODON_SIZE                                                             \
     ((IMM_NUCLT_SIZE + 1) * (IMM_NUCLT_SIZE + 1) * (IMM_NUCLT_SIZE + 1))
 
-enum imm_rc imm_codon_marg_write(struct imm_codon_marg const *codonm,
-                                 FILE *file)
+enum imm_rc imm_codon_marg_pack(struct imm_codon_marg const *codonm,
+                                struct cw_pack_context *ctx)
 {
-    cmp_ctx_t ctx = {0};
-    xcmp_fsetup(&ctx, file);
     imm_float const *lprobs = &codonm->lprobs[0][0][0];
 
-    cmp_write_array(&ctx, CODON_SIZE);
+    cw_pack_array_size(ctx, CODON_SIZE);
     for (unsigned i = 0; i < CODON_SIZE; ++i)
-    {
-        if (!io_write_imm_float(&ctx, lprobs[i]))
-            return error(IMM_IOERROR, "failed to write imm_float");
-    }
-    return IMM_SUCCESS;
+        cw_pack_imm_float(ctx, lprobs[i]);
+
+    return ctx->return_code ? error(IMM_IOERROR, "failed to pack codon_marg")
+                            : IMM_SUCCESS;
 }
 
-enum imm_rc imm_codon_marg_read(struct imm_codon_marg *codonm, FILE *file)
-{
-    cmp_ctx_t cmp = {0};
-    xcmp_fsetup(&cmp, file);
-    return imm_codon_marg_read_cmp(codonm, &cmp);
-}
-
-enum imm_rc imm_codon_marg_read_cmp(struct imm_codon_marg *codonm,
-                                    struct cmp_ctx_s *cmp)
+enum imm_rc imm_codon_marg_unpack(struct imm_codon_marg *codonm,
+                                  struct cw_unpack_context *ctx)
 {
     imm_float *lprobs = &codonm->lprobs[0][0][0];
 
-    uint32_t size = 0;
-    cmp_read_array(cmp, &size);
-    assert(size == CODON_SIZE);
+    if (cw_unpack_next_array_size(ctx) != CODON_SIZE)
+        return error(IMM_IOERROR, "wrong array size");
+
     for (unsigned i = 0; i < CODON_SIZE; ++i)
-    {
-        if (!io_read_imm_float(cmp, lprobs + i))
-            return error(IMM_IOERROR, "failed to read imm_float");
-    }
-    return IMM_SUCCESS;
+        lprobs[i] = cw_unpack_next_imm_float(ctx);
+
+    return ctx->return_code ? error(IMM_IOERROR, "failed to unpack marg_lprob")
+                            : IMM_SUCCESS;
 }

@@ -1,3 +1,4 @@
+#include "cwpack_stream_context.h"
 #include "hope/hope.h"
 #include "imm/imm.h"
 
@@ -5,14 +6,15 @@ int main(void)
 {
     struct imm_dna const *dna_out = &imm_dna_iupac;
 
-    FILE *file = fopen(TMPDIR "/dna.imm", "wb");
-    imm_dna_write(dna_out, file);
-    fclose(file);
+    new_pack_ctx(TMPDIR "/dna.imm");
+    EQ(imm_abc_pack((struct imm_abc const *)dna_out, pack_ctx), IMM_SUCCESS);
+    del_pack_ctx();
 
     struct imm_dna dna_in;
-    file = fopen(TMPDIR "/dna.imm", "rb");
-    imm_dna_read(&dna_in, file);
-    fclose(file);
+
+    new_unpack_ctx(TMPDIR "/dna.imm");
+    EQ(imm_abc_unpack((struct imm_abc *)&dna_in, unpack_ctx), IMM_SUCCESS);
+    del_unpack_ctx();
 
     struct imm_abc const *out = imm_super(imm_super(dna_out));
     struct imm_abc const *in = imm_super(imm_super(&dna_in));
