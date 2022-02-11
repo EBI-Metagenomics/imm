@@ -5,8 +5,8 @@
 
 enum imm_rc abc_init(struct imm_abc *abc, unsigned len, char const *symbols,
                      char any_symbol, struct imm_abc_vtable vtable);
-enum imm_rc abc_pack(struct imm_abc const *abc, struct cw_pack_context *ctx);
-enum imm_rc abc_unpack(struct imm_abc *abc, struct cw_unpack_context *ctx);
+enum imm_rc abc_pack(struct imm_abc const *abc, struct lip_ctx_file *ctx);
+enum imm_rc abc_unpack(struct imm_abc *abc, struct lip_ctx_file *ctx);
 
 #define ABC_EMPTY                                                              \
     {                                                                          \

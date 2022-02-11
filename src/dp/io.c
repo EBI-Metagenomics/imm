@@ -3,7 +3,10 @@
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
 #include "imm/dp.h"
-#include "xcw.h"
+#include "lite_pack/1darray.h"
+#include "lite_pack/ctx/file.h"
+#include "lite_pack/lite_pack.h"
+#include "xlip.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -36,74 +39,81 @@ static_assert(sizeof(imm_state_idx_t) == sizeof(uint16_t), "wrong types");
         }                                                                      \
     } while (0)
 
-enum imm_rc imm_dp_pack(struct imm_dp const *dp, struct cw_pack_context *ctx)
+#ifdef IMM_DOUBLE_PRECISION
+#define REAL_BYTES 8
+#define USER_EXT CWP_ITEM_USER_EXT_1
+#else
+#define REAL_BYTES 4
+#define USER_EXT CWP_ITEM_USER_EXT_0
+#endif
+
+enum imm_rc imm_dp_pack(struct imm_dp const *dp, struct lip_ctx_file *ctx)
 {
     unsigned size = 0;
     unsigned nstates = dp->state_table.nstates;
 
-    cw_pack_map_size(ctx, 12);
+    lip_write_map_size(ctx, 10);
 
     /* emission */
-    cw_pack_cstr(ctx, KEY_EMIS_SCORE);
+    xlip_write_cstr(ctx, KEY_EMIS_SCORE);
     size = emis_score_size(&dp->emis, nstates);
-    cw_pack_array_size(ctx, size);
-    for (unsigned i = 0; i < size; ++i)
-        cw_pack_imm_float(ctx, dp->emis.score[i]);
+    lip_write_1darray_size_type(ctx, size, XLIP_1DARRAY_FLOAT);
+    lip_write_1darray_float(ctx, size, dp->emis.score);
 
-    cw_pack_cstr(ctx, KEY_EMIS_OFFSET);
+    xlip_write_cstr(ctx, KEY_EMIS_OFFSET);
     size = emis_offset_size(nstates);
-    cw_pack_array_size(ctx, size);
+    lip_write_array_size(ctx, size);
     for (unsigned i = 0; i < size; ++i)
-        cw_pack_unsigned(ctx, dp->emis.offset[i]);
+        lip_read_int(ctx, dp->emis.offset + i);
 
     /* trans_table */
-    cw_pack_cstr(ctx, KEY_TRANS_SIZE);
-    cw_pack_unsigned(ctx, dp->trans_table.ntrans);
+    // xlip_write_cstr(ctx, KEY_TRANS_SIZE);
+    // cw_pack_unsigned(ctx, dp->trans_table.ntrans);
 
     size = dp->trans_table.ntrans;
-    cw_pack_cstr(ctx, KEY_TRANS_SCORE);
-    cw_pack_array_size(ctx, size);
+    xlip_write_cstr(ctx, KEY_TRANS_SCORE);
+    lip_write_1darray_size_type(ctx, size, XLIP_1DARRAY_FLOAT);
     for (unsigned i = 0; i < size; ++i)
-        cw_pack_imm_float(ctx, dp->trans_table.trans[i].score);
+        lip_write_1darray_float(ctx, 1, &dp->trans_table.trans[i].score);
 
-    size = dp->trans_table.ntrans;
-    cw_pack_cstr(ctx, KEY_TRANS_SRC);
-    cw_pack_array_size(ctx, size);
+    xlip_write_cstr(ctx, KEY_TRANS_SRC);
+    lip_write_1darray_size_type(ctx, size, LIP_1DARRAY_UINT16);
     for (unsigned i = 0; i < size; ++i)
-        cw_pack_unsigned(ctx, dp->trans_table.trans[i].src);
+        lip_write_1darray_int_data(ctx, 1, &dp->trans_table.trans[i].src);
 
     size = trans_table_offsize(nstates);
-    cw_pack_cstr(ctx, KEY_TRANS_OFFSET);
-    cw_pack_array_size(ctx, size);
-    for (unsigned i = 0; i < size; ++i)
-        cw_pack_unsigned(ctx, dp->trans_table.offset[i]);
+    xlip_write_cstr(ctx, KEY_TRANS_OFFSET);
+    lip_write_1darray_size_type(ctx, size, LIP_1DARRAY_UINT16);
+    lip_write_1darray_int_data(ctx, size, dp->trans_table.offset);
 
     /* state_table */
-    cw_pack_cstr(ctx, KEY_STATE_SIZE);
-    cw_pack_unsigned(ctx, dp->state_table.nstates);
+    // xlip_write_cstr(ctx, KEY_STATE_SIZE);
+    // cw_pack_unsigned(ctx, dp->state_table.nstates);
 
     size = dp->state_table.nstates;
-    cw_pack_cstr(ctx, KEY_STATE_IDS);
-    cw_pack_array_size(ctx, size);
+    xlip_write_cstr(ctx, KEY_STATE_IDS);
+    lip_write_1darray_size_type(ctx, size, LIP_1DARRAY_UINT16);
+    lip_write_1darray_int_data(ctx, size, dp->state_table.ids);
+
+    xlip_write_cstr(ctx, KEY_STATE_START);
+    lip_write_int(ctx, dp->state_table.start.state);
+    xlip_write_cstr(ctx, KEY_STATE_LPROB);
+    lip_write_float(ctx, dp->state_table.start.lprob);
+    xlip_write_cstr(ctx, KEY_STATE_END);
+    lip_write_int(ctx, dp->state_table.end_state_idx);
+
+    xlip_write_cstr(ctx, KEY_STATE_SPAN);
+    lip_write_1darray_size_type(ctx, size, LIP_1DARRAY_UINT16);
     for (unsigned i = 0; i < size; ++i)
-        cw_pack_unsigned(ctx, dp->state_table.ids[i]);
+    {
+        uint16_t u = span_zip(dp->state_table.span + i);
+        lip_write_1darray_int_data(ctx, 1, &u);
+    }
 
-    cw_pack_cstr(ctx, KEY_STATE_START);
-    cw_pack_unsigned(ctx, dp->state_table.start.state);
-    cw_pack_cstr(ctx, KEY_STATE_LPROB);
-    cw_pack_imm_float(ctx, dp->state_table.start.lprob);
-    cw_pack_cstr(ctx, KEY_STATE_END);
-    cw_pack_unsigned(ctx, dp->state_table.end_state_idx);
-
-    cw_pack_cstr(ctx, KEY_STATE_SPAN);
-    cw_pack_array_size(ctx, size);
-    for (unsigned i = 0; i < size; ++i)
-        cw_pack_unsigned(ctx, span_zip(dp->state_table.span + i));
-
-    return ctx->return_code ? IMM_IOERROR : IMM_SUCCESS;
+    return ctx->error ? IMM_IOERROR : IMM_SUCCESS;
 }
 
-enum imm_rc imm_dp_unpack(struct imm_dp *dp, struct cw_unpack_context *ctx)
+enum imm_rc imm_dp_unpack(struct imm_dp *dp, struct lip_ctx_file *ctx)
 {
     enum imm_rc rc = IMM_SUCCESS;
     unsigned size = 0;
@@ -116,11 +126,15 @@ enum imm_rc imm_dp_unpack(struct imm_dp *dp, struct cw_unpack_context *ctx)
     /* emission */
     if (!cw_unpack_next_cstr_expect(ctx, KEY_EMIS_SCORE)) return IMM_FAILURE;
     e = &dp->emis;
-    size = cw_unpack_next_array_size(ctx);
-    e->score = realloc(e->score, sizeof(*e->score) * size);
+    cw_unpack_next(ctx);
+    // size = cw_unpack_next_array_size(ctx);
+    size = ctx->item.as.ext.length / REAL_BYTES;
+    // e->score = realloc(e->score, sizeof(*e->score) * size);
+    e->score = realloc(e->score, ctx->item.as.ext.length);
     ERET(!e->score && size > 0, IMM_IOERROR);
-    for (unsigned i = 0; i < size; ++i)
-        e->score[i] = cw_unpack_next_imm_float(ctx);
+    memcpy(e->score, ctx->item.as.ext.start, ctx->item.as.ext.length);
+    // for (unsigned i = 0; i < size; ++i)
+    //     e->score[i] = cw_unpack_next_imm_float(ctx);
 
     if (!cw_unpack_next_cstr_expect(ctx, KEY_EMIS_OFFSET)) return IMM_FAILURE;
     size = cw_unpack_next_array_size(ctx);

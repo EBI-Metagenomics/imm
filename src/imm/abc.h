@@ -27,8 +27,7 @@ struct imm_abc
     struct imm_abc_vtable vtable;
 };
 
-struct cw_pack_context;
-struct cw_unpack_context;
+struct lip_ctx_file;
 
 IMM_API extern struct imm_abc const imm_abc_empty;
 
@@ -41,10 +40,10 @@ IMM_API enum imm_rc imm_abc_init(struct imm_abc *abc, struct imm_str symbols,
                                  char any_symbol_id);
 
 IMM_API enum imm_rc imm_abc_pack(struct imm_abc const *abc,
-                                 struct cw_pack_context *ctx);
+                                 struct lip_ctx_file *ctx);
 
 IMM_API enum imm_rc imm_abc_unpack(struct imm_abc *abc,
-                                   struct cw_unpack_context *ctx);
+                                   struct lip_ctx_file *ctx);
 
 static inline bool imm_abc_has_symbol_id(struct imm_abc const *abc, unsigned id)
 {

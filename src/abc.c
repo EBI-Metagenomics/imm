@@ -1,9 +1,10 @@
 #include "abc.h"
-#include "cwpack.h"
-#include "cwpack_utils.h"
 #include "error.h"
 #include "imm/sym.h"
-#include "xcmp.h"
+#include "lite_pack/1darray.h"
+#include "lite_pack/ctx/file.h"
+#include "lite_pack/lite_pack.h"
+#include "xlip.h"
 #include <assert.h>
 #include <stdint.h>
 
@@ -16,14 +17,14 @@ enum imm_rc imm_abc_init(struct imm_abc *abc, struct imm_str symbols,
     return abc_init(abc, symbols.len, symbols.data, any_symbol, vtable);
 }
 
-enum imm_rc imm_abc_pack(struct imm_abc const *abc, struct cw_pack_context *ctx)
+enum imm_rc imm_abc_pack(struct imm_abc const *abc, struct lip_ctx_file *ctx)
 {
     enum imm_rc rc = abc_pack(abc, ctx);
     if (rc) return error(rc, "failed to write alphabet");
     return rc;
 }
 
-enum imm_rc imm_abc_unpack(struct imm_abc *abc, struct cw_unpack_context *ctx)
+enum imm_rc imm_abc_unpack(struct imm_abc *abc, struct lip_ctx_file *ctx)
 {
     enum imm_rc rc = abc_unpack(abc, ctx);
     if (rc) return error(rc, "failed to read alphabet");
@@ -89,51 +90,50 @@ static_assert(sizeof(imm_abc_typeid_t) == sizeof(uint8_t), "wrong types");
         if (!!(expr)) return e;                                                \
     } while (0)
 
-enum imm_rc abc_pack(struct imm_abc const *abc, struct cw_pack_context *ctx)
+enum imm_rc abc_pack(struct imm_abc const *abc, struct lip_ctx_file *ctx)
 {
-    cw_pack_map_size(ctx, 4);
+    lip_write_map_size(ctx, 4);
 
-    cw_pack_cstr(ctx, "symbols");
-    cw_pack_str(ctx, abc->symbols, abc->size);
+    xlip_write_cstr(ctx, "symbols");
+    xlip_write_cstr(ctx, abc->symbols);
 
-    cw_pack_cstr(ctx, "idx");
-    cw_pack_array_size(ctx, IMM_ARRAY_SIZE(abc->sym.idx));
+    xlip_write_cstr(ctx, "idx");
+    lip_write_1darray_size_type(ctx, IMM_ARRAY_SIZE(abc->sym.idx),
+                                LIP_1DARRAY_UINT8);
+    lip_write_1darray_u8_data(ctx, IMM_ARRAY_SIZE(abc->sym.idx), abc->sym.idx);
 
-    for (unsigned i = 0; i < IMM_ARRAY_SIZE(abc->sym.idx); ++i)
-        cw_pack_unsigned(ctx, abc->sym.idx[i]);
+    xlip_write_cstr(ctx, "any_symbol_id");
+    lip_write_int(ctx, abc->any_symbol_id);
 
-    cw_pack_cstr(ctx, "any_symbol_id");
-    cw_pack_unsigned(ctx, abc->any_symbol_id);
-    cw_pack_cstr(ctx, "typeid");
-    cw_pack_unsigned(ctx, abc->vtable.typeid);
+    xlip_write_cstr(ctx, "typeid");
+    lip_write_int(ctx, abc->vtable.typeid);
 
-    return ctx->return_code == CWP_RC_OK ? IMM_SUCCESS : IMM_FAILURE;
+    return !ctx->error ? IMM_SUCCESS : IMM_FAILURE;
 }
 
-enum imm_rc abc_unpack(struct imm_abc *abc, struct cw_unpack_context *ctx)
+enum imm_rc abc_unpack(struct imm_abc *abc, struct lip_ctx_file *ctx)
 {
-    if (cw_unpack_next_map_size(ctx) != 4) return IMM_FAILURE;
+    unsigned size = 0;
+    uint8_t type = 0;
 
-    if (!cw_unpack_next_cstr_expect(ctx, "symbols")) return IMM_FAILURE;
+    if (!xlip_expect_map(ctx, 4)) return IMM_FAILURE;
 
-    if (cw_unpack_next_str_lengh(ctx) + 1 > IMM_ARRAY_SIZE(abc->symbols))
-        return IMM_FAILURE;
-    abc->size = ctx->item.as.str.length;
-    cw_unpack_cstr(ctx, abc->symbols);
+    if (!xlip_expect_key(ctx, "symbols")) return IMM_FAILURE;
 
-    if (!cw_unpack_next_cstr_expect(ctx, "idx")) return IMM_FAILURE;
+    xlip_read_cstr(ctx, IMM_ABC_MAX_SIZE, abc->symbols);
+    abc->size = (unsigned)strlen(abc->symbols);
 
-    if (cw_unpack_next_array_size(ctx) != IMM_ARRAY_SIZE(abc->sym.idx))
-        return IMM_PARSEERROR;
+    if (!xlip_expect_key(ctx, "idx")) return IMM_FAILURE;
+    lip_read_1darray_size_type(ctx, &size, &type);
+    if (size != IMM_ARRAY_SIZE(abc->sym.idx)) return IMM_FAILURE;
+    if (type != LIP_1DARRAY_UINT8) return IMM_FAILURE;
+    lip_read_1darray_u8_data(ctx, size, abc->sym.idx);
 
-    for (unsigned i = 0; i < IMM_ARRAY_SIZE(abc->sym.idx); ++i)
-        abc->sym.idx[i] = cw_unpack_next_unsigned8(ctx);
+    if (!xlip_expect_key(ctx, "any_symbol_id")) return IMM_FAILURE;
+    lip_read_int(ctx, &abc->any_symbol_id);
 
-    if (!cw_unpack_next_cstr_expect(ctx, "any_symbol_id")) return IMM_FAILURE;
-    abc->any_symbol_id = cw_unpack_next_unsigned8(ctx);
-
-    if (!cw_unpack_next_cstr_expect(ctx, "typeid")) return IMM_FAILURE;
-    abc->vtable.typeid = cw_unpack_next_unsigned8(ctx);
+    if (!xlip_expect_key(ctx, "typeid")) return IMM_FAILURE;
+    lip_read_int(ctx, &abc->vtable.typeid);
     if (!imm_abc_typeid_valid(abc->vtable.typeid)) return IMM_PARSEERROR;
 
     return IMM_SUCCESS;

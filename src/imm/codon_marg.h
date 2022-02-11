@@ -26,8 +26,7 @@ struct imm_codon_marg
                     [IMM_NUCLT_SIZE + 1];
 };
 
-struct cw_pack_context;
-struct cw_unpack_context;
+struct lip_ctx_file;
 
 IMM_API struct imm_codon_marg imm_codon_marg(struct imm_codon_lprob *codonp);
 
@@ -52,9 +51,9 @@ imm_codon_marg_lprob(struct imm_codon_marg const *codonm,
 }
 
 IMM_API enum imm_rc imm_codon_marg_pack(struct imm_codon_marg const *codonm,
-                                        struct cw_pack_context *ctx);
+                                        struct lip_ctx_file *ctx);
 
 IMM_API enum imm_rc imm_codon_marg_unpack(struct imm_codon_marg *codonm,
-                                          struct cw_unpack_context *ctx);
+                                          struct lip_ctx_file *ctx);
 
 #endif
