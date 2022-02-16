@@ -1,20 +1,21 @@
-#include "cwpack_stream_context.h"
 #include "hope/hope.h"
 #include "imm/imm.h"
+#include "lite_pack/io/file.h"
 
 int main(void)
 {
+    struct lip_io_file io = {0};
     struct imm_amino const *amino_out = &imm_amino_iupac;
 
-    new_pack_ctx(TMPDIR "/amino.imm");
-    EQ(imm_abc_pack((struct imm_abc const *)amino_out, pack_ctx), IMM_SUCCESS);
-    del_pack_ctx();
+    io.fp = fopen(TMPDIR "/amino.imm", "wb");
+    EQ(imm_abc_pack((struct imm_abc const *)amino_out, &io), IMM_SUCCESS);
+    fclose(io.fp);
 
     struct imm_amino amino_in;
 
-    new_unpack_ctx(TMPDIR "/amino.imm");
-    EQ(imm_abc_unpack((struct imm_abc *)&amino_in, unpack_ctx), IMM_SUCCESS);
-    del_unpack_ctx();
+    io.fp = fopen(TMPDIR "/amino.imm", "rb");
+    EQ(imm_abc_unpack((struct imm_abc *)&amino_in, &io), IMM_SUCCESS);
+    fclose(io.fp);
 
     struct imm_abc const *out = imm_super(amino_out);
     struct imm_abc const *in = imm_super(&amino_in);

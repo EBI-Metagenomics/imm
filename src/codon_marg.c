@@ -4,9 +4,6 @@
 #include "imm/codon_lprob.h"
 #include "imm/generics.h"
 #include "imm/nuclt.h"
-#include "lite_pack/1darray.h"
-#include "lite_pack/ctx/file.h"
-#include "lite_pack/lite_pack.h"
 #include "xlip.h"
 #include <assert.h>
 
@@ -135,31 +132,21 @@ struct imm_codon_marg imm_codon_marg(struct imm_codon_lprob *codonp)
     ((IMM_NUCLT_SIZE + 1) * (IMM_NUCLT_SIZE + 1) * (IMM_NUCLT_SIZE + 1))
 
 enum imm_rc imm_codon_marg_pack(struct imm_codon_marg const *codonm,
-                                struct lip_ctx_file *ctx)
+                                struct lip_io_file *io)
 {
-    imm_float const *lprobs = &codonm->lprobs[0][0][0];
+    lip_write_1darray_float(io, CODON_SIZE, &codonm->lprobs[0][0][0]);
 
-    lip_write_1darray_size_type(ctx, CODON_SIZE, LIP_1DARRAY_IMM_FLOAT);
-    lip_write_1darray_float(ctx, CODON_SIZE, lprobs);
-
-    return ctx->error ? error(IMM_IOERROR, "failed to pack codon_marg")
-                      : IMM_SUCCESS;
+    return io->error ? error(IMM_IOERROR, "failed to pack codon_marg")
+                     : IMM_SUCCESS;
 }
 
 enum imm_rc imm_codon_marg_unpack(struct imm_codon_marg *codonm,
-                                  struct lip_ctx_file *ctx)
+                                  struct lip_io_file *io)
 {
     imm_float *lprobs = &codonm->lprobs[0][0][0];
 
-    unsigned size = 0;
-    uint8_t type = 0;
+    xlip_expect_1darray_float_type(io, CODON_SIZE, XLIP_1DARRAY_FLOAT, lprobs);
 
-    lip_read_1darray_size_type(ctx, &size, &type);
-    if (size != CODON_SIZE || type != LIP_1DARRAY_IMM_FLOAT)
-        return error(IMM_IOERROR, "wrong array size");
-
-    lip_read_1darray_float(ctx, CODON_SIZE, lprobs);
-
-    return ctx->error ? error(IMM_IOERROR, "failed to unpack marg_lprob")
-                      : IMM_SUCCESS;
+    return io->error ? error(IMM_IOERROR, "failed to unpack marg_lprob")
+                     : IMM_SUCCESS;
 }

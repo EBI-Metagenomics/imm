@@ -54,12 +54,14 @@ static void calc_offset(struct imm_dp_emis *emis, struct imm_code const *code,
     unsigned size = code_size(code, min, max);
     for (unsigned i = 1; i < nstates; ++i)
     {
-        emis->offset[i] = size;
+        assert(size <= UINT32_MAX);
+        emis->offset[i] = (uint32_t)size;
         min = imm_state_span(states[i]).min;
         max = imm_state_span(states[i]).max;
         size += code_size(code, min, max);
     }
-    emis->offset[nstates] = size;
+    assert(size <= UINT32_MAX);
+    emis->offset[nstates] = (uint32_t)size;
 }
 
 static void calc_score(struct imm_dp_emis *emis, struct imm_code const *code,

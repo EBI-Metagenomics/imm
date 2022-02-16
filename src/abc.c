@@ -1,9 +1,6 @@
 #include "abc.h"
 #include "error.h"
 #include "imm/sym.h"
-#include "lite_pack/1darray.h"
-#include "lite_pack/ctx/file.h"
-#include "lite_pack/lite_pack.h"
 #include "xlip.h"
 #include <assert.h>
 #include <stdint.h>
@@ -17,16 +14,16 @@ enum imm_rc imm_abc_init(struct imm_abc *abc, struct imm_str symbols,
     return abc_init(abc, symbols.len, symbols.data, any_symbol, vtable);
 }
 
-enum imm_rc imm_abc_pack(struct imm_abc const *abc, struct lip_ctx_file *ctx)
+enum imm_rc imm_abc_pack(struct imm_abc const *abc, struct lip_io_file *io)
 {
-    enum imm_rc rc = abc_pack(abc, ctx);
+    enum imm_rc rc = abc_pack(abc, io);
     if (rc) return error(rc, "failed to write alphabet");
     return rc;
 }
 
-enum imm_rc imm_abc_unpack(struct imm_abc *abc, struct lip_ctx_file *ctx)
+enum imm_rc imm_abc_unpack(struct imm_abc *abc, struct lip_io_file *io)
 {
-    enum imm_rc rc = abc_unpack(abc, ctx);
+    enum imm_rc rc = abc_unpack(abc, io);
     if (rc) return error(rc, "failed to read alphabet");
     return rc;
 }
@@ -90,51 +87,45 @@ static_assert(sizeof(imm_abc_typeid_t) == sizeof(uint8_t), "wrong types");
         if (!!(expr)) return e;                                                \
     } while (0)
 
-enum imm_rc abc_pack(struct imm_abc const *abc, struct lip_ctx_file *ctx)
+enum imm_rc abc_pack(struct imm_abc const *abc, struct lip_io_file *io)
 {
-    lip_write_map_size(ctx, 4);
+    lip_write_map_size(io, 4);
 
-    xlip_write_cstr(ctx, "symbols");
-    xlip_write_cstr(ctx, abc->symbols);
+    xlip_write_key(io, "symbols");
+    xlip_write_cstr(io, abc->symbols);
 
-    xlip_write_cstr(ctx, "idx");
-    lip_write_1darray_size_type(ctx, IMM_ARRAY_SIZE(abc->sym.idx),
-                                LIP_1DARRAY_UINT8);
-    lip_write_1darray_u8_data(ctx, IMM_ARRAY_SIZE(abc->sym.idx), abc->sym.idx);
+    xlip_write_key(io, "idx");
+    lip_write_1darray_u8(io, IMM_ARRAY_SIZE(abc->sym.idx), abc->sym.idx);
 
-    xlip_write_cstr(ctx, "any_symbol_id");
-    lip_write_int(ctx, abc->any_symbol_id);
+    xlip_write_key(io, "any_symbol_id");
+    lip_write_int(io, abc->any_symbol_id);
 
-    xlip_write_cstr(ctx, "typeid");
-    lip_write_int(ctx, abc->vtable.typeid);
+    xlip_write_key(io, "typeid");
+    lip_write_int(io, abc->vtable.typeid);
 
-    return !ctx->error ? IMM_SUCCESS : IMM_FAILURE;
+    return io->error ? IMM_FAILURE : IMM_SUCCESS;
 }
 
-enum imm_rc abc_unpack(struct imm_abc *abc, struct lip_ctx_file *ctx)
+enum imm_rc abc_unpack(struct imm_abc *abc, struct lip_io_file *io)
 {
-    unsigned size = 0;
-    uint8_t type = 0;
+    if (!xlip_expect_map(io, 4)) return IMM_FAILURE;
 
-    if (!xlip_expect_map(ctx, 4)) return IMM_FAILURE;
+    if (!xlip_expect_key(io, "symbols")) return IMM_FAILURE;
+    xlip_read_cstr(io, IMM_ABC_MAX_SIZE, abc->symbols);
 
-    if (!xlip_expect_key(ctx, "symbols")) return IMM_FAILURE;
-
-    xlip_read_cstr(ctx, IMM_ABC_MAX_SIZE, abc->symbols);
     abc->size = (unsigned)strlen(abc->symbols);
 
-    if (!xlip_expect_key(ctx, "idx")) return IMM_FAILURE;
-    lip_read_1darray_size_type(ctx, &size, &type);
-    if (size != IMM_ARRAY_SIZE(abc->sym.idx)) return IMM_FAILURE;
-    if (type != LIP_1DARRAY_UINT8) return IMM_FAILURE;
-    lip_read_1darray_u8_data(ctx, size, abc->sym.idx);
+    if (!xlip_expect_key(io, "idx")) return IMM_FAILURE;
+    xlip_expect_1darray_u8_type(io, IMM_ARRAY_SIZE(abc->sym.idx),
+                                LIP_1DARRAY_UINT8, abc->sym.idx);
 
-    if (!xlip_expect_key(ctx, "any_symbol_id")) return IMM_FAILURE;
-    lip_read_int(ctx, &abc->any_symbol_id);
+    if (!xlip_expect_key(io, "any_symbol_id")) return IMM_FAILURE;
+    lip_read_int(io, &abc->any_symbol_id);
 
-    if (!xlip_expect_key(ctx, "typeid")) return IMM_FAILURE;
-    lip_read_int(ctx, &abc->vtable.typeid);
+    if (!xlip_expect_key(io, "typeid")) return IMM_FAILURE;
+    lip_read_int(io, &abc->vtable.typeid);
+
     if (!imm_abc_typeid_valid(abc->vtable.typeid)) return IMM_PARSEERROR;
 
-    return IMM_SUCCESS;
+    return io->error ? IMM_FAILURE : IMM_SUCCESS;
 }

@@ -39,7 +39,6 @@ add_library(
     src/frame_cond.c
     src/frame_state.c
     src/gc.c
-    src/xlip.c
     src/gc_auto.c
     src/hmm.c
     src/log.c
@@ -55,6 +54,7 @@ add_library(
     src/seq.c
     src/state.c
     src/task.c
+    src/xlip.c
     src/tsort.c)
 add_library(IMM::imm ALIAS imm)
 

@@ -1,20 +1,21 @@
-#include "cwpack_stream_context.h"
 #include "hope/hope.h"
 #include "imm/imm.h"
+#include "lite_pack/io/file.h"
 
 int main(void)
 {
+    struct lip_io_file io = {0};
     struct imm_rna const *rna_out = &imm_rna_iupac;
 
-    new_pack_ctx(TMPDIR "/rna.imm");
-    EQ(imm_abc_pack((struct imm_abc const *)rna_out, pack_ctx), IMM_SUCCESS);
-    del_pack_ctx();
+    io.fp = fopen(TMPDIR "/rna.imm", "wb");
+    EQ(imm_abc_pack((struct imm_abc const *)rna_out, &io), IMM_SUCCESS);
+    fclose(io.fp);
 
     struct imm_rna rna_in;
 
-    new_unpack_ctx(TMPDIR "/rna.imm");
-    EQ(imm_abc_unpack((struct imm_abc *)&rna_in, unpack_ctx), IMM_SUCCESS);
-    del_unpack_ctx();
+    io.fp = fopen(TMPDIR "/rna.imm", "rb");
+    EQ(imm_abc_unpack((struct imm_abc *)&rna_in, &io), IMM_SUCCESS);
+    fclose(io.fp);
 
     struct imm_abc const *out = imm_super(imm_super(rna_out));
     struct imm_abc const *in = imm_super(imm_super(&rna_in));

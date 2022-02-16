@@ -1,45 +1,106 @@
 #include "xlip.h"
 #include "imm/support.h"
-#include "lite_pack/ctx/file.h"
 #include "lite_pack/lite_pack.h"
 
-bool xlip_expect_map(struct lip_ctx_file *ctx, unsigned size)
+bool xlip_expect_map(struct lip_io_file *io, unsigned size)
 {
     unsigned sz = 0;
-    lip_read_map_size(ctx, &size);
+    lip_read_map_size(io, &sz);
     return size == sz;
 }
 
-bool xlip_expect_key(struct lip_ctx_file *ctx, char const key[])
+bool xlip_expect_key(struct lip_io_file *io, char const key[])
 {
     unsigned size = 0;
     char buf[16] = {0};
 
-    lip_read_str_size(ctx, &size);
-    if (size > IMM_ARRAY_SIZE(buf)) return false;
+    lip_read_str_size(io, &size);
+    if (size > IMM_ARRAY_SIZE(buf)) io->error = true;
 
-    lip_read_str_data(ctx, size, buf);
-    if (size != (unsigned)strlen(key)) return false;
+    lip_read_str_data(io, size, buf);
+    if (size != (unsigned)strlen(key)) io->error = true;
     return strncmp(key, buf, size) == 0;
 }
 
-void xlip_write_cstr(struct lip_ctx_file *ctx, char const val[])
+bool xlip_expect_1darray_u8(struct lip_io_file *io, unsigned size,
+                            uint8_t arr[])
 {
-    unsigned size = (unsigned)strlen(val);
-    lip_write_str_size(ctx, size);
-    lip_write_str_data(ctx, size, val);
+    unsigned sz = 0;
+    uint8_t type = 0;
+    lip_read_1darray_size_type(io, &sz, &type);
+    if (size != sz) goto error;
+    lip_read_1darray_int_data(io, size, arr);
+    return !io->error;
+
+error:
+    io->error = true;
+    return false;
 }
 
-void xlip_read_cstr(struct lip_ctx_file *ctx, unsigned size, char val[])
+bool xlip_expect_1darray_u8_type(struct lip_io_file *io, unsigned size,
+                                 uint8_t type, uint8_t arr[])
 {
-    val[0] = 0;
     unsigned sz = 0;
-    lip_read_str_size(ctx, &sz);
+    uint8_t ty = 0;
+    lip_read_1darray_size_type(io, &sz, &ty);
+    if (size != sz) goto error;
+    if (type != ty) goto error;
+    lip_read_1darray_int_data(io, size, arr);
+    return !io->error;
+
+error:
+    io->error = true;
+    return false;
+}
+
+bool xlip_expect_1darray_float(struct lip_io_file *io, unsigned size,
+                               imm_float arr[])
+{
+    unsigned sz = 0;
+    uint8_t type = 0;
+    lip_read_1darray_size_type(io, &sz, &type);
+    if (size != sz) goto error;
+    lip_read_1darray_float_data(io, size, arr);
+    return !io->error;
+
+error:
+    io->error = true;
+    return false;
+}
+
+bool xlip_expect_1darray_float_type(struct lip_io_file *io, unsigned size,
+                                    uint8_t type, imm_float arr[])
+{
+    unsigned sz = 0;
+    uint8_t ty = 0;
+    lip_read_1darray_size_type(io, &sz, &type);
+    if (size != sz) goto error;
+    if (type != ty) goto error;
+    lip_read_1darray_float_data(io, size, arr);
+    return !io->error;
+
+error:
+    io->error = true;
+    return false;
+}
+
+void xlip_write_cstr(struct lip_io_file *io, char const str[])
+{
+    unsigned size = (unsigned)strlen(str);
+    lip_write_str_size(io, size);
+    lip_write_str_data(io, size, str);
+}
+
+void xlip_read_cstr(struct lip_io_file *io, unsigned size, char str[])
+{
+    str[0] = 0;
+    unsigned sz = 0;
+    lip_read_str_size(io, &sz);
     if (sz > size)
     {
-        ctx->error = true;
+        io->error = true;
         return;
     }
-    lip_read_str_data(ctx, sz, val);
-    val[sz] = 0;
+    lip_read_str_data(io, sz, str);
+    str[sz] = 0;
 }
