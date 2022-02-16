@@ -78,7 +78,7 @@ enum imm_rc imm_dp_pack(struct imm_dp const *dp, struct lip_io_file *io)
 
     /* state_table */
     xlip_write_key(io, KEY_STATE_IDS);
-    lip_write_1darray_int(io, dp->state_table.nstates, dp->state_table.ids);
+    lip_write_1darray_int(io, nstates, dp->state_table.ids);
 
     xlip_write_key(io, KEY_STATE_START);
     lip_write_int(io, dp->state_table.start.state);
@@ -88,8 +88,8 @@ enum imm_rc imm_dp_pack(struct imm_dp const *dp, struct lip_io_file *io)
     lip_write_int(io, dp->state_table.end_state_idx);
 
     xlip_write_key(io, KEY_STATE_SPAN);
-    lip_write_1darray_size_type(io, size, LIP_1DARRAY_UINT16);
-    for (unsigned i = 0; i < size; ++i)
+    lip_write_1darray_size_type(io, nstates, LIP_1DARRAY_UINT16);
+    for (unsigned i = 0; i < nstates; ++i)
         lip_write_1darray_int_item(io, span_zip(dp->state_table.span + i));
 
     return io->error ? IMM_IOERROR : IMM_SUCCESS;
@@ -161,7 +161,7 @@ enum imm_rc imm_dp_unpack(struct imm_dp *dp, struct lip_io_file *io)
 
     ERET(!xlip_expect_key(io, KEY_STATE_SPAN), IMM_IOERROR);
     lip_read_1darray_size_type(io, &size, &type);
-    ERET(st->nstates + 1 != size, IMM_PARSEERROR);
+    ERET(st->nstates != size, IMM_PARSEERROR);
     ERET(type != LIP_1DARRAY_UINT16, IMM_IOERROR);
     st->span = reallocf(st->span, sizeof(*st->span) * size);
     ERET(!st->span && size > 0, IMM_IOERROR);
