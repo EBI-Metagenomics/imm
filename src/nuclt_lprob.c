@@ -1,7 +1,8 @@
 #include "imm/nuclt_lprob.h"
 #include "error.h"
+#include "expect.h"
 #include "imm/rc.h"
-#include "xlip.h"
+#include "lite_pack.h"
 
 enum imm_rc imm_nuclt_lprob_pack(struct imm_nuclt_lprob const *nucltp,
                                  struct lip_io_file *io)
@@ -15,8 +16,8 @@ enum imm_rc imm_nuclt_lprob_pack(struct imm_nuclt_lprob const *nucltp,
 enum imm_rc imm_nuclt_lprob_unpack(struct imm_nuclt_lprob *nucltp,
                                    struct lip_io_file *io)
 {
-    xlip_expect_1darray_float_type(io, IMM_NUCLT_SIZE, XLIP_1DARRAY_FLOAT,
-                                   nucltp->lprobs);
+    expect_1darray_float_type(io, IMM_NUCLT_SIZE, XLIP_1DARRAY_FLOAT,
+                              nucltp->lprobs);
 
     return io->error ? error(IMM_IOERROR, "failed to unpack nuclt_lprob")
                      : IMM_SUCCESS;

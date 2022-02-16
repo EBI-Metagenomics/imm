@@ -36,6 +36,7 @@ add_library(
     src/eseq.c
     src/example1.c
     src/example2.c
+    src/expect.c
     src/frame_cond.c
     src/frame_state.c
     src/gc.c
@@ -54,7 +55,6 @@ add_library(
     src/seq.c
     src/state.c
     src/task.c
-    src/xlip.c
     src/tsort.c)
 add_library(IMM::imm ALIAS imm)
 

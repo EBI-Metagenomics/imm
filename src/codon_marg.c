@@ -1,10 +1,11 @@
 #include "imm/codon_marg.h"
 #include "error.h"
+#include "expect.h"
 #include "imm/abc.h"
 #include "imm/codon_lprob.h"
 #include "imm/generics.h"
 #include "imm/nuclt.h"
-#include "xlip.h"
+#include "lite_pack.h"
 #include <assert.h>
 
 static_assert(IMM_NUCLT_SIZE == 4, "nuclt size expected to be four");
@@ -145,7 +146,7 @@ enum imm_rc imm_codon_marg_unpack(struct imm_codon_marg *codonm,
 {
     imm_float *lprobs = &codonm->lprobs[0][0][0];
 
-    xlip_expect_1darray_float_type(io, CODON_SIZE, XLIP_1DARRAY_FLOAT, lprobs);
+    expect_1darray_float_type(io, CODON_SIZE, XLIP_1DARRAY_FLOAT, lprobs);
 
     return io->error ? error(IMM_IOERROR, "failed to unpack marg_lprob")
                      : IMM_SUCCESS;

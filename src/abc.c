@@ -1,7 +1,8 @@
 #include "abc.h"
 #include "error.h"
+#include "expect.h"
 #include "imm/sym.h"
-#include "xlip.h"
+#include "lite_pack.h"
 #include <assert.h>
 #include <stdint.h>
 
@@ -91,16 +92,16 @@ enum imm_rc abc_pack(struct imm_abc const *abc, struct lip_io_file *io)
 {
     lip_write_map_size(io, 4);
 
-    xlip_write_key(io, "symbols");
-    xlip_write_cstr(io, abc->symbols);
+    lip_write_cstr(io, "symbols");
+    lip_write_cstr(io, abc->symbols);
 
-    xlip_write_key(io, "idx");
+    lip_write_cstr(io, "idx");
     lip_write_1darray_u8(io, IMM_ARRAY_SIZE(abc->sym.idx), abc->sym.idx);
 
-    xlip_write_key(io, "any_symbol_id");
+    lip_write_cstr(io, "any_symbol_id");
     lip_write_int(io, abc->any_symbol_id);
 
-    xlip_write_key(io, "typeid");
+    lip_write_cstr(io, "typeid");
     lip_write_int(io, abc->vtable.typeid);
 
     return io->error ? IMM_FAILURE : IMM_SUCCESS;
@@ -108,21 +109,21 @@ enum imm_rc abc_pack(struct imm_abc const *abc, struct lip_io_file *io)
 
 enum imm_rc abc_unpack(struct imm_abc *abc, struct lip_io_file *io)
 {
-    if (!xlip_expect_map(io, 4)) return IMM_FAILURE;
+    if (!expect_map(io, 4)) return IMM_FAILURE;
 
-    if (!xlip_expect_key(io, "symbols")) return IMM_FAILURE;
-    xlip_read_cstr(io, IMM_ABC_MAX_SIZE, abc->symbols);
+    if (!expect_key(io, "symbols")) return IMM_FAILURE;
+    lip_read_cstr(io, IMM_ABC_MAX_SIZE, abc->symbols);
 
     abc->size = (unsigned)strlen(abc->symbols);
 
-    if (!xlip_expect_key(io, "idx")) return IMM_FAILURE;
-    xlip_expect_1darray_u8_type(io, IMM_ARRAY_SIZE(abc->sym.idx),
-                                LIP_1DARRAY_UINT8, abc->sym.idx);
+    if (!expect_key(io, "idx")) return IMM_FAILURE;
+    expect_1darray_u8_type(io, IMM_ARRAY_SIZE(abc->sym.idx), LIP_1DARRAY_UINT8,
+                           abc->sym.idx);
 
-    if (!xlip_expect_key(io, "any_symbol_id")) return IMM_FAILURE;
+    if (!expect_key(io, "any_symbol_id")) return IMM_FAILURE;
     lip_read_int(io, &abc->any_symbol_id);
 
-    if (!xlip_expect_key(io, "typeid")) return IMM_FAILURE;
+    if (!expect_key(io, "typeid")) return IMM_FAILURE;
     lip_read_int(io, &abc->vtable.typeid);
 
     if (!imm_abc_typeid_valid(abc->vtable.typeid)) return IMM_PARSEERROR;
