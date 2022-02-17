@@ -12,7 +12,7 @@ struct imm_nuclt_lprob
     imm_float lprobs[IMM_NUCLT_SIZE];
 };
 
-struct lip_io_file;
+struct lip_file;
 
 static inline struct imm_nuclt_lprob
 imm_nuclt_lprob(struct imm_nuclt const *nuclt,
@@ -40,9 +40,9 @@ static inline imm_float imm_nuclt_lprob_get(struct imm_nuclt_lprob const *lprob,
 }
 
 IMM_API enum imm_rc imm_nuclt_lprob_pack(struct imm_nuclt_lprob const *nucltp,
-                                         struct lip_io_file *io);
+                                         struct lip_file *io);
 
 IMM_API enum imm_rc imm_nuclt_lprob_unpack(struct imm_nuclt_lprob *nucltp,
-                                           struct lip_io_file *io);
+                                           struct lip_file *io);
 
 #endif

@@ -1,6 +1,6 @@
 #include "hope/hope.h"
 #include "imm/imm.h"
-#include "lite_pack/io/file.h"
+#include "lite_pack/file/file.h"
 
 void test_dp_io_large_normal(void);
 void test_dp_io_large_frame(void);
@@ -14,22 +14,22 @@ int main(void)
 
 void test_dp_io_large_normal(void)
 {
-    struct lip_io_file io = {0};
+    struct lip_file file = {0};
     imm_example1_init(IMM_EXAMPLE1_SIZE);
     struct imm_example1 *m = &imm_example1;
     struct imm_dp dp;
     EQ(imm_hmm_init_dp(&imm_example1.hmm, imm_super(&m->end), &dp),
        IMM_SUCCESS);
 
-    io.fp = fopen(TMPDIR "/dp_normal.imm", "wb");
-    EQ(imm_dp_pack(&dp, &io), IMM_SUCCESS);
-    fclose(io.fp);
+    file.fp = fopen(TMPDIR "/dp_normal.imm", "wb");
+    EQ(imm_dp_pack(&dp, &file), IMM_SUCCESS);
+    fclose(file.fp);
     imm_del(&dp);
 
     imm_dp_init(&dp, &m->code);
-    io.fp = fopen(TMPDIR "/dp_normal.imm", "rb");
-    EQ(imm_dp_unpack(&dp, &io), IMM_SUCCESS);
-    fclose(io.fp);
+    file.fp = fopen(TMPDIR "/dp_normal.imm", "rb");
+    EQ(imm_dp_unpack(&dp, &file), IMM_SUCCESS);
+    fclose(file.fp);
 
     struct imm_task *task = imm_task_new(&dp);
     struct imm_prod prod = imm_prod();
@@ -45,7 +45,7 @@ void test_dp_io_large_normal(void)
 
 void test_dp_io_large_frame(void)
 {
-    struct lip_io_file io = {0};
+    struct lip_file file = {0};
     imm_example2_init();
     struct imm_example2 *m = &imm_example2;
     struct imm_dp dp;
@@ -61,15 +61,15 @@ void test_dp_io_large_frame(void)
     imm_del(&prod);
     imm_del(task);
 
-    io.fp = fopen(TMPDIR "/dp_frame.imm", "wb");
-    EQ(imm_dp_pack(&dp, &io), IMM_SUCCESS);
-    fclose(io.fp);
+    file.fp = fopen(TMPDIR "/dp_frame.imm", "wb");
+    EQ(imm_dp_pack(&dp, &file), IMM_SUCCESS);
+    fclose(file.fp);
     imm_del(&dp);
 
     imm_dp_init(&dp, &m->code);
-    io.fp = fopen(TMPDIR "/dp_frame.imm", "rb");
-    EQ(imm_dp_unpack(&dp, &io), IMM_SUCCESS);
-    fclose(io.fp);
+    file.fp = fopen(TMPDIR "/dp_frame.imm", "rb");
+    EQ(imm_dp_unpack(&dp, &file), IMM_SUCCESS);
+    fclose(file.fp);
 
     task = imm_task_new(&dp);
     prod = imm_prod();

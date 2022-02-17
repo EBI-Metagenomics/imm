@@ -45,58 +45,58 @@ static_assert(sizeof(imm_state_idx_t) == sizeof(uint16_t), "wrong types");
 #define USER_EXT CWP_ITEM_USER_EXT_0
 #endif
 
-enum imm_rc imm_dp_pack(struct imm_dp const *dp, struct lip_io_file *io)
+enum imm_rc imm_dp_pack(struct imm_dp const *dp, struct lip_file *f)
 {
     unsigned size = 0;
     unsigned nstates = dp->state_table.nstates;
 
-    lip_write_map_size(io, 10);
+    lip_write_map_size(f, 10);
 
     /* emission */
-    lip_write_cstr(io, KEY_EMIS_SCORE);
+    lip_write_cstr(f, KEY_EMIS_SCORE);
     size = emis_score_size(&dp->emis, nstates);
-    lip_write_1darray_float(io, size, dp->emis.score);
+    lip_write_1darray_float(f, size, dp->emis.score);
 
-    lip_write_cstr(io, KEY_EMIS_OFFSET);
-    lip_write_1darray_int(io, emis_offset_size(nstates), dp->emis.offset);
+    lip_write_cstr(f, KEY_EMIS_OFFSET);
+    lip_write_1darray_int(f, emis_offset_size(nstates), dp->emis.offset);
 
     /* trans_table */
     size = dp->trans_table.ntrans;
-    lip_write_cstr(io, KEY_TRANS_SCORE);
-    lip_write_1darray_size_type(io, size, XLIP_1DARRAY_FLOAT);
+    lip_write_cstr(f, KEY_TRANS_SCORE);
+    lip_write_1darray_size_type(f, size, XLIP_1DARRAY_FLOAT);
     for (unsigned i = 0; i < size; ++i)
-        lip_write_1darray_float_item(io, dp->trans_table.trans[i].score);
+        lip_write_1darray_float_item(f, dp->trans_table.trans[i].score);
 
     size = dp->trans_table.ntrans;
-    lip_write_cstr(io, KEY_TRANS_SRC);
-    lip_write_1darray_size_type(io, size, LIP_1DARRAY_UINT16);
+    lip_write_cstr(f, KEY_TRANS_SRC);
+    lip_write_1darray_size_type(f, size, LIP_1DARRAY_UINT16);
     for (unsigned i = 0; i < size; ++i)
-        lip_write_1darray_int_item(io, dp->trans_table.trans[i].src);
+        lip_write_1darray_int_item(f, dp->trans_table.trans[i].src);
 
     size = trans_table_offsize(nstates);
-    lip_write_cstr(io, KEY_TRANS_OFFSET);
-    lip_write_1darray_int(io, size, dp->trans_table.offset);
+    lip_write_cstr(f, KEY_TRANS_OFFSET);
+    lip_write_1darray_int(f, size, dp->trans_table.offset);
 
     /* state_table */
-    lip_write_cstr(io, KEY_STATE_IDS);
-    lip_write_1darray_int(io, nstates, dp->state_table.ids);
+    lip_write_cstr(f, KEY_STATE_IDS);
+    lip_write_1darray_int(f, nstates, dp->state_table.ids);
 
-    lip_write_cstr(io, KEY_STATE_START);
-    lip_write_int(io, dp->state_table.start.state);
-    lip_write_cstr(io, KEY_STATE_LPROB);
-    lip_write_float(io, dp->state_table.start.lprob);
-    lip_write_cstr(io, KEY_STATE_END);
-    lip_write_int(io, dp->state_table.end_state_idx);
+    lip_write_cstr(f, KEY_STATE_START);
+    lip_write_int(f, dp->state_table.start.state);
+    lip_write_cstr(f, KEY_STATE_LPROB);
+    lip_write_float(f, dp->state_table.start.lprob);
+    lip_write_cstr(f, KEY_STATE_END);
+    lip_write_int(f, dp->state_table.end_state_idx);
 
-    lip_write_cstr(io, KEY_STATE_SPAN);
-    lip_write_1darray_size_type(io, nstates, LIP_1DARRAY_UINT16);
+    lip_write_cstr(f, KEY_STATE_SPAN);
+    lip_write_1darray_size_type(f, nstates, LIP_1DARRAY_UINT16);
     for (unsigned i = 0; i < nstates; ++i)
-        lip_write_1darray_int_item(io, span_zip(dp->state_table.span + i));
+        lip_write_1darray_int_item(f, span_zip(dp->state_table.span + i));
 
-    return io->error ? IMM_IOERROR : IMM_SUCCESS;
+    return f->error ? IMM_IOERROR : IMM_SUCCESS;
 }
 
-enum imm_rc imm_dp_unpack(struct imm_dp *dp, struct lip_io_file *io)
+enum imm_rc imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
 {
     enum imm_rc rc = IMM_SUCCESS;
     unsigned size = 0;
@@ -105,63 +105,63 @@ enum imm_rc imm_dp_unpack(struct imm_dp *dp, struct lip_io_file *io)
     struct imm_dp_trans_table *tt = &dp->trans_table;
     struct imm_dp_state_table *st = &dp->state_table;
 
-    if (!expect_map(io, 10)) return IMM_FAILURE;
+    if (!expect_map(f, 10)) return IMM_FAILURE;
 
     /* emission */
-    ERET(!expect_key(io, KEY_EMIS_SCORE), IMM_IOERROR);
-    lip_read_1darray_size_type(io, &size, &type);
+    ERET(!expect_key(f, KEY_EMIS_SCORE), IMM_IOERROR);
+    lip_read_1darray_size_type(f, &size, &type);
     ERET(type != XLIP_1DARRAY_FLOAT, IMM_IOERROR);
     e->score = reallocf(e->score, sizeof(*e->score) * size);
     ERET(!e->score && size > 0, IMM_IOERROR);
-    lip_read_1darray_float_data(io, size, e->score);
+    lip_read_1darray_float_data(f, size, e->score);
 
-    ERET(!expect_key(io, KEY_EMIS_OFFSET), IMM_IOERROR);
-    lip_read_1darray_size_type(io, &size, &type);
+    ERET(!expect_key(f, KEY_EMIS_OFFSET), IMM_IOERROR);
+    lip_read_1darray_size_type(f, &size, &type);
     ERET(type != LIP_1DARRAY_UINT32, IMM_IOERROR);
     e->offset = reallocf(e->offset, sizeof(*e->offset) * size);
     ERET(!e->offset && size > 0, IMM_IOERROR);
-    lip_read_1darray_int_data(io, size, e->offset);
+    lip_read_1darray_int_data(f, size, e->offset);
 
     /* trans_table */
-    ERET(!expect_key(io, KEY_TRANS_SCORE), IMM_IOERROR);
-    lip_read_1darray_size_type(io, &tt->ntrans, &type);
+    ERET(!expect_key(f, KEY_TRANS_SCORE), IMM_IOERROR);
+    lip_read_1darray_size_type(f, &tt->ntrans, &type);
     ERET(type != XLIP_1DARRAY_FLOAT, IMM_IOERROR);
     tt->trans = reallocf(tt->trans, sizeof(*tt->trans) * tt->ntrans);
     ERET(!tt->trans && tt->ntrans > 0, IMM_IOERROR);
     for (unsigned i = 0; i < tt->ntrans; ++i)
-        lip_read_1darray_float_item(io, &tt->trans[i].score);
+        lip_read_1darray_float_item(f, &tt->trans[i].score);
 
-    ERET(!expect_key(io, KEY_TRANS_SRC), IMM_IOERROR);
-    lip_read_1darray_size_type(io, &size, &type);
+    ERET(!expect_key(f, KEY_TRANS_SRC), IMM_IOERROR);
+    lip_read_1darray_size_type(f, &size, &type);
     ERET(type != LIP_1DARRAY_UINT16, IMM_IOERROR);
     ERET(tt->ntrans != size, IMM_PARSEERROR);
     for (unsigned i = 0; i < size; ++i)
-        lip_read_1darray_int_item(io, &tt->trans[i].src);
+        lip_read_1darray_int_item(f, &tt->trans[i].src);
 
-    ERET(!expect_key(io, KEY_TRANS_OFFSET), IMM_IOERROR);
-    lip_read_1darray_size_type(io, &size, &type);
+    ERET(!expect_key(f, KEY_TRANS_OFFSET), IMM_IOERROR);
+    lip_read_1darray_size_type(f, &size, &type);
     ERET(type != LIP_1DARRAY_UINT16, IMM_IOERROR);
     tt->offset = reallocf(tt->offset, sizeof(*tt->offset) * size);
     ERET(!tt->offset && size > 0, IMM_IOERROR);
-    lip_read_1darray_int_data(io, size, tt->offset);
+    lip_read_1darray_int_data(f, size, tt->offset);
 
     /* state_table */
-    ERET(!expect_key(io, KEY_STATE_IDS), IMM_IOERROR);
-    lip_read_1darray_size_type(io, &st->nstates, &type);
+    ERET(!expect_key(f, KEY_STATE_IDS), IMM_IOERROR);
+    lip_read_1darray_size_type(f, &st->nstates, &type);
     ERET(type != LIP_1DARRAY_UINT16, IMM_IOERROR);
     st->ids = reallocf(st->ids, sizeof(*st->ids) * st->nstates);
     ERET(!st->ids && st->nstates > 0, IMM_IOERROR);
-    lip_read_1darray_int_data(io, st->nstates, st->ids);
+    lip_read_1darray_int_data(f, st->nstates, st->ids);
 
-    ERET(!expect_key(io, KEY_STATE_START), IMM_IOERROR);
-    lip_read_int(io, &dp->state_table.start.state);
-    ERET(!expect_key(io, KEY_STATE_LPROB), IMM_IOERROR);
-    lip_read_float(io, &dp->state_table.start.lprob);
-    ERET(!expect_key(io, KEY_STATE_END), IMM_IOERROR);
-    lip_read_int(io, &dp->state_table.end_state_idx);
+    ERET(!expect_key(f, KEY_STATE_START), IMM_IOERROR);
+    lip_read_int(f, &dp->state_table.start.state);
+    ERET(!expect_key(f, KEY_STATE_LPROB), IMM_IOERROR);
+    lip_read_float(f, &dp->state_table.start.lprob);
+    ERET(!expect_key(f, KEY_STATE_END), IMM_IOERROR);
+    lip_read_int(f, &dp->state_table.end_state_idx);
 
-    ERET(!expect_key(io, KEY_STATE_SPAN), IMM_IOERROR);
-    lip_read_1darray_size_type(io, &size, &type);
+    ERET(!expect_key(f, KEY_STATE_SPAN), IMM_IOERROR);
+    lip_read_1darray_size_type(f, &size, &type);
     ERET(st->nstates != size, IMM_PARSEERROR);
     ERET(type != LIP_1DARRAY_UINT16, IMM_IOERROR);
     st->span = reallocf(st->span, sizeof(*st->span) * size);
@@ -169,12 +169,12 @@ enum imm_rc imm_dp_unpack(struct imm_dp *dp, struct lip_io_file *io)
     for (unsigned i = 0; i < size; ++i)
     {
         uint16_t span = 0;
-        lip_read_1darray_int_item(io, &span);
+        lip_read_1darray_int_item(f, &span);
         ERET(!span_unzip(st->span + i, span), IMM_PARSEERROR);
         ERET(st->span[i].max > IMM_STATE_MAX_SEQLEN, IMM_PARSEERROR);
     }
 
-    if (!io->error) return IMM_SUCCESS;
+    if (!f->error) return IMM_SUCCESS;
 
 cleanup:
     if (e)

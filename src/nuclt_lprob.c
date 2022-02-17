@@ -5,7 +5,7 @@
 #include "lite_pack.h"
 
 enum imm_rc imm_nuclt_lprob_pack(struct imm_nuclt_lprob const *nucltp,
-                                 struct lip_io_file *io)
+                                 struct lip_file *io)
 {
     lip_write_1darray_float(io, IMM_NUCLT_SIZE, nucltp->lprobs);
 
@@ -14,7 +14,7 @@ enum imm_rc imm_nuclt_lprob_pack(struct imm_nuclt_lprob const *nucltp,
 }
 
 enum imm_rc imm_nuclt_lprob_unpack(struct imm_nuclt_lprob *nucltp,
-                                   struct lip_io_file *io)
+                                   struct lip_file *io)
 {
     expect_1darray_float_type(io, IMM_NUCLT_SIZE, XLIP_1DARRAY_FLOAT,
                               nucltp->lprobs);

@@ -15,16 +15,16 @@ enum imm_rc imm_abc_init(struct imm_abc *abc, struct imm_str symbols,
     return abc_init(abc, symbols.len, symbols.data, any_symbol, vtable);
 }
 
-enum imm_rc imm_abc_pack(struct imm_abc const *abc, struct lip_io_file *io)
+enum imm_rc imm_abc_pack(struct imm_abc const *abc, struct lip_file *file)
 {
-    enum imm_rc rc = abc_pack(abc, io);
+    enum imm_rc rc = abc_pack(abc, file);
     if (rc) return error(rc, "failed to write alphabet");
     return rc;
 }
 
-enum imm_rc imm_abc_unpack(struct imm_abc *abc, struct lip_io_file *io)
+enum imm_rc imm_abc_unpack(struct imm_abc *abc, struct lip_file *file)
 {
-    enum imm_rc rc = abc_unpack(abc, io);
+    enum imm_rc rc = abc_unpack(abc, file);
     if (rc) return error(rc, "failed to read alphabet");
     return rc;
 }
@@ -88,7 +88,7 @@ static_assert(sizeof(imm_abc_typeid_t) == sizeof(uint8_t), "wrong types");
         if (!!(expr)) return e;                                                \
     } while (0)
 
-enum imm_rc abc_pack(struct imm_abc const *abc, struct lip_io_file *io)
+enum imm_rc abc_pack(struct imm_abc const *abc, struct lip_file *io)
 {
     lip_write_map_size(io, 4);
 
@@ -107,7 +107,7 @@ enum imm_rc abc_pack(struct imm_abc const *abc, struct lip_io_file *io)
     return io->error ? IMM_FAILURE : IMM_SUCCESS;
 }
 
-enum imm_rc abc_unpack(struct imm_abc *abc, struct lip_io_file *io)
+enum imm_rc abc_unpack(struct imm_abc *abc, struct lip_file *io)
 {
     if (!expect_map(io, 4)) return IMM_FAILURE;
 

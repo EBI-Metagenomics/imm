@@ -133,7 +133,7 @@ struct imm_codon_marg imm_codon_marg(struct imm_codon_lprob *codonp)
     ((IMM_NUCLT_SIZE + 1) * (IMM_NUCLT_SIZE + 1) * (IMM_NUCLT_SIZE + 1))
 
 enum imm_rc imm_codon_marg_pack(struct imm_codon_marg const *codonm,
-                                struct lip_io_file *io)
+                                struct lip_file *io)
 {
     lip_write_1darray_float(io, CODON_SIZE, &codonm->lprobs[0][0][0]);
 
@@ -142,7 +142,7 @@ enum imm_rc imm_codon_marg_pack(struct imm_codon_marg const *codonm,
 }
 
 enum imm_rc imm_codon_marg_unpack(struct imm_codon_marg *codonm,
-                                  struct lip_io_file *io)
+                                  struct lip_file *io)
 {
     imm_float *lprobs = &codonm->lprobs[0][0][0];
 

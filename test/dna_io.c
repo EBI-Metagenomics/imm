@@ -1,21 +1,21 @@
 #include "hope/hope.h"
 #include "imm/imm.h"
-#include "lite_pack/io/file.h"
+#include "lite_pack/file/file.h"
 
 int main(void)
 {
-    struct lip_io_file io = {0};
+    struct lip_file file = {0};
     struct imm_dna const *dna_out = &imm_dna_iupac;
 
-    io.fp = fopen(TMPDIR "/dna.imm", "wb");
-    EQ(imm_abc_pack((struct imm_abc const *)dna_out, &io), IMM_SUCCESS);
-    fclose(io.fp);
+    file.fp = fopen(TMPDIR "/dna.imm", "wb");
+    EQ(imm_abc_pack((struct imm_abc const *)dna_out, &file), IMM_SUCCESS);
+    fclose(file.fp);
 
     struct imm_dna dna_in;
 
-    io.fp = fopen(TMPDIR "/dna.imm", "rb");
-    EQ(imm_abc_unpack((struct imm_abc *)&dna_in, &io), IMM_SUCCESS);
-    fclose(io.fp);
+    file.fp = fopen(TMPDIR "/dna.imm", "rb");
+    EQ(imm_abc_unpack((struct imm_abc *)&dna_in, &file), IMM_SUCCESS);
+    fclose(file.fp);
 
     struct imm_abc const *out = imm_super(imm_super(dna_out));
     struct imm_abc const *in = imm_super(imm_super(&dna_in));
