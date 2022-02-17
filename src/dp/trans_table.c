@@ -3,6 +3,7 @@
 #include "dp/dp.h"
 #include "error.h"
 #include "imm/trans.h"
+#include "reallocf.h"
 #include <assert.h>
 #include <limits.h>
 #include <stdlib.h>
@@ -33,18 +34,18 @@ enum imm_rc trans_table_reset(struct imm_dp_trans_table *tbl,
     tbl->ntrans = args->ntrans;
 
     unsigned offsize = trans_table_offsize(args->nstates);
-    tbl->offset = realloc(tbl->offset, sizeof(*tbl->offset) * offsize);
+    tbl->offset = reallocf(tbl->offset, sizeof(*tbl->offset) * offsize);
     if (!tbl->offset && offsize > 0)
-        return error(IMM_OUTOFMEM, "failed to realloc");
+        return error(IMM_OUTOFMEM, "failed to reallocf");
 
     tbl->offset[0] = 0;
 
-    tbl->trans = realloc(tbl->trans, sizeof(*tbl->trans) * tbl->ntrans);
+    tbl->trans = reallocf(tbl->trans, sizeof(*tbl->trans) * tbl->ntrans);
     if (!tbl->trans && tbl->ntrans > 0)
     {
         tbl->offset = NULL;
         free(tbl->offset);
-        return error(IMM_OUTOFMEM, "failed to realloc");
+        return error(IMM_OUTOFMEM, "failed to reallocf");
     }
 
     for (unsigned i = 0; i < args->nstates; ++i)

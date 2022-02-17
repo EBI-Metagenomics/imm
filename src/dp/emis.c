@@ -5,6 +5,7 @@
 #include "imm/cartes.h"
 #include "imm/code.h"
 #include "imm/state.h"
+#include "reallocf.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -31,7 +32,7 @@ void emis_init(struct imm_dp_emis *emis)
 static enum imm_rc realloc_offset(struct imm_dp_emis *emis, unsigned nstates)
 {
     unsigned offsize = emis_offset_size(nstates);
-    emis->offset = realloc(emis->offset, sizeof(*emis->offset) * offsize);
+    emis->offset = reallocf(emis->offset, sizeof(*emis->offset) * offsize);
     if (!emis->offset) return error(IMM_OUTOFMEM, "failed to resize");
     return IMM_SUCCESS;
 }
@@ -39,7 +40,7 @@ static enum imm_rc realloc_offset(struct imm_dp_emis *emis, unsigned nstates)
 static enum imm_rc realloc_score(struct imm_dp_emis *emis, unsigned nstates)
 {
     unsigned score_size = emis_score_size(emis, nstates);
-    emis->score = realloc(emis->score, sizeof(*emis->score) * score_size);
+    emis->score = reallocf(emis->score, sizeof(*emis->score) * score_size);
     if (!emis->score && score_size > 0)
         return error(IMM_OUTOFMEM, "failed to resize");
     return IMM_SUCCESS;

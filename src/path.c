@@ -1,6 +1,7 @@
 #include "imm/path.h"
 #include "error.h"
 #include "imm/step.h"
+#include "reallocf.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -11,8 +12,7 @@ static enum imm_rc path_setup(struct imm_path *path)
     path->dir = 1;
     path->start = 0;
     path->steps = malloc((size_t)path->capacity);
-    if (!path->steps)
-        return error(IMM_OUTOFMEM, "failed to malloc");
+    if (!path->steps) return error(IMM_OUTOFMEM, "failed to malloc");
     return IMM_SUCCESS;
 }
 
@@ -21,8 +21,7 @@ enum imm_rc imm_path_add(struct imm_path *path, struct imm_step step)
     enum imm_rc rc = IMM_SUCCESS;
     if (path->capacity == 0)
     {
-        if ((rc = path_setup(path)))
-            return rc;
+        if ((rc = path_setup(path))) return rc;
     }
 
     size_t count = (unsigned)path->nsteps + 1;
@@ -32,7 +31,7 @@ enum imm_rc imm_path_add(struct imm_path *path, struct imm_step step)
     {
         capacity <<= 1;
         assert(capacity >= sizeof *path->steps * count);
-        path->steps = realloc(path->steps, capacity);
+        path->steps = reallocf(path->steps, capacity);
         if (!path->steps && capacity > 0)
             return error(IMM_OUTOFMEM, "failed to realloc");
     }

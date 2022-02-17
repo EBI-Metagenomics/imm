@@ -2,6 +2,7 @@
 #include "dp/state_table.h"
 #include "error.h"
 #include "imm/rc.h"
+#include "reallocf.h"
 
 #define MAX_LOOKUP (2 * IMM_STATE_MAX_SEQLEN)
 
@@ -18,8 +19,7 @@ enum imm_rc matrix_init(struct matrix *matrix,
 enum imm_rc matrix_reset(struct matrix *m, struct imm_dp_state_table const *tbl)
 {
     unsigned n = tbl->nstates;
-    /* TODO: use reallocf */
-    m->state_col = realloc(m->state_col, sizeof(*m->state_col) * n);
+    m->state_col = reallocf(m->state_col, sizeof(*m->state_col) * n);
     if (!m->state_col && n > 0) return error(IMM_OUTOFMEM, "failed to realloc");
 
     unsigned next_col = 0;

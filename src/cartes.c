@@ -2,6 +2,7 @@
 #include "error.h"
 #include "imm/imm.h"
 #include "ipow.h"
+#include "reallocf.h"
 #include <assert.h>
 #include <limits.h>
 #include <stdlib.h>
@@ -21,8 +22,7 @@ void imm_cartes_deinit(struct imm_cartes const *cartes)
 
 char const *imm_cartes_next(struct imm_cartes *cartes)
 {
-    if (cartes->iter_idx == cartes->nitems)
-        return NULL;
+    if (cartes->iter_idx == cartes->nitems) return NULL;
 
     char *item = cartes->item;
     unsigned idx = cartes->iter_idx++;
@@ -47,9 +47,9 @@ enum imm_rc imm_cartes_reset(struct imm_cartes *cartes, char const *set,
     size_t new_capacity = sizeof(*cartes->item) * (unsigned)(max_times + 1);
     if (new_capacity > cartes->capacity)
     {
-        cartes->item = realloc(cartes->item, new_capacity);
+        cartes->item = reallocf(cartes->item, new_capacity);
         if (new_capacity > 0 && !cartes->item)
-            return error(IMM_OUTOFMEM, "failed to realloc");
+            return error(IMM_OUTOFMEM, "failed to reallocf");
         cartes->capacity = new_capacity;
     }
     cartes->nitems = 0;

@@ -1,5 +1,6 @@
 #include "bitmap.h"
 #include "bits.h"
+#include "reallocf.h"
 #include <stdlib.h>
 
 #define LONG_START(bit) (bit / (sizeof(long) * BITS_PER_BYTE))
@@ -19,9 +20,9 @@ unsigned long bitmap_get(unsigned long *x, unsigned long start, unsigned len)
     return val;
 }
 
-unsigned long *bitmap_realloc(unsigned long *x, unsigned long bits)
+unsigned long *bitmap_reallocf(unsigned long *x, unsigned long bits)
 {
-    return realloc(x, sizeof(long) * BITS_TO_LONGS(bits));
+    return reallocf(x, sizeof(long) * BITS_TO_LONGS(bits));
 }
 
 void bitmap_set(unsigned long *x, unsigned long val, unsigned long start,

@@ -1,6 +1,7 @@
 #ifndef MATRIX_MAKE_MATRIX_H
 #define MATRIX_MAKE_MATRIX_H
 
+#include "reallocf.h"
 #include <stdlib.h>
 
 #define MAKE_MATRIX_STRUCT(NAME, T)                                            \
@@ -16,8 +17,7 @@
                                   unsigned cols)                               \
     {                                                                          \
         matrix->data = malloc(sizeof(T) * (rows * cols));                      \
-        if (!matrix->data)                                                     \
-            return 1;                                                          \
+        if (!matrix->data) return 1;                                           \
         matrix->rows = rows;                                                   \
         matrix->cols = cols;                                                   \
         return 0;                                                              \
@@ -88,9 +88,8 @@
     static inline int NAME##_resize(struct NAME *matrix, unsigned rows,        \
                                     unsigned cols)                             \
     {                                                                          \
-        matrix->data = realloc(matrix->data, sizeof(T) * (rows * cols));       \
-        if (!matrix->data && rows * cols > 0)                                  \
-            return 1;                                                          \
+        matrix->data = reallocf(matrix->data, sizeof(T) * (rows * cols));      \
+        if (!matrix->data && rows * cols > 0) return 1;                        \
         matrix->rows = rows;                                                   \
         matrix->cols = cols;                                                   \
         return 0;                                                              \

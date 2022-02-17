@@ -3,6 +3,7 @@
 #include "error.h"
 #include "imm/state.h"
 #include "imm/state_types.h"
+#include "reallocf.h"
 #include <limits.h>
 #include <stdlib.h>
 
@@ -20,13 +21,13 @@ enum imm_rc state_table_reset(struct imm_dp_state_table *tbl,
                               struct dp_args const *args)
 {
     tbl->nstates = args->nstates;
-    tbl->ids = realloc(tbl->ids, sizeof(*tbl->ids) * args->nstates);
-    tbl->span = realloc(tbl->span, sizeof(*tbl->span) * args->nstates);
+    tbl->ids = reallocf(tbl->ids, sizeof(*tbl->ids) * args->nstates);
+    tbl->span = reallocf(tbl->span, sizeof(*tbl->span) * args->nstates);
 
     if (args->nstates > 0)
     {
         if (!tbl->ids || !tbl->span)
-            return error(IMM_OUTOFMEM, "failed to realloc");
+            return error(IMM_OUTOFMEM, "failed to reallocf");
     }
 
     for (unsigned i = 0; i < args->nstates; ++i)

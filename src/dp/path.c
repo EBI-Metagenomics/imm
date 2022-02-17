@@ -4,6 +4,7 @@
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
 #include "error.h"
+#include "reallocf.h"
 #include <stdlib.h>
 
 enum imm_rc path_init(struct path *path,
@@ -13,8 +14,7 @@ enum imm_rc path_init(struct path *path,
     path->state_offset = NULL;
     path->trans_bits = NULL;
     enum imm_rc rc = path_reset(path, state_tbl, trans_tbl);
-    if (rc)
-        return rc;
+    if (rc) return rc;
     path->bit = NULL;
     return IMM_SUCCESS;
 }
@@ -26,15 +26,14 @@ enum imm_rc path_reset(struct path *p,
     unsigned n = p->nstates = state_tbl->nstates;
 
     p->state_offset =
-        realloc(p->state_offset, sizeof *p->state_offset * (n + 1));
+        reallocf(p->state_offset, sizeof *p->state_offset * (n + 1));
 
-    if (!p->state_offset)
-        return error(IMM_OUTOFMEM, "failed to realloc");
+    if (!p->state_offset) return error(IMM_OUTOFMEM, "failed to reallocf");
     p->state_offset[0] = 0;
 
-    p->trans_bits = realloc(p->trans_bits, sizeof *p->trans_bits * n);
+    p->trans_bits = reallocf(p->trans_bits, sizeof *p->trans_bits * n);
     if (n > 0 && !p->trans_bits)
-        return error(IMM_OUTOFMEM, "failed to realloc");
+        return error(IMM_OUTOFMEM, "failed to reallocf");
 
     for (unsigned dst = 0; dst < n; ++dst)
     {
@@ -64,15 +63,13 @@ void path_del(struct path const *path)
 {
     free(path->state_offset);
     free(path->trans_bits);
-    if (path->bit)
-        free(path->bit);
+    if (path->bit) free(path->bit);
 }
 
 enum imm_rc path_setup(struct path *path, unsigned len)
 {
     size_t size = path->state_offset[path->nstates] * len;
-    path->bit = bitmap_realloc(path->bit, size);
-    if (!path->bit && size > 0)
-        return error(IMM_OUTOFMEM, "failed to realloc");
+    path->bit = bitmap_reallocf(path->bit, size);
+    if (!path->bit && size > 0) return error(IMM_OUTOFMEM, "failed to realloc");
     return IMM_SUCCESS;
 }
