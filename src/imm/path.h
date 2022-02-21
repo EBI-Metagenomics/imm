@@ -51,8 +51,7 @@ static inline unsigned imm_path_nsteps(struct imm_path const *path)
 
 static inline void imm_path_reverse(struct imm_path *path)
 {
-    if (path->nsteps == 0)
-        return;
+    if (path->nsteps == 0) return;
     int i = path->start + (int)path->nsteps * path->dir;
     int n = path->capacity;
     path->start = (((i % n) + n) % n) - 1;

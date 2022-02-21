@@ -13,7 +13,6 @@ void imm_mute_state_init(struct imm_mute_state *state, unsigned id,
 
 static imm_float lprob(struct imm_state const *state, struct imm_seq const *seq)
 {
-    if (imm_seq_size(seq) == 0)
-        return imm_log(1.0);
+    if (imm_seq_size(seq) == 0) return imm_log(1.0);
     return imm_lprob_zero();
 }

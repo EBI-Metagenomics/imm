@@ -10,14 +10,11 @@
 
 static bool check_mute_visit(struct imm_state **states, struct imm_state *state)
 {
-    if (imm_state_span(state).min > 0)
-        return false;
+    if (imm_state_span(state).min > 0) return false;
 
-    if (state->mark == PERMANENT_MARK)
-        return false;
+    if (state->mark == PERMANENT_MARK) return false;
 
-    if (state->mark == TEMPORARY_MARK)
-        return true;
+    if (state->mark == TEMPORARY_MARK) return true;
 
     state->mark = TEMPORARY_MARK;
 
@@ -25,8 +22,7 @@ static bool check_mute_visit(struct imm_state **states, struct imm_state *state)
     struct cco_iter it = cco_stack_iter(&state->trans.outgoing);
     cco_iter_for_each_entry(trans, &it, outgoing)
     {
-        if (check_mute_visit(states, states[trans->pair.idx.dst]))
-            return true;
+        if (check_mute_visit(states, states[trans->pair.idx.dst])) return true;
     }
     state->mark = PERMANENT_MARK;
 
@@ -38,8 +34,7 @@ static enum imm_rc check_mute_cycles(unsigned nstates,
 {
     for (unsigned i = 0; i < nstates; ++i)
     {
-        if (check_mute_visit(states, states[i]))
-            return IMM_FAILURE;
+        if (check_mute_visit(states, states[i])) return IMM_FAILURE;
     }
     return IMM_SUCCESS;
 }
@@ -53,10 +48,8 @@ static void clear_marks(unsigned nstates, struct imm_state **states)
 static void visit(struct imm_state *state, struct imm_state **states,
                   unsigned *end, struct imm_state **tmp)
 {
-    if (state->mark == PERMANENT_MARK)
-        return;
-    if (state->mark == TEMPORARY_MARK)
-        return;
+    if (state->mark == PERMANENT_MARK) return;
+    if (state->mark == TEMPORARY_MARK) return;
 
     state->mark = TEMPORARY_MARK;
     struct imm_trans const *trans = NULL;
@@ -81,8 +74,7 @@ enum imm_rc tsort(unsigned nstates, struct imm_state **states,
     clear_marks(nstates, states);
 
     struct imm_state **tmp = malloc(sizeof(*tmp) * nstates);
-    if (!tmp)
-        return error(IMM_OUTOFMEM, "failed to malloc");
+    if (!tmp) return error(IMM_OUTOFMEM, "failed to malloc");
 
     unsigned end = nstates;
     visit(states[start_idx], states, &end, tmp);

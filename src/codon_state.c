@@ -20,8 +20,7 @@ void imm_codon_state_init(struct imm_codon_state *state, unsigned id,
 static imm_float lprob(struct imm_state const *state, struct imm_seq const *seq)
 {
     struct imm_codon_state const *codon_state = state->vtable.derived;
-    if (imm_unlikely(imm_seq_size(seq) != 3))
-        return imm_lprob_nan();
+    if (imm_unlikely(imm_seq_size(seq) != 3)) return imm_lprob_nan();
 
     struct imm_codon_lprob const *codonp = codon_state->codonp;
     struct imm_codon codon = {
