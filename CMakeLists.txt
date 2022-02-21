@@ -59,6 +59,13 @@ add_library(
     src/tsort.c)
 add_library(IMM::imm ALIAS imm)
 
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    include(CheckIPOSupported)
+    check_ipo_supported()
+    set_target_properties(${PROJECT_NAME}
+                          PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif()
+
 cbp_hide_functions(imm)
 cbp_set_warning_flags()
 cbp_ci_build_option()

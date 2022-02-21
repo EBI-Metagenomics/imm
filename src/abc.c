@@ -88,45 +88,45 @@ static_assert(sizeof(imm_abc_typeid_t) == sizeof(uint8_t), "wrong types");
         if (!!(expr)) return e;                                                \
     } while (0)
 
-enum imm_rc abc_pack(struct imm_abc const *abc, struct lip_file *io)
+enum imm_rc abc_pack(struct imm_abc const *abc, struct lip_file *file)
 {
-    lip_write_map_size(io, 4);
+    lip_write_map_size(file, 4);
 
-    lip_write_cstr(io, "symbols");
-    lip_write_cstr(io, abc->symbols);
+    lip_write_cstr(file, "symbols");
+    lip_write_cstr(file, abc->symbols);
 
-    lip_write_cstr(io, "idx");
-    lip_write_1darray_u8(io, IMM_ARRAY_SIZE(abc->sym.idx), abc->sym.idx);
+    lip_write_cstr(file, "idx");
+    lip_write_1darray_u8(file, IMM_ARRAY_SIZE(abc->sym.idx), abc->sym.idx);
 
-    lip_write_cstr(io, "any_symbol_id");
-    lip_write_int(io, abc->any_symbol_id);
+    lip_write_cstr(file, "any_symbol_id");
+    lip_write_int(file, abc->any_symbol_id);
 
-    lip_write_cstr(io, "typeid");
-    lip_write_int(io, abc->vtable.typeid);
+    lip_write_cstr(file, "typeid");
+    lip_write_int(file, abc->vtable.typeid);
 
-    return io->error ? IMM_FAILURE : IMM_SUCCESS;
+    return file->error ? IMM_FAILURE : IMM_SUCCESS;
 }
 
-enum imm_rc abc_unpack(struct imm_abc *abc, struct lip_file *io)
+enum imm_rc abc_unpack(struct imm_abc *abc, struct lip_file *file)
 {
-    if (!expect_map(io, 4)) return IMM_FAILURE;
+    if (!expect_map(file, 4)) return IMM_FAILURE;
 
-    if (!expect_key(io, "symbols")) return IMM_FAILURE;
-    lip_read_cstr(io, IMM_ABC_MAX_SIZE, abc->symbols);
+    if (!expect_key(file, "symbols")) return IMM_FAILURE;
+    lip_read_cstr(file, IMM_ABC_MAX_SIZE, abc->symbols);
 
     abc->size = (unsigned)strlen(abc->symbols);
 
-    if (!expect_key(io, "idx")) return IMM_FAILURE;
-    expect_1darray_u8_type(io, IMM_ARRAY_SIZE(abc->sym.idx), LIP_1DARRAY_UINT8,
-                           abc->sym.idx);
+    if (!expect_key(file, "idx")) return IMM_FAILURE;
+    expect_1darray_u8_type(file, IMM_ARRAY_SIZE(abc->sym.idx),
+                           LIP_1DARRAY_UINT8, abc->sym.idx);
 
-    if (!expect_key(io, "any_symbol_id")) return IMM_FAILURE;
-    lip_read_int(io, &abc->any_symbol_id);
+    if (!expect_key(file, "any_symbol_id")) return IMM_FAILURE;
+    lip_read_int(file, &abc->any_symbol_id);
 
-    if (!expect_key(io, "typeid")) return IMM_FAILURE;
-    lip_read_int(io, &abc->vtable.typeid);
+    if (!expect_key(file, "typeid")) return IMM_FAILURE;
+    lip_read_int(file, &abc->vtable.typeid);
 
     if (!imm_abc_typeid_valid(abc->vtable.typeid)) return IMM_PARSEERROR;
 
-    return io->error ? IMM_FAILURE : IMM_SUCCESS;
+    return file->error ? IMM_FAILURE : IMM_SUCCESS;
 }

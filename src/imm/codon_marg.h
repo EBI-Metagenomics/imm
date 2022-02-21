@@ -51,9 +51,9 @@ imm_codon_marg_lprob(struct imm_codon_marg const *codonm,
 }
 
 IMM_API enum imm_rc imm_codon_marg_pack(struct imm_codon_marg const *codonm,
-                                        struct lip_file *io);
+                                        struct lip_file *);
 
 IMM_API enum imm_rc imm_codon_marg_unpack(struct imm_codon_marg *codonm,
-                                          struct lip_file *io);
+                                          struct lip_file *);
 
 #endif

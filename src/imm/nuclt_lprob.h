@@ -40,9 +40,9 @@ static inline imm_float imm_nuclt_lprob_get(struct imm_nuclt_lprob const *lprob,
 }
 
 IMM_API enum imm_rc imm_nuclt_lprob_pack(struct imm_nuclt_lprob const *nucltp,
-                                         struct lip_file *io);
+                                         struct lip_file *);
 
 IMM_API enum imm_rc imm_nuclt_lprob_unpack(struct imm_nuclt_lprob *nucltp,
-                                           struct lip_file *io);
+                                           struct lip_file *);
 
 #endif
