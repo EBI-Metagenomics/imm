@@ -10,10 +10,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include(external/cmake-boilerplate/cbp.cmake)
 cbp_set_rpath()
 
-find_package(logaddexp REQUIRED)
-find_package(elapsed REQUIRED)
 find_package(cco REQUIRED)
+find_package(elapsed REQUIRED)
 find_package(lite_pack REQUIRED)
+find_package(logaddexp REQUIRED)
 
 add_library(
     imm
