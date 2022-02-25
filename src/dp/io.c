@@ -101,7 +101,7 @@ enum imm_rc imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
 {
     enum imm_rc rc = IMM_SUCCESS;
     unsigned size = 0;
-    uint8_t type = 0;
+    enum lip_1darray_type type = 0;
     struct imm_dp_emis *e = &dp->emis;
     struct imm_dp_trans_table *tt = &dp->trans_table;
     struct imm_dp_state_table *st = &dp->state_table;
