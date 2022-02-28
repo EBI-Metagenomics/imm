@@ -16,8 +16,7 @@ enum imm_rc imm_nuclt_lprob_pack(struct imm_nuclt_lprob const *nucltp,
 enum imm_rc imm_nuclt_lprob_unpack(struct imm_nuclt_lprob *nucltp,
                                    struct lip_file *file)
 {
-    expect_1darray_float_type(file, IMM_NUCLT_SIZE, XLIP_1DARRAY_FLOAT,
-                              nucltp->lprobs);
+    expect_1darray_float_type(file, IMM_NUCLT_SIZE, nucltp->lprobs);
 
     return file->error ? error(IMM_IOERROR, "failed to unpack nuclt_lprob")
                        : IMM_SUCCESS;

@@ -109,21 +109,20 @@ enum imm_rc abc_pack(struct imm_abc const *abc, struct lip_file *file)
 
 enum imm_rc abc_unpack(struct imm_abc *abc, struct lip_file *file)
 {
-    if (!expect_map(file, 4)) return IMM_FAILURE;
+    if (!expect_map_size(file, 4)) return IMM_FAILURE;
 
-    if (!expect_key(file, "symbols")) return IMM_FAILURE;
+    if (!expect_map_key(file, "symbols")) return IMM_FAILURE;
     lip_read_cstr(file, IMM_ABC_MAX_SIZE, abc->symbols);
 
     abc->size = (unsigned)strlen(abc->symbols);
 
-    if (!expect_key(file, "idx")) return IMM_FAILURE;
-    expect_1darray_u8_type(file, IMM_ARRAY_SIZE(abc->sym.idx),
-                           LIP_1DARRAY_UINT8, abc->sym.idx);
+    if (!expect_map_key(file, "idx")) return IMM_FAILURE;
+    expect_1darray_u8_type(file, IMM_ARRAY_SIZE(abc->sym.idx), abc->sym.idx);
 
-    if (!expect_key(file, "any_symbol_id")) return IMM_FAILURE;
+    if (!expect_map_key(file, "any_symbol_id")) return IMM_FAILURE;
     lip_read_int(file, &abc->any_symbol_id);
 
-    if (!expect_key(file, "typeid")) return IMM_FAILURE;
+    if (!expect_map_key(file, "typeid")) return IMM_FAILURE;
     lip_read_int(file, &abc->vtable.typeid);
 
     if (!imm_abc_typeid_valid(abc->vtable.typeid)) return IMM_PARSEERROR;

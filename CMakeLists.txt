@@ -1,19 +1,24 @@
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
+
 project(
     imm
     VERSION 0.0.48
     LANGUAGES C)
 
-# Generate compile_commands.json file
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-include(external/cmake-boilerplate/cbp.cmake)
-cbp_set_rpath()
-
 find_package(cco REQUIRED)
 find_package(elapsed REQUIRED)
 find_package(lite_pack REQUIRED)
 find_package(logaddexp REQUIRED)
+
+include(external/cmake-boilerplate/cbp.cmake)
+include(cmake/compiler-options.cmake)
+include(cmake/sanitizers.cmake)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_C_STANDARD 11)
+
+add_compile_definitions(_XOPEN_SOURCE=700)
+add_compile_definitions(_DARWIN_C_SOURCE=1)
 
 add_library(
     imm
@@ -57,18 +62,19 @@ add_library(
     src/state.c
     src/task.c
     src/tsort.c)
-add_library(IMM::imm ALIAS imm)
+add_library(IMM::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
+# Enable interprodecural optimization
+macro(enable_ipo lib)
+  if(CMAKE_BUILD_TYPE STREQUAL "Release")
     include(CheckIPOSupported)
     check_ipo_supported()
-    set_target_properties(${PROJECT_NAME}
-                          PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
-endif()
+    set_target_properties(${lib} PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+  endif()
+endmacro()
 
-cbp_hide_functions(imm)
-cbp_set_warning_flags()
-cbp_ci_build_option()
+enable_ipo(${PROJECT_NAME})
+
 cbp_generate_export_header(imm EXPORT_FILE)
 
 if(DEFINED ENV{IMM_DOUBLE_PRECISION})
@@ -104,7 +110,6 @@ target_link_libraries(imm PUBLIC LITE_PACK::lite_pack)
 target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
 set_target_properties(imm PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
-target_compile_features(imm PRIVATE c_std_11)
 
 include(CheckSymbolExists)
 check_symbol_exists(reallocf "stdlib.h" HAVE_REALLOCF)
