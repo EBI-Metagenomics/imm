@@ -1,8 +1,11 @@
 #ifndef IMM_ABC_TYPES_H
 #define IMM_ABC_TYPES_H
 
+#include "imm/export.h"
 #include <stdbool.h>
 #include <stdint.h>
+
+#define IMM_ABC_TYPEID_SIZE 10
 
 enum imm_abc_typeid
 {
@@ -26,5 +29,7 @@ struct imm_abc_vtable
     enum imm_abc_typeid typeid;
     void *derived;
 };
+
+IMM_API char const *imm_abc_typeid_name(enum imm_abc_typeid typeid);
 
 #endif

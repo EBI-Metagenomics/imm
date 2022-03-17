@@ -23,6 +23,7 @@ add_compile_definitions(_DARWIN_C_SOURCE=1)
 add_library(
     imm
     src/abc.c
+    src/abc_types.c
     src/amino.c
     src/bitmap.c
     src/cartes.c
