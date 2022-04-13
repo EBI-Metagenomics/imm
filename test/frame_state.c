@@ -34,7 +34,7 @@ void test_frame_state1(void)
     struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
     struct imm_frame_state state;
-    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
+    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, IMM_SPAN(1, 5));
     struct imm_state *s = imm_super(&state);
 
     struct imm_seq seq = imm_seq(IMM_STR("A"), abc);
@@ -71,7 +71,7 @@ void test_frame_state2(void)
     struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
     struct imm_frame_state state;
-    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
+    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, IMM_SPAN(1, 5));
     struct imm_state *s = imm_super(&state);
 
     struct imm_seq seq;
@@ -126,7 +126,7 @@ void test_frame_state3(void)
     struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
     struct imm_frame_state state;
-    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
+    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, IMM_SPAN(1, 5));
     struct imm_state *s = imm_super(&state);
 
     struct imm_seq seq;
@@ -199,7 +199,7 @@ void test_frame_state_lposterior(void)
     struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
     struct imm_frame_state state;
-    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
+    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, IMM_SPAN(1, 5));
 
     imm_cartes_init(&codon_iter, symbols, length, 3);
 
@@ -250,7 +250,7 @@ void test_frame_state_decode(void)
     struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
     struct imm_frame_state state;
-    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
+    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, IMM_SPAN(1, 5));
 
     struct imm_seq seq;
     seq = imm_seq(IMM_STR("ATG"), abc);

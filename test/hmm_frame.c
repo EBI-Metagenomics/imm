@@ -14,6 +14,7 @@ static struct imm_code code;
 struct imm_nuclt_lprob nucltp;
 struct imm_codon_lprob codonp;
 struct imm_codon_marg codonm;
+struct imm_span span = IMM_SPAN(1, 5);
 
 int main(void)
 {
@@ -46,7 +47,7 @@ void test_hmm_frame_state_0eps(void)
     imm_hmm_init(&hmm, &code);
 
     struct imm_frame_state state;
-    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.0f);
+    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.0f, span);
 
     imm_hmm_add_state(&hmm, imm_super(&state));
     imm_hmm_set_start(&hmm, imm_super(&state), imm_log(1.0));
@@ -69,7 +70,7 @@ void test_hmm_frame_state_len1(void)
     imm_hmm_init(&hmm, &code);
 
     struct imm_frame_state state;
-    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
+    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, span);
 
     imm_hmm_add_state(&hmm, imm_super(&state));
     imm_hmm_set_start(&hmm, imm_super(&state), imm_log(1.0));
@@ -113,7 +114,7 @@ void test_hmm_frame_state_len2(void)
     imm_hmm_init(&hmm, &code);
 
     struct imm_frame_state state;
-    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
+    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, span);
 
     imm_hmm_add_state(&hmm, imm_super(&state));
     imm_hmm_set_start(&hmm, imm_super(&state), imm_log(1.0));
@@ -181,7 +182,7 @@ void test_hmm_frame_state_len3(void)
     imm_hmm_init(&hmm, &code);
 
     struct imm_frame_state state;
-    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
+    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, span);
 
     imm_hmm_add_state(&hmm, imm_super(&state));
     imm_hmm_set_start(&hmm, imm_super(&state), imm_log(1.0));
@@ -225,7 +226,7 @@ void test_hmm_frame_state_len4(void)
     imm_hmm_init(&hmm, &code);
 
     struct imm_frame_state state;
-    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
+    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, span);
 
     imm_hmm_add_state(&hmm, imm_super(&state));
     imm_hmm_set_start(&hmm, imm_super(&state), imm_log(1.0));
@@ -257,7 +258,7 @@ void test_hmm_frame_state_len5(void)
     imm_hmm_init(&hmm, &code);
 
     struct imm_frame_state state;
-    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f);
+    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, span);
 
     imm_hmm_add_state(&hmm, imm_super(&state));
     imm_hmm_set_start(&hmm, imm_super(&state), imm_log(1.0));

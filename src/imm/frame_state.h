@@ -24,7 +24,7 @@ struct imm_frame_state
 IMM_API void imm_frame_state_init(struct imm_frame_state *state, unsigned id,
                                   struct imm_nuclt_lprob const *nucltp,
                                   struct imm_codon_marg const *codonm,
-                                  imm_float epsilon);
+                                  imm_float epsilon, struct imm_span span);
 
 IMM_API imm_float imm_frame_state_lposterior(
     struct imm_frame_state const *state, struct imm_codon const *codon,
