@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16.3 FATAL_ERROR)
 
 project(
     imm
-    VERSION 0.0.48
+    VERSION 0.0.49
     LANGUAGES C)
 
 find_package(cco REQUIRED)
