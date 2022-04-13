@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# For testing
 bash -c "$(curl -fsSL https://bit.ly/3Kv06KA)" -s horta/hope || exit 1
 bash -c "$(curl -fsSL https://bit.ly/3Kv06KA)" -s EBI-Metagenomics/log || exit 1
 
