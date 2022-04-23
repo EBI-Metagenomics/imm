@@ -11,7 +11,7 @@ MAKE_MATRIX(matrixf, imm_float)
 struct matrix
 {
     struct matrixf score;
-    unsigned *state_col;
+    int *state_col;
 };
 
 void matrix_del(struct matrix const *matrix);
@@ -27,8 +27,8 @@ static inline imm_float matrix_get_score(struct matrix const *matrix,
                                          unsigned seqlen)
 {
     row = row % matrixf_nrows(&matrix->score);
-    unsigned col = matrix->state_col[state] + seqlen;
-    return matrixf_get(&matrix->score, row, col);
+    int col = matrix->state_col[state] + (int)seqlen;
+    return matrixf_get(&matrix->score, row, (unsigned)col);
 }
 
 static inline void matrix_set_score(struct matrix *matrix, unsigned row,
@@ -36,8 +36,8 @@ static inline void matrix_set_score(struct matrix *matrix, unsigned row,
                                     imm_float score)
 {
     row = row % matrixf_nrows(&matrix->score);
-    unsigned col = matrix->state_col[state] + seqlen;
-    matrixf_set(&matrix->score, row, col, score);
+    int col = matrix->state_col[state] + (int)seqlen;
+    matrixf_set(&matrix->score, row, (unsigned)col, score);
 }
 
 #endif
