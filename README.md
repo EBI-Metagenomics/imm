@@ -7,3 +7,13 @@ Invisible Markov model library.
 ```bash
 bash -c "$(curl -fsSL https://git.io/Jz7Oa) -s EBI-Metagenomics/imm"
 ```
+
+## Development
+
+```
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_ALL_WARNINGS=ON ..
+make
+make test
+```
