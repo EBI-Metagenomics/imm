@@ -36,7 +36,7 @@ void test_dp_io_large_normal(void)
     struct imm_seq seq = imm_seq(imm_str(imm_example1_seq), &m->abc);
     EQ(imm_task_setup(task, &seq), IMM_SUCCESS);
     EQ(imm_dp_viterbi(&dp, task, &prod), IMM_SUCCESS);
-    CLOSE(prod.loglik, -65826.0106185297);
+    CLOSE(prod.loglik, -194573.56250000000);
 
     imm_del(task);
     imm_del(&prod);

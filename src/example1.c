@@ -6,15 +6,15 @@
 #define ONE ((imm_float)0.)
 
 /* State IDs */
-#define START ((imm_state_id_t)(0U << 11))
-#define B ((imm_state_id_t)(1U << 11))
-#define M ((imm_state_id_t)(2U << 11))
-#define I ((imm_state_id_t)(3U << 11))
-#define D ((imm_state_id_t)(4U << 11))
-#define E ((imm_state_id_t)(5U << 11))
-#define J ((imm_state_id_t)(6U << 11))
-#define END ((imm_state_id_t)(7U << 11))
-#define N ((imm_state_id_t)(8U << 11))
+#define START ((imm_state_id_t)(0U << 12))
+#define B ((imm_state_id_t)(1U << 12))
+#define M ((imm_state_id_t)(2U << 12))
+#define I ((imm_state_id_t)(3U << 12))
+#define D ((imm_state_id_t)(4U << 12))
+#define E ((imm_state_id_t)(5U << 12))
+#define J ((imm_state_id_t)(6U << 12))
+#define END ((imm_state_id_t)(7U << 12))
+#define N ((imm_state_id_t)(8U << 12))
 
 unsigned imm_example1_state_name(unsigned id, char name[IMM_STATE_NAME_SIZE])
 {

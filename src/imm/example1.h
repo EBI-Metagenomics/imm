@@ -8,7 +8,7 @@
 #include "imm/mute_state.h"
 #include "imm/normal_state.h"
 
-#define IMM_EXAMPLE1_SIZE 1000U
+#define IMM_EXAMPLE1_SIZE 3000U
 
 IMM_API void imm_example1_init(unsigned core_size);
 
