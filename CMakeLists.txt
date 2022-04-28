@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16.3 FATAL_ERROR)
 
 project(
     imm
-    VERSION 0.1.0
+    VERSION 0.1.1
     LANGUAGES C)
 
 include(cmake/compiler-options.cmake)
@@ -184,6 +184,10 @@ write_basic_package_version_file(${CMAKE_VERSION_FILE}
 install(FILES ${CMAKE_VERSION_FILE} ${CMAKE_CONFIG_FILE}
         DESTINATION lib/cmake/${PROJECT_NAME})
 install(FILES ${EXPORT_FILE} ${CONFIG_FILE} DESTINATION include/${PROJECT_NAME})
+
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/README.md
+              ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.md
+        DESTINATION share/docs/${PROJECT_NAME})
 
 enable_testing()
 add_subdirectory(test)
