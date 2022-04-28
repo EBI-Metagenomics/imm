@@ -37,24 +37,6 @@ best_trans_score_first_row(struct imm_dp const *dp, struct matrix const *matrix,
 static struct final_score final_score(struct imm_dp const *dp,
                                       struct imm_task *task);
 
-static unsigned max_seq(unsigned nstates, struct imm_state **states)
-{
-    unsigned max = imm_state_span(states[0]).max;
-    for (unsigned i = 1; i < nstates; ++i)
-        max = MAX(max, imm_state_span(states[i]).max);
-
-    return max;
-}
-
-static unsigned min_seq(unsigned nstates, struct imm_state **states)
-{
-    unsigned min = imm_state_span(states[0]).min;
-    for (unsigned i = 1; i < nstates; ++i)
-        min = MIN(min, imm_state_span(states[i]).min);
-
-    return min;
-}
-
 static void set_score(struct imm_dp const *dp, struct imm_task *task,
                       imm_float trans_score, unsigned min_len, unsigned max_len,
                       unsigned row, unsigned state)

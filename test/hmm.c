@@ -1,4 +1,4 @@
-#include "hope/hope.h"
+#include "hope.h"
 #include "imm/imm.h"
 
 void test_hmm_state_id(void);
@@ -70,7 +70,7 @@ void test_hmm_wrong_states(void)
                          imm_log(0.3)),
        IMM_ILLEGALARG);
 
-    EQ(imm_hmm_normalize_state_trans(&hmm, imm_super(&state1)), IMM_ILLEGALARG);
+    EQ(imm_hmm_normalize_state_trans(imm_super(&state1)), IMM_ILLEGALARG);
 
-    EQ(imm_hmm_normalize_state_trans(&hmm, imm_super(&state0)), IMM_SUCCESS);
+    EQ(imm_hmm_normalize_state_trans(imm_super(&state0)), IMM_SUCCESS);
 }

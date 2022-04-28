@@ -1,4 +1,4 @@
-#include "hope/hope.h"
+#include "hope.h"
 #include "imm/imm.h"
 
 void test_hmm_frame_state_0eps(void);

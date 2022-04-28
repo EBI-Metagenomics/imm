@@ -9,8 +9,6 @@
 #include "state.h"
 #include <assert.h>
 
-static void del(struct imm_state const *state);
-
 static imm_float lprob(struct imm_state const *state,
                        struct imm_seq const *seq);
 

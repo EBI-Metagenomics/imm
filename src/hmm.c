@@ -18,17 +18,6 @@ static inline void start_init(struct imm_hmm *hmm)
     hmm->start.state_id = IMM_STATE_NULL_ID;
 }
 
-static void detach_states(struct imm_hmm const *hmm)
-{
-    unsigned bkt = 0;
-    struct imm_state *state = NULL;
-    struct cco_hnode *tmp = NULL;
-    cco_hash_for_each_safe(hmm->states.tbl, bkt, tmp, state, hnode)
-    {
-        state_detach(state);
-    }
-}
-
 static void init_states_table(struct imm_hmm *hmm)
 {
     hmm->states.size = 0;
@@ -259,13 +248,12 @@ enum imm_rc imm_hmm_normalize_trans(struct imm_hmm const *hmm)
     enum imm_rc rc = IMM_SUCCESS;
     cco_hash_for_each(hmm->states.tbl, bkt, state, hnode)
     {
-        if ((rc = imm_hmm_normalize_state_trans(hmm, state))) break;
+        if ((rc = imm_hmm_normalize_state_trans(state))) break;
     }
     return rc;
 }
 
-enum imm_rc imm_hmm_normalize_state_trans(struct imm_hmm const *hmm,
-                                          struct imm_state *src)
+enum imm_rc imm_hmm_normalize_state_trans(struct imm_state *src)
 {
     if (!cco_hash_hashed(&src->hnode))
         return error(IMM_ILLEGALARG, "state not found");

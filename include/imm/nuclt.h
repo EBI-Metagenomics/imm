@@ -22,6 +22,7 @@ IMM_API enum imm_rc imm_nuclt_init(struct imm_nuclt *nuclt,
 
 static inline unsigned imm_nuclt_size(struct imm_nuclt const *nuclt)
 {
+    (void)nuclt;
     return IMM_NUCLT_SIZE;
 }
 

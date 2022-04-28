@@ -4,6 +4,7 @@
 
 static void default_print(char const *msg, void *arg)
 {
+    (void)arg;
     fprintf(stderr, "%s\n", msg);
 }
 

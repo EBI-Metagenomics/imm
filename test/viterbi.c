@@ -1,4 +1,4 @@
-#include "hope/hope.h"
+#include "hope.h"
 #include "imm/imm.h"
 
 void test_viterbi_one_mute_state(void);

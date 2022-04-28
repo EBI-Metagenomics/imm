@@ -1,4 +1,4 @@
-#include "hope/hope.h"
+#include "hope.h"
 #include "imm/imm.h"
 
 static unsigned state_name(unsigned id, char name[IMM_STATE_NAME_SIZE])

@@ -74,8 +74,7 @@ IMM_API imm_float imm_hmm_loglik(struct imm_hmm const *hmm,
 
 IMM_API enum imm_rc imm_hmm_normalize_trans(struct imm_hmm const *hmm);
 
-IMM_API enum imm_rc imm_hmm_normalize_state_trans(struct imm_hmm const *hmm,
-                                                  struct imm_state *src);
+IMM_API enum imm_rc imm_hmm_normalize_state_trans(struct imm_state *src);
 
 IMM_API enum imm_rc imm_hmm_set_start(struct imm_hmm *hmm,
                                       struct imm_state const *state,
