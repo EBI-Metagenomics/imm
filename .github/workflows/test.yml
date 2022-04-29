@@ -2,32 +2,21 @@ name: Test
 
 on: push
 
-env:
-  BUILD_TYPE: Release
-
 jobs:
   test:
-    name: Test on ${{ matrix.os }} with double precision ${{ matrix.double_precision }}
+    name: Test on ${{ matrix.os }} with double precision ${{ matrix.double_precision }} and build type ${{ matrix.build_type }}
     runs-on: ${{ matrix.os }}
     env:
       IMM_DOUBLE_PRECISION: ${{ matrix.double_precision }}
+      BUILD_TYPE: ${{ matrix.build_type }}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
         double_precision: ["On", "Off"]
+        build_type: [Release, Debug]
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Check for sudo
-        shell: bash
-        run: |
-          if type sudo >/dev/null 2>&1; then SUDO="sudo"; else SUDO=""; fi
-          echo "SUDO=$SUDO" >> $GITHUB_ENV
-
-      - name: Install dependencies
-        shell: bash
-        run: if [ -f install-deps ]; then $SUDO ./install-deps; fi
 
       - name: Configure CMake
         if: runner.os == 'Linux'
@@ -43,8 +32,3 @@ jobs:
       - name: Test
         working-directory: ${{github.workspace}}/build
         run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure
-
-      - name: Install
-        working-directory: ${{github.workspace}}/build
-        shell: bash
-        run: $SUDO cmake --build . --target install --config $BUILD_TYPE

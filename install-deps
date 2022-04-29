@@ -1,6 +1,0 @@
-#!/bin/bash
-
-bash -c "$(curl -fsSL https://bit.ly/3Kv06KA)" -s horta/logaddexp || exit 1
-bash -c "$(curl -fsSL https://bit.ly/3Kv06KA)" -s horta/elapsed || exit 1
-bash -c "$(curl -fsSL https://bit.ly/3Kv06KA)" -s EBI-Metagenomics/c-containers || exit 1
-bash -c "$(curl -fsSL https://bit.ly/3Kv06KA)" -s EBI-Metagenomics/lite-pack || exit 1
