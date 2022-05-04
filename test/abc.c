@@ -36,26 +36,27 @@ void test_abc_normal(void)
 void test_abc_duplicated_alphabet(void)
 {
     struct imm_abc abc = imm_abc_empty;
-    EQ(imm_abc_init(&abc, IMM_STR("ACTC"), '*'), IMM_OK);
+    EQ(imm_abc_init(&abc, IMM_STR("ACTC"), '*'), IMM_DUPLICATED_SYMBOLS);
 }
 
 void test_abc_duplicated_any_symbol(void)
 {
     struct imm_abc abc = imm_abc_empty;
-    EQ(imm_abc_init(&abc, IMM_STR("AC*T"), '*'), IMM_OK);
+    EQ(imm_abc_init(&abc, IMM_STR("AC*T"), '*'), IMM_ANY_SYMBOL_IN_ABC);
 }
 
 void test_abc_symbol_outside_range(void)
 {
     struct imm_abc abc = imm_abc_empty;
     char symbols[] = {3, '\0'};
-    EQ(imm_abc_init(&abc, (struct imm_str){2, symbols}, '*'), IMM_OK);
+    EQ(imm_abc_init(&abc, (struct imm_str){2, symbols}, '*'),
+       IMM_SYMBOL_OUT_OF_RANGE);
 }
 
 void test_abc_any_symbol_outside_range(void)
 {
     struct imm_abc abc = imm_abc_empty;
-    EQ(imm_abc_init(&abc, IMM_STR("ACGT"), 3), IMM_OK);
+    EQ(imm_abc_init(&abc, IMM_STR("ACGT"), 3), IMM_ANY_SYMBOL_OUT_RANGE);
 }
 
 void test_abc_union_size(void)

@@ -79,7 +79,7 @@ void test_hmm_loglik_single_state(void)
     EQ(imm_hmm_normalize_trans(&hmm), 0);
     EQ(imm_hmm_set_trans(&hmm, imm_super(&state), imm_super(&state),
                          imm_lprob_zero()),
-       IMM_OK);
+       IMM_NON_FINITE_PROBABILITY);
     EQ(imm_hmm_normalize_trans(&hmm), 0);
     EQ(imm_hmm_set_trans(&hmm, imm_super(&state), imm_super(&state),
                          imm_log(0.5)),

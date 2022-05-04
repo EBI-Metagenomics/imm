@@ -35,11 +35,12 @@ void test_dp_illegal(void)
     imm_hmm_init(&hmm, &code);
 
     struct imm_dp dp;
-    EQ(imm_hmm_init_dp(&hmm, imm_super(&state), &dp), IMM_OK);
+    EQ(imm_hmm_init_dp(&hmm, imm_super(&state), &dp), IMM_END_STATE_NOT_FOUND);
     imm_del(&dp);
 
     EQ(imm_hmm_add_state(&hmm, imm_super(&state)), IMM_OK);
-    EQ(imm_hmm_init_dp(&hmm, imm_super(&state), &dp), IMM_OK);
+    EQ(imm_hmm_init_dp(&hmm, imm_super(&state), &dp),
+       IMM_START_STATE_NOT_FOUND);
     imm_del(&dp);
 
     EQ(imm_hmm_set_start(&hmm, imm_super(&state), imm_log(0.1)), IMM_OK);
@@ -49,7 +50,7 @@ void test_dp_illegal(void)
     EQ(imm_hmm_set_trans(&hmm, imm_super(&state), imm_super(&state),
                          imm_log(0.5)),
        IMM_OK);
-    EQ(imm_hmm_init_dp(&hmm, imm_super(&state), &dp), IMM_OK);
+    EQ(imm_hmm_init_dp(&hmm, imm_super(&state), &dp), IMM_TSORT_MUTE_CYLES);
     imm_del(&dp);
 }
 
@@ -90,7 +91,7 @@ void test_dp_one_mute(void)
     EQ(imm_hmm_init_dp(&hmm, imm_super(&state), &dp), IMM_OK);
 
     struct imm_task *task = imm_task_new(&dp);
-    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
+    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_NOT_SET_SEQ);
 
     imm_task_setup(task, &EMPTY);
     EQ(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
@@ -123,14 +124,15 @@ void test_dp_two_mutes(void)
        IMM_OK);
 
     struct imm_dp dp;
-    EQ(imm_hmm_init_dp(&hmm, imm_super(&state1), &dp), IMM_OK);
+    EQ(imm_hmm_init_dp(&hmm, imm_super(&state1), &dp),
+       IMM_START_STATE_NOT_FOUND);
 
     EQ(imm_hmm_set_start(&hmm, imm_super(&state0), imm_log(0.3)), IMM_OK);
     EQ(imm_hmm_init_dp(&hmm, imm_super(&state1), &dp), IMM_OK);
 
     struct imm_task *task = imm_task_new(&dp);
 
-    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
+    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_NOT_SET_SEQ);
 
     imm_task_setup(task, &EMPTY);
     EQ(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
