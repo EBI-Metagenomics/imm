@@ -3,7 +3,6 @@
 
 #include "imm/abc_types.h"
 #include "imm/export.h"
-#include "imm/log.h"
 #include "imm/str.h"
 #include "imm/support.h"
 #include "imm/sym.h"

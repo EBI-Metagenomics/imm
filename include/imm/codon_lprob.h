@@ -2,7 +2,6 @@
 #define IMM_CODON_LPROB_H
 
 #include "imm/codon.h"
-#include "imm/log.h"
 #include "imm/lprob.h"
 #include "imm/nuclt.h"
 #include "imm/rc.h"

@@ -5,7 +5,6 @@
 #include "cco/stack.h"
 #include "imm/export.h"
 #include "imm/float.h"
-#include "imm/log.h"
 #include "imm/lprob.h"
 #include "imm/seq.h"
 #include "imm/span.h"

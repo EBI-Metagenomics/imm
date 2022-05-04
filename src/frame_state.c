@@ -197,7 +197,7 @@ static imm_float lprob(struct imm_state const *state, struct imm_seq const *seq)
     case 5:
         return joint_seq_len5(f, seq);
     default:
-        error(IMM_ILLEGALARG, "sequence not in range");
+        error(IMM_SEQ_OUT_OF_RANGE);
     }
 
     return imm_lprob_zero();

@@ -84,7 +84,7 @@ void imm_dp_del(struct imm_dp *dp)
 
 enum imm_rc dp_reset(struct imm_dp *dp, struct dp_args const *args)
 {
-    enum imm_rc rc = IMM_SUCCESS;
+    enum imm_rc rc = IMM_OK;
 
     if ((rc = emis_reset(&dp->emis, dp->code, args->states, args->nstates)))
         return rc;
@@ -100,25 +100,21 @@ enum imm_rc imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
                            struct imm_prod *prod)
 {
     imm_prod_reset(prod);
-    if (!task->seq) return error(IMM_ILLEGALARG, "seq has not been set");
+    if (!task->seq) return error(IMM_NOT_SET_SEQ);
 
     if (dp->code->abc != imm_seq_abc(task->seq))
-        return error(IMM_ILLEGALARG, "dp and seq must have the same alphabet");
+        return error(IMM_DIFFERENT_ABC);
 
     unsigned end_state = dp->state_table.end_state_idx;
     unsigned min = state_table_span(&dp->state_table, end_state).min;
-    if (imm_seq_size(task->seq) < min)
-        return error(IMM_ILLEGALARG,
-                     "seq is shorter than end_state's lower bound");
+    if (imm_seq_size(task->seq) < min) return error(IMM_SEQ_TOO_SHORT);
 
     struct elapsed elapsed = ELAPSED_INIT;
-    if (elapsed_start(&elapsed))
-        return error(IMM_RUNTIMEERROR, "elapsed_start has failed");
+    if (elapsed_start(&elapsed)) return error(IMM_ELAPSED_LIB_FAILED);
 
     enum imm_rc rc = viterbi(dp, task, prod);
 
-    if (elapsed_stop(&elapsed))
-        return error(IMM_RUNTIMEERROR, "elapsed_stop has failed");
+    if (elapsed_stop(&elapsed)) return error(IMM_ELAPSED_LIB_FAILED);
 
     prod->seconds = elapsed_milliseconds(&elapsed);
 
@@ -134,10 +130,10 @@ enum imm_rc imm_dp_change_trans(struct imm_dp *dp, unsigned trans_idx,
                                 imm_float lprob)
 {
     if (imm_unlikely(imm_lprob_is_nan(lprob)))
-        return error(IMM_ILLEGALARG, "lprob cannot be NaN");
+        return error(IMM_NAN_PROBABILITY);
 
     trans_table_change(&dp->trans_table, trans_idx, lprob);
-    return IMM_SUCCESS;
+    return IMM_OK;
 }
 
 imm_float imm_dp_emis_score(struct imm_dp const *dp, unsigned state_id,
@@ -429,7 +425,7 @@ static enum imm_rc viterbi_path(struct imm_dp const *dp,
         }
     }
     imm_path_reverse(path);
-    return IMM_SUCCESS;
+    return IMM_OK;
 }
 
 static void _viterbi(struct imm_dp const *dp, struct imm_task *task,

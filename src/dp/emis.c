@@ -33,17 +33,16 @@ static enum imm_rc realloc_offset(struct imm_dp_emis *emis, unsigned nstates)
 {
     unsigned offsize = emis_offset_size(nstates);
     emis->offset = reallocf(emis->offset, sizeof(*emis->offset) * offsize);
-    if (!emis->offset) return error(IMM_OUTOFMEM, "failed to resize");
-    return IMM_SUCCESS;
+    if (!emis->offset) return error(IMM_NOMEM);
+    return IMM_OK;
 }
 
 static enum imm_rc realloc_score(struct imm_dp_emis *emis, unsigned nstates)
 {
     unsigned score_size = emis_score_size(emis, nstates);
     emis->score = reallocf(emis->score, sizeof(*emis->score) * score_size);
-    if (!emis->score && score_size > 0)
-        return error(IMM_OUTOFMEM, "failed to resize");
-    return IMM_SUCCESS;
+    if (!emis->score && score_size > 0) return error(IMM_NOMEM);
+    return IMM_OK;
 }
 
 static void calc_offset(struct imm_dp_emis *emis, struct imm_code const *code,
@@ -99,14 +98,14 @@ static void calc_score(struct imm_dp_emis *emis, struct imm_code const *code,
 enum imm_rc emis_reset(struct imm_dp_emis *emis, struct imm_code const *code,
                        struct imm_state **states, unsigned nstates)
 {
-    enum imm_rc rc = IMM_SUCCESS;
+    enum imm_rc rc = IMM_OK;
     if ((rc = realloc_offset(emis, nstates))) goto cleanup;
     calc_offset(emis, code, nstates, states);
 
     if ((rc = realloc_score(emis, nstates))) goto cleanup;
     calc_score(emis, code, nstates, states);
 
-    return IMM_SUCCESS;
+    return IMM_OK;
 
 cleanup:
     cleanup(emis);

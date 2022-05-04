@@ -29,14 +29,13 @@ static bool check_mute_visit(struct imm_state **states, struct imm_state *state)
     return false;
 }
 
-static enum imm_rc check_mute_cycles(unsigned nstates,
-                                     struct imm_state **states)
+static bool check_mute_cycles(unsigned nstates, struct imm_state **states)
 {
     for (unsigned i = 0; i < nstates; ++i)
     {
-        if (check_mute_visit(states, states[i])) return IMM_FAILURE;
+        if (check_mute_visit(states, states[i])) return false;
     }
-    return IMM_SUCCESS;
+    return true;
 }
 
 static void clear_marks(unsigned nstates, struct imm_state **states)
@@ -68,13 +67,12 @@ enum imm_rc tsort(unsigned nstates, struct imm_state **states,
 {
     clear_marks(nstates, states);
 
-    if (check_mute_cycles(nstates, states))
-        return error(IMM_RUNTIMEERROR, "mute cycles are not allowed");
+    if (!check_mute_cycles(nstates, states)) return error(IMM_TSORT_MUTE_CYLES);
 
     clear_marks(nstates, states);
 
     struct imm_state **tmp = malloc(sizeof(*tmp) * nstates);
-    if (!tmp) return error(IMM_OUTOFMEM, "failed to malloc");
+    if (!tmp) return error(IMM_NOMEM);
 
     unsigned end = nstates;
     visit(states[start_idx], states, &end, tmp);
@@ -88,5 +86,5 @@ enum imm_rc tsort(unsigned nstates, struct imm_state **states,
     memcpy(states, tmp, sizeof(*tmp) * nstates);
     free(tmp);
 
-    return IMM_SUCCESS;
+    return IMM_OK;
 }

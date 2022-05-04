@@ -10,8 +10,7 @@ enum imm_rc matrix_init(struct matrix *matrix,
                         struct imm_dp_state_table const *tbl)
 {
     matrix->state_col = NULL;
-    if (matrixf_init(&matrix->score, MAX_LOOKUP, 1))
-        return error(IMM_OUTOFMEM, "failed to matrix init");
+    if (matrixf_init(&matrix->score, MAX_LOOKUP, 1)) return error(IMM_NOMEM);
 
     return matrix_reset(matrix, tbl);
 }
@@ -20,7 +19,7 @@ enum imm_rc matrix_reset(struct matrix *m, struct imm_dp_state_table const *tbl)
 {
     unsigned n = tbl->nstates;
     m->state_col = reallocf(m->state_col, sizeof(*m->state_col) * n);
-    if (!m->state_col && n > 0) return error(IMM_OUTOFMEM, "failed to realloc");
+    if (!m->state_col && n > 0) return error(IMM_NOMEM);
 
     unsigned next_col = 0;
     for (unsigned i = 0; i < n; ++i)
@@ -32,8 +31,8 @@ enum imm_rc matrix_reset(struct matrix *m, struct imm_dp_state_table const *tbl)
         next_col += (unsigned)(max - min + 1);
     }
     if (matrixf_resize(&m->score, MAX_LOOKUP, next_col))
-        return error(IMM_OUTOFMEM, "failed to resize");
-    return IMM_SUCCESS;
+        return error(IMM_NOMEM);
+    return IMM_OK;
 }
 
 void matrix_del(struct matrix const *matrix)

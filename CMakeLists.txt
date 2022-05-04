@@ -50,7 +50,6 @@ add_library(
     src/gc.c
     src/gc_auto.c
     src/hmm.c
-    src/log.c
     src/lprob.c
     src/mute_state.c
     src/normal_state.c

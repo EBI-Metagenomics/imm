@@ -26,8 +26,7 @@ enum imm_rc state_table_reset(struct imm_dp_state_table *tbl,
 
     if (args->nstates > 0)
     {
-        if (!tbl->ids || !tbl->span)
-            return error(IMM_OUTOFMEM, "failed to reallocf");
+        if (!tbl->ids || !tbl->span) return error(IMM_NOMEM);
     }
 
     for (unsigned i = 0; i < args->nstates; ++i)
@@ -40,7 +39,7 @@ enum imm_rc state_table_reset(struct imm_dp_state_table *tbl,
     tbl->start.lprob = args->start.lprob;
     tbl->start.state = (imm_state_idx_t)args->start.state->idx;
     tbl->end_state_idx = args->end_state->idx;
-    return IMM_SUCCESS;
+    return IMM_OK;
 }
 
 void state_table_del(struct imm_dp_state_table const *tbl)

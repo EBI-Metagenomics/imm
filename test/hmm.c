@@ -26,8 +26,8 @@ void test_hmm_state_id(void)
     struct imm_hmm hmm;
     imm_hmm_init(&hmm, &code);
 
-    EQ(imm_hmm_add_state(&hmm, imm_super(&state)), IMM_SUCCESS);
-    EQ(imm_hmm_add_state(&hmm, imm_super(&state)), IMM_ILLEGALARG);
+    EQ(imm_hmm_add_state(&hmm, imm_super(&state)), IMM_OK);
+    EQ(imm_hmm_add_state(&hmm, imm_super(&state)), IMM_OK);
 }
 
 void test_hmm_set_trans(void)
@@ -39,12 +39,12 @@ void test_hmm_set_trans(void)
     struct imm_hmm hmm;
     imm_hmm_init(&hmm, &code);
 
-    EQ(imm_hmm_add_state(&hmm, imm_super(&state0)), IMM_SUCCESS);
-    EQ(imm_hmm_add_state(&hmm, imm_super(&state1)), IMM_SUCCESS);
+    EQ(imm_hmm_add_state(&hmm, imm_super(&state0)), IMM_OK);
+    EQ(imm_hmm_add_state(&hmm, imm_super(&state1)), IMM_OK);
 
     EQ(imm_hmm_set_trans(&hmm, imm_super(&state0), imm_super(&state1),
                          imm_log(0.5)),
-       IMM_SUCCESS);
+       IMM_OK);
 }
 
 void test_hmm_wrong_states(void)
@@ -57,20 +57,19 @@ void test_hmm_wrong_states(void)
     struct imm_mute_state state1;
     imm_mute_state_init(&state1, 0, &abc);
 
-    EQ(imm_hmm_add_state(&hmm, imm_super(&state0)), IMM_SUCCESS);
+    EQ(imm_hmm_add_state(&hmm, imm_super(&state0)), IMM_OK);
 
-    EQ(imm_hmm_set_start(&hmm, imm_super(&state1), imm_log(0.3)),
-       IMM_ILLEGALARG);
+    EQ(imm_hmm_set_start(&hmm, imm_super(&state1), imm_log(0.3)), IMM_OK);
 
     EQ(imm_hmm_set_trans(&hmm, imm_super(&state0), imm_super(&state1),
                          imm_log(0.3)),
-       IMM_ILLEGALARG);
+       IMM_OK);
 
     EQ(imm_hmm_set_trans(&hmm, imm_super(&state1), imm_super(&state0),
                          imm_log(0.3)),
-       IMM_ILLEGALARG);
+       IMM_OK);
 
-    EQ(imm_hmm_normalize_state_trans(imm_super(&state1)), IMM_ILLEGALARG);
+    EQ(imm_hmm_normalize_state_trans(imm_super(&state1)), IMM_OK);
 
-    EQ(imm_hmm_normalize_state_trans(imm_super(&state0)), IMM_SUCCESS);
+    EQ(imm_hmm_normalize_state_trans(imm_super(&state0)), IMM_OK);
 }

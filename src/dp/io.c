@@ -2,6 +2,7 @@
 #include "dp/emis.h"
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
+#include "error.h"
 #include "expect.h"
 #include "imm/dp.h"
 #include "lite_pack.h"
@@ -33,7 +34,7 @@ static_assert(sizeof(imm_state_idx_t) == sizeof(uint16_t), "wrong types");
     {                                                                          \
         if (!!(expr))                                                          \
         {                                                                      \
-            rc = e;                                                            \
+            rc = error(e);                                                     \
             goto cleanup;                                                      \
         }                                                                      \
     } while (0)
@@ -94,19 +95,19 @@ enum imm_rc imm_dp_pack(struct imm_dp const *dp, struct lip_file *f)
     for (unsigned i = 0; i < nstates; ++i)
         lip_write_1darray_int_item(f, span_zip(dp->state_table.span + i));
 
-    return f->error ? IMM_IOERROR : IMM_SUCCESS;
+    return f->error ? IMM_IOERROR : IMM_OK;
 }
 
 enum imm_rc imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
 {
-    enum imm_rc rc = IMM_SUCCESS;
+    enum imm_rc rc = IMM_OK;
     unsigned size = 0;
     enum lip_1darray_type type = 0;
     struct imm_dp_emis *e = &dp->emis;
     struct imm_dp_trans_table *tt = &dp->trans_table;
     struct imm_dp_state_table *st = &dp->state_table;
 
-    if (!expect_map_size(f, 10)) return IMM_FAILURE;
+    if (!expect_map_size(f, 10)) return error(IMM_IOERROR);
 
     /* emission */
     ERET(!expect_map_key(f, KEY_EMIS_SCORE), IMM_IOERROR);
@@ -135,7 +136,7 @@ enum imm_rc imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
     ERET(!expect_map_key(f, KEY_TRANS_SRC), IMM_IOERROR);
     lip_read_1darray_size_type(f, &size, &type);
     ERET(type != LIP_1DARRAY_UINT16, IMM_IOERROR);
-    ERET(tt->ntrans != size, IMM_PARSEERROR);
+    ERET(tt->ntrans != size, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
         lip_read_1darray_int_item(f, &tt->trans[i].src);
 
@@ -163,7 +164,7 @@ enum imm_rc imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
 
     ERET(!expect_map_key(f, KEY_STATE_SPAN), IMM_IOERROR);
     lip_read_1darray_size_type(f, &size, &type);
-    ERET(st->nstates != size, IMM_PARSEERROR);
+    ERET(st->nstates != size, IMM_IOERROR);
     ERET(type != LIP_1DARRAY_UINT16, IMM_IOERROR);
     st->span = reallocf(st->span, sizeof(*st->span) * size);
     ERET(!st->span && size > 0, IMM_IOERROR);
@@ -171,11 +172,11 @@ enum imm_rc imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
     {
         uint16_t span = 0;
         lip_read_1darray_int_item(f, &span);
-        ERET(!span_unzip(st->span + i, span), IMM_PARSEERROR);
-        ERET(st->span[i].max > IMM_STATE_MAX_SEQLEN, IMM_PARSEERROR);
+        ERET(!span_unzip(st->span + i, span), IMM_IOERROR);
+        ERET(st->span[i].max > IMM_STATE_MAX_SEQLEN, IMM_IOERROR);
     }
 
-    if (!f->error) return IMM_SUCCESS;
+    if (!f->error) return IMM_OK;
 
 cleanup:
     if (e)

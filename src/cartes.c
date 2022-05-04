@@ -48,12 +48,11 @@ enum imm_rc imm_cartes_reset(struct imm_cartes *cartes, char const *set,
     if (new_capacity > cartes->capacity)
     {
         cartes->item = reallocf(cartes->item, new_capacity);
-        if (new_capacity > 0 && !cartes->item)
-            return error(IMM_OUTOFMEM, "failed to reallocf");
+        if (new_capacity > 0 && !cartes->item) return error(IMM_NOMEM);
         cartes->capacity = new_capacity;
     }
     cartes->nitems = 0;
-    return IMM_SUCCESS;
+    return IMM_OK;
 }
 
 void imm_cartes_setup(struct imm_cartes *cartes, unsigned times)

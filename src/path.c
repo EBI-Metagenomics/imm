@@ -12,13 +12,13 @@ static enum imm_rc path_setup(struct imm_path *path)
     path->dir = 1;
     path->start = 0;
     path->steps = malloc((size_t)path->capacity);
-    if (!path->steps) return error(IMM_OUTOFMEM, "failed to malloc");
-    return IMM_SUCCESS;
+    if (!path->steps) return error(IMM_NOMEM);
+    return IMM_OK;
 }
 
 enum imm_rc imm_path_add(struct imm_path *path, struct imm_step step)
 {
-    enum imm_rc rc = IMM_SUCCESS;
+    enum imm_rc rc = IMM_OK;
     if (path->capacity == 0)
     {
         if ((rc = path_setup(path))) return rc;
@@ -32,8 +32,7 @@ enum imm_rc imm_path_add(struct imm_path *path, struct imm_step step)
         capacity <<= 1;
         assert(capacity >= sizeof *path->steps * count);
         path->steps = reallocf(path->steps, capacity);
-        if (!path->steps && capacity > 0)
-            return error(IMM_OUTOFMEM, "failed to realloc");
+        if (!path->steps && capacity > 0) return error(IMM_NOMEM);
     }
 
     path->capacity = (int)capacity;

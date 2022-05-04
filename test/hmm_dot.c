@@ -26,12 +26,12 @@ int main(void)
     struct imm_hmm hmm;
     imm_hmm_init(&hmm, &code);
 
-    EQ(imm_hmm_add_state(&hmm, imm_super(&state0)), IMM_SUCCESS);
-    EQ(imm_hmm_add_state(&hmm, imm_super(&state1)), IMM_SUCCESS);
+    EQ(imm_hmm_add_state(&hmm, imm_super(&state0)), IMM_OK);
+    EQ(imm_hmm_add_state(&hmm, imm_super(&state1)), IMM_OK);
 
     EQ(imm_hmm_set_trans(&hmm, imm_super(&state0), imm_super(&state1),
                          imm_log(0.5)),
-       IMM_SUCCESS);
+       IMM_OK);
 
     FILE *fd = fopen(TMPDIR "/hmm.dot", "w");
     NOTNULL(fd);

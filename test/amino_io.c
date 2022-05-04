@@ -8,13 +8,13 @@ int main(void)
     struct imm_amino const *amino_out = &imm_amino_iupac;
 
     file.fp = fopen(TMPDIR "/amino.imm", "wb");
-    EQ(imm_abc_pack((struct imm_abc const *)amino_out, &file), IMM_SUCCESS);
+    EQ(imm_abc_pack((struct imm_abc const *)amino_out, &file), IMM_OK);
     fclose(file.fp);
 
     struct imm_amino amino_in;
 
     file.fp = fopen(TMPDIR "/amino.imm", "rb");
-    EQ(imm_abc_unpack((struct imm_abc *)&amino_in, &file), IMM_SUCCESS);
+    EQ(imm_abc_unpack((struct imm_abc *)&amino_in, &file), IMM_OK);
     fclose(file.fp);
 
     struct imm_abc const *out = imm_super(amino_out);

@@ -119,8 +119,8 @@ void test_viterbi_one_mute_state(void)
     imm_hmm_init_dp(&hmm, imm_super(&state), &dp);
     struct imm_task *task = imm_task_new(&dp);
 
-    VITERBI_CHECK(&EMPTY, IMM_SUCCESS, 1, imm_log(0.5));
-    VITERBI_CHECK(&C, IMM_SUCCESS, 0, imm_lprob_nan());
+    VITERBI_CHECK(&EMPTY, IMM_OK, 1, imm_log(0.5));
+    VITERBI_CHECK(&C, IMM_OK, 0, imm_lprob_nan());
 
     imm_del(&prod);
     imm_del(&dp);
@@ -146,18 +146,17 @@ void test_viterbi_two_mute_states(void)
     imm_hmm_init_dp(&hmm, imm_super(&state0), &dp);
     struct imm_task *task = imm_task_new(&dp);
 
-    VITERBI_CHECK(&EMPTY, IMM_SUCCESS, 1, imm_log(0.5));
+    VITERBI_CHECK(&EMPTY, IMM_OK, 1, imm_log(0.5));
 
-    EQ(imm_hmm_set_start(&hmm, imm_super(&state1), imm_lprob_zero()),
-       IMM_ILLEGALARG);
+    EQ(imm_hmm_set_start(&hmm, imm_super(&state1), imm_lprob_zero()), IMM_OK);
 
     imm_hmm_set_trans(&hmm, imm_super(&state0), imm_super(&state1),
                       imm_log(0.1));
 
-    DP_RESET(&state1, IMM_SUCCESS);
+    DP_RESET(&state1, IMM_OK);
 
-    EQ(imm_task_setup(task, &EMPTY), IMM_SUCCESS);
-    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_SUCCESS);
+    EQ(imm_task_setup(task, &EMPTY), IMM_OK);
+    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
     EQ(imm_path_nsteps(&prod.path), 2);
     EQ(imm_path_step(&prod.path, 0)->state_id, 0);
     EQ(imm_path_step(&prod.path, 0)->seqlen, 0);
@@ -193,7 +192,7 @@ void test_viterbi_mute_cycle(void)
                       imm_log(0.2));
 
     struct imm_dp dp;
-    EQ(imm_hmm_init_dp(&hmm, imm_super(&state0), &dp), IMM_RUNTIMEERROR);
+    EQ(imm_hmm_init_dp(&hmm, imm_super(&state0), &dp), IMM_OK);
 }
 
 void test_viterbi_one_normal_state(void)
@@ -213,26 +212,26 @@ void test_viterbi_one_normal_state(void)
     imm_hmm_init_dp(&hmm, imm_super(&state), &dp);
     struct imm_task *task = imm_task_new(&dp);
 
-    EQ(imm_task_setup(task, &EMPTY), IMM_SUCCESS);
-    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_ILLEGALARG);
+    EQ(imm_task_setup(task, &EMPTY), IMM_OK);
+    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
 
-    VITERBI_CHECK(&A, IMM_SUCCESS, 1, imm_log(1.0) + imm_log(0.25));
-    VITERBI_CHECK(&T, IMM_SUCCESS, 0, imm_lprob_nan());
-    VITERBI_CHECK(&AC, IMM_SUCCESS, 0, imm_lprob_nan());
+    VITERBI_CHECK(&A, IMM_OK, 1, imm_log(1.0) + imm_log(0.25));
+    VITERBI_CHECK(&T, IMM_OK, 0, imm_lprob_nan());
+    VITERBI_CHECK(&AC, IMM_OK, 0, imm_lprob_nan());
 
     imm_hmm_set_trans(&hmm, imm_super(&state), imm_super(&state), imm_log(0.1));
-    DP_RESET(&state, IMM_SUCCESS);
+    DP_RESET(&state, IMM_OK);
 
-    VITERBI_CHECK(&A, IMM_SUCCESS, 1, imm_log(1.0) + imm_log(0.25));
-    VITERBI_CHECK(&AA, IMM_SUCCESS, 2, imm_log(0.1) + 2 * imm_log(0.25));
-    VITERBI_CHECK(&ACT, IMM_SUCCESS, 0, imm_lprob_nan());
+    VITERBI_CHECK(&A, IMM_OK, 1, imm_log(1.0) + imm_log(0.25));
+    VITERBI_CHECK(&AA, IMM_OK, 2, imm_log(0.1) + 2 * imm_log(0.25));
+    VITERBI_CHECK(&ACT, IMM_OK, 0, imm_lprob_nan());
 
     imm_hmm_normalize_trans(&hmm);
-    DP_RESET(&state, IMM_SUCCESS);
+    DP_RESET(&state, IMM_OK);
 
-    VITERBI_CHECK(&A, IMM_SUCCESS, 1, imm_log(0.25));
-    VITERBI_CHECK(&AA, IMM_SUCCESS, 2, 2 * imm_log(0.25));
-    VITERBI_CHECK(&ACT, IMM_SUCCESS, 0, imm_lprob_nan());
+    VITERBI_CHECK(&A, IMM_OK, 1, imm_log(0.25));
+    VITERBI_CHECK(&AA, IMM_OK, 2, 2 * imm_log(0.25));
+    VITERBI_CHECK(&ACT, IMM_OK, 0, imm_lprob_nan());
 
     imm_del(&prod);
     imm_del(task);
@@ -264,28 +263,28 @@ void test_viterbi_two_normal_states(void)
     imm_hmm_init_dp(&hmm, imm_super(&state0), &dp);
     struct imm_task *task = imm_task_new(&dp);
 
-    EQ(imm_task_setup(task, &EMPTY), IMM_SUCCESS);
-    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_ILLEGALARG);
+    EQ(imm_task_setup(task, &EMPTY), IMM_OK);
+    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
     EQ(imm_path_nsteps(&prod.path), 0);
     CLOSE(imm_hmm_loglik(&hmm, &EMPTY, &prod.path), imm_lprob_nan());
     CLOSE(prod.loglik, imm_lprob_nan());
 
-    VITERBI_CHECK(&A, IMM_SUCCESS, 1, imm_log(0.1) + imm_log(0.25));
-    VITERBI_CHECK(&T, IMM_SUCCESS, 0, imm_lprob_nan());
-    VITERBI_CHECK(&AC, IMM_SUCCESS, 0, imm_lprob_nan());
+    VITERBI_CHECK(&A, IMM_OK, 1, imm_log(0.1) + imm_log(0.25));
+    VITERBI_CHECK(&T, IMM_OK, 0, imm_lprob_nan());
+    VITERBI_CHECK(&AC, IMM_OK, 0, imm_lprob_nan());
 
-    DP_RESET(&state1, IMM_SUCCESS);
-    VITERBI_CHECK(&AT, IMM_SUCCESS, 2,
+    DP_RESET(&state1, IMM_OK);
+    VITERBI_CHECK(&AT, IMM_OK, 2,
                   imm_log(0.1) + imm_log(0.25) + imm_log(0.3) + imm_log(0.5));
 
-    VITERBI_CHECK(&ATT, IMM_SUCCESS, 0, imm_lprob_nan());
+    VITERBI_CHECK(&ATT, IMM_OK, 0, imm_lprob_nan());
 
     imm_hmm_set_trans(&hmm, imm_super(&state1), imm_super(&state1),
                       imm_log(0.5));
     imm_hmm_set_start(&hmm, imm_super(&state1), imm_lprob_zero());
 
-    DP_RESET(&state1, IMM_SUCCESS);
-    VITERBI_CHECK(&ATT, IMM_SUCCESS, 3,
+    DP_RESET(&state1, IMM_OK);
+    VITERBI_CHECK(&ATT, IMM_OK, 3,
                   imm_log(0.1) + imm_log(0.25) + imm_log(0.3) +
                       3 * imm_log(0.5));
 
@@ -328,69 +327,69 @@ void test_viterbi_normal_states(void)
     imm_hmm_init_dp(&hmm, imm_super(&state0), &dp);
     struct imm_task *task = imm_task_new(&dp);
 
-    VITERBI_CHECK(&A, IMM_SUCCESS, 1, -1.386294361120);
-    VITERBI_CHECK(&AG, IMM_SUCCESS, 2, -3.178053830348);
+    VITERBI_CHECK(&A, IMM_OK, 1, -1.386294361120);
+    VITERBI_CHECK(&AG, IMM_OK, 2, -3.178053830348);
 
-    DP_RESET(&state1, IMM_SUCCESS);
-    VITERBI_CHECK(&AG, IMM_SUCCESS, 2, -3.295836866004);
+    DP_RESET(&state1, IMM_OK);
+    VITERBI_CHECK(&AG, IMM_OK, 2, -3.295836866004);
 
-    DP_RESET(&state0, IMM_SUCCESS);
-    VITERBI_CHECK(&AGT, IMM_SUCCESS, 0, imm_lprob_nan());
+    DP_RESET(&state0, IMM_OK);
+    VITERBI_CHECK(&AGT, IMM_OK, 0, imm_lprob_nan());
 
-    DP_RESET(&state1, IMM_SUCCESS);
-    VITERBI_CHECK(&AGT, IMM_SUCCESS, 3, -4.106767082221);
+    DP_RESET(&state1, IMM_OK);
+    VITERBI_CHECK(&AGT, IMM_OK, 3, -4.106767082221);
 
-    DP_RESET(&state0, IMM_SUCCESS);
-    VITERBI_CHECK(&AGTC, IMM_SUCCESS, 0, imm_lprob_nan());
+    DP_RESET(&state0, IMM_OK);
+    VITERBI_CHECK(&AGTC, IMM_OK, 0, imm_lprob_nan());
 
-    DP_RESET(&state1, IMM_SUCCESS);
-    VITERBI_CHECK(&AGTC, IMM_SUCCESS, 4, -6.303991659557);
+    DP_RESET(&state1, IMM_OK);
+    VITERBI_CHECK(&AGTC, IMM_OK, 4, -6.303991659557);
 
     EQ(imm_hmm_set_trans(&hmm, imm_super(&state0), imm_super(&state0), zero()),
-       IMM_ILLEGALARG);
+       IMM_OK);
     EQ(imm_hmm_set_trans(&hmm, imm_super(&state0), imm_super(&state1), zero()),
-       IMM_ILLEGALARG);
+       IMM_OK);
     EQ(imm_hmm_set_trans(&hmm, imm_super(&state1), imm_super(&state0), zero()),
-       IMM_ILLEGALARG);
+       IMM_OK);
     EQ(imm_hmm_set_trans(&hmm, imm_super(&state1), imm_super(&state1), zero()),
-       IMM_ILLEGALARG);
+       IMM_OK);
 
-    EQ(imm_hmm_set_start(&hmm, imm_super(&state0), zero()), IMM_ILLEGALARG);
-    EQ(imm_hmm_set_start(&hmm, imm_super(&state1), zero()), IMM_ILLEGALARG);
+    EQ(imm_hmm_set_start(&hmm, imm_super(&state0), zero()), IMM_OK);
+    EQ(imm_hmm_set_start(&hmm, imm_super(&state1), zero()), IMM_OK);
 
     imm_hmm_set_start(&hmm, imm_super(&state0), imm_log(1.0));
 
-    DP_RESET(&state0, IMM_SUCCESS);
+    DP_RESET(&state0, IMM_OK);
 
-    EQ(imm_task_setup(task, &EMPTY), IMM_SUCCESS);
-    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_ILLEGALARG);
+    EQ(imm_task_setup(task, &EMPTY), IMM_OK);
+    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
     EQ(imm_path_nsteps(&prod.path), 0);
 
-    DP_RESET(&state1, IMM_SUCCESS);
+    DP_RESET(&state1, IMM_OK);
 
-    EQ(imm_task_setup(task, &EMPTY), IMM_SUCCESS);
-    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_ILLEGALARG);
+    EQ(imm_task_setup(task, &EMPTY), IMM_OK);
+    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
     EQ(imm_path_nsteps(&prod.path), 0);
 
-    DP_RESET(&state0, IMM_SUCCESS);
+    DP_RESET(&state0, IMM_OK);
 
-    VITERBI_CHECK(&A, IMM_SUCCESS, 1, imm_log(0.25));
+    VITERBI_CHECK(&A, IMM_OK, 1, imm_log(0.25));
 
     imm_hmm_set_trans(&hmm, imm_super(&state0), imm_super(&state0),
                       imm_log(0.9));
 
-    DP_RESET(&state0, IMM_SUCCESS);
+    DP_RESET(&state0, IMM_OK);
 
-    VITERBI_CHECK(&A, IMM_SUCCESS, 1, imm_log(0.25));
-    VITERBI_CHECK(&AA, IMM_SUCCESS, 2, 2 * imm_log(0.25) + imm_log(0.9));
+    VITERBI_CHECK(&A, IMM_OK, 1, imm_log(0.25));
+    VITERBI_CHECK(&AA, IMM_OK, 2, 2 * imm_log(0.25) + imm_log(0.9));
 
     imm_hmm_set_trans(&hmm, imm_super(&state0), imm_super(&state1),
                       imm_log(0.2));
 
-    DP_RESET(&state0, IMM_SUCCESS);
+    DP_RESET(&state0, IMM_OK);
 
-    VITERBI_CHECK(&A, IMM_SUCCESS, 1, imm_log(0.25));
-    VITERBI_CHECK(&AA, IMM_SUCCESS, 2, 2 * imm_log(0.25) + imm_log(0.9));
+    VITERBI_CHECK(&A, IMM_OK, 1, imm_log(0.25));
+    VITERBI_CHECK(&AA, IMM_OK, 2, 2 * imm_log(0.25) + imm_log(0.9));
 
     imm_del(&prod);
     imm_del(task);
@@ -438,39 +437,37 @@ void test_viterbi_profile1(void)
     imm_hmm_init_dp(&hmm, imm_super(&end), &dp);
     struct imm_task *task = imm_task_new(&dp);
 
-    VITERBI_CHECK(&EMPTY_ab, IMM_SUCCESS, 3, imm_log(0.1) + imm_log(1.0));
+    VITERBI_CHECK(&EMPTY_ab, IMM_OK, 3, imm_log(0.1) + imm_log(1.0));
 
-    DP_RESET(&D0, IMM_SUCCESS);
-    VITERBI_CHECK(&EMPTY_ab, IMM_SUCCESS, 2, imm_log(0.1));
+    DP_RESET(&D0, IMM_OK);
+    VITERBI_CHECK(&EMPTY_ab, IMM_OK, 2, imm_log(0.1));
 
-    DP_RESET(&start, IMM_SUCCESS);
-    VITERBI_CHECK(&EMPTY_ab, IMM_SUCCESS, 1, imm_log(1.0));
+    DP_RESET(&start, IMM_OK);
+    VITERBI_CHECK(&EMPTY_ab, IMM_OK, 1, imm_log(1.0));
 
-    DP_RESET(&M0, IMM_SUCCESS);
+    DP_RESET(&M0, IMM_OK);
 
-    EQ(imm_task_setup(task, &EMPTY_ab), IMM_SUCCESS);
-    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_ILLEGALARG);
+    EQ(imm_task_setup(task, &EMPTY_ab), IMM_OK);
+    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
     EQ(imm_path_nsteps(&prod.path), 0);
     CLOSE(imm_hmm_loglik(&hmm, &EMPTY_ab, &prod.path), imm_lprob_nan());
     CLOSE(prod.loglik, imm_lprob_nan());
 
-    DP_RESET(&M0, IMM_SUCCESS);
-    VITERBI_CHECK(&A_ab, IMM_SUCCESS, 2, imm_log(0.5) + imm_log(0.4));
+    DP_RESET(&M0, IMM_OK);
+    VITERBI_CHECK(&A_ab, IMM_OK, 2, imm_log(0.5) + imm_log(0.4));
 
-    DP_RESET(&end, IMM_SUCCESS);
-    VITERBI_CHECK(&A_ab, IMM_SUCCESS, 3,
-                  imm_log(0.5) + imm_log(0.4) + imm_log(0.8));
+    DP_RESET(&end, IMM_OK);
+    VITERBI_CHECK(&A_ab, IMM_OK, 3, imm_log(0.5) + imm_log(0.4) + imm_log(0.8));
 
-    DP_RESET(&M0, IMM_SUCCESS);
-    VITERBI_CHECK(&B_ab, IMM_SUCCESS, 2, imm_log(0.5) + imm_log(0.2));
+    DP_RESET(&M0, IMM_OK);
+    VITERBI_CHECK(&B_ab, IMM_OK, 2, imm_log(0.5) + imm_log(0.2));
 
-    DP_RESET(&end, IMM_SUCCESS);
-    VITERBI_CHECK(&B_ab, IMM_SUCCESS, 3,
-                  imm_log(0.5) + imm_log(0.2) + imm_log(0.8));
-    VITERBI_CHECK(&AA_ab, IMM_SUCCESS, 4,
+    DP_RESET(&end, IMM_OK);
+    VITERBI_CHECK(&B_ab, IMM_OK, 3, imm_log(0.5) + imm_log(0.2) + imm_log(0.8));
+    VITERBI_CHECK(&AA_ab, IMM_OK, 4,
                   imm_log(0.5) + imm_log(0.4) + imm_log(0.1) + imm_log(0.5));
 
-    VITERBI_CHECK(&AAB_ab, IMM_SUCCESS, 5,
+    VITERBI_CHECK(&AAB_ab, IMM_OK, 5,
                   imm_log(0.5) + imm_log(0.4) + imm_log(0.1) + imm_log(0.2) +
                       2 * imm_log(0.5));
 
@@ -559,51 +556,50 @@ void test_viterbi_profile2(void)
     imm_hmm_init_dp(&hmm, imm_super(&M2), &dp);
     struct imm_task *task = imm_task_new(&dp);
 
-    VITERBI_CHECK(&A, IMM_SUCCESS, 2, imm_log(0.05));
+    VITERBI_CHECK(&A, IMM_OK, 2, imm_log(0.05));
 
-    DP_RESET(&M2, IMM_SUCCESS);
-    VITERBI_CHECK(&C, IMM_SUCCESS, 2, imm_log(0.05));
-    VITERBI_CHECK(&G, IMM_SUCCESS, 2, imm_log(0.05));
-    VITERBI_CHECK(&T, IMM_SUCCESS, 2, imm_log(0.05));
+    DP_RESET(&M2, IMM_OK);
+    VITERBI_CHECK(&C, IMM_OK, 2, imm_log(0.05));
+    VITERBI_CHECK(&G, IMM_OK, 2, imm_log(0.05));
+    VITERBI_CHECK(&T, IMM_OK, 2, imm_log(0.05));
 
-    DP_RESET(&end, IMM_SUCCESS);
-    VITERBI_CHECK(&A, IMM_SUCCESS, 3, imm_log(0.6));
-    VITERBI_CHECK(&C, IMM_SUCCESS, 3, imm_log(0.05));
-    VITERBI_CHECK(&G, IMM_SUCCESS, 3, imm_log(0.6));
-    VITERBI_CHECK(&T, IMM_SUCCESS, 3, imm_log(0.05));
+    DP_RESET(&end, IMM_OK);
+    VITERBI_CHECK(&A, IMM_OK, 3, imm_log(0.6));
+    VITERBI_CHECK(&C, IMM_OK, 3, imm_log(0.05));
+    VITERBI_CHECK(&G, IMM_OK, 3, imm_log(0.6));
+    VITERBI_CHECK(&T, IMM_OK, 3, imm_log(0.05));
 
-    DP_RESET(&M1, IMM_SUCCESS);
-    VITERBI_CHECK(&A, IMM_SUCCESS, 2, imm_log(0.6));
+    DP_RESET(&M1, IMM_OK);
+    VITERBI_CHECK(&A, IMM_OK, 2, imm_log(0.6));
 
-    DP_RESET(&end, IMM_SUCCESS);
-    VITERBI_CHECK(&GA, IMM_SUCCESS, 4, 2 * imm_log(0.6));
+    DP_RESET(&end, IMM_OK);
+    VITERBI_CHECK(&GA, IMM_OK, 4, 2 * imm_log(0.6));
 
-    DP_RESET(&I0, IMM_SUCCESS);
-    VITERBI_CHECK(&GT, IMM_SUCCESS, 3,
-                  imm_log(0.6) + imm_log(0.2) + imm_log(0.7));
+    DP_RESET(&I0, IMM_OK);
+    VITERBI_CHECK(&GT, IMM_OK, 3, imm_log(0.6) + imm_log(0.2) + imm_log(0.7));
 
-    DP_RESET(&end, IMM_SUCCESS);
-    VITERBI_CHECK(&GTTTA, IMM_SUCCESS, 7,
+    DP_RESET(&end, IMM_OK);
+    VITERBI_CHECK(&GTTTA, IMM_OK, 7,
                   imm_log(0.6) + imm_log(0.2) + 3 * imm_log(0.7) +
                       3 * imm_log(0.5) + imm_log(0.6));
 
-    VITERBI_CHECK(&GTTTAC, IMM_SUCCESS, 8,
+    VITERBI_CHECK(&GTTTAC, IMM_OK, 8,
                   imm_log(0.6) + imm_log(0.2) + 3 * imm_log(0.7) +
                       3 * imm_log(0.5) + imm_log(0.6) + imm_log(0.05));
 
-    DP_RESET(&M2, IMM_SUCCESS);
-    VITERBI_CHECK(&GTTTACA, IMM_SUCCESS, 8,
+    DP_RESET(&M2, IMM_OK);
+    VITERBI_CHECK(&GTTTACA, IMM_OK, 8,
                   imm_log(0.6) + imm_log(0.2) + 3 * imm_log(0.7) +
                       3 * imm_log(0.5) + imm_log(0.6) + imm_log(0.2) +
                       imm_log(0.1) + imm_log(0.5) + imm_log(0.05));
 
-    DP_RESET(&M1, IMM_SUCCESS);
-    VITERBI_CHECK(&GTTTACA, IMM_SUCCESS, 8,
+    DP_RESET(&M1, IMM_OK);
+    VITERBI_CHECK(&GTTTACA, IMM_OK, 8,
                   imm_log(0.6) + imm_log(0.2) + 5 * imm_log(0.5) +
                       3 * imm_log(0.7) + 2 * imm_log(0.1) + imm_log(0.6));
 
-    DP_RESET(&end, IMM_SUCCESS);
-    VITERBI_CHECK(&GTTTACA, IMM_SUCCESS, 9,
+    DP_RESET(&end, IMM_OK);
+    VITERBI_CHECK(&GTTTACA, IMM_OK, 9,
                   imm_log(0.6) + imm_log(0.2) + 5 * imm_log(0.5) +
                       3 * imm_log(0.7) + 2 * imm_log(0.1) + imm_log(0.6));
 
@@ -648,16 +644,16 @@ void test_viterbi_profile_delete(void)
     imm_hmm_init_dp(&hmm, imm_super(&N0), &dp);
     struct imm_task *task = imm_task_new(&dp);
 
-    VITERBI_CHECK(&A_ab, IMM_SUCCESS, 1, imm_log(0.5));
+    VITERBI_CHECK(&A_ab, IMM_OK, 1, imm_log(0.5));
 
-    DP_RESET(&M, IMM_SUCCESS);
-    VITERBI_CHECK(&A_ab, IMM_SUCCESS, 2, 2 * imm_log(0.5));
+    DP_RESET(&M, IMM_OK);
+    VITERBI_CHECK(&A_ab, IMM_OK, 2, 2 * imm_log(0.5));
 
-    DP_RESET(&N2, IMM_SUCCESS);
-    VITERBI_CHECK(&AB_ab, IMM_SUCCESS, 3, 4 * imm_log(0.5));
+    DP_RESET(&N2, IMM_OK);
+    VITERBI_CHECK(&AB_ab, IMM_OK, 3, 4 * imm_log(0.5));
 
-    DP_RESET(&M, IMM_SUCCESS);
-    VITERBI_CHECK(&A_ab, IMM_SUCCESS, 2, 2 * imm_log(0.5));
+    DP_RESET(&M, IMM_OK);
+    VITERBI_CHECK(&A_ab, IMM_OK, 2, 2 * imm_log(0.5));
 
     imm_del(&prod);
     imm_del(task);
@@ -783,42 +779,42 @@ void test_viterbi_global_profile(void)
     imm_hmm_init_dp(&hmm, imm_super(&start), &dp);
     struct imm_task *task = imm_task_new(&dp);
 
-    VITERBI_CHECK(&C_z, IMM_SUCCESS, 0, imm_lprob_nan());
+    VITERBI_CHECK(&C_z, IMM_OK, 0, imm_lprob_nan());
 
-    DP_RESET(&B, IMM_SUCCESS);
-    VITERBI_CHECK(&C_z, IMM_SUCCESS, 2, imm_log(1.0));
+    DP_RESET(&B, IMM_OK);
+    VITERBI_CHECK(&C_z, IMM_OK, 2, imm_log(1.0));
 
-    VITERBI_CHECK(&CC_z, IMM_SUCCESS, 3, imm_log(1.0));
-    VITERBI_CHECK(&CCC_z, IMM_SUCCESS, 4, imm_log(1.0));
-    VITERBI_CHECK(&CCA_z, IMM_SUCCESS, 4, imm_log(0.01));
+    VITERBI_CHECK(&CC_z, IMM_OK, 3, imm_log(1.0));
+    VITERBI_CHECK(&CCC_z, IMM_OK, 4, imm_log(1.0));
+    VITERBI_CHECK(&CCA_z, IMM_OK, 4, imm_log(0.01));
 
-    DP_RESET(&M0, IMM_SUCCESS);
-    VITERBI_CHECK(&CCA_z, IMM_SUCCESS, 4, imm_log(0.9));
+    DP_RESET(&M0, IMM_OK);
+    VITERBI_CHECK(&CCA_z, IMM_OK, 4, imm_log(0.9));
 
-    DP_RESET(&M1, IMM_SUCCESS);
-    VITERBI_CHECK(&CCAB_z, IMM_SUCCESS, 5, 2 * imm_log(0.9));
+    DP_RESET(&M1, IMM_OK);
+    VITERBI_CHECK(&CCAB_z, IMM_OK, 5, 2 * imm_log(0.9));
 
-    DP_RESET(&I0, IMM_SUCCESS);
-    VITERBI_CHECK(&CCAB_z, IMM_SUCCESS, 5, imm_log(0.9 * 0.5 * 0.1));
+    DP_RESET(&I0, IMM_OK);
+    VITERBI_CHECK(&CCAB_z, IMM_OK, 5, imm_log(0.9 * 0.5 * 0.1));
 
-    VITERBI_CHECK(&CCABB_z, IMM_SUCCESS, 6, imm_log(0.9) + 2 * (imm_log(0.05)));
+    VITERBI_CHECK(&CCABB_z, IMM_OK, 6, imm_log(0.9) + 2 * (imm_log(0.05)));
 
-    DP_RESET(&M1, IMM_SUCCESS);
-    VITERBI_CHECK(&CCABA_z, IMM_SUCCESS, 6,
+    DP_RESET(&M1, IMM_OK);
+    VITERBI_CHECK(&CCABA_z, IMM_OK, 6,
                   imm_log(0.9) + imm_log(0.5) + imm_log(0.1) + imm_log(0.5) +
                       imm_log(0.01));
 
-    DP_RESET(&D1, IMM_SUCCESS);
-    VITERBI_CHECK(&AA_z, IMM_SUCCESS, 4, imm_log(0.01) + imm_log(0.9));
+    DP_RESET(&D1, IMM_OK);
+    VITERBI_CHECK(&AA_z, IMM_OK, 4, imm_log(0.01) + imm_log(0.9));
 
-    DP_RESET(&D2, IMM_SUCCESS);
-    VITERBI_CHECK(&AA_z, IMM_SUCCESS, 5, imm_log(0.01) + imm_log(0.9));
+    DP_RESET(&D2, IMM_OK);
+    VITERBI_CHECK(&AA_z, IMM_OK, 5, imm_log(0.01) + imm_log(0.9));
 
-    DP_RESET(&E, IMM_SUCCESS);
-    VITERBI_CHECK(&AA_z, IMM_SUCCESS, 6, imm_log(0.01) + imm_log(0.9));
+    DP_RESET(&E, IMM_OK);
+    VITERBI_CHECK(&AA_z, IMM_OK, 6, imm_log(0.01) + imm_log(0.9));
 
-    DP_RESET(&M2, IMM_SUCCESS);
-    VITERBI_CHECK(&AAB_z, IMM_SUCCESS, 5,
+    DP_RESET(&M2, IMM_OK);
+    VITERBI_CHECK(&AAB_z, IMM_OK, 5,
                   imm_log(0.01) + imm_log(0.9) + imm_log(0.5));
 
     imm_del(&prod);
@@ -869,15 +865,15 @@ void test_viterbi_cycle_mute_ending(void)
     imm_hmm_init_dp(&hmm, imm_super(&end), &dp);
     struct imm_task *task = imm_task_new(&dp);
 
-    VITERBI_CHECK(&A_ab, IMM_SUCCESS, 5, -13.815510557964272);
+    VITERBI_CHECK(&A_ab, IMM_OK, 5, -13.815510557964272);
 
     unsigned BM = imm_dp_trans_idx(&dp, imm_state_idx(imm_super(&B)),
                                    imm_state_idx(imm_super(&M)));
 
     imm_dp_change_trans(&dp, BM, imm_log(1.0));
 
-    EQ(imm_task_setup(task, &A_ab), IMM_SUCCESS);
-    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_SUCCESS);
+    EQ(imm_task_setup(task, &A_ab), IMM_OK);
+    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
     EQ(imm_path_nsteps(&prod.path), 5);
     CLOSE(prod.loglik, -11.5129254650);
 

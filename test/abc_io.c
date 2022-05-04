@@ -10,13 +10,13 @@ int main(void)
     imm_abc_init(&abc_out, IMM_STR("ACGT"), '*');
 
     file.fp = fopen(TMPDIR "/abc.imm", "wb");
-    EQ(imm_abc_pack(&abc_out, &file), IMM_SUCCESS);
+    EQ(imm_abc_pack(&abc_out, &file), IMM_OK);
     fclose(file.fp);
 
     struct imm_abc abc_in = imm_abc_empty;
 
     file.fp = fopen(TMPDIR "/abc.imm", "rb");
-    EQ(imm_abc_unpack(&abc_in, &file), IMM_SUCCESS);
+    EQ(imm_abc_unpack(&abc_in, &file), IMM_OK);
     fclose(file.fp);
 
     EQ(abc_in.any_symbol_id, abc_out.any_symbol_id);

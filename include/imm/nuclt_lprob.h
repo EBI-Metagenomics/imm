@@ -1,7 +1,6 @@
 #ifndef IMM_NUCLT_LPROB_H
 #define IMM_NUCLT_LPROB_H
 
-#include "imm/log.h"
 #include "imm/lprob.h"
 #include "imm/nuclt.h"
 #include <assert.h>

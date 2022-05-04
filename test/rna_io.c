@@ -8,13 +8,13 @@ int main(void)
     struct imm_rna const *rna_out = &imm_rna_iupac;
 
     file.fp = fopen(TMPDIR "/rna.imm", "wb");
-    EQ(imm_abc_pack((struct imm_abc const *)rna_out, &file), IMM_SUCCESS);
+    EQ(imm_abc_pack((struct imm_abc const *)rna_out, &file), IMM_OK);
     fclose(file.fp);
 
     struct imm_rna rna_in;
 
     file.fp = fopen(TMPDIR "/rna.imm", "rb");
-    EQ(imm_abc_unpack((struct imm_abc *)&rna_in, &file), IMM_SUCCESS);
+    EQ(imm_abc_unpack((struct imm_abc *)&rna_in, &file), IMM_OK);
     fclose(file.fp);
 
     struct imm_abc const *out = imm_super(imm_super(rna_out));

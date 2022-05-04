@@ -49,9 +49,9 @@ void test_hmm_loglik_single_state(void)
     struct imm_hmm hmm;
     imm_hmm_init(&hmm, &code);
 
-    EQ(imm_hmm_add_state(&hmm, imm_super(&state)), IMM_SUCCESS);
-    EQ(imm_hmm_set_start(&hmm, imm_super(&state), imm_log(0.5)), IMM_SUCCESS);
-    EQ(imm_hmm_normalize_trans(&hmm), IMM_SUCCESS);
+    EQ(imm_hmm_add_state(&hmm, imm_super(&state)), IMM_OK);
+    EQ(imm_hmm_set_start(&hmm, imm_super(&state), imm_log(0.5)), IMM_OK);
+    EQ(imm_hmm_normalize_trans(&hmm), IMM_OK);
 
     struct imm_path path = imm_path();
     imm_path_add(&path, imm_step(imm_state_id(imm_super(&state)), 1));
@@ -79,11 +79,11 @@ void test_hmm_loglik_single_state(void)
     EQ(imm_hmm_normalize_trans(&hmm), 0);
     EQ(imm_hmm_set_trans(&hmm, imm_super(&state), imm_super(&state),
                          imm_lprob_zero()),
-       IMM_ILLEGALARG);
+       IMM_OK);
     EQ(imm_hmm_normalize_trans(&hmm), 0);
     EQ(imm_hmm_set_trans(&hmm, imm_super(&state), imm_super(&state),
                          imm_log(0.5)),
-       IMM_SUCCESS);
+       IMM_OK);
     imm_path_reset(&path);
 
     imm_path_add(&path, imm_step(imm_state_id(imm_super(&state)), 1));

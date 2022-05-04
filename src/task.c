@@ -10,7 +10,7 @@ struct imm_task *imm_task_new(struct imm_dp const *dp)
     struct imm_task *task = malloc(sizeof(*task));
     if (!task)
     {
-        error(IMM_OUTOFMEM, "failed to malloc");
+        error(IMM_NOMEM);
         return NULL;
     }
     if (matrix_init(&task->matrix, &dp->state_table))
@@ -33,12 +33,12 @@ enum imm_rc imm_task_reset(struct imm_task *task, struct imm_dp const *dp)
 {
     enum imm_rc rc = matrix_reset(&task->matrix, &dp->state_table);
     if (rc) return rc;
-    /* FIX: memory leak possibility */
+    /* TODO: memory leak possibility */
     if ((rc = path_reset(&task->path, &dp->state_table, &dp->trans_table)))
         return rc;
     eseq_reset(&task->eseq, dp->code);
     task->seq = NULL;
-    return IMM_SUCCESS;
+    return IMM_OK;
 }
 
 enum imm_rc imm_task_setup(struct imm_task *task, struct imm_seq const *seq)

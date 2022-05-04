@@ -16,7 +16,7 @@ unsigned trans_table_idx(struct imm_dp_trans_table *trans_tbl, unsigned src_idx,
         if (trans_table_source_state(trans_tbl, dst_idx, i) == src_idx)
             return trans_tbl->offset[dst_idx] + i;
     }
-    error(IMM_ILLEGALARG, "transition not found");
+    error(IMM_TRANSITION_NOT_FOUND);
     return IMM_TRANS_NULL_IDX;
 }
 
@@ -35,8 +35,7 @@ enum imm_rc trans_table_reset(struct imm_dp_trans_table *tbl,
 
     unsigned offsize = trans_table_offsize(args->nstates);
     tbl->offset = reallocf(tbl->offset, sizeof(*tbl->offset) * offsize);
-    if (!tbl->offset && offsize > 0)
-        return error(IMM_OUTOFMEM, "failed to reallocf");
+    if (!tbl->offset && offsize > 0) return error(IMM_NOMEM);
 
     tbl->offset[0] = 0;
 
@@ -45,7 +44,7 @@ enum imm_rc trans_table_reset(struct imm_dp_trans_table *tbl,
     {
         tbl->offset = NULL;
         free(tbl->offset);
-        return error(IMM_OUTOFMEM, "failed to reallocf");
+        return error(IMM_NOMEM);
     }
 
     for (unsigned i = 0; i < args->nstates; ++i)
@@ -61,7 +60,7 @@ enum imm_rc trans_table_reset(struct imm_dp_trans_table *tbl,
         }
         tbl->offset[i + 1] = (imm_trans_idx_t)(tbl->offset[i] + j);
     }
-    return IMM_SUCCESS;
+    return IMM_OK;
 }
 
 void trans_table_del(struct imm_dp_trans_table const *tbl)

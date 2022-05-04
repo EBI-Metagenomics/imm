@@ -18,15 +18,13 @@ enum imm_rc imm_abc_init(struct imm_abc *abc, struct imm_str symbols,
 enum imm_rc imm_abc_pack(struct imm_abc const *abc, struct lip_file *file)
 {
     enum imm_rc rc = abc_pack(abc, file);
-    if (rc) return error(rc, "failed to write alphabet");
-    return rc;
+    return rc ? error(IMM_IOERROR) : rc;
 }
 
 enum imm_rc imm_abc_unpack(struct imm_abc *abc, struct lip_file *file)
 {
     enum imm_rc rc = abc_unpack(abc, file);
-    if (rc) return error(rc, "failed to read alphabet");
-    return rc;
+    return rc ? error(IMM_IOERROR) : rc;
 }
 
 unsigned imm_abc_union_size(struct imm_abc const *abc, struct imm_str seq)
@@ -43,13 +41,12 @@ unsigned imm_abc_union_size(struct imm_abc const *abc, struct imm_str seq)
 enum imm_rc abc_init(struct imm_abc *abc, unsigned len, char const *symbols,
                      char any_symbol, struct imm_abc_vtable vtable)
 {
-    if (!imm_sym_valid_char(any_symbol))
-        return error(IMM_ILLEGALARG, "any_symbol outside range");
+    if (!imm_sym_valid_char(any_symbol)) return error(IMM_ANY_SYMBOL_OUT_RANGE);
 
-    if (len == 0) return error(IMM_ILLEGALARG, "alphabet cannot be empty");
+    if (len == 0) return error(IMM_EMPTY_ABC);
 
     if (len > IMM_ABC_MAX_SIZE || len > IMM_SYM_SIZE)
-        return error(IMM_ILLEGALARG, "symbols length is too large");
+        return error(IMM_TOO_MANY_SYMBOLS);
 
     abc->size = len;
     memcpy(abc->symbols, symbols, sizeof *abc->symbols * len);
@@ -59,23 +56,20 @@ enum imm_rc abc_init(struct imm_abc *abc, unsigned len, char const *symbols,
 
     for (unsigned i = 0; i < abc->size; ++i)
     {
-        if (symbols[i] == any_symbol)
-            return error(IMM_ILLEGALARG,
-                         "any_symbol cannot be in the alphabet");
+        if (symbols[i] == any_symbol) return error(IMM_ANY_SYMBOL_IN_ABC);
 
         if (!imm_sym_valid_char(symbols[i]))
-            return error(IMM_ILLEGALARG, "symbol outside range");
+            return error(IMM_SYMBOL_OUT_OF_RANGE);
 
         unsigned id = imm_sym_id(symbols[i]);
         if (imm_sym_idx(&abc->sym, id) != IMM_SYM_NULL_IDX)
-            return error(IMM_ILLEGALARG,
-                         "alphabet cannot have duplicated symbols");
+            return error(IMM_DUPLICATED_SYMBOLS);
 
         imm_sym_set_idx(&abc->sym, id, i);
     }
     imm_sym_set_idx(&abc->sym, abc->any_symbol_id, abc->size);
     abc->vtable = vtable;
-    return IMM_SUCCESS;
+    return IMM_OK;
 }
 
 static_assert(sizeof(imm_sym_id_t) == sizeof(uint8_t), "wrong types");
@@ -104,28 +98,28 @@ enum imm_rc abc_pack(struct imm_abc const *abc, struct lip_file *file)
     lip_write_cstr(file, "typeid");
     lip_write_int(file, abc->vtable.typeid);
 
-    return file->error ? IMM_FAILURE : IMM_SUCCESS;
+    return file->error ? error(IMM_IOERROR) : IMM_OK;
 }
 
 enum imm_rc abc_unpack(struct imm_abc *abc, struct lip_file *file)
 {
-    if (!expect_map_size(file, 4)) return IMM_FAILURE;
+    if (!expect_map_size(file, 4)) return error(IMM_IOERROR);
 
-    if (!expect_map_key(file, "symbols")) return IMM_FAILURE;
+    if (!expect_map_key(file, "symbols")) return error(IMM_IOERROR);
     lip_read_cstr(file, IMM_ABC_MAX_SIZE, abc->symbols);
 
     abc->size = (unsigned)strlen(abc->symbols);
 
-    if (!expect_map_key(file, "idx")) return IMM_FAILURE;
+    if (!expect_map_key(file, "idx")) return error(IMM_IOERROR);
     expect_1darray_u8_type(file, IMM_ARRAY_SIZE(abc->sym.idx), abc->sym.idx);
 
-    if (!expect_map_key(file, "any_symbol_id")) return IMM_FAILURE;
+    if (!expect_map_key(file, "any_symbol_id")) return error(IMM_IOERROR);
     lip_read_int(file, &abc->any_symbol_id);
 
-    if (!expect_map_key(file, "typeid")) return IMM_FAILURE;
+    if (!expect_map_key(file, "typeid")) return error(IMM_IOERROR);
     lip_read_int(file, &abc->vtable.typeid);
 
-    if (!imm_abc_typeid_valid(abc->vtable.typeid)) return IMM_PARSEERROR;
+    if (!imm_abc_typeid_valid(abc->vtable.typeid)) return error(IMM_IOERROR);
 
-    return file->error ? IMM_FAILURE : IMM_SUCCESS;
+    return file->error ? error(IMM_IOERROR) : IMM_OK;
 }

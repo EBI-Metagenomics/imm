@@ -21,7 +21,7 @@ enum imm_rc eseq_setup(struct eseq *eseq, struct imm_seq const *seq)
 {
     unsigned ncols = IMM_STATE_MAX_SEQLEN + 1;
     if (matrixu16_resize(&eseq->data, imm_seq_size(seq) + 1, ncols))
-        return error(IMM_OUTOFMEM, "failed to resize");
+        return error(IMM_NOMEM);
 
     for (unsigned i = 0; i <= imm_seq_size(seq); ++i)
     {
@@ -34,5 +34,5 @@ enum imm_rc eseq_setup(struct eseq *eseq, struct imm_seq const *seq)
             matrixu16_set(&eseq->data, i, len, (uint16_t)code);
         }
     }
-    return IMM_SUCCESS;
+    return IMM_OK;
 }

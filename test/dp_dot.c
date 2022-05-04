@@ -26,14 +26,14 @@ int main(void)
     struct imm_hmm hmm;
     imm_hmm_init(&hmm, &code);
 
-    EQ(imm_hmm_add_state(&hmm, imm_super(&state0)), IMM_SUCCESS);
-    EQ(imm_hmm_add_state(&hmm, imm_super(&state1)), IMM_SUCCESS);
+    EQ(imm_hmm_add_state(&hmm, imm_super(&state0)), IMM_OK);
+    EQ(imm_hmm_add_state(&hmm, imm_super(&state1)), IMM_OK);
 
     EQ(imm_hmm_set_trans(&hmm, imm_super(&state0), imm_super(&state1),
                          imm_log(0.5)),
-       IMM_SUCCESS);
+       IMM_OK);
 
-    EQ(imm_hmm_set_start(&hmm, imm_super(&state0), 0.5f), IMM_SUCCESS);
+    EQ(imm_hmm_set_start(&hmm, imm_super(&state0), 0.5f), IMM_OK);
 
     FILE *fd = fopen(TMPDIR "/hmm.dot", "w");
     NOTNULL(fd);
@@ -41,7 +41,7 @@ int main(void)
     fclose(fd);
 
     struct imm_dp dp;
-    EQ(imm_hmm_init_dp(&hmm, imm_super(&state1), &dp), IMM_SUCCESS);
+    EQ(imm_hmm_init_dp(&hmm, imm_super(&state1), &dp), IMM_OK);
 
     fd = fopen(TMPDIR "/dp.dot", "w");
     NOTNULL(fd);

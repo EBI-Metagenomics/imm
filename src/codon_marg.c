@@ -137,8 +137,7 @@ enum imm_rc imm_codon_marg_pack(struct imm_codon_marg const *codonm,
 {
     lip_write_1darray_float(file, CODON_SIZE, &codonm->lprobs[0][0][0]);
 
-    return file->error ? error(IMM_IOERROR, "failed to pack codon_marg")
-                       : IMM_SUCCESS;
+    return file->error ? error(IMM_IOERROR) : IMM_OK;
 }
 
 enum imm_rc imm_codon_marg_unpack(struct imm_codon_marg *codonm,
@@ -148,6 +147,5 @@ enum imm_rc imm_codon_marg_unpack(struct imm_codon_marg *codonm,
 
     expect_1darray_float_type(file, CODON_SIZE, lprobs);
 
-    return file->error ? error(IMM_IOERROR, "failed to unpack marg_lprob")
-                       : IMM_SUCCESS;
+    return file->error ? error(IMM_IOERROR) : IMM_OK;
 }

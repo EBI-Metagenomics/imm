@@ -8,13 +8,13 @@ int main(void)
     struct imm_dna const *dna_out = &imm_dna_iupac;
 
     file.fp = fopen(TMPDIR "/dna.imm", "wb");
-    EQ(imm_abc_pack((struct imm_abc const *)dna_out, &file), IMM_SUCCESS);
+    EQ(imm_abc_pack((struct imm_abc const *)dna_out, &file), IMM_OK);
     fclose(file.fp);
 
     struct imm_dna dna_in;
 
     file.fp = fopen(TMPDIR "/dna.imm", "rb");
-    EQ(imm_abc_unpack((struct imm_abc *)&dna_in, &file), IMM_SUCCESS);
+    EQ(imm_abc_unpack((struct imm_abc *)&dna_in, &file), IMM_OK);
     fclose(file.fp);
 
     struct imm_abc const *out = imm_super(imm_super(dna_out));

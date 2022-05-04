@@ -34,13 +34,13 @@ static enum imm_rc add_transition(struct imm_hmm *hmm, struct imm_state *src,
                                   struct imm_state *dst, imm_float lprob)
 {
     if (hmm->transitions.size >= IMM_ARRAY_SIZE(hmm->transitions.data))
-        return error(IMM_RUNTIMEERROR, "max number of trans has been reached");
+        return error(IMM_TOO_MANY_TRANSITIONS);
     struct imm_trans *trans = hmm->transitions.data + hmm->transitions.size++;
     trans_init(trans, src->id, dst->id, lprob);
     cco_hash_add(hmm->transitions.tbl, &trans->hnode, trans->pair.id.key);
     cco_stack_put(&src->trans.outgoing, &trans->outgoing);
     cco_stack_put(&dst->trans.incoming, &trans->incoming);
-    return IMM_SUCCESS;
+    return IMM_OK;
 }
 
 static inline bool has_start_state(struct imm_hmm const *hmm)
@@ -88,11 +88,10 @@ void imm_hmm_write_dot(struct imm_hmm const *hmm, FILE *restrict fd,
 
 enum imm_rc imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
 {
-    if (cco_hash_hashed(&state->hnode))
-        return error(IMM_ILLEGALARG, "state already belongs to a hmm");
+    if (cco_hash_hashed(&state->hnode)) return error(IMM_STATE_ALREADY_IN_HMM);
     assert(!hmm_state(hmm, state->id));
     hmm_add_state(hmm, state);
-    return IMM_SUCCESS;
+    return IMM_OK;
 }
 
 enum imm_rc imm_hmm_init_dp(struct imm_hmm const *hmm,
@@ -114,19 +113,19 @@ enum imm_rc imm_hmm_reset_dp(struct imm_hmm const *hmm,
                              struct imm_state const *end_state,
                              struct imm_dp *dp)
 {
-    enum imm_rc rc = IMM_SUCCESS;
+    enum imm_rc rc = IMM_OK;
     struct imm_state **states =
         malloc(sizeof(struct imm_state *) * hmm->states.size);
-    if (!states) return error(IMM_OUTOFMEM, "failed to malloc");
+    if (!states) return error(IMM_NOMEM);
 
     if (!hmm_state(hmm, end_state->id))
     {
-        rc = error(IMM_ILLEGALARG, "end state not found");
+        rc = error(IMM_END_STATE_NOT_FOUND);
         goto cleanup;
     }
     if (!has_start_state(hmm))
     {
-        rc = error(IMM_ILLEGALARG, "start state not found");
+        rc = error(IMM_START_STATE_NOT_FOUND);
         goto cleanup;
     }
 
@@ -140,11 +139,7 @@ enum imm_rc imm_hmm_reset_dp(struct imm_hmm const *hmm,
     set_state_indices(hmm, states);
 
     unsigned start_idx = hmm_state(hmm, hmm->start.state_id)->idx;
-    if (tsort(hmm->states.size, states, start_idx))
-    {
-        rc = error(IMM_RUNTIMEERROR, "failed to sort states");
-        goto cleanup;
-    }
+    if ((rc = tsort(hmm->states.size, states, start_idx))) goto cleanup;
     set_state_indices(hmm, states);
 
     struct dp_args args = dp_args(hmm->transitions.size, hmm->states.size,
@@ -168,12 +163,12 @@ imm_float imm_hmm_trans(struct imm_hmm const *hmm, struct imm_state const *src,
 {
     if (!cco_hash_hashed(&src->hnode) || !cco_hash_hashed(&dst->hnode))
     {
-        error(IMM_ILLEGALARG, "state(s) not found");
+        error(IMM_STATE_NOT_FOUND);
         return imm_lprob_nan();
     }
     struct imm_trans const *trans = hmm_trans(hmm, src, dst);
     if (trans) return trans->lprob;
-    error(IMM_ILLEGALARG, "transition not found");
+    error(IMM_TRANSITION_NOT_FOUND);
     return imm_lprob_nan();
 }
 
@@ -182,14 +177,14 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
 {
     if (hmm->code->abc != seq->abc)
     {
-        error(IMM_ILLEGALARG, "hmm and seq must have the same alphabet");
+        error(IMM_DIFFERENT_ABC);
         return imm_lprob_nan();
     }
 
     unsigned nsteps = imm_path_nsteps(path);
     if (nsteps == 0)
     {
-        error(IMM_ILLEGALARG, "path must have steps");
+        error(IMM_PATH_NO_STEPS);
         return imm_lprob_nan();
     }
 
@@ -197,13 +192,13 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
     struct imm_state const *state = hmm_state(hmm, step->state_id);
     if (state != hmm_state(hmm, hmm->start.state_id))
     {
-        error(IMM_ILLEGALARG, "first state must be the starting one");
+        error(IMM_FIRST_STATE_NOT_STARTING);
         return imm_lprob_nan();
     }
 
     if (step->seqlen > imm_seq_size(seq))
     {
-        error(IMM_ILLEGALARG, "path emits more symbols than sequence");
+        error(IMM_PATH_EMITS_MORE_SEQ);
         return imm_lprob_nan();
     }
 
@@ -217,14 +212,14 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
         step = imm_path_step(path, i);
         if (start + step->seqlen > imm_seq_size(seq))
         {
-            error(IMM_ILLEGALARG, "path emits more symbols than sequence");
+            error(IMM_PATH_EMITS_MORE_SEQ);
             return imm_lprob_nan();
         }
 
         struct imm_state const *prev_state = state;
         if (!(state = hmm_state(hmm, step->state_id)))
         {
-            error(IMM_ILLEGALARG, "state not found");
+            error(IMM_STATE_NOT_FOUND);
             return imm_lprob_nan();
         }
         imm_subseq_init(&subseq, seq, start, step->seqlen);
@@ -234,8 +229,7 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
 
     if (start + step->seqlen < imm_seq_size(seq))
     {
-        error(IMM_ILLEGALARG,
-              "sequence is longer than symbols emitted by path");
+        error(IMM_SEQ_LONGER_THAN_PATH_SYMBOLS);
         return imm_lprob_nan();
     }
     return lprob;
@@ -245,7 +239,7 @@ enum imm_rc imm_hmm_normalize_trans(struct imm_hmm const *hmm)
 {
     struct imm_state *state = NULL;
     unsigned bkt = 0;
-    enum imm_rc rc = IMM_SUCCESS;
+    enum imm_rc rc = IMM_OK;
     cco_hash_for_each(hmm->states.tbl, bkt, state, hnode)
     {
         if ((rc = imm_hmm_normalize_state_trans(state))) break;
@@ -255,10 +249,9 @@ enum imm_rc imm_hmm_normalize_trans(struct imm_hmm const *hmm)
 
 enum imm_rc imm_hmm_normalize_state_trans(struct imm_state *src)
 {
-    if (!cco_hash_hashed(&src->hnode))
-        return error(IMM_ILLEGALARG, "state not found");
+    if (!cco_hash_hashed(&src->hnode)) return error(IMM_STATE_NOT_FOUND);
 
-    if (cco_stack_empty(&src->trans.outgoing)) return IMM_SUCCESS;
+    if (cco_stack_empty(&src->trans.outgoing)) return IMM_OK;
 
     struct imm_trans *trans = NULL;
     struct cco_iter it = cco_stack_iter(&src->trans.outgoing);
@@ -268,39 +261,33 @@ enum imm_rc imm_hmm_normalize_state_trans(struct imm_state *src)
         lnorm = logaddexp(lnorm, trans->lprob);
     }
 
-    if (!imm_lprob_is_finite(lnorm))
-        return error(IMM_ILLEGALARG, "non-finite normalization denominator");
+    if (!imm_lprob_is_finite(lnorm)) return error(IMM_NON_FINITE_PROBABILITY);
 
     it = cco_stack_iter(&src->trans.outgoing);
     cco_iter_for_each_entry(trans, &it, outgoing) { trans->lprob -= lnorm; }
-    return IMM_SUCCESS;
+    return IMM_OK;
 }
 
 enum imm_rc imm_hmm_set_start(struct imm_hmm *hmm,
                               struct imm_state const *state, imm_float lprob)
 {
-    if (!imm_lprob_is_finite(lprob))
-        return error(IMM_ILLEGALARG, "probability must be finite");
+    if (!imm_lprob_is_finite(lprob)) return error(IMM_NON_FINITE_PROBABILITY);
 
-    if (!cco_hash_hashed(&state->hnode))
-        return error(IMM_ILLEGALARG, "state not found");
+    if (!cco_hash_hashed(&state->hnode)) return error(IMM_STATE_NOT_FOUND);
 
     hmm->start.lprob = lprob;
     hmm->start.state_id = state->id;
-    return IMM_SUCCESS;
+    return IMM_OK;
 }
 
 enum imm_rc imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state *src,
                               struct imm_state *dst, imm_float lprob)
 {
-    if (!imm_lprob_is_finite(lprob))
-        return error(IMM_ILLEGALARG, "probability must be finite");
+    if (!imm_lprob_is_finite(lprob)) return error(IMM_NON_FINITE_PROBABILITY);
 
-    if (!cco_hash_hashed(&src->hnode))
-        return error(IMM_ILLEGALARG, "source state not found");
+    if (!cco_hash_hashed(&src->hnode)) return error(IMM_STATE_NOT_FOUND);
 
-    if (!cco_hash_hashed(&dst->hnode))
-        return error(IMM_ILLEGALARG, "destination state not found");
+    if (!cco_hash_hashed(&dst->hnode)) return error(IMM_STATE_NOT_FOUND);
 
     struct imm_trans *trans = hmm_trans(hmm, src, dst);
 
@@ -309,7 +296,7 @@ enum imm_rc imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state *src,
     else
         return add_transition(hmm, src, dst, lprob);
 
-    return IMM_SUCCESS;
+    return IMM_OK;
 }
 
 struct imm_state *hmm_state(struct imm_hmm const *hmm, unsigned state_id)
