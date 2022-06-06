@@ -89,7 +89,8 @@ void imm_example1_init(unsigned core_size)
     assert(core_size > 0);
     assert(core_size <= IMM_EXAMPLE1_SIZE);
     struct imm_example1 *m = &imm_example1;
-    imm_abc_init(&m->abc, imm_str("BMIEJ"), '*');
+    imm_abc_init(&m->abc, imm_str(IMM_EXAMPLE1_NUCLT_SYMBOLS),
+                 IMM_EXAMPLE1_NUCLT_ANY_SYMBOL);
     imm_code_init(&m->code, &m->abc);
     imm_hmm_init(&m->hmm, &m->code);
     m->core_size = core_size;

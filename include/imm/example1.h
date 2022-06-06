@@ -9,6 +9,9 @@
 #include "imm/normal_state.h"
 
 #define IMM_EXAMPLE1_SIZE 3000U
+#define IMM_EXAMPLE1_NUCLT_ANY_SYMBOL '*'
+#define IMM_EXAMPLE1_NUCLT_SYMBOLS "BMIEJ"
+#define IMM_EXAMPLE1_NUCLT_SIZE 5
 
 IMM_API void imm_example1_init(unsigned core_size);
 
