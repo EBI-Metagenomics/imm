@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16.3 FATAL_ERROR)
 
 project(
     imm
-    VERSION 2.0.1
+    VERSION 2.0.2
     LANGUAGES C)
 
 include(cmake/compiler-options.cmake)
@@ -11,9 +11,9 @@ include(cmake/CPM.cmake)
 
 cpmaddpackage(NAME cco GIT_TAG 0.0.9 GITHUB_REPOSITORY
               EBI-Metagenomics/c-containers)
-cpmaddpackage(NAME elapsed GIT_TAG 3.0.5 GITHUB_REPOSITORY horta/elapsed)
+cpmaddpackage(NAME elapsed VERSION 3.0.6 GITHUB_REPOSITORY horta/elapsed)
 cpmaddpackage(NAME logaddexp GIT_TAG 2.1.8 GITHUB_REPOSITORY horta/logaddexp)
-cpmaddpackage(NAME lite_pack VERSION 0.1.4 GITHUB_REPOSITORY
+cpmaddpackage(NAME lite_pack VERSION 0.3.0 GITHUB_REPOSITORY
               EBI-Metagenomics/lite-pack)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
