@@ -3,14 +3,14 @@
 #include "lite_pack.h"
 #include <string.h>
 
-bool expect_map_size(struct lip_file *file, unsigned size)
+bool imm_expect_map_size(struct lip_file *file, unsigned size)
 {
     unsigned sz = 0;
     lip_read_map_size(file, &sz);
     return size == sz;
 }
 
-bool expect_map_key(struct lip_file *file, char const key[])
+bool imm_expect_map_key(struct lip_file *file, char const key[])
 {
     unsigned size = 0;
     char buf[16] = {0};
@@ -23,7 +23,7 @@ bool expect_map_key(struct lip_file *file, char const key[])
     return strncmp(key, buf, size) == 0;
 }
 
-bool expect_1darray_u8(struct lip_file *file, unsigned size, uint8_t arr[])
+bool imm_expect_1darr_u8(struct lip_file *file, unsigned size, uint8_t arr[])
 {
     unsigned sz = 0;
     enum lip_1darray_type type = 0;
@@ -37,7 +37,8 @@ error:
     return false;
 }
 
-bool expect_1darray_u8_type(struct lip_file *file, unsigned size, uint8_t arr[])
+bool imm_expect_1darr_u8_type(struct lip_file *file, unsigned size,
+                              uint8_t arr[])
 {
     unsigned sz = 0;
     enum lip_1darray_type type = 0;
@@ -52,7 +53,8 @@ error:
     return false;
 }
 
-bool expect_1darray_float(struct lip_file *file, unsigned size, imm_float arr[])
+bool imm_expect_1darr_float(struct lip_file *file, unsigned size,
+                            imm_float arr[])
 {
     unsigned sz = 0;
     enum lip_1darray_type type = 0;
@@ -66,8 +68,8 @@ error:
     return false;
 }
 
-bool expect_1darray_float_type(struct lip_file *file, unsigned size,
-                               imm_float arr[])
+bool imm_expect_1darr_float_type(struct lip_file *file, unsigned size,
+                                 imm_float arr[])
 {
     unsigned sz = 0;
     enum lip_1darray_type type = 0;

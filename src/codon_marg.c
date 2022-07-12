@@ -145,7 +145,7 @@ enum imm_rc imm_codon_marg_unpack(struct imm_codon_marg *codonm,
 {
     imm_float *lprobs = &codonm->lprobs[0][0][0];
 
-    expect_1darray_float_type(file, CODON_SIZE, lprobs);
+    imm_expect_1darr_float_type(file, CODON_SIZE, lprobs);
 
     return file->error ? error(IMM_IOERROR) : IMM_OK;
 }

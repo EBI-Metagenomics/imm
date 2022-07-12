@@ -103,20 +103,20 @@ enum imm_rc abc_pack(struct imm_abc const *abc, struct lip_file *file)
 
 enum imm_rc abc_unpack(struct imm_abc *abc, struct lip_file *file)
 {
-    if (!expect_map_size(file, 4)) return error(IMM_IOERROR);
+    if (!imm_expect_map_size(file, 4)) return error(IMM_IOERROR);
 
-    if (!expect_map_key(file, "symbols")) return error(IMM_IOERROR);
+    if (!imm_expect_map_key(file, "symbols")) return error(IMM_IOERROR);
     lip_read_cstr(file, IMM_ABC_MAX_SIZE, abc->symbols);
 
     abc->size = (unsigned)strlen(abc->symbols);
 
-    if (!expect_map_key(file, "idx")) return error(IMM_IOERROR);
-    expect_1darray_u8_type(file, IMM_ARRAY_SIZE(abc->sym.idx), abc->sym.idx);
+    if (!imm_expect_map_key(file, "idx")) return error(IMM_IOERROR);
+    imm_expect_1darr_u8_type(file, IMM_ARRAY_SIZE(abc->sym.idx), abc->sym.idx);
 
-    if (!expect_map_key(file, "any_symbol_id")) return error(IMM_IOERROR);
+    if (!imm_expect_map_key(file, "any_symbol_id")) return error(IMM_IOERROR);
     lip_read_int(file, &abc->any_symbol_id);
 
-    if (!expect_map_key(file, "typeid")) return error(IMM_IOERROR);
+    if (!imm_expect_map_key(file, "typeid")) return error(IMM_IOERROR);
     lip_read_int(file, &abc->vtable.typeid);
 
     if (!imm_abc_typeid_valid(abc->vtable.typeid)) return error(IMM_IOERROR);
