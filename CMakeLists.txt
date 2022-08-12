@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16.3 FATAL_ERROR)
 
 project(
     imm
-    VERSION 2.0.3
+    VERSION 2.0.4
     LANGUAGES C)
 
 include(cmake/compiler-options.cmake)
