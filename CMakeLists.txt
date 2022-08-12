@@ -2,19 +2,32 @@ cmake_minimum_required(VERSION 3.16.3 FATAL_ERROR)
 
 project(
     imm
-    VERSION 2.0.4
+    VERSION 2.0.5
     LANGUAGES C)
+
+set(IMM_MAIN_PROJECT OFF)
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+    set(IMM_MAIN_PROJECT ON)
+endif()
+
+if(IMM_MAIN_PROJECT)
+    set(IMM_BUILD_TESTS_DEFAULT ON)
+else()
+    set(IMM_BUILD_TESTS_DEFAULT OFF)
+endif()
+
+option(IMM_BUILD_TESTS "Build the unit tests" ${IMM_BUILD_TESTS_DEFAULT})
+message(STATUS "IMM_MAIN_PROJECT: " ${IMM_MAIN_PROJECT})
+message(STATUS "IMM_BUILD_TESTS: " ${IMM_BUILD_TESTS})
 
 include(cmake/compiler-options.cmake)
 include(cmake/sanitizers.cmake)
 include(cmake/CPM.cmake)
 
-cpmaddpackage(NAME cco GIT_TAG 0.0.9 GITHUB_REPOSITORY
-              EBI-Metagenomics/c-containers)
-cpmaddpackage(NAME elapsed VERSION 3.0.6 GITHUB_REPOSITORY horta/elapsed)
-cpmaddpackage(NAME logaddexp GIT_TAG 2.1.8 GITHUB_REPOSITORY horta/logaddexp)
-cpmaddpackage(NAME lite_pack VERSION 0.3.0 GITHUB_REPOSITORY
-              EBI-Metagenomics/lite-pack)
+cpmaddpackage("gh:EBI-Metagenomics/c-containers@0.0.10")
+cpmaddpackage("gh:horta/elapsed@3.0.7")
+cpmaddpackage("gh:horta/logaddexp@2.1.9")
+cpmaddpackage("gh:EBI-Metagenomics/lite-pack@0.3.1")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_C_STANDARD 11)
@@ -188,8 +201,10 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/README.md
               ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.md
         DESTINATION share/docs/${PROJECT_NAME})
 
-enable_testing()
-add_subdirectory(test)
+if(IMM_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(test)
+endif()
 
 set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
 set(CPACK_PACKAGE_VENDOR "Danilo Horta")
