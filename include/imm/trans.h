@@ -1,8 +1,7 @@
 #ifndef IMM_TRANS_H
 #define IMM_TRANS_H
 
-#include "cco/hnode.h"
-#include "cco/node.h"
+#include "cco.h"
 #include "pair.h"
 #include <stdint.h>
 

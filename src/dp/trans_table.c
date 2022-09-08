@@ -1,7 +1,7 @@
 #include "dp/trans_table.h"
-#include "cco/stack.h"
 #include "dp/dp.h"
 #include "error.h"
+#include "imm/cco.h"
 #include "imm/trans.h"
 #include "reallocf.h"
 #include <assert.h>

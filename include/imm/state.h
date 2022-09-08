@@ -1,8 +1,7 @@
 #ifndef IMM_STATE_H
 #define IMM_STATE_H
 
-#include "cco/hash.h"
-#include "cco/stack.h"
+#include "cco.h"
 #include "imm/export.h"
 #include "imm/float.h"
 #include "imm/lprob.h"
