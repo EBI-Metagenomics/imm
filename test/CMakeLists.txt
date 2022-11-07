@@ -1,6 +1,7 @@
 function(imm_add_test name)
   add_executable(${name} ${name}.c)
   target_link_libraries(${name} PRIVATE IMM::imm)
+  target_link_libraries(${name} PRIVATE LITE_PACK::lite_pack)
   target_compile_options(${name} PRIVATE ${WARNING_FLAGS})
   target_compile_features(${name} PRIVATE c_std_11)
   add_test(NAME ${name} COMMAND ${name})

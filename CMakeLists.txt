@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16.3 FATAL_ERROR)
 
 project(
   imm
-  VERSION 2.0.7
+  VERSION 2.0.8
   LANGUAGES C)
 
 set(IMM_MAIN_PROJECT OFF)
@@ -120,8 +120,8 @@ target_include_directories(
 
 target_compile_features(imm PUBLIC c_std_11)
 target_link_libraries(imm PUBLIC LOGADDEXP::logaddexp)
-target_link_libraries(imm PUBLIC ELAPSED::elapsed)
-target_link_libraries(imm PUBLIC LITE_PACK::lite_pack)
+target_link_libraries(imm PRIVATE ELAPSED::elapsed)
+target_link_libraries(imm PRIVATE LITE_PACK::lite_pack)
 target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
 set_target_properties(imm PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
