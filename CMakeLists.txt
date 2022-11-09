@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16.3 FATAL_ERROR)
 
 project(
   imm
-  VERSION 2.0.8
+  VERSION 2.0.9
   LANGUAGES C)
 
 set(IMM_MAIN_PROJECT OFF)
@@ -24,11 +24,12 @@ include(cmake/compiler-options.cmake)
 include(cmake/sanitizers.cmake)
 include(cmake/CPM.cmake)
 
-cpmaddpackage("gh:horta/elapsed@3.0.7")
-cpmaddpackage("gh:horta/logaddexp@2.1.9")
-cpmaddpackage("gh:EBI-Metagenomics/lite-pack@0.3.1")
+cpmaddpackage("gh:horta/elapsed@3.0.8")
+cpmaddpackage("gh:horta/logaddexp@2.1.10")
+cpmaddpackage("gh:EBI-Metagenomics/lite-pack@0.3.2")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_C_EXTENSIONS OFF)
 
 add_library(
   imm
@@ -74,7 +75,7 @@ add_library(
   src/tsort.c)
 add_library(IMM::imm ALIAS imm)
 
-# Enable interprodecural optimization
+# Enable interprocedural optimization
 macro(enable_ipo lib)
   if(CMAKE_BUILD_TYPE STREQUAL "Release")
     include(CheckIPOSupported)
@@ -129,16 +130,10 @@ set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
 include(CheckSymbolExists)
 check_symbol_exists(reallocf "stdlib.h" HAVE_REALLOCF)
 
-target_compile_definitions(
-  imm PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRECATE>)
-target_compile_definitions(imm PRIVATE $<$<BOOL:${WIN32}>:__extension__>)
 target_compile_definitions(imm
                            PRIVATE $<$<BOOL:${HAVE_REALLOCF}>:HAVE_REALLOCF>)
-target_compile_definitions(imm PRIVATE _XOPEN_SOURCE=700)
-target_compile_definitions(imm PRIVATE _DARWIN_C_SOURCE=1)
 
 target_compile_options(imm PRIVATE ${WARNING_FLAGS})
-target_compile_options(imm PRIVATE "-fverbose-asm")
 
 set(CONFIG_FILE ${CMAKE_CURRENT_BINARY_DIR}/imm/config.h)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/imm/config.h.in

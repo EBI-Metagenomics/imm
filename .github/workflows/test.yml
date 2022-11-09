@@ -11,7 +11,7 @@ jobs:
       BUILD_TYPE: ${{ matrix.build_type }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-22.04, macos-12]
         double_precision: ["On", "Off"]
         build_type: [Release, Debug]
 
