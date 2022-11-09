@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.16.3 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 
 project(
   imm
-  VERSION 2.0.9
+  VERSION 2.0.10
   LANGUAGES C)
 
 set(IMM_MAIN_PROJECT OFF)
@@ -26,7 +26,7 @@ include(cmake/CPM.cmake)
 
 cpmaddpackage("gh:horta/elapsed@3.0.8")
 cpmaddpackage("gh:horta/logaddexp@2.1.10")
-cpmaddpackage("gh:EBI-Metagenomics/lite-pack@0.3.2")
+cpmaddpackage("gh:EBI-Metagenomics/lite-pack@0.4.0")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_C_EXTENSIONS OFF)
@@ -119,7 +119,7 @@ target_include_directories(
          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
   PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>)
 
-target_compile_features(imm PUBLIC c_std_11)
+target_compile_features(imm PRIVATE c_std_23)
 target_link_libraries(imm PUBLIC LOGADDEXP::logaddexp)
 target_link_libraries(imm PRIVATE ELAPSED::elapsed)
 target_link_libraries(imm PRIVATE LITE_PACK::lite_pack)
