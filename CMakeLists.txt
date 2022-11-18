@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 
 project(
   imm
-  VERSION 2.0.11
+  VERSION 2.0.12
   LANGUAGES C)
 
 set(IMM_MAIN_PROJECT OFF)
@@ -26,7 +26,7 @@ include(cmake/CPM.cmake)
 
 cpmaddpackage("gh:horta/elapsed@3.0.8")
 cpmaddpackage("gh:horta/logaddexp@2.1.10")
-cpmaddpackage("gh:EBI-Metagenomics/lite-pack@0.4.0")
+cpmaddpackage("gh:EBI-Metagenomics/lite-pack@0.4.1")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_C_EXTENSIONS OFF)
