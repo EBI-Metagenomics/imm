@@ -4,6 +4,7 @@
 #include "imm/gc.h"
 #include "imm/generics.h"
 #include <assert.h>
+#include <string.h>
 
 extern struct gc const gencode[];
 struct imm_dna const *const imm_gc_dna = &imm_dna_iupac;

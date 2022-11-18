@@ -5,6 +5,7 @@
 #include "lite_pack.h"
 #include <assert.h>
 #include <stdint.h>
+#include <string.h>
 
 struct imm_abc const imm_abc_empty = ABC_EMPTY;
 

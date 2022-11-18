@@ -3,6 +3,7 @@
 #include "imm/state.h"
 #include "imm/trans.h"
 #include <stdlib.h>
+#include <string.h>
 
 #define INITIAL_MARK 0
 #define TEMPORARY_MARK 1
