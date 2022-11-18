@@ -19,6 +19,9 @@ typedef float imm_float;
 #define imm_log(x) ((imm_float)log(x))
 
 #define IMM_ARR(...)                                                           \
-    (imm_float[]) { __VA_ARGS__ }
+    (imm_float[])                                                              \
+    {                                                                          \
+        __VA_ARGS__                                                            \
+    }
 
 #endif

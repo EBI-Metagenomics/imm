@@ -12,7 +12,7 @@ struct imm_dp_trans_table
     {
         imm_float score;     /**< Transition score. */
         imm_state_idx_t src; /**< Source state. */
-    } * trans;
+    } *trans;
     imm_trans_idx_t *offset; /**< Maps (dest. state, local trans) to score
                                   and src. state indices. */
 };

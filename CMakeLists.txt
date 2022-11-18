@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 
 project(
   imm
-  VERSION 2.0.10
+  VERSION 2.0.11
   LANGUAGES C)
 
 set(IMM_MAIN_PROJECT OFF)
@@ -71,6 +71,7 @@ add_library(
   src/rnd.c
   src/seq.c
   src/state.c
+  src/str.c
   src/task.c
   src/tsort.c)
 add_library(IMM::imm ALIAS imm)

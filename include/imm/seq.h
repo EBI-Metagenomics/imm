@@ -15,7 +15,10 @@ struct imm_seq
 extern struct imm_seq const imm_seq_empty;
 
 #define IMM_SEQ_UNSAFE(size, str, abc)                                         \
-    (struct imm_seq) { size, str, abc }
+    (struct imm_seq)                                                           \
+    {                                                                          \
+        size, str, abc                                                         \
+    }
 
 static inline struct imm_abc const *imm_seq_abc(struct imm_seq const *seq)
 {
