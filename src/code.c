@@ -33,7 +33,7 @@ void imm_code_init(struct imm_code *code, struct imm_abc const *abc)
     calc_offsets(code->offset, imm_abc_size(code->abc));
 }
 
-unsigned code_encode(struct imm_code const *code, struct imm_seq const *seq)
+unsigned imm_code_encode(struct imm_code const *code, struct imm_seq const *seq)
 {
     unsigned len = imm_seq_size(seq);
     unsigned c = code->offset[len];

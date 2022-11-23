@@ -72,12 +72,12 @@ char const imm_example1_seq[] =
     "BMIIMIIMMIMMMIMEJBMIIMIIMMIMMMMMMMMMIIMIMIMIMIMIIM"
     "IIIMIMIMIMMMMMMIMMIMIMIMIIMIMMIMIMIMIMIMMMMIMMIMME";
 
-imm_float b_lprobs[] = {ONE, ZERO, ZERO, ZERO, ZERO};
-imm_float m_lprobs[] = {ZERO, ONE, ZERO, ZERO, ZERO};
-imm_float i_lprobs[] = {ZERO, ZERO, ONE, ZERO, ZERO};
-imm_float e_lprobs[] = {ZERO, ZERO, ZERO, ONE, ZERO};
-imm_float j_lprobs[] = {ZERO, ZERO, ZERO, ZERO, ONE};
-imm_float n_lprobs[] = {-1e3f, -1e3f, -1e3f, -1e3f, -1e3f};
+static imm_float b_lprobs[] = {ONE, ZERO, ZERO, ZERO, ZERO};
+static imm_float m_lprobs[] = {ZERO, ONE, ZERO, ZERO, ZERO};
+static imm_float i_lprobs[] = {ZERO, ZERO, ONE, ZERO, ZERO};
+static imm_float e_lprobs[] = {ZERO, ZERO, ZERO, ONE, ZERO};
+static imm_float j_lprobs[] = {ZERO, ZERO, ZERO, ZERO, ONE};
+static imm_float n_lprobs[] = {-1e3f, -1e3f, -1e3f, -1e3f, -1e3f};
 
 struct imm_example1 imm_example1;
 

@@ -7,21 +7,21 @@
 #include "reallocf.h"
 #include <stdlib.h>
 
-enum imm_rc path_init(struct path *path,
-                      struct imm_dp_state_table const *state_tbl,
-                      struct imm_dp_trans_table const *trans_tbl)
+enum imm_rc imm_path_init(struct path *path,
+                          struct imm_dp_state_table const *state_tbl,
+                          struct imm_dp_trans_table const *trans_tbl)
 {
     path->state_offset = NULL;
     path->trans_bits = NULL;
-    enum imm_rc rc = path_reset(path, state_tbl, trans_tbl);
+    enum imm_rc rc = imm__path_reset(path, state_tbl, trans_tbl);
     if (rc) return rc;
     path->bit = NULL;
     return IMM_OK;
 }
 
-enum imm_rc path_reset(struct path *p,
-                       struct imm_dp_state_table const *state_tbl,
-                       struct imm_dp_trans_table const *trans_tbl)
+enum imm_rc imm__path_reset(struct path *p,
+                            struct imm_dp_state_table const *state_tbl,
+                            struct imm_dp_trans_table const *trans_tbl)
 {
     unsigned n = p->nstates = state_tbl->nstates;
 
@@ -58,17 +58,17 @@ enum imm_rc path_reset(struct path *p,
     return IMM_OK;
 }
 
-void path_del(struct path const *path)
+void imm__path_del(struct path const *path)
 {
     free(path->state_offset);
     free(path->trans_bits);
     if (path->bit) free(path->bit);
 }
 
-enum imm_rc path_setup(struct path *path, unsigned len)
+enum imm_rc imm_path_setup(struct path *path, unsigned len)
 {
     size_t size = path->state_offset[path->nstates] * len;
-    path->bit = bitmap_reallocf(path->bit, size);
+    path->bit = imm_bitmap_reallocf(path->bit, size);
     if (!path->bit && size > 0) return error(IMM_NOMEM);
     return IMM_OK;
 }

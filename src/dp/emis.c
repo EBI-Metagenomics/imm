@@ -17,13 +17,13 @@ static inline void cleanup(struct imm_dp_emis *emis)
     emis->offset = NULL;
 }
 
-void emis_del(struct imm_dp_emis const *emis)
+void imm_emis_del(struct imm_dp_emis const *emis)
 {
     free(emis->score);
     free(emis->offset);
 }
 
-void emis_init(struct imm_dp_emis *emis)
+void imm_emis_init(struct imm_dp_emis *emis)
 {
     emis->score = NULL;
     emis->offset = NULL;
@@ -85,7 +85,8 @@ static void calc_score(struct imm_dp_emis *emis, struct imm_code const *code,
             while ((item = imm_cartes_next(&cartes)) != NULL)
             {
                 struct imm_seq seq = IMM_SEQ_UNSAFE(len, item, abc);
-                unsigned c = code_translate(code, code_encode(code, &seq), min);
+                unsigned c =
+                    code_translate(code, imm_code_encode(code, &seq), min);
                 imm_float score = imm_state_lprob(states[i], &seq);
                 assert(!imm_lprob_is_nan(score));
                 emis->score[emis->offset[i] + c] = score;
@@ -95,8 +96,9 @@ static void calc_score(struct imm_dp_emis *emis, struct imm_code const *code,
     imm_cartes_deinit(&cartes);
 }
 
-enum imm_rc emis_reset(struct imm_dp_emis *emis, struct imm_code const *code,
-                       struct imm_state **states, unsigned nstates)
+enum imm_rc imm_emis_reset(struct imm_dp_emis *emis,
+                           struct imm_code const *code,
+                           struct imm_state **states, unsigned nstates)
 {
     enum imm_rc rc = IMM_OK;
     if ((rc = realloc_offset(emis, nstates))) goto cleanup;

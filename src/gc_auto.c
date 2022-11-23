@@ -1,6 +1,6 @@
 #include "gc.h"
 
-struct gc const gencode[] = {
+struct gc const imm_gencode[] = {
     {"Standard", "SGC0", 1,
      "FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
      "---M------**--*----M---------------M----------------------------",

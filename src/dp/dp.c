@@ -67,31 +67,31 @@ static void _viterbi_safe(struct imm_dp const *dp, struct imm_task *task,
 void imm_dp_init(struct imm_dp *dp, struct imm_code const *code)
 {
     dp->code = code;
-    emis_init(&dp->emis);
-    trans_table_init(&dp->trans_table);
-    state_table_init(&dp->state_table);
+    imm_emis_init(&dp->emis);
+    imm_trans_table_init(&dp->trans_table);
+    imm_state_table_init(&dp->state_table);
 }
 
 void imm_dp_del(struct imm_dp *dp)
 {
     if (dp)
     {
-        emis_del(&dp->emis);
-        trans_table_del(&dp->trans_table);
-        state_table_del(&dp->state_table);
+        imm_emis_del(&dp->emis);
+        imm_trans_table_del(&dp->trans_table);
+        imm_state_table_del(&dp->state_table);
     }
 }
 
-enum imm_rc dp_reset(struct imm_dp *dp, struct dp_args const *args)
+enum imm_rc imm_dp_reset(struct imm_dp *dp, struct dp_args const *args)
 {
     enum imm_rc rc = IMM_OK;
 
-    if ((rc = emis_reset(&dp->emis, dp->code, args->states, args->nstates)))
+    if ((rc = imm_emis_reset(&dp->emis, dp->code, args->states, args->nstates)))
         return rc;
 
-    if ((rc = trans_table_reset(&dp->trans_table, args))) return rc;
+    if ((rc = imm_trans_table_reset(&dp->trans_table, args))) return rc;
 
-    if ((rc = state_table_reset(&dp->state_table, args))) return rc;
+    if ((rc = imm_state_table_reset(&dp->state_table, args))) return rc;
 
     return rc;
 }
@@ -123,7 +123,7 @@ enum imm_rc imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
 
 unsigned imm_dp_trans_idx(struct imm_dp *dp, unsigned src_idx, unsigned dst_idx)
 {
-    return trans_table_idx(&dp->trans_table, src_idx, dst_idx);
+    return imm_trans_table_idx(&dp->trans_table, src_idx, dst_idx);
 }
 
 enum imm_rc imm_dp_change_trans(struct imm_dp *dp, unsigned trans_idx,
@@ -140,26 +140,26 @@ imm_float imm_dp_emis_score(struct imm_dp const *dp, unsigned state_id,
                             struct imm_seq const *seq)
 {
     struct eseq eseq;
-    eseq_init(&eseq, dp->code);
+    imm_eseq_init(&eseq, dp->code);
     imm_float score = IMM_LPROB_NAN;
-    if (eseq_setup(&eseq, seq)) goto cleanup;
+    if (imm_eseq_setup(&eseq, seq)) goto cleanup;
 
-    unsigned state_idx = state_table_idx(&dp->state_table, state_id);
+    unsigned state_idx = imm_state_table_idx(&dp->state_table, state_id);
     unsigned min = state_table_span(&dp->state_table, state_idx).min;
 
     unsigned seq_code = eseq_get(&eseq, 0, imm_seq_size(seq), min);
     score = emis_score(&dp->emis, state_idx, seq_code);
 
 cleanup:
-    eseq_del(&eseq);
+    imm_eseq_del(&eseq);
     return score;
 }
 
 imm_float imm_dp_trans_score(struct imm_dp const *dp, unsigned src,
                              unsigned dst)
 {
-    unsigned src_idx = state_table_idx(&dp->state_table, src);
-    unsigned dst_idx = state_table_idx(&dp->state_table, dst);
+    unsigned src_idx = imm_state_table_idx(&dp->state_table, src);
+    unsigned dst_idx = imm_state_table_idx(&dp->state_table, dst);
 
     if (src_idx == UINT_MAX || dst_idx == UINT_MAX) return IMM_LPROB_NAN;
 
@@ -499,7 +499,7 @@ static void _viterbi_safe(struct imm_dp const *dp, struct imm_task *task,
 
 void imm_dp_dump_state_table(struct imm_dp const *dp)
 {
-    state_table_dump(&dp->state_table);
+    imm_state_table_dump(&dp->state_table);
 }
 
 void imm_dp_dump_path(struct imm_dp const *dp, struct imm_task const *task,
@@ -509,7 +509,8 @@ void imm_dp_dump_path(struct imm_dp const *dp, struct imm_task const *task,
     for (unsigned i = 0; i < task->path.nstates; ++i)
     {
         struct imm_step const *step = imm_path_step(&prod->path, i);
-        unsigned state_idx = state_table_idx(&dp->state_table, step->state_id);
+        unsigned state_idx =
+            imm_state_table_idx(&dp->state_table, step->state_id);
 
         unsigned min = state_table_span(&dp->state_table, state_idx).min;
         unsigned seq_code = eseq_get(&task->eseq, begin, step->seqlen, min);

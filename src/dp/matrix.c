@@ -6,16 +6,17 @@
 
 #define MAX_LOOKUP (2 * IMM_STATE_MAX_SEQLEN)
 
-enum imm_rc matrix_init(struct matrix *matrix,
-                        struct imm_dp_state_table const *tbl)
+enum imm_rc imm_matrix_init(struct matrix *matrix,
+                            struct imm_dp_state_table const *tbl)
 {
     matrix->state_col = NULL;
     if (matrixf_init(&matrix->score, MAX_LOOKUP, 1)) return error(IMM_NOMEM);
 
-    return matrix_reset(matrix, tbl);
+    return imm_matrix_reset(matrix, tbl);
 }
 
-enum imm_rc matrix_reset(struct matrix *m, struct imm_dp_state_table const *tbl)
+enum imm_rc imm_matrix_reset(struct matrix *m,
+                             struct imm_dp_state_table const *tbl)
 {
     unsigned n = tbl->nstates;
     m->state_col = reallocf(m->state_col, sizeof(*m->state_col) * n);
@@ -35,7 +36,7 @@ enum imm_rc matrix_reset(struct matrix *m, struct imm_dp_state_table const *tbl)
     return IMM_OK;
 }
 
-void matrix_del(struct matrix const *matrix)
+void imm_matrix_del(struct matrix const *matrix)
 {
     matrixf_deinit(&matrix->score);
     free((void *)matrix->state_col);

@@ -5,7 +5,7 @@
 
 struct imm_state;
 
-enum imm_rc tsort(unsigned nstates, struct imm_state **states,
-                  unsigned start_idx);
+enum imm_rc imm_tsort(unsigned nstates, struct imm_state **states,
+                      unsigned start_idx);
 
 #endif

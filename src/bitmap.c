@@ -6,7 +6,8 @@
 #define LONG_START(bit) (bit / (sizeof(long) * BITS_PER_BYTE))
 #define BIT_START(bit) (bit % (sizeof(long) * BITS_PER_BYTE))
 
-unsigned long bitmap_get(unsigned long *x, unsigned long start, unsigned len)
+unsigned long imm_bitmap_get(unsigned long *x, unsigned long start,
+                             unsigned len)
 {
     unsigned long val = 0;
     for (unsigned i = 0; i < len; ++i)
@@ -20,13 +21,13 @@ unsigned long bitmap_get(unsigned long *x, unsigned long start, unsigned len)
     return val;
 }
 
-unsigned long *bitmap_reallocf(unsigned long *x, unsigned long bits)
+unsigned long *imm_bitmap_reallocf(unsigned long *x, unsigned long bits)
 {
     return reallocf(x, sizeof(long) * BITS_TO_LONGS(bits));
 }
 
-void bitmap_set(unsigned long *x, unsigned long val, unsigned long start,
-                unsigned len)
+void imm_bitmap_set(unsigned long *x, unsigned long val, unsigned long start,
+                    unsigned len)
 {
     for (unsigned i = 0; i < len; ++i)
     {

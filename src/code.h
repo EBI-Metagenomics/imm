@@ -8,7 +8,8 @@ struct imm_abc;
 struct imm_code;
 struct imm_seq;
 
-unsigned code_encode(struct imm_code const *code, struct imm_seq const *seq);
+unsigned imm_code_encode(struct imm_code const *code,
+                         struct imm_seq const *seq);
 
 static inline unsigned code_translate(struct imm_code const *code,
                                       unsigned value, unsigned min_seq)

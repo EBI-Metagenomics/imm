@@ -13,9 +13,9 @@ struct eseq
     struct imm_code const *code;
 };
 
-void eseq_del(struct eseq const *eseq);
+void imm_eseq_del(struct eseq const *eseq);
 
-void eseq_reset(struct eseq *eseq, struct imm_code const *code);
+void imm_eseq_reset(struct eseq *eseq, struct imm_code const *code);
 
 static inline unsigned eseq_get(struct eseq const *eseq, unsigned pos,
                                 unsigned len, unsigned min_seq)
@@ -29,8 +29,8 @@ static inline unsigned eseq_len(struct eseq const *eseq)
     return matrixu16_nrows(&eseq->data) - 1;
 }
 
-void eseq_init(struct eseq *eseq, struct imm_code const *code);
+void imm_eseq_init(struct eseq *eseq, struct imm_code const *code);
 
-enum imm_rc eseq_setup(struct eseq *eseq, struct imm_seq const *seq);
+enum imm_rc imm_eseq_setup(struct eseq *eseq, struct imm_seq const *seq);
 
 #endif

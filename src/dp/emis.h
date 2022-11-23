@@ -6,12 +6,13 @@
 struct imm_state;
 struct imm_code;
 
-void emis_del(struct imm_dp_emis const *emis);
+void imm_emis_del(struct imm_dp_emis const *emis);
 
-void emis_init(struct imm_dp_emis *emis);
+void imm_emis_init(struct imm_dp_emis *emis);
 
-enum imm_rc emis_reset(struct imm_dp_emis *emis, struct imm_code const *code,
-                       struct imm_state **states, unsigned nstates);
+enum imm_rc imm_emis_reset(struct imm_dp_emis *emis,
+                           struct imm_code const *code,
+                           struct imm_state **states, unsigned nstates);
 
 static inline imm_float emis_score(struct imm_dp_emis const *emis,
                                    unsigned state, unsigned seq_code)

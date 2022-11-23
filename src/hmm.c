@@ -1,8 +1,7 @@
-#include "hmm.h"
+#include "imm/hmm.h"
 #include "dp/dp.h"
 #include "error.h"
 #include "imm/dp.h"
-#include "imm/hmm.h"
 #include "imm/lprob.h"
 #include "imm/path.h"
 #include "imm/state_types.h"
@@ -48,6 +47,9 @@ static inline bool has_start_state(struct imm_hmm const *hmm)
     return hmm->start.state_id != IMM_STATE_NULL_ID;
 }
 
+static struct imm_state *hmm_state(struct imm_hmm const *hmm,
+                                   unsigned state_id);
+
 static void set_state_indices(struct imm_hmm const *hmm,
                               struct imm_state **states)
 {
@@ -90,7 +92,8 @@ enum imm_rc imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
 {
     if (cco_hash_hashed(&state->hnode)) return error(IMM_STATE_ALREADY_IN_HMM);
     assert(!hmm_state(hmm, state->id));
-    hmm_add_state(hmm, state);
+    cco_hash_add(hmm->states.tbl, &state->hnode, state->id);
+    hmm->states.size++;
     return IMM_OK;
 }
 
@@ -139,14 +142,14 @@ enum imm_rc imm_hmm_reset_dp(struct imm_hmm const *hmm,
     set_state_indices(hmm, states);
 
     unsigned start_idx = hmm_state(hmm, hmm->start.state_id)->idx;
-    if ((rc = tsort(hmm->states.size, states, start_idx))) goto cleanup;
+    if ((rc = imm_tsort(hmm->states.size, states, start_idx))) goto cleanup;
     set_state_indices(hmm, states);
 
     struct dp_args args = dp_args(hmm->transitions.size, hmm->states.size,
                                   states, hmm_state(hmm, hmm->start.state_id),
                                   hmm->start.lprob, end_state);
 
-    dp_reset(dp, &args);
+    imm_dp_reset(dp, &args);
 
 cleanup:
     free(states);
@@ -157,6 +160,10 @@ imm_float imm_hmm_start_lprob(struct imm_hmm const *hmm)
 {
     return hmm->start.lprob;
 }
+
+static struct imm_trans *hmm_trans(struct imm_hmm const *hmm,
+                                   struct imm_state const *src,
+                                   struct imm_state const *dst);
 
 imm_float imm_hmm_trans(struct imm_hmm const *hmm, struct imm_state const *src,
                         struct imm_state const *dst)
@@ -299,7 +306,7 @@ enum imm_rc imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state *src,
     return IMM_OK;
 }
 
-struct imm_state *hmm_state(struct imm_hmm const *hmm, unsigned state_id)
+static struct imm_state *hmm_state(struct imm_hmm const *hmm, unsigned state_id)
 {
     struct imm_state *state = NULL;
     cco_hash_for_each_possible(hmm->states.tbl, state, hnode, state_id)
@@ -309,9 +316,9 @@ struct imm_state *hmm_state(struct imm_hmm const *hmm, unsigned state_id)
     return NULL;
 }
 
-struct imm_trans *hmm_trans(struct imm_hmm const *hmm,
-                            struct imm_state const *src,
-                            struct imm_state const *dst)
+static struct imm_trans *hmm_trans(struct imm_hmm const *hmm,
+                                   struct imm_state const *src,
+                                   struct imm_state const *dst)
 {
     struct imm_trans *trans = NULL;
     struct imm_pair pair = IMM_PAIR_INIT(src->id, dst->id);

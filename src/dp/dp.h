@@ -33,6 +33,6 @@ static inline struct dp_args dp_args(unsigned ntrans, unsigned nstates,
                             .end_state = end_state};
 }
 
-enum imm_rc dp_reset(struct imm_dp *dp, struct dp_args const *args);
+enum imm_rc imm_dp_reset(struct imm_dp *dp, struct dp_args const *args);
 
 #endif

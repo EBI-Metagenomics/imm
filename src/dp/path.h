@@ -75,31 +75,31 @@ static inline uint64_t start_bit(struct path const *path, unsigned pos,
            path->state_offset[state];
 }
 
-void path_del(struct path const *path);
+void imm__path_del(struct path const *path);
 
-enum imm_rc path_init(struct path *path,
-                      struct imm_dp_state_table const *state_tbl,
-                      struct imm_dp_trans_table const *trans_tbl);
+enum imm_rc imm_path_init(struct path *path,
+                          struct imm_dp_state_table const *state_tbl,
+                          struct imm_dp_trans_table const *trans_tbl);
 
-enum imm_rc path_reset(struct path *path,
-                       struct imm_dp_state_table const *state_tbl,
-                       struct imm_dp_trans_table const *trans_tbl);
+enum imm_rc imm__path_reset(struct path *path,
+                            struct imm_dp_state_table const *state_tbl,
+                            struct imm_dp_trans_table const *trans_tbl);
 
-enum imm_rc path_setup(struct path *path, unsigned len);
+enum imm_rc imm_path_setup(struct path *path, unsigned len);
 
 static inline unsigned path_seqlen(struct path const *path, unsigned pos,
                                    unsigned state)
 {
     uint64_t start = start_bit(path, pos, state) + path->trans_bits[state];
-    return (unsigned)bitmap_get(path->bit, start,
-                                __path_seqlen_bits(path, pos, state));
+    return (unsigned)imm_bitmap_get(path->bit, start,
+                                    __path_seqlen_bits(path, pos, state));
 }
 
 static inline unsigned path_trans(struct path const *path, unsigned pos,
                                   unsigned state)
 {
     uint64_t start = start_bit(path, pos, state);
-    return (unsigned)bitmap_get(path->bit, start, path->trans_bits[state]);
+    return (unsigned)imm_bitmap_get(path->bit, start, path->trans_bits[state]);
 }
 
 static inline bool path_valid(struct path const *path, unsigned pos,
@@ -113,15 +113,16 @@ static inline void path_set_seqlen(struct path *path, unsigned pos,
                                    unsigned state, unsigned len)
 {
     uint64_t start = start_bit(path, pos, state) + path->trans_bits[state];
-    bitmap_set(path->bit, (unsigned long)len, start,
-               __path_seqlen_bits(path, pos, state));
+    imm_bitmap_set(path->bit, (unsigned long)len, start,
+                   __path_seqlen_bits(path, pos, state));
 }
 
 static inline void path_set_trans(struct path *path, unsigned pos,
                                   unsigned state, unsigned trans)
 {
     uint64_t start = start_bit(path, pos, state);
-    bitmap_set(path->bit, (unsigned long)trans, start, path->trans_bits[state]);
+    imm_bitmap_set(path->bit, (unsigned long)trans, start,
+                   path->trans_bits[state]);
 }
 
 static inline void path_invalidate(struct path *path, unsigned pos,

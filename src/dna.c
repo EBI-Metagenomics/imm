@@ -7,8 +7,8 @@ enum imm_rc imm_dna_init(struct imm_dna *dna, char const symbols[IMM_DNA_SIZE],
                          char any_symbol)
 {
     struct imm_abc_vtable vtable = {IMM_DNA, dna};
-    return abc_init(&dna->super.super, IMM_DNA_SIZE, symbols, any_symbol,
-                    vtable);
+    return imm__abc_init(&dna->super.super, IMM_DNA_SIZE, symbols, any_symbol,
+                         vtable);
 }
 
 #define ID(c) IMM_SYM_ID(c)

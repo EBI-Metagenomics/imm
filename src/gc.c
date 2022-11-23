@@ -6,22 +6,22 @@
 #include <assert.h>
 #include <string.h>
 
-extern struct gc const gencode[];
+extern struct gc const imm_gencode[];
 struct imm_dna const *const imm_gc_dna = &imm_dna_iupac;
 
-char const *imm_gc_name1(unsigned id) { return gencode[id - 1].name1; }
+char const *imm_gc_name1(unsigned id) { return imm_gencode[id - 1].name1; }
 
-char const *imm_gc_name2(unsigned id) { return gencode[id - 1].name2; }
+char const *imm_gc_name2(unsigned id) { return imm_gencode[id - 1].name2; }
 
 unsigned imm_gc_size(void)
 {
-    struct gc const *gc = &gencode[0];
+    struct gc const *gc = &imm_gencode[0];
     return (unsigned)strlen(gc->ncbieaa);
 }
 
 struct imm_codon imm_gc_codon(unsigned id, unsigned idx)
 {
-    struct gc const *gc = &gencode[id - 1];
+    struct gc const *gc = &imm_gencode[id - 1];
     struct imm_nuclt const *nuclt = &imm_gc_dna->super;
     return imm_codon_from_symbols(nuclt, gc->base1[idx], gc->base2[idx],
                                   gc->base3[idx]);
@@ -29,7 +29,7 @@ struct imm_codon imm_gc_codon(unsigned id, unsigned idx)
 
 char imm_gc_aa(unsigned id, unsigned idx)
 {
-    struct gc const *gc = &gencode[id - 1];
+    struct gc const *gc = &imm_gencode[id - 1];
     return gc->ncbieaa[idx];
 }
 
@@ -38,7 +38,7 @@ static unsigned perfect_hash_id1(char key);
 char imm_gc_decode(unsigned id, struct imm_codon codon)
 {
     assert(id == 1);
-    struct gc const *gc = &gencode[id - 1];
+    struct gc const *gc = &imm_gencode[id - 1];
     char const *aa = gc->ncbieaa;
     char const a = imm_abc_symbols(&imm_gc_dna->super.super)[codon.a];
     char const b = imm_abc_symbols(&imm_gc_dna->super.super)[codon.b];

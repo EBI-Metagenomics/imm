@@ -5,8 +5,8 @@
 
 struct dp_args;
 
-unsigned trans_table_idx(struct imm_dp_trans_table *tbl, unsigned src_idx,
-                         unsigned dst_idx);
+unsigned imm_trans_table_idx(struct imm_dp_trans_table *tbl, unsigned src_idx,
+                             unsigned dst_idx);
 
 static inline void trans_table_change(struct imm_dp_trans_table *trans_tbl,
                                       unsigned trans_idx, imm_float score)
@@ -14,12 +14,12 @@ static inline void trans_table_change(struct imm_dp_trans_table *trans_tbl,
     trans_tbl->trans[trans_idx].score = score;
 }
 
-void trans_table_init(struct imm_dp_trans_table *tbl);
+void imm_trans_table_init(struct imm_dp_trans_table *tbl);
 
-enum imm_rc trans_table_reset(struct imm_dp_trans_table *tbl,
-                              struct dp_args const *args);
+enum imm_rc imm_trans_table_reset(struct imm_dp_trans_table *tbl,
+                                  struct dp_args const *args);
 
-void trans_table_del(struct imm_dp_trans_table const *tbl);
+void imm_trans_table_del(struct imm_dp_trans_table const *tbl);
 
 static inline unsigned trans_table_ntrans(struct imm_dp_trans_table const *tbl,
                                           unsigned dst)

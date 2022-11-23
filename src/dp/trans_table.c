@@ -8,8 +8,8 @@
 #include <limits.h>
 #include <stdlib.h>
 
-unsigned trans_table_idx(struct imm_dp_trans_table *trans_tbl, unsigned src_idx,
-                         unsigned dst_idx)
+unsigned imm_trans_table_idx(struct imm_dp_trans_table *trans_tbl,
+                             unsigned src_idx, unsigned dst_idx)
 {
     for (unsigned i = 0; i < trans_table_ntrans(trans_tbl, dst_idx); ++i)
     {
@@ -20,15 +20,15 @@ unsigned trans_table_idx(struct imm_dp_trans_table *trans_tbl, unsigned src_idx,
     return IMM_TRANS_NULL_IDX;
 }
 
-void trans_table_init(struct imm_dp_trans_table *tbl)
+void imm_trans_table_init(struct imm_dp_trans_table *tbl)
 {
     tbl->ntrans = UINT_MAX;
     tbl->trans = NULL;
     tbl->offset = NULL;
 }
 
-enum imm_rc trans_table_reset(struct imm_dp_trans_table *tbl,
-                              struct dp_args const *args)
+enum imm_rc imm_trans_table_reset(struct imm_dp_trans_table *tbl,
+                                  struct dp_args const *args)
 {
     assert(args->nstates > 0);
     tbl->ntrans = args->ntrans;
@@ -63,7 +63,7 @@ enum imm_rc trans_table_reset(struct imm_dp_trans_table *tbl,
     return IMM_OK;
 }
 
-void trans_table_del(struct imm_dp_trans_table const *tbl)
+void imm_trans_table_del(struct imm_dp_trans_table const *tbl)
 {
     free(tbl->trans);
     free(tbl->offset);

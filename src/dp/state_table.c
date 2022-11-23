@@ -7,7 +7,7 @@
 #include <limits.h>
 #include <stdlib.h>
 
-void state_table_init(struct imm_dp_state_table *tbl)
+void imm_state_table_init(struct imm_dp_state_table *tbl)
 {
     tbl->nstates = IMM_NSTATES_NULL;
     tbl->ids = NULL;
@@ -17,8 +17,8 @@ void state_table_init(struct imm_dp_state_table *tbl)
     tbl->span = NULL;
 }
 
-enum imm_rc state_table_reset(struct imm_dp_state_table *tbl,
-                              struct dp_args const *args)
+enum imm_rc imm_state_table_reset(struct imm_dp_state_table *tbl,
+                                  struct dp_args const *args)
 {
     tbl->nstates = args->nstates;
     tbl->ids = reallocf(tbl->ids, sizeof(*tbl->ids) * args->nstates);
@@ -42,14 +42,14 @@ enum imm_rc state_table_reset(struct imm_dp_state_table *tbl,
     return IMM_OK;
 }
 
-void state_table_del(struct imm_dp_state_table const *tbl)
+void imm_state_table_del(struct imm_dp_state_table const *tbl)
 {
     free(tbl->ids);
     free(tbl->span);
 }
 
-unsigned state_table_idx(struct imm_dp_state_table const *tbl,
-                         unsigned state_id)
+unsigned imm_state_table_idx(struct imm_dp_state_table const *tbl,
+                             unsigned state_id)
 {
     for (unsigned idx = 0; idx < tbl->nstates; ++idx)
     {
@@ -58,7 +58,7 @@ unsigned state_table_idx(struct imm_dp_state_table const *tbl,
     return UINT_MAX;
 }
 
-void state_table_dump(struct imm_dp_state_table const *tbl)
+void imm_state_table_dump(struct imm_dp_state_table const *tbl)
 {
     for (unsigned i = 0; i < tbl->nstates; ++i)
     {
