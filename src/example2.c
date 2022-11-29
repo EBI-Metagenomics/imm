@@ -133,7 +133,7 @@ void imm_example2_init(void)
     imm_code_init(&m->code, abc);
     imm_hmm_init(&m->hmm, &m->code);
 
-    imm_float epsilon = (imm_float)0.01;
+    imm_float eps = (imm_float)0.01;
     m->nucltp = imm_nuclt_lprob(nuclt, IMM_ARR(imm_log(0.25), imm_log(0.25),
                                                imm_log(0.45), imm_log(0.05)));
 
@@ -151,13 +151,13 @@ void imm_example2_init(void)
     imm_mute_state_init(&m->end, END, abc);
     imm_hmm_add_state(&m->hmm, imm_super(&m->end));
 
-    imm_frame_state_init(&m->b, B, &m->nucltp, &m->b_marg, epsilon);
+    imm_frame_state_init(&m->b, B, &m->nucltp, &m->b_marg, eps, IMM_SPAN(1, 5));
     imm_hmm_add_state(&m->hmm, imm_super(&m->b));
 
-    imm_frame_state_init(&m->e, E, &m->nucltp, &m->e_marg, epsilon);
+    imm_frame_state_init(&m->e, E, &m->nucltp, &m->e_marg, eps, IMM_SPAN(1, 5));
     imm_hmm_add_state(&m->hmm, imm_super(&m->e));
 
-    imm_frame_state_init(&m->j, J, &m->nucltp, &m->j_marg, epsilon);
+    imm_frame_state_init(&m->j, J, &m->nucltp, &m->j_marg, eps, IMM_SPAN(1, 5));
     imm_hmm_add_state(&m->hmm, imm_super(&m->j));
 
     SET_TRANS(m->hmm, m->start, m->b, imm_log(0.2));
@@ -170,8 +170,10 @@ void imm_example2_init(void)
 
     for (unsigned k = 0; k < IMM_EXAMPLE2_SIZE; ++k)
     {
-        imm_frame_state_init(m->m + k, M | k, &m->nucltp, &m->m_marg, epsilon);
-        imm_frame_state_init(m->i + k, I | k, &m->nucltp, &m->i_marg, epsilon);
+        imm_frame_state_init(m->m + k, M | k, &m->nucltp, &m->m_marg, eps,
+                             IMM_SPAN(1, 5));
+        imm_frame_state_init(m->i + k, I | k, &m->nucltp, &m->i_marg, eps,
+                             IMM_SPAN(1, 5));
         imm_mute_state_init(m->d + k, D | k, abc);
 
         imm_hmm_add_state(&m->hmm, imm_super(&m->m[k]));
@@ -202,7 +204,8 @@ void imm_example2_init(void)
     }
 
     imm_hmm_init(&m->null.hmm, &m->code);
-    imm_frame_state_init(&m->null.n, N, &m->nucltp, &m->null.n_marg, epsilon);
+    imm_frame_state_init(&m->null.n, N, &m->nucltp, &m->null.n_marg, eps,
+                         IMM_SPAN(1, 5));
     imm_hmm_add_state(&m->null.hmm, imm_super(&m->null.n));
     imm_hmm_set_start(&m->null.hmm, imm_super(&m->null.n), imm_log(1.0));
     SET_TRANS(m->null.hmm, m->null.n, m->null.n, imm_log(0.2));

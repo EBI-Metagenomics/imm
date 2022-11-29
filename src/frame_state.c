@@ -15,7 +15,7 @@ static imm_float lprob(struct imm_state const *state,
 void imm_frame_state_init(struct imm_frame_state *state, unsigned id,
                           struct imm_nuclt_lprob const *nucltp,
                           struct imm_codon_marg const *codonm,
-                          imm_float epsilon)
+                          imm_float epsilon, struct imm_span span)
 {
     assert(nucltp->nuclt == codonm->nuclt);
     state->nucltp = nucltp;
@@ -25,7 +25,7 @@ void imm_frame_state_init(struct imm_frame_state *state, unsigned id,
 
     struct imm_state_vtable vtable = {lprob, IMM_FRAME_STATE, state};
     struct imm_abc const *abc = imm_super(codonm->nuclt);
-    state->super = __imm_state_init(id, abc, vtable, IMM_SPAN(1, 5));
+    state->super = __imm_state_init(id, abc, vtable, span);
 }
 
 #define CODON(A, B, C)                                                         \
