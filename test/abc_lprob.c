@@ -17,7 +17,7 @@ void test_abc_lprob(void)
                                  imm_log(0.5)};
     struct imm_abc_lprob lprob = imm_abc_lprob(&abc, lprobs);
 
-    CLOSE(imm_abc_lprob_get(&lprob, 'A'), imm_log(0.2));
-    CLOSE(imm_abc_lprob_get(&lprob, 'C'), imm_log(0.01));
-    CLOSE(imm_abc_lprob_get(&lprob, 'T'), imm_log(0.5));
+    close(imm_abc_lprob_get(&lprob, 'A'), imm_log(0.2));
+    close(imm_abc_lprob_get(&lprob, 'C'), imm_log(0.01));
+    close(imm_abc_lprob_get(&lprob, 'T'), imm_log(0.5));
 }

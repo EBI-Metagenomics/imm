@@ -27,8 +27,8 @@ void test_codon_state(void)
     const struct imm_state *s = imm_super(&state);
 
     struct imm_seq seq = imm_seq(IMM_STR("ATG"), abc);
-    CLOSE(imm_state_lprob(s, &seq), imm_log(0.8 / 0.9));
+    close(imm_state_lprob(s, &seq), imm_log(0.8 / 0.9));
 
     seq = imm_seq(IMM_STR("AG"), abc);
-    COND(imm_lprob_is_nan(imm_state_lprob(s, &seq)));
+    cond(imm_lprob_is_nan(imm_state_lprob(s, &seq)));
 }

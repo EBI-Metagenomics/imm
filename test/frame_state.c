@@ -38,21 +38,21 @@ void test_frame_state1(void)
     struct imm_state *s = imm_super(&state);
 
     struct imm_seq seq = imm_seq(IMM_STR("A"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -5.9145034795);
+    close(imm_state_lprob(s, &seq), -5.9145034795);
     seq = imm_seq(IMM_STR("AT"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -2.9158434138);
+    close(imm_state_lprob(s, &seq), -2.9158434138);
     seq = imm_seq(IMM_STR("ATA"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -6.9055970891);
+    close(imm_state_lprob(s, &seq), -6.9055970891);
     seq = imm_seq(IMM_STR("ATG"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -0.5347732947);
+    close(imm_state_lprob(s, &seq), -0.5347732947);
     seq = imm_seq(IMM_STR("ATT"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -2.5902373362);
+    close(imm_state_lprob(s, &seq), -2.5902373362);
     seq = imm_seq(IMM_STR("ATTA"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -6.8810321984);
+    close(imm_state_lprob(s, &seq), -6.8810321984);
     seq = imm_seq(IMM_STR("ATTAA"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -12.0882895834);
+    close(imm_state_lprob(s, &seq), -12.0882895834);
     seq = imm_seq(IMM_STR("ATTAAT"), abc);
-    COND(imm_lprob_is_zero(imm_state_lprob(s, &seq)));
+    cond(imm_lprob_is_zero(imm_state_lprob(s, &seq)));
 }
 
 void test_frame_state2(void)
@@ -76,35 +76,35 @@ void test_frame_state2(void)
 
     struct imm_seq seq;
     seq = imm_seq(IMM_STR("A"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -5.9145034795);
+    close(imm_state_lprob(s, &seq), -5.9145034795);
     seq = imm_seq(IMM_STR("C"), abc);
-    COND(imm_lprob_is_zero(imm_state_lprob(s, &seq)));
+    cond(imm_lprob_is_zero(imm_state_lprob(s, &seq)));
     seq = imm_seq(IMM_STR("G"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -6.0322865151);
+    close(imm_state_lprob(s, &seq), -6.0322865151);
     seq = imm_seq(IMM_STR("T"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -5.8091429638);
+    close(imm_state_lprob(s, &seq), -5.8091429638);
 
     seq = imm_seq(IMM_STR("AT"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -2.9159357400);
+    close(imm_state_lprob(s, &seq), -2.9159357400);
     seq = imm_seq(IMM_STR("ATA"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -7.8215183173);
+    close(imm_state_lprob(s, &seq), -7.8215183173);
     seq = imm_seq(IMM_STR("ATG"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -0.5344319144);
+    close(imm_state_lprob(s, &seq), -0.5344319144);
     seq = imm_seq(IMM_STR("ATC"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -7.1294800576);
+    close(imm_state_lprob(s, &seq), -7.1294800576);
     seq = imm_seq(IMM_STR("ATT"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -2.5751452135);
+    close(imm_state_lprob(s, &seq), -2.5751452135);
 
     seq = imm_seq(IMM_STR("ATTA"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -7.7896445735);
+    close(imm_state_lprob(s, &seq), -7.7896445735);
     seq = imm_seq(IMM_STR("ACTG"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -5.0366370866);
+    close(imm_state_lprob(s, &seq), -5.0366370866);
 
     seq = imm_seq(IMM_STR("ATTAA"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -13.9208710471);
+    close(imm_state_lprob(s, &seq), -13.9208710471);
 
     seq = imm_seq(IMM_STR("ATTAAT"), abc);
-    COND(imm_lprob_is_zero(imm_state_lprob(s, &seq)));
+    cond(imm_lprob_is_zero(imm_state_lprob(s, &seq)));
 }
 
 void test_frame_state3(void)
@@ -131,37 +131,37 @@ void test_frame_state3(void)
 
     struct imm_seq seq;
     seq = imm_seq(IMM_STR("A"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -6.2822282596);
+    close(imm_state_lprob(s, &seq), -6.2822282596);
     seq = imm_seq(IMM_STR("C"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -7.0931584758);
+    close(imm_state_lprob(s, &seq), -7.0931584758);
     seq = imm_seq(IMM_STR("G"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -5.9945461872);
+    close(imm_state_lprob(s, &seq), -5.9945461872);
     seq = imm_seq(IMM_STR("T"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -5.8403955073);
+    close(imm_state_lprob(s, &seq), -5.8403955073);
     seq = imm_seq(IMM_STR("AT"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -3.2834143360);
+    close(imm_state_lprob(s, &seq), -3.2834143360);
     seq = imm_seq(IMM_STR("CG"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -9.3957435523);
+    close(imm_state_lprob(s, &seq), -9.3957435523);
     seq = imm_seq(IMM_STR("ATA"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -8.1891199599);
+    close(imm_state_lprob(s, &seq), -8.1891199599);
     seq = imm_seq(IMM_STR("ATG"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -0.9021561046);
+    close(imm_state_lprob(s, &seq), -0.9021561046);
     seq = imm_seq(IMM_STR("ATT"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -2.9428648052);
+    close(imm_state_lprob(s, &seq), -2.9428648052);
     seq = imm_seq(IMM_STR("ATC"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -7.3148113691);
+    close(imm_state_lprob(s, &seq), -7.3148113691);
     seq = imm_seq(IMM_STR("GTC"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -1.5951613416);
+    close(imm_state_lprob(s, &seq), -1.5951613416);
     seq = imm_seq(IMM_STR("ATTA"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -8.1573693536);
+    close(imm_state_lprob(s, &seq), -8.1573693536);
     seq = imm_seq(IMM_STR("GTTC"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -4.7116424205);
+    close(imm_state_lprob(s, &seq), -4.7116424205);
     seq = imm_seq(IMM_STR("ACTG"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -5.4043618667);
+    close(imm_state_lprob(s, &seq), -5.4043618667);
     seq = imm_seq(IMM_STR("ATTAA"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -14.2885958273);
+    close(imm_state_lprob(s, &seq), -14.2885958273);
     seq = imm_seq(IMM_STR("GTCAA"), abc);
-    CLOSE(imm_state_lprob(s, &seq), -12.9023014661);
+    close(imm_state_lprob(s, &seq), -12.9023014661);
 }
 
 void test_frame_state_lposterior(void)
@@ -225,7 +225,7 @@ void test_frame_state_lposterior(void)
             }
             imm_cartes_deinit(&seq_iter);
         }
-        CLOSE((imm_float)exp(total), 1.0);
+        close((imm_float)exp(total), 1.0);
     }
     imm_cartes_deinit(&codon_iter);
 }
@@ -254,62 +254,62 @@ void test_frame_state_decode(void)
 
     struct imm_seq seq;
     seq = imm_seq(IMM_STR("ATG"), abc);
-    CLOSE(imm_frame_state_decode(&state, &seq, &codon), -0.9025667126);
-    COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+    close(imm_frame_state_decode(&state, &seq, &codon), -0.9025667126);
+    cond(codon.a == imm_abc_symbol_idx(abc, 'A') &&
          codon.b == imm_abc_symbol_idx(abc, 'T') &&
          codon.c == imm_abc_symbol_idx(abc, 'G'));
 
     seq = imm_seq(IMM_STR("ATGT"), abc);
-    CLOSE(imm_frame_state_decode(&state, &seq, &codon), -4.7105990700);
-    COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+    close(imm_frame_state_decode(&state, &seq, &codon), -4.7105990700);
+    cond(codon.a == imm_abc_symbol_idx(abc, 'A') &&
          codon.b == imm_abc_symbol_idx(abc, 'T') &&
          codon.c == imm_abc_symbol_idx(abc, 'G'));
 
     seq = imm_seq(IMM_STR("ATGA"), abc);
-    CLOSE(imm_frame_state_decode(&state, &seq, &codon), -6.0977143369);
-    COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+    close(imm_frame_state_decode(&state, &seq, &codon), -6.0977143369);
+    cond(codon.a == imm_abc_symbol_idx(abc, 'A') &&
          codon.b == imm_abc_symbol_idx(abc, 'T') &&
          codon.c == imm_abc_symbol_idx(abc, 'G'));
 
     seq = imm_seq(IMM_STR("ATGGT"), abc);
-    CLOSE(imm_frame_state_decode(&state, &seq, &codon), -9.0311004552);
-    COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+    close(imm_frame_state_decode(&state, &seq, &codon), -9.0311004552);
+    cond(codon.a == imm_abc_symbol_idx(abc, 'A') &&
          codon.b == imm_abc_symbol_idx(abc, 'T') &&
          codon.c == imm_abc_symbol_idx(abc, 'G'));
 
     seq = imm_seq(IMM_STR("ATT"), abc);
-    CLOSE(imm_frame_state_decode(&state, &seq, &codon), -2.9771014466);
-    COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+    close(imm_frame_state_decode(&state, &seq, &codon), -2.9771014466);
+    cond(codon.a == imm_abc_symbol_idx(abc, 'A') &&
          codon.b == imm_abc_symbol_idx(abc, 'T') &&
          codon.c == imm_abc_symbol_idx(abc, 'T'));
 
     seq = imm_seq(IMM_STR("ATC"), abc);
-    CLOSE(imm_frame_state_decode(&state, &seq, &codon), -7.7202251148);
-    COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+    close(imm_frame_state_decode(&state, &seq, &codon), -7.7202251148);
+    cond(codon.a == imm_abc_symbol_idx(abc, 'A') &&
          codon.b == imm_abc_symbol_idx(abc, 'T') &&
          codon.c == imm_abc_symbol_idx(abc, 'G'));
 
     seq = imm_seq(IMM_STR("TC"), abc);
-    CLOSE(imm_frame_state_decode(&state, &seq, &codon), -4.1990898725);
-    COND(codon.a == imm_abc_symbol_idx(abc, 'G') &&
+    close(imm_frame_state_decode(&state, &seq, &codon), -4.1990898725);
+    cond(codon.a == imm_abc_symbol_idx(abc, 'G') &&
          codon.b == imm_abc_symbol_idx(abc, 'T') &&
          codon.c == imm_abc_symbol_idx(abc, 'C'));
 
     seq = imm_seq(IMM_STR("A"), abc);
-    CLOSE(imm_frame_state_decode(&state, &seq, &codon), -6.4000112953);
-    COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+    close(imm_frame_state_decode(&state, &seq, &codon), -6.4000112953);
+    cond(codon.a == imm_abc_symbol_idx(abc, 'A') &&
          codon.b == imm_abc_symbol_idx(abc, 'T') &&
          codon.c == imm_abc_symbol_idx(abc, 'G'));
 
     seq = imm_seq(IMM_STR("AG"), abc);
-    CLOSE(imm_frame_state_decode(&state, &seq, &codon), -3.5071734613);
-    COND(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+    close(imm_frame_state_decode(&state, &seq, &codon), -3.5071734613);
+    cond(codon.a == imm_abc_symbol_idx(abc, 'A') &&
          codon.b == imm_abc_symbol_idx(abc, 'T') &&
          codon.c == imm_abc_symbol_idx(abc, 'G'));
 
     seq = imm_seq(IMM_STR("GC"), abc);
-    CLOSE(imm_frame_state_decode(&state, &seq, &codon), -4.1997050678);
-    COND(codon.a == imm_abc_symbol_idx(abc, 'G') &&
+    close(imm_frame_state_decode(&state, &seq, &codon), -4.1997050678);
+    cond(codon.a == imm_abc_symbol_idx(abc, 'G') &&
          codon.b == imm_abc_symbol_idx(abc, 'T') &&
          codon.c == imm_abc_symbol_idx(abc, 'C'));
 }

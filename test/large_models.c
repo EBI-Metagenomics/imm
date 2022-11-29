@@ -24,9 +24,9 @@ void test_large_normal(void)
     struct imm_prod prod = imm_prod();
 
     struct imm_seq seq = imm_seq(imm_str(imm_example1_seq), &m->abc);
-    EQ(imm_task_setup(task, &seq), IMM_OK);
-    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
-    CLOSE(prod.loglik, -194581.04361377980);
+    eq(imm_task_setup(task, &seq), IMM_OK);
+    eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
+    close(prod.loglik, -194581.04361377980);
 
     imm_del(task);
     imm_del(&prod);
@@ -45,9 +45,9 @@ void test_large_frame(void)
     struct imm_abc const *abc = imm_super(nuclt);
 
     struct imm_seq seq = imm_seq(imm_str(imm_example2_seq), abc);
-    EQ(imm_task_setup(task, &seq), IMM_OK);
-    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
-    CLOSE(prod.loglik, -1622.8488101101);
+    eq(imm_task_setup(task, &seq), IMM_OK);
+    eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
+    close(prod.loglik, -1622.8488101101);
 
     imm_del(&prod);
     imm_del(task);

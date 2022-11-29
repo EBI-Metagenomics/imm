@@ -90,16 +90,16 @@ int main(void)
 }
 
 #define VITERBI_CHECK(seq, status, nsteps, llik)                               \
-    EQ(imm_task_setup(task, seq), status);                                     \
-    EQ(imm_dp_viterbi(&dp, task, &prod), status);                              \
-    EQ(imm_path_nsteps(&prod.path), nsteps);                                   \
-    CLOSE(imm_hmm_loglik(&hmm, seq, &prod.path), (llik));                      \
-    CLOSE(prod.loglik, (llik));
+    eq(imm_task_setup(task, seq), status);                                     \
+    eq(imm_dp_viterbi(&dp, task, &prod), status);                              \
+    eq(imm_path_nsteps(&prod.path), nsteps);                                   \
+    close(imm_hmm_loglik(&hmm, seq, &prod.path), (llik));                      \
+    close(prod.loglik, (llik));
 
 #define DP_RESET(end_state, status)                                            \
     imm_del(&dp);                                                              \
     imm_hmm_init_dp(&hmm, imm_super(end_state), &dp);                          \
-    EQ(imm_task_reset(task, &dp), status);
+    eq(imm_task_reset(task, &dp), status);
 
 static inline imm_float zero(void) { return imm_lprob_zero(); }
 
@@ -148,7 +148,7 @@ void test_viterbi_two_mute_states(void)
 
     VITERBI_CHECK(&EMPTY, IMM_OK, 1, imm_log(0.5));
 
-    EQ(imm_hmm_set_start(&hmm, imm_super(&state1), imm_lprob_zero()),
+    eq(imm_hmm_set_start(&hmm, imm_super(&state1), imm_lprob_zero()),
        IMM_NON_FINITE_PROBABILITY);
 
     imm_hmm_set_trans(&hmm, imm_super(&state0), imm_super(&state1),
@@ -156,16 +156,16 @@ void test_viterbi_two_mute_states(void)
 
     DP_RESET(&state1, IMM_OK);
 
-    EQ(imm_task_setup(task, &EMPTY), IMM_OK);
-    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
-    EQ(imm_path_nsteps(&prod.path), 2);
-    EQ(imm_path_step(&prod.path, 0)->state_id, 0);
-    EQ(imm_path_step(&prod.path, 0)->seqlen, 0);
-    EQ(imm_path_step(&prod.path, 1)->state_id, 1);
-    EQ(imm_path_step(&prod.path, 1)->seqlen, 0);
-    CLOSE(imm_hmm_loglik(&hmm, &EMPTY, &prod.path),
+    eq(imm_task_setup(task, &EMPTY), IMM_OK);
+    eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
+    eq(imm_path_nsteps(&prod.path), 2);
+    eq(imm_path_step(&prod.path, 0)->state_id, 0);
+    eq(imm_path_step(&prod.path, 0)->seqlen, 0);
+    eq(imm_path_step(&prod.path, 1)->state_id, 1);
+    eq(imm_path_step(&prod.path, 1)->seqlen, 0);
+    close(imm_hmm_loglik(&hmm, &EMPTY, &prod.path),
           imm_log(0.5) + imm_log(0.1));
-    CLOSE(prod.loglik, imm_log(0.5) + imm_log(0.1));
+    close(prod.loglik, imm_log(0.5) + imm_log(0.1));
 
     imm_del(&prod);
     imm_del(task);
@@ -193,7 +193,7 @@ void test_viterbi_mute_cycle(void)
                       imm_log(0.2));
 
     struct imm_dp dp;
-    EQ(imm_hmm_init_dp(&hmm, imm_super(&state0), &dp), IMM_TSORT_MUTE_CYLES);
+    eq(imm_hmm_init_dp(&hmm, imm_super(&state0), &dp), IMM_TSORT_MUTE_CYLES);
 }
 
 void test_viterbi_one_normal_state(void)
@@ -213,8 +213,8 @@ void test_viterbi_one_normal_state(void)
     imm_hmm_init_dp(&hmm, imm_super(&state), &dp);
     struct imm_task *task = imm_task_new(&dp);
 
-    EQ(imm_task_setup(task, &EMPTY), IMM_OK);
-    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_SEQ_TOO_SHORT);
+    eq(imm_task_setup(task, &EMPTY), IMM_OK);
+    eq(imm_dp_viterbi(&dp, task, &prod), IMM_SEQ_TOO_SHORT);
 
     VITERBI_CHECK(&A, IMM_OK, 1, imm_log(1.0) + imm_log(0.25));
     VITERBI_CHECK(&T, IMM_OK, 0, imm_lprob_nan());
@@ -264,11 +264,11 @@ void test_viterbi_two_normal_states(void)
     imm_hmm_init_dp(&hmm, imm_super(&state0), &dp);
     struct imm_task *task = imm_task_new(&dp);
 
-    EQ(imm_task_setup(task, &EMPTY), IMM_OK);
-    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_SEQ_TOO_SHORT);
-    EQ(imm_path_nsteps(&prod.path), 0);
-    CLOSE(imm_hmm_loglik(&hmm, &EMPTY, &prod.path), imm_lprob_nan());
-    CLOSE(prod.loglik, imm_lprob_nan());
+    eq(imm_task_setup(task, &EMPTY), IMM_OK);
+    eq(imm_dp_viterbi(&dp, task, &prod), IMM_SEQ_TOO_SHORT);
+    eq(imm_path_nsteps(&prod.path), 0);
+    close(imm_hmm_loglik(&hmm, &EMPTY, &prod.path), imm_lprob_nan());
+    close(prod.loglik, imm_lprob_nan());
 
     VITERBI_CHECK(&A, IMM_OK, 1, imm_log(0.1) + imm_log(0.25));
     VITERBI_CHECK(&T, IMM_OK, 0, imm_lprob_nan());
@@ -346,33 +346,33 @@ void test_viterbi_normal_states(void)
     DP_RESET(&state1, IMM_OK);
     VITERBI_CHECK(&AGTC, IMM_OK, 4, -6.303991659557);
 
-    EQ(imm_hmm_set_trans(&hmm, imm_super(&state0), imm_super(&state0), zero()),
+    eq(imm_hmm_set_trans(&hmm, imm_super(&state0), imm_super(&state0), zero()),
        IMM_NON_FINITE_PROBABILITY);
-    EQ(imm_hmm_set_trans(&hmm, imm_super(&state0), imm_super(&state1), zero()),
+    eq(imm_hmm_set_trans(&hmm, imm_super(&state0), imm_super(&state1), zero()),
        IMM_NON_FINITE_PROBABILITY);
-    EQ(imm_hmm_set_trans(&hmm, imm_super(&state1), imm_super(&state0), zero()),
+    eq(imm_hmm_set_trans(&hmm, imm_super(&state1), imm_super(&state0), zero()),
        IMM_NON_FINITE_PROBABILITY);
-    EQ(imm_hmm_set_trans(&hmm, imm_super(&state1), imm_super(&state1), zero()),
+    eq(imm_hmm_set_trans(&hmm, imm_super(&state1), imm_super(&state1), zero()),
        IMM_NON_FINITE_PROBABILITY);
 
-    EQ(imm_hmm_set_start(&hmm, imm_super(&state0), zero()),
+    eq(imm_hmm_set_start(&hmm, imm_super(&state0), zero()),
        IMM_NON_FINITE_PROBABILITY);
-    EQ(imm_hmm_set_start(&hmm, imm_super(&state1), zero()),
+    eq(imm_hmm_set_start(&hmm, imm_super(&state1), zero()),
        IMM_NON_FINITE_PROBABILITY);
 
     imm_hmm_set_start(&hmm, imm_super(&state0), imm_log(1.0));
 
     DP_RESET(&state0, IMM_OK);
 
-    EQ(imm_task_setup(task, &EMPTY), IMM_OK);
-    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_SEQ_TOO_SHORT);
-    EQ(imm_path_nsteps(&prod.path), 0);
+    eq(imm_task_setup(task, &EMPTY), IMM_OK);
+    eq(imm_dp_viterbi(&dp, task, &prod), IMM_SEQ_TOO_SHORT);
+    eq(imm_path_nsteps(&prod.path), 0);
 
     DP_RESET(&state1, IMM_OK);
 
-    EQ(imm_task_setup(task, &EMPTY), IMM_OK);
-    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_SEQ_TOO_SHORT);
-    EQ(imm_path_nsteps(&prod.path), 0);
+    eq(imm_task_setup(task, &EMPTY), IMM_OK);
+    eq(imm_dp_viterbi(&dp, task, &prod), IMM_SEQ_TOO_SHORT);
+    eq(imm_path_nsteps(&prod.path), 0);
 
     DP_RESET(&state0, IMM_OK);
 
@@ -450,11 +450,11 @@ void test_viterbi_profile1(void)
 
     DP_RESET(&M0, IMM_OK);
 
-    EQ(imm_task_setup(task, &EMPTY_ab), IMM_OK);
-    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_SEQ_TOO_SHORT);
-    EQ(imm_path_nsteps(&prod.path), 0);
-    CLOSE(imm_hmm_loglik(&hmm, &EMPTY_ab, &prod.path), imm_lprob_nan());
-    CLOSE(prod.loglik, imm_lprob_nan());
+    eq(imm_task_setup(task, &EMPTY_ab), IMM_OK);
+    eq(imm_dp_viterbi(&dp, task, &prod), IMM_SEQ_TOO_SHORT);
+    eq(imm_path_nsteps(&prod.path), 0);
+    close(imm_hmm_loglik(&hmm, &EMPTY_ab, &prod.path), imm_lprob_nan());
+    close(prod.loglik, imm_lprob_nan());
 
     DP_RESET(&M0, IMM_OK);
     VITERBI_CHECK(&A_ab, IMM_OK, 2, imm_log(0.5) + imm_log(0.4));
@@ -875,10 +875,10 @@ void test_viterbi_cycle_mute_ending(void)
 
     imm_dp_change_trans(&dp, BM, imm_log(1.0));
 
-    EQ(imm_task_setup(task, &A_ab), IMM_OK);
-    EQ(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
-    EQ(imm_path_nsteps(&prod.path), 5);
-    CLOSE(prod.loglik, -11.5129254650);
+    eq(imm_task_setup(task, &A_ab), IMM_OK);
+    eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
+    eq(imm_path_nsteps(&prod.path), 5);
+    close(prod.loglik, -11.5129254650);
 
     imm_del(&prod);
     imm_del(task);

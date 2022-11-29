@@ -26,35 +26,35 @@ int main(void)
     struct imm_hmm hmm;
     imm_hmm_init(&hmm, &code);
 
-    EQ(imm_hmm_add_state(&hmm, imm_super(&state0)), IMM_OK);
-    EQ(imm_hmm_add_state(&hmm, imm_super(&state1)), IMM_OK);
+    eq(imm_hmm_add_state(&hmm, imm_super(&state0)), IMM_OK);
+    eq(imm_hmm_add_state(&hmm, imm_super(&state1)), IMM_OK);
 
-    EQ(imm_hmm_set_trans(&hmm, imm_super(&state0), imm_super(&state1),
+    eq(imm_hmm_set_trans(&hmm, imm_super(&state0), imm_super(&state1),
                          imm_log(0.5)),
        IMM_OK);
 
-    EQ(imm_hmm_set_start(&hmm, imm_super(&state0), 0.5f), IMM_OK);
+    eq(imm_hmm_set_start(&hmm, imm_super(&state0), 0.5f), IMM_OK);
 
     FILE *fd = fopen(TMPDIR "/hmm.dot", "w");
-    NOTNULL(fd);
+    notnull(fd);
     imm_hmm_write_dot(&hmm, fd, state_name);
     fclose(fd);
 
     struct imm_dp dp;
-    EQ(imm_hmm_init_dp(&hmm, imm_super(&state1), &dp), IMM_OK);
+    eq(imm_hmm_init_dp(&hmm, imm_super(&state1), &dp), IMM_OK);
 
     fd = fopen(TMPDIR "/dp.dot", "w");
-    NOTNULL(fd);
+    notnull(fd);
     imm_dp_write_dot(&dp, fd, state_name);
     fclose(fd);
     imm_del(&dp);
 
     FILE *a = fopen(TMPDIR "/hmm.dot", "r");
-    NOTNULL(a);
+    notnull(a);
     FILE *b = fopen(TMPDIR "/dp.dot", "r");
-    NOTNULL(b);
+    notnull(b);
 
-    EQ(a, b);
+    eq(a, b);
 
     fclose(a);
     fclose(b);

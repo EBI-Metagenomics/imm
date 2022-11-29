@@ -25,11 +25,11 @@ void test_normal_state(void)
     struct imm_normal_state state;
     imm_normal_state_init(&state, 0, &abc, lprobs);
 
-    EQ(imm_state_id(imm_super(&state)), 0);
-    CLOSE(imm_state_lprob(imm_super(&state), &A), imm_log(0.25));
-    CLOSE(imm_state_lprob(imm_super(&state), &C), imm_log(0.25));
-    CLOSE(imm_state_lprob(imm_super(&state), &G), imm_log(0.5));
-    COND(imm_lprob_is_zero(imm_state_lprob(imm_super(&state), &T)));
+    eq(imm_state_id(imm_super(&state)), 0);
+    close(imm_state_lprob(imm_super(&state), &A), imm_log(0.25));
+    close(imm_state_lprob(imm_super(&state), &C), imm_log(0.25));
+    close(imm_state_lprob(imm_super(&state), &G), imm_log(0.5));
+    cond(imm_lprob_is_zero(imm_state_lprob(imm_super(&state), &T)));
 }
 
 void test_mute_state(void)
@@ -42,7 +42,7 @@ void test_mute_state(void)
     struct imm_mute_state state;
     imm_mute_state_init(&state, 43, &abc);
 
-    EQ(imm_state_id(imm_super(&state)), 43);
-    CLOSE(imm_state_lprob(imm_super(&state), &EMPTY), 0.0);
-    COND(imm_lprob_is_zero(imm_state_lprob(imm_super(&state), &A)));
+    eq(imm_state_id(imm_super(&state)), 43);
+    close(imm_state_lprob(imm_super(&state), &EMPTY), 0.0);
+    cond(imm_lprob_is_zero(imm_state_lprob(imm_super(&state), &A)));
 }

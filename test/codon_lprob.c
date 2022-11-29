@@ -17,13 +17,13 @@ void test_codon_lprob(void)
 
     struct imm_codon codon = IMM_CODON(nuclt, "ACC");
 
-    COND(imm_lprob_is_zero(imm_codon_lprob_get(&codonp, codon)));
+    cond(imm_lprob_is_zero(imm_codon_lprob_get(&codonp, codon)));
     imm_codon_lprob_set(&codonp, codon, imm_log(0.5));
-    CLOSE(imm_codon_lprob_get(&codonp, codon), imm_log(0.5));
+    close(imm_codon_lprob_get(&codonp, codon), imm_log(0.5));
 
     imm_codon_lprob_normalize(&codonp);
-    CLOSE(imm_codon_lprob_get(&codonp, codon), imm_log(1.0));
+    close(imm_codon_lprob_get(&codonp, codon), imm_log(1.0));
 
     codon = IMM_CODON(nuclt, "ACX");
-    COND(imm_lprob_is_zero(imm_codon_lprob_get(&codonp, codon)));
+    cond(imm_lprob_is_zero(imm_codon_lprob_get(&codonp, codon)));
 }

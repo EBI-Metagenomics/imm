@@ -18,16 +18,16 @@ void test_amino_success(void)
     struct imm_amino const *amino = &imm_amino_iupac;
     for (unsigned i = 0; i < imm_abc_size(&amino->super); ++i)
     {
-        EQ(imm_abc_symbols(&amino->super)[i], symbols[i]);
-        EQ(imm_abc_symbol_idx(&amino->super, symbols[i]), i);
+        eq(imm_abc_symbols(&amino->super)[i], symbols[i]);
+        eq(imm_abc_symbol_idx(&amino->super, symbols[i]), i);
     }
 
-    EQ(imm_abc_any_symbol(imm_super(amino)), IMM_AMINO_ANY_SYMBOL);
-    COND(imm_abc_has_symbol(imm_super(amino), 'A'));
-    COND(!imm_abc_has_symbol(imm_super(amino), 'B'));
+    eq(imm_abc_any_symbol(imm_super(amino)), IMM_AMINO_ANY_SYMBOL);
+    cond(imm_abc_has_symbol(imm_super(amino), 'A'));
+    cond(!imm_abc_has_symbol(imm_super(amino), 'B'));
 
-    NOTNULL(imm_super(amino));
-    EQ(imm_typeid(amino), IMM_AMINO);
+    notnull(imm_super(amino));
+    eq(imm_typeid(amino), IMM_AMINO);
 }
 
 void test_amino_lprob(void)
@@ -36,7 +36,7 @@ void test_amino_lprob(void)
         &imm_amino_iupac,
         IMM_ARR(imm_lprob_zero(), imm_log(1), [19] = imm_log(19)));
 
-    COND(imm_lprob_is_zero(imm_amino_lprob_get(&lprob, 'A')));
-    CLOSE(imm_amino_lprob_get(&lprob, 'C'), log(1));
-    CLOSE(imm_amino_lprob_get(&lprob, 'Y'), log(19));
+    cond(imm_lprob_is_zero(imm_amino_lprob_get(&lprob, 'A')));
+    close(imm_amino_lprob_get(&lprob, 'C'), log(1));
+    close(imm_amino_lprob_get(&lprob, 'Y'), log(19));
 }

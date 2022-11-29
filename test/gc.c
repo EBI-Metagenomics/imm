@@ -17,8 +17,8 @@ int main(void)
 
 void test_gc_f(void)
 {
-    EQ(imm_gc_name1(1), "Standard");
-    EQ(imm_gc_name2(1), "SGC0");
+    eq(imm_gc_name1(1), "Standard");
+    eq(imm_gc_name2(1), "SGC0");
 
     struct imm_nuclt const *nuclt = &imm_gc_dna->super;
     struct imm_codon codons[2] = {IMM_CODON(nuclt, "TTT"),
@@ -29,9 +29,9 @@ void test_gc_f(void)
     {
         if (imm_gc_aa(1, i) == 'F')
         {
-            EQ(imm_gc_codon(1, i).a, codons[idx].a);
-            EQ(imm_gc_codon(1, i).b, codons[idx].b);
-            EQ(imm_gc_codon(1, i).c, codons[idx].c);
+            eq(imm_gc_codon(1, i).a, codons[idx].a);
+            eq(imm_gc_codon(1, i).b, codons[idx].b);
+            eq(imm_gc_codon(1, i).c, codons[idx].c);
             idx++;
         }
     }
@@ -39,8 +39,8 @@ void test_gc_f(void)
 
 void test_gc_l(void)
 {
-    EQ(imm_gc_name1(1), "Standard");
-    EQ(imm_gc_name2(1), "SGC0");
+    eq(imm_gc_name1(1), "Standard");
+    eq(imm_gc_name2(1), "SGC0");
 
     struct imm_nuclt const *nuclt = &imm_gc_dna->super;
     struct imm_codon codons[6] = {
@@ -53,9 +53,9 @@ void test_gc_l(void)
     {
         if (imm_gc_aa(1, i) == 'L')
         {
-            EQ(imm_gc_codon(1, i).a, codons[idx].a);
-            EQ(imm_gc_codon(1, i).b, codons[idx].b);
-            EQ(imm_gc_codon(1, i).c, codons[idx].c);
+            eq(imm_gc_codon(1, i).a, codons[idx].a);
+            eq(imm_gc_codon(1, i).b, codons[idx].b);
+            eq(imm_gc_codon(1, i).c, codons[idx].c);
             idx++;
         }
     }
@@ -63,8 +63,8 @@ void test_gc_l(void)
 
 void test_gc_p(void)
 {
-    EQ(imm_gc_name1(1), "Standard");
-    EQ(imm_gc_name2(1), "SGC0");
+    eq(imm_gc_name1(1), "Standard");
+    eq(imm_gc_name2(1), "SGC0");
 
     struct imm_nuclt const *nuclt = &imm_gc_dna->super;
     struct imm_codon codons[4] = {
@@ -76,9 +76,9 @@ void test_gc_p(void)
     {
         if (imm_gc_aa(1, i) == 'P')
         {
-            EQ(imm_gc_codon(1, i).a, codons[idx].a);
-            EQ(imm_gc_codon(1, i).b, codons[idx].b);
-            EQ(imm_gc_codon(1, i).c, codons[idx].c);
+            eq(imm_gc_codon(1, i).a, codons[idx].a);
+            eq(imm_gc_codon(1, i).b, codons[idx].b);
+            eq(imm_gc_codon(1, i).c, codons[idx].c);
             idx++;
         }
     }
@@ -86,9 +86,9 @@ void test_gc_p(void)
 
 void test_gc_decode(void)
 {
-    EQ(imm_gc_name1(1), "Standard");
-    EQ(imm_gc_name2(1), "SGC0");
+    eq(imm_gc_name1(1), "Standard");
+    eq(imm_gc_name2(1), "SGC0");
     struct imm_nuclt const *nuclt = &imm_gc_dna->super;
-    EQ(imm_gc_decode(1, IMM_CODON(nuclt, "CCG")), 'P');
-    EQ(imm_gc_decode(1, IMM_CODON(nuclt, "TAG")), '*');
+    eq(imm_gc_decode(1, IMM_CODON(nuclt, "CCG")), 'P');
+    eq(imm_gc_decode(1, IMM_CODON(nuclt, "TAG")), '*');
 }

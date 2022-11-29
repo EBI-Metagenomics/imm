@@ -17,7 +17,7 @@ void test_amino_lprob(void)
                                               imm_log(1), [19] = imm_log(19)};
     struct imm_amino_lprob aminop = imm_amino_lprob(amino, lprobs);
 
-    COND(imm_lprob_is_zero(imm_amino_lprob_get(&aminop, 'A')));
-    CLOSE(imm_amino_lprob_get(&aminop, 'C'), imm_log(1));
-    CLOSE(imm_amino_lprob_get(&aminop, 'Y'), imm_log(19));
+    cond(imm_lprob_is_zero(imm_amino_lprob_get(&aminop, 'A')));
+    close(imm_amino_lprob_get(&aminop, 'C'), imm_log(1));
+    close(imm_amino_lprob_get(&aminop, 'Y'), imm_log(19));
 }
