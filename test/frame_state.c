@@ -17,7 +17,7 @@ int main(void)
     return hope_status();
 }
 
-void test_frame_state1(void)
+void run_frame_state1(imm_float lprobs[], struct imm_span span)
 {
     struct imm_dna const *dna = &imm_dna_iupac;
     struct imm_nuclt const *nuclt = imm_super(dna);
@@ -34,25 +34,37 @@ void test_frame_state1(void)
     struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
     struct imm_frame_state state;
-    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, IMM_SPAN(1, 5));
+    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, span);
     struct imm_state *s = imm_super(&state);
 
     struct imm_seq seq = imm_seq(IMM_STR("A"), abc);
-    close(imm_state_lprob(s, &seq), -5.9145034795);
+    close(imm_state_lprob(s, &seq), lprobs[0]);
     seq = imm_seq(IMM_STR("AT"), abc);
-    close(imm_state_lprob(s, &seq), -2.9158434138);
+    close(imm_state_lprob(s, &seq), lprobs[1]);
     seq = imm_seq(IMM_STR("ATA"), abc);
-    close(imm_state_lprob(s, &seq), -6.9055970891);
+    close(imm_state_lprob(s, &seq), lprobs[2]);
     seq = imm_seq(IMM_STR("ATG"), abc);
-    close(imm_state_lprob(s, &seq), -0.5347732947);
+    close(imm_state_lprob(s, &seq), lprobs[3]);
     seq = imm_seq(IMM_STR("ATT"), abc);
-    close(imm_state_lprob(s, &seq), -2.5902373362);
+    close(imm_state_lprob(s, &seq), lprobs[4]);
     seq = imm_seq(IMM_STR("ATTA"), abc);
-    close(imm_state_lprob(s, &seq), -6.8810321984);
+    close(imm_state_lprob(s, &seq), lprobs[5]);
     seq = imm_seq(IMM_STR("ATTAA"), abc);
-    close(imm_state_lprob(s, &seq), -12.0882895834);
+    close(imm_state_lprob(s, &seq), lprobs[6]);
     seq = imm_seq(IMM_STR("ATTAAT"), abc);
     cond(imm_lprob_is_zero(imm_state_lprob(s, &seq)));
+}
+
+void test_frame_state1(void)
+{
+    imm_float lprobs_15[] = {-5.9145034795, -2.9158434138, -6.9055970891,
+                             -0.5347732947, -2.5902373362, -6.8810321984,
+                             -12.0882895834};
+    run_frame_state1(lprobs_15, IMM_SPAN(1, 5));
+    imm_float lprobs_24[] = {-5.9145034795, -2.9158434138, -6.9055970891,
+                             -0.5347732947, -2.5902373362, -6.8810321984,
+                             -12.0882895834};
+    run_frame_state1(lprobs_24, IMM_SPAN(2, 4));
 }
 
 void test_frame_state2(void)

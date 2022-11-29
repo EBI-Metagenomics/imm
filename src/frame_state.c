@@ -9,6 +9,63 @@
 #include "state.h"
 #include <assert.h>
 
+// Let S be the random variable of sequences obeying our codon-hmm-tree schema.
+// The lengths of S vary from 1 to 5: len(S) \in {1, 2, 3, 4, 5}
+// Let N = len(S).
+//
+// We have
+//
+//     p(S)    = p(S|N) * p(N) / p(N|S)
+//     p(S, N) = p(S|N) * p(N)
+//
+// Notice that p(N|S) \in {0, 1}:
+//
+//     p(N|S) = 1 if N=len(S)
+//     p(N|S) = 0 otherwise
+//
+// Let D be the random variable of codons.
+// Let f(D=(d0,d1,d2)) = f(d0,d1,d2) be the probability
+// of seeing the codon (d0, d1, 2).
+//
+// Let the symbol _ denote marginalisation over the corresponding random
+// variable.
+//
+// Length 1
+// --------
+//
+// We have
+//
+//     p(S=(s0,)) = p(S=(s0,),N=_)
+//                = p(S=(s0,)|N=_) * p(N=_)
+//                = p(S=(s0,)|N=1) * p(N=1)
+//
+// We have by definition
+//
+//     p(S=(s0,)|N=1) = (f(s0,_,_) + f(_,s0,_) + f(_,_,s0)) / 3
+//
+// Length 2
+// --------
+//
+// There are 4 paths in the codon-hmm-tree:
+//
+//     Nop, Del, Nop, Nop: (1-e)*e    *(1-e)*(1-e)
+//     Del, Nop, Nop, Nop: e    *(1-e)*(1-e)*(1-e)
+//     Del, Del, Nop, Ins: e    *e    *(1-e)*e
+//     Del, Del, Ins, Nop: e    *e    *    e*(1-e)
+//
+//     p(T=ndnn) = (1-e)*e    *(1-e)*(1-e)
+//     p(T=dnnn) = e    *(1-e)*(1-e)*(1-e)
+//     p(T=ddni) = e    *e    *(1-e)*e
+//     p(T=ddin) = e    *e    *    e*(1-e)
+//
+// We have
+//
+//     p(S=(s0,s1)) = p(S=(s0,s1)|N=2) * p(N=2)
+//
+// We have by definition
+//
+//     p(S=(s0,s1)|N=2) = (f(s0,_,_) + f(_,s0,_) + f(_,_,s0)) / 3
+
 static imm_float lprob(struct imm_state const *state,
                        struct imm_seq const *seq);
 
@@ -37,6 +94,10 @@ void imm_frame_state_init(struct imm_frame_state *state, unsigned id,
 #define LP(A, B, C)                                                            \
     imm_codon_marg_lprob(state->codonm, CODON(nucl[A], nucl[B], nucl[C]))
 
+// p(S=(s0,)) = p(S=(s0,)|N=1) * p(N=1)
+//
+//     p(S=(s0,)|N=1) = (f(s0,_,_) + f(_,s0,_) + f(_,_,s0)) / 3
+//     p(N=1)         = e^2 * (1-e)^2
 static imm_float joint_seq_len1(struct imm_frame_state const *state,
                                 struct imm_seq const *seq)
 {
@@ -45,9 +106,14 @@ static imm_float joint_seq_len1(struct imm_frame_state const *state,
                         imm_abc_any_symbol_idx(abc)};
     unsigned _ = IMM_ARRAY_SIZE(nucl) - 1;
 
+    // exp(c) = p(N=1)
     imm_float c = 2 * state->eps.loge + 2 * state->eps.log1e;
 
-    return c + LOGSUM(LP(0, _, _), LP(_, 0, _), LP(_, _, 0)) - imm_log(3);
+    // exp(v) = p(S=(s0,)|N=1)
+    imm_float v = LOGSUM(LP(0, _, _), LP(_, 0, _), LP(_, _, 0)) - imm_log(3);
+
+    // p(S=(s0,))
+    return c + v;
 }
 
 static imm_float joint_seq_len2(struct imm_frame_state const *state,
