@@ -22,6 +22,7 @@ void imm_cartes_deinit(struct imm_cartes const *cartes)
 
 char const *imm_cartes_next(struct imm_cartes *cartes)
 {
+    assert(cartes->nitems > 0);
     if (cartes->iter_idx == cartes->nitems) return NULL;
 
     char *item = cartes->item;

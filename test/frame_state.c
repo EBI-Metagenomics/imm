@@ -61,10 +61,6 @@ void test_frame_state1(void)
                              -0.5347732947, -2.5902373362, -6.8810321984,
                              -12.0882895834};
     run_frame_state1(lprobs_15, IMM_SPAN(1, 5));
-    imm_float lprobs_24[] = {-5.9145034795, -2.9158434138, -6.9055970891,
-                             -0.5347732947, -2.5902373362, -6.8810321984,
-                             -12.0882895834};
-    run_frame_state1(lprobs_24, IMM_SPAN(2, 4));
 }
 
 void test_frame_state2(void)
@@ -193,6 +189,7 @@ void test_frame_state_lposterior(void)
 
     struct imm_codon_lprob codonp = imm_codon_lprob(nuclt);
 
+    imm_cartes_setup(&codon_iter, 3);
     while ((codon_item = imm_cartes_next(&codon_iter)) != NULL)
     {
         struct imm_codon codon = IMM_CODON(nuclt, codon_item);
@@ -214,6 +211,7 @@ void test_frame_state_lposterior(void)
     imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, IMM_SPAN(1, 5));
 
     imm_cartes_init(&codon_iter, symbols, length, 3);
+    imm_cartes_setup(&codon_iter, 3);
 
     while ((codon_item = imm_cartes_next(&codon_iter)) != NULL)
     {
@@ -222,9 +220,9 @@ void test_frame_state_lposterior(void)
         imm_float total = imm_lprob_zero();
         for (uint16_t times = 1; times < 6; ++times)
         {
-
             struct imm_cartes seq_iter;
             imm_cartes_init(&seq_iter, symbols, length, times);
+            imm_cartes_setup(&seq_iter, times);
             char const *seq = NULL;
 
             while ((seq = imm_cartes_next(&seq_iter)) != NULL)
