@@ -57,6 +57,7 @@ add_library(
   src/frame_cond.c
   src/frame_state.c
   src/frame_state_15.c
+  src/frame_state_24.c
   src/gc.c
   src/gc_auto.c
   src/hmm.c
