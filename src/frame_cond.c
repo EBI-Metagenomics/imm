@@ -195,7 +195,7 @@ static imm_float lprob_frag_given_codon3(struct imm_frame_cond const *c,
                    imm_log((x[0] == z[0]) + (x[1] == z[0]) + (x[2] == z[0])) +
                    lprob_z2 + lprob_z3;
 
-    return LOGSUM(v0, v1, v2, v3, v4, v5, v6);
+    return logsum(v0, v1, v2, v3, v4, v5, v6);
 }
 
 static imm_float lprob_frag_given_codon4(struct imm_frame_cond const *cond,
@@ -214,14 +214,14 @@ static imm_float lprob_frag_given_codon4(struct imm_frame_cond const *cond,
     imm_float lprob_z3 = __imm_nuclt_lprob_get(cond->nucltp, z[2]);
     imm_float lprob_z4 = __imm_nuclt_lprob_get(cond->nucltp, z[3]);
 
-    imm_float v0 = LOGSUM(
+    imm_float v0 = logsum(
         imm_log((x[0] == z[1]) * (x[1] == z[2]) * (x[2] == z[3])) + lprob_z1,
         imm_log((x[0] == z[0]) * (x[1] == z[2]) * (x[2] == z[3])) + lprob_z2,
         imm_log((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[3])) + lprob_z3,
         imm_log((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[2])) + lprob_z4);
 
     imm_float v1 =
-        LOGSUM(imm_log((x[1] == z[2]) * (x[2] == z[3])) + lprob_z1 + lprob_z2,
+        logsum(imm_log((x[1] == z[2]) * (x[2] == z[3])) + lprob_z1 + lprob_z2,
                imm_log((x[1] == z[1]) * (x[2] == z[3])) + lprob_z1 + lprob_z3,
                imm_log((x[1] == z[1]) * (x[2] == z[2])) + lprob_z1 + lprob_z4,
                imm_log((x[1] == z[0]) * (x[2] == z[3])) + lprob_z2 + lprob_z3,
@@ -264,7 +264,7 @@ static imm_float lprob_frag_given_codon5(struct imm_frame_cond const *cond,
     imm_float lprob_z5 = __imm_nuclt_lprob_get(cond->nucltp, z[4]);
 
     imm_float v =
-        LOGSUM(lprob_z1 + lprob_z2 +
+        logsum(lprob_z1 + lprob_z2 +
                    imm_log((x[0] == z[2]) * (x[1] == z[3]) * (x[2] == z[4])),
                lprob_z1 + lprob_z3 +
                    imm_log((x[0] == z[1]) * (x[1] == z[3]) * (x[2] == z[4])),

@@ -2,6 +2,7 @@
 #define IMM_FLOAT_H
 
 #include "imm/config.h"
+#include <float.h>
 #include <tgmath.h>
 
 #ifdef I
@@ -11,9 +12,11 @@
 #ifdef IMM_DOUBLE_PRECISION
 typedef double imm_float;
 #define IMM_FLOAT_BYTES 8
+#define IMM_FLOAT_MAX DBL_MAX
 #else
 typedef float imm_float;
 #define IMM_FLOAT_BYTES 4
+#define IMM_FLOAT_MAX FLT_MAX
 #endif
 
 #define imm_log(x) ((imm_float)log(x))
