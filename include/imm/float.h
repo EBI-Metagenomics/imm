@@ -20,6 +20,7 @@ typedef float imm_float;
 #endif
 
 #define imm_log(x) ((imm_float)log(x))
+#define imm_exp(x) ((imm_float)exp(x))
 
 #define IMM_ARR(...)                                                           \
     (imm_float[])                                                              \
