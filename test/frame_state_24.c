@@ -3,6 +3,7 @@
 
 int main(void)
 {
+    struct imm_span span = IMM_SPAN(2, 4);
     struct imm_dna const *dna = &imm_dna_iupac;
     struct imm_nuclt const *nuclt = imm_super(dna);
     struct imm_abc const *abc = imm_super(nuclt);
@@ -18,6 +19,7 @@ int main(void)
 
     struct imm_codon_lprob codonp = imm_codon_lprob(nuclt);
 
+    imm_cartes_setup(&codon_iter, 3);
     while ((codon_item = imm_cartes_next(&codon_iter)) != NULL)
     {
         struct imm_codon codon = IMM_CODON(nuclt, codon_item);
@@ -36,37 +38,25 @@ int main(void)
     struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
     struct imm_frame_state state;
-    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, IMM_SPAN(2, 4));
+    imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, span);
 
-    imm_cartes_init(&codon_iter, symbols, length, 3);
-    imm_cartes_setup(&codon_iter, 3);
-
-    while ((codon_item = imm_cartes_next(&codon_iter)) != NULL)
+    struct imm_cartes seq_iter;
+    imm_cartes_init(&seq_iter, symbols, length, span.max);
+    imm_float total = imm_lprob_zero();
+    for (unsigned times = span.min; times <= span.max; ++times)
     {
-        printf("%c%c%c,", codon_item[0], codon_item[1], codon_item[2]);
-        codon = IMM_CODON(nuclt, codon_item);
+        imm_cartes_setup(&seq_iter, times);
 
-        imm_float total = imm_lprob_zero();
-        for (uint16_t times = 2; times < 5; ++times)
+        char const *seq = NULL;
+        while ((seq = imm_cartes_next(&seq_iter)) != NULL)
         {
-            struct imm_cartes seq_iter;
-            imm_cartes_init(&seq_iter, symbols, length, times);
-            char const *seq = NULL;
-
-            while ((seq = imm_cartes_next(&seq_iter)) != NULL)
-            {
-                struct imm_seq tmp = imm_seq((struct imm_str){times, seq}, abc);
-                imm_float lprob =
-                    imm_frame_state_lposterior(&state, &codon, &tmp);
-                lprob -= imm_codon_marg_lprob(&codonm, codon);
-                total = imm_lprob_add(total, lprob);
-            }
-            imm_cartes_deinit(&seq_iter);
+            struct imm_seq tmp = imm_seq((struct imm_str){times, seq}, abc);
+            struct imm_state const *s = imm_frame_state_super_c(&state);
+            imm_float lprob = imm_state_lprob(s, &tmp);
+            total = imm_lprob_add(total, lprob);
         }
-        close((imm_float)exp(total), 1.001);
     }
-    printf("\n");
-    imm_cartes_deinit(&codon_iter);
-
+    close((imm_float)exp(total), 1.0);
+    imm_cartes_deinit(&seq_iter);
     return hope_status();
 }

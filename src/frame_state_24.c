@@ -118,8 +118,8 @@ imm_float imm_joint_n4_24(struct imm_frame_state const *state,
     imm_float c = 1 * state->eps.loge + 1 * state->eps.log1e;
 
     // exp(p) = p(S=(s0,s1,s2,s3)|T=ni)
-    imm_float p = logsum(lf(0, 1, 2) * i3, lf(0, 1, 3) * i2, lf(0, 2, 3) * i1,
-                         lf(1, 2, 3) * i0) -
+    imm_float p = logsum(lf(0, 1, 2) + i3, lf(0, 1, 3) + i2, lf(0, 2, 3) + i1,
+                         lf(1, 2, 3) + i0) -
                   ln(4);
 
     // ln(p(S=(s0,s1,s2,s3)))
