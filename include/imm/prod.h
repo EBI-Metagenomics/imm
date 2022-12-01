@@ -12,7 +12,7 @@ struct imm_prod
     struct imm_seq const *seq;
     struct imm_path path;
     imm_float loglik;
-    uint64_t seconds;
+    uint64_t mseconds;
 };
 
 static inline struct imm_prod imm_prod(void)
@@ -26,7 +26,7 @@ static inline void imm_prod_del(struct imm_prod *prod)
     {
         prod->seq = NULL;
         imm_path_del(&prod->path);
-        prod->seconds = 0;
+        prod->mseconds = 0;
     }
 }
 
@@ -34,7 +34,7 @@ static inline void imm_prod_reset(struct imm_prod *prod)
 {
     imm_path_reset(&prod->path);
     prod->loglik = IMM_LPROB_NAN;
-    prod->seconds = 0;
+    prod->mseconds = 0;
 }
 
 #endif

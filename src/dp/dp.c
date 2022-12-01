@@ -116,7 +116,7 @@ enum imm_rc imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
 
     if (elapsed_stop(&elapsed)) return error(IMM_ELAPSED_LIB_FAILED);
 
-    prod->seconds = elapsed_milliseconds(&elapsed);
+    prod->mseconds = elapsed_milliseconds(&elapsed);
 
     return rc;
 }

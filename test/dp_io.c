@@ -45,7 +45,7 @@ void test_dp_io_large_normal(void)
 void test_dp_io_large_frame(void)
 {
     struct lip_file file = {0};
-    imm_example2_init();
+    imm_example2_init(IMM_SPAN(1, 5));
     struct imm_example2 *m = &imm_example2;
     struct imm_dp dp;
     imm_hmm_init_dp(&m->hmm, imm_super(&m->end), &dp);

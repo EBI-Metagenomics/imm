@@ -8,10 +8,11 @@
 #include "imm/hmm.h"
 #include "imm/mute_state.h"
 #include "imm/nuclt_lprob.h"
+#include "imm/span.h"
 
 #define IMM_EXAMPLE2_SIZE 1000U
 
-IMM_API void imm_example2_init(void);
+IMM_API void imm_example2_init(struct imm_span);
 
 struct imm_example2
 {

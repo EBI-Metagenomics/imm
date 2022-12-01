@@ -2,21 +2,21 @@
 #include "imm/imm.h"
 
 void test_large_normal(void);
-void test_large_frame(void);
+void test_large_frame(struct imm_span, imm_float loglik);
 
 int main(void)
 {
-    imm_example1_init(IMM_EXAMPLE1_SIZE);
     test_large_normal();
-
-    imm_example2_init();
-    test_large_frame();
-
+    test_large_frame(IMM_SPAN(1, 5), -1622.8488101101);
+    test_large_frame(IMM_SPAN(2, 4), -1793.0598144531);
+    test_large_frame(IMM_SPAN(3, 3), imm_lprob_nan());
     return hope_status();
 }
 
 void test_large_normal(void)
 {
+    imm_example1_init(IMM_EXAMPLE1_SIZE);
+
     struct imm_example1 *m = &imm_example1;
     struct imm_dp dp;
     imm_hmm_init_dp(&imm_example1.hmm, imm_super(&m->end), &dp);
@@ -33,8 +33,10 @@ void test_large_normal(void)
     imm_del(&dp);
 }
 
-void test_large_frame(void)
+void test_large_frame(struct imm_span span, imm_float loglik)
 {
+    imm_example2_init(span);
+
     struct imm_example2 *m = &imm_example2;
     struct imm_dp dp;
     imm_hmm_init_dp(&m->hmm, imm_super(&m->end), &dp);
@@ -46,8 +48,9 @@ void test_large_frame(void)
 
     struct imm_seq seq = imm_seq(imm_str(imm_example2_seq), abc);
     eq(imm_task_setup(task, &seq), IMM_OK);
+
     eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
-    close(prod.loglik, -1622.8488101101);
+    close(prod.loglik, loglik);
 
     imm_del(&prod);
     imm_del(task);

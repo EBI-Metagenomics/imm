@@ -20,6 +20,7 @@ int main(void)
 
     test_frame_state_joint(&nucltp, &codonm, IMM_SPAN(1, 5));
     test_frame_state_joint(&nucltp, &codonm, IMM_SPAN(2, 4));
+    test_frame_state_joint(&nucltp, &codonm, IMM_SPAN(3, 3));
 
     return hope_status();
 }
