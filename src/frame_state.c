@@ -27,13 +27,11 @@ void imm_frame_state_init(struct imm_frame_state *state, unsigned id,
     state->epsilon = epsilon;
     state->eps = imm_frame_epsilon(epsilon);
 
+    assert(span.min == 1 && span.max == 5 || span.min == 2 && span.max == 4);
+
     struct imm_state_vtable vtable = {NULL, IMM_FRAME_STATE, state};
-    if (span.min == 1 && span.max == 5)
-        vtable.lprob = lprob15;
-    else if (span.min == 2 && span.max == 4)
-        vtable.lprob = lprob24;
-    else
-        assert(false);
+    if (span.min == 1 && span.max == 5) vtable.lprob = lprob15;
+    if (span.min == 2 && span.max == 4) vtable.lprob = lprob24;
 
     struct imm_abc const *abc = imm_super(codonm->nuclt);
     state->super = __imm_state_init(id, abc, vtable, span);
@@ -60,6 +58,8 @@ imm_float imm_frame_state_lposterior(struct imm_frame_state const *state,
                                      struct imm_codon const *codon,
                                      struct imm_seq const *seq)
 {
+    struct imm_span span = imm_frame_state_super_c(state)->span;
+    assert(span.min == 1 && span.max == 5 || span.min == 2 && span.max == 4);
     struct imm_frame_cond cond = imm_frame_cond_init(state);
     return imm_frame_cond_lprob(&cond, codon, seq);
 }
