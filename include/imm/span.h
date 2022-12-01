@@ -11,7 +11,7 @@ struct imm_span
 
 static_assert(sizeof(struct imm_span) == 8, "struct imm_span must be packed");
 
-#define IMM_SPAN(min, max)                                                     \
+#define imm_span(min, max)                                                     \
     (struct imm_span)                                                          \
     {                                                                          \
         (min), (max)                                                           \

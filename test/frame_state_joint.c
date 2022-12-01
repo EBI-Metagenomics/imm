@@ -18,9 +18,9 @@ int main(void)
     struct imm_nuclt_lprob nucltp = setup_nucltp(nuclt);
     struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
-    test_frame_state_joint(&nucltp, &codonm, IMM_SPAN(1, 5));
-    test_frame_state_joint(&nucltp, &codonm, IMM_SPAN(2, 4));
-    test_frame_state_joint(&nucltp, &codonm, IMM_SPAN(3, 3));
+    test_frame_state_joint(&nucltp, &codonm, imm_span(1, 5));
+    test_frame_state_joint(&nucltp, &codonm, imm_span(2, 4));
+    test_frame_state_joint(&nucltp, &codonm, imm_span(3, 3));
 
     return hope_status();
 }
