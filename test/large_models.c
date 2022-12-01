@@ -8,7 +8,7 @@ int main(void)
 {
     test_large_normal();
     test_large_frame(IMM_SPAN(1, 5), -1622.8488101101);
-    test_large_frame(IMM_SPAN(2, 4), -1793.0598144531);
+    test_large_frame(IMM_SPAN(2, 4), -1793.03239395872);
     test_large_frame(IMM_SPAN(3, 3), imm_lprob_nan());
     return hope_status();
 }
