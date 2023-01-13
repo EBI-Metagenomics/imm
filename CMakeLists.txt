@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 
 project(
   imm
-  VERSION 2.1.0
+  VERSION 2.1.1
   LANGUAGES C)
 
 set(IMM_MAIN_PROJECT OFF)
@@ -20,15 +20,16 @@ option(IMM_BUILD_TESTS "Build the unit tests" ${IMM_BUILD_TESTS_DEFAULT})
 message(STATUS "IMM_MAIN_PROJECT: " ${IMM_MAIN_PROJECT})
 message(STATUS "IMM_BUILD_TESTS: " ${IMM_BUILD_TESTS})
 
-include(cmake/compiler-options.cmake)
 include(cmake/sanitizers.cmake)
+include(cmake/warnings.cmake)
 include(cmake/CPM.cmake)
 
-cpmaddpackage("gh:horta/elapsed@3.0.8")
-cpmaddpackage("gh:horta/logaddexp@2.1.10")
-cpmaddpackage("gh:EBI-Metagenomics/lite-pack@0.4.1")
+cpmaddpackage("gh:horta/elapsed@3.1.0")
+cpmaddpackage("gh:horta/logaddexp@2.1.11")
+cpmaddpackage("gh:EBI-Metagenomics/lite-pack@0.4.2")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_EXTENSIONS OFF)
 
 add_library(
@@ -123,7 +124,6 @@ target_include_directories(
          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
   PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>)
 
-target_compile_features(imm PRIVATE c_std_23)
 target_link_libraries(imm PUBLIC LOGADDEXP::logaddexp)
 target_link_libraries(imm PRIVATE ELAPSED::elapsed)
 target_link_libraries(imm PRIVATE LITE_PACK::lite_pack)
@@ -195,18 +195,3 @@ if(IMM_BUILD_TESTS)
   enable_testing()
   add_subdirectory(test)
 endif()
-
-set(CPACK_PACKAGE_NAME imm)
-set(CPACK_PACKAGE_VENDOR "Danilo Horta")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Invisible Markov model library")
-set(CPACK_PACKAGE_CONTACT "Danilo Horta")
-set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
-set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
-set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
-set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.md)
-set(CPACK_RESOURCE_FILE_README ${CMAKE_CURRENT_SOURCE_DIR}/README.md)
-set(CPACK_OUTPUT_FILE_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/package)
-set(CPACK_VERBATIM_VARIABLES YES)
-set(CPACK_PACKAGE_RELOCATABLE YES)
-set(CPACK_MONOLITHIC_INSTALL YES)
-include(CPack)

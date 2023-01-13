@@ -37,7 +37,7 @@ static char const strings[][44] = {
     [IMM_ELAPSED_LIB_FAILED] = "elapsed library has failed",
 };
 
-enum imm_rc __error_print(enum imm_rc rc, char const *ctx, char const *msg)
+enum imm_rc __imm_error_print(enum imm_rc rc, char const *ctx, char const *msg)
 {
 #ifdef NDEBUG
     (void)ctx;
