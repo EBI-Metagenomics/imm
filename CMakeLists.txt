@@ -176,6 +176,8 @@ install(
 
 install(FILES ${EXPORT_FILE} ${CONFIG_FILE} DESTINATION include/imm)
 
+include(CMakePackageConfigHelpers)
+
 set(CMAKE_CONFIG_FILE ${CMAKE_CURRENT_BINARY_DIR}/imm-config.cmake)
 configure_package_config_file(imm-config.cmake.in ${CMAKE_CONFIG_FILE}
                               INSTALL_DESTINATION lib/cmake/imm)
