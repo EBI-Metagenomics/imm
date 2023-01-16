@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 
 project(
   imm
-  VERSION 2.1.3
+  VERSION 2.1.4
   LANGUAGES C)
 
 set(IMM_MAIN_PROJECT OFF)
