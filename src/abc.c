@@ -2,7 +2,7 @@
 #include "error.h"
 #include "expect.h"
 #include "imm/sym.h"
-#include "lite_pack.h"
+#include "lip.h"
 #include <assert.h>
 #include <stdint.h>
 #include <string.h>

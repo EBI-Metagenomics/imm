@@ -5,7 +5,7 @@
 #include "imm/codon_lprob.h"
 #include "imm/generics.h"
 #include "imm/nuclt.h"
-#include "lite_pack.h"
+#include "lip.h"
 #include <assert.h>
 
 static_assert(IMM_NUCLT_SIZE == 4, "nuclt size expected to be four");

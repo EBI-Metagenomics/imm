@@ -1,6 +1,6 @@
 #include "expect.h"
 #include "imm/support.h"
-#include "lite_pack.h"
+#include "lip.h"
 #include <string.h>
 
 bool imm_expect_map_size(struct lip_file *file, unsigned size)

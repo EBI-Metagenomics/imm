@@ -2,7 +2,7 @@
 #include "error.h"
 #include "expect.h"
 #include "imm/rc.h"
-#include "lite_pack.h"
+#include "lip.h"
 
 enum imm_rc imm_nuclt_lprob_pack(struct imm_nuclt_lprob const *nucltp,
                                  struct lip_file *file)

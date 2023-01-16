@@ -5,7 +5,7 @@
 #include "error.h"
 #include "expect.h"
 #include "imm/dp.h"
-#include "lite_pack.h"
+#include "lip.h"
 #include "reallocf.h"
 #include <assert.h>
 #include <stdlib.h>
