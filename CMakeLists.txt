@@ -1,32 +1,17 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-
 project(
   imm
-  VERSION 2.1.5
+  VERSION 2.1.6
   LANGUAGES C)
-
-set(IMM_MAIN_PROJECT OFF)
-if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
-  set(IMM_MAIN_PROJECT ON)
-endif()
-
-if(IMM_MAIN_PROJECT)
-  set(IMM_BUILD_TESTS_DEFAULT ON)
-else()
-  set(IMM_BUILD_TESTS_DEFAULT OFF)
-endif()
-
-option(IMM_BUILD_TESTS "Build the unit tests" ${IMM_BUILD_TESTS_DEFAULT})
-message(STATUS "IMM_MAIN_PROJECT: " ${IMM_MAIN_PROJECT})
-message(STATUS "IMM_BUILD_TESTS: " ${IMM_BUILD_TESTS})
+set(PROJECT_DESCRIPTION "Invisible Markov model library.")
 
 include(cmake/sanitizers.cmake)
 include(cmake/warnings.cmake)
 include(cmake/CPM.cmake)
 
-cpmaddpackage("gh:horta/elapsed@3.1.1")
-cpmaddpackage("gh:horta/logaddexp@2.1.12")
-cpmaddpackage("gh:EBI-Metagenomics/lite_pack@0.4.3")
+cpmaddpackage("gh:horta/elapsed@3.1.2")
+cpmaddpackage("gh:horta/logaddexp@2.1.14")
+cpmaddpackage("gh:EBI-Metagenomics/lip@0.5.0")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_C_STANDARD 11)
@@ -80,29 +65,25 @@ add_library(
   src/tsort.c)
 add_library(IMM::imm ALIAS imm)
 
-# Enable interprocedural optimization
-macro(enable_ipo lib)
-  if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    include(CheckIPOSupported)
-    check_ipo_supported()
-    set_target_properties(${lib} PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
-  endif()
-endmacro()
+if(NOT BUILD_SHARED_LIBS)
+  target_compile_definitions(imm PUBLIC -DIMM_STATIC_DEFINE)
+endif()
 
-enable_ipo(imm)
-
-set(EXPORT_FILE ${CMAKE_CURRENT_BINARY_DIR}/imm/export.h)
-include(GenerateExportHeader)
-generate_export_header(
+target_include_directories(
   imm
-  BASE_NAME
-  IMM
-  INCLUDE_GUARD_NAME
-  IMM_EXPORT_H
-  EXPORT_MACRO_NAME
-  IMM_API
-  EXPORT_FILE_NAME
-  ${EXPORT_FILE})
+  PUBLIC $<INSTALL_INTERFACE:include>
+         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+  PRIVATE ${PROJECT_SOURCE_DIR}/src)
+
+set_target_properties(imm PROPERTIES VERSION ${PROJECT_VERSION})
+set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
+target_compile_options(imm PRIVATE ${WARNING_FLAGS})
+
+target_link_libraries(imm PUBLIC LOGADDEXP::logaddexp)
+target_link_libraries(imm PRIVATE ELAPSED::elapsed)
+target_link_libraries(imm PRIVATE LIP::lip)
+target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
 
 if(DEFINED ENV{IMM_DOUBLE_PRECISION})
   set(IMM_DOUBLE_PRECISION "$ENV{IMM_DOUBLE_PRECISION}")
@@ -117,30 +98,14 @@ else()
   message(STATUS "Double-precision floating-point - OFF")
 endif()
 
-target_include_directories(
-  imm
-  PUBLIC $<INSTALL_INTERFACE:include>
-         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-  PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>)
-
-target_link_libraries(imm PUBLIC LOGADDEXP::logaddexp)
-target_link_libraries(imm PRIVATE ELAPSED::elapsed)
-target_link_libraries(imm PRIVATE LITE_PACK::lite_pack)
-target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
-set_target_properties(imm PROPERTIES VERSION ${PROJECT_VERSION})
-set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
-
 include(CheckSymbolExists)
 check_symbol_exists(reallocf "stdlib.h" HAVE_REALLOCF)
 
 target_compile_definitions(imm
                            PRIVATE $<$<BOOL:${HAVE_REALLOCF}>:HAVE_REALLOCF>)
 
-target_compile_options(imm PRIVATE ${WARNING_FLAGS})
-
-set(CONFIG_FILE ${CMAKE_CURRENT_BINARY_DIR}/imm/config.h)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/imm/config.h.in
+set(CONFIG_FILE ${PROJECT_BINARY_DIR}/imm/config.h)
+configure_file(${PROJECT_SOURCE_DIR}/include/imm/config.h.in
                ${CONFIG_FILE} @ONLY)
 
 include(CheckTypeSize)
@@ -164,36 +129,48 @@ else()
 endif()
 target_compile_definitions(imm PRIVATE SIZEOF_LONG=${SIZEOF_LONG})
 
-install(TARGETS imm EXPORT imm-targets)
-
-install(DIRECTORY include/imm/ DESTINATION include/imm)
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+  include(CheckIPOSupported)
+  check_ipo_supported()
+  set_target_properties(imm PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif()
 
 install(
+  TARGETS imm
   EXPORT imm-targets
-  FILE imm-targets.cmake
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
+install(DIRECTORY include/imm/ DESTINATION include/imm)
+install(FILES ${CONFIG_FILE} DESTINATION include/imm)
+
+export(
+  TARGETS imm
+  NAMESPACE IMM::
+  FILE imm-targets.cmake)
+install(
+  EXPORT imm-targets
   NAMESPACE IMM::
   DESTINATION lib/cmake/imm)
 
-install(FILES ${EXPORT_FILE} ${CONFIG_FILE} DESTINATION include/imm)
+install(FILES ${PROJECT_SOURCE_DIR}/README.md ${PROJECT_SOURCE_DIR}/LICENSE.md
+        DESTINATION share/docs/imm)
 
 include(CMakePackageConfigHelpers)
 
-set(CMAKE_CONFIG_FILE ${CMAKE_CURRENT_BINARY_DIR}/imm-config.cmake)
-configure_package_config_file(imm-config.cmake.in ${CMAKE_CONFIG_FILE}
+set(project_config ${PROJECT_BINARY_DIR}/imm-config.cmake)
+set(version_config ${PROJECT_BINARY_DIR}/imm-config-version.cmake)
+
+configure_package_config_file(imm-config.cmake.in ${project_config}
                               INSTALL_DESTINATION lib/cmake/imm)
 
-set(CMAKE_VERSION_FILE ${CMAKE_CURRENT_BINARY_DIR}/imm-config-version.cmake)
-write_basic_package_version_file(${CMAKE_VERSION_FILE}
+write_basic_package_version_file(${version_config}
                                  COMPATIBILITY SameMajorVersion)
 
-install(FILES ${CMAKE_VERSION_FILE} ${CMAKE_CONFIG_FILE}
+install(FILES ${project_config} ${version_config}
         DESTINATION lib/cmake/imm)
-install(FILES ${EXPORT_FILE} ${CONFIG_FILE} DESTINATION include/imm)
 
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/README.md
-              ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.md DESTINATION share/docs/imm)
-
-if(IMM_BUILD_TESTS)
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
   enable_testing()
   add_subdirectory(test)
 endif()
