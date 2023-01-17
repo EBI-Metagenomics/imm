@@ -1,6 +1,10 @@
 #include "imm/imm.h"
 #include <string.h>
 
+#ifdef I
+#undef I
+#endif
+
 /* Log-probabilities */
 #define ZERO IMM_LPROB_ZERO
 #define ONE ((imm_float)0.)

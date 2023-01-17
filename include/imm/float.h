@@ -5,10 +5,6 @@
 #include <float.h>
 #include <tgmath.h>
 
-#ifdef I
-#undef I
-#endif
-
 #ifdef IMM_DOUBLE_PRECISION
 typedef double imm_float;
 #define IMM_FLOAT_BYTES 8
