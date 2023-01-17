@@ -28,13 +28,10 @@
 
 #include "reallocf.h"
 #include <stdlib.h>
-#include <sys/cdefs.h>
 
 void *reallocf(void *ptr, size_t size)
 {
-    void *nptr;
-
-    nptr = realloc(ptr, size);
+    void *nptr = realloc(ptr, size);
 
     /*
      * When the System V compatibility option (malloc "V" flag) is
