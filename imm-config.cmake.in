@@ -1,5 +1,7 @@
 @PACKAGE_INIT@
 
+include(CMakeFindDependencyMacro)
+
 find_dependency(elapsed)
 find_dependency(logaddexp)
 find_dependency(lip)
