@@ -3,7 +3,7 @@
 
 #include "imm/config.h"
 #include <float.h>
-#include <tgmath.h>
+#include <math.h>
 
 #ifdef IMM_DOUBLE_PRECISION
 typedef double imm_float;

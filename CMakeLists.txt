@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(
   imm
-  VERSION 2.1.9
+  VERSION 2.1.10
   LANGUAGES C)
 set(PROJECT_DESCRIPTION "Invisible Markov model library.")
 

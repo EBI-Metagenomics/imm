@@ -1,9 +1,5 @@
 #include "imm/imm.h"
 
-#ifdef I
-#undef I
-#endif
-
 /* State IDs */
 #define START ((imm_state_id_t)(0U << 11))
 #define B ((imm_state_id_t)(1U << 11))
