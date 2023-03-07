@@ -2,6 +2,7 @@
 #include "dp/dp.h"
 #include "error.h"
 #include "imm/cco.h"
+#include "imm/list.h"
 #include "imm/trans.h"
 #include "reallocf.h"
 #include <assert.h>
@@ -49,10 +50,10 @@ enum imm_rc imm_trans_table_reset(struct imm_dp_trans_table *tbl,
 
     for (unsigned i = 0; i < args->nstates; ++i)
     {
-        struct cco_iter it = cco_stack_iter(&args->states[i]->trans.incoming);
         struct imm_trans *trans = NULL;
         unsigned j = 0;
-        cco_iter_for_each_entry(trans, &it, incoming)
+        imm_list_for_each_entry(trans, &args->states[i]->trans.incoming,
+                                incoming)
         {
             tbl->trans[tbl->offset[i] + j].score = trans->lprob;
             tbl->trans[tbl->offset[i] + j].src = trans->pair.idx.src;

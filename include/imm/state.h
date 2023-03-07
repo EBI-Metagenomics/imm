@@ -1,12 +1,13 @@
 #ifndef IMM_STATE_H
 #define IMM_STATE_H
 
-#include "cco.h"
+#include "imm/cco.h"
 #include "imm/export.h"
 #include "imm/float.h"
 #include "imm/lprob.h"
 #include "imm/seq.h"
 #include "imm/span.h"
+#include "imm/stack.h"
 #include "imm/state_types.h"
 #include "imm/support.h"
 #include <assert.h>
@@ -20,8 +21,8 @@ struct imm_state
     struct imm_state_vtable vtable;
     struct
     {
-        struct cco_stack outgoing;
-        struct cco_stack incoming;
+        struct imm_list_head outgoing;
+        struct imm_list_head incoming;
     } trans;
     struct cco_hnode hnode;
     int mark;
@@ -42,10 +43,10 @@ static inline unsigned imm_state_idx(struct imm_state const *state)
     return state->idx;
 }
 
-IMM_API struct imm_state __imm_state_init(unsigned id,
-                                          struct imm_abc const *abc,
-                                          struct imm_state_vtable vtable,
-                                          struct imm_span span);
+IMM_API void __imm_state_init(struct imm_state *, unsigned id,
+                              struct imm_abc const *abc,
+                              struct imm_state_vtable vtable,
+                              struct imm_span span);
 
 IMM_API imm_float imm_state_lprob(struct imm_state const *state,
                                   struct imm_seq const *seq);

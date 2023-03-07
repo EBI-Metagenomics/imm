@@ -1,8 +1,8 @@
 #ifndef IMM_TRANS_H
 #define IMM_TRANS_H
 
-#include "cco.h"
-#include "pair.h"
+#include "imm/list.h"
+#include "imm/pair.h"
 #include <stdint.h>
 
 typedef uint16_t imm_trans_idx_t;
@@ -15,8 +15,8 @@ struct imm_trans
 {
     struct imm_pair pair;
     imm_float lprob;
-    struct cco_node outgoing;
-    struct cco_node incoming;
+    struct imm_list_head outgoing;
+    struct imm_list_head incoming;
     struct cco_hnode hnode;
 };
 
@@ -25,8 +25,8 @@ static inline void trans_init(struct imm_trans *trans, unsigned src,
 {
     imm_pair_init(&trans->pair, src, dst);
     trans->lprob = lprob;
-    cco_node_init(&trans->outgoing);
-    cco_node_init(&trans->incoming);
+    IMM_INIT_LIST_HEAD(&trans->outgoing);
+    IMM_INIT_LIST_HEAD(&trans->incoming);
     cco_hnode_init(&trans->hnode);
 }
 

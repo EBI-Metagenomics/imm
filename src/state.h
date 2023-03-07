@@ -5,8 +5,8 @@
 
 static inline void state_detach(struct imm_state *state)
 {
-    cco_stack_init(&state->trans.outgoing);
-    cco_stack_init(&state->trans.incoming);
+    IMM_INIT_LIST_HEAD(&state->trans.outgoing);
+    IMM_INIT_LIST_HEAD(&state->trans.incoming);
     cco_hash_del(&state->hnode);
 }
 

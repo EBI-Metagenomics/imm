@@ -2,6 +2,7 @@
 #include "dp/dp.h"
 #include "error.h"
 #include "imm/dp.h"
+#include "imm/list.h"
 #include "imm/lprob.h"
 #include "imm/path.h"
 #include "imm/state_types.h"
@@ -37,8 +38,8 @@ static enum imm_rc add_transition(struct imm_hmm *hmm, struct imm_state *src,
     struct imm_trans *trans = hmm->transitions.data + hmm->transitions.size++;
     trans_init(trans, src->id, dst->id, lprob);
     cco_hash_add(hmm->transitions.tbl, &trans->hnode, trans->pair.id.key);
-    cco_stack_put(&src->trans.outgoing, &trans->outgoing);
-    cco_stack_put(&dst->trans.incoming, &trans->incoming);
+    imm_stack_put(&trans->outgoing, &src->trans.outgoing);
+    imm_stack_put(&trans->incoming, &dst->trans.incoming);
     return IMM_OK;
 }
 
@@ -258,20 +259,21 @@ enum imm_rc imm_hmm_normalize_state_trans(struct imm_state *src)
 {
     if (!cco_hash_hashed(&src->hnode)) return error(IMM_STATE_NOT_FOUND);
 
-    if (cco_stack_empty(&src->trans.outgoing)) return IMM_OK;
+    if (imm_list_empty(&src->trans.outgoing)) return IMM_OK;
 
     struct imm_trans *trans = NULL;
-    struct cco_iter it = cco_stack_iter(&src->trans.outgoing);
     imm_float lnorm = imm_lprob_zero();
-    cco_iter_for_each_entry(trans, &it, outgoing)
+    imm_list_for_each_entry(trans, &src->trans.outgoing, outgoing)
     {
         lnorm = logaddexp(lnorm, trans->lprob);
     }
 
     if (!imm_lprob_is_finite(lnorm)) return error(IMM_NON_FINITE_PROBABILITY);
 
-    it = cco_stack_iter(&src->trans.outgoing);
-    cco_iter_for_each_entry(trans, &it, outgoing) { trans->lprob -= lnorm; }
+    imm_list_for_each_entry(trans, &src->trans.outgoing, outgoing)
+    {
+        trans->lprob -= lnorm;
+    }
     return IMM_OK;
 }
 

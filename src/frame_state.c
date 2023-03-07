@@ -39,7 +39,7 @@ void imm_frame_state_init(struct imm_frame_state *state, unsigned id,
     if (span.min == 3 && span.max == 3) vtable.lprob = lprob33;
 
     struct imm_abc const *abc = imm_super(codonm->nuclt);
-    state->super = __imm_state_init(id, abc, vtable, span);
+    __imm_state_init(&state->super, id, abc, vtable, span);
 }
 
 #define CODON(A, B, C)                                                         \

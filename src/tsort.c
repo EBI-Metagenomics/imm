@@ -1,5 +1,6 @@
 #include "tsort.h"
 #include "error.h"
+#include "imm/list.h"
 #include "imm/state.h"
 #include "imm/trans.h"
 #include <stdlib.h>
@@ -20,8 +21,7 @@ static bool check_mute_visit(struct imm_state **states, struct imm_state *state)
     state->mark = TEMPORARY_MARK;
 
     struct imm_trans *trans = NULL;
-    struct cco_iter it = cco_stack_iter(&state->trans.outgoing);
-    cco_iter_for_each_entry(trans, &it, outgoing)
+    imm_list_for_each_entry(trans, &state->trans.outgoing, outgoing)
     {
         if (check_mute_visit(states, states[trans->pair.idx.dst])) return true;
     }
@@ -53,8 +53,7 @@ static void visit(struct imm_state *state, struct imm_state **states,
 
     state->mark = TEMPORARY_MARK;
     struct imm_trans const *trans = NULL;
-    struct cco_iter it = cco_stack_iter(&state->trans.outgoing);
-    cco_iter_for_each_entry(trans, &it, outgoing)
+    imm_list_for_each_entry(trans, &state->trans.outgoing, outgoing)
     {
         visit(states[trans->pair.idx.dst], states, end, tmp);
     }
