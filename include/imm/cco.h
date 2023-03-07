@@ -1,45 +1,13 @@
-#ifndef CCO_H
-#define CCO_H
+#ifndef IMM_CCO_H
+#define IMM_CCO_H
+
+#include "imm/cof.h"
 
 /* ---- cco_compiler module begin ------------------------------------------- */
 #ifndef __has_builtin
 #define __has_builtin(x) (0)
 #endif
 /* ---- cco_compiler module end --------------------------------------------- */
-
-/* ---- cco_of module begin ------------------------------------------------- */
-#include <stddef.h>
-
-/**
- * cco_of - cast a member of a structure out to the containing
- * structure
- * @ptr:	the pointer to the member.
- * @type:	the type of the container struct this is embedded in.
- * @member:	the name of the member within the struct.
- *
- */
-#define cco_of(ptr, type, member)                                              \
-    ({                                                                         \
-        char *__mptr = (char *)(ptr);                                          \
-        ((type *)(__mptr - offsetof(type, member)));                           \
-    })
-
-/**
- * cco_of_safe - cast a member of a structure out to the containing
- * structure
- * @ptr:	the pointer to the member.
- * @type:	the type of the container struct this is embedded in.
- * @member:	the name of the member within the struct.
- *
- * Return NULL if ptr is NULL.
- */
-#define cco_of_safe(ptr, type, member)                                         \
-    ({                                                                         \
-        char *__mptr = (char *)(ptr);                                          \
-        __mptr == NULL ? (type *)__mptr                                        \
-                       : ((type *)(__mptr - offsetof(type, member)));          \
-    })
-/* ---- cco_of module end --------------------------------------------------- */
 
 /* ---- cco_hash_support module begin --------------------------------------- */
 #include <stdint.h>
@@ -320,7 +288,7 @@ static inline int cco_hlist_unhashed(struct cco_hnode const *h)
     return !h->pprev;
 }
 
-#define cco_hlist_entry(ptr, type, member) cco_of(ptr, type, member)
+#define cco_hlist_entry(ptr, type, member) imm_cof(ptr, type, member)
 
 #define cco_hlist_entry_safe(ptr, type, member)                                \
     ({                                                                         \
@@ -477,142 +445,5 @@ static inline bool cco_hash_hashed(struct cco_hnode const *node)
          (bkt)++)                                                              \
     __cco_hlist_for_each_entry(obj, &name[bkt], member)
 /* ---- cco_hash module end ------------------------------------------------- */
-
-/* ---- cco_iter module begin ----------------------------------------------- */
-struct cco_iter
-{
-    struct cco_node *curr;
-    struct cco_node const *end;
-};
-
-static inline struct cco_node *cco_iter_next(struct cco_iter *iter)
-{
-    if (!iter || iter->curr == iter->end) return NULL;
-    struct cco_node *node = iter->curr;
-    iter->curr = node->next;
-    return node;
-}
-
-#define cco_iter_entry(pos, type, member) cco_of_safe(pos, type, member)
-
-#define cco_iter_next_entry(iter, entry, member)                               \
-    cco_of_safe(cco_iter_next(iter), __typeof__(*entry), member)
-
-#define cco_iter_for_each(pos, iter, member)                                   \
-    for (pos = cco_iter_next(iter); pos; pos = cco_iter_next(iter))
-
-#define cco_iter_for_each_safe(pos, tmp, iter, member)                         \
-    for (pos = cco_iter_next(iter), tmp = cco_iter_next(iter); pos;            \
-         pos = tmp, tmp = iter_next(iter))
-
-#define cco_iter_for_each_entry(entry, iter, member)                           \
-    for (entry = cco_iter_next_entry(iter, entry, member); entry;              \
-         entry = cco_iter_next_entry(iter, entry, member))
-
-#define cco_iter_for_each_entry_safe(entry, tmp, iter, member)                 \
-    for (entry = cco_iter_next_entry(iter, entry, member),                     \
-        tmp = cco_iter_next_entry(iter, entry, member);                        \
-         entry; entry = tmp, tmp = cco_iter_next_entry(iter, entry, member))
-/* ---- cco_iter module end ------------------------------------------------- */
-
-/* ---- cco_queue module begin ---------------------------------------------- */
-#include <stdbool.h>
-
-struct cco_queue
-{
-    struct cco_node head;
-    struct cco_node *tail;
-};
-
-#define CCO_QUEUE_INIT(name)                                                   \
-    {                                                                          \
-        (struct cco_node){&name.head}, &name.head                              \
-    }
-
-static inline bool cco_queue_empty(struct cco_queue const *queue)
-{
-    return &queue->head == queue->tail;
-}
-
-static inline void cco_queue_init(struct cco_queue *queue)
-{
-    queue->tail = queue->head.next = &queue->head;
-}
-
-static inline struct cco_iter cco_queue_iter(struct cco_queue *queue)
-{
-    return (struct cco_iter){queue->tail, &queue->head};
-}
-
-static inline struct cco_node *cco_queue_pop(struct cco_queue *queue)
-{
-    struct cco_node *node = queue->tail;
-    queue->tail = queue->tail->next;
-    if (queue->tail == &queue->head) queue->head.next = &queue->head;
-    return node;
-}
-
-static inline void cco_queue_put(struct cco_queue *queue,
-                                 struct cco_node *novel)
-{
-    if (cco_queue_empty(queue)) queue->tail = novel;
-
-    struct cco_node *next = queue->head.next;
-    next->next = novel;
-    novel->next = &queue->head;
-    queue->head.next = novel;
-}
-
-static inline void cco_queue_put_first(struct cco_queue *queue,
-                                       struct cco_node *novel)
-{
-    struct cco_node *tail = queue->tail;
-    novel->next = tail;
-    queue->tail = novel;
-    if (queue->head.next == &queue->head) queue->head.next = novel;
-}
-/* ---- cco_queue module end ------------------------------------------------ */
-
-/* ---- cco_stack module begin ---------------------------------------------- */
-#include <stdbool.h>
-
-struct cco_stack
-{
-    struct cco_node head;
-};
-
-#define CCO_STACK_INIT()                                                       \
-    {                                                                          \
-        CCO_NODE_INIT()                                                        \
-    }
-
-static inline bool cco_stack_empty(struct cco_stack const *stack)
-{
-    return stack->head.next == NULL;
-}
-
-static inline void cco_stack_init(struct cco_stack *stack)
-{
-    cco_node_init(&stack->head);
-}
-
-static inline struct cco_iter cco_stack_iter(struct cco_stack *stack)
-{
-    return (struct cco_iter){stack->head.next, NULL};
-}
-
-static inline struct cco_node *cco_stack_pop(struct cco_stack *stack)
-{
-    struct cco_node *node = stack->head.next;
-    cco_node_del(&stack->head, node);
-    return node;
-}
-
-static inline void cco_stack_put(struct cco_stack *stack,
-                                 struct cco_node *novel)
-{
-    cco_node_add_next(&stack->head, novel);
-}
-/* ---- cco_stack module end ------------------------------------------------ */
 
 #endif
