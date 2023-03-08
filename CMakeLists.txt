@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(
   imm
-  VERSION 2.1.10
+  VERSION 2.2.0
   LANGUAGES C)
 set(PROJECT_DESCRIPTION "Invisible Markov model library.")
 
@@ -105,8 +105,8 @@ target_compile_definitions(imm
                            PRIVATE $<$<BOOL:${HAVE_REALLOCF}>:HAVE_REALLOCF>)
 
 set(CONFIG_FILE ${PROJECT_BINARY_DIR}/imm/config.h)
-configure_file(${PROJECT_SOURCE_DIR}/include/imm/config.h.in
-               ${CONFIG_FILE} @ONLY)
+configure_file(${PROJECT_SOURCE_DIR}/include/imm/config.h.in ${CONFIG_FILE}
+               @ONLY)
 
 include(CheckTypeSize)
 
@@ -167,8 +167,7 @@ configure_package_config_file(imm-config.cmake.in ${project_config}
 write_basic_package_version_file(${version_config}
                                  COMPATIBILITY SameMajorVersion)
 
-install(FILES ${project_config} ${version_config}
-        DESTINATION lib/cmake/imm)
+install(FILES ${project_config} ${version_config} DESTINATION lib/cmake/imm)
 
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
   enable_testing()
