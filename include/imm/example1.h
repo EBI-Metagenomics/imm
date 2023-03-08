@@ -39,6 +39,7 @@ struct imm_example1
 };
 
 IMM_API extern char const imm_example1_seq[];
+IMM_API extern char const imm_example1_seq_only_matches[];
 IMM_API extern struct imm_example1 imm_example1;
 
 IMM_API unsigned imm_example1_state_name(unsigned id,

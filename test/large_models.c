@@ -2,11 +2,13 @@
 #include "imm/imm.h"
 
 void test_large_normal(void);
+void test_large_normal_removed_states(void);
 void test_large_frame(struct imm_span, imm_float loglik);
 
 int main(void)
 {
     test_large_normal();
+    test_large_normal_removed_states();
     test_large_frame(imm_span(1, 5), -1622.8488101101);
     test_large_frame(imm_span(2, 4), -1793.03239395872);
     test_large_frame(imm_span(3, 3), imm_lprob_nan());
@@ -27,6 +29,29 @@ void test_large_normal(void)
     eq(imm_task_setup(task, &seq), IMM_OK);
     eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
     close(prod.loglik, -194581.04361377980);
+
+    imm_del(task);
+    imm_del(&prod);
+    imm_del(&dp);
+}
+
+void test_large_normal_removed_states(void)
+{
+    imm_example1_init(IMM_EXAMPLE1_SIZE);
+    imm_example1_remove_insertion_states(IMM_EXAMPLE1_SIZE);
+    imm_example1_remove_deletion_states(IMM_EXAMPLE1_SIZE);
+
+    struct imm_example1 *m = &imm_example1;
+    struct imm_dp dp;
+    imm_hmm_init_dp(&imm_example1.hmm, imm_super(&m->end), &dp);
+    struct imm_task *task = imm_task_new(&dp);
+    struct imm_prod prod = imm_prod();
+
+    struct imm_seq seq =
+        imm_seq(imm_str(imm_example1_seq_only_matches), &m->abc);
+    eq(imm_task_setup(task, &seq), IMM_OK);
+    eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
+    close(prod.loglik, -4833.06982421875);
 
     imm_del(task);
     imm_del(&prod);
