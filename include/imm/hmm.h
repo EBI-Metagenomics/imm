@@ -37,6 +37,7 @@ struct imm_hmm
         unsigned size;
         CCO_HASH_DECLARE(tbl, IMM_TRANS_MAX_SIZE - 1);
         struct imm_trans data[(1 << IMM_TRANS_MAX_SIZE)];
+        struct imm_trans *avail;
     } transitions;
 };
 

@@ -28,14 +28,21 @@ static void init_transitions_table(struct imm_hmm *hmm)
 {
     hmm->transitions.size = 0;
     cco_hash_init(hmm->transitions.tbl);
+    hmm->transitions.avail = &hmm->transitions.data[0];
 }
 
 static enum imm_rc add_transition(struct imm_hmm *hmm, struct imm_state *src,
                                   struct imm_state *dst, imm_float lprob)
 {
-    if (hmm->transitions.size >= IMM_ARRAY_SIZE(hmm->transitions.data))
+    unsigned max_size = (unsigned)IMM_ARRAY_SIZE(hmm->transitions.data);
+    if (hmm->transitions.size >= max_size)
         return error(IMM_TOO_MANY_TRANSITIONS);
-    struct imm_trans *trans = hmm->transitions.data + hmm->transitions.size++;
+
+    if (hmm->transitions.avail > &hmm->transitions.data[max_size - 1])
+        return error(IMM_NOMEM);
+
+    struct imm_trans *trans = hmm->transitions.avail++;
+    hmm->transitions.size++;
     trans_init(trans, src->id, dst->id, lprob);
     cco_hash_add(hmm->transitions.tbl, &trans->hnode, trans->pair.id.key);
     imm_stack_put(&trans->outgoing, &src->trans.outgoing);
@@ -372,6 +379,7 @@ static enum imm_rc del_outgoing_transitions(struct imm_hmm *hmm,
             }
         }
         cco_hash_del(&t->hnode);
+        hmm->transitions.size--;
     }
 
     return IMM_OK;
@@ -399,6 +407,7 @@ static enum imm_rc del_incoming_transitions(struct imm_hmm *hmm,
             }
         }
         cco_hash_del(&t->hnode);
+        hmm->transitions.size--;
     }
 
     return IMM_OK;
