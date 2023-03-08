@@ -14,7 +14,7 @@ static inline void bits_clr(unsigned long *x, unsigned bit)
     *x &= ~(1UL << bit);
 }
 
-static inline bool bits_get(unsigned long *x, unsigned bit)
+static inline bool bits_get(unsigned long const *x, unsigned bit)
 {
     return !!((*x >> bit) & 1UL);
 }

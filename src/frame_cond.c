@@ -108,7 +108,7 @@ static imm_float lprob_frag_given_codon1(struct imm_frame_cond const *cond,
 {
     unsigned const *x = codon->idx;
 
-    unsigned z[1] = {imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[0])};
+    unsigned const z[1] = {imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[0])};
 
     imm_float c = 2 * cond->eps.loge + 2 * cond->eps.log1e;
 
