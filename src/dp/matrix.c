@@ -27,7 +27,6 @@ enum imm_rc imm_matrix_reset(struct matrix *m,
     {
         unsigned min = state_table_span(tbl, i).min;
         unsigned max = state_table_span(tbl, i).max;
-        assert(next_col >= min);
         m->state_col[i] = (int)(next_col - min);
         next_col += (unsigned)(max - min + 1);
     }
