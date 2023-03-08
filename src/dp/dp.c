@@ -186,8 +186,8 @@ void imm_dp_write_dot(struct imm_dp const *dp, FILE *restrict fd,
             char dst_name[IMM_STATE_NAME_SIZE] = {'\0', '\0', '\0', '\0',
                                                   '\0', '\0', '\0', '\0'};
 
-            name(state_table_id(&dp->state_table, src), src_name);
-            name(state_table_id(&dp->state_table, dst), dst_name);
+            (*name)(state_table_id(&dp->state_table, src), src_name);
+            (*name)(state_table_id(&dp->state_table, dst), dst_name);
             fprintf(fd, "%s -> %s [label=%.4f];\n", src_name, dst_name,
                     trans_table_score(&dp->trans_table, dst, t));
         }

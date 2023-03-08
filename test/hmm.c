@@ -3,6 +3,7 @@
 
 void test_hmm_state_id(void);
 void test_hmm_set_trans(void);
+void test_hmm_del_state(void);
 void test_hmm_wrong_states(void);
 
 struct imm_abc abc;
@@ -15,6 +16,7 @@ int main(void)
 
     test_hmm_state_id();
     test_hmm_set_trans();
+    test_hmm_del_state();
     test_hmm_wrong_states();
     return hope_status();
 }
@@ -45,6 +47,26 @@ void test_hmm_set_trans(void)
     eq(imm_hmm_set_trans(&hmm, imm_super(&state0), imm_super(&state1),
                          imm_log(0.5)),
        IMM_OK);
+}
+
+void test_hmm_del_state(void)
+{
+    struct imm_mute_state state0;
+    imm_mute_state_init(&state0, 0, &abc);
+    struct imm_mute_state state1;
+    imm_mute_state_init(&state1, 1, &abc);
+    struct imm_hmm hmm;
+    imm_hmm_init(&hmm, &code);
+
+    eq(imm_hmm_add_state(&hmm, imm_super(&state0)), IMM_OK);
+    eq(imm_hmm_add_state(&hmm, imm_super(&state1)), IMM_OK);
+
+    eq(imm_hmm_set_trans(&hmm, imm_super(&state0), imm_super(&state1),
+                         imm_log(0.5)),
+       IMM_OK);
+
+    eq(imm_hmm_del_state(&hmm, imm_super(&state0)), IMM_OK);
+    eq(imm_hmm_del_state(&hmm, imm_super(&state1)), IMM_OK);
 }
 
 void test_hmm_wrong_states(void)

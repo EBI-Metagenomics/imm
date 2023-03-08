@@ -6,11 +6,11 @@
 #define ONE ((imm_float)0.)
 
 /* State IDs */
-#define START ((imm_state_id_t)(0U << 12))
-#define B ((imm_state_id_t)(1U << 12))
-#define M ((imm_state_id_t)(2U << 12))
-#define I ((imm_state_id_t)(3U << 12))
-#define D ((imm_state_id_t)(4U << 12))
+#define M ((imm_state_id_t)(0U << 12))
+#define I ((imm_state_id_t)(1U << 12))
+#define D ((imm_state_id_t)(2U << 12))
+#define START ((imm_state_id_t)(3U << 12))
+#define B ((imm_state_id_t)(4U << 12))
 #define E ((imm_state_id_t)(5U << 12))
 #define J ((imm_state_id_t)(6U << 12))
 #define END ((imm_state_id_t)(7U << 12))
@@ -18,15 +18,24 @@
 
 unsigned imm_example1_state_name(unsigned id, char name[IMM_STATE_NAME_SIZE])
 {
-    if (id == START) strcpy(name, "START");
-    if (id == B) strcpy(name, "B");
-    if (id == M) strcpy(name, "M");
-    if (id == I) strcpy(name, "I");
-    if (id == D) strcpy(name, "D");
-    if (id == E) strcpy(name, "E");
-    if (id == J) strcpy(name, "J");
-    if (id == END) strcpy(name, "END");
-    if (id == N) strcpy(name, "N");
+    if ((id & (15U << 12)) == START) strcpy(name, "START");
+    if ((id & (15U << 12)) == B)
+    {
+        strcpy(name, "B");
+        printf("This is B\n");
+    }
+    if ((id & (15U << 12)) == M)
+    {
+        sprintf(name, "M%u", (id & (0xFFFF >> 4)));
+        printf("This is M\n");
+    }
+    if ((id & (15U << 12)) == I) sprintf(name, "I%u", (id & (0xFFFF >> 4)));
+    if ((id & (15U << 12)) == D) sprintf(name, "D%u", (id & (0xFFFF >> 4)));
+    if ((id & (15U << 12)) == E) strcpy(name, "E");
+    if ((id & (15U << 12)) == J) strcpy(name, "J");
+    if ((id & (15U << 12)) == END) strcpy(name, "END");
+    if ((id & (15U << 12)) == N) strcpy(name, "N");
+    printf("Over\n");
     return (unsigned)strlen(name);
 }
 
@@ -157,4 +166,22 @@ void imm_example1_init(unsigned core_size)
     imm_hmm_add_state(&m->null.hmm, imm_super(&m->null.n));
     imm_hmm_set_start(&m->null.hmm, imm_super(&m->null.n), imm_log(1.0));
     SET_TRANS(&m->null.hmm, &m->null.n, &m->null.n, imm_log(0.2));
+}
+
+void imm_example1_remove_insertion_states(unsigned core_size)
+{
+    struct imm_example1 *m = &imm_example1;
+    for (unsigned k = 0; k < core_size; ++k)
+    {
+        imm_hmm_del_state(&m->hmm, imm_super(&m->i[k]));
+    }
+}
+
+void imm_example1_remove_deletion_states(unsigned core_size)
+{
+    struct imm_example1 *m = &imm_example1;
+    for (unsigned k = 0; k < core_size; ++k)
+    {
+        imm_hmm_del_state(&m->hmm, imm_super(&m->d[k]));
+    }
 }

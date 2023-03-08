@@ -14,6 +14,8 @@
 #define IMM_EXAMPLE1_NUCLT_SIZE 5
 
 IMM_API void imm_example1_init(unsigned core_size);
+IMM_API void imm_example1_remove_insertion_states(unsigned core_size);
+IMM_API void imm_example1_remove_deletion_states(unsigned core_size);
 
 struct imm_example1
 {

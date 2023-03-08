@@ -82,8 +82,8 @@ void imm_hmm_write_dot(struct imm_hmm const *hmm, FILE *restrict fd,
                                               '\0', '\0', '\0', '\0'};
         struct imm_state *src = hmm_state(hmm, t->pair.id.src);
         struct imm_state *dst = hmm_state(hmm, t->pair.id.dst);
-        name(src->id, src_name);
-        name(dst->id, dst_name);
+        (*name)(src->id, src_name);
+        (*name)(dst->id, dst_name);
         fprintf(fd, "%s -> %s [label=%.4f];\n", src_name, dst_name, t->lprob);
     }
     fprintf(fd, "}\n");
@@ -96,6 +96,24 @@ enum imm_rc imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
     cco_hash_add(hmm->states.tbl, &state->hnode, state->id);
     hmm->states.size++;
     return IMM_OK;
+}
+
+static enum imm_rc del_outgoing_transitions(struct imm_hmm *,
+                                            struct imm_state *);
+static enum imm_rc del_incoming_transitions(struct imm_hmm *,
+                                            struct imm_state *);
+
+enum imm_rc imm_hmm_del_state(struct imm_hmm *hmm, struct imm_state *state)
+{
+    enum imm_rc rc = IMM_OK;
+
+    if ((rc = del_outgoing_transitions(hmm, state))) return rc;
+    if ((rc = del_incoming_transitions(hmm, state))) return rc;
+
+    cco_hash_del(&state->hnode);
+    hmm->states.size--;
+
+    return rc;
 }
 
 enum imm_rc imm_hmm_init_dp(struct imm_hmm const *hmm,
@@ -330,4 +348,58 @@ static struct imm_trans *hmm_trans(struct imm_hmm const *hmm,
             return trans;
     }
     return NULL;
+}
+
+static enum imm_rc del_outgoing_transitions(struct imm_hmm *hmm,
+                                            struct imm_state *state)
+{
+    if (!cco_hash_hashed(&state->hnode)) return error(IMM_STATE_NOT_FOUND);
+    assert(hmm_state(hmm, state->id));
+
+    struct imm_trans *t = NULL;
+    imm_list_for_each_entry(t, &state->trans.outgoing, outgoing)
+    {
+        struct imm_state *dst = hmm_state(hmm, t->pair.id.dst);
+        struct imm_list_head *pos = NULL;
+        struct imm_list_head *n = NULL;
+        imm_list_for_each_safe(pos, n, &dst->trans.incoming)
+        {
+            struct imm_trans *x = imm_cof(pos, struct imm_trans, incoming);
+            if (x == t)
+            {
+                imm_list_del(pos);
+                break;
+            }
+        }
+        cco_hash_del(&t->hnode);
+    }
+
+    return IMM_OK;
+}
+
+static enum imm_rc del_incoming_transitions(struct imm_hmm *hmm,
+                                            struct imm_state *state)
+{
+    if (!cco_hash_hashed(&state->hnode)) return error(IMM_STATE_NOT_FOUND);
+    assert(hmm_state(hmm, state->id));
+
+    struct imm_trans *t = NULL;
+    imm_list_for_each_entry(t, &state->trans.incoming, incoming)
+    {
+        struct imm_state *src = hmm_state(hmm, t->pair.id.src);
+        struct imm_list_head *pos = NULL;
+        struct imm_list_head *n = NULL;
+        imm_list_for_each_safe(pos, n, &src->trans.outgoing)
+        {
+            struct imm_trans *x = imm_cof(pos, struct imm_trans, outgoing);
+            if (x == t)
+            {
+                imm_list_del(pos);
+                break;
+            }
+        }
+        cco_hash_del(&t->hnode);
+    }
+
+    return IMM_OK;
 }

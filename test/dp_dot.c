@@ -12,7 +12,19 @@ static unsigned state_name(unsigned id, char name[IMM_STATE_NAME_SIZE])
     return 2;
 }
 
+void test_dp_dot_tiny(void);
+void test_dp_dot_example1(void);
+void test_dp_dot_example1_remove_states(void);
+
 int main(void)
+{
+    test_dp_dot_tiny();
+    test_dp_dot_example1();
+    test_dp_dot_example1_remove_states();
+    return hope_status();
+}
+
+void test_dp_dot_tiny(void)
 {
     struct imm_abc abc;
     imm_abc_init(&abc, IMM_STR("ACGT"), '*');
@@ -37,7 +49,7 @@ int main(void)
 
     FILE *fd = fopen(TMPDIR "/hmm.dot", "w");
     notnull(fd);
-    imm_hmm_write_dot(&hmm, fd, state_name);
+    imm_hmm_write_dot(&hmm, fd, &state_name);
     fclose(fd);
 
     struct imm_dp dp;
@@ -45,7 +57,7 @@ int main(void)
 
     fd = fopen(TMPDIR "/dp.dot", "w");
     notnull(fd);
-    imm_dp_write_dot(&dp, fd, state_name);
+    imm_dp_write_dot(&dp, fd, &state_name);
     fclose(fd);
     imm_del(&dp);
 
@@ -58,6 +70,46 @@ int main(void)
 
     fclose(a);
     fclose(b);
+}
 
-    return hope_status();
+void test_dp_dot_example1(void)
+{
+    imm_example1_init(4);
+
+    FILE *fd = fopen(TMPDIR "/example1_hmm.dot", "w");
+    notnull(fd);
+    imm_hmm_write_dot(&imm_example1.hmm, fd, &imm_example1_state_name);
+    fclose(fd);
+
+    struct imm_dp dp = {0};
+    imm_hmm_init_dp(&imm_example1.hmm, imm_super(&imm_example1.end), &dp);
+
+    fd = fopen(TMPDIR "/example1_dp.dot", "w");
+    notnull(fd);
+    imm_dp_write_dot(&dp, fd, &imm_example1_state_name);
+    fclose(fd);
+
+    imm_del(&dp);
+}
+
+void test_dp_dot_example1_remove_states(void)
+{
+    imm_example1_init(4);
+    imm_example1_remove_insertion_states(4);
+    imm_example1_remove_deletion_states(4);
+
+    FILE *fd = fopen(TMPDIR "/example1_removed_hmm.dot", "w");
+    notnull(fd);
+    imm_hmm_write_dot(&imm_example1.hmm, fd, &imm_example1_state_name);
+    fclose(fd);
+
+    struct imm_dp dp = {0};
+    imm_hmm_init_dp(&imm_example1.hmm, imm_super(&imm_example1.end), &dp);
+
+    fd = fopen(TMPDIR "/example1_removed_dp.dot", "w");
+    notnull(fd);
+    imm_dp_write_dot(&dp, fd, &imm_example1_state_name);
+    fclose(fd);
+
+    imm_del(&dp);
 }
