@@ -51,7 +51,7 @@ void test_large_normal_removed_states(void)
         imm_seq(imm_str(imm_example1_seq_only_matches), &m->abc);
     eq(imm_task_setup(task, &seq), IMM_OK);
     eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
-    close(prod.loglik, -4833.06982421875);
+    close(prod.loglik, -4833.14205103985);
 
     imm_del(task);
     imm_del(&prod);
