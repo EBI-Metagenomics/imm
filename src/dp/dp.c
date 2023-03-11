@@ -4,6 +4,7 @@
 #include "dp/minmax.h"
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
+#include "dp/viterbi.h"
 #include "elapsed/elapsed.h"
 #include "error.h"
 #include "imm/dp.h"
@@ -315,13 +316,20 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
 
     if (len >= 1 + IMM_STATE_MAX_SEQLEN)
     {
-        viterbi_first_row_safe(dp, task);
+        struct premise premise = {UNKNOWN_STATE, 0,     0,    false,
+                                  false,         false, false};
+        viterbi3(premise, dp, task, 0, 0, len);
+        // viterbi_first_row_safe(dp, task);
         _viterbi_safe(dp, task, 1, len - IMM_STATE_MAX_SEQLEN);
         _viterbi(dp, task, len - IMM_STATE_MAX_SEQLEN + 1, len);
     }
     else
     {
-        viterbi_first_row(dp, task, len);
+        struct premise premise = {UNKNOWN_STATE, 0,     0,    false,
+                                  false,         false, false};
+        viterbi3(premise, dp, task, 0, 0, len);
+        // viterbi_first_row(dp, task, len);
+        // viterbi3(premise, dp, task, 1, len, len);
         _viterbi(dp, task, 1, len);
     }
 

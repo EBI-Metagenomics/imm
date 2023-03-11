@@ -4,11 +4,11 @@
 #include "imm/float.h"
 #include <stdint.h>
 
-struct final_score
+struct final_score2
 {
     imm_float score;
-    unsigned state;
-    unsigned emislen;
+    unsigned prev_state;
+    unsigned prev_seqlen;
     uint16_t trans;
     uint8_t seqlen;
 };

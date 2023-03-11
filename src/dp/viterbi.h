@@ -6,6 +6,7 @@
 #include "task.h"
 
 void viterbi3(struct premise premise, struct imm_dp const *dp,
-              struct imm_task *task, unsigned start_row, unsigned stop_row);
+              struct imm_task *task, unsigned start_row, unsigned stop_row,
+              unsigned seqlen);
 
 #endif

@@ -12,7 +12,8 @@
 #include <assert.h>
 
 void viterbi3(struct premise premise, struct imm_dp const *dp,
-              struct imm_task *task, unsigned start_row, unsigned stop_row)
+              struct imm_task *task, unsigned start_row, unsigned stop_row,
+              unsigned seqlen)
 {
     if (premise.first_row) ASSUME(start_row == 0 && stop_row == 0);
 
@@ -21,12 +22,12 @@ void viterbi3(struct premise premise, struct imm_dp const *dp,
         for (unsigned i = 0; i < dp->state_table.nstates; ++i)
         {
             struct matrix const *matrix = &task->matrix;
-            struct final_score fs =
+            struct final_score2 fs =
                 best_trans_score3(premise, dp, matrix, i, r);
 
             // I believe this condition can be eliminated if we invalidate
             // the whole path before-hand.
-            if (fs.state != IMM_STATE_NULL_IDX)
+            if (fs.prev_state != IMM_STATE_NULL_IDX)
             {
                 path_set_trans(&task->path, r, i, fs.trans);
                 path_set_seqlen(&task->path, r, i, fs.seqlen);
@@ -40,14 +41,44 @@ void viterbi3(struct premise premise, struct imm_dp const *dp,
             }
 
             struct span span = state_table_span(&dp->state_table, i);
+
             if (premise.safe_ceiling) ASSUME(span.max + r <= stop_row);
-            span.max = min_u(span.max, stop_row - r);
 
-            if (r == 0 && dp->state_table.start.state == i)
-                fs.score = MAX(dp->state_table.start.lprob, fs.score);
+            if (r == 0)
+            {
+                // span.min = min_u(span.min, seqlen);
+                span.max = min_u(span.max, seqlen);
 
-            struct state_range range = {i, span.min, span.max};
+                if (dp->state_table.start.state == i)
+                    fs.score = MAX(dp->state_table.start.lprob, fs.score);
+
+                if (span.min > span.max) continue;
+                struct state_range range = state_range(i, span.min, span.max);
+                set_multi_score(premise, &dp->emis, task, r, &range, fs.score);
+            }
+
+#if 0
+            struct span span = state_table_span(&dp->state_table, i);
+
+            if (premise.safe_ceiling) ASSUME(span.max + r <= stop_row);
+
+            if (r == 0)
+            {
+                if (seqlen < span.min) continue;
+                span.max = min_u(span.max, seqlen);
+            }
+            else
+            {
+                span.max = min_u(span.max, stop_row - r);
+                if (dp->state_table.start.state == i)
+                    fs.score = MAX(dp->state_table.start.lprob, fs.score);
+            }
+
+            if (span.min > span.max) continue;
+
+            struct state_range range = state_range(i, span.min, span.max);
             set_multi_score(premise, &dp->emis, task, r, &range, fs.score);
+#endif
         }
     }
 }
