@@ -5,6 +5,7 @@
 #include "dp/final_score.h"
 #include "dp/matrix.h"
 #include "dp/minmax.h"
+#include "dp/premise.h"
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
 #include "imm/dp.h"
@@ -33,28 +34,27 @@ static inline void best_trans_score_loop(
     }
 }
 
-static struct final_score best_trans_score(bool first_row, bool real_past,
-                                           bool safe_floor, enum state_type T,
-                                           unsigned MINLEN, unsigned MAXLEN,
-                                           struct imm_dp const *dp,
-                                           struct matrix const *matrix,
-                                           unsigned dst, unsigned row)
+static struct final_score best_trans_score3(struct premise premise,
+                                            struct imm_dp const *dp,
+                                            struct matrix const *matrix,
+                                            unsigned dst, unsigned row)
 {
-    ASSUME_FIRST_ROW(first_row, row);
+    if (premise.first_row) ASSUME(row == 0);
     struct final_score score = {imm_lprob_zero(), IMM_STATE_NULL_IDX,
                                 IMM_STATE_NULL_SEQLEN, UINT16_MAX, UINT8_MAX};
 
     for (unsigned i = 0; i < trans_table_ntrans(&dp->trans_table, dst); ++i)
     {
         unsigned src = trans_table_source_state(&dp->trans_table, dst, i);
-        ASSUME_REAL_PAST(real_past, src, dst);
+        if (premise.safe_past) ASSUME(src <= dst);
 
         struct span span = state_table_span(&dp->state_table, src);
 
-        ASSUME_MINLEN(T, MINLEN, span.min);
-        ASSUME_SAFE_FLOOR(safe_floor, span.min, row);
+        ASSUME_MIXLEN(premise, span.min, span.max);
+        if (premise.safe_floor) ASSUME(span.min <= row);
+
         if (span.min > row || (span.min == 0 && src > dst)) continue;
-        ASSUME_MIXLEN(T, MINLEN, MAXLEN, span.min, span.max);
+
         span.max = min_u(span.max, row);
 
         best_trans_score_loop(matrix, &dp->trans_table, row, src, dst, &span, i,

@@ -14,7 +14,7 @@ cpmaddpackage("gh:horta/logaddexp@2.1.14")
 cpmaddpackage("gh:EBI-Metagenomics/lip@0.5.0")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_EXTENSIONS OFF)
 
 add_library(
@@ -35,6 +35,7 @@ add_library(
   src/dp/path.c
   src/dp/state_table.c
   src/dp/trans_table.c
+  src/dp/viterbi.c
   src/error.c
   src/eseq.c
   src/example1.c
