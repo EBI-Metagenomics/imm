@@ -59,6 +59,14 @@ static struct final_score2 best_trans_score3(struct premise premise,
             best_trans_score_loop(matrix, &dp->trans_table, row, src, dst,
                                   &span, i, &score);
         }
+        else
+        {
+            if (span.min > row || (span.min == 0 && src > dst)) continue;
+
+            span.max = min_u(span.max, row);
+            best_trans_score_loop(matrix, &dp->trans_table, row, src, dst,
+                                  &span, i, &score);
+        }
 
 #if 0
         ASSUME_MIXLEN(premise, span.min, span.max);

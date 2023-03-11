@@ -320,7 +320,8 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
                                   false,         false, false};
         viterbi3(premise, dp, task, 0, 0, len);
         // viterbi_first_row_safe(dp, task);
-        _viterbi_safe(dp, task, 1, len - IMM_STATE_MAX_SEQLEN);
+        viterbi3(premise, dp, task, 1, len - IMM_STATE_MAX_SEQLEN, len);
+        // _viterbi_safe(dp, task, 1, len - IMM_STATE_MAX_SEQLEN);
         _viterbi(dp, task, len - IMM_STATE_MAX_SEQLEN + 1, len);
     }
     else

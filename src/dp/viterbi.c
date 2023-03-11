@@ -48,11 +48,16 @@ void viterbi3(struct premise premise, struct imm_dp const *dp,
             {
                 // span.min = min_u(span.min, seqlen);
                 span.max = min_u(span.max, seqlen);
+                if (span.min > span.max) continue;
 
                 if (dp->state_table.start.state == i)
                     fs.score = MAX(dp->state_table.start.lprob, fs.score);
 
-                if (span.min > span.max) continue;
+                struct state_range range = state_range(i, span.min, span.max);
+                set_multi_score(premise, &dp->emis, task, r, &range, fs.score);
+            }
+            else
+            {
                 struct state_range range = state_range(i, span.min, span.max);
                 set_multi_score(premise, &dp->emis, task, r, &range, fs.score);
             }
