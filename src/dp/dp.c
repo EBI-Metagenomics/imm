@@ -322,7 +322,8 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
         // viterbi_first_row_safe(dp, task);
         viterbi3(premise, dp, task, 1, len - IMM_STATE_MAX_SEQLEN, len);
         // _viterbi_safe(dp, task, 1, len - IMM_STATE_MAX_SEQLEN);
-        _viterbi(dp, task, len - IMM_STATE_MAX_SEQLEN + 1, len);
+        // _viterbi(dp, task, len - IMM_STATE_MAX_SEQLEN + 1, len);
+        viterbi3(premise, dp, task, len - IMM_STATE_MAX_SEQLEN + 1, len, len);
     }
     else
     {
@@ -331,7 +332,8 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
         viterbi3(premise, dp, task, 0, 0, len);
         // viterbi_first_row(dp, task, len);
         // viterbi3(premise, dp, task, 1, len, len);
-        _viterbi(dp, task, 1, len);
+        // _viterbi(dp, task, 1, len);
+        viterbi3(premise, dp, task, 1, len, len);
     }
 
     struct final_score const fscore = final_score(dp, task);
