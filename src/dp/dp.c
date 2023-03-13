@@ -17,23 +17,6 @@
 #include <assert.h>
 #include <limits.h>
 
-struct final_score
-{
-    imm_float score;
-    unsigned state;
-    unsigned seq_len;
-};
-
-static struct final_score final_score(struct imm_dp const *dp,
-                                      struct imm_task *task);
-
-static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
-                           struct imm_prod *prod);
-static enum imm_rc viterbi_path(struct imm_dp const *dp,
-                                struct imm_task const *task,
-                                struct imm_path *path, unsigned end_state,
-                                unsigned end_seq_len);
-
 void imm_dp_init(struct imm_dp *dp, struct imm_code const *code)
 {
     dp->code = code;
@@ -163,96 +146,6 @@ void imm_dp_write_dot(struct imm_dp const *dp, FILE *restrict fd,
         }
     }
     fprintf(fd, "}\n");
-}
-
-static struct final_score final_score(struct imm_dp const *dp,
-                                      struct imm_task *task)
-{
-    imm_float score = imm_lprob_zero();
-    unsigned end_state = dp->state_table.end_state_idx;
-
-    unsigned final_state = IMM_STATE_NULL_IDX;
-    unsigned final_seq_len = IMM_STATE_NULL_SEQLEN;
-
-    unsigned length = eseq_len(&task->eseq);
-    unsigned max_seq = state_table_span(&dp->state_table, end_state).max;
-
-    for (unsigned len = (unsigned)MIN(max_seq, length);; --len)
-    {
-
-        imm_float s =
-            matrix_get_score(&task->matrix, length - len, end_state, len);
-        if (s > score)
-        {
-            score = s;
-            final_state = end_state;
-            final_seq_len = len;
-        }
-
-        if (state_table_span(&dp->state_table, end_state).min == len) break;
-    }
-    struct final_score fscore = {score, final_state, final_seq_len};
-    if (final_state == IMM_STATE_NULL_IDX)
-        fscore.score = (imm_float)imm_lprob_nan();
-
-    return fscore;
-}
-
-static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
-                           struct imm_prod *prod)
-{
-    unsigned len = eseq_len(&task->eseq);
-
-    if (len >= 1 + IMM_STATE_MAX_SEQLEN)
-    {
-        struct premise premise = {UNKNOWN_STATE, 0,     0,    false,
-                                  false,         false, false};
-        viterbi3(premise, dp, task, 0, 0, len);
-        viterbi3(premise, dp, task, 1, len - IMM_STATE_MAX_SEQLEN, len);
-        viterbi3(premise, dp, task, len - IMM_STATE_MAX_SEQLEN + 1, len, len);
-    }
-    else
-    {
-        struct premise premise = {UNKNOWN_STATE, 0,     0,    false,
-                                  false,         false, false};
-        viterbi3(premise, dp, task, 0, 0, len);
-        viterbi3(premise, dp, task, 1, len, len);
-    }
-
-    struct final_score const fscore = final_score(dp, task);
-    prod->loglik = fscore.score;
-    return viterbi_path(dp, task, &prod->path, fscore.state, fscore.seq_len);
-}
-
-static enum imm_rc viterbi_path(struct imm_dp const *dp,
-                                struct imm_task const *task,
-                                struct imm_path *path, unsigned end_state,
-                                unsigned end_seq_len)
-{
-    unsigned row = eseq_len(&task->eseq);
-    unsigned state = end_state;
-    unsigned seqlen = end_seq_len;
-    bool valid = seqlen != IMM_STATE_NULL_SEQLEN;
-
-    while (valid)
-    {
-        unsigned id = dp->state_table.ids[state];
-        struct imm_step step = imm_step(id, seqlen);
-        enum imm_rc rc = imm_path_add(path, step);
-        if (rc) return rc;
-        row -= seqlen;
-
-        valid = path_valid(&task->path, row, state);
-        if (valid)
-        {
-            unsigned trans = path_trans(&task->path, row, state);
-            unsigned len = path_seqlen(&task->path, row, state);
-            state = trans_table_source_state(&dp->trans_table, state, trans);
-            seqlen = len + state_table_span(&dp->state_table, state).min;
-        }
-    }
-    imm_path_reverse(path);
-    return IMM_OK;
 }
 
 void imm_dp_dump_state_table(struct imm_dp const *dp)

@@ -7,7 +7,7 @@ enum state_type
     MUTE_STATE = 1,
     NONMUTE_STATE = 2,
     NORMAL_STATE = 3,
-    FRAME_STATE = 4,
+    FRAME15_STATE = 4,
 };
 
 #endif

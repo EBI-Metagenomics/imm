@@ -25,7 +25,7 @@ static inline void set_multi_score(struct premise premise,
                                    struct state_range const *range,
                                    imm_float tscore)
 {
-    ASSUME_MIXLEN(premise, range->min_len, range->max_len);
+    ASSUME_MIXLEN(premise.state, range->min_len, range->max_len);
     for (unsigned len = range->min_len; len <= range->max_len; ++len)
     {
         struct state_loc loc = {range->state, range->min_len, len};

@@ -7,8 +7,6 @@
 struct premise
 {
     enum state_type state;
-    unsigned min_len;
-    unsigned max_len;
     bool first_row;
     bool safe_past;
     bool safe_floor;

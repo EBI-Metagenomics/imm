@@ -1,12 +1,13 @@
 #ifndef DP_VITERBI_H
 #define DP_VITERBI_H
 
-#include "dp/premise.h"
-#include "imm/dp.h"
-#include "task.h"
+#include "imm/rc.h"
 
-void viterbi3(struct premise premise, struct imm_dp const *dp,
-              struct imm_task *task, unsigned start_row, unsigned stop_row,
-              unsigned seqlen);
+struct imm_dp;
+struct imm_prod;
+struct imm_task;
+
+enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
+                    struct imm_prod *prod);
 
 #endif
