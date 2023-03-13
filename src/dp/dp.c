@@ -24,26 +24,8 @@ struct final_score
     unsigned seq_len;
 };
 
-static struct final_score best_trans_score(struct imm_dp const *dp,
-                                           struct matrix const *matrix,
-                                           unsigned tgt_state, unsigned row,
-                                           uint16_t *best_trans,
-                                           uint8_t *best_len);
-
 static struct final_score final_score(struct imm_dp const *dp,
                                       struct imm_task *task);
-
-static void set_score(struct imm_dp const *dp, struct imm_task *task,
-                      imm_float trans_score, unsigned min_len, unsigned max_len,
-                      unsigned row, unsigned state)
-{
-    for (unsigned len = min_len; len <= max_len; ++len)
-    {
-        unsigned seq_code = eseq_get(&task->eseq, row, len, min_len);
-        imm_float score = trans_score + emis_score(&dp->emis, state, seq_code);
-        matrix_set_score(&task->matrix, row, state, len, score);
-    }
-}
 
 static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
                            struct imm_prod *prod);
@@ -181,50 +163,6 @@ void imm_dp_write_dot(struct imm_dp const *dp, FILE *restrict fd,
         }
     }
     fprintf(fd, "}\n");
-}
-
-static struct final_score best_trans_score(struct imm_dp const *dp,
-                                           struct matrix const *matrix,
-                                           unsigned dst, unsigned row,
-                                           uint16_t *best_trans,
-                                           uint8_t *best_len)
-{
-    imm_float score = imm_lprob_zero();
-    unsigned prev_state = IMM_STATE_NULL_IDX;
-    unsigned prev_seqlen = IMM_STATE_NULL_SEQLEN;
-    *best_trans = UINT16_MAX;
-    *best_len = UINT8_MAX;
-
-    for (unsigned i = 0; i < trans_table_ntrans(&dp->trans_table, dst); ++i)
-    {
-
-        unsigned src = trans_table_source_state(&dp->trans_table, dst, i);
-        unsigned min_seq = state_table_span(&dp->state_table, src).min;
-
-        if (imm_unlikely(row < min_seq) || (min_seq == 0 && src > dst))
-            continue;
-
-        unsigned max_seq = state_table_span(&dp->state_table, src).max;
-        max_seq = (unsigned)MIN(max_seq, row);
-        for (unsigned len = min_seq; len <= max_seq; ++len)
-        {
-
-            imm_float v0 = matrix_get_score(matrix, row - len, src, len);
-            imm_float v1 = trans_table_score(&dp->trans_table, dst, i);
-            imm_float v = v0 + v1;
-
-            if (v > score)
-            {
-                score = v;
-                prev_state = src;
-                prev_seqlen = len;
-                *best_trans = (uint16_t)i;
-                *best_len = (uint8_t)(len - min_seq);
-            }
-        }
-    }
-
-    return (struct final_score){score, prev_state, prev_seqlen};
 }
 
 static struct final_score final_score(struct imm_dp const *dp,
