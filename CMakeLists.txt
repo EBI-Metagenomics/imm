@@ -26,6 +26,7 @@ add_library(
   src/cartes.c
   src/code.c
   src/codon_marg.c
+  src/range.c
   src/codon_state.c
   src/dna.c
   src/dp/dp.c
