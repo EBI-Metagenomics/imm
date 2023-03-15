@@ -1,16 +1,17 @@
 #ifndef DP_PREMISE_H
 #define DP_PREMISE_H
 
-#include "dp/state_type.h"
 #include <stdbool.h>
 
 struct premise
 {
-    enum state_type state;
-    bool first_row;
     bool safe_past;
-    bool safe_floor;
-    bool safe_ceiling;
+    bool safe_future;
 };
+
+static inline struct premise premise_init(bool safe_past, bool safe_future)
+{
+    return (struct premise){safe_past, safe_future};
+}
 
 #endif

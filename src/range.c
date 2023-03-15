@@ -1,49 +1,61 @@
 #include "range.h"
+#include "swap.h"
 #include <assert.h>
 
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
-struct range range_init(unsigned a, unsigned b)
+struct imm_range imm_range_init(unsigned a, unsigned b)
 {
     assert(a <= b);
-    return (struct range){a, b};
+    return (struct imm_range){a, b};
 }
 
-void range_set(struct range *x, unsigned a, unsigned b)
+void imm_range_set(struct imm_range *x, unsigned a, unsigned b)
 {
     assert(a <= b);
     x->a = a;
     x->b = b;
 }
 
-unsigned range_size(struct range x) { return x.b - x.a; }
+unsigned imm_range_size(struct imm_range x) { return x.b - x.a; }
 
-bool range_empty(struct range x) { return x.b <= x.a; }
+bool imm_range_empty(struct imm_range x) { return x.b <= x.a; }
 
-struct range range_intersect(struct range x, struct range y)
+void imm_range_swap(struct imm_range *x, struct imm_range *y)
+{
+    swap(x->a, y->a);
+    swap(x->b, y->b);
+}
+
+struct imm_range imm_range_intersect(struct imm_range x, struct imm_range y)
 {
     if (x.a <= y.a)
     {
         if (y.a < x.b)
-            return range_init(y.a, MIN(x.b, y.b));
+            return imm_range_init(y.a, MIN(x.b, y.b));
         else
-            return range_init(x.a, x.a);
+            return imm_range_init(x.b, x.b);
     }
-    return range_intersect(y, x);
+    return imm_range_intersect(y, x);
 }
 
-void range_subtract(struct range x, struct range y, struct range *l,
-                    struct range *r)
+void imm_range_subtract(struct imm_range x, struct imm_range y,
+                        struct imm_range *l, struct imm_range *r)
 {
-    struct range i = range_intersect(x, y);
-    if (range_empty(i))
+    struct imm_range i = imm_range_intersect(x, y);
+    if (imm_range_empty(i))
     {
-        range_set(l, x.a, x.b);
-        range_set(r, x.b, x.b);
+        imm_range_set(l, x.a, x.b);
+        imm_range_set(r, x.b, x.b);
         return;
     }
 
-    range_set(l, x.a, i.a);
-    range_set(r, i.b, x.b);
+    imm_range_set(l, x.a, i.a);
+    imm_range_set(r, i.b, x.b);
     return;
+}
+
+void imm_range_dump(struct imm_range x, FILE *restrict fp)
+{
+    fprintf(fp, "range[%u, %u)", x.a, x.b);
 }

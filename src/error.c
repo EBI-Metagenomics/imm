@@ -35,6 +35,7 @@ static char const strings[][44] = {
     [IMM_NOT_SET_SEQ] = "sequence has not been set",
     [IMM_SEQ_TOO_SHORT] = "seq is shorter than end_state's lower bound",
     [IMM_ELAPSED_LIB_FAILED] = "elapsed library has failed",
+    [IMM_TOO_MANY_UNSAFE_STATES] = "too many unsafe states",
 };
 
 enum imm_rc __imm_error_print(enum imm_rc rc, char const *ctx, char const *msg)

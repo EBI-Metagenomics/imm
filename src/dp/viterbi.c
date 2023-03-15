@@ -10,6 +10,7 @@
 #include "imm/dp.h"
 #include "imm/path.h"
 #include "imm/prod.h"
+#include "range.h"
 #include "task.h"
 #include <assert.h>
 
@@ -18,36 +19,165 @@ static imm_float final_score(struct imm_dp const *dp, struct imm_task *task,
 void viterbi3(struct premise premise, struct imm_dp const *dp,
               struct imm_task *task, unsigned start_row, unsigned stop_row,
               unsigned seqlen);
+void viterbi4(struct imm_dp const *dp, struct imm_task *task,
+              unsigned start_row, unsigned stop_row, unsigned seqlen);
 static enum imm_rc viterbi_path(struct imm_dp const *dp,
                                 struct imm_task const *task,
                                 struct imm_path *path, unsigned end_state,
                                 unsigned end_seq_len);
 
+static void viterbi_safe_past(struct imm_dp const *dp, struct imm_task *task,
+                              unsigned start_row, unsigned stop_row,
+                              unsigned seqlen);
+static void viterbi_safe_future(struct imm_dp const *dp, struct imm_task *task,
+                                unsigned start_row, unsigned stop_row,
+                                unsigned seqlen);
+static void viterbi_very_safe(struct imm_dp const *dp, struct imm_task *task,
+                              unsigned start_row, unsigned stop_row,
+                              unsigned seqlen);
+
+// Define as:
+//   lowest row such that r >= max(max_seq) > 0 for every r >= row.
+static struct imm_range find_safe_past(unsigned seqlen)
+{
+    assert(IMM_STATE_MAX_SEQLEN > 0);
+    if (seqlen >= IMM_STATE_MAX_SEQLEN)
+        return imm_range_init(IMM_STATE_MAX_SEQLEN, seqlen + 1);
+    return imm_range_init(seqlen + 1, seqlen + 1);
+}
+
+// Define as:
+//   greatest row such that seqlen >= max(max_seq) + r for every r <= row.
+static struct imm_range find_safe_future(unsigned seqlen)
+{
+    if (seqlen >= IMM_STATE_MAX_SEQLEN)
+        return imm_range_init(0, seqlen - IMM_STATE_MAX_SEQLEN + 1);
+    return imm_range_init(0, 0);
+}
+
+static unsigned find_unsafe_states(struct imm_dp const *dp, unsigned *state)
+{
+    unsigned n = 0;
+    for (unsigned dst = 0; dst < dp->state_table.nstates; ++dst)
+    {
+        for (unsigned t = 0; t < trans_table_ntrans(&dp->trans_table, dst); ++t)
+        {
+            unsigned src = trans_table_source_state(&dp->trans_table, dst, t);
+            struct span span = state_table_span(&dp->state_table, src);
+            if (span.min == 0 && dst < src)
+            {
+                n++;
+                *state = dst;
+            }
+        }
+    }
+    return n;
+}
+
 enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
                     struct imm_prod *prod)
 {
     unsigned len = eseq_len(&task->eseq);
-    struct premise premise = {UNKNOWN_STATE, false, false, false, false};
+    printf("len: %u\n", len);
 
-    if (len >= 1 + IMM_STATE_MAX_SEQLEN)
+    struct imm_range safe_past = find_safe_past(len);
+    struct imm_range safe_future = find_safe_future(len);
+    struct imm_range very_safe = imm_range_intersect(safe_past, safe_future);
+
+    unsigned unsafe_state = 0;
+    unsigned num_unsafe_states = find_unsafe_states(dp, &unsafe_state);
+
+    if (num_unsafe_states > 1) return IMM_TOO_MANY_UNSAFE_STATES;
+
+    // imm_range_dump(safe_future, stdout);
+    // printf(" ");
+    // imm_range_dump(very_safe, stdout);
+    // printf(" ");
+    // imm_range_dump(safe_past, stdout);
+    // putchar('\n');
+
+    struct imm_range safe_future_only = {0};
+    struct imm_range tmp = {0};
+    imm_range_subtract(safe_future, very_safe, &safe_future_only, &tmp);
+    if (imm_range_empty(safe_future_only))
+        imm_range_swap(&safe_future_only, &tmp);
+    assert(imm_range_empty(tmp));
+
+    struct imm_range safe_past_only = {0};
+    imm_range_subtract(safe_past, very_safe, &tmp, &safe_past_only);
+    if (imm_range_empty(safe_past_only)) imm_range_swap(&safe_past_only, &tmp);
+    assert(imm_range_empty(tmp));
+
+    struct imm_range unsafe = {0};
+    if (imm_range_empty(very_safe))
+        imm_range_set(&unsafe, safe_future_only.b, safe_past_only.a);
+    else
+        imm_range_set(&unsafe, very_safe.b, very_safe.b);
+
+    imm_range_dump(safe_future_only, stdout);
+    printf(" ");
+    imm_range_dump(very_safe, stdout);
+    printf("/");
+    imm_range_dump(unsafe, stdout);
+    printf(" ");
+    imm_range_dump(safe_past_only, stdout);
+    putchar('\n');
+
+    assert(imm_range_empty(very_safe) || imm_range_empty(unsafe));
+
+#if 0
+    if (num_unsafe_states == 0)
+        printf("No unsafe state found.\n");
+    else
+        printf("Unsafe state found: %u\n", unsafe_state);
+#endif
+
+    assert(safe_future_only.a == 0);
+    if (imm_range_empty(unsafe))
     {
-        premise = (struct premise){UNKNOWN_STATE, true, false, false, false};
-        viterbi3(premise, dp, task, 0, 0, len);
-
-        premise = (struct premise){UNKNOWN_STATE, false, false, false, true};
-        viterbi3(premise, dp, task, 1, len - IMM_STATE_MAX_SEQLEN, len);
-
-        premise = (struct premise){UNKNOWN_STATE, false, false, false, false};
-        viterbi3(premise, dp, task, len - IMM_STATE_MAX_SEQLEN + 1, len, len);
+        assert(safe_future_only.b == very_safe.a);
+        assert(very_safe.b == safe_past_only.a);
     }
     else
     {
-        premise = (struct premise){UNKNOWN_STATE, true, false, false, false};
-        viterbi3(premise, dp, task, 0, 0, len);
-
-        premise = (struct premise){UNKNOWN_STATE, false, false, false, false};
-        viterbi3(premise, dp, task, 1, len, len);
+        assert(safe_future_only.b == unsafe.a);
+        assert(unsafe.b == safe_past_only.a);
     }
+    assert(safe_past_only.b == len + 1);
+
+#if 0
+    viterbi3(premise_init(false, false), dp, task, 0, len, len);
+
+#else
+    // viterbi4(premise_init(false, true), dp, task, safe_future_only.a,
+    //          safe_future_only.b, len);
+
+    viterbi_safe_future(dp, task, safe_future_only.a, safe_future_only.b, len);
+
+    if (imm_range_empty(unsafe))
+        viterbi_very_safe(dp, task, very_safe.a, very_safe.b, len);
+    else
+        viterbi4(dp, task, unsafe.a, unsafe.b, len);
+
+    // viterbi4(premise_init(true, false), dp, task, safe_past_only.a,
+    //          safe_past_only.b, len);
+
+    viterbi_safe_past(dp, task, safe_past_only.a, safe_past_only.b, len);
+#endif
+
+#if 0
+    viterbi3(premise_init(false, true), dp, task, safe_future_only.a,
+             safe_future_only.b, len);
+
+    if (imm_range_empty(unsafe))
+        viterbi3(premise_init(true, true), dp, task, very_safe.a, very_safe.b,
+                 len);
+    else
+        viterbi3(premise_init(false, false), dp, task, unsafe.a, unsafe.b, len);
+
+    viterbi3(premise_init(true, false), dp, task, safe_past_only.a,
+             safe_past_only.b, len);
+#endif
 
     unsigned state = 0;
     unsigned seqlen = 0;
@@ -122,15 +252,14 @@ void viterbi3(struct premise premise, struct imm_dp const *dp,
               struct imm_task *task, unsigned start_row, unsigned stop_row,
               unsigned seqlen)
 {
-    ASSUME(stop_row <= seqlen);
-    if (premise.first_row) ASSUME(start_row == 0 && stop_row == 0);
+    assume(stop_row <= seqlen);
 
     for (unsigned r = start_row; r <= stop_row; ++r)
     {
         for (unsigned i = 0; i < dp->state_table.nstates; ++i)
         {
             struct matrix const *matrix = &task->matrix;
-            struct trans_info fs = best_trans_score3(premise, dp, matrix, i, r);
+            struct trans_info fs = best_trans_score3(dp, matrix, i, r);
 
             // I believe this condition can be eliminated if we invalidate
             // the whole path before-hand.
@@ -148,17 +277,161 @@ void viterbi3(struct premise premise, struct imm_dp const *dp,
             }
 
             struct span span = state_table_span(&dp->state_table, i);
-            ASSUME(span.min <= span.max);
+            if (premise.safe_future) assume(seqlen < span.max + r);
             if (seqlen < span.min + r) continue;
             if (seqlen < span.max + r) span.max = seqlen - r;
 
-#if 0
-            if (r == 0 && dp->state_table.start.state == i)
-                fs.score = MAX(dp->state_table.start.lprob, fs.score);
-#endif
+            struct state_range range = state_range(i, span.min, span.max);
+            set_multi_score(&dp->emis, task, r, &range, fs.score);
+        }
+    }
+}
+
+void viterbi4(struct imm_dp const *dp, struct imm_task *task,
+              unsigned start_row, unsigned stop_row, unsigned seqlen)
+{
+    assume(stop_row <= seqlen);
+
+    for (unsigned r = start_row; r < stop_row; ++r)
+    {
+        for (unsigned i = 0; i < dp->state_table.nstates; ++i)
+        {
+            struct matrix const *matrix = &task->matrix;
+            struct trans_info fs = best_trans_score3(dp, matrix, i, r);
+
+            // I believe this condition can be eliminated if we invalidate
+            // the whole path before-hand.
+            if (fs.prev_state != IMM_STATE_NULL_IDX)
+            {
+                path_set_trans(&task->path, r, i, fs.trans);
+                path_set_seqlen(&task->path, r, i, fs.seqlen);
+                assert(path_trans(&task->path, r, i) == fs.trans);
+                assert(path_seqlen(&task->path, r, i) == fs.seqlen);
+            }
+            else
+            {
+                path_invalidate(&task->path, r, i);
+                assert(!path_valid(&task->path, r, i));
+            }
+
+            struct span span = state_table_span(&dp->state_table, i);
+            if (seqlen < span.min + r) continue;
+            if (seqlen < span.max + r) span.max = seqlen - r;
 
             struct state_range range = state_range(i, span.min, span.max);
-            set_multi_score(premise, &dp->emis, task, r, &range, fs.score);
+            set_multi_score(&dp->emis, task, r, &range, fs.score);
+        }
+    }
+}
+
+static void viterbi_safe_past(struct imm_dp const *dp, struct imm_task *task,
+                              unsigned start_row, unsigned stop_row,
+                              unsigned seqlen)
+{
+    assume(stop_row <= seqlen);
+
+    for (unsigned r = start_row; r < stop_row; ++r)
+    {
+        for (unsigned i = 0; i < dp->state_table.nstates; ++i)
+        {
+            struct matrix const *matrix = &task->matrix;
+            struct trans_info fs = best_trans_score_safe_past(dp, matrix, i, r);
+
+            // I believe this condition can be eliminated if we invalidate
+            // the whole path before-hand.
+            if (fs.prev_state != IMM_STATE_NULL_IDX)
+            {
+                path_set_trans(&task->path, r, i, fs.trans);
+                path_set_seqlen(&task->path, r, i, fs.seqlen);
+                assert(path_trans(&task->path, r, i) == fs.trans);
+                assert(path_seqlen(&task->path, r, i) == fs.seqlen);
+            }
+            else
+            {
+                path_invalidate(&task->path, r, i);
+                assert(!path_valid(&task->path, r, i));
+            }
+
+            struct span span = state_table_span(&dp->state_table, i);
+            if (seqlen < span.min + r) continue;
+            if (seqlen < span.max + r) span.max = seqlen - r;
+
+            struct state_range range = state_range(i, span.min, span.max);
+            set_multi_score(&dp->emis, task, r, &range, fs.score);
+        }
+    }
+}
+
+static void viterbi_safe_future(struct imm_dp const *dp, struct imm_task *task,
+                                unsigned start_row, unsigned stop_row,
+                                unsigned seqlen)
+{
+    assume(stop_row <= seqlen);
+
+    for (unsigned r = start_row; r < stop_row; ++r)
+    {
+        for (unsigned i = 0; i < dp->state_table.nstates; ++i)
+        {
+            struct matrix const *matrix = &task->matrix;
+            struct trans_info fs = best_trans_score3(dp, matrix, i, r);
+
+            // I believe this condition can be eliminated if we invalidate
+            // the whole path before-hand.
+            if (fs.prev_state != IMM_STATE_NULL_IDX)
+            {
+                path_set_trans(&task->path, r, i, fs.trans);
+                path_set_seqlen(&task->path, r, i, fs.seqlen);
+                assert(path_trans(&task->path, r, i) == fs.trans);
+                assert(path_seqlen(&task->path, r, i) == fs.seqlen);
+            }
+            else
+            {
+                path_invalidate(&task->path, r, i);
+                assert(!path_valid(&task->path, r, i));
+            }
+
+            struct span span = state_table_span(&dp->state_table, i);
+            assume(seqlen < span.max + r);
+
+            struct state_range range = state_range(i, span.min, span.max);
+            set_multi_score(&dp->emis, task, r, &range, fs.score);
+        }
+    }
+}
+
+static void viterbi_very_safe(struct imm_dp const *dp, struct imm_task *task,
+                              unsigned start_row, unsigned stop_row,
+                              unsigned seqlen)
+{
+    assume(stop_row <= seqlen);
+
+    for (unsigned r = start_row; r < stop_row; ++r)
+    {
+        for (unsigned i = 0; i < dp->state_table.nstates; ++i)
+        {
+            struct matrix const *matrix = &task->matrix;
+            struct trans_info fs = best_trans_score_safe_past(dp, matrix, i, r);
+
+            // I believe this condition can be eliminated if we invalidate
+            // the whole path before-hand.
+            if (fs.prev_state != IMM_STATE_NULL_IDX)
+            {
+                path_set_trans(&task->path, r, i, fs.trans);
+                path_set_seqlen(&task->path, r, i, fs.seqlen);
+                assert(path_trans(&task->path, r, i) == fs.trans);
+                assert(path_seqlen(&task->path, r, i) == fs.seqlen);
+            }
+            else
+            {
+                path_invalidate(&task->path, r, i);
+                assert(!path_valid(&task->path, r, i));
+            }
+
+            struct span span = state_table_span(&dp->state_table, i);
+            assume(seqlen < span.max + r);
+
+            struct state_range range = state_range(i, span.min, span.max);
+            set_multi_score(&dp->emis, task, r, &range, fs.score);
         }
     }
 }

@@ -124,10 +124,10 @@ imm_float imm_dp_trans_score(struct imm_dp const *dp, unsigned src,
     return IMM_LPROB_NAN;
 }
 
-void imm_dp_write_dot(struct imm_dp const *dp, FILE *restrict fd,
+void imm_dp_write_dot(struct imm_dp const *dp, FILE *restrict fp,
                       imm_state_name *name)
 {
-    fprintf(fd, "digraph hmm {\n");
+    fprintf(fp, "digraph hmm {\n");
     for (unsigned dst = 0; dst < dp->state_table.nstates; ++dst)
     {
         for (unsigned t = 0; t < trans_table_ntrans(&dp->trans_table, dst); ++t)
@@ -141,11 +141,44 @@ void imm_dp_write_dot(struct imm_dp const *dp, FILE *restrict fd,
 
             (*name)(state_table_id(&dp->state_table, src), src_name);
             (*name)(state_table_id(&dp->state_table, dst), dst_name);
-            fprintf(fd, "%s -> %s [label=%.4f];\n", src_name, dst_name,
+            fprintf(fp, "%s -> %s [label=%.4f];\n", src_name, dst_name,
                     trans_table_score(&dp->trans_table, dst, t));
         }
     }
-    fprintf(fd, "}\n");
+    fprintf(fp, "}\n");
+}
+
+IMM_API void imm_dp_dump_impl_details(struct imm_dp const *dp,
+                                      FILE *restrict fp, imm_state_name *callb)
+{
+    if (dp->state_table.nstates == 0) return;
+    printf("Symbology: \n");
+    printf("  ^ starting-state\n");
+    printf("  ~ mute-state with dst < src\n");
+    printf("\n");
+
+    char name[IMM_STATE_NAME_SIZE] = {0};
+
+    for (unsigned dst = 0; dst < dp->state_table.nstates; ++dst)
+    {
+        (*callb)(state_table_id(&dp->state_table, dst), name);
+        if (dp->state_table.start.state == dst)
+            fputc('^', fp);
+        else
+            fputc(' ', fp);
+
+        printf("%02u:%3s: ", dst, name);
+        for (unsigned t = 0; t < trans_table_ntrans(&dp->trans_table, dst); ++t)
+        {
+            if (t > 0) fputc(',', fp);
+            unsigned src = trans_table_source_state(&dp->trans_table, dst, t);
+            struct span span = state_table_span(&dp->state_table, src);
+            if (span.min == 0 && dst < src) fputc('~', fp);
+            (*callb)(state_table_id(&dp->state_table, src), name);
+            printf("%s", name);
+        }
+        fputc('\n', fp);
+    }
 }
 
 void imm_dp_dump_state_table(struct imm_dp const *dp)
@@ -154,21 +187,22 @@ void imm_dp_dump_state_table(struct imm_dp const *dp)
 }
 
 void imm_dp_dump_path(struct imm_dp const *dp, struct imm_task const *task,
-                      struct imm_prod const *prod)
+                      struct imm_prod const *prod, imm_state_name *callb)
 {
+    char name[IMM_STATE_NAME_SIZE] = {0};
     unsigned begin = 0;
-    for (unsigned i = 0; i < task->path.nstates; ++i)
+    for (unsigned i = 0; i < imm_path_nsteps(&prod->path); ++i)
     {
         struct imm_step const *step = imm_path_step(&prod->path, i);
-        unsigned state_idx =
-            imm_state_table_idx(&dp->state_table, step->state_id);
+        unsigned idx = imm_state_table_idx(&dp->state_table, step->state_id);
 
-        unsigned min = state_table_span(&dp->state_table, state_idx).min;
+        unsigned min = state_table_span(&dp->state_table, idx).min;
         unsigned seq_code = eseq_get(&task->eseq, begin, step->seqlen, min);
 
-        imm_float score = emis_score(&dp->emis, state_idx, seq_code);
+        imm_float score = emis_score(&dp->emis, idx, seq_code);
         struct imm_seq subseq = imm_subseq(task->seq, begin, step->seqlen);
-        printf("<%.*s,%.4f>\n", subseq.size, subseq.str, score);
+        (*callb)(step->state_id, name);
+        printf("<%s,%.*s,%.4f>\n", name, subseq.size, subseq.str, score);
         begin += step->seqlen;
     }
 }

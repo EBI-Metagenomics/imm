@@ -2,20 +2,23 @@
 #define RANGE_H
 
 #include <stdbool.h>
+#include <stdio.h>
 
 // [a, b)
-struct range
+struct imm_range
 {
     unsigned a;
     unsigned b;
 };
 
-struct range range_init(unsigned a, unsigned b);
-void range_set(struct range *x, unsigned a, unsigned b);
-unsigned range_size(struct range x);
-bool range_empty(struct range x);
-struct range range_intersect(struct range x, struct range y);
-void range_subtract(struct range x, struct range y, struct range *l,
-                    struct range *r);
+struct imm_range imm_range_init(unsigned a, unsigned b);
+void imm_range_set(struct imm_range *x, unsigned a, unsigned b);
+unsigned imm_range_size(struct imm_range x);
+bool imm_range_empty(struct imm_range x);
+void imm_range_swap(struct imm_range *, struct imm_range *);
+struct imm_range imm_range_intersect(struct imm_range x, struct imm_range y);
+void imm_range_subtract(struct imm_range x, struct imm_range y,
+                        struct imm_range *l, struct imm_range *r);
+void imm_range_dump(struct imm_range, FILE *restrict);
 
 #endif

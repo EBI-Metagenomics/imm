@@ -149,10 +149,42 @@ int main(void)
 
     imm_hmm_set_start(&hmm, imm_super(&S), imm_log(1.0));
 
-    FILE *fd = fopen(TMPDIR "/hmm.dot", "w");
-    notnull(fd);
-    imm_hmm_write_dot(&hmm, fd, state_name);
-    fclose(fd);
+    FILE *fp = fopen(TMPDIR "/hmm.dot", "w");
+    notnull(fp);
+    imm_hmm_write_dot(&hmm, fp, &state_name);
+    fclose(fp);
+
+    struct imm_dp dp = {0};
+    imm_hmm_init_dp(&hmm, imm_super(&T), &dp);
+    struct imm_task *task = imm_task_new(&dp);
+    struct imm_prod prod = imm_prod();
+
+    struct imm_seq seq = imm_seq(IMM_STR("C"), abc);
+    imm_task_setup(task, &seq);
+    eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
+    eq(imm_path_nsteps(&prod.path), 5);
+    close(imm_hmm_loglik(&hmm, &seq, &prod.path), -15.39749512835);
+    close(prod.loglik, -15.39749512835);
+    imm_dp_dump_path(&dp, task, &prod, &state_name);
+
+    seq = imm_seq(IMM_STR("CCCTTTGGG"), abc);
+    imm_task_setup(task, &seq);
+    eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
+    eq(imm_path_nsteps(&prod.path), 7);
+    close(imm_hmm_loglik(&hmm, &seq, &prod.path), -10.57676188818);
+    close(prod.loglik, -10.57676188818);
+    imm_dp_dump_path(&dp, task, &prod, &state_name);
+
+    fp = fopen(TMPDIR "/dp.dot", "w");
+    notnull(fp);
+    imm_dp_write_dot(&dp, fp, &state_name);
+    fclose(fp);
+
+    imm_dp_dump_impl_details(&dp, stdout, &state_name);
+
+    imm_del(&prod);
+    imm_del(&dp);
+    imm_del(task);
 
     return hope_status();
 }
