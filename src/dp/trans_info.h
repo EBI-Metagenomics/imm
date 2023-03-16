@@ -21,4 +21,18 @@ static inline struct trans_info trans_info(void)
                                IMM_STATE_NULL_SEQLEN, UINT16_MAX, UINT8_MAX};
 }
 
+static inline void update_trans_info(struct trans_info *x, imm_float score,
+                                     unsigned prev_state, unsigned prev_seqlen,
+                                     uint_fast16_t trans, uint_fast8_t seqlen)
+{
+    if (score > x->score)
+    {
+        x->score = score;
+        x->prev_state = prev_state;
+        x->prev_seqlen = prev_seqlen;
+        x->trans = trans;
+        x->seqlen = seqlen;
+    }
+}
+
 #endif

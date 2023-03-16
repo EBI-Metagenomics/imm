@@ -48,6 +48,10 @@ IMM_API enum imm_rc imm_dp_viterbi(struct imm_dp const *dp,
                                    struct imm_task *task,
                                    struct imm_prod *prod);
 
+IMM_API enum imm_rc imm_dp_viterbi_score(struct imm_dp const *dp,
+                                         struct imm_task *task,
+                                         struct imm_prod *prod);
+
 IMM_API enum imm_rc imm_dp_pack(struct imm_dp const *dp, struct lip_file *io);
 
 IMM_API enum imm_rc imm_dp_unpack(struct imm_dp *dp, struct lip_file *io);

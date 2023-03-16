@@ -11,12 +11,23 @@
 #include "imm/dp.h"
 #include "imm/dp/trans_table.h"
 
+static inline imm_float candidate_score(struct matrix const *matrix,
+                                        struct imm_dp_trans_table const *tt,
+                                        unsigned row, unsigned src,
+                                        unsigned dst, unsigned len,
+                                        unsigned tidx)
+{
+    unsigned r = row - len;
+    imm_float v0 = matrix_get_score(matrix, r, src, len);
+    imm_float v1 = trans_table_score(tt, dst, tidx);
+    return v0 + v1;
+}
+
 static struct trans_info best_trans_score_safe_past(struct imm_dp const *dp,
                                                     struct matrix const *matrix,
                                                     unsigned dst, unsigned row)
 {
     assume(row > 0);
-
     struct imm_dp_state_table const *st = &dp->state_table;
     struct imm_dp_trans_table const *tt = &dp->trans_table;
     struct trans_info score = trans_info();
@@ -34,33 +45,22 @@ static struct trans_info best_trans_score_safe_past(struct imm_dp const *dp,
         for (unsigned len = span.min; len <= span.max; ++len)
         {
             assert(row >= len);
-            unsigned r = row - len;
-            imm_float v0 = matrix_get_score(matrix, r, src, len);
-            imm_float v1 = trans_table_score(tt, dst, i);
-            imm_float v = v0 + v1;
-
-            if (v > score.score)
-            {
-                score.score = v;
-                score.prev_state = src;
-                score.prev_seqlen = len;
-                score.trans = (uint_fast16_t)i;
-                assert(len >= span.min);
-                score.seqlen = (uint_fast8_t)(len - span.min);
-            }
+            imm_float v = candidate_score(matrix, tt, row, src, dst, len, i);
+            update_trans_info(&score, v, src, len, i, len - span.min);
         }
     }
 
     return score;
 }
 
-static struct trans_info best_trans_score3(struct imm_dp const *dp,
-                                           struct matrix const *matrix,
-                                           unsigned dst, unsigned row)
+static struct trans_info best_trans_score(struct imm_dp const *dp,
+                                          struct matrix const *matrix,
+                                          unsigned dst, unsigned row)
 {
     struct imm_dp_state_table const *st = &dp->state_table;
     struct imm_dp_trans_table const *tt = &dp->trans_table;
     struct trans_info score = trans_info();
+
     if (row == 0 && st->start.state == dst)
     {
         score.score = st->start.lprob;
@@ -81,20 +81,8 @@ static struct trans_info best_trans_score3(struct imm_dp const *dp,
         for (unsigned len = span.min; len <= span.max; ++len)
         {
             assert(row >= len);
-            unsigned r = row - len;
-            imm_float v0 = matrix_get_score(matrix, r, src, len);
-            imm_float v1 = trans_table_score(tt, dst, i);
-            imm_float v = v0 + v1;
-
-            if (v > score.score)
-            {
-                score.score = v;
-                score.prev_state = src;
-                score.prev_seqlen = len;
-                score.trans = (uint_fast16_t)i;
-                assert(len >= span.min);
-                score.seqlen = (uint_fast8_t)(len - span.min);
-            }
+            imm_float v = candidate_score(matrix, tt, row, src, dst, len, i);
+            update_trans_info(&score, v, src, len, i, len - span.min);
         }
     }
 
