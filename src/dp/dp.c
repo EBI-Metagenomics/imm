@@ -23,6 +23,35 @@ struct final_score
     unsigned seq_len;
 };
 
+struct unsafe_pair
+{
+    unsigned src;
+    unsigned dst;
+    unsigned trans;
+};
+
+static unsigned find_unsafe_states(struct imm_dp const *dp,
+                                   struct unsafe_pair *x)
+{
+    unsigned n = 0;
+    for (unsigned dst = 0; dst < dp->state_table.nstates; ++dst)
+    {
+        for (unsigned t = 0; t < trans_table_ntrans(&dp->trans_table, dst); ++t)
+        {
+            unsigned src = trans_table_source_state(&dp->trans_table, dst, t);
+            struct span span = state_table_span(&dp->state_table, src);
+            if (span.min == 0 && dst < src)
+            {
+                n++;
+                x->src = src;
+                x->dst = dst;
+                x->trans = t;
+            }
+        }
+    }
+    return n;
+}
+
 static struct final_score best_trans_score(struct imm_dp const *dp,
                                            struct matrix const *matrix,
                                            unsigned tgt_state, unsigned row,
@@ -60,9 +89,11 @@ static enum imm_rc viterbi_path(struct imm_dp const *dp,
                                 struct imm_path *path, unsigned end_state,
                                 unsigned end_seq_len);
 static void _viterbi(struct imm_dp const *dp, struct imm_task *task,
-                     unsigned const start_row, unsigned const stop_row);
+                     unsigned const start_row, unsigned const stop_row,
+                     unsigned seqlen, struct unsafe_pair *upair);
 static void _viterbi_safe(struct imm_dp const *dp, struct imm_task *task,
-                          unsigned const start_row, unsigned const stop_row);
+                          unsigned const start_row, unsigned const stop_row,
+                          struct unsafe_pair *upair);
 
 void imm_dp_init(struct imm_dp *dp, struct imm_code const *code)
 {
@@ -209,12 +240,12 @@ static struct final_score best_trans_score(struct imm_dp const *dp,
 
     for (unsigned i = 0; i < trans_table_ntrans(&dp->trans_table, dst); ++i)
     {
-
         unsigned src = trans_table_source_state(&dp->trans_table, dst, i);
         unsigned min_seq = state_table_span(&dp->state_table, src).min;
 
-        if (imm_unlikely(row < min_seq) || (min_seq == 0 && src > dst))
-            continue;
+        if (imm_unlikely(row < min_seq)) continue;
+        // if (imm_unlikely(row < min_seq) || (min_seq == 0 && src > dst))
+        //     continue;
 
         unsigned max_seq = state_table_span(&dp->state_table, src).max;
         max_seq = (unsigned)MIN(max_seq, row);
@@ -313,17 +344,25 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
 {
     unsigned len = eseq_len(&task->eseq);
 
+    struct unsafe_pair unsafe_pair = {0};
+    unsigned num_unsafe_states = find_unsafe_states(dp, &unsafe_pair);
+    struct unsafe_pair *upair = num_unsafe_states > 0 ? &unsafe_pair : NULL;
+    assert(num_unsafe_states <= 1);
+
     if (len >= 1 + IMM_STATE_MAX_SEQLEN)
     {
         viterbi_first_row_safe(dp, task);
-        _viterbi_safe(dp, task, 1, len - IMM_STATE_MAX_SEQLEN);
-        _viterbi(dp, task, len - IMM_STATE_MAX_SEQLEN + 1, len);
+        _viterbi_safe(dp, task, 1, len - IMM_STATE_MAX_SEQLEN, upair);
+        _viterbi(dp, task, len - IMM_STATE_MAX_SEQLEN + 1, len, len, upair);
     }
     else
     {
         viterbi_first_row(dp, task, len);
-        _viterbi(dp, task, 1, len);
+        _viterbi(dp, task, 1, len, len, upair);
     }
+
+    // printf("B=0,X=1,E=0\n");
+    // imm_matrix_dump(&task->matrix, stdout);
 
     struct final_score const fscore = final_score(dp, task);
     prod->loglik = fscore.score;
@@ -428,71 +467,98 @@ static enum imm_rc viterbi_path(struct imm_dp const *dp,
     return IMM_OK;
 }
 
+static inline void _viti(struct imm_dp const *dp, struct imm_task *task,
+                         unsigned const r, unsigned i, unsigned remain)
+{
+    uint16_t trans = 0;
+    uint8_t len = 0;
+    struct final_score tscore =
+        best_trans_score(dp, &task->matrix, i, r, &trans, &len);
+    if (tscore.state != IMM_STATE_NULL_IDX)
+    {
+        path_set_trans(&task->path, r, i, trans);
+        path_set_seqlen(&task->path, r, i, len);
+        assert(path_trans(&task->path, r, i) == trans);
+        assert(path_seqlen(&task->path, r, i) == len);
+    }
+    else
+    {
+        path_invalidate(&task->path, r, i);
+        assert(!path_valid(&task->path, r, i));
+    }
+
+    unsigned min_len = state_table_span(&dp->state_table, i).min;
+    unsigned max_len =
+        (unsigned)MIN(state_table_span(&dp->state_table, i).max, remain);
+
+    set_score(dp, task, tscore.score, min_len, max_len, r, i);
+}
+
 static void _viterbi(struct imm_dp const *dp, struct imm_task *task,
-                     unsigned const start_row, unsigned const stop_row)
+                     unsigned const start_row, unsigned const stop_row,
+                     unsigned seqlen, struct unsafe_pair *upair)
 {
     for (unsigned r = start_row; r <= stop_row; ++r)
     {
-
+        if ((r > 0 && r < seqlen) && upair)
+        // if (r > 0 && upair)
+        {
+            // printf("-----\n");
+            // imm_matrix_dump(&task->matrix, stdout);
+            _viti(dp, task, r, upair->src, stop_row - r);
+            // printf("-----\n");
+            // imm_matrix_dump(&task->matrix, stdout);
+        }
         for (unsigned i = 0; i < dp->state_table.nstates; ++i)
         {
-
-            uint16_t trans = 0;
-            uint8_t len = 0;
-            struct final_score tscore =
-                best_trans_score(dp, &task->matrix, i, r, &trans, &len);
-            if (tscore.state != IMM_STATE_NULL_IDX)
-            {
-                path_set_trans(&task->path, r, i, trans);
-                path_set_seqlen(&task->path, r, i, len);
-                assert(path_trans(&task->path, r, i) == trans);
-                assert(path_seqlen(&task->path, r, i) == len);
-            }
-            else
-            {
-                path_invalidate(&task->path, r, i);
-                assert(!path_valid(&task->path, r, i));
-            }
-
-            unsigned min_len = state_table_span(&dp->state_table, i).min;
-            unsigned max_len = (unsigned)MIN(
-                state_table_span(&dp->state_table, i).max, stop_row - r);
-
-            set_score(dp, task, tscore.score, min_len, max_len, r, i);
+            _viti(dp, task, r, i, stop_row - r);
         }
     }
 }
 
+static inline void _viti_safe(struct imm_dp const *dp, struct imm_task *task,
+                              unsigned const r, unsigned i)
+{
+    uint16_t trans = 0;
+    uint8_t len = 0;
+    struct final_score tscore =
+        best_trans_score(dp, &task->matrix, i, r, &trans, &len);
+    if (tscore.state != IMM_STATE_NULL_IDX)
+    {
+        path_set_trans(&task->path, r, i, trans);
+        path_set_seqlen(&task->path, r, i, len);
+        assert(path_trans(&task->path, r, i) == trans);
+        assert(path_seqlen(&task->path, r, i) == len);
+    }
+    else
+    {
+        path_invalidate(&task->path, r, i);
+        assert(!path_valid(&task->path, r, i));
+    }
+
+    unsigned min_len = state_table_span(&dp->state_table, i).min;
+    unsigned max_len = state_table_span(&dp->state_table, i).max;
+
+    set_score(dp, task, tscore.score, min_len, max_len, r, i);
+}
+
 static void _viterbi_safe(struct imm_dp const *dp, struct imm_task *task,
-                          unsigned const start_row, unsigned const stop_row)
+                          unsigned const start_row, unsigned const stop_row,
+                          struct unsafe_pair *upair)
 {
     for (unsigned r = start_row; r <= stop_row; ++r)
     {
-
+        if (r > 0 && upair)
+        {
+            // printf("-----\n");
+            // imm_matrix_dump(&task->matrix, stdout);
+            _viti_safe(dp, task, r, upair->src);
+            // printf("-----\n");
+            // imm_matrix_dump(&task->matrix, stdout);
+        }
         for (unsigned i = 0; i < dp->state_table.nstates; ++i)
         {
-
-            uint16_t trans = 0;
-            uint8_t len = 0;
-            struct final_score tscore =
-                best_trans_score(dp, &task->matrix, i, r, &trans, &len);
-            if (tscore.state != IMM_STATE_NULL_IDX)
-            {
-                path_set_trans(&task->path, r, i, trans);
-                path_set_seqlen(&task->path, r, i, len);
-                assert(path_trans(&task->path, r, i) == trans);
-                assert(path_seqlen(&task->path, r, i) == len);
-            }
-            else
-            {
-                path_invalidate(&task->path, r, i);
-                assert(!path_valid(&task->path, r, i));
-            }
-
-            unsigned min_len = state_table_span(&dp->state_table, i).min;
-            unsigned max_len = state_table_span(&dp->state_table, i).max;
-
-            set_score(dp, task, tscore.score, min_len, max_len, r, i);
+            _viti_safe(dp, task, r, i);
         }
     }
 }
@@ -503,21 +569,22 @@ void imm_dp_dump_state_table(struct imm_dp const *dp)
 }
 
 void imm_dp_dump_path(struct imm_dp const *dp, struct imm_task const *task,
-                      struct imm_prod const *prod)
+                      struct imm_prod const *prod, imm_state_name *callb)
 {
+    char name[IMM_STATE_NAME_SIZE] = {0};
     unsigned begin = 0;
-    for (unsigned i = 0; i < task->path.nstates; ++i)
+    for (unsigned i = 0; i < imm_path_nsteps(&prod->path); ++i)
     {
         struct imm_step const *step = imm_path_step(&prod->path, i);
-        unsigned state_idx =
-            imm_state_table_idx(&dp->state_table, step->state_id);
+        unsigned idx = imm_state_table_idx(&dp->state_table, step->state_id);
 
-        unsigned min = state_table_span(&dp->state_table, state_idx).min;
+        unsigned min = state_table_span(&dp->state_table, idx).min;
         unsigned seq_code = eseq_get(&task->eseq, begin, step->seqlen, min);
 
-        imm_float score = emis_score(&dp->emis, state_idx, seq_code);
+        imm_float score = emis_score(&dp->emis, idx, seq_code);
         struct imm_seq subseq = imm_subseq(task->seq, begin, step->seqlen);
-        printf("<%.*s,%.4f>\n", subseq.size, subseq.str, score);
+        (*callb)(step->state_id, name);
+        printf("<%s,%.*s,%.4f>\n", name, subseq.size, subseq.str, score);
         begin += step->seqlen;
     }
 }

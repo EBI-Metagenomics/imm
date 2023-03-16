@@ -3,6 +3,7 @@
 
 #include "imm/float.h"
 #include "matrix/matrix.h"
+#include <stdio.h>
 
 struct imm_dp_state_table;
 
@@ -39,5 +40,7 @@ static inline void matrix_set_score(struct matrix *matrix, unsigned row,
     int col = matrix->state_col[state] + (int)seqlen;
     matrixf_set(&matrix->score, row, (unsigned)col, score);
 }
+
+void imm_matrix_dump(struct matrix *matrix, FILE *restrict);
 
 #endif

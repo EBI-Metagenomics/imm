@@ -29,6 +29,7 @@ void test_large_normal(void)
     eq(imm_task_setup(task, &seq), IMM_OK);
     eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
     close(prod.loglik, -194581.04361377980);
+    printf("Normal msecs: %llu\n", prod.mseconds);
 
     imm_del(task);
     imm_del(&prod);
@@ -76,6 +77,7 @@ void test_large_frame(struct imm_span span, imm_float loglik)
 
     eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
     close(prod.loglik, loglik);
+    printf("Frame msecs: %llu\n", prod.mseconds);
 
     imm_del(&prod);
     imm_del(task);

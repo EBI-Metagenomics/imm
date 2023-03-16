@@ -40,3 +40,16 @@ void imm_matrix_del(struct matrix const *matrix)
     matrixf_deinit(&matrix->score);
     free((void *)matrix->state_col);
 }
+
+void imm_matrix_dump(struct matrix *matrix, FILE *restrict fp)
+{
+    for (unsigned r = 0; r < matrixf_nrows(&matrix->score); ++r)
+    {
+        for (unsigned c = 0; c < matrixf_ncols(&matrix->score); ++c)
+        {
+            if (c > 0) fputc(',', fp);
+            fprintf(fp, "%f", matrixf_get(&matrix->score, r, c));
+        }
+        fputc('\n', fp);
+    }
+}
