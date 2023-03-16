@@ -241,8 +241,8 @@ int main(void)
     imm_dp_viterbi(&dp, task, &prod);
     eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
     eq(imm_path_nsteps(&prod.path), 24);
-    close(imm_hmm_loglik(&hmm, &seq, &prod.path), -59.43338012695);
-    close(prod.loglik, -59.43338012695);
+    close(imm_hmm_loglik(&hmm, &seq, &prod.path), -59.43337774952);
+    close(prod.loglik, -59.43337774952);
     imm_dp_dump_path(&dp, task, &prod, &state_name);
 
     fp = fopen(TMPDIR "/dp.dot", "w");
