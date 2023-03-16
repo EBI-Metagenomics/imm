@@ -9,11 +9,10 @@
 #include "imm/dp.h"
 #include "task.h"
 
-static struct final_score best_trans_score(struct imm_dp const *dp,
-                                           struct matrix const *matrix,
-                                           unsigned dst, unsigned row,
-                                           uint16_t *best_trans,
-                                           uint8_t *best_len)
+static struct final_score best_trans(struct imm_dp const *dp,
+                                     struct matrix const *matrix, unsigned dst,
+                                     unsigned row, uint16_t *best_trans,
+                                     uint8_t *best_len)
 {
     imm_float score = imm_lprob_zero();
     unsigned prev_state = IMM_STATE_NULL_IDX;
@@ -24,17 +23,13 @@ static struct final_score best_trans_score(struct imm_dp const *dp,
     for (unsigned i = 0; i < trans_table_ntrans(&dp->trans_table, dst); ++i)
     {
         unsigned src = trans_table_source_state(&dp->trans_table, dst, i);
-        unsigned min_seq = state_table_span(&dp->state_table, src).min;
+        struct span span = state_table_span(&dp->state_table, src);
 
-        if (imm_unlikely(row < min_seq)) continue;
-        // if (imm_unlikely(row < min_seq) || (min_seq == 0 && src > dst))
-        //     continue;
+        if (imm_unlikely(row < span.min)) continue;
 
-        unsigned max_seq = state_table_span(&dp->state_table, src).max;
-        max_seq = (unsigned)MIN(max_seq, row);
-        for (unsigned len = min_seq; len <= max_seq; ++len)
+        span.max = (unsigned)MIN(span.max, row);
+        for (unsigned len = span.min; len <= span.max; ++len)
         {
-
             imm_float v0 = matrix_get_score(matrix, row - len, src, len);
             imm_float v1 = trans_table_score(&dp->trans_table, dst, i);
             imm_float v = v0 + v1;
@@ -45,7 +40,7 @@ static struct final_score best_trans_score(struct imm_dp const *dp,
                 prev_state = src;
                 prev_seqlen = len;
                 *best_trans = (uint16_t)i;
-                *best_len = (uint8_t)(len - min_seq);
+                *best_len = (uint8_t)(len - span.min);
             }
         }
     }
@@ -53,10 +48,10 @@ static struct final_score best_trans_score(struct imm_dp const *dp,
     return (struct final_score){score, prev_state, prev_seqlen};
 }
 
-static struct final_score
-best_trans_score_first_row(struct imm_dp const *dp, struct matrix const *matrix,
-                           unsigned dst, uint16_t *best_trans,
-                           uint8_t *best_len)
+static struct final_score best_trans_row0(struct imm_dp const *dp,
+                                          struct matrix const *matrix,
+                                          unsigned dst, uint16_t *best_trans,
+                                          uint8_t *best_len)
 {
     imm_float score = imm_lprob_zero();
     unsigned prev_state = IMM_STATE_NULL_IDX;
@@ -66,7 +61,6 @@ best_trans_score_first_row(struct imm_dp const *dp, struct matrix const *matrix,
 
     for (unsigned i = 0; i < trans_table_ntrans(&dp->trans_table, dst); ++i)
     {
-
         unsigned src = trans_table_source_state(&dp->trans_table, dst, i);
         unsigned min_seq = state_table_span(&dp->state_table, src).min;
 

@@ -243,7 +243,7 @@ static void viterbi_first_row(struct imm_dp const *dp, struct imm_task *task,
         uint16_t trans = 0;
         uint8_t len = 0;
         struct final_score tscore =
-            best_trans_score_first_row(dp, &task->matrix, i, &trans, &len);
+            best_trans_row0(dp, &task->matrix, i, &trans, &len);
         if (tscore.state != IMM_STATE_NULL_IDX)
         {
             path_set_trans(&task->path, 0, i, trans);
@@ -277,7 +277,7 @@ static void viterbi_first_row_safe(struct imm_dp const *dp,
         uint16_t trans = 0;
         uint8_t len = 0;
         struct final_score tscore =
-            best_trans_score_first_row(dp, &task->matrix, i, &trans, &len);
+            best_trans_row0(dp, &task->matrix, i, &trans, &len);
         if (tscore.state != IMM_STATE_NULL_IDX)
         {
             path_set_trans(&task->path, 0, i, trans);
@@ -338,7 +338,7 @@ static inline void _viti(struct imm_dp const *dp, struct imm_task *task,
     uint16_t trans = 0;
     uint8_t len = 0;
     struct final_score tscore =
-        best_trans_score(dp, &task->matrix, i, r, &trans, &len);
+        best_trans(dp, &task->matrix, i, r, &trans, &len);
     if (tscore.state != IMM_STATE_NULL_IDX)
     {
         path_set_trans(&task->path, r, i, trans);
@@ -386,9 +386,8 @@ static inline void _viti_safe(struct imm_dp const *dp, struct imm_task *task,
 {
     uint16_t trans = 0;
     uint8_t len = 0;
-    struct final_score tscore =
-        best_trans_score(dp, &task->matrix, i, r, &trans, &len);
-    if (tscore.state != IMM_STATE_NULL_IDX)
+    struct final_score fs = best_trans(dp, &task->matrix, i, r, &trans, &len);
+    if (fs.state != IMM_STATE_NULL_IDX)
     {
         path_set_trans(&task->path, r, i, trans);
         path_set_seqlen(&task->path, r, i, len);
@@ -404,7 +403,7 @@ static inline void _viti_safe(struct imm_dp const *dp, struct imm_task *task,
     unsigned min_len = state_table_span(&dp->state_table, i).min;
     unsigned max_len = state_table_span(&dp->state_table, i).max;
 
-    set_score(dp, task, tscore.score, min_len, max_len, r, i);
+    set_score(dp, task, fs.score, min_len, max_len, r, i);
 }
 
 static void _viterbi_safe(struct imm_dp const *dp, struct imm_task *task,
