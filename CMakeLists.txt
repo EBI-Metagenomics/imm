@@ -31,12 +31,14 @@ add_library(
   src/dp/best_trans.c
   src/dp/dp.c
   src/dp/emis.c
+  src/dp/final_score.c
   src/dp/io.c
   src/dp/matrix.c
   src/dp/path.c
   src/dp/state_table.c
   src/dp/trans_table.c
-  src/range.c
+  src/dp/unsafe_pair.c
+  src/dp/viterbi.c
   src/error.c
   src/eseq.c
   src/example1.c
@@ -52,6 +54,7 @@ add_library(
   src/hmm.c
   src/lprob.c
   src/mute_state.c
+  src/range.c
   src/normal_state.c
   src/nuclt.c
   src/nuclt_code.c
