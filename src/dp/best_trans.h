@@ -9,20 +9,52 @@
 #include "imm/dp.h"
 #include "task.h"
 
-static struct final_score best_trans(struct imm_dp const *dp,
-                                     struct matrix const *matrix, unsigned dst,
-                                     unsigned row, uint16_t *best_trans,
-                                     uint8_t *best_len)
+struct best_trans
 {
-    imm_float score = imm_lprob_zero();
-    unsigned prev_state = IMM_STATE_NULL_IDX;
-    unsigned prev_seqlen = IMM_STATE_NULL_SEQLEN;
-    *best_trans = UINT16_MAX;
-    *best_len = UINT8_MAX;
+    imm_float score;
+    unsigned prev_state;
+    unsigned prev_len;
+    unsigned trans;
+    unsigned len;
+};
 
-    for (unsigned i = 0; i < trans_table_ntrans(&dp->trans_table, dst); ++i)
+static inline struct best_trans best_trans_init(void)
+{
+    return (struct best_trans){imm_lprob_zero(), IMM_STATE_NULL_IDX,
+                               IMM_STATE_NULL_SEQLEN, UINT16_MAX, UINT8_MAX};
+}
+
+static inline void best_trans_set(struct best_trans *x, imm_float score,
+                                  unsigned prev_state, unsigned prev_len,
+                                  unsigned trans, unsigned len)
+{
+    x->score = score;
+    x->prev_state = prev_state;
+    x->prev_len = prev_len;
+    x->trans = trans;
+    x->len = len;
+}
+
+static inline imm_float bt_calc_score(struct matrix const *mt,
+                                      struct imm_dp_trans_table const *tt,
+                                      unsigned row, unsigned src, unsigned dst,
+                                      unsigned len, unsigned trans)
+{
+    imm_float v0 = matrix_get_score(mt, row, src, len);
+    imm_float v1 = trans_table_score(tt, dst, trans);
+    return v0 + v1;
+}
+
+static struct best_trans best_trans_find(struct imm_dp const *dp,
+                                         struct matrix const *mt, unsigned dst,
+                                         unsigned row)
+{
+    struct best_trans x = best_trans_init();
+    struct imm_dp_trans_table const *tt = &dp->trans_table;
+
+    for (unsigned i = 0; i < trans_table_ntrans(tt, dst); ++i)
     {
-        unsigned src = trans_table_source_state(&dp->trans_table, dst, i);
+        unsigned src = trans_table_source_state(tt, dst, i);
         struct span span = state_table_span(&dp->state_table, src);
 
         if (imm_unlikely(row < span.min)) continue;
@@ -30,57 +62,63 @@ static struct final_score best_trans(struct imm_dp const *dp,
         span.max = (unsigned)MIN(span.max, row);
         for (unsigned len = span.min; len <= span.max; ++len)
         {
-            imm_float v0 = matrix_get_score(matrix, row - len, src, len);
-            imm_float v1 = trans_table_score(&dp->trans_table, dst, i);
-            imm_float v = v0 + v1;
-
-            if (v > score)
-            {
-                score = v;
-                prev_state = src;
-                prev_seqlen = len;
-                *best_trans = (uint16_t)i;
-                *best_len = (uint8_t)(len - span.min);
-            }
+            assume(row >= len);
+            assume(len >= span.min);
+            imm_float v = bt_calc_score(mt, tt, row - len, src, dst, len, i);
+            if (v > x.score) best_trans_set(&x, v, src, len, i, len - span.min);
         }
     }
 
-    return (struct final_score){score, prev_state, prev_seqlen};
+    return x;
 }
 
-static struct final_score best_trans_row0(struct imm_dp const *dp,
-                                          struct matrix const *matrix,
-                                          unsigned dst, uint16_t *best_trans,
-                                          uint8_t *best_len)
+static struct best_trans best_trans_find_safe(struct imm_dp const *dp,
+                                              struct matrix const *mt,
+                                              unsigned dst, unsigned row)
 {
-    imm_float score = imm_lprob_zero();
-    unsigned prev_state = IMM_STATE_NULL_IDX;
-    unsigned prev_seq_len = IMM_STATE_NULL_SEQLEN;
-    *best_trans = UINT16_MAX;
-    *best_len = UINT8_MAX;
+    struct best_trans x = best_trans_init();
+    struct imm_dp_trans_table const *tt = &dp->trans_table;
 
-    for (unsigned i = 0; i < trans_table_ntrans(&dp->trans_table, dst); ++i)
+    for (unsigned i = 0; i < trans_table_ntrans(tt, dst); ++i)
     {
-        unsigned src = trans_table_source_state(&dp->trans_table, dst, i);
-        unsigned min_seq = state_table_span(&dp->state_table, src).min;
+        unsigned src = trans_table_source_state(tt, dst, i);
+        struct span span = state_table_span(&dp->state_table, src);
 
-        if (min_seq > 0 || src > dst) continue;
+        assume(span.min >= 0);
+        assume(row >= span.min);
+        assume(row >= span.max);
 
-        imm_float v0 = matrix_get_score(matrix, 0, src, 0);
-        imm_float v1 = trans_table_score(&dp->trans_table, dst, i);
-        imm_float v = v0 + v1;
-
-        if (v > score)
+        for (unsigned len = span.min; len <= span.max; ++len)
         {
-            score = v;
-            prev_state = src;
-            prev_seq_len = 0;
-            *best_trans = (uint16_t)i;
-            *best_len = 0;
+            assume(row >= len);
+            assume(len >= span.min);
+            imm_float v = bt_calc_score(mt, tt, row - len, src, dst, len, i);
+            if (v > x.score) best_trans_set(&x, v, src, len, i, len - span.min);
         }
     }
 
-    return (struct final_score){score, prev_state, prev_seq_len};
+    return x;
+}
+
+static struct best_trans best_trans_find_row0(struct imm_dp const *dp,
+                                              struct matrix const *mt,
+                                              unsigned dst)
+{
+    struct best_trans x = best_trans_init();
+    struct imm_dp_trans_table const *tt = &dp->trans_table;
+
+    for (unsigned i = 0; i < trans_table_ntrans(tt, dst); ++i)
+    {
+        unsigned src = trans_table_source_state(tt, dst, i);
+        struct span span = state_table_span(&dp->state_table, src);
+
+        if (span.min > 0 || imm_unlikely(src > dst)) continue;
+
+        imm_float v = bt_calc_score(mt, tt, 0, src, dst, 0, i);
+        if (v > x.score) best_trans_set(&x, v, src, 0, i, 0);
+    }
+
+    return x;
 }
 
 #endif
