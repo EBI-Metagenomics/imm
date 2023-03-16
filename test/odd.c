@@ -9,7 +9,6 @@ static void test_need_odd_check(void);
 int main(void)
 {
     test_no_odd_check();
-    printf("--------------\n");
     test_need_odd_check();
     return hope_status();
 }
@@ -50,7 +49,6 @@ static void test_no_odd_check(void)
     struct imm_seq seq = imm_seq(IMM_STR("XX"), &abc);
     eq(imm_task_setup(task, &seq), IMM_OK);
     eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
-    printf("NSTEPS: %u\n", imm_path_nsteps(&prod.path));
     eq(imm_path_nsteps(&prod.path), 6);
     close(imm_hmm_loglik(&hmm, &seq, &prod.path), 12212.);
     close(prod.loglik, 12212.);
@@ -106,14 +104,12 @@ static void test_need_odd_check(void)
     struct imm_seq seq = imm_seq(IMM_STR("XJX"), &abc);
     eq(imm_task_setup(task, &seq), IMM_OK);
     eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
-    printf("NSTEPS: %u\n", imm_path_nsteps(&prod.path));
-    // eq(imm_path_nsteps(&prod.path), 6);
+    eq(imm_path_nsteps(&prod.path), 7);
     close(imm_hmm_loglik(&hmm, &seq, &prod.path), 0);
     close(prod.loglik, 0);
     imm_dp_dump_path(&dp, task, &prod, &state_name);
     imm_hmm_write_dot(&hmm, stdout, &state_name);
     imm_dp_write_dot(&dp, stdout, &state_name);
-    // imm_dp_dump_impl_details(&dp, stdout, &state_name);
 
     imm_del(&prod);
     imm_del(&dp);

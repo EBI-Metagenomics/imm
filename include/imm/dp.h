@@ -58,7 +58,7 @@ IMM_API imm_float imm_dp_emis_score(struct imm_dp const *dp, unsigned state_id,
 IMM_API imm_float imm_dp_trans_score(struct imm_dp const *dp, unsigned src,
                                      unsigned dst);
 
-IMM_API void imm_dp_write_dot(struct imm_dp const *dp, FILE *restrict fd,
-                              imm_state_name *name);
+IMM_API void imm_dp_write_dot(struct imm_dp const *dp, FILE *restrict,
+                              imm_state_name *);
 
 #endif
