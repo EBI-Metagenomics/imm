@@ -26,9 +26,9 @@ add_library(
   src/cartes.c
   src/code.c
   src/codon_marg.c
-  src/range.c
   src/codon_state.c
   src/dna.c
+  src/dp/best_trans.c
   src/dp/dp.c
   src/dp/emis.c
   src/dp/io.c
@@ -36,6 +36,7 @@ add_library(
   src/dp/path.c
   src/dp/state_table.c
   src/dp/trans_table.c
+  src/range.c
   src/error.c
   src/eseq.c
   src/example1.c
