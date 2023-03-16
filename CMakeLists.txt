@@ -14,7 +14,7 @@ cpmaddpackage("gh:horta/logaddexp@2.1.14")
 cpmaddpackage("gh:EBI-Metagenomics/lip@0.5.0")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_EXTENSIONS OFF)
 
 add_library(
@@ -26,6 +26,7 @@ add_library(
   src/cartes.c
   src/code.c
   src/codon_marg.c
+  src/range.c
   src/codon_state.c
   src/dna.c
   src/dp/dp.c
