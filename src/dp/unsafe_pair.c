@@ -3,7 +3,7 @@
 #include "dp/trans_table.h"
 #include "imm/dp.h"
 
-unsigned find_unsafe_states(struct imm_dp const *dp, struct unsafe_pair *x)
+unsigned find_unsafe_states(struct imm_dp const *dp, unsigned *state)
 {
     unsigned n = 0;
     for (unsigned dst = 0; dst < dp->state_table.nstates; ++dst)
@@ -15,9 +15,7 @@ unsigned find_unsafe_states(struct imm_dp const *dp, struct unsafe_pair *x)
             if (span.min == 0 && dst < src)
             {
                 n++;
-                x->src = src;
-                x->dst = dst;
-                x->trans = t;
+                *state = src;
             }
         }
     }

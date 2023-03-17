@@ -164,9 +164,8 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
 {
     unsigned len = eseq_len(&task->eseq);
 
-    struct unsafe_pair unsafe_pair = {0};
-    unsigned num_unsafe_states = find_unsafe_states(dp, &unsafe_pair);
-    struct unsafe_pair *upair = num_unsafe_states > 0 ? &unsafe_pair : NULL;
+    unsigned unsafe_state = {0};
+    unsigned num_unsafe_states = find_unsafe_states(dp, &unsafe_state);
     assert(num_unsafe_states <= 1);
 
     struct ranges rg = {0};
@@ -195,22 +194,23 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
 
         viterbi_row0_safe(dp, task);
         viterbi_safe_future(dp, task, rg.safe_future.a + 1,
-                            rg.safe_future.b - 1, upair);
-        viterbi_safe(dp, task, rg.safe.a, rg.safe.b - 1, upair);
+                            rg.safe_future.b - 1, unsafe_state);
+        viterbi_safe(dp, task, rg.safe.a, rg.safe.b - 1, unsafe_state);
         viterbi_unsafe(dp, task, rg.safe_past.a, rg.safe_past.b - 1, len,
-                       upair);
+                       unsafe_state);
     }
     else if (len >= 1 + IMM_STATE_MAX_SEQLEN)
     {
         viterbi_row0_safe(dp, task);
-        viterbi_safe_future(dp, task, 1, len - IMM_STATE_MAX_SEQLEN, upair);
+        viterbi_safe_future(dp, task, 1, len - IMM_STATE_MAX_SEQLEN,
+                            unsafe_state);
         viterbi_unsafe(dp, task, len - IMM_STATE_MAX_SEQLEN + 1, len, len,
-                       upair);
+                       unsafe_state);
     }
     else
     {
         viterbi_row0(dp, task, len);
-        viterbi_unsafe(dp, task, 1, len, len, upair);
+        viterbi_unsafe(dp, task, 1, len, len, unsafe_state);
     }
 
     struct final_score const fscore = final_score(dp, task);
