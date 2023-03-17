@@ -113,16 +113,14 @@ static inline void path_set_seqlen(struct path *path, unsigned pos,
                                    unsigned state, unsigned len)
 {
     uint64_t start = start_bit(path, pos, state) + path->trans_bits[state];
-    imm_bitmap_set(path->bit, (unsigned long)len, start,
-                   __path_seqlen_bits(path, pos, state));
+    imm_bitmap_set(path->bit, len, start, __path_seqlen_bits(path, pos, state));
 }
 
 static inline void path_set_trans(struct path *path, unsigned pos,
                                   unsigned state, unsigned trans)
 {
     uint64_t start = start_bit(path, pos, state);
-    imm_bitmap_set(path->bit, (unsigned long)trans, start,
-                   path->trans_bits[state]);
+    imm_bitmap_set(path->bit, trans, start, path->trans_bits[state]);
 }
 
 static inline void path_invalidate(struct path *path, unsigned pos,
