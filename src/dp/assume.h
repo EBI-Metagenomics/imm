@@ -1,6 +1,8 @@
 #ifndef DP_ASSUME_H
 #define DP_ASSUME_H
 
+#include "compiler.h"
+
 #if __has_builtin(__builtin_assume)
 #define assume(x) __builtin_assume(x)
 #else
