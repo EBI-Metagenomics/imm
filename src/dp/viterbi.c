@@ -46,6 +46,51 @@ static inline void _viti_safe_future(struct imm_dp const *dp,
     set_score(dp, task, bt.score, span.min, span.max, r, i);
 }
 
+static inline void _viti_safe_future_ge1(struct imm_dp const *dp,
+                                         struct imm_task *task,
+                                         unsigned const r, unsigned i)
+{
+    struct best_trans bt = best_trans_find_ge1(dp, &task->matrix, i, r);
+    if (bt.prev_state != IMM_STATE_NULL_IDX)
+    {
+        path_set_trans(&task->path, r, i, bt.trans);
+        path_set_seqlen(&task->path, r, i, bt.len);
+        assert(path_trans(&task->path, r, i) == bt.trans);
+        assert(path_seqlen(&task->path, r, i) == bt.len);
+    }
+    else
+    {
+        path_invalidate(&task->path, r, i);
+        assert(!path_valid(&task->path, r, i));
+    }
+
+    struct span span = state_table_span(&dp->state_table, i);
+
+    set_score(dp, task, bt.score, span.min, span.max, r, i);
+}
+
+static inline void _viti_safe_ge1(struct imm_dp const *dp,
+                                  struct imm_task *task, unsigned const r,
+                                  unsigned i)
+{
+    struct best_trans bt = best_trans_find_safe_ge1(dp, &task->matrix, i, r);
+    if (bt.prev_state != IMM_STATE_NULL_IDX)
+    {
+        path_set_trans(&task->path, r, i, bt.trans);
+        path_set_seqlen(&task->path, r, i, bt.len);
+        assert(path_trans(&task->path, r, i) == bt.trans);
+        assert(path_seqlen(&task->path, r, i) == bt.len);
+    }
+    else
+    {
+        path_invalidate(&task->path, r, i);
+        assert(!path_valid(&task->path, r, i));
+    }
+
+    struct span span = state_table_span(&dp->state_table, i);
+    set_score(dp, task, bt.score, span.min, span.max, r, i);
+}
+
 static inline void _viti_safe(struct imm_dp const *dp, struct imm_task *task,
                               unsigned const r, unsigned i)
 {
@@ -90,6 +135,29 @@ static inline void _viti(struct imm_dp const *dp, struct imm_task *task,
     set_score(dp, task, bt.score, span.min, span.max, r, i);
 }
 
+static inline void _viti_ge1(struct imm_dp const *dp, struct imm_task *task,
+                             unsigned const r, unsigned i, unsigned remain)
+{
+    struct best_trans bt = best_trans_find_ge1(dp, &task->matrix, i, r);
+    if (bt.prev_state != IMM_STATE_NULL_IDX)
+    {
+        path_set_trans(&task->path, r, i, bt.trans);
+        path_set_seqlen(&task->path, r, i, bt.len);
+        assert(path_trans(&task->path, r, i) == bt.trans);
+        assert(path_seqlen(&task->path, r, i) == bt.len);
+    }
+    else
+    {
+        path_invalidate(&task->path, r, i);
+        assert(!path_valid(&task->path, r, i));
+    }
+
+    struct span span = state_table_span(&dp->state_table, i);
+    span.max = MIN(span.max, remain);
+
+    set_score(dp, task, bt.score, span.min, span.max, r, i);
+}
+
 void viterbi_unsafe(struct imm_dp const *dp, struct imm_task *task,
                     unsigned const start_row, unsigned const stop_row,
                     unsigned seqlen, unsigned unsafe_state)
@@ -101,7 +169,7 @@ void viterbi_unsafe(struct imm_dp const *dp, struct imm_task *task,
         {
             // printf("-----\n");
             // imm_matrix_dump(&task->matrix, stdout);
-            _viti(dp, task, r, unsafe_state, stop_row - r);
+            _viti_ge1(dp, task, r, unsafe_state, stop_row - r);
             // printf("-----\n");
             // imm_matrix_dump(&task->matrix, stdout);
         }
@@ -121,7 +189,7 @@ void viterbi_safe_future(struct imm_dp const *dp, struct imm_task *task,
     {
         // printf("-----\n");
         // imm_matrix_dump(&task->matrix, stdout);
-        _viti_safe_future(dp, task, r, unsafe_state);
+        _viti_safe_future_ge1(dp, task, r, unsafe_state);
         // printf("-----\n");
         // imm_matrix_dump(&task->matrix, stdout);
         for (unsigned i = 0; i < dp->state_table.nstates; ++i)
@@ -140,7 +208,7 @@ void viterbi_safe(struct imm_dp const *dp, struct imm_task *task,
     {
         // printf("-----\n");
         // imm_matrix_dump(&task->matrix, stdout);
-        _viti_safe(dp, task, r, unsafe_state);
+        _viti_safe_ge1(dp, task, r, unsafe_state);
         // printf("-----\n");
         // imm_matrix_dump(&task->matrix, stdout);
         for (unsigned i = 0; i < dp->state_table.nstates; ++i)

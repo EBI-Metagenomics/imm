@@ -166,6 +166,7 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
 
     unsigned unsafe_state = {0};
     unsigned num_unsafe_states = find_unsafe_states(dp, &unsafe_state);
+    (void)num_unsafe_states;
     assert(num_unsafe_states <= 1);
 
     struct ranges rg = {0};
