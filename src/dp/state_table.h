@@ -4,6 +4,7 @@
 #include "dp/assume.h"
 #include "dp/span.h"
 #include "imm/dp/state_table.h"
+#include "imm/state_types.h"
 #include <assert.h>
 
 struct dp_args;
@@ -21,6 +22,7 @@ static inline struct span state_table_span(struct imm_dp_state_table const *tbl,
     struct span span = tbl->span[state];
     assert(span.min <= span.max && !(span.min == 0 && span.max > 0));
     assume(span.min <= span.max && !(span.min == 0 && span.max > 0));
+    assume(span.max <= IMM_STATE_MAX_SEQLEN);
     return span;
 }
 

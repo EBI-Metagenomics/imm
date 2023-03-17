@@ -42,7 +42,7 @@ struct best_trans best_trans_find(struct imm_dp const *dp,
 
         if (imm_unlikely(row < span.min)) continue;
 
-        span.max = (unsigned)MIN(span.max, row);
+        span.max = MIN(span.max, row);
         for (unsigned len = span.min; len <= span.max; ++len)
         {
             assume(row >= len);

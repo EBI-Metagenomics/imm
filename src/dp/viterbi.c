@@ -41,10 +41,9 @@ static inline void _viti_safe_future(struct imm_dp const *dp,
         assert(!path_valid(&task->path, r, i));
     }
 
-    unsigned min_len = state_table_span(&dp->state_table, i).min;
-    unsigned max_len = state_table_span(&dp->state_table, i).max;
+    struct span span = state_table_span(&dp->state_table, i);
 
-    set_score(dp, task, bt.score, min_len, max_len, r, i);
+    set_score(dp, task, bt.score, span.min, span.max, r, i);
 }
 
 static inline void _viti_safe(struct imm_dp const *dp, struct imm_task *task,
@@ -85,11 +84,10 @@ static inline void _viti(struct imm_dp const *dp, struct imm_task *task,
         assert(!path_valid(&task->path, r, i));
     }
 
-    unsigned min_len = state_table_span(&dp->state_table, i).min;
-    unsigned max_len =
-        (unsigned)MIN(state_table_span(&dp->state_table, i).max, remain);
+    struct span span = state_table_span(&dp->state_table, i);
+    span.max = MIN(span.max, remain);
 
-    set_score(dp, task, bt.score, min_len, max_len, r, i);
+    set_score(dp, task, bt.score, span.min, span.max, r, i);
 }
 
 void viterbi_unsafe(struct imm_dp const *dp, struct imm_task *task,
@@ -170,13 +168,12 @@ void viterbi_row0_safe(struct imm_dp const *dp, struct imm_task *task)
             assert(!path_valid(&task->path, 0, i));
         }
 
-        unsigned min_len = state_table_span(&dp->state_table, i).min;
-        unsigned max_len = state_table_span(&dp->state_table, i).max;
+        struct span span = state_table_span(&dp->state_table, i);
 
         if (dp->state_table.start.state == i)
             bt.score = MAX(dp->state_table.start.lprob, bt.score);
 
-        set_score(dp, task, bt.score, min_len, max_len, 0, i);
+        set_score(dp, task, bt.score, span.min, span.max, 0, i);
     }
 }
 
@@ -199,13 +196,12 @@ void viterbi_row0(struct imm_dp const *dp, struct imm_task *task,
             assert(!path_valid(&task->path, 0, i));
         }
 
-        unsigned min_len = state_table_span(&dp->state_table, i).min;
-        unsigned max_len =
-            (unsigned)MIN(state_table_span(&dp->state_table, i).max, remain);
+        struct span span = state_table_span(&dp->state_table, i);
+        span.max = MIN(span.max, remain);
 
         if (dp->state_table.start.state == i)
             bt.score = MAX(dp->state_table.start.lprob, bt.score);
 
-        set_score(dp, task, bt.score, min_len, max_len, 0, i);
+        set_score(dp, task, bt.score, span.min, span.max, 0, i);
     }
 }
