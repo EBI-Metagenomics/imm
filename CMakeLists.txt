@@ -35,6 +35,7 @@ add_library(
   src/dp/io.c
   src/dp/matrix.c
   src/dp/path.c
+  src/dp/ranges.c
   src/dp/state_table.c
   src/dp/trans_table.c
   src/dp/unsafe_pair.c

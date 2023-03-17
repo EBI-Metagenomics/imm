@@ -9,6 +9,10 @@ void viterbi_unsafe(struct imm_dp const *dp, struct imm_task *task,
                     unsigned const start_row, unsigned const stop_row,
                     unsigned seqlen, struct unsafe_pair *upair);
 
+void viterbi_safe_future(struct imm_dp const *dp, struct imm_task *task,
+                         unsigned const start_row, unsigned const stop_row,
+                         struct unsafe_pair *upair);
+
 void viterbi_safe(struct imm_dp const *dp, struct imm_task *task,
                   unsigned const start_row, unsigned const stop_row,
                   struct unsafe_pair *upair);

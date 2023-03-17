@@ -4,6 +4,7 @@
 #include "dp/final_score.h"
 #include "dp/matrix.h"
 #include "dp/minmax.h"
+#include "dp/ranges.h"
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
 #include "dp/unsafe_pair.h"
@@ -168,10 +169,41 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
     struct unsafe_pair *upair = num_unsafe_states > 0 ? &unsafe_pair : NULL;
     assert(num_unsafe_states <= 1);
 
-    if (len >= 1 + IMM_STATE_MAX_SEQLEN)
+    struct ranges rg = {0};
+    dp_ranges_find(&rg, len);
+
+    if (!imm_range_empty(rg.safe))
+    {
+        // printf("RANGES\n");
+        // printf("[%u, %u) ", rg.safe_future.a, rg.safe_future.b);
+        // printf("[%u, %u) ", rg.safe.a, rg.safe.b);
+        // if (!imm_range_empty(rg.unsafe))
+        //     printf("[%u, %u) ", rg.unsafe.a, rg.unsafe.b);
+        // printf("[%u, %u)\n", rg.safe_past.a, rg.safe_past.b);
+        // printf("[%u %u] ", 0, len - IMM_STATE_MAX_SEQLEN);
+        // printf("[%u %u]\n", len - IMM_STATE_MAX_SEQLEN + 1, len);
+        // if (len - IMM_STATE_MAX_SEQLEN + 1 != rg.unsafe.a ||
+        //     rg.safe_past.a != len - IMM_STATE_MAX_SEQLEN + 1)
+        //     printf("UNEXPECTED\n");
+        // printf("len: %u\n", len);
+        // printf("----------------\n");
+        //
+        // assert(rg.safe_future.a == 0);
+        // assert(rg.safe_future.b == rg.safe.a);
+        // assert(rg.safe.b == rg.safe_past.a);
+        // assert(rg.safe_past.b == len + 1);
+
+        viterbi_row0_safe(dp, task);
+        viterbi_safe_future(dp, task, rg.safe_future.a + 1,
+                            rg.safe_future.b - 1, upair);
+        viterbi_safe(dp, task, rg.safe.a, rg.safe.b - 1, upair);
+        viterbi_unsafe(dp, task, rg.safe_past.a, rg.safe_past.b - 1, len,
+                       upair);
+    }
+    else if (len >= 1 + IMM_STATE_MAX_SEQLEN)
     {
         viterbi_row0_safe(dp, task);
-        viterbi_safe(dp, task, 1, len - IMM_STATE_MAX_SEQLEN, upair);
+        viterbi_safe_future(dp, task, 1, len - IMM_STATE_MAX_SEQLEN, upair);
         viterbi_unsafe(dp, task, len - IMM_STATE_MAX_SEQLEN + 1, len, len,
                        upair);
     }

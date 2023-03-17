@@ -23,8 +23,9 @@ static inline void set_score(struct imm_dp const *dp, struct imm_task *task,
     }
 }
 
-static inline void _viti_safe(struct imm_dp const *dp, struct imm_task *task,
-                              unsigned const r, unsigned i)
+static inline void _viti_safe_future(struct imm_dp const *dp,
+                                     struct imm_task *task, unsigned const r,
+                                     unsigned i)
 {
     struct best_trans bt = best_trans_find(dp, &task->matrix, i, r);
     if (bt.prev_state != IMM_STATE_NULL_IDX)
@@ -44,6 +45,28 @@ static inline void _viti_safe(struct imm_dp const *dp, struct imm_task *task,
     unsigned max_len = state_table_span(&dp->state_table, i).max;
 
     set_score(dp, task, bt.score, min_len, max_len, r, i);
+}
+
+static inline void _viti_safe(struct imm_dp const *dp, struct imm_task *task,
+                              unsigned const r, unsigned i)
+{
+    struct best_trans bt = best_trans_find_safe(dp, &task->matrix, i, r);
+    if (bt.prev_state != IMM_STATE_NULL_IDX)
+    {
+        path_set_trans(&task->path, r, i, bt.trans);
+        path_set_seqlen(&task->path, r, i, bt.len);
+        assert(path_trans(&task->path, r, i) == bt.trans);
+        assert(path_seqlen(&task->path, r, i) == bt.len);
+    }
+    else
+    {
+        path_invalidate(&task->path, r, i);
+        assert(!path_valid(&task->path, r, i));
+    }
+
+    struct span span = state_table_span(&dp->state_table, i);
+
+    set_score(dp, task, bt.score, span.min, span.max, r, i);
 }
 
 static inline void _viti(struct imm_dp const *dp, struct imm_task *task,
@@ -92,13 +115,35 @@ void viterbi_unsafe(struct imm_dp const *dp, struct imm_task *task,
     }
 }
 
-void viterbi_safe(struct imm_dp const *dp, struct imm_task *task,
-                  unsigned const start_row, unsigned const stop_row,
-                  struct unsafe_pair *upair)
+void viterbi_safe_future(struct imm_dp const *dp, struct imm_task *task,
+                         unsigned const start_row, unsigned const stop_row,
+                         struct unsafe_pair *upair)
 {
     for (unsigned r = start_row; r <= stop_row; ++r)
     {
         if (r > 0 && upair)
+        {
+            // printf("-----\n");
+            // imm_matrix_dump(&task->matrix, stdout);
+            _viti_safe_future(dp, task, r, upair->src);
+            // printf("-----\n");
+            // imm_matrix_dump(&task->matrix, stdout);
+        }
+        for (unsigned i = 0; i < dp->state_table.nstates; ++i)
+        {
+            _viti_safe_future(dp, task, r, i);
+        }
+    }
+}
+
+void viterbi_safe(struct imm_dp const *dp, struct imm_task *task,
+                  unsigned const start_row, unsigned const stop_row,
+                  struct unsafe_pair *upair)
+{
+    assume(start_row > 0);
+    for (unsigned r = start_row; r <= stop_row; ++r)
+    {
+        if (upair)
         {
             // printf("-----\n");
             // imm_matrix_dump(&task->matrix, stdout);
