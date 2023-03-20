@@ -8,12 +8,12 @@ void test_large_frame(struct imm_span, imm_float loglik);
 
 int main(void)
 {
-    // test_large_normal();
+    test_large_normal();
     test_large_normal_nopath();
-    // test_large_normal_removed_states();
-    // test_large_frame(imm_span(1, 5), -1622.8488101101);
-    // test_large_frame(imm_span(2, 4), -1793.03239395872);
-    // test_large_frame(imm_span(3, 3), imm_lprob_nan());
+    test_large_normal_removed_states();
+    test_large_frame(imm_span(1, 5), -1622.8488101101);
+    test_large_frame(imm_span(2, 4), -1793.03239395872);
+    test_large_frame(imm_span(3, 3), imm_lprob_nan());
     return hope_status();
 }
 

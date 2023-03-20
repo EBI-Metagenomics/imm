@@ -1,17 +1,17 @@
 #include "hope.h"
 #include "imm/imm.h"
 
-void test_viterbi_one_mute_state(void);
-void test_viterbi_two_mute_states(void);
+void test_viterbi_one_mute_state(bool check_path);
+void test_viterbi_two_mute_states(bool check_path);
 void test_viterbi_mute_cycle(void);
-void test_viterbi_one_normal_state(void);
-void test_viterbi_two_normal_states(void);
-void test_viterbi_normal_states(void);
-void test_viterbi_profile1(void);
-void test_viterbi_profile2(void);
-void test_viterbi_profile_delete(void);
-void test_viterbi_global_profile(void);
-void test_viterbi_cycle_mute_ending(void);
+void test_viterbi_one_normal_state(bool check_path);
+void test_viterbi_two_normal_states(bool check_path);
+void test_viterbi_normal_states(bool check_path);
+void test_viterbi_profile1(bool check_path);
+void test_viterbi_profile2(bool check_path);
+void test_viterbi_profile_delete(bool check_path);
+void test_viterbi_global_profile(bool check_path);
+void test_viterbi_cycle_mute_ending(bool check_path);
 
 static struct imm_abc abc;
 static struct imm_code code;
@@ -75,35 +75,52 @@ int main(void)
     AB_ab = imm_seq(IMM_STR("AB"), &abc_ab);
     AAB_ab = imm_seq(IMM_STR("AAB"), &abc_ab);
 
-    test_viterbi_one_mute_state();
-    test_viterbi_two_mute_states();
     test_viterbi_mute_cycle();
-    test_viterbi_one_normal_state();
-    test_viterbi_two_normal_states();
-    test_viterbi_normal_states();
-    test_viterbi_profile1();
-    test_viterbi_profile2();
-    test_viterbi_profile_delete();
-    test_viterbi_global_profile();
-    test_viterbi_cycle_mute_ending();
+
+    bool check_path[2] = {true, false};
+    for (int i = 0; i < 2; ++i)
+    {
+        bool x = check_path[i];
+        test_viterbi_one_mute_state(x);
+        test_viterbi_two_mute_states(x);
+        test_viterbi_one_normal_state(x);
+        test_viterbi_two_normal_states(x);
+        test_viterbi_normal_states(x);
+        test_viterbi_profile1(x);
+        test_viterbi_profile2(x);
+        test_viterbi_profile_delete(x);
+        test_viterbi_global_profile(x);
+        test_viterbi_cycle_mute_ending(x);
+    }
     return hope_status();
 }
 
-#define VITERBI_CHECK(seq, status, nsteps, llik)                               \
-    eq(imm_task_setup(task, seq), status);                                     \
-    eq(imm_dp_viterbi(&dp, task, &prod), status);                              \
-    eq(imm_path_nsteps(&prod.path), nsteps);                                   \
-    close(imm_hmm_loglik(&hmm, seq, &prod.path), (llik));                      \
-    close(prod.loglik, (llik));
+#define RUN(seq, status, llik)                                                 \
+    do                                                                         \
+    {                                                                          \
+        eq(imm_task_setup(task, seq), status);                                 \
+        eq(imm_dp_viterbi(&dp, task, &prod), status);                          \
+        close(prod.loglik, (llik));                                            \
+    } while (0);
+
+#define CHECK_PATH(seq, llik, nsteps)                                          \
+    do                                                                         \
+    {                                                                          \
+        close(imm_hmm_loglik(&hmm, seq, &prod.path), (llik));                  \
+        eq(imm_path_nsteps(&prod.path), nsteps);                               \
+    } while (0);
 
 #define DP_RESET(end_state, status)                                            \
-    imm_del(&dp);                                                              \
-    imm_hmm_init_dp(&hmm, imm_super(end_state), &dp);                          \
-    eq(imm_task_reset(task, &dp), status);
+    do                                                                         \
+    {                                                                          \
+        imm_del(&dp);                                                          \
+        imm_hmm_init_dp(&hmm, imm_super(end_state), &dp);                      \
+        eq(imm_task_reset(task, &dp), status);                                 \
+    } while (0);
 
 static inline imm_float zero(void) { return imm_lprob_zero(); }
 
-void test_viterbi_one_mute_state(void)
+void test_viterbi_one_mute_state(bool check_path)
 {
     struct imm_hmm hmm;
     imm_hmm_init(&hmm, &code);
@@ -118,16 +135,20 @@ void test_viterbi_one_mute_state(void)
     struct imm_dp dp;
     imm_hmm_init_dp(&hmm, imm_super(&state), &dp);
     struct imm_task *task = imm_task_new(&dp);
+    imm_task_set_save_path(task, check_path);
 
-    VITERBI_CHECK(&EMPTY, IMM_OK, 1, imm_log(0.5));
-    VITERBI_CHECK(&C, IMM_OK, 0, imm_lprob_nan());
+    RUN(&EMPTY, IMM_OK, imm_log(0.5));
+    if (check_path) CHECK_PATH(&EMPTY, imm_log(0.5), 1);
+
+    RUN(&C, IMM_OK, imm_lprob_nan());
+    if (check_path) CHECK_PATH(&C, imm_lprob_nan(), 0);
 
     imm_del(&prod);
     imm_del(&dp);
     imm_del(task);
 }
 
-void test_viterbi_two_mute_states(void)
+void test_viterbi_two_mute_states(bool check_path)
 {
     struct imm_hmm hmm;
     imm_hmm_init(&hmm, &code);
@@ -146,7 +167,8 @@ void test_viterbi_two_mute_states(void)
     imm_hmm_init_dp(&hmm, imm_super(&state0), &dp);
     struct imm_task *task = imm_task_new(&dp);
 
-    VITERBI_CHECK(&EMPTY, IMM_OK, 1, imm_log(0.5));
+    RUN(&EMPTY, IMM_OK, imm_log(0.5));
+    if (check_path) CHECK_PATH(&EMPTY, imm_log(0.5), 1);
 
     eq(imm_hmm_set_start(&hmm, imm_super(&state1), imm_lprob_zero()),
        IMM_NON_FINITE_PROBABILITY);
@@ -196,7 +218,7 @@ void test_viterbi_mute_cycle(void)
     eq(imm_hmm_init_dp(&hmm, imm_super(&state0), &dp), IMM_TSORT_MUTE_CYLES);
 }
 
-void test_viterbi_one_normal_state(void)
+void test_viterbi_one_normal_state(bool check_path)
 {
     struct imm_hmm hmm;
     imm_hmm_init(&hmm, &code);
@@ -216,30 +238,39 @@ void test_viterbi_one_normal_state(void)
     eq(imm_task_setup(task, &EMPTY), IMM_OK);
     eq(imm_dp_viterbi(&dp, task, &prod), IMM_SEQ_TOO_SHORT);
 
-    VITERBI_CHECK(&A, IMM_OK, 1, imm_log(1.0) + imm_log(0.25));
-    VITERBI_CHECK(&T, IMM_OK, 0, imm_lprob_nan());
-    VITERBI_CHECK(&AC, IMM_OK, 0, imm_lprob_nan());
+    RUN(&A, IMM_OK, imm_log(1.0) + imm_log(0.25));
+    if (check_path) CHECK_PATH(&A, imm_log(1.0) + imm_log(0.25), 1);
+    RUN(&T, IMM_OK, imm_lprob_nan());
+    if (check_path) CHECK_PATH(&T, imm_lprob_nan(), 0);
+    RUN(&AC, IMM_OK, imm_lprob_nan());
+    if (check_path) CHECK_PATH(&AC, imm_lprob_nan(), 0);
 
     imm_hmm_set_trans(&hmm, imm_super(&state), imm_super(&state), imm_log(0.1));
     DP_RESET(&state, IMM_OK);
 
-    VITERBI_CHECK(&A, IMM_OK, 1, imm_log(1.0) + imm_log(0.25));
-    VITERBI_CHECK(&AA, IMM_OK, 2, imm_log(0.1) + 2 * imm_log(0.25));
-    VITERBI_CHECK(&ACT, IMM_OK, 0, imm_lprob_nan());
+    RUN(&A, IMM_OK, imm_log(1.0) + imm_log(0.25));
+    if (check_path) CHECK_PATH(&A, imm_log(1.0) + imm_log(0.25), 1);
+    RUN(&AA, IMM_OK, imm_log(0.1) + 2 * imm_log(0.25));
+    if (check_path) CHECK_PATH(&AA, imm_log(0.1) + 2 * imm_log(0.25), 2);
+    RUN(&ACT, IMM_OK, imm_lprob_nan());
+    if (check_path) CHECK_PATH(&ACT, imm_lprob_nan(), 0);
 
     imm_hmm_normalize_trans(&hmm);
     DP_RESET(&state, IMM_OK);
 
-    VITERBI_CHECK(&A, IMM_OK, 1, imm_log(0.25));
-    VITERBI_CHECK(&AA, IMM_OK, 2, 2 * imm_log(0.25));
-    VITERBI_CHECK(&ACT, IMM_OK, 0, imm_lprob_nan());
+    RUN(&A, IMM_OK, imm_log(0.25));
+    if (check_path) CHECK_PATH(&A, imm_log(0.25), 1);
+    RUN(&AA, IMM_OK, 2 * imm_log(0.25));
+    if (check_path) CHECK_PATH(&AA, 2 * imm_log(0.25), 2);
+    RUN(&ACT, IMM_OK, imm_lprob_nan());
+    if (check_path) CHECK_PATH(&ACT, imm_lprob_nan(), 0);
 
     imm_del(&prod);
     imm_del(task);
     imm_del(&dp);
 }
 
-void test_viterbi_two_normal_states(void)
+void test_viterbi_two_normal_states(bool check_path)
 {
     struct imm_hmm hmm;
     imm_hmm_init(&hmm, &code);
@@ -270,31 +301,36 @@ void test_viterbi_two_normal_states(void)
     close(imm_hmm_loglik(&hmm, &EMPTY, &prod.path), imm_lprob_nan());
     close(prod.loglik, imm_lprob_nan());
 
-    VITERBI_CHECK(&A, IMM_OK, 1, imm_log(0.1) + imm_log(0.25));
-    VITERBI_CHECK(&T, IMM_OK, 0, imm_lprob_nan());
-    VITERBI_CHECK(&AC, IMM_OK, 0, imm_lprob_nan());
+    RUN(&A, IMM_OK, imm_log(0.1) + imm_log(0.25));
+    if (check_path) CHECK_PATH(&A, imm_log(0.1) + imm_log(0.25), 1);
+    RUN(&T, IMM_OK, imm_lprob_nan());
+    if (check_path) CHECK_PATH(&T, imm_lprob_nan(), 0);
+    RUN(&AC, IMM_OK, imm_lprob_nan());
+    if (check_path) CHECK_PATH(&AC, imm_lprob_nan(), 0);
 
     DP_RESET(&state1, IMM_OK);
-    VITERBI_CHECK(&AT, IMM_OK, 2,
-                  imm_log(0.1) + imm_log(0.25) + imm_log(0.3) + imm_log(0.5));
+    imm_float des = imm_log(0.1) + imm_log(0.25) + imm_log(0.3) + imm_log(0.5);
+    RUN(&AT, IMM_OK, des);
+    if (check_path) CHECK_PATH(&AT, des, 2);
 
-    VITERBI_CHECK(&ATT, IMM_OK, 0, imm_lprob_nan());
+    RUN(&ATT, IMM_OK, imm_lprob_nan());
+    if (check_path) CHECK_PATH(&ATT, imm_lprob_nan(), 0);
 
     imm_hmm_set_trans(&hmm, imm_super(&state1), imm_super(&state1),
                       imm_log(0.5));
     imm_hmm_set_start(&hmm, imm_super(&state1), imm_lprob_zero());
 
     DP_RESET(&state1, IMM_OK);
-    VITERBI_CHECK(&ATT, IMM_OK, 3,
-                  imm_log(0.1) + imm_log(0.25) + imm_log(0.3) +
-                      3 * imm_log(0.5));
+    des = imm_log(0.1) + imm_log(0.25) + imm_log(0.3) + 3 * imm_log(0.5);
+    RUN(&ATT, IMM_OK, des);
+    if (check_path) CHECK_PATH(&ATT, des, 3);
 
     imm_del(&prod);
     imm_del(task);
     imm_del(&dp);
 }
 
-void test_viterbi_normal_states(void)
+void test_viterbi_normal_states(bool check_path)
 {
     struct imm_hmm hmm;
     imm_hmm_init(&hmm, &code);
@@ -328,23 +364,30 @@ void test_viterbi_normal_states(void)
     imm_hmm_init_dp(&hmm, imm_super(&state0), &dp);
     struct imm_task *task = imm_task_new(&dp);
 
-    VITERBI_CHECK(&A, IMM_OK, 1, -1.386294361120);
-    VITERBI_CHECK(&AG, IMM_OK, 2, -3.178053830348);
+    RUN(&A, IMM_OK, -1.386294361120);
+    if (check_path) CHECK_PATH(&A, -1.386294361120, 1);
+    RUN(&AG, IMM_OK, -3.178053830348);
+    if (check_path) CHECK_PATH(&AG, -3.178053830348, 2);
 
     DP_RESET(&state1, IMM_OK);
-    VITERBI_CHECK(&AG, IMM_OK, 2, -3.295836866004);
+    RUN(&AG, IMM_OK, -3.295836866004);
+    if (check_path) CHECK_PATH(&AG, -3.295836866004, 2);
 
     DP_RESET(&state0, IMM_OK);
-    VITERBI_CHECK(&AGT, IMM_OK, 0, imm_lprob_nan());
+    RUN(&AGT, IMM_OK, imm_lprob_nan());
+    if (check_path) CHECK_PATH(&AGT, imm_lprob_nan(), 0);
 
     DP_RESET(&state1, IMM_OK);
-    VITERBI_CHECK(&AGT, IMM_OK, 3, -4.106767082221);
+    RUN(&AGT, IMM_OK, -4.106767082221);
+    if (check_path) CHECK_PATH(&AGT, -4.106767082221, 3);
 
     DP_RESET(&state0, IMM_OK);
-    VITERBI_CHECK(&AGTC, IMM_OK, 0, imm_lprob_nan());
+    RUN(&AGTC, IMM_OK, imm_lprob_nan());
+    if (check_path) CHECK_PATH(&AGTC, imm_lprob_nan(), 0);
 
     DP_RESET(&state1, IMM_OK);
-    VITERBI_CHECK(&AGTC, IMM_OK, 4, -6.303991659557);
+    RUN(&AGTC, IMM_OK, -6.303991659557);
+    if (check_path) CHECK_PATH(&AGTC, -6.303991659557, 4);
 
     eq(imm_hmm_set_trans(&hmm, imm_super(&state0), imm_super(&state0), zero()),
        IMM_NON_FINITE_PROBABILITY);
@@ -376,30 +419,35 @@ void test_viterbi_normal_states(void)
 
     DP_RESET(&state0, IMM_OK);
 
-    VITERBI_CHECK(&A, IMM_OK, 1, imm_log(0.25));
+    RUN(&A, IMM_OK, imm_log(0.25));
+    if (check_path) CHECK_PATH(&A, imm_log(0.25), 1);
 
     imm_hmm_set_trans(&hmm, imm_super(&state0), imm_super(&state0),
                       imm_log(0.9));
 
     DP_RESET(&state0, IMM_OK);
 
-    VITERBI_CHECK(&A, IMM_OK, 1, imm_log(0.25));
-    VITERBI_CHECK(&AA, IMM_OK, 2, 2 * imm_log(0.25) + imm_log(0.9));
+    RUN(&A, IMM_OK, imm_log(0.25));
+    if (check_path) CHECK_PATH(&A, imm_log(0.25), 1);
+    RUN(&AA, IMM_OK, 2 * imm_log(0.25) + imm_log(0.9));
+    if (check_path) CHECK_PATH(&AA, 2 * imm_log(0.25) + imm_log(0.9), 2);
 
     imm_hmm_set_trans(&hmm, imm_super(&state0), imm_super(&state1),
                       imm_log(0.2));
 
     DP_RESET(&state0, IMM_OK);
 
-    VITERBI_CHECK(&A, IMM_OK, 1, imm_log(0.25));
-    VITERBI_CHECK(&AA, IMM_OK, 2, 2 * imm_log(0.25) + imm_log(0.9));
+    RUN(&A, IMM_OK, imm_log(0.25));
+    if (check_path) CHECK_PATH(&A, imm_log(0.25), 1);
+    RUN(&AA, IMM_OK, 2 * imm_log(0.25) + imm_log(0.9));
+    if (check_path) CHECK_PATH(&AA, 2 * imm_log(0.25) + imm_log(0.9), 2);
 
     imm_del(&prod);
     imm_del(task);
     imm_del(&dp);
 }
 
-void test_viterbi_profile1(void)
+void test_viterbi_profile1(bool check_path)
 {
     struct imm_hmm hmm;
     imm_hmm_init(&hmm, &code_ab);
@@ -440,13 +488,16 @@ void test_viterbi_profile1(void)
     imm_hmm_init_dp(&hmm, imm_super(&end), &dp);
     struct imm_task *task = imm_task_new(&dp);
 
-    VITERBI_CHECK(&EMPTY_ab, IMM_OK, 3, imm_log(0.1) + imm_log(1.0));
+    RUN(&EMPTY_ab, IMM_OK, imm_log(0.1) + imm_log(1.0));
+    if (check_path) CHECK_PATH(&EMPTY_ab, imm_log(0.1) + imm_log(1.0), 3);
 
     DP_RESET(&D0, IMM_OK);
-    VITERBI_CHECK(&EMPTY_ab, IMM_OK, 2, imm_log(0.1));
+    RUN(&EMPTY_ab, IMM_OK, imm_log(0.1));
+    if (check_path) CHECK_PATH(&EMPTY_ab, imm_log(0.1), 2);
 
     DP_RESET(&start, IMM_OK);
-    VITERBI_CHECK(&EMPTY_ab, IMM_OK, 1, imm_log(1.0));
+    RUN(&EMPTY_ab, IMM_OK, imm_log(1.0));
+    if (check_path) CHECK_PATH(&EMPTY_ab, imm_log(1.0), 1);
 
     DP_RESET(&M0, IMM_OK);
 
@@ -457,29 +508,38 @@ void test_viterbi_profile1(void)
     close(prod.loglik, imm_lprob_nan());
 
     DP_RESET(&M0, IMM_OK);
-    VITERBI_CHECK(&A_ab, IMM_OK, 2, imm_log(0.5) + imm_log(0.4));
+    imm_float des = imm_log(0.5) + imm_log(0.4);
+    RUN(&A_ab, IMM_OK, des);
+    if (check_path) CHECK_PATH(&A_ab, des, 2);
 
     DP_RESET(&end, IMM_OK);
-    VITERBI_CHECK(&A_ab, IMM_OK, 3, imm_log(0.5) + imm_log(0.4) + imm_log(0.8));
+    des = imm_log(0.5) + imm_log(0.4) + imm_log(0.8);
+    RUN(&A_ab, IMM_OK, des);
+    if (check_path) CHECK_PATH(&A_ab, des, 3);
 
     DP_RESET(&M0, IMM_OK);
-    VITERBI_CHECK(&B_ab, IMM_OK, 2, imm_log(0.5) + imm_log(0.2));
+    RUN(&B_ab, IMM_OK, imm_log(0.5) + imm_log(0.2));
+    if (check_path) CHECK_PATH(&B_ab, imm_log(0.5) + imm_log(0.2), 2);
 
     DP_RESET(&end, IMM_OK);
-    VITERBI_CHECK(&B_ab, IMM_OK, 3, imm_log(0.5) + imm_log(0.2) + imm_log(0.8));
-    VITERBI_CHECK(&AA_ab, IMM_OK, 4,
-                  imm_log(0.5) + imm_log(0.4) + imm_log(0.1) + imm_log(0.5));
+    des = imm_log(0.5) + imm_log(0.2) + imm_log(0.8);
+    RUN(&B_ab, IMM_OK, des);
+    if (check_path) CHECK_PATH(&B_ab, des, 3);
+    des = imm_log(0.5) + imm_log(0.4) + imm_log(0.1) + imm_log(0.5);
+    RUN(&AA_ab, IMM_OK, des);
+    if (check_path) CHECK_PATH(&AA_ab, des, 4);
 
-    VITERBI_CHECK(&AAB_ab, IMM_OK, 5,
-                  imm_log(0.5) + imm_log(0.4) + imm_log(0.1) + imm_log(0.2) +
-                      2 * imm_log(0.5));
+    des = imm_log(0.5) + imm_log(0.4) + imm_log(0.1) + imm_log(0.2) +
+          2 * imm_log(0.5);
+    RUN(&AAB_ab, IMM_OK, des);
+    if (check_path) CHECK_PATH(&AAB_ab, des, 5);
 
     imm_del(&prod);
     imm_del(&dp);
     imm_del(task);
 }
 
-void test_viterbi_profile2(void)
+void test_viterbi_profile2(bool check_path)
 {
     struct imm_hmm hmm;
     imm_hmm_init(&hmm, &code);
@@ -559,59 +619,76 @@ void test_viterbi_profile2(void)
     imm_hmm_init_dp(&hmm, imm_super(&M2), &dp);
     struct imm_task *task = imm_task_new(&dp);
 
-    VITERBI_CHECK(&A, IMM_OK, 2, imm_log(0.05));
+    RUN(&A, IMM_OK, imm_log(0.05));
+    if (check_path) CHECK_PATH(&A, imm_log(0.05), 2);
 
     DP_RESET(&M2, IMM_OK);
-    VITERBI_CHECK(&C, IMM_OK, 2, imm_log(0.05));
-    VITERBI_CHECK(&G, IMM_OK, 2, imm_log(0.05));
-    VITERBI_CHECK(&T, IMM_OK, 2, imm_log(0.05));
+    RUN(&C, IMM_OK, imm_log(0.05));
+    if (check_path) CHECK_PATH(&C, imm_log(0.05), 2);
+    RUN(&G, IMM_OK, imm_log(0.05));
+    if (check_path) CHECK_PATH(&G, imm_log(0.05), 2);
+    RUN(&T, IMM_OK, imm_log(0.05));
+    if (check_path) CHECK_PATH(&T, imm_log(0.05), 2);
 
     DP_RESET(&end, IMM_OK);
-    VITERBI_CHECK(&A, IMM_OK, 3, imm_log(0.6));
-    VITERBI_CHECK(&C, IMM_OK, 3, imm_log(0.05));
-    VITERBI_CHECK(&G, IMM_OK, 3, imm_log(0.6));
-    VITERBI_CHECK(&T, IMM_OK, 3, imm_log(0.05));
+    RUN(&A, IMM_OK, imm_log(0.6));
+    if (check_path) CHECK_PATH(&A, imm_log(0.6), 3);
+    RUN(&C, IMM_OK, imm_log(0.05));
+    if (check_path) CHECK_PATH(&C, imm_log(0.05), 3);
+    RUN(&G, IMM_OK, imm_log(0.6));
+    if (check_path) CHECK_PATH(&G, imm_log(0.6), 3);
+    RUN(&T, IMM_OK, imm_log(0.05));
+    if (check_path) CHECK_PATH(&T, imm_log(0.05), 3);
 
     DP_RESET(&M1, IMM_OK);
-    VITERBI_CHECK(&A, IMM_OK, 2, imm_log(0.6));
+    RUN(&A, IMM_OK, imm_log(0.6));
+    if (check_path) CHECK_PATH(&A, imm_log(0.6), 2);
 
     DP_RESET(&end, IMM_OK);
-    VITERBI_CHECK(&GA, IMM_OK, 4, 2 * imm_log(0.6));
+    RUN(&GA, IMM_OK, 2 * imm_log(0.6));
+    if (check_path) CHECK_PATH(&GA, 2 * imm_log(0.6), 4);
 
     DP_RESET(&I0, IMM_OK);
-    VITERBI_CHECK(&GT, IMM_OK, 3, imm_log(0.6) + imm_log(0.2) + imm_log(0.7));
+    RUN(&GT, IMM_OK, imm_log(0.6) + imm_log(0.2) + imm_log(0.7));
+    if (check_path)
+        CHECK_PATH(&GT, imm_log(0.6) + imm_log(0.2) + imm_log(0.7), 3);
 
     DP_RESET(&end, IMM_OK);
-    VITERBI_CHECK(&GTTTA, IMM_OK, 7,
-                  imm_log(0.6) + imm_log(0.2) + 3 * imm_log(0.7) +
-                      3 * imm_log(0.5) + imm_log(0.6));
+    imm_float des = imm_log(0.6) + imm_log(0.2) + 3 * imm_log(0.7) +
+                    3 * imm_log(0.5) + imm_log(0.6);
+    RUN(&GTTTA, IMM_OK, des);
+    if (check_path) CHECK_PATH(&GTTTA, des, 7);
 
-    VITERBI_CHECK(&GTTTAC, IMM_OK, 8,
-                  imm_log(0.6) + imm_log(0.2) + 3 * imm_log(0.7) +
-                      3 * imm_log(0.5) + imm_log(0.6) + imm_log(0.05));
+    des = imm_log(0.6) + imm_log(0.2) + 3 * imm_log(0.7) + 3 * imm_log(0.5) +
+          imm_log(0.6) + imm_log(0.05);
+    RUN(&GTTTAC, IMM_OK, des);
+    if (check_path) CHECK_PATH(&GTTTAC, des, 8);
 
     DP_RESET(&M2, IMM_OK);
-    VITERBI_CHECK(&GTTTACA, IMM_OK, 8,
-                  imm_log(0.6) + imm_log(0.2) + 3 * imm_log(0.7) +
-                      3 * imm_log(0.5) + imm_log(0.6) + imm_log(0.2) +
-                      imm_log(0.1) + imm_log(0.5) + imm_log(0.05));
+    des = imm_log(0.6) + imm_log(0.2) + 3 * imm_log(0.7) + 3 * imm_log(0.5) +
+          imm_log(0.6) + imm_log(0.2) + imm_log(0.1) + imm_log(0.5) +
+          imm_log(0.05);
+    RUN(&GTTTACA, IMM_OK, des);
+    if (check_path) CHECK_PATH(&GTTTACA, des, 8);
 
     DP_RESET(&M1, IMM_OK);
-    VITERBI_CHECK(&GTTTACA, IMM_OK, 8,
-                  imm_log(0.6) + imm_log(0.2) + 5 * imm_log(0.5) +
-                      3 * imm_log(0.7) + 2 * imm_log(0.1) + imm_log(0.6));
+    des = imm_log(0.6) + imm_log(0.2) + 5 * imm_log(0.5) + 3 * imm_log(0.7) +
+          2 * imm_log(0.1) + imm_log(0.6);
+    RUN(&GTTTACA, IMM_OK, des);
+    if (check_path) CHECK_PATH(&GTTTACA, des, 8);
 
     DP_RESET(&end, IMM_OK);
-    VITERBI_CHECK(&GTTTACA, IMM_OK, 9,
-                  imm_log(0.6) + imm_log(0.2) + 5 * imm_log(0.5) +
-                      3 * imm_log(0.7) + 2 * imm_log(0.1) + imm_log(0.6));
+    des = imm_log(0.6) + imm_log(0.2) + 5 * imm_log(0.5) + 3 * imm_log(0.7) +
+          2 * imm_log(0.1) + imm_log(0.6);
+    RUN(&GTTTACA, IMM_OK, des);
+    if (check_path) CHECK_PATH(&GTTTACA, des, 9);
 
     imm_del(&prod);
     imm_del(task);
     imm_del(&dp);
 }
 
-void test_viterbi_profile_delete(void)
+void test_viterbi_profile_delete(bool check_path)
 {
     struct imm_hmm hmm;
     imm_hmm_init(&hmm, &code_ab);
@@ -647,23 +724,27 @@ void test_viterbi_profile_delete(void)
     imm_hmm_init_dp(&hmm, imm_super(&N0), &dp);
     struct imm_task *task = imm_task_new(&dp);
 
-    VITERBI_CHECK(&A_ab, IMM_OK, 1, imm_log(0.5));
+    RUN(&A_ab, IMM_OK, imm_log(0.5));
+    if (check_path) CHECK_PATH(&A_ab, imm_log(0.5), 1);
 
     DP_RESET(&M, IMM_OK);
-    VITERBI_CHECK(&A_ab, IMM_OK, 2, 2 * imm_log(0.5));
+    RUN(&A_ab, IMM_OK, 2 * imm_log(0.5));
+    if (check_path) CHECK_PATH(&A_ab, 2 * imm_log(0.5), 2);
 
     DP_RESET(&N2, IMM_OK);
-    VITERBI_CHECK(&AB_ab, IMM_OK, 3, 4 * imm_log(0.5));
+    RUN(&AB_ab, IMM_OK, 4 * imm_log(0.5));
+    if (check_path) CHECK_PATH(&AB_ab, 4 * imm_log(0.5), 3);
 
     DP_RESET(&M, IMM_OK);
-    VITERBI_CHECK(&A_ab, IMM_OK, 2, 2 * imm_log(0.5));
+    RUN(&A_ab, IMM_OK, 2 * imm_log(0.5));
+    if (check_path) CHECK_PATH(&A_ab, 2 * imm_log(0.5), 2);
 
     imm_del(&prod);
     imm_del(task);
     imm_del(&dp);
 }
 
-void test_viterbi_global_profile(void)
+void test_viterbi_global_profile(bool check_path)
 {
     struct imm_abc abc_z;
     struct imm_code code_z;
@@ -782,50 +863,64 @@ void test_viterbi_global_profile(void)
     imm_hmm_init_dp(&hmm, imm_super(&start), &dp);
     struct imm_task *task = imm_task_new(&dp);
 
-    VITERBI_CHECK(&C_z, IMM_OK, 0, imm_lprob_nan());
+    RUN(&C_z, IMM_OK, imm_lprob_nan());
+    if (check_path) CHECK_PATH(&C_z, imm_lprob_nan(), 0);
 
     DP_RESET(&B, IMM_OK);
-    VITERBI_CHECK(&C_z, IMM_OK, 2, imm_log(1.0));
+    RUN(&C_z, IMM_OK, imm_log(1.0));
+    if (check_path) CHECK_PATH(&C_z, imm_log(1.0), 2);
 
-    VITERBI_CHECK(&CC_z, IMM_OK, 3, imm_log(1.0));
-    VITERBI_CHECK(&CCC_z, IMM_OK, 4, imm_log(1.0));
-    VITERBI_CHECK(&CCA_z, IMM_OK, 4, imm_log(0.01));
+    RUN(&CC_z, IMM_OK, imm_log(1.0));
+    if (check_path) CHECK_PATH(&CC_z, imm_log(1.0), 3);
+    RUN(&CCC_z, IMM_OK, imm_log(1.0));
+    if (check_path) CHECK_PATH(&CCC_z, imm_log(1.0), 4);
+    RUN(&CCA_z, IMM_OK, imm_log(0.01));
+    if (check_path) CHECK_PATH(&CCA_z, imm_log(0.01), 4);
 
     DP_RESET(&M0, IMM_OK);
-    VITERBI_CHECK(&CCA_z, IMM_OK, 4, imm_log(0.9));
+    RUN(&CCA_z, IMM_OK, imm_log(0.9));
+    if (check_path) CHECK_PATH(&CCA_z, imm_log(0.9), 4);
 
     DP_RESET(&M1, IMM_OK);
-    VITERBI_CHECK(&CCAB_z, IMM_OK, 5, 2 * imm_log(0.9));
+    RUN(&CCAB_z, IMM_OK, 2 * imm_log(0.9));
+    if (check_path) CHECK_PATH(&CCAB_z, 2 * imm_log(0.9), 5);
 
     DP_RESET(&I0, IMM_OK);
-    VITERBI_CHECK(&CCAB_z, IMM_OK, 5, imm_log(0.9 * 0.5 * 0.1));
+    RUN(&CCAB_z, IMM_OK, imm_log(0.9 * 0.5 * 0.1));
+    if (check_path) CHECK_PATH(&CCAB_z, imm_log(0.9 * 0.5 * 0.1), 5);
 
-    VITERBI_CHECK(&CCABB_z, IMM_OK, 6, imm_log(0.9) + 2 * (imm_log(0.05)));
+    RUN(&CCABB_z, IMM_OK, imm_log(0.9) + 2 * (imm_log(0.05)));
+    if (check_path) CHECK_PATH(&CCABB_z, imm_log(0.9) + 2 * (imm_log(0.05)), 6);
 
     DP_RESET(&M1, IMM_OK);
-    VITERBI_CHECK(&CCABA_z, IMM_OK, 6,
-                  imm_log(0.9) + imm_log(0.5) + imm_log(0.1) + imm_log(0.5) +
-                      imm_log(0.01));
+    imm_float des = imm_log(0.9) + imm_log(0.5) + imm_log(0.1) + imm_log(0.5) +
+                    imm_log(0.01);
+    RUN(&CCABA_z, IMM_OK, des);
+    if (check_path) CHECK_PATH(&CCABA_z, des, 6);
 
     DP_RESET(&D1, IMM_OK);
-    VITERBI_CHECK(&AA_z, IMM_OK, 4, imm_log(0.01) + imm_log(0.9));
+    RUN(&AA_z, IMM_OK, imm_log(0.01) + imm_log(0.9));
+    if (check_path) CHECK_PATH(&AA_z, imm_log(0.01) + imm_log(0.9), 4);
 
     DP_RESET(&D2, IMM_OK);
-    VITERBI_CHECK(&AA_z, IMM_OK, 5, imm_log(0.01) + imm_log(0.9));
+    RUN(&AA_z, IMM_OK, imm_log(0.01) + imm_log(0.9));
+    if (check_path) CHECK_PATH(&AA_z, imm_log(0.01) + imm_log(0.9), 5);
 
     DP_RESET(&E, IMM_OK);
-    VITERBI_CHECK(&AA_z, IMM_OK, 6, imm_log(0.01) + imm_log(0.9));
+    RUN(&AA_z, IMM_OK, imm_log(0.01) + imm_log(0.9));
+    if (check_path) CHECK_PATH(&AA_z, imm_log(0.01) + imm_log(0.9), 6);
 
     DP_RESET(&M2, IMM_OK);
-    VITERBI_CHECK(&AAB_z, IMM_OK, 5,
-                  imm_log(0.01) + imm_log(0.9) + imm_log(0.5));
+    des = imm_log(0.01) + imm_log(0.9) + imm_log(0.5);
+    RUN(&AAB_z, IMM_OK, des);
+    if (check_path) CHECK_PATH(&AAB_z, des, 5);
 
     imm_del(&prod);
     imm_del(task);
     imm_del(&dp);
 }
 
-void test_viterbi_cycle_mute_ending(void)
+void test_viterbi_cycle_mute_ending(bool check_path)
 {
     struct imm_hmm hmm;
     imm_hmm_init(&hmm, &code_ab);
@@ -868,7 +963,8 @@ void test_viterbi_cycle_mute_ending(void)
     imm_hmm_init_dp(&hmm, imm_super(&end), &dp);
     struct imm_task *task = imm_task_new(&dp);
 
-    VITERBI_CHECK(&A_ab, IMM_OK, 5, -13.815510557964272);
+    RUN(&A_ab, IMM_OK, -13.815510557964272);
+    if (check_path) CHECK_PATH(&A_ab, -13.815510557964272, 5);
 
     unsigned BM = imm_dp_trans_idx(&dp, imm_state_idx(imm_super(&B)),
                                    imm_state_idx(imm_super(&M)));
