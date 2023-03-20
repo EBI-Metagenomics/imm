@@ -29,6 +29,7 @@ extern "C" {
 #include "imm/generics.h"
 #include "imm/hmm.h"
 #include "imm/lprob.h"
+#include "imm/msv_example1.h"
 #include "imm/mute_state.h"
 #include "imm/normal_state.h"
 #include "imm/nuclt.h"

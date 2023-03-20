@@ -2,6 +2,7 @@
 #include "imm/imm.h"
 
 void test_large_normal(void);
+void test_large_msv_normal(void);
 void test_large_normal_nopath(void);
 void test_large_normal_removed_states(void);
 void test_large_frame(struct imm_span, imm_float loglik);
@@ -10,6 +11,7 @@ int main(void)
 {
     test_large_normal();
     test_large_normal_nopath();
+    test_large_msv_normal();
     test_large_normal_removed_states();
     test_large_frame(imm_span(1, 5), -1622.8488101101);
     test_large_frame(imm_span(2, 4), -1793.03239395872);
@@ -31,6 +33,27 @@ void test_large_normal(void)
     eq(imm_task_setup(task, &seq), IMM_OK);
     eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
     close(prod.loglik, -194581.04361377980);
+    printf("Normal msecs: %llu\n", prod.mseconds);
+
+    imm_del(task);
+    imm_del(&prod);
+    imm_del(&dp);
+}
+
+void test_large_msv_normal(void)
+{
+    imm_msv_example1_init(IMM_MSV_EXAMPLE1_SIZE);
+
+    struct imm_msv_example1 *m = &imm_msv_example1;
+    struct imm_dp dp;
+    imm_hmm_init_dp(&imm_msv_example1.hmm, imm_super(&m->end), &dp);
+    struct imm_task *task = imm_task_new(&dp);
+    struct imm_prod prod = imm_prod();
+
+    struct imm_seq seq = imm_seq(imm_str(imm_msv_example1_seq1), &m->abc);
+    eq(imm_task_setup(task, &seq), IMM_OK);
+    eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
+    close(prod.loglik, -4833.14205103985);
     printf("Normal msecs: %llu\n", prod.mseconds);
 
     imm_del(task);
