@@ -1,6 +1,7 @@
 #include "dp/viterbi.h"
 #include "dp/best_trans.h"
 #include "dp/emis.h"
+#include "dp/hot_range.h"
 #include "dp/matrix.h"
 #include "dp/minmax.h"
 #include "dp/path.h"
@@ -149,6 +150,23 @@ static inline void _viti_safe_nopath(struct imm_dp const *dp,
     set_score(dp, task, bt.score, span.min, span.max, r, i);
 }
 
+static inline void _viti_safe_hot_nopath(struct imm_dp const *dp,
+                                         struct imm_task *task,
+                                         unsigned const row, unsigned dst,
+                                         struct hot_range const *hot)
+{
+
+    struct imm_dp_trans_table const *tt = &dp->trans_table;
+    struct matrix const *mt = &task->matrix;
+
+    imm_float v0 = matrix_get_score(mt, row - 1, dst - 1, 1) +
+                   trans_table_score(tt, dst, 0);
+    imm_float v1 =
+        matrix_get_score(mt, row, hot->left, 0) + trans_table_score(tt, dst, 1);
+
+    set_score(dp, task, v0 < v1 ? v1 : v0, 1, 1, row, dst);
+}
+
 static inline void _viti(struct imm_dp const *dp, struct imm_task *task,
                          unsigned const r, unsigned i, unsigned remain)
 {
@@ -295,10 +313,6 @@ void viterbi_safe(struct imm_dp const *dp, struct imm_task *task,
     }
 }
 
-void viterbi_safe_nopath(struct imm_dp const *dp, struct imm_task *task,
-                         unsigned const start_row, unsigned const stop_row,
-                         unsigned unsafe_state)
-{
 #if 0
     printf("CUT-BEGIN\n");
     for (unsigned dst = 0; dst < dp->state_table.nstates; ++dst)
@@ -314,13 +328,37 @@ void viterbi_safe_nopath(struct imm_dp const *dp, struct imm_task *task,
     printf("CUT-END\n");
 #endif
 
+void viterbi_safe_nopath(struct imm_dp const *dp, struct imm_task *task,
+                         unsigned const start_row, unsigned const stop_row,
+                         unsigned unsafe_state)
+{
+    struct hot_range hot = {0};
+    imm_hot_range(dp, (struct span){1, 1}, &hot);
+
     assume(start_row > 0);
     for (unsigned r = start_row; r <= stop_row; ++r)
     {
         _viti_safe_ge1_nopath(dp, task, r, unsafe_state);
-        for (unsigned i = 0; i < dp->state_table.nstates; ++i)
+
+        if (hot.total < 2)
         {
-            _viti_safe_nopath(dp, task, r, i);
+            for (unsigned i = 0; i < dp->state_table.nstates; ++i)
+                _viti_safe_nopath(dp, task, r, i);
+        }
+        else
+        {
+            for (unsigned i = 0; i < hot.start; ++i)
+                _viti_safe_nopath(dp, task, r, i);
+
+            for (unsigned i = hot.start; i < hot.start + hot.total; ++i)
+            {
+                // _viti_safe_nopath(dp, task, r, i);
+                _viti_safe_hot_nopath(dp, task, r, i, &hot);
+            }
+
+            for (unsigned i = hot.start + hot.total;
+                 i < dp->state_table.nstates; ++i)
+                _viti_safe_nopath(dp, task, r, i);
         }
     }
 }

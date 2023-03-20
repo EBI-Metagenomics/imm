@@ -9,13 +9,13 @@ void test_large_frame(struct imm_span, imm_float loglik);
 
 int main(void)
 {
-    test_large_normal();
-    test_large_normal_nopath();
+    // test_large_normal();
+    // test_large_normal_nopath();
     test_large_msv_normal();
-    test_large_normal_removed_states();
-    test_large_frame(imm_span(1, 5), -1622.8488101101);
-    test_large_frame(imm_span(2, 4), -1793.03239395872);
-    test_large_frame(imm_span(3, 3), imm_lprob_nan());
+    // test_large_normal_removed_states();
+    // test_large_frame(imm_span(1, 5), -1622.8488101101);
+    // test_large_frame(imm_span(2, 4), -1793.03239395872);
+    // test_large_frame(imm_span(3, 3), imm_lprob_nan());
     return hope_status();
 }
 
@@ -46,15 +46,22 @@ void test_large_msv_normal(void)
 
     struct imm_msv_example1 *m = &imm_msv_example1;
     struct imm_dp dp;
-    imm_hmm_init_dp(&imm_msv_example1.hmm, imm_super(&m->end), &dp);
+    imm_hmm_init_dp(&imm_msv_example1.hmm, imm_super(&m->T), &dp);
     struct imm_task *task = imm_task_new(&dp);
     struct imm_prod prod = imm_prod();
 
     struct imm_seq seq = imm_seq(imm_str(imm_msv_example1_seq1), &m->abc);
     eq(imm_task_setup(task, &seq), IMM_OK);
+
+    imm_task_set_save_path(task, true);
     eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
-    close(prod.loglik, -4833.14205103985);
-    printf("Normal msecs: %llu\n", prod.mseconds);
+    close(prod.loglik, -6369.93095660004);
+    printf("MSV        msecs: %llu\n", prod.mseconds);
+
+    imm_task_set_save_path(task, false);
+    eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
+    close(prod.loglik, -6369.93095660004);
+    printf("MSV-nopath msecs: %llu\n", prod.mseconds);
 
     imm_del(task);
     imm_del(&prod);

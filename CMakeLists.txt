@@ -33,6 +33,7 @@ add_library(
   src/dp/dp.c
   src/dp/emis.c
   src/dp/final_score.c
+  src/dp/hot_range.c
   src/dp/io.c
   src/dp/matrix.c
   src/dp/path.c

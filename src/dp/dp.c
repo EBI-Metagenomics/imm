@@ -179,6 +179,20 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
         struct elapsed e2 = ELAPSED_INIT;
         struct elapsed e3 = ELAPSED_INIT;
 
+#if 0
+        for (unsigned dst = 0; dst < dp->state_table.nstates; ++dst)
+        {
+            printf("%u: ", dst);
+            for (unsigned j = 0; j < trans_table_ntrans(&dp->trans_table, dst);
+                 ++j)
+            {
+                printf("<-%u ",
+                       trans_table_source_state(&dp->trans_table, dst, j));
+            }
+            printf("\n");
+        }
+#endif
+
         elapsed_start(&e0);
         viterbi_row0_safe(dp, task);
         elapsed_stop(&e0);
