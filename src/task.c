@@ -26,6 +26,7 @@ struct imm_task *imm_task_new(struct imm_dp const *dp)
     }
     imm_eseq_init(&task->eseq, dp->code);
     task->seq = NULL;
+    task->save_path = true;
     return task;
 }
 
@@ -47,6 +48,11 @@ enum imm_rc imm_task_setup(struct imm_task *task, struct imm_seq const *seq)
     enum imm_rc rc = imm_path_setup(&task->path, imm_seq_size(seq) + 1);
     if (rc) return rc;
     return imm_eseq_setup(&task->eseq, seq);
+}
+
+void imm_task_set_save_path(struct imm_task *task, bool save)
+{
+    task->save_path = save;
 }
 
 void imm_task_del(struct imm_task const *task)

@@ -174,39 +174,67 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
 
     if (!imm_range_empty(rg.safe))
     {
-        // printf("RANGES\n");
-        // printf("[%u, %u) ", rg.safe_future.a, rg.safe_future.b);
-        // printf("[%u, %u) ", rg.safe.a, rg.safe.b);
-        // if (!imm_range_empty(rg.unsafe))
-        //     printf("[%u, %u) ", rg.unsafe.a, rg.unsafe.b);
-        // printf("[%u, %u)\n", rg.safe_past.a, rg.safe_past.b);
-        // printf("[%u %u] ", 0, len - IMM_STATE_MAX_SEQLEN);
-        // printf("[%u %u]\n", len - IMM_STATE_MAX_SEQLEN + 1, len);
-        // if (len - IMM_STATE_MAX_SEQLEN + 1 != rg.unsafe.a ||
-        //     rg.safe_past.a != len - IMM_STATE_MAX_SEQLEN + 1)
-        //     printf("UNEXPECTED\n");
-        // printf("len: %u\n", len);
-        // printf("----------------\n");
-        //
-        // assert(rg.safe_future.a == 0);
-        // assert(rg.safe_future.b == rg.safe.a);
-        // assert(rg.safe.b == rg.safe_past.a);
-        // assert(rg.safe_past.b == len + 1);
+        struct elapsed e0 = ELAPSED_INIT;
+        struct elapsed e1 = ELAPSED_INIT;
+        struct elapsed e2 = ELAPSED_INIT;
+        struct elapsed e3 = ELAPSED_INIT;
 
+        elapsed_start(&e0);
         viterbi_row0_safe(dp, task);
-        viterbi_safe_future(dp, task, rg.safe_future.a + 1,
-                            rg.safe_future.b - 1, unsafe_state);
-        viterbi_safe(dp, task, rg.safe.a, rg.safe.b - 1, unsafe_state);
-        viterbi_unsafe(dp, task, rg.safe_past.a, rg.safe_past.b - 1, len,
-                       unsafe_state);
+        elapsed_stop(&e0);
+
+        elapsed_start(&e1);
+        if (task->save_path)
+            viterbi_safe_future(dp, task, rg.safe_future.a + 1,
+                                rg.safe_future.b - 1, unsafe_state);
+        else
+            viterbi_safe_future_nopath(dp, task, rg.safe_future.a + 1,
+                                       rg.safe_future.b - 1, unsafe_state);
+        elapsed_stop(&e1);
+
+        elapsed_start(&e2);
+        if (task->save_path)
+            viterbi_safe(dp, task, rg.safe.a, rg.safe.b - 1, unsafe_state);
+        else
+            viterbi_safe_nopath(dp, task, rg.safe.a, rg.safe.b - 1,
+                                unsafe_state);
+        elapsed_stop(&e2);
+
+        elapsed_start(&e3);
+        if (task->save_path)
+            viterbi_unsafe(dp, task, rg.safe_past.a, rg.safe_past.b - 1, len,
+                           unsafe_state);
+        else
+            viterbi_unsafe_nopath(dp, task, rg.safe_past.a, rg.safe_past.b - 1,
+                                  len, unsafe_state);
+        elapsed_stop(&e3);
+
+        printf("%ld %ld %ld %ld\n", elapsed_milliseconds(&e0),
+               elapsed_milliseconds(&e1), elapsed_milliseconds(&e2),
+               elapsed_milliseconds(&e3));
     }
     else if (len >= 1 + IMM_STATE_MAX_SEQLEN)
     {
+        struct elapsed e0 = ELAPSED_INIT;
+        struct elapsed e1 = ELAPSED_INIT;
+        struct elapsed e2 = ELAPSED_INIT;
+
+        elapsed_start(&e0);
         viterbi_row0_safe(dp, task);
+        elapsed_stop(&e0);
+
+        elapsed_start(&e1);
         viterbi_safe_future(dp, task, 1, len - IMM_STATE_MAX_SEQLEN,
                             unsafe_state);
+        elapsed_stop(&e1);
+
+        elapsed_start(&e2);
         viterbi_unsafe(dp, task, len - IMM_STATE_MAX_SEQLEN + 1, len, len,
                        unsafe_state);
+        elapsed_stop(&e2);
+
+        printf("%ld %ld %ld\n", elapsed_milliseconds(&e0),
+               elapsed_milliseconds(&e1), elapsed_milliseconds(&e2));
     }
     else
     {
@@ -216,7 +244,10 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
 
     struct final_score const fscore = final_score(dp, task);
     prod->loglik = fscore.score;
-    return viterbi_path(dp, task, &prod->path, fscore.state, fscore.seq_len);
+    if (task->save_path)
+        return viterbi_path(dp, task, &prod->path, fscore.state,
+                            fscore.seq_len);
+    return IMM_OK;
 }
 
 static enum imm_rc viterbi_path(struct imm_dp const *dp,
