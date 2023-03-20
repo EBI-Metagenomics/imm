@@ -29,6 +29,7 @@ add_library(
   src/codon_state.c
   src/dna.c
   src/dp/best_trans.c
+  src/dp/best_trans_score.c
   src/dp/dp.c
   src/dp/emis.c
   src/dp/final_score.c
