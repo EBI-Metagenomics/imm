@@ -9,7 +9,6 @@ struct best_trans
 {
     imm_float score;
     unsigned prev_state;
-    unsigned prev_len;
     unsigned trans;
     unsigned len;
 };
@@ -20,7 +19,7 @@ struct matrix;
 static inline struct best_trans best_trans_init(void)
 {
     return (struct best_trans){imm_lprob_zero(), IMM_STATE_NULL_IDX,
-                               IMM_STATE_NULL_SEQLEN, UINT16_MAX, UINT8_MAX};
+                               IMM_STATE_NULL_SEQLEN, UINT16_MAX};
 }
 
 struct best_trans best_trans_find_ge1(struct imm_dp const *dp,
