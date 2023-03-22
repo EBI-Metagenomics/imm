@@ -195,7 +195,7 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
         if (task->save_path)
             viterbi_unsafe(dp, task, &rg.safe_past, len, unsafe_state);
         else
-            viterbi_nopath_unsafe(dp, task, &rg.safe_past, len, unsafe_state);
+            viterbi_nopath_unsafe(dp, task, &rg.safe_past, unsafe_state);
     }
     else if (len >= 1 + IMM_STATE_MAX_SEQLEN)
     {
