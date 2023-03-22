@@ -9,6 +9,7 @@
 #include "dp/trans_table.h"
 #include "dp/unsafe_pair.h"
 #include "dp/viterbi.h"
+#include "dp/viterbi_nopath.h"
 #include "elapsed/elapsed.h"
 #include "error.h"
 #include "imm/dp.h"

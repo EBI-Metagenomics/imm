@@ -42,6 +42,7 @@ add_library(
   src/dp/trans_table.c
   src/dp/unsafe_pair.c
   src/dp/viterbi.c
+  src/dp/viterbi_nopath.c
   src/error.c
   src/eseq.c
   src/example1.c
@@ -49,9 +50,9 @@ add_library(
   src/expect.c
   src/frame_cond.c
   src/frame_state.c
-  src/msv_example1.c
   src/frame_state_15.c
   src/frame_state_24.c
+  src/msv_example1.c
   src/frame_state_33.c
   src/gc.c
   src/gc_auto.c
