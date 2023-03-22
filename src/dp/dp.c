@@ -86,6 +86,11 @@ enum imm_rc imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
     return rc;
 }
 
+unsigned imm_dp_nstates(struct imm_dp const *dp)
+{
+    return dp->state_table.nstates;
+}
+
 unsigned imm_dp_trans_idx(struct imm_dp *dp, unsigned src_idx, unsigned dst_idx)
 {
     return imm_trans_table_idx(&dp->trans_table, src_idx, dst_idx);

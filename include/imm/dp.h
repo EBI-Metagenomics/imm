@@ -38,6 +38,8 @@ IMM_API void imm_dp_dump_path(struct imm_dp const *dp,
                               struct imm_prod const *prod,
                               imm_state_name *callb);
 
+IMM_API unsigned imm_dp_nstates(struct imm_dp const *);
+
 IMM_API unsigned imm_dp_trans_idx(struct imm_dp *dp, unsigned src_idx,
                                   unsigned dst_idx);
 

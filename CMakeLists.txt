@@ -35,6 +35,7 @@ add_library(
   src/dp/final_score.c
   src/dp/hot_range.c
   src/dp/io.c
+  src/dp/step.c
   src/dp/matrix.c
   src/dp/path.c
   src/dp/ranges.c

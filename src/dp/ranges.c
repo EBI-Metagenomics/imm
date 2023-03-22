@@ -18,7 +18,6 @@ static struct imm_range find_safe_past(unsigned seqlen)
 //
 static struct imm_range find_safe_future(unsigned seqlen)
 {
-    assert(seqlen > 0);
     if (seqlen >= IMM_STATE_MAX_SEQLEN)
         return imm_range_init(1, seqlen - IMM_STATE_MAX_SEQLEN + 1);
     return imm_range_init(1, 1);

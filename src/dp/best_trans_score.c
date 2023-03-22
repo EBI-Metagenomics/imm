@@ -34,8 +34,7 @@ imm_float best_trans_score_ge1(struct imm_dp const *dp, struct matrix const *mt,
         span.max = min(span.max, row);
         for (unsigned len = span.min; len <= span.max; ++len)
         {
-            assume(row >= len);
-            assume(len >= span.min);
+            assume(row >= len && len >= span.min);
             imm_float v = calc_score(mt, tt, row - len, src, dst, len, i);
             score = score < v ? v : score;
         }
@@ -59,58 +58,12 @@ imm_float best_trans_score(struct imm_dp const *dp, struct matrix const *mt,
         span.max = min(span.max, row);
         for (unsigned len = span.min; len <= span.max; ++len)
         {
-            assume(row >= len);
-            assume(len >= span.min);
+            assume(row >= len && len >= span.min);
             imm_float v = calc_score(mt, tt, row - len, src, dst, len, i);
             score = score < v ? v : score;
         }
     }
     return score;
-}
-
-static inline void best_trans_find_safe_single_ge1(imm_float *score,
-                                                   struct imm_dp const *dp,
-                                                   struct matrix const *mt,
-                                                   unsigned row, unsigned src,
-                                                   unsigned dst, unsigned trans)
-{
-    struct imm_dp_trans_table const *tt = &dp->trans_table;
-    struct span span = state_table_span(&dp->state_table, src);
-    if (span.min == 0) return;
-
-    assume(span.min >= 0);
-    assume(row >= span.min);
-    assume(row >= span.max);
-
-    for (unsigned len = span.min; len <= span.max; ++len)
-    {
-        assume(row >= len);
-        assume(len >= span.min);
-        imm_float v = calc_score(mt, tt, row - len, src, dst, len, trans);
-        *score = *score < v ? v : *score;
-    }
-}
-
-static inline void best_trans_find_safe_single(imm_float *score,
-                                               struct imm_dp const *dp,
-                                               struct matrix const *mt,
-                                               unsigned row, unsigned src,
-                                               unsigned dst, unsigned trans)
-{
-    struct imm_dp_trans_table const *tt = &dp->trans_table;
-    struct span span = state_table_span(&dp->state_table, src);
-
-    assume(span.min >= 0);
-    assume(row >= span.min);
-    assume(row >= span.max);
-
-    for (unsigned len = span.min; len <= span.max; ++len)
-    {
-        assume(row >= len);
-        assume(len >= span.min);
-        imm_float v = calc_score(mt, tt, row - len, src, dst, len, trans);
-        *score = *score < v ? v : *score;
-    }
 }
 
 imm_float best_trans_score_safe_ge1(struct imm_dp const *dp,
@@ -123,7 +76,17 @@ imm_float best_trans_score_safe_ge1(struct imm_dp const *dp,
     for (unsigned i = 0; i < trans_table_ntrans(tt, dst); ++i)
     {
         unsigned src = trans_table_source_state(tt, dst, i);
-        best_trans_find_safe_single_ge1(&score, dp, mt, row, src, dst, i);
+        struct span span = state_table_span(&dp->state_table, src);
+        if (span.min == 0) continue;
+
+        assume(span.min >= 0 && row >= span.min && row >= span.max);
+
+        for (unsigned len = span.min; len <= span.max; ++len)
+        {
+            assume(row >= len && len >= span.min);
+            imm_float v = calc_score(mt, tt, row - len, src, dst, len, i);
+            score = score < v ? v : score;
+        }
     }
     return score;
 }
@@ -138,7 +101,14 @@ imm_float best_trans_score_find_safe(struct imm_dp const *dp,
     for (unsigned i = 0; i < trans_table_ntrans(tt, dst); ++i)
     {
         unsigned src = trans_table_source_state(tt, dst, i);
-        best_trans_find_safe_single(&score, dp, mt, row, src, dst, i);
+        struct span span = state_table_span(&dp->state_table, src);
+        assume(span.min >= 0 && row >= span.min && row >= span.max);
+        for (unsigned len = span.min; len <= span.max; ++len)
+        {
+            assume(row >= len && len >= span.min);
+            imm_float v = calc_score(mt, tt, row - len, src, dst, len, i);
+            score = score < v ? v : score;
+        }
     }
     return score;
 }
