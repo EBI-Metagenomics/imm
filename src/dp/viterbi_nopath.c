@@ -14,24 +14,11 @@ static inline struct span safe_span(struct imm_dp const *dp, unsigned state)
     return state_table_span(&dp->state_table, state);
 }
 
-static inline struct span rclip(struct span x, unsigned max)
-{
-    return span_init(x.min, x.max <= max ? x.max : max);
-}
-
 static inline struct span unsafe_span(struct imm_dp const *dp, unsigned state,
                                       unsigned max)
 {
-    return rclip(state_table_span(&dp->state_table, state), max);
-}
-
-static inline void unsafe(struct imm_dp const *dp, struct imm_task *task,
-                          struct imm_dp_step const *step,
-                          struct imm_range const *range, unsigned r, unsigned i)
-{
-    imm_float score = imm_dp_step_score(step, i, r);
-    unsigned rem = range->b - r - 1;
-    set_score(dp, task, score, r, i, unsafe_span(dp, i, rem));
+    struct span x = state_table_span(&dp->state_table, state);
+    return span_init(x.min, x.max <= max ? x.max : max);
 }
 
 static inline void unsafe_row0(struct imm_dp const *dp, struct imm_task *task,
@@ -43,28 +30,13 @@ static inline void unsafe_row0(struct imm_dp const *dp, struct imm_task *task,
     set_score(dp, task, score, 0, i, unsafe_span(dp, i, 0));
 }
 
-void viterbi_nopath_unsafe_row0(struct imm_dp const *dp, struct imm_task *task,
-                                unsigned unsafe_state)
+static inline void unsafe(struct imm_dp const *dp, struct imm_task *task,
+                          struct imm_dp_step const *step,
+                          struct imm_range const *range, unsigned r, unsigned i)
 {
-    struct imm_dp_step step = imm_dp_step_init(dp, &task->matrix);
-
-    unsafe_row0(dp, task, &step, unsafe_state);
-    for (unsigned i = 0; i < imm_dp_nstates(dp); ++i)
-        unsafe_row0(dp, task, &step, i);
-}
-
-void viterbi_nopath_unsafe(struct imm_dp const *dp, struct imm_task *task,
-                           struct imm_range const *range, unsigned unsafe_state)
-{
-    struct imm_dp_step step = imm_dp_step_init(dp, &task->matrix);
-    assume(range->a > 0);
-
-    for (unsigned r = range->a; r < range->b; ++r)
-    {
-        unsafe(dp, task, &step, range, r, unsafe_state);
-        for (unsigned i = 0; i < imm_dp_nstates(dp); ++i)
-            unsafe(dp, task, &step, range, r, i);
-    }
+    imm_float score = imm_dp_step_score(step, i, r);
+    unsigned rem = range->b - r - 1;
+    set_score(dp, task, score, r, i, unsafe_span(dp, i, rem));
 }
 
 static inline void safe_future(struct imm_dp const *dp, struct imm_task *task,
@@ -83,28 +55,21 @@ static inline void safe_future2(struct imm_dp const *dp, struct imm_task *task,
     set_score(dp, task, score, r, i, safe_span(dp, i));
 }
 
-void viterbi_nopath_safe_future(struct imm_dp const *dp, struct imm_task *task,
-                                struct imm_range const *range,
-                                unsigned unsafe_state)
-{
-    assert(range->a > 0);
-    struct imm_dp_step step = imm_dp_step_init(dp, &task->matrix);
-
-    for (unsigned r = range->a; r < range->b; ++r)
-    {
-        safe_future(dp, task, &step, r, unsafe_state);
-
-        for (unsigned i = 0; i < imm_dp_nstates(dp); ++i)
-            safe_future2(dp, task, &step, r, i);
-    }
-}
-
 static inline void safe(struct imm_dp const *dp, struct imm_task *task,
                         unsigned r, unsigned i)
 {
     struct imm_dp_step step = imm_dp_step_init(dp, &task->matrix);
     imm_float score = imm_dp_step_score_safe(&step, i, r);
     set_score(dp, task, score, r, i, safe_span(dp, i));
+}
+
+static inline void safe_row0(struct imm_dp const *dp, struct imm_task *task,
+                             struct imm_dp_step const *step, unsigned i)
+{
+    imm_float score = imm_dp_step_score_safe(step, i, 0);
+    if (dp->state_table.start.state == i)
+        score = max(dp->state_table.start.lprob, score);
+    set_score(dp, task, score, 0, i, safe_span(dp, i));
 }
 
 static inline void safe_hot(struct imm_dp const *dp, struct imm_task *task,
@@ -121,6 +86,40 @@ static inline void safe_hot(struct imm_dp const *dp, struct imm_task *task,
 
     imm_float score = v0 < v1 ? v1 : v0;
     set_score(dp, task, score, row, dst, span_init(1, 1));
+}
+
+void viterbi_nopath_row0(struct imm_dp const *dp, struct imm_task *task,
+                         unsigned unsafe_state)
+{
+    struct imm_dp_step step = imm_dp_step_init(dp, &task->matrix);
+
+    unsafe_row0(dp, task, &step, unsafe_state);
+    for (unsigned i = 0; i < imm_dp_nstates(dp); ++i)
+        unsafe_row0(dp, task, &step, i);
+}
+
+void viterbi_nopath(struct imm_dp const *dp, struct imm_task *task,
+                    struct imm_range const *range, unsigned unsafe_state)
+{
+    struct imm_dp_step step = imm_dp_step_init(dp, &task->matrix);
+    assume(range->a > 0);
+
+    for (unsigned r = range->a; r < range->b; ++r)
+    {
+        unsafe(dp, task, &step, range, r, unsafe_state);
+        for (unsigned i = 0; i < imm_dp_nstates(dp); ++i)
+            unsafe(dp, task, &step, range, r, i);
+    }
+}
+
+void viterbi_nopath_safe_row0(struct imm_dp const *dp, struct imm_task *task,
+                              unsigned unsafe_state)
+{
+    struct imm_dp_step step = imm_dp_step_init(dp, &task->matrix);
+
+    safe_row0(dp, task, &step, unsafe_state);
+    for (unsigned i = 0; i < imm_dp_nstates(dp); ++i)
+        safe_row0(dp, task, &step, i);
 }
 
 void viterbi_nopath_safe(struct imm_dp const *dp, struct imm_task *task,
@@ -155,5 +154,21 @@ void viterbi_nopath_safe(struct imm_dp const *dp, struct imm_task *task,
                  ++i)
                 safe(dp, task, r, i);
         }
+    }
+}
+
+void viterbi_nopath_safe_future(struct imm_dp const *dp, struct imm_task *task,
+                                struct imm_range const *range,
+                                unsigned unsafe_state)
+{
+    assert(range->a > 0);
+    struct imm_dp_step step = imm_dp_step_init(dp, &task->matrix);
+
+    for (unsigned r = range->a; r < range->b; ++r)
+    {
+        safe_future(dp, task, &step, r, unsafe_state);
+
+        for (unsigned i = 0; i < imm_dp_nstates(dp); ++i)
+            safe_future2(dp, task, &step, r, i);
     }
 }

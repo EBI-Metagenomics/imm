@@ -180,7 +180,10 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
 
     if (!imm_range_empty(rg.safe))
     {
-        viterbi_row0_safe(dp, task);
+        if (task->save_path)
+            viterbi_row0_safe(dp, task);
+        else
+            viterbi_nopath_safe_row0(dp, task, unsafe_state);
 
         if (task->save_path)
             viterbi_safe_future(dp, task, &rg.safe_future, unsafe_state);
@@ -195,7 +198,7 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
         if (task->save_path)
             viterbi_unsafe(dp, task, &rg.safe_past, len, unsafe_state);
         else
-            viterbi_nopath_unsafe(dp, task, &rg.safe_past, unsafe_state);
+            viterbi_nopath(dp, task, &rg.safe_past, unsafe_state);
     }
     else if (len >= 1 + IMM_STATE_MAX_SEQLEN)
     {
@@ -212,7 +215,7 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
         if (task->save_path)
             viterbi_row0(dp, task, len);
         else
-            viterbi_nopath_unsafe_row0(dp, task, len);
+            viterbi_nopath_row0(dp, task, len);
 
         struct imm_range range = imm_range_init(1, len + 1);
         viterbi_unsafe(dp, task, &range, len, unsafe_state);
