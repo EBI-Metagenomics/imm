@@ -22,7 +22,7 @@ static inline imm_float calc_score(struct matrix const *mt,
                                    unsigned row, unsigned src, unsigned dst,
                                    unsigned len, unsigned trans)
 {
-    imm_float v0 = matrix_get_score(mt, row, src, len);
+    imm_float v0 = matrix_get_score(mt, cell_init(row, src, len));
     imm_float v1 = trans_table_score(tt, dst, trans);
     return v0 + v1;
 }

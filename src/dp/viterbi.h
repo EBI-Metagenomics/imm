@@ -3,19 +3,17 @@
 
 struct imm_dp;
 struct imm_task;
-struct unsafe_pair;
 
-void viterbi_unsafe(struct imm_dp const *dp, struct imm_task *task,
-                    unsigned const start_row, unsigned const stop_row,
-                    unsigned seqlen, unsigned unsafe_state);
+void viterbi_unsafe(struct imm_dp const *, struct imm_task *,
+                    unsigned start_row, unsigned stop_row, unsigned seqlen,
+                    unsigned unsafe_state);
 
-void viterbi_safe_future(struct imm_dp const *dp, struct imm_task *task,
-                         unsigned const start_row, unsigned const stop_row,
+void viterbi_safe_future(struct imm_dp const *, struct imm_task *,
+                         unsigned start_row, unsigned stop_row,
                          unsigned unsafe_state);
 
-void viterbi_safe(struct imm_dp const *dp, struct imm_task *task,
-                  unsigned const start_row, unsigned const stop_row,
-                  unsigned unsafe_state);
+void viterbi_safe(struct imm_dp const *, struct imm_task *, unsigned start_row,
+                  unsigned stop_row, unsigned unsafe_state);
 
 void viterbi_row0_safe(struct imm_dp const *dp, struct imm_task *task);
 

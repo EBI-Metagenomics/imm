@@ -19,8 +19,8 @@ struct final_score final_score(struct imm_dp const *dp, struct imm_task *task)
     for (unsigned len = min(max_seq, length);; --len)
     {
 
-        imm_float s =
-            matrix_get_score(&task->matrix, length - len, end_state, len);
+        imm_float s = matrix_get_score(&task->matrix,
+                                       cell_init(length - len, end_state, len));
         if (s > score)
         {
             score = s;

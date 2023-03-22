@@ -6,16 +6,15 @@
 struct imm_dp;
 struct matrix;
 
-imm_float best_trans_score_find_ge1(struct imm_dp const *,
+imm_float best_trans_score_ge1(struct imm_dp const *, struct matrix const *,
+                               unsigned dst, unsigned row);
+
+imm_float best_trans_score(struct imm_dp const *, struct matrix const *,
+                           unsigned dst, unsigned row);
+
+imm_float best_trans_score_safe_ge1(struct imm_dp const *,
                                     struct matrix const *, unsigned dst,
                                     unsigned row);
-
-imm_float best_trans_score_find(struct imm_dp const *, struct matrix const *,
-                                unsigned dst, unsigned row);
-
-imm_float best_trans_score_find_safe_ge1(struct imm_dp const *,
-                                         struct matrix const *, unsigned dst,
-                                         unsigned row);
 
 imm_float best_trans_score_find_safe(struct imm_dp const *,
                                      struct matrix const *, unsigned dst,

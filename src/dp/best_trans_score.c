@@ -12,14 +12,13 @@ static inline imm_float calc_score(struct matrix const *mt,
                                    unsigned row, unsigned src, unsigned dst,
                                    unsigned len, unsigned trans)
 {
-    imm_float v0 = matrix_get_score(mt, row, src, len);
+    imm_float v0 = matrix_get_score(mt, cell_init(row, src, len));
     imm_float v1 = trans_table_score(tt, dst, trans);
     return v0 + v1;
 }
 
-imm_float best_trans_score_find_ge1(struct imm_dp const *dp,
-                                    struct matrix const *mt, unsigned dst,
-                                    unsigned row)
+imm_float best_trans_score_ge1(struct imm_dp const *dp, struct matrix const *mt,
+                               unsigned dst, unsigned row)
 {
     imm_float score = imm_lprob_zero();
     struct imm_dp_trans_table const *tt = &dp->trans_table;
@@ -44,9 +43,8 @@ imm_float best_trans_score_find_ge1(struct imm_dp const *dp,
     return score;
 }
 
-imm_float best_trans_score_find(struct imm_dp const *dp,
-                                struct matrix const *mt, unsigned dst,
-                                unsigned row)
+imm_float best_trans_score(struct imm_dp const *dp, struct matrix const *mt,
+                           unsigned dst, unsigned row)
 {
     imm_float score = imm_lprob_zero();
     struct imm_dp_trans_table const *tt = &dp->trans_table;
@@ -115,9 +113,9 @@ static inline void best_trans_find_safe_single(imm_float *score,
     }
 }
 
-imm_float best_trans_score_find_safe_ge1(struct imm_dp const *dp,
-                                         struct matrix const *mt, unsigned dst,
-                                         unsigned row)
+imm_float best_trans_score_safe_ge1(struct imm_dp const *dp,
+                                    struct matrix const *mt, unsigned dst,
+                                    unsigned row)
 {
     imm_float score = imm_lprob_zero();
     struct imm_dp_trans_table const *tt = &dp->trans_table;

@@ -8,112 +8,61 @@
 #include "minmax.h"
 #include "task.h"
 
-static inline void _viti_ge1_nopath(struct imm_dp const *dp,
-                                    struct imm_task *task, unsigned const r,
-                                    unsigned i, unsigned remain)
-{
-    imm_float score = best_trans_score_find_ge1(dp, &task->matrix, i, r);
-    struct span span = state_table_span(&dp->state_table, i);
-    span.max = min(span.max, remain);
-    set_score(dp, task, score, span.min, span.max, r, i);
-}
-
-static inline void _viti_nopath(struct imm_dp const *dp, struct imm_task *task,
-                                unsigned const r, unsigned i, unsigned remain)
-{
-    imm_float score = best_trans_score_find(dp, &task->matrix, i, r);
-    struct span span = state_table_span(&dp->state_table, i);
-    span.max = min(span.max, remain);
-    set_score(dp, task, score, span.min, span.max, r, i);
-}
+static inline void _viti_safe_nopath(struct imm_dp const *, struct imm_task *,
+                                     unsigned r, unsigned i);
+static inline void _viti_safe_hot_nopath(struct imm_dp const *,
+                                         struct imm_task *, unsigned row,
+                                         unsigned dst,
+                                         struct hot_range const *);
 
 void viterbi_nopath_unsafe(struct imm_dp const *dp, struct imm_task *task,
-                           unsigned const start_row, unsigned const stop_row,
-                           unsigned seqlen, unsigned unsafe_state)
+                           unsigned start_row, unsigned stop_row, unsigned len,
+                           unsigned unsafe_state)
 {
     for (unsigned r = start_row; r <= stop_row; ++r)
     {
-        if ((r > 0 && r < seqlen))
+        if ((r > 0 && r < len))
         {
-            _viti_ge1_nopath(dp, task, r, unsafe_state, stop_row - r);
+            unsigned state = unsafe_state;
+            imm_float score = best_trans_score_ge1(dp, &task->matrix, state, r);
+            struct span span = state_table_span(&dp->state_table, state);
+            span.max = min(span.max, (unsigned)(stop_row - r));
+            set_score(dp, task, score, r, state, span);
         }
-        for (unsigned i = 0; i < dp->state_table.nstates; ++i)
+
+        for (unsigned state = 0; state < dp->state_table.nstates; ++state)
         {
-            _viti_nopath(dp, task, r, i, stop_row - r);
+            imm_float score = best_trans_score(dp, &task->matrix, state, r);
+            struct span span = state_table_span(&dp->state_table, state);
+            span.max = min(span.max, (unsigned)(stop_row - r));
+            set_score(dp, task, score, r, state, span);
         }
     }
 }
 
-static inline void _viti_safe_future_nopath(struct imm_dp const *dp,
-                                            struct imm_task *task,
-                                            unsigned const r, unsigned i)
-{
-    imm_float score = best_trans_score_find(dp, &task->matrix, i, r);
-    struct span span = state_table_span(&dp->state_table, i);
-    set_score(dp, task, score, span.min, span.max, r, i);
-}
-
-static inline void _viti_safe_future_ge1_nopath(struct imm_dp const *dp,
-                                                struct imm_task *task,
-                                                unsigned const r, unsigned i)
-{
-    imm_float score = best_trans_score_find_ge1(dp, &task->matrix, i, r);
-    struct span span = state_table_span(&dp->state_table, i);
-    set_score(dp, task, score, span.min, span.max, r, i);
-}
-
 void viterbi_nopath_safe_future(struct imm_dp const *dp, struct imm_task *task,
-                                unsigned const start_row,
-                                unsigned const stop_row, unsigned unsafe_state)
+                                unsigned start_row, unsigned stop_row,
+                                unsigned unsafe_state)
 {
     assert(start_row > 0);
     for (unsigned r = start_row; r <= stop_row; ++r)
     {
-        _viti_safe_future_ge1_nopath(dp, task, r, unsafe_state);
-        for (unsigned i = 0; i < dp->state_table.nstates; ++i)
+        unsigned state = unsafe_state;
+        imm_float score = best_trans_score_ge1(dp, &task->matrix, state, r);
+        struct span span = state_table_span(&dp->state_table, state);
+        set_score(dp, task, score, r, state, span);
+
+        for (unsigned state = 0; state < dp->state_table.nstates; ++state)
         {
-            _viti_safe_future_nopath(dp, task, r, i);
+            imm_float score = best_trans_score(dp, &task->matrix, state, r);
+            struct span span = state_table_span(&dp->state_table, state);
+            set_score(dp, task, score, r, state, span);
         }
     }
 }
 
-static inline void _viti_safe_ge1_nopath(struct imm_dp const *dp,
-                                         struct imm_task *task,
-                                         unsigned const r, unsigned i)
-{
-    imm_float score = best_trans_score_find_safe_ge1(dp, &task->matrix, i, r);
-    struct span span = state_table_span(&dp->state_table, i);
-    set_score(dp, task, score, span.min, span.max, r, i);
-}
-
-static inline void _viti_safe_nopath(struct imm_dp const *dp,
-                                     struct imm_task *task, unsigned const r,
-                                     unsigned i)
-{
-    imm_float score = best_trans_score_find_safe(dp, &task->matrix, i, r);
-    struct span span = state_table_span(&dp->state_table, i);
-    set_score(dp, task, score, span.min, span.max, r, i);
-}
-
-static inline void _viti_safe_hot_nopath(struct imm_dp const *dp,
-                                         struct imm_task *task,
-                                         unsigned const row, unsigned dst,
-                                         struct hot_range const *hot)
-{
-
-    struct imm_dp_trans_table const *tt = &dp->trans_table;
-    struct matrix const *mt = &task->matrix;
-
-    imm_float v0 = matrix_get_score(mt, row - 1, dst - 1, 1) +
-                   trans_table_score(tt, dst, 0);
-    imm_float v1 =
-        matrix_get_score(mt, row, hot->left, 0) + trans_table_score(tt, dst, 1);
-
-    set_score(dp, task, v0 < v1 ? v1 : v0, 1, 1, row, dst);
-}
-
 void viterbi_nopath_safe(struct imm_dp const *dp, struct imm_task *task,
-                         unsigned const start_row, unsigned const stop_row,
+                         unsigned start_row, unsigned stop_row,
                          unsigned unsafe_state)
 {
     struct hot_range hot = {0};
@@ -122,7 +71,11 @@ void viterbi_nopath_safe(struct imm_dp const *dp, struct imm_task *task,
     assume(start_row > 0);
     for (unsigned r = start_row; r <= stop_row; ++r)
     {
-        _viti_safe_ge1_nopath(dp, task, r, unsafe_state);
+        unsigned state = unsafe_state;
+        imm_float score =
+            best_trans_score_safe_ge1(dp, &task->matrix, state, r);
+        struct span span = state_table_span(&dp->state_table, state);
+        set_score(dp, task, score, r, state, span);
 
         if (hot.total < 2)
         {
@@ -145,4 +98,31 @@ void viterbi_nopath_safe(struct imm_dp const *dp, struct imm_task *task,
                 _viti_safe_nopath(dp, task, r, i);
         }
     }
+}
+
+static inline void _viti_safe_nopath(struct imm_dp const *dp,
+                                     struct imm_task *task, unsigned r,
+                                     unsigned i)
+{
+    imm_float score = best_trans_score_find_safe(dp, &task->matrix, i, r);
+    struct span span = state_table_span(&dp->state_table, i);
+    set_score(dp, task, score, r, i, span);
+}
+
+static inline void _viti_safe_hot_nopath(struct imm_dp const *dp,
+                                         struct imm_task *task, unsigned row,
+                                         unsigned dst,
+                                         struct hot_range const *hot)
+{
+
+    struct imm_dp_trans_table const *tt = &dp->trans_table;
+    struct matrix const *mt = &task->matrix;
+
+    imm_float v0 = matrix_get_score(mt, cell_init(row - 1, dst - 1, 1)) +
+                   trans_table_score(tt, dst, 0);
+    imm_float v1 = matrix_get_score(mt, cell_init(row, hot->left, 0)) +
+                   trans_table_score(tt, dst, 1);
+
+    imm_float score = v0 < v1 ? v1 : v0;
+    set_score(dp, task, score, row, dst, span_init(1, 1));
 }

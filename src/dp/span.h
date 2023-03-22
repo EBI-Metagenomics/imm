@@ -20,6 +20,11 @@ struct span
 
 static_assert(sizeof(struct span) == 2, "struct span must be packed");
 
+static inline struct span span_init(unsigned min, unsigned max)
+{
+    return (struct span){.min = min, .max = max};
+}
+
 static inline uint16_t span_zip(struct span const *span)
 {
     return (uint16_t)((span->min << 8) | span->max);
