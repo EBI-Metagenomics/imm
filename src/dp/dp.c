@@ -209,7 +209,11 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
     }
     else
     {
-        viterbi_row0(dp, task, len);
+        if (task->save_path)
+            viterbi_row0(dp, task, len);
+        else
+            viterbi_nopath_unsafe_row0(dp, task, len);
+
         struct imm_range range = imm_range_init(1, len + 1);
         viterbi_unsafe(dp, task, &range, len, unsafe_state);
     }

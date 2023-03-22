@@ -34,6 +34,25 @@ static inline void unsafe(struct imm_dp const *dp, struct imm_task *task,
     set_score(dp, task, score, r, i, unsafe_span(dp, i, rem));
 }
 
+static inline void unsafe_row0(struct imm_dp const *dp, struct imm_task *task,
+                               struct imm_dp_step const *step, unsigned i)
+{
+    imm_float score = imm_dp_step_score(step, i, 0);
+    if (dp->state_table.start.state == i)
+        score = max(dp->state_table.start.lprob, score);
+    set_score(dp, task, score, 0, i, unsafe_span(dp, i, 0));
+}
+
+void viterbi_nopath_unsafe_row0(struct imm_dp const *dp, struct imm_task *task,
+                                unsigned unsafe_state)
+{
+    struct imm_dp_step step = imm_dp_step_init(dp, &task->matrix);
+
+    unsafe_row0(dp, task, &step, unsafe_state);
+    for (unsigned i = 0; i < imm_dp_nstates(dp); ++i)
+        unsafe_row0(dp, task, &step, i);
+}
+
 void viterbi_nopath_unsafe(struct imm_dp const *dp, struct imm_task *task,
                            struct imm_range const *range, unsigned unsafe_state)
 {
