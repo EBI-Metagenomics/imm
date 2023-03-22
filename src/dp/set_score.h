@@ -1,7 +1,7 @@
 #ifndef DP_SET_SCORE_H
 #define DP_SET_SCORE_H
 
-#include "dp/assume.h"
+#include "assume.h"
 #include "dp/emis.h"
 #include "dp/span.h"
 #include "dp/state_loc.h"

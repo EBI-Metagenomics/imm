@@ -1,5 +1,5 @@
-#ifndef DP_ASSUME_H
-#define DP_ASSUME_H
+#ifndef ASSUME_H
+#define ASSUME_H
 
 #include "compiler.h"
 

@@ -1,7 +1,7 @@
 #ifndef DP_STATE_TABLE_H
 #define DP_STATE_TABLE_H
 
-#include "dp/assume.h"
+#include "assume.h"
 #include "dp/span.h"
 #include "imm/dp/state_table.h"
 #include "imm/state_types.h"

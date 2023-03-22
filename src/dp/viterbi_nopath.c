@@ -6,6 +6,7 @@
 #include "dp/trans_table.h"
 #include "imm/dp.h"
 #include "minmax.h"
+#include "range.h"
 #include "task.h"
 
 static inline void _viti_safe_nopath(struct imm_dp const *, struct imm_task *,
@@ -16,17 +17,17 @@ static inline void _viti_safe_hot_nopath(struct imm_dp const *,
                                          struct hot_range const *);
 
 void viterbi_nopath_unsafe(struct imm_dp const *dp, struct imm_task *task,
-                           unsigned start_row, unsigned stop_row, unsigned len,
+                           struct imm_range const *range, unsigned len,
                            unsigned unsafe_state)
 {
-    for (unsigned r = start_row; r <= stop_row; ++r)
+    for (unsigned r = range->a; r < range->b; ++r)
     {
         if ((r > 0 && r < len))
         {
             unsigned state = unsafe_state;
             imm_float score = best_trans_score_ge1(dp, &task->matrix, state, r);
             struct span span = state_table_span(&dp->state_table, state);
-            span.max = min(span.max, (unsigned)(stop_row - r));
+            span.max = min(span.max, (unsigned)(range->b - r - 1));
             set_score(dp, task, score, r, state, span);
         }
 
@@ -34,7 +35,7 @@ void viterbi_nopath_unsafe(struct imm_dp const *dp, struct imm_task *task,
         {
             imm_float score = best_trans_score(dp, &task->matrix, state, r);
             struct span span = state_table_span(&dp->state_table, state);
-            span.max = min(span.max, (unsigned)(stop_row - r));
+            span.max = min(span.max, (unsigned)(range->b - r - 1));
             set_score(dp, task, score, r, state, span);
         }
     }

@@ -175,58 +175,26 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
 
     if (!imm_range_empty(rg.safe))
     {
-        struct elapsed e0 = ELAPSED_INIT;
-        struct elapsed e1 = ELAPSED_INIT;
-        struct elapsed e2 = ELAPSED_INIT;
-        struct elapsed e3 = ELAPSED_INIT;
-
-#if 0
-        for (unsigned dst = 0; dst < dp->state_table.nstates; ++dst)
-        {
-            printf("%u: ", dst);
-            for (unsigned j = 0; j < trans_table_ntrans(&dp->trans_table, dst);
-                 ++j)
-            {
-                printf("<-%u ",
-                       trans_table_source_state(&dp->trans_table, dst, j));
-            }
-            printf("\n");
-        }
-#endif
-
-        elapsed_start(&e0);
         viterbi_row0_safe(dp, task);
-        elapsed_stop(&e0);
 
-        elapsed_start(&e1);
         if (task->save_path)
             viterbi_safe_future(dp, task, rg.safe_future.a + 1,
                                 rg.safe_future.b - 1, unsafe_state);
         else
             viterbi_nopath_safe_future(dp, task, rg.safe_future.a + 1,
                                        rg.safe_future.b - 1, unsafe_state);
-        elapsed_stop(&e1);
 
-        elapsed_start(&e2);
         if (task->save_path)
             viterbi_safe(dp, task, rg.safe.a, rg.safe.b - 1, unsafe_state);
         else
             viterbi_nopath_safe(dp, task, rg.safe.a, rg.safe.b - 1,
                                 unsafe_state);
-        elapsed_stop(&e2);
 
-        elapsed_start(&e3);
         if (task->save_path)
             viterbi_unsafe(dp, task, rg.safe_past.a, rg.safe_past.b - 1, len,
                            unsafe_state);
         else
-            viterbi_nopath_unsafe(dp, task, rg.safe_past.a, rg.safe_past.b - 1,
-                                  len, unsafe_state);
-        elapsed_stop(&e3);
-
-        printf("%ld %ld %ld %ld\n", elapsed_milliseconds(&e0),
-               elapsed_milliseconds(&e1), elapsed_milliseconds(&e2),
-               elapsed_milliseconds(&e3));
+            viterbi_nopath_unsafe(dp, task, &rg.safe_past, len, unsafe_state);
     }
     else if (len >= 1 + IMM_STATE_MAX_SEQLEN)
     {
@@ -234,19 +202,13 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
         struct elapsed e1 = ELAPSED_INIT;
         struct elapsed e2 = ELAPSED_INIT;
 
-        elapsed_start(&e0);
         viterbi_row0_safe(dp, task);
-        elapsed_stop(&e0);
 
-        elapsed_start(&e1);
         viterbi_safe_future(dp, task, 1, len - IMM_STATE_MAX_SEQLEN,
                             unsafe_state);
-        elapsed_stop(&e1);
 
-        elapsed_start(&e2);
         viterbi_unsafe(dp, task, len - IMM_STATE_MAX_SEQLEN + 1, len, len,
                        unsafe_state);
-        elapsed_stop(&e2);
 
         printf("%ld %ld %ld\n", elapsed_milliseconds(&e0),
                elapsed_milliseconds(&e1), elapsed_milliseconds(&e2));
