@@ -3,7 +3,6 @@
 #include "dp/emis.h"
 #include "dp/final_score.h"
 #include "dp/matrix.h"
-#include "dp/minmax.h"
 #include "dp/ranges.h"
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
@@ -18,6 +17,7 @@
 #include "imm/state.h"
 #include "imm/subseq.h"
 #include "imm/trans.h"
+#include "minmax.h"
 #include "task.h"
 #include <assert.h>
 #include <limits.h>
@@ -203,7 +203,7 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
             viterbi_safe_future(dp, task, rg.safe_future.a + 1,
                                 rg.safe_future.b - 1, unsafe_state);
         else
-            viterbi_safe_future_nopath(dp, task, rg.safe_future.a + 1,
+            viterbi_nopath_safe_future(dp, task, rg.safe_future.a + 1,
                                        rg.safe_future.b - 1, unsafe_state);
         elapsed_stop(&e1);
 
@@ -211,7 +211,7 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
         if (task->save_path)
             viterbi_safe(dp, task, rg.safe.a, rg.safe.b - 1, unsafe_state);
         else
-            viterbi_safe_nopath(dp, task, rg.safe.a, rg.safe.b - 1,
+            viterbi_nopath_safe(dp, task, rg.safe.a, rg.safe.b - 1,
                                 unsafe_state);
         elapsed_stop(&e2);
 
@@ -220,7 +220,7 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
             viterbi_unsafe(dp, task, rg.safe_past.a, rg.safe_past.b - 1, len,
                            unsafe_state);
         else
-            viterbi_unsafe_nopath(dp, task, rg.safe_past.a, rg.safe_past.b - 1,
+            viterbi_nopath_unsafe(dp, task, rg.safe_past.a, rg.safe_past.b - 1,
                                   len, unsafe_state);
         elapsed_stop(&e3);
 

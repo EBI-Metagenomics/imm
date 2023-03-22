@@ -1,8 +1,8 @@
 #include "dp/final_score.h"
-#include "dp/minmax.h"
 #include "dp/state_table.h"
 #include "imm/dp.h"
 #include "imm/lprob.h"
+#include "minmax.h"
 #include "task.h"
 
 struct final_score final_score(struct imm_dp const *dp, struct imm_task *task)
@@ -16,7 +16,7 @@ struct final_score final_score(struct imm_dp const *dp, struct imm_task *task)
     unsigned length = eseq_len(&task->eseq);
     unsigned max_seq = state_table_span(&dp->state_table, end_state).max;
 
-    for (unsigned len = (unsigned)MIN(max_seq, length);; --len)
+    for (unsigned len = min(max_seq, length);; --len)
     {
 
         imm_float s =

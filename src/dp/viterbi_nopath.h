@@ -4,15 +4,15 @@
 struct imm_dp;
 struct imm_task;
 
-void viterbi_unsafe_nopath(struct imm_dp const *dp, struct imm_task *task,
+void viterbi_nopath_unsafe(struct imm_dp const *dp, struct imm_task *task,
                            unsigned const start_row, unsigned const stop_row,
                            unsigned seqlen, unsigned unsafe_state);
 
-void viterbi_safe_future_nopath(struct imm_dp const *dp, struct imm_task *task,
+void viterbi_nopath_safe_future(struct imm_dp const *dp, struct imm_task *task,
                                 unsigned const start_row,
                                 unsigned const stop_row, unsigned unsafe_state);
 
-void viterbi_safe_nopath(struct imm_dp const *dp, struct imm_task *task,
+void viterbi_nopath_safe(struct imm_dp const *dp, struct imm_task *task,
                          unsigned const start_row, unsigned const stop_row,
                          unsigned unsafe_state);
 

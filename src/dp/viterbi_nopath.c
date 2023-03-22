@@ -1,11 +1,11 @@
 #include "dp/viterbi_nopath.h"
 #include "dp/best_trans_score.h"
 #include "dp/hot_range.h"
-#include "dp/minmax.h"
 #include "dp/set_score.h"
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
 #include "imm/dp.h"
+#include "minmax.h"
 #include "task.h"
 
 static inline void _viti_ge1_nopath(struct imm_dp const *dp,
@@ -14,7 +14,7 @@ static inline void _viti_ge1_nopath(struct imm_dp const *dp,
 {
     imm_float score = best_trans_score_find_ge1(dp, &task->matrix, i, r);
     struct span span = state_table_span(&dp->state_table, i);
-    span.max = MIN(span.max, remain);
+    span.max = min(span.max, remain);
     set_score(dp, task, score, span.min, span.max, r, i);
 }
 
@@ -23,18 +23,17 @@ static inline void _viti_nopath(struct imm_dp const *dp, struct imm_task *task,
 {
     imm_float score = best_trans_score_find(dp, &task->matrix, i, r);
     struct span span = state_table_span(&dp->state_table, i);
-    span.max = MIN(span.max, remain);
+    span.max = min(span.max, remain);
     set_score(dp, task, score, span.min, span.max, r, i);
 }
 
-void viterbi_unsafe_nopath(struct imm_dp const *dp, struct imm_task *task,
+void viterbi_nopath_unsafe(struct imm_dp const *dp, struct imm_task *task,
                            unsigned const start_row, unsigned const stop_row,
                            unsigned seqlen, unsigned unsafe_state)
 {
     for (unsigned r = start_row; r <= stop_row; ++r)
     {
         if ((r > 0 && r < seqlen))
-        // if (r > 0 && upair)
         {
             _viti_ge1_nopath(dp, task, r, unsafe_state, stop_row - r);
         }
@@ -63,7 +62,7 @@ static inline void _viti_safe_future_ge1_nopath(struct imm_dp const *dp,
     set_score(dp, task, score, span.min, span.max, r, i);
 }
 
-void viterbi_safe_future_nopath(struct imm_dp const *dp, struct imm_task *task,
+void viterbi_nopath_safe_future(struct imm_dp const *dp, struct imm_task *task,
                                 unsigned const start_row,
                                 unsigned const stop_row, unsigned unsafe_state)
 {
@@ -113,7 +112,7 @@ static inline void _viti_safe_hot_nopath(struct imm_dp const *dp,
     set_score(dp, task, v0 < v1 ? v1 : v0, 1, 1, row, dst);
 }
 
-void viterbi_safe_nopath(struct imm_dp const *dp, struct imm_task *task,
+void viterbi_nopath_safe(struct imm_dp const *dp, struct imm_task *task,
                          unsigned const start_row, unsigned const stop_row,
                          unsigned unsafe_state)
 {

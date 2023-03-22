@@ -3,7 +3,6 @@
 #include "dp/emis.h"
 #include "dp/hot_range.h"
 #include "dp/matrix.h"
-#include "dp/minmax.h"
 #include "dp/path.h"
 #include "dp/set_score.h"
 #include "dp/state_table.h"
@@ -11,6 +10,7 @@
 #include "dp/unsafe_pair.h"
 #include "eseq.h"
 #include "imm/dp.h"
+#include "minmax.h"
 #include "task.h"
 
 static inline void _viti_safe_future(struct imm_dp const *dp,
@@ -120,7 +120,7 @@ static inline void _viti(struct imm_dp const *dp, struct imm_task *task,
     }
 
     struct span span = state_table_span(&dp->state_table, i);
-    span.max = MIN(span.max, remain);
+    span.max = min(span.max, remain);
 
     set_score(dp, task, bt.score, span.min, span.max, r, i);
 }
@@ -143,7 +143,7 @@ static inline void _viti_ge1(struct imm_dp const *dp, struct imm_task *task,
     }
 
     struct span span = state_table_span(&dp->state_table, i);
-    span.max = MIN(span.max, remain);
+    span.max = min(span.max, remain);
 
     set_score(dp, task, bt.score, span.min, span.max, r, i);
 }
@@ -232,7 +232,7 @@ void viterbi_row0_safe(struct imm_dp const *dp, struct imm_task *task)
         struct span span = state_table_span(&dp->state_table, i);
 
         if (dp->state_table.start.state == i)
-            bt.score = MAX(dp->state_table.start.lprob, bt.score);
+            bt.score = max(dp->state_table.start.lprob, bt.score);
 
         set_score(dp, task, bt.score, span.min, span.max, 0, i);
     }
@@ -246,7 +246,7 @@ void viterbi_row0_safe_nopath(struct imm_dp const *dp, struct imm_task *task)
         struct span span = state_table_span(&dp->state_table, i);
 
         if (dp->state_table.start.state == i)
-            bt.score = MAX(dp->state_table.start.lprob, bt.score);
+            bt.score = max(dp->state_table.start.lprob, bt.score);
 
         set_score(dp, task, bt.score, span.min, span.max, 0, i);
     }
@@ -272,10 +272,10 @@ void viterbi_row0(struct imm_dp const *dp, struct imm_task *task,
         }
 
         struct span span = state_table_span(&dp->state_table, i);
-        span.max = MIN(span.max, remain);
+        span.max = min(span.max, remain);
 
         if (dp->state_table.start.state == i)
-            bt.score = MAX(dp->state_table.start.lprob, bt.score);
+            bt.score = max(dp->state_table.start.lprob, bt.score);
 
         set_score(dp, task, bt.score, span.min, span.max, 0, i);
     }

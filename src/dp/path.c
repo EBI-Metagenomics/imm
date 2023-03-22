@@ -1,9 +1,9 @@
 #include "dp/path.h"
 #include "bits.h"
-#include "dp/minmax.h"
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
 #include "error.h"
+#include "minmax.h"
 #include "reallocf.h"
 #include <stdlib.h>
 
@@ -43,7 +43,7 @@ enum imm_rc imm__path_reset(struct path *p,
             unsigned src = trans_table_source_state(trans_tbl, dst, i);
             unsigned min_seq = state_table_span(state_tbl, src).min;
             unsigned max_seq = state_table_span(state_tbl, src).max;
-            depth = MAX(max_seq - min_seq, depth);
+            depth = max(max_seq - min_seq, depth);
         }
         p->state_offset[dst + 1] = p->state_offset[dst];
         p->trans_bits[dst] =

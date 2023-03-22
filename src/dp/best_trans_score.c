@@ -1,10 +1,10 @@
 #include "dp/best_trans_score.h"
 #include "dp/final_score.h"
 #include "dp/matrix.h"
-#include "dp/minmax.h"
 #include "dp/state_table.h"
 #include "dp/trans_table.h"
 #include "imm/dp.h"
+#include "minmax.h"
 #include "task.h"
 
 static inline imm_float calc_score(struct matrix const *mt,
@@ -32,7 +32,7 @@ imm_float best_trans_score_find_ge1(struct imm_dp const *dp,
 
         if (imm_unlikely(row < span.min)) continue;
 
-        span.max = MIN(span.max, row);
+        span.max = min(span.max, row);
         for (unsigned len = span.min; len <= span.max; ++len)
         {
             assume(row >= len);
@@ -58,7 +58,7 @@ imm_float best_trans_score_find(struct imm_dp const *dp,
 
         if (imm_unlikely(row < span.min)) continue;
 
-        span.max = MIN(span.max, row);
+        span.max = min(span.max, row);
         for (unsigned len = span.min; len <= span.max; ++len)
         {
             assume(row >= len);
