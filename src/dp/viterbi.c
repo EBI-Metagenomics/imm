@@ -6,6 +6,7 @@
 #include "dp/viterbi_nopath.h"
 #include "imm/dp.h"
 #include "minmax.h"
+#include "range.h"
 #include "task.h"
 
 static inline void _viti_safe_future(struct imm_dp const *dp,
@@ -143,25 +144,24 @@ static inline void _viti_ge1(struct imm_dp const *dp, struct imm_task *task,
 }
 
 void viterbi_unsafe(struct imm_dp const *dp, struct imm_task *task,
-                    unsigned start_row, unsigned stop_row, unsigned seqlen,
+                    struct imm_range const *range, unsigned len,
                     unsigned unsafe_state)
 {
-    for (unsigned r = start_row; r <= stop_row; ++r)
+    for (unsigned r = range->a; r < range->b; ++r)
     {
-        if ((r > 0 && r < seqlen))
-            _viti_ge1(dp, task, r, unsafe_state, stop_row - r);
+        if ((r > 0 && r < len))
+            _viti_ge1(dp, task, r, unsafe_state, (unsigned)(range->b - r - 1));
 
         for (unsigned i = 0; i < dp->state_table.nstates; ++i)
-            _viti(dp, task, r, i, stop_row - r);
+            _viti(dp, task, r, i, (unsigned)(range->b - r - 1));
     }
 }
 
 void viterbi_safe_future(struct imm_dp const *dp, struct imm_task *task,
-                         unsigned start_row, unsigned stop_row,
-                         unsigned unsafe_state)
+                         struct imm_range const *range, unsigned unsafe_state)
 {
-    assert(start_row > 0);
-    for (unsigned r = start_row; r <= stop_row; ++r)
+    assert(range->a > 0);
+    for (unsigned r = range->a; r < range->b; ++r)
     {
         _viti_safe_future_ge1(dp, task, r, unsafe_state);
         for (unsigned i = 0; i < dp->state_table.nstates; ++i)
@@ -172,10 +172,10 @@ void viterbi_safe_future(struct imm_dp const *dp, struct imm_task *task,
 }
 
 void viterbi_safe(struct imm_dp const *dp, struct imm_task *task,
-                  unsigned start_row, unsigned stop_row, unsigned unsafe_state)
+                  struct imm_range const *range, unsigned unsafe_state)
 {
-    assume(start_row > 0);
-    for (unsigned r = start_row; r <= stop_row; ++r)
+    assume(range->a > 0);
+    for (unsigned r = range->a; r < range->b; ++r)
     {
         _viti_safe_ge1(dp, task, r, unsafe_state);
         for (unsigned i = 0; i < dp->state_table.nstates; ++i)

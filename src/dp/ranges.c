@@ -13,12 +13,15 @@ static struct imm_range find_safe_past(unsigned seqlen)
 }
 
 // Define as:
-//   greatest row such that seqlen >= max(max_seq) + r for every r <= row.
+//   greatest row such that seqlen >= max(max_seq) + r for every r <= row
+//   and subject to row > 0.
+//
 static struct imm_range find_safe_future(unsigned seqlen)
 {
+    assert(seqlen > 0);
     if (seqlen >= IMM_STATE_MAX_SEQLEN)
-        return imm_range_init(0, seqlen - IMM_STATE_MAX_SEQLEN + 1);
-    return imm_range_init(0, 0);
+        return imm_range_init(1, seqlen - IMM_STATE_MAX_SEQLEN + 1);
+    return imm_range_init(1, 1);
 }
 
 void dp_ranges_find(struct ranges *x, unsigned len)

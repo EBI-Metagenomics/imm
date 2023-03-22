@@ -178,45 +178,35 @@ static enum imm_rc viterbi(struct imm_dp const *dp, struct imm_task *task,
         viterbi_row0_safe(dp, task);
 
         if (task->save_path)
-            viterbi_safe_future(dp, task, rg.safe_future.a + 1,
-                                rg.safe_future.b - 1, unsafe_state);
+            viterbi_safe_future(dp, task, &rg.safe_future, unsafe_state);
         else
-            viterbi_nopath_safe_future(dp, task, rg.safe_future.a + 1,
-                                       rg.safe_future.b - 1, unsafe_state);
+            viterbi_nopath_safe_future(dp, task, &rg.safe_future, unsafe_state);
 
         if (task->save_path)
-            viterbi_safe(dp, task, rg.safe.a, rg.safe.b - 1, unsafe_state);
+            viterbi_safe(dp, task, &rg.safe, unsafe_state);
         else
-            viterbi_nopath_safe(dp, task, rg.safe.a, rg.safe.b - 1,
-                                unsafe_state);
+            viterbi_nopath_safe(dp, task, &rg.safe, unsafe_state);
 
         if (task->save_path)
-            viterbi_unsafe(dp, task, rg.safe_past.a, rg.safe_past.b - 1, len,
-                           unsafe_state);
+            viterbi_unsafe(dp, task, &rg.safe_past, len, unsafe_state);
         else
             viterbi_nopath_unsafe(dp, task, &rg.safe_past, len, unsafe_state);
     }
     else if (len >= 1 + IMM_STATE_MAX_SEQLEN)
     {
-        struct elapsed e0 = ELAPSED_INIT;
-        struct elapsed e1 = ELAPSED_INIT;
-        struct elapsed e2 = ELAPSED_INIT;
-
         viterbi_row0_safe(dp, task);
 
-        viterbi_safe_future(dp, task, 1, len - IMM_STATE_MAX_SEQLEN,
-                            unsafe_state);
+        struct imm_range t = imm_range_init(1, len - IMM_STATE_MAX_SEQLEN + 1);
+        viterbi_safe_future(dp, task, &t, unsafe_state);
 
-        viterbi_unsafe(dp, task, len - IMM_STATE_MAX_SEQLEN + 1, len, len,
-                       unsafe_state);
-
-        printf("%ld %ld %ld\n", elapsed_milliseconds(&e0),
-               elapsed_milliseconds(&e1), elapsed_milliseconds(&e2));
+        t = imm_range_init(len - IMM_STATE_MAX_SEQLEN + 1, len + 1);
+        viterbi_unsafe(dp, task, &t, len, unsafe_state);
     }
     else
     {
         viterbi_row0(dp, task, len);
-        viterbi_unsafe(dp, task, 1, len, len, unsafe_state);
+        struct imm_range range = imm_range_init(1, len + 1);
+        viterbi_unsafe(dp, task, &range, len, unsafe_state);
     }
 
     struct final_score const fscore = final_score(dp, task);
