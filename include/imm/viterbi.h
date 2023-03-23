@@ -1,6 +1,7 @@
 #ifndef IMM_VITERBI_H
 #define IMM_VITERBI_H
 
+#include "imm/btrans.h"
 #include "imm/float.h"
 
 struct imm_dp;
@@ -20,5 +21,13 @@ imm_float imm_viterbi_score_safe_future(struct imm_viterbi const *,
                                         unsigned dst, unsigned row);
 imm_float imm_viterbi_score_safe(struct imm_viterbi const *, unsigned dst,
                                  unsigned row);
+
+struct imm_btrans imm_viterbi2(struct imm_viterbi const *, unsigned dst,
+                               unsigned row);
+struct imm_btrans imm_viterbi2_row0(struct imm_viterbi const *, unsigned dst);
+struct imm_btrans imm_viterbi2_safe_future(struct imm_viterbi const *,
+                                           unsigned dst, unsigned row);
+struct imm_btrans imm_viterbi2_safe(struct imm_viterbi const *, unsigned dst,
+                                    unsigned row);
 
 #endif

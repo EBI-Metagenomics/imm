@@ -1,5 +1,6 @@
 #include "imm/viterbi.h"
 #include "assume.h"
+#include "imm/btrans.h"
 #include "imm/cell.h"
 #include "imm/dp.h"
 #include "imm/float.h"
@@ -126,4 +127,96 @@ imm_float imm_viterbi_score_safe(struct imm_viterbi const *x, unsigned dst,
         }
     }
     return score;
+}
+
+struct imm_btrans imm_viterbi2(struct imm_viterbi const *x, unsigned dst,
+                               unsigned row)
+{
+    struct imm_btrans bt = imm_btrans_init();
+
+    for (unsigned i = 0; i < ntrans(x, dst); ++i)
+    {
+        unsigned src = source_state(x, dst, i);
+        struct span span = state_span(x, src);
+
+        if (imm_unlikely(row < span.min)) continue;
+
+        span.max = min(span.max, row);
+        for (unsigned len = span.min; len <= span.max; ++len)
+        {
+            assume(row >= len && len >= span.min);
+            imm_float v = total_score(x, row - len, src, dst, len, i);
+            if (v > bt.score) imm_btrans_set(&bt, v, src, i, len - span.min);
+        }
+    }
+    return bt;
+}
+
+// Assume: row == 0.
+struct imm_btrans imm_viterbi2_row0(struct imm_viterbi const *x, unsigned dst)
+{
+    struct imm_btrans bt = imm_btrans_init();
+
+    for (unsigned i = 0; i < ntrans(x, dst); ++i)
+    {
+        unsigned src = source_state(x, dst, i);
+        struct span span = state_span(x, src);
+
+        if (span.min > 0 || imm_unlikely(src > dst)) continue;
+
+        imm_float v = total_score(x, 0, src, dst, 0, i);
+        if (v > bt.score) imm_btrans_set(&bt, v, src, i, 0);
+    }
+    return bt;
+}
+
+// Assume: seqlen >= max(max_seq) + row and row > 0. Therefore,
+// we don't need `span.max = min(span.max, row);`, avoiding a conditional
+// jump.
+struct imm_btrans imm_viterbi2_safe_future(struct imm_viterbi const *x,
+                                           unsigned dst, unsigned row)
+{
+    struct imm_btrans bt = imm_btrans_init();
+
+    for (unsigned i = 0; i < ntrans(x, dst); ++i)
+    {
+        unsigned src = source_state(x, dst, i);
+        struct span span = state_span(x, src);
+
+        assume(row >= span.min && row >= span.max);
+        if (span.min == 0) continue;
+
+        for (unsigned len = span.min; len <= span.max; ++len)
+        {
+            assume(row >= len && len >= span.min);
+            imm_float v = total_score(x, row - len, src, dst, len, i);
+            if (v > bt.score) imm_btrans_set(&bt, v, src, i, len - span.min);
+        }
+    }
+    return bt;
+}
+
+// Assume: seqlen >= max(max_seq) + row, row >= max(max_seq) > 0, and row > 0.
+// Therefore, we don't need `span.max = min(span.max, row);` nor
+// `if (span.min == 0) continue;`.
+struct imm_btrans imm_viterbi2_safe(struct imm_viterbi const *x, unsigned dst,
+                                    unsigned row)
+{
+    struct imm_btrans bt = imm_btrans_init();
+
+    for (unsigned i = 0; i < ntrans(x, dst); ++i)
+    {
+        unsigned src = source_state(x, dst, i);
+        struct span span = state_span(x, src);
+
+        assume(row >= span.min && row >= span.max);
+
+        for (unsigned len = span.min; len <= span.max; ++len)
+        {
+            assume(row >= len && len >= span.min);
+            imm_float v = total_score(x, row - len, src, dst, len, i);
+            if (v > bt.score) imm_btrans_set(&bt, v, src, i, len - span.min);
+        }
+    }
+    return bt;
 }
