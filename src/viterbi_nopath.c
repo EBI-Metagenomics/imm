@@ -79,6 +79,7 @@ static inline void safe_hot(struct imm_dp const *dp, struct imm_task *task,
     set_score(dp, task, score, row, dst, span_init(1, 1));
 }
 
+// Assume: `x->a > 0`.
 void viterbi_nopath_unsafe(struct imm_viterbi const *x,
                            struct imm_range const *range, unsigned len)
 {
@@ -86,7 +87,7 @@ void viterbi_nopath_unsafe(struct imm_viterbi const *x,
 
     for (unsigned r = range->a; r < range->b; ++r)
     {
-        if ((r > 0 && r < len)) unsafe(x, range, r, x->unsafe_state);
+        if (r < len) unsafe(x, range, r, x->unsafe_state);
         for (unsigned i = 0; i < imm_dp_nstates(x->dp); ++i)
             unsafe(x, range, r, i);
     }

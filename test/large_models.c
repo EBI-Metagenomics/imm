@@ -1,25 +1,31 @@
 #include "hope.h"
 #include "imm/imm.h"
 
-void test_large_normal(void);
-void test_large_msv_normal(void);
+void test_large_normal(bool save_path);
+void test_large_msv_normal(bool save_path);
 void test_large_normal_nopath(void);
-void test_large_normal_removed_states(void);
-void test_large_frame(struct imm_span, imm_float loglik);
+void test_large_normal_removed_states(bool save_path);
+void test_large_frame(struct imm_span, imm_float loglik, bool save_path);
 
 int main(void)
 {
-    // test_large_normal();
-    // test_large_normal_nopath();
-    test_large_msv_normal();
-    // test_large_normal_removed_states();
-    // test_large_frame(imm_span(1, 5), -1622.8488101101);
-    // test_large_frame(imm_span(2, 4), -1793.03239395872);
-    // test_large_frame(imm_span(3, 3), imm_lprob_nan());
+    test_large_normal_nopath();
+    bool save_paths[2] = {true, false};
+    for (int i = 0; i < 2; ++i)
+    {
+        bool x = save_paths[i];
+        test_large_normal(x);
+        test_large_msv_normal(x);
+        test_large_normal_removed_states(x);
+        test_large_frame(imm_span(1, 5), -1622.8488101101, x);
+        test_large_frame(imm_span(2, 4), -1793.03239395872, x);
+        test_large_frame(imm_span(3, 3), imm_lprob_nan(), x);
+    }
+
     return hope_status();
 }
 
-void test_large_normal(void)
+void test_large_normal(bool save_path)
 {
     imm_example1_init(IMM_EXAMPLE1_SIZE);
 
@@ -31,6 +37,7 @@ void test_large_normal(void)
 
     struct imm_seq seq = imm_seq(imm_str(imm_example1_seq), &m->abc);
     eq(imm_task_setup(task, &seq), IMM_OK);
+    imm_task_set_save_path(task, save_path);
     eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
     close(prod.loglik, -194581.04361377980);
     printf("Normal msecs: %llu\n", prod.mseconds);
@@ -40,7 +47,7 @@ void test_large_normal(void)
     imm_del(&dp);
 }
 
-void test_large_msv_normal(void)
+void test_large_msv_normal(bool save_path)
 {
     imm_msv_example1_init(IMM_MSV_EXAMPLE1_SIZE);
 
@@ -53,15 +60,10 @@ void test_large_msv_normal(void)
     struct imm_seq seq = imm_seq(imm_str(imm_msv_example1_seq1), &m->abc);
     eq(imm_task_setup(task, &seq), IMM_OK);
 
-    imm_task_set_save_path(task, true);
+    imm_task_set_save_path(task, save_path);
     eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
     close(prod.loglik, -6369.93095660004);
     printf("MSV        msecs: %llu\n", prod.mseconds);
-
-    imm_task_set_save_path(task, false);
-    eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
-    close(prod.loglik, -6369.93095660004);
-    printf("MSV-nopath msecs: %llu\n", prod.mseconds);
 
     imm_del(task);
     imm_del(&prod);
@@ -81,6 +83,7 @@ void test_large_normal_nopath(void)
 
     struct imm_seq seq = imm_seq(imm_str(imm_example1_seq), &m->abc);
     eq(imm_task_setup(task, &seq), IMM_OK);
+    imm_task_set_save_path(task, true);
     eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
     close(prod.loglik, -194581.04361377980);
     printf("Normal-nopath msecs: %llu\n", prod.mseconds);
@@ -90,7 +93,7 @@ void test_large_normal_nopath(void)
     imm_del(&dp);
 }
 
-void test_large_normal_removed_states(void)
+void test_large_normal_removed_states(bool save_path)
 {
     imm_example1_init(IMM_EXAMPLE1_SIZE);
     imm_example1_remove_insertion_states(IMM_EXAMPLE1_SIZE);
@@ -105,6 +108,7 @@ void test_large_normal_removed_states(void)
     struct imm_seq seq =
         imm_seq(imm_str(imm_example1_seq_only_matches), &m->abc);
     eq(imm_task_setup(task, &seq), IMM_OK);
+    imm_task_set_save_path(task, save_path);
     eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
     close(prod.loglik, -4833.14205103985);
 
@@ -113,7 +117,7 @@ void test_large_normal_removed_states(void)
     imm_del(&dp);
 }
 
-void test_large_frame(struct imm_span span, imm_float loglik)
+void test_large_frame(struct imm_span span, imm_float loglik, bool save_path)
 {
     imm_example2_init(span);
 
@@ -128,6 +132,7 @@ void test_large_frame(struct imm_span span, imm_float loglik)
 
     struct imm_seq seq = imm_seq(imm_str(imm_example2_seq), abc);
     eq(imm_task_setup(task, &seq), IMM_OK);
+    imm_task_set_save_path(task, save_path);
 
     eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
     close(prod.loglik, loglik);
