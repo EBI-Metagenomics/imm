@@ -1,7 +1,7 @@
 #include "imm/hmm.h"
-#include "dp/dp.h"
 #include "error.h"
 #include "imm/dp.h"
+#include "imm/dp_args.h"
 #include "imm/list.h"
 #include "imm/lprob.h"
 #include "imm/path.h"
@@ -171,9 +171,9 @@ enum imm_rc imm_hmm_reset_dp(struct imm_hmm const *hmm,
     if ((rc = imm_tsort(hmm->states.size, states, start_idx))) goto cleanup;
     set_state_indices(hmm, states);
 
-    struct dp_args args = dp_args(hmm->transitions.size, hmm->states.size,
-                                  states, hmm_state(hmm, hmm->start.state_id),
-                                  hmm->start.lprob, end_state);
+    struct imm_dp_args args = imm_dp_args_init(
+        hmm->transitions.size, hmm->states.size, states,
+        hmm_state(hmm, hmm->start.state_id), hmm->start.lprob, end_state);
 
     imm_dp_reset(dp, &args);
 

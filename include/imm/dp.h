@@ -2,14 +2,14 @@
 #define IMM_DP_H
 
 #include "imm/code.h"
-#include "imm/dp/code.h"
-#include "imm/dp/emis.h"
-#include "imm/dp/state_table.h"
-#include "imm/dp/trans_table.h"
+#include "imm/dp_args.h"
+#include "imm/emis.h"
 #include "imm/export.h"
 #include "imm/float.h"
+#include "imm/state_table.h"
 #include "imm/state_types.h"
 #include "imm/trans.h"
+#include "imm/trans_table.h"
 #include <stdio.h>
 
 struct imm_abc;
@@ -20,14 +20,16 @@ struct imm_task;
 struct imm_dp
 {
     struct imm_code const *code;
-    struct imm_dp_emis emis;
-    struct imm_dp_trans_table trans_table;
-    struct imm_dp_state_table state_table;
+    struct imm_emis emis;
+    struct imm_trans_table trans_table;
+    struct imm_state_table state_table;
 };
 
 struct lip_file;
 
 IMM_API void imm_dp_init(struct imm_dp *dp, struct imm_code const *code);
+IMM_API enum imm_rc imm_dp_reset(struct imm_dp *dp,
+                                 struct imm_dp_args const *args);
 
 IMM_API void imm_dp_del(struct imm_dp *dp);
 

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(
   imm
-  VERSION 2.3.2
+  VERSION 3.0.0
   LANGUAGES C)
 set(PROJECT_DESCRIPTION "Invisible Markov model library.")
 
@@ -28,22 +28,13 @@ add_library(
   src/codon_marg.c
   src/codon_state.c
   src/dna.c
-  src/dp/best_trans.c
-  src/dp/best_trans_score.c
-  src/dp/dp.c
-  src/dp/emis.c
-  src/dp/final_score.c
-  src/dp/hot_range.c
-  src/dp/io.c
-  src/dp/step.c
-  src/dp/matrix.c
-  src/dp/path.c
+  src/dp.c
+  src/dp_io.c
+  src/best_trans.c
+  src/final_score.c
+  src/cpath.c
   src/dp/ranges.c
-  src/dp/state_table.c
-  src/dp/trans_table.c
-  src/dp/unsafe_pair.c
-  src/dp/viterbi.c
-  src/dp/viterbi_nopath.c
+  src/emis.c
   src/error.c
   src/eseq.c
   src/example1.c
@@ -53,26 +44,34 @@ add_library(
   src/frame_state.c
   src/frame_state_15.c
   src/frame_state_24.c
-  src/msv_example1.c
   src/frame_state_33.c
   src/gc.c
   src/gc_auto.c
   src/hmm.c
   src/lprob.c
+  src/matrix.c
+  src/matrixf.c
+  src/matrixu16.c
+  src/msv_example1.c
   src/mute_state.c
-  src/range.c
   src/normal_state.c
   src/nuclt.c
   src/nuclt_code.c
   src/nuclt_lprob.c
   src/path.c
+  src/range.c
   src/reallocf.c
   src/rna.c
   src/rnd.c
   src/seq.c
   src/state.c
+  src/state_table.c
   src/str.c
   src/task.c
+  src/trans_table.c
+  src/viterbi.c
+  src/viterbi_nopath.c
+  src/viterbi_path.c
   src/tsort.c)
 add_library(IMM::imm ALIAS imm)
 
