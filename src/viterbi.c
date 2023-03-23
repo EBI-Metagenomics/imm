@@ -59,6 +59,24 @@ imm_float imm_viterbi_score(struct imm_viterbi const *x, unsigned dst,
     return score;
 }
 
+// Assume: row == 0.
+imm_float imm_viterbi_score_row0(struct imm_viterbi const *x, unsigned dst)
+{
+    imm_float score = imm_lprob_zero();
+
+    for (unsigned i = 0; i < ntrans(x, dst); ++i)
+    {
+        unsigned src = source_state(x, dst, i);
+        struct span span = state_span(x, src);
+
+        if (span.min > 0 || imm_unlikely(src > dst)) continue;
+
+        imm_float v = total_score(x, 0, src, dst, 0, i);
+        score = max(score, v);
+    }
+    return score;
+}
+
 // Assume: seqlen >= max(max_seq) + row and row > 0. Therefore,
 // we don't need `span.max = min(span.max, row);`, avoiding a conditional
 // jump.
@@ -106,24 +124,6 @@ imm_float imm_viterbi_score_safe(struct imm_viterbi const *x, unsigned dst,
             imm_float v = total_score(x, row - len, src, dst, len, i);
             score = max(score, v);
         }
-    }
-    return score;
-}
-
-// Assume: row == 0.
-imm_float imm_viterbi_score_row0(struct imm_viterbi const *x, unsigned dst)
-{
-    imm_float score = imm_lprob_zero();
-
-    for (unsigned i = 0; i < ntrans(x, dst); ++i)
-    {
-        unsigned src = source_state(x, dst, i);
-        struct span span = state_span(x, src);
-
-        if (span.min > 0 || imm_unlikely(src > dst)) continue;
-
-        imm_float v = total_score(x, 0, src, dst, 0, i);
-        score = max(score, v);
     }
     return score;
 }

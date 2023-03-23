@@ -15,10 +15,10 @@ struct imm_viterbi
 
 imm_float imm_viterbi_score(struct imm_viterbi const *, unsigned dst,
                             unsigned row);
+imm_float imm_viterbi_score_row0(struct imm_viterbi const *, unsigned dst);
 imm_float imm_viterbi_score_safe_future(struct imm_viterbi const *,
                                         unsigned dst, unsigned row);
 imm_float imm_viterbi_score_safe(struct imm_viterbi const *, unsigned dst,
                                  unsigned row);
-imm_float imm_viterbi_score_row0(struct imm_viterbi const *, unsigned dst);
 
 #endif

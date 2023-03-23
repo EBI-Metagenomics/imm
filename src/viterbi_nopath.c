@@ -79,13 +79,7 @@ static inline void safe_hot(struct imm_dp const *dp, struct imm_task *task,
     set_score(dp, task, score, row, dst, span_init(1, 1));
 }
 
-void viterbi_nopath_row0(struct imm_viterbi const *x)
-{
-    unsafe_row0(x, x->unsafe_state);
-    for (unsigned i = 0; i < imm_dp_nstates(x->dp); ++i)
-        unsafe_row0(x, i);
-}
-
+// Assume: `x->a > 0`.
 void viterbi_nopath(struct imm_viterbi const *x, struct imm_range const *range)
 {
     assume(range->a > 0);
@@ -98,13 +92,29 @@ void viterbi_nopath(struct imm_viterbi const *x, struct imm_range const *range)
     }
 }
 
-void viterbi_nopath_safe_row0(struct imm_viterbi const *x)
+// Assume: `row == 0`.
+void viterbi_nopath_row0(struct imm_viterbi const *x)
 {
-    safe_row0(x, x->unsafe_state);
+    unsafe_row0(x, x->unsafe_state);
     for (unsigned i = 0; i < imm_dp_nstates(x->dp); ++i)
-        safe_row0(x, i);
+        unsafe_row0(x, i);
 }
 
+// Assume: `seqlen >= max(max_seq) + row and row > 0`.
+void viterbi_nopath_safe_future(struct imm_viterbi const *x,
+                                struct imm_range const *range)
+{
+    assert(range->a > 0);
+
+    for (unsigned r = range->a; r < range->b; ++r)
+    {
+        safe_future(x, r, x->unsafe_state);
+        for (unsigned i = 0; i < imm_dp_nstates(x->dp); ++i)
+            safe_future2(x, r, i);
+    }
+}
+
+// Assume: seqlen >= max(max_seq) + row, row >= max(max_seq) > 0, and row > 0.
 void viterbi_nopath_safe(struct imm_viterbi const *x,
                          struct imm_range const *range)
 {
@@ -118,36 +128,20 @@ void viterbi_nopath_safe(struct imm_viterbi const *x,
         imm_float score = imm_viterbi_score_safe(x, state, r);
         set_score(x->dp, x->task, score, r, state, safe_span(x->dp, state));
 
-        if (hot.total < 2)
-        {
-            for (unsigned i = 0; i < imm_dp_nstates(x->dp); ++i)
-                safe(x, r, i);
-        }
-        else
-        {
-            for (unsigned i = 0; i < hot.start; ++i)
-                safe(x, r, i);
+        for (unsigned i = 0; i < hot.start; ++i)
+            safe(x, r, i);
 
-            for (unsigned i = hot.start; i < hot.start + hot.total; ++i)
-                safe_hot(x->dp, x->task, r, i, &hot);
+        for (unsigned i = hot.start; i < hot.start + hot.total; ++i)
+            safe_hot(x->dp, x->task, r, i, &hot);
 
-            for (unsigned i = hot.start + hot.total; i < imm_dp_nstates(x->dp);
-                 ++i)
-                safe(x, r, i);
-        }
+        for (unsigned i = hot.start + hot.total; i < imm_dp_nstates(x->dp); ++i)
+            safe(x, r, i);
     }
 }
 
-void viterbi_nopath_safe_future(struct imm_viterbi const *x,
-                                struct imm_range const *range)
+void viterbi_nopath_safe_row0(struct imm_viterbi const *x)
 {
-    assert(range->a > 0);
-
-    for (unsigned r = range->a; r < range->b; ++r)
-    {
-        safe_future(x, r, x->unsafe_state);
-
-        for (unsigned i = 0; i < imm_dp_nstates(x->dp); ++i)
-            safe_future2(x, r, i);
-    }
+    safe_row0(x, x->unsafe_state);
+    for (unsigned i = 0; i < imm_dp_nstates(x->dp); ++i)
+        safe_row0(x, i);
 }
