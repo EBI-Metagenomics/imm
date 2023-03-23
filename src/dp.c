@@ -230,14 +230,14 @@ static enum imm_rc call_viterbi(struct imm_viterbi const *x,
         {
             viterbi_row0_safe(x);
             viterbi_safe_future(x, &f);
+            viterbi_unsafe(x, &t, len);
         }
         else
         {
             viterbi_nopath_safe_row0(x);
             viterbi_nopath_safe_future(x, &f);
+            viterbi_nopath_unsafe(x, &t, len);
         }
-
-        viterbi_unsafe(x, &t, len);
     }
     else
     {
