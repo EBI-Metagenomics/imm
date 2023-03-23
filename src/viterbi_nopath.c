@@ -21,7 +21,7 @@ static inline struct span unsafe_span(struct imm_dp const *dp, unsigned state,
 
 static inline void unsafe_row0(struct imm_viterbi const *x, unsigned i)
 {
-    imm_float score = imm_viterbi_score(x, i, 0);
+    imm_float score = imm_viterbi_score_row0(x, i);
     if (x->dp->state_table.start.state == i)
         score = max(x->dp->state_table.start.lprob, score);
     set_score(x->dp, x->task, score, 0, i, unsafe_span(x->dp, i, 0));
