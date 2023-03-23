@@ -120,7 +120,6 @@ void viterbi_nopath_safe_future(struct imm_viterbi const *x,
                                 struct imm_range const *range)
 {
     assert(range->a > 0);
-
     for (unsigned r = range->a; r < range->b; ++r)
     {
         safe_future(x, r, x->unsafe_state);
