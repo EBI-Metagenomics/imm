@@ -241,13 +241,17 @@ static enum imm_rc call_viterbi(struct imm_viterbi const *x,
     }
     else
     {
-        if (x->task->save_path)
-            viterbi_row0(x, len);
-        else
-            viterbi_nopath_row0(x);
-
         struct imm_range range = imm_range_init(1, len + 1);
-        viterbi_unsafe(x, &range, len);
+        if (x->task->save_path)
+        {
+            viterbi_row0(x, len);
+            viterbi_unsafe(x, &range, len);
+        }
+        else
+        {
+            viterbi_nopath_row0(x);
+            viterbi_nopath_unsafe(x, &range, len);
+        }
     }
 
     struct final_score const fscore = final_score(x->dp, x->task);
