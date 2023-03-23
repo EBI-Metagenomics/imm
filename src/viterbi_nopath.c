@@ -38,7 +38,7 @@ static inline void unsafe(struct imm_viterbi const *x,
 static inline void safe_future(struct imm_viterbi const *x, unsigned r,
                                unsigned i)
 {
-    imm_float score = imm_viterbi_score_ge1(x, i, r);
+    imm_float score = imm_viterbi_score_safe_future(x, i, r);
     set_score(x->dp, x->task, score, r, i, safe_span(x->dp, i));
 }
 
@@ -115,7 +115,7 @@ void viterbi_nopath_safe(struct imm_viterbi const *x,
     for (unsigned r = range->a; r < range->b; ++r)
     {
         unsigned state = x->unsafe_state;
-        imm_float score = imm_viterbi_score_safe_ge1(x, state, r);
+        imm_float score = imm_viterbi_score_safe(x, state, r);
         set_score(x->dp, x->task, score, r, state, safe_span(x->dp, state));
 
         if (hot.total < 2)

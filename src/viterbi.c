@@ -53,14 +53,17 @@ imm_float imm_viterbi_score(struct imm_viterbi const *x, unsigned dst,
         {
             assume(row >= len && len >= span.min);
             imm_float v = total_score(x, row - len, src, dst, len, i);
-            score = score < v ? v : score;
+            score = max(score, v);
         }
     }
     return score;
 }
 
-imm_float imm_viterbi_score_ge1(struct imm_viterbi const *x, unsigned dst,
-                                unsigned row)
+// Assume: seqlen >= max(max_seq) + row and row > 0. Therefore,
+// we don't need `span.max = min(span.max, row);`, avoiding a conditional
+// jump.
+imm_float imm_viterbi_score_safe_future(struct imm_viterbi const *x,
+                                        unsigned dst, unsigned row)
 {
     imm_float score = imm_lprob_zero();
 
@@ -68,20 +71,23 @@ imm_float imm_viterbi_score_ge1(struct imm_viterbi const *x, unsigned dst,
     {
         unsigned src = source_state(x, dst, i);
         struct span span = state_span(x, src);
-        if (span.min == 0) continue;
 
-        assume(span.min >= 0 && row >= span.min && row >= span.max);
+        assume(row >= span.min && row >= span.max);
+        if (span.min == 0) continue;
 
         for (unsigned len = span.min; len <= span.max; ++len)
         {
             assume(row >= len && len >= span.min);
             imm_float v = total_score(x, row - len, src, dst, len, i);
-            score = score < v ? v : score;
+            score = max(score, v);
         }
     }
     return score;
 }
 
+// Assume: seqlen >= max(max_seq) + row, row >= max(max_seq) > 0, and row > 0.
+// Therefore, we don't need `span.max = min(span.max, row);` nor
+// `if (span.min == 0) continue;`.
 imm_float imm_viterbi_score_safe(struct imm_viterbi const *x, unsigned dst,
                                  unsigned row)
 {
@@ -91,17 +97,20 @@ imm_float imm_viterbi_score_safe(struct imm_viterbi const *x, unsigned dst,
     {
         unsigned src = source_state(x, dst, i);
         struct span span = state_span(x, src);
-        assume(span.min >= 0 && row >= span.min && row >= span.max);
+
+        assume(row >= span.min && row >= span.max);
+
         for (unsigned len = span.min; len <= span.max; ++len)
         {
             assume(row >= len && len >= span.min);
             imm_float v = total_score(x, row - len, src, dst, len, i);
-            score = score < v ? v : score;
+            score = max(score, v);
         }
     }
     return score;
 }
 
+// Assume: row == 0.
 imm_float imm_viterbi_score_row0(struct imm_viterbi const *x, unsigned dst)
 {
     imm_float score = imm_lprob_zero();
@@ -114,30 +123,7 @@ imm_float imm_viterbi_score_row0(struct imm_viterbi const *x, unsigned dst)
         if (span.min > 0 || imm_unlikely(src > dst)) continue;
 
         imm_float v = total_score(x, 0, src, dst, 0, i);
-        score = score < v ? v : score;
-    }
-    return score;
-}
-
-imm_float imm_viterbi_score_safe_ge1(struct imm_viterbi const *x, unsigned dst,
-                                     unsigned row)
-{
-    imm_float score = imm_lprob_zero();
-
-    for (unsigned i = 0; i < ntrans(x, dst); ++i)
-    {
-        unsigned src = source_state(x, dst, i);
-        struct span span = state_span(x, src);
-        if (span.min == 0) continue;
-
-        assume(span.min >= 0 && row >= span.min && row >= span.max);
-
-        for (unsigned len = span.min; len <= span.max; ++len)
-        {
-            assume(row >= len && len >= span.min);
-            imm_float v = total_score(x, row - len, src, dst, len, i);
-            score = score < v ? v : score;
-        }
+        score = max(score, v);
     }
     return score;
 }
