@@ -129,6 +129,30 @@ imm_float imm_viterbi_score_safe(struct imm_viterbi const *x, unsigned dst,
     return score;
 }
 
+struct imm_btrans imm_viterbi2_ge1(struct imm_viterbi const *x, unsigned dst,
+                                   unsigned row)
+{
+    struct imm_btrans bt = imm_btrans_init();
+
+    for (unsigned i = 0; i < ntrans(x, dst); ++i)
+    {
+        unsigned src = source_state(x, dst, i);
+        struct span span = state_span(x, src);
+        if (span.min == 0) continue;
+
+        if (imm_unlikely(row < span.min)) continue;
+
+        span.max = min(span.max, row);
+        for (unsigned len = span.min; len <= span.max; ++len)
+        {
+            assume(row >= len && len >= span.min);
+            imm_float v = total_score(x, row - len, src, dst, len, i);
+            if (v > bt.score) imm_btrans_set(&bt, v, src, i, len - span.min);
+        }
+    }
+    return bt;
+}
+
 struct imm_btrans imm_viterbi2(struct imm_viterbi const *x, unsigned dst,
                                unsigned row)
 {

@@ -207,33 +207,36 @@ static enum imm_rc call_viterbi(struct imm_viterbi const *x,
     if (!imm_range_empty(rg.safe))
     {
         if (x->task->save_path)
+        {
             viterbi_row0_safe(x);
-        else
-            viterbi_nopath_safe_row0(x);
-
-        if (x->task->save_path)
             viterbi_safe_future(x, &rg.safe_future);
-        else
-            viterbi_nopath_safe_future(x, &rg.safe_future);
-
-        if (x->task->save_path)
             viterbi_safe(x, &rg.safe);
+            viterbi_safe_past(x, &rg.safe_past);
+        }
         else
+        {
+            viterbi_nopath_safe_row0(x);
+            viterbi_nopath_safe_future(x, &rg.safe_future);
             viterbi_nopath_safe(x, &rg.safe);
-
-        if (x->task->save_path)
-            viterbi_unsafe(x, &rg.safe_past, len);
-        else
-            viterbi_nopath(x, &rg.safe_past);
+            viterbi_nopath_safe_past(x, &rg.safe_past);
+        }
     }
     else if (len >= 1 + IMM_STATE_MAX_SEQLEN)
     {
-        viterbi_row0_safe(x);
+        struct imm_range f = imm_range_init(1, len - IMM_STATE_MAX_SEQLEN + 1);
+        struct imm_range t = imm_range_init(f.b, len + 1);
 
-        struct imm_range t = imm_range_init(1, len - IMM_STATE_MAX_SEQLEN + 1);
-        viterbi_safe_future(x, &t);
+        if (x->task->save_path)
+        {
+            viterbi_row0_safe(x);
+            viterbi_safe_future(x, &f);
+        }
+        else
+        {
+            viterbi_nopath_safe_row0(x);
+            viterbi_nopath_safe_future(x, &f);
+        }
 
-        t = imm_range_init(len - IMM_STATE_MAX_SEQLEN + 1, len + 1);
         viterbi_unsafe(x, &t, len);
     }
     else

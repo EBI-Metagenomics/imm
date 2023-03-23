@@ -4,7 +4,10 @@
 struct imm_viterbi;
 struct imm_range;
 
-void viterbi_nopath(struct imm_viterbi const *, struct imm_range const *);
+void viterbi_nopath_unsafe(struct imm_viterbi const *, struct imm_range const *,
+                           unsigned len);
+void viterbi_nopath_safe_past(struct imm_viterbi const *,
+                              struct imm_range const *);
 void viterbi_nopath_row0(struct imm_viterbi const *);
 void viterbi_nopath_safe_future(struct imm_viterbi const *,
                                 struct imm_range const *);

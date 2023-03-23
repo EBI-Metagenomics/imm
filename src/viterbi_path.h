@@ -6,7 +6,7 @@ struct imm_range;
 
 void viterbi_unsafe(struct imm_viterbi const *, struct imm_range const *,
                     unsigned len);
-
+void viterbi_safe_past(struct imm_viterbi const *, struct imm_range const *);
 void viterbi_safe_future(struct imm_viterbi const *, struct imm_range const *);
 
 void viterbi_safe(struct imm_viterbi const *, struct imm_range const *);

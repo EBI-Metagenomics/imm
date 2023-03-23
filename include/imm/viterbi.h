@@ -22,6 +22,8 @@ imm_float imm_viterbi_score_safe_future(struct imm_viterbi const *,
 imm_float imm_viterbi_score_safe(struct imm_viterbi const *, unsigned dst,
                                  unsigned row);
 
+struct imm_btrans imm_viterbi2_ge1(struct imm_viterbi const *, unsigned dst,
+                                   unsigned row);
 struct imm_btrans imm_viterbi2(struct imm_viterbi const *, unsigned dst,
                                unsigned row);
 struct imm_btrans imm_viterbi2_row0(struct imm_viterbi const *, unsigned dst);
