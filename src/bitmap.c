@@ -23,7 +23,7 @@ unsigned long imm_bitmap_get(unsigned long *x, unsigned long start,
 
 unsigned long *imm_bitmap_reallocf(unsigned long *x, unsigned long bits)
 {
-    return reallocf(x, sizeof(long) * BITS_TO_LONGS(bits));
+    return imm_reallocf(x, sizeof(long) * BITS_TO_LONGS(bits));
 }
 
 void imm_bitmap_set(unsigned long *x, unsigned long val, unsigned long start,

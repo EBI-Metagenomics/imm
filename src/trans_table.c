@@ -23,12 +23,12 @@ int imm_trans_table_reset(struct imm_trans_table *x,
     x->ntrans = args->ntrans;
 
     unsigned offsize = imm_trans_table_offsize(args->nstates);
-    x->offset = reallocf(x->offset, sizeof(*x->offset) * offsize);
+    x->offset = imm_reallocf(x->offset, sizeof(*x->offset) * offsize);
     if (!x->offset && offsize > 0) return error(IMM_NOMEM);
 
     x->offset[0] = 0;
 
-    x->trans = reallocf(x->trans, sizeof(*x->trans) * x->ntrans);
+    x->trans = imm_reallocf(x->trans, sizeof(*x->trans) * x->ntrans);
     if (!x->trans && x->ntrans > 0)
     {
         x->offset = NULL;

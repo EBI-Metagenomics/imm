@@ -3,6 +3,6 @@
 
 #include <stddef.h>
 
-void *reallocf(void *ptr, size_t size);
+void *imm_reallocf(void *ptr, size_t size);
 
 #endif

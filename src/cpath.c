@@ -27,12 +27,12 @@ enum imm_rc imm__cpath_reset(struct cpath *p,
     unsigned n = p->nstates = state_tbl->nstates;
 
     p->state_offset =
-        reallocf(p->state_offset, sizeof *p->state_offset * (n + 1));
+        imm_reallocf(p->state_offset, sizeof *p->state_offset * (n + 1));
 
     if (!p->state_offset) return error(IMM_NOMEM);
     p->state_offset[0] = 0;
 
-    p->trans_bits = reallocf(p->trans_bits, sizeof *p->trans_bits * n);
+    p->trans_bits = imm_reallocf(p->trans_bits, sizeof *p->trans_bits * n);
     if (n > 0 && !p->trans_bits) return error(IMM_NOMEM);
 
     for (unsigned dst = 0; dst < n; ++dst)

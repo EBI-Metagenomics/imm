@@ -1,6 +1,7 @@
 #include "imm/matrixu16.h"
 #include "error.h"
 #include "imm/rc.h"
+#include "reallocf.h"
 #include <stdlib.h>
 
 int imm_matrixu16_init(struct imm_matrixu16 *x, unsigned rows, unsigned cols)
@@ -14,7 +15,7 @@ int imm_matrixu16_init(struct imm_matrixu16 *x, unsigned rows, unsigned cols)
 
 void imm_matrixu16_empty(struct imm_matrixu16 *x)
 {
-    x->data = ((void *)0);
+    x->data = NULL;
     x->rows = 0;
     x->cols = 0;
 }
@@ -47,7 +48,7 @@ void imm_matrixu16_deinit(struct imm_matrixu16 const *x) { free(x->data); }
 
 int imm_matrixu16_resize(struct imm_matrixu16 *x, unsigned rows, unsigned cols)
 {
-    x->data = reallocf(x->data, sizeof(*x->data) * (rows * cols));
+    x->data = imm_reallocf(x->data, sizeof(*x->data) * (rows * cols));
     if (!x->data && rows * cols > 0) return error(IMM_NOMEM);
     x->rows = rows;
     x->cols = cols;

@@ -24,12 +24,10 @@
  * SUCH DAMAGE.
  */
 
-#ifndef HAVE_REALLOCF
-
 #include "reallocf.h"
 #include <stdlib.h>
 
-void *reallocf(void *ptr, size_t size)
+void *imm_reallocf(void *ptr, size_t size)
 {
     void *nptr = realloc(ptr, size);
 
@@ -42,5 +40,3 @@ void *reallocf(void *ptr, size_t size)
     if (!nptr && ptr && size != 0) free(ptr);
     return (nptr);
 }
-
-#endif

@@ -57,7 +57,7 @@ static inline void safe(struct imm_viterbi const *x, unsigned r, unsigned i)
 
 static inline void safe_row0(struct imm_viterbi const *x, unsigned i)
 {
-    imm_float score = imm_viterbi_score_safe(x, i, 0);
+    imm_float score = imm_viterbi_score_row0(x, i);
     if (x->dp->state_table.start.state == i)
         score = max(x->dp->state_table.start.lprob, score);
     set_score(x->dp, x->task, score, 0, i, safe_span(x->dp, i));

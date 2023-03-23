@@ -34,8 +34,8 @@ int imm_state_table_reset(struct imm_state_table *x,
                           struct imm_dp_args const *args)
 {
     x->nstates = args->nstates;
-    x->ids = reallocf(x->ids, sizeof(*x->ids) * args->nstates);
-    x->span = reallocf(x->span, sizeof(*x->span) * args->nstates);
+    x->ids = imm_reallocf(x->ids, sizeof(*x->ids) * args->nstates);
+    x->span = imm_reallocf(x->span, sizeof(*x->span) * args->nstates);
 
     if (args->nstates > 0)
     {

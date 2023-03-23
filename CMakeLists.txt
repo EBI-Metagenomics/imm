@@ -109,7 +109,6 @@ else()
 endif()
 
 include(CheckSymbolExists)
-check_symbol_exists(reallocf "stdlib.h" HAVE_REALLOCF)
 
 target_compile_definitions(imm
                            PRIVATE $<$<BOOL:${HAVE_REALLOCF}>:HAVE_REALLOCF>)

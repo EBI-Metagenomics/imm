@@ -48,7 +48,7 @@ enum imm_rc imm_cartes_reset(struct imm_cartes *cartes, char const *set,
     size_t new_capacity = sizeof(*cartes->item) * (unsigned)(max_times + 1);
     if (new_capacity > cartes->capacity)
     {
-        cartes->item = reallocf(cartes->item, new_capacity);
+        cartes->item = imm_reallocf(cartes->item, new_capacity);
         if (new_capacity > 0 && !cartes->item) return error(IMM_NOMEM);
         cartes->capacity = new_capacity;
     }

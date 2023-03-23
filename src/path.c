@@ -31,7 +31,7 @@ enum imm_rc imm_path_add(struct imm_path *path, struct imm_step step)
     {
         capacity <<= 1;
         assert(capacity >= sizeof *path->steps * count);
-        path->steps = reallocf(path->steps, capacity);
+        path->steps = imm_reallocf(path->steps, capacity);
         if (!path->steps && capacity > 0) return error(IMM_NOMEM);
     }
 

@@ -114,14 +114,14 @@ enum imm_rc imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
     ERET(!imm_expect_map_key(f, KEY_EMIS_SCORE), IMM_IOERROR);
     lip_read_1darray_size_type(f, &size, &type);
     ERET(type != XLIP_1DARRAY_FLOAT, IMM_IOERROR);
-    e->score = reallocf(e->score, sizeof(*e->score) * size);
+    e->score = imm_reallocf(e->score, sizeof(*e->score) * size);
     ERET(!e->score && size > 0, IMM_IOERROR);
     lip_read_1darray_float_data(f, size, e->score);
 
     ERET(!imm_expect_map_key(f, KEY_EMIS_OFFSET), IMM_IOERROR);
     lip_read_1darray_size_type(f, &size, &type);
     ERET(type != LIP_1DARRAY_UINT32, IMM_IOERROR);
-    e->offset = reallocf(e->offset, sizeof(*e->offset) * size);
+    e->offset = imm_reallocf(e->offset, sizeof(*e->offset) * size);
     ERET(!e->offset && size > 0, IMM_IOERROR);
     lip_read_1darray_int_data(f, size, e->offset);
 
@@ -129,7 +129,7 @@ enum imm_rc imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
     ERET(!imm_expect_map_key(f, KEY_TRANS_SCORE), IMM_IOERROR);
     lip_read_1darray_size_type(f, &tt->ntrans, &type);
     ERET(type != XLIP_1DARRAY_FLOAT, IMM_IOERROR);
-    tt->trans = reallocf(tt->trans, sizeof(*tt->trans) * tt->ntrans);
+    tt->trans = imm_reallocf(tt->trans, sizeof(*tt->trans) * tt->ntrans);
     ERET(!tt->trans && tt->ntrans > 0, IMM_IOERROR);
     for (unsigned i = 0; i < tt->ntrans; ++i)
         lip_read_1darray_float_item(f, &tt->trans[i].score);
@@ -144,7 +144,7 @@ enum imm_rc imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
     ERET(!imm_expect_map_key(f, KEY_TRANS_OFFSET), IMM_IOERROR);
     lip_read_1darray_size_type(f, &size, &type);
     ERET(type != LIP_1DARRAY_UINT16, IMM_IOERROR);
-    tt->offset = reallocf(tt->offset, sizeof(*tt->offset) * size);
+    tt->offset = imm_reallocf(tt->offset, sizeof(*tt->offset) * size);
     ERET(!tt->offset && size > 0, IMM_IOERROR);
     lip_read_1darray_int_data(f, size, tt->offset);
 
@@ -152,7 +152,7 @@ enum imm_rc imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
     ERET(!imm_expect_map_key(f, KEY_STATE_IDS), IMM_IOERROR);
     lip_read_1darray_size_type(f, &st->nstates, &type);
     ERET(type != LIP_1DARRAY_UINT16, IMM_IOERROR);
-    st->ids = reallocf(st->ids, sizeof(*st->ids) * st->nstates);
+    st->ids = imm_reallocf(st->ids, sizeof(*st->ids) * st->nstates);
     ERET(!st->ids && st->nstates > 0, IMM_IOERROR);
     lip_read_1darray_int_data(f, st->nstates, st->ids);
 
@@ -167,7 +167,7 @@ enum imm_rc imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
     lip_read_1darray_size_type(f, &size, &type);
     ERET(st->nstates != size, IMM_IOERROR);
     ERET(type != LIP_1DARRAY_UINT16, IMM_IOERROR);
-    st->span = reallocf(st->span, sizeof(*st->span) * size);
+    st->span = imm_reallocf(st->span, sizeof(*st->span) * size);
     ERET(!st->span && size > 0, IMM_IOERROR);
     for (unsigned i = 0; i < size; ++i)
     {
