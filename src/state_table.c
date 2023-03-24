@@ -79,6 +79,13 @@ struct span imm_state_table_span(struct imm_state_table const *x,
     return span;
 }
 
+struct imm_range imm_state_table_range(struct imm_state_table const *x,
+                                       unsigned state)
+{
+    struct span span = imm_state_table_span(x, state);
+    return imm_range_init(span.min, span.max + 1);
+}
+
 void imm_state_table_dump(struct imm_state_table const *tbl)
 {
     for (unsigned i = 0; i < tbl->nstates; ++i)

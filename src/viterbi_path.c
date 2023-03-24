@@ -3,11 +3,11 @@
 #include "hot_range.h"
 #include "imm/btrans.h"
 #include "imm/dp.h"
+#include "imm/range.h"
 #include "imm/state_table.h"
 #include "imm/trans_table.h"
 #include "imm/viterbi.h"
 #include "minmax.h"
-#include "range.h"
 #include "set_score.h"
 #include "task.h"
 

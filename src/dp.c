@@ -104,7 +104,8 @@ enum imm_rc imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
     unsigned num_unsafe_states = find_unsafe_states(dp, &unsafe_state);
     (void)num_unsafe_states;
     assert(num_unsafe_states <= 1);
-    struct imm_viterbi viterbi = {dp, task, unsafe_state};
+    struct imm_viterbi viterbi = {dp, task, imm_seq_size(task->seq),
+                                  unsafe_state};
     enum imm_rc rc = call_viterbi(&viterbi, prod);
 
     if (elapsed_stop(&elapsed)) return error(IMM_ELAPSED_LIB_FAILED);

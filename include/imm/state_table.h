@@ -1,6 +1,7 @@
 #ifndef IMM_STATE_TABLE_H
 #define IMM_STATE_TABLE_H
 
+#include "imm/range.h"
 #include "imm/state_types.h"
 
 struct span;
@@ -25,6 +26,8 @@ int imm_state_table_reset(struct imm_state_table *, struct imm_dp_args const *);
 unsigned imm_state_table_idx(struct imm_state_table const *, unsigned id);
 unsigned imm_state_table_id(struct imm_state_table const *, unsigned idx);
 struct span imm_state_table_span(struct imm_state_table const *, unsigned idx);
+struct imm_range imm_state_table_range(struct imm_state_table const *,
+                                       unsigned idx);
 void imm_state_table_dump(struct imm_state_table const *);
 
 #endif

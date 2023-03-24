@@ -1,5 +1,5 @@
-#ifndef RANGE_H
-#define RANGE_H
+#ifndef IMM_RANGE_H
+#define IMM_RANGE_H
 
 #include <stdbool.h>
 #include <stdio.h>
