@@ -39,9 +39,42 @@ enum state_id
 // #define TPROB -1.5
 #define TPROB 0
 
-static unsigned state_name(unsigned id, char *name);
+static void test_msv_short(bool save_path);
 
 int main(void)
+{
+    test_msv_short(true);
+    test_msv_short(false);
+    return hope_status();
+}
+
+static unsigned state_name(unsigned id, char *name)
+{
+    char *x = name;
+    if (id == S_ID) *(x++) = 'S';
+    if (id == N_ID) *(x++) = 'N';
+    if (id == B_ID) *(x++) = 'B';
+
+    if (id == M1_ID) *(x++) = 'M';
+    if (id == M1_ID) *(x++) = '1';
+
+    if (id == M2_ID) *(x++) = 'M';
+    if (id == M2_ID) *(x++) = '2';
+
+    if (id == M3_ID) *(x++) = 'M';
+    if (id == M3_ID) *(x++) = '3';
+
+    if (id == J_ID) *(x++) = 'J';
+
+    if (id == E_ID) *(x++) = 'E';
+    if (id == C_ID) *(x++) = 'C';
+    if (id == T_ID) *(x++) = 'T';
+
+    *x = '\0';
+    return (unsigned)strlen(name);
+}
+
+static void test_msv_short(bool save_path)
 {
     struct imm_dna const *dna = &imm_dna_iupac;
     struct imm_nuclt const *nuclt = imm_super(dna);
@@ -162,9 +195,13 @@ int main(void)
 
     struct imm_seq seq = imm_seq(IMM_STR("CCCTTTGGG"), abc);
     imm_task_setup(task, &seq);
+    imm_task_set_save_path(task, save_path);
     eq(imm_dp_viterbi(&dp, task, &prod), IMM_OK);
-    eq(imm_path_nsteps(&prod.path), 7);
-    close(imm_hmm_loglik(&hmm, &seq, &prod.path), -1.57676188818);
+    if (save_path)
+    {
+        eq(imm_path_nsteps(&prod.path), 7);
+        close(imm_hmm_loglik(&hmm, &seq, &prod.path), -1.57676188818);
+    }
     close(prod.loglik, -1.57676188818);
     imm_dp_dump_path(&dp, task, &prod, &state_name);
 
@@ -173,37 +210,7 @@ int main(void)
     imm_dp_write_dot(&dp, fp, &state_name);
     fclose(fp);
 
-    // imm_dp_dump_impl_details(&dp, stdout, &state_name);
-
     imm_del(&prod);
     imm_del(&dp);
     imm_del(task);
-
-    return hope_status();
-}
-
-static unsigned state_name(unsigned id, char *name)
-{
-    char *x = name;
-    if (id == S_ID) *(x++) = 'S';
-    if (id == N_ID) *(x++) = 'N';
-    if (id == B_ID) *(x++) = 'B';
-
-    if (id == M1_ID) *(x++) = 'M';
-    if (id == M1_ID) *(x++) = '1';
-
-    if (id == M2_ID) *(x++) = 'M';
-    if (id == M2_ID) *(x++) = '2';
-
-    if (id == M3_ID) *(x++) = 'M';
-    if (id == M3_ID) *(x++) = '3';
-
-    if (id == J_ID) *(x++) = 'J';
-
-    if (id == E_ID) *(x++) = 'E';
-    if (id == C_ID) *(x++) = 'C';
-    if (id == T_ID) *(x++) = 'T';
-
-    *x = '\0';
-    return (unsigned)strlen(name);
 }
