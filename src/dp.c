@@ -19,6 +19,7 @@
 #include "minmax.h"
 #include "span.h"
 #include "task.h"
+#include "viterbi_generic.h"
 #include "viterbi_nopath.h"
 #include "viterbi_path.h"
 #include <assert.h>
@@ -201,6 +202,26 @@ static enum imm_rc call_viterbi(struct imm_viterbi const *x,
                                 struct imm_prod *prod)
 {
     unsigned len = imm_eseq_len(&x->task->eseq);
+    struct imm_range range = imm_range_init(0, len + 1);
+    viterbi_generic(x, &range);
+    struct final_score fs = final_score(x->dp, x->task);
+    prod->loglik = fs.score;
+
+    if (x->task->save_path)
+        return viterbi_path(x->dp, x->task, &prod->path, fs.state, fs.seq_len);
+
+    return 0;
+
+#if 0
+    if (!x->task->save_path)
+    {
+        struct imm_range range = imm_range_init(0, len + 1);
+        viterbi_generic(x, &range);
+        struct final_score fs = final_score(x->dp, x->task);
+        prod->loglik = fs.score;
+        return 0;
+    }
+#endif
 
     struct ranges rg = {0};
     dp_ranges_find(&rg, len);

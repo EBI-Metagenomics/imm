@@ -22,24 +22,24 @@ add_library(
   src/abc.c
   src/abc_types.c
   src/amino.c
+  src/best_trans.c
   src/bitmap.c
   src/cartes.c
   src/code.c
   src/codon_marg.c
   src/codon_state.c
+  src/cpath.c
   src/dna.c
   src/dp.c
-  src/dp_io.c
-  src/best_trans.c
-  src/final_score.c
-  src/cpath.c
   src/dp/ranges.c
+  src/dp_io.c
   src/emis.c
   src/error.c
   src/eseq.c
   src/example1.c
   src/example2.c
   src/expect.c
+  src/final_score.c
   src/frame_cond.c
   src/frame_state.c
   src/frame_state_15.c
@@ -70,6 +70,7 @@ add_library(
   src/task.c
   src/trans_table.c
   src/viterbi.c
+  src/viterbi_generic.c
   src/viterbi_nopath.c
   src/viterbi_path.c
   src/tsort.c)
