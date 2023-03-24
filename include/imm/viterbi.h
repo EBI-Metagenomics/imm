@@ -33,22 +33,4 @@ imm_float imm_viterbi_start_lprob(struct imm_viterbi const *);
 imm_float imm_viterbi_emission(struct imm_viterbi const *x, unsigned row,
                                unsigned state, unsigned len, unsigned min_len);
 
-imm_float imm_viterbi_score(struct imm_viterbi const *, unsigned dst,
-                            unsigned row);
-imm_float imm_viterbi_score_row0(struct imm_viterbi const *, unsigned dst);
-imm_float imm_viterbi_score_safe_future(struct imm_viterbi const *,
-                                        unsigned dst, unsigned row);
-imm_float imm_viterbi_score_safe(struct imm_viterbi const *, unsigned dst,
-                                 unsigned row);
-
-struct imm_btrans imm_viterbi2_ge1(struct imm_viterbi const *, unsigned dst,
-                                   unsigned row);
-struct imm_btrans imm_viterbi2(struct imm_viterbi const *, unsigned dst,
-                               unsigned row);
-struct imm_btrans imm_viterbi2_row0(struct imm_viterbi const *, unsigned dst);
-struct imm_btrans imm_viterbi2_safe_future(struct imm_viterbi const *,
-                                           unsigned dst, unsigned row);
-struct imm_btrans imm_viterbi2_safe(struct imm_viterbi const *, unsigned dst,
-                                    unsigned row);
-
 #endif

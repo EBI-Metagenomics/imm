@@ -44,7 +44,7 @@ enum imm_rc imm__cpath_reset(struct cpath *p,
             unsigned src = imm_trans_table_source_state(trans_tbl, dst, i);
             unsigned min_seq = imm_state_table_span(state_tbl, src).min;
             unsigned max_seq = imm_state_table_span(state_tbl, src).max;
-            depth = max(max_seq - min_seq, depth);
+            depth = MAX(max_seq - min_seq, depth);
         }
         p->state_offset[dst + 1] = p->state_offset[dst];
         p->trans_bits[dst] = (uint8_t)bits_width(

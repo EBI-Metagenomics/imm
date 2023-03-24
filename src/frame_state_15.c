@@ -29,10 +29,7 @@
 //     p(N|S) = 0 otherwise
 
 #define codon(A, B, C)                                                         \
-    (struct imm_codon)                                                         \
-    {                                                                          \
-        .a = (A), .b = (B), .c = (C)                                           \
-    }
+    (struct imm_codon) { .a = (A), .b = (B), .c = (C) }
 
 #define lf(A, B, C)                                                            \
     imm_codon_marg_lprob(state->codonm, codon(nucl[A], nucl[B], nucl[C]))

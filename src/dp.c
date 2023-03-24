@@ -1,9 +1,6 @@
 #include "imm/dp.h"
-#include "best_trans.h"
-#include "dp/ranges.h"
 #include "elapsed/elapsed.h"
 #include "error.h"
-#include "final_score.h"
 #include "imm/dp.h"
 #include "imm/dp_args.h"
 #include "imm/emis.h"
@@ -20,8 +17,6 @@
 #include "span.h"
 #include "task.h"
 #include "viterbi_generic.h"
-#include "viterbi_nopath.h"
-#include "viterbi_path.h"
 #include <assert.h>
 #include <limits.h>
 
@@ -198,6 +193,44 @@ void imm_dp_write_dot(struct imm_dp const *dp, FILE *restrict fd,
     fprintf(fd, "}\n");
 }
 
+struct final_score
+{
+    imm_float score;
+    unsigned state;
+    unsigned seq_len;
+};
+
+static struct final_score final_score(struct imm_dp const *dp,
+                                      struct imm_task *task)
+{
+    imm_float score = imm_lprob_zero();
+    unsigned end_state = dp->state_table.end_state_idx;
+
+    unsigned final_state = IMM_STATE_NULL_IDX;
+    unsigned final_seq_len = IMM_STATE_NULL_SEQLEN;
+
+    unsigned length = imm_eseq_len(&task->eseq);
+    unsigned max_seq = imm_state_table_span(&dp->state_table, end_state).max;
+
+    for (unsigned len = MIN(max_seq, length);; --len)
+    {
+        imm_float s = imm_matrix_get_score(
+            &task->matrix, imm_cell_init(length - len, end_state, len));
+        if (s > score)
+        {
+            score = s;
+            final_state = end_state;
+            final_seq_len = len;
+        }
+
+        if (imm_state_table_span(&dp->state_table, end_state).min == len) break;
+    }
+    struct final_score fscore = {score, final_state, final_seq_len};
+    if (final_state == IMM_STATE_NULL_IDX) fscore.score = imm_lprob_nan();
+
+    return fscore;
+}
+
 static enum imm_rc call_viterbi(struct imm_viterbi const *x,
                                 struct imm_prod *prod)
 {
@@ -211,77 +244,6 @@ static enum imm_rc call_viterbi(struct imm_viterbi const *x,
         return viterbi_path(x->dp, x->task, &prod->path, fs.state, fs.seq_len);
 
     return 0;
-
-#if 0
-    if (!x->task->save_path)
-    {
-        struct imm_range range = imm_range_init(0, len + 1);
-        viterbi_generic(x, &range);
-        struct final_score fs = final_score(x->dp, x->task);
-        prod->loglik = fs.score;
-        return 0;
-    }
-#endif
-
-    struct ranges rg = {0};
-    dp_ranges_find(&rg, len);
-
-    if (!imm_range_empty(rg.safe))
-    {
-        if (x->task->save_path)
-        {
-            viterbi_path_safe_row0(x);
-            viterbi_path_safe_future(x, &rg.safe_future);
-            viterbi_path_safe(x, &rg.safe);
-            viterbi_path_safe_past(x, &rg.safe_past);
-        }
-        else
-        {
-            viterbi_nopath_safe_row0(x);
-            viterbi_nopath_safe_future(x, &rg.safe_future);
-            viterbi_nopath_safe(x, &rg.safe);
-            viterbi_nopath_safe_past(x, &rg.safe_past);
-        }
-    }
-    else if (len >= 1 + IMM_STATE_MAX_SEQLEN)
-    {
-        struct imm_range f = imm_range_init(1, len - IMM_STATE_MAX_SEQLEN + 1);
-        struct imm_range t = imm_range_init(f.b, len + 1);
-
-        if (x->task->save_path)
-        {
-            viterbi_path_safe_row0(x);
-            viterbi_path_safe_future(x, &f);
-            viterbi_path_unsafe(x, &t, len);
-        }
-        else
-        {
-            viterbi_nopath_safe_row0(x);
-            viterbi_nopath_safe_future(x, &f);
-            viterbi_nopath_unsafe(x, &t, len);
-        }
-    }
-    else
-    {
-        struct imm_range range = imm_range_init(1, len + 1);
-        if (x->task->save_path)
-        {
-            viterbi_path_row0(x, len);
-            viterbi_path_unsafe(x, &range, len);
-        }
-        else
-        {
-            viterbi_nopath_row0(x);
-            viterbi_nopath_unsafe(x, &range, len);
-        }
-    }
-
-    struct final_score const fscore = final_score(x->dp, x->task);
-    prod->loglik = fscore.score;
-    if (x->task->save_path)
-        return viterbi_path(x->dp, x->task, &prod->path, fscore.state,
-                            fscore.seq_len);
-    return IMM_OK;
 }
 
 static enum imm_rc viterbi_path(struct imm_dp const *dp,
@@ -302,11 +264,11 @@ static enum imm_rc viterbi_path(struct imm_dp const *dp,
         if (rc) return rc;
         row -= seqlen;
 
-        valid = path_valid(&task->path, row, state);
+        valid = cpath_valid(&task->path, row, state);
         if (valid)
         {
-            unsigned trans = path_trans(&task->path, row, state);
-            unsigned len = path_seqlen(&task->path, row, state);
+            unsigned trans = cpath_trans(&task->path, row, state);
+            unsigned len = cpath_seqlen(&task->path, row, state);
             state =
                 imm_trans_table_source_state(&dp->trans_table, state, trans);
             seqlen = len + imm_state_table_span(&dp->state_table, state).min;

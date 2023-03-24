@@ -13,10 +13,7 @@ struct span
 } __attribute__((__packed__));
 
 #define SPAN(min, max)                                                         \
-    (struct span)                                                              \
-    {                                                                          \
-        (imm_state_seqlen_t)(min), (imm_state_seqlen_t)(max)                   \
-    }
+    (struct span) { (imm_state_seqlen_t)(min), (imm_state_seqlen_t)(max) }
 
 static_assert(sizeof(struct span) == 2, "struct span must be packed");
 

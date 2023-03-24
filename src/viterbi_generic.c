@@ -35,26 +35,27 @@ static inline void set_cpath(struct cpath *path, struct bt2 const *bt,
 {
     if (bt->prev_state != IMM_STATE_NULL_IDX)
     {
-        path_set_trans(path, r, i, bt->trans);
-        path_set_seqlen(path, r, i, bt->len);
-        assert(path_trans(path, r, i) == bt->trans);
-        assert(path_seqlen(path, r, i) == bt->len);
+        cpath_set_trans(path, r, i, bt->trans);
+        cpath_set_seqlen(path, r, i, bt->len);
+        assert(cpath_trans(path, r, i) == bt->trans);
+        assert(cpath_seqlen(path, r, i) == bt->len);
     }
     else
     {
         path_invalidate(path, r, i);
-        assert(!path_valid(path, r, i));
+        assert(!cpath_valid(path, r, i));
     }
 }
 
 static void generic(struct imm_viterbi const *x, unsigned row, unsigned dst,
-                    unsigned remain)
+                    unsigned remain, bool unsafe_state)
 {
     struct bt2 bt = INIT_BT2;
     for (unsigned t = 0; t < imm_viterbi_ntrans(x, dst); ++t)
     {
         unsigned src = imm_viterbi_source(x, dst, t);
         struct imm_range src_range = imm_viterbi_range(x, src);
+        src_range.a = MAX(src_range.a, (unsigned)(unsafe_state));
         src_range.b = MIN(src_range.b, row + 1);
 
         for (unsigned len = src_range.a; len < src_range.b; ++len)
@@ -88,8 +89,8 @@ void viterbi_generic(struct imm_viterbi const *x, struct imm_range const *range)
 {
     for (unsigned row = range->a; row < range->b; ++row)
     {
-        generic(x, row, x->unsafe_state, range->b - 1 - row);
+        generic(x, row, x->unsafe_state, range->b - 1 - row, true);
         for (unsigned dst = 0; dst < imm_viterbi_nstates(x); ++dst)
-            generic(x, row, dst, range->b - 1 - row);
+            generic(x, row, dst, range->b - 1 - row, false);
     }
 }
