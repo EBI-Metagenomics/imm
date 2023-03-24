@@ -48,7 +48,7 @@ static_assert(sizeof(imm_state_idx_t) == sizeof(uint16_t), "wrong types");
 #define USER_EXT CWP_ITEM_USER_EXT_0
 #endif
 
-enum imm_rc imm_dp_pack(struct imm_dp const *dp, struct lip_file *f)
+int imm_dp_pack(struct imm_dp const *dp, struct lip_file *f)
 {
     unsigned size = 0;
     unsigned nstates = dp->state_table.nstates;
@@ -99,9 +99,9 @@ enum imm_rc imm_dp_pack(struct imm_dp const *dp, struct lip_file *f)
     return f->error ? IMM_IOERROR : IMM_OK;
 }
 
-enum imm_rc imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
+int imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
 {
-    enum imm_rc rc = IMM_OK;
+    int rc = IMM_OK;
     unsigned size = 0;
     enum lip_1darray_type type = 0;
     struct imm_emis *e = &dp->emis;

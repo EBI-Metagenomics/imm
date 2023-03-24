@@ -3,6 +3,6 @@
 
 #include "imm/rc.h"
 
-char const *imm_error_string(enum imm_rc rc);
+char const *imm_error_string(int rc);
 
 #endif

@@ -11,7 +11,7 @@
 struct imm_dp;
 struct imm_state;
 
-enum imm_rc imm_dp_reset(struct imm_dp *dp, struct dp_args const *args);
+int imm_dp_reset(struct imm_dp *dp, struct dp_args const *args);
 
 static inline unsigned dp_start_state(struct imm_dp const *x)
 {

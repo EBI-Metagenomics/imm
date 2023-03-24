@@ -50,10 +50,10 @@ imm_codon_marg_lprob(struct imm_codon_marg const *codonm,
     return codonm->lprobs[codon.idx[0]][codon.idx[1]][codon.idx[2]];
 }
 
-IMM_API enum imm_rc imm_codon_marg_pack(struct imm_codon_marg const *codonm,
-                                        struct lip_file *);
+IMM_API int imm_codon_marg_pack(struct imm_codon_marg const *codonm,
+                                struct lip_file *);
 
-IMM_API enum imm_rc imm_codon_marg_unpack(struct imm_codon_marg *codonm,
-                                          struct lip_file *);
+IMM_API int imm_codon_marg_unpack(struct imm_codon_marg *codonm,
+                                  struct lip_file *);
 
 #endif

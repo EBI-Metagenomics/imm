@@ -31,9 +31,9 @@ struct imm_task *imm_task_new(struct imm_dp const *dp)
     return task;
 }
 
-enum imm_rc imm_task_reset(struct imm_task *task, struct imm_dp const *dp)
+int imm_task_reset(struct imm_task *task, struct imm_dp const *dp)
 {
-    enum imm_rc rc = imm_matrix_reset(&task->matrix, &dp->state_table);
+    int rc = imm_matrix_reset(&task->matrix, &dp->state_table);
     if (rc) return rc;
     /* TODO: memory leak possibility */
     if ((rc =
@@ -44,10 +44,10 @@ enum imm_rc imm_task_reset(struct imm_task *task, struct imm_dp const *dp)
     return IMM_OK;
 }
 
-enum imm_rc imm_task_setup(struct imm_task *task, struct imm_seq const *seq)
+int imm_task_setup(struct imm_task *task, struct imm_seq const *seq)
 {
     task->seq = seq;
-    enum imm_rc rc = imm_cpath_setup(&task->path, imm_seq_size(seq) + 1);
+    int rc = imm_cpath_setup(&task->path, imm_seq_size(seq) + 1);
     if (rc) return rc;
     return imm_eseq_setup(&task->eseq, seq);
 }

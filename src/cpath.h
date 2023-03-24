@@ -77,15 +77,13 @@ static inline uint64_t start_bit(struct cpath const *path, unsigned pos,
 
 void imm__cpath_del(struct cpath const *path);
 
-enum imm_rc imm_cpath_init(struct cpath *path,
-                           struct imm_state_table const *state_tbl,
-                           struct imm_trans_table const *trans_tbl);
+int imm_cpath_init(struct cpath *path, struct imm_state_table const *state_tbl,
+                   struct imm_trans_table const *trans_tbl);
 
-enum imm_rc imm__cpath_reset(struct cpath *,
-                             struct imm_state_table const *state_tbl,
-                             struct imm_trans_table const *trans_tbl);
+int imm__cpath_reset(struct cpath *, struct imm_state_table const *state_tbl,
+                     struct imm_trans_table const *trans_tbl);
 
-enum imm_rc imm_cpath_setup(struct cpath *, unsigned len);
+int imm_cpath_setup(struct cpath *, unsigned len);
 
 static inline unsigned cpath_seqlen(struct cpath const *path, unsigned pos,
                                     unsigned state)

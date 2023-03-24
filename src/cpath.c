@@ -8,21 +8,19 @@
 #include "span.h"
 #include <stdlib.h>
 
-enum imm_rc imm_cpath_init(struct cpath *path,
-                           struct imm_state_table const *state_tbl,
-                           struct imm_trans_table const *trans_tbl)
+int imm_cpath_init(struct cpath *path, struct imm_state_table const *state_tbl,
+                   struct imm_trans_table const *trans_tbl)
 {
     path->state_offset = NULL;
     path->trans_bits = NULL;
-    enum imm_rc rc = imm__cpath_reset(path, state_tbl, trans_tbl);
+    int rc = imm__cpath_reset(path, state_tbl, trans_tbl);
     if (rc) return rc;
     path->bit = NULL;
     return IMM_OK;
 }
 
-enum imm_rc imm__cpath_reset(struct cpath *p,
-                             struct imm_state_table const *state_tbl,
-                             struct imm_trans_table const *trans_tbl)
+int imm__cpath_reset(struct cpath *p, struct imm_state_table const *state_tbl,
+                     struct imm_trans_table const *trans_tbl)
 {
     unsigned n = p->nstates = state_tbl->nstates;
 
@@ -66,7 +64,7 @@ void imm__cpath_del(struct cpath const *path)
     if (path->bit) free(path->bit);
 }
 
-enum imm_rc imm_cpath_setup(struct cpath *path, unsigned len)
+int imm_cpath_setup(struct cpath *path, unsigned len)
 {
     size_t size = path->state_offset[path->nstates] * len;
     path->bit = imm_bitmap_reallocf(path->bit, size);

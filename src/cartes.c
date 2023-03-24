@@ -38,8 +38,8 @@ char const *imm_cartes_next(struct imm_cartes *cartes)
     return item;
 }
 
-enum imm_rc imm_cartes_reset(struct imm_cartes *cartes, char const *set,
-                             unsigned set_size, unsigned max_times)
+int imm_cartes_reset(struct imm_cartes *cartes, char const *set,
+                     unsigned set_size, unsigned max_times)
 {
     cartes->set = set;
     cartes->set_size = set_size;

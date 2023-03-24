@@ -28,8 +28,7 @@ struct imm_dp
 struct lip_file;
 
 IMM_API void imm_dp_init(struct imm_dp *dp, struct imm_code const *code);
-IMM_API enum imm_rc imm_dp_reset(struct imm_dp *dp,
-                                 struct imm_dp_args const *args);
+IMM_API int imm_dp_reset(struct imm_dp *dp, struct imm_dp_args const *args);
 
 IMM_API void imm_dp_del(struct imm_dp *dp);
 
@@ -45,16 +44,15 @@ IMM_API unsigned imm_dp_nstates(struct imm_dp const *);
 IMM_API unsigned imm_dp_trans_idx(struct imm_dp *dp, unsigned src_idx,
                                   unsigned dst_idx);
 
-IMM_API enum imm_rc imm_dp_change_trans(struct imm_dp *dp, unsigned trans_idx,
-                                        imm_float lprob);
+IMM_API int imm_dp_change_trans(struct imm_dp *dp, unsigned trans_idx,
+                                imm_float lprob);
 
-IMM_API enum imm_rc imm_dp_viterbi(struct imm_dp const *dp,
-                                   struct imm_task *task,
-                                   struct imm_prod *prod);
+IMM_API int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
+                           struct imm_prod *prod);
 
-IMM_API enum imm_rc imm_dp_pack(struct imm_dp const *dp, struct lip_file *io);
+IMM_API int imm_dp_pack(struct imm_dp const *dp, struct lip_file *io);
 
-IMM_API enum imm_rc imm_dp_unpack(struct imm_dp *dp, struct lip_file *io);
+IMM_API int imm_dp_unpack(struct imm_dp *dp, struct lip_file *io);
 
 IMM_API imm_float imm_dp_emis_score(struct imm_dp const *dp, unsigned state_id,
                                     struct imm_seq const *seq);

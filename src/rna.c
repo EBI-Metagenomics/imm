@@ -3,8 +3,8 @@
 
 struct imm_rna const imm_rna_empty = {{ABC_EMPTY}};
 
-enum imm_rc imm_rna_init(struct imm_rna *rna, char const symbols[IMM_RNA_SIZE],
-                         char any_symbol)
+int imm_rna_init(struct imm_rna *rna, char const symbols[IMM_RNA_SIZE],
+                 char any_symbol)
 {
     struct imm_abc_vtable vtable = {IMM_RNA, rna};
     return imm__abc_init(&rna->super.super, IMM_RNA_SIZE, symbols, any_symbol,

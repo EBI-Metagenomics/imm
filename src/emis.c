@@ -38,7 +38,7 @@ void imm_emis_del(struct imm_emis const *x)
     }
 }
 
-static enum imm_rc realloc_offset(struct imm_emis *emis, unsigned nstates)
+static int realloc_offset(struct imm_emis *emis, unsigned nstates)
 {
     unsigned offsize = imm_emis_offset_size(nstates);
     emis->offset = imm_reallocf(emis->offset, sizeof(*emis->offset) * offsize);
@@ -46,7 +46,7 @@ static enum imm_rc realloc_offset(struct imm_emis *emis, unsigned nstates)
     return 0;
 }
 
-static enum imm_rc realloc_score(struct imm_emis *emis, unsigned nstates)
+static int realloc_score(struct imm_emis *emis, unsigned nstates)
 {
     unsigned score_size = imm_emis_score_size(emis, nstates);
     emis->score = imm_reallocf(emis->score, sizeof(*emis->score) * score_size);

@@ -38,10 +38,10 @@ static inline imm_float imm_nuclt_lprob_get(struct imm_nuclt_lprob const *lprob,
     return __imm_nuclt_lprob_get(lprob, imm_abc_symbol_idx(abc, symbol));
 }
 
-IMM_API enum imm_rc imm_nuclt_lprob_pack(struct imm_nuclt_lprob const *nucltp,
-                                         struct lip_file *);
+IMM_API int imm_nuclt_lprob_pack(struct imm_nuclt_lprob const *nucltp,
+                                 struct lip_file *);
 
-IMM_API enum imm_rc imm_nuclt_lprob_unpack(struct imm_nuclt_lprob *nucltp,
-                                           struct lip_file *);
+IMM_API int imm_nuclt_lprob_unpack(struct imm_nuclt_lprob *nucltp,
+                                   struct lip_file *);
 
 #endif

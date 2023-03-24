@@ -16,9 +16,8 @@ struct imm_nuclt
 
 IMM_API extern struct imm_nuclt const imm_nuclt_empty;
 
-IMM_API enum imm_rc imm_nuclt_init(struct imm_nuclt *nuclt,
-                                   char const symbols[IMM_NUCLT_SIZE],
-                                   char any_symbol);
+IMM_API int imm_nuclt_init(struct imm_nuclt *nuclt,
+                           char const symbols[IMM_NUCLT_SIZE], char any_symbol);
 
 static inline unsigned imm_nuclt_size(struct imm_nuclt const *nuclt)
 {

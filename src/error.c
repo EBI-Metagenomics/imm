@@ -38,7 +38,7 @@ static char const strings[][44] = {
     [IMM_TOO_MANY_UNSAFE_STATES] = "too many unsafe states",
 };
 
-enum imm_rc __imm_error_print(enum imm_rc rc, char const *ctx, char const *msg)
+int __imm_error_print(int rc, char const *ctx, char const *msg)
 {
 #ifdef NDEBUG
     (void)ctx;
@@ -53,7 +53,7 @@ enum imm_rc __imm_error_print(enum imm_rc rc, char const *ctx, char const *msg)
     return rc;
 }
 
-char const *imm_error_string(enum imm_rc rc)
+char const *imm_error_string(int rc)
 {
     return rc > IMM_LAST_RC ? NOT_AN_ERROR : strings[rc];
 }

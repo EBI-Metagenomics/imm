@@ -62,8 +62,7 @@ static void visit(struct imm_state *state, struct imm_state **states,
     tmp[*end] = state;
 }
 
-enum imm_rc imm_tsort(unsigned nstates, struct imm_state **states,
-                      unsigned start_idx)
+int imm_tsort(unsigned nstates, struct imm_state **states, unsigned start_idx)
 {
     clear_marks(nstates, states);
 

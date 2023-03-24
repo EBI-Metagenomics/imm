@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-static enum imm_rc path_setup(struct imm_path *path)
+static int path_setup(struct imm_path *path)
 {
     path->capacity = sizeof(*path->steps) * (1 << 4);
     path->nsteps = 0;
@@ -16,9 +16,9 @@ static enum imm_rc path_setup(struct imm_path *path)
     return IMM_OK;
 }
 
-enum imm_rc imm_path_add(struct imm_path *path, struct imm_step step)
+int imm_path_add(struct imm_path *path, struct imm_step step)
 {
-    enum imm_rc rc = IMM_OK;
+    int rc = IMM_OK;
     if (path->capacity == 0)
     {
         if ((rc = path_setup(path))) return rc;

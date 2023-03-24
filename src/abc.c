@@ -9,22 +9,21 @@
 
 struct imm_abc const imm_abc_empty = ABC_EMPTY;
 
-enum imm_rc imm_abc_init(struct imm_abc *abc, struct imm_str symbols,
-                         char any_symbol)
+int imm_abc_init(struct imm_abc *abc, struct imm_str symbols, char any_symbol)
 {
     struct imm_abc_vtable vtable = {IMM_ABC, NULL};
     return imm__abc_init(abc, symbols.len, symbols.data, any_symbol, vtable);
 }
 
-enum imm_rc imm_abc_pack(struct imm_abc const *abc, struct lip_file *file)
+int imm_abc_pack(struct imm_abc const *abc, struct lip_file *file)
 {
-    enum imm_rc rc = imm__abc_pack(abc, file);
+    int rc = imm__abc_pack(abc, file);
     return rc ? error(IMM_IOERROR) : rc;
 }
 
-enum imm_rc imm_abc_unpack(struct imm_abc *abc, struct lip_file *file)
+int imm_abc_unpack(struct imm_abc *abc, struct lip_file *file)
 {
-    enum imm_rc rc = imm__abc_unpack(abc, file);
+    int rc = imm__abc_unpack(abc, file);
     return rc ? error(IMM_IOERROR) : rc;
 }
 
@@ -39,9 +38,8 @@ unsigned imm_abc_union_size(struct imm_abc const *abc, struct imm_str seq)
     return size;
 }
 
-enum imm_rc imm__abc_init(struct imm_abc *abc, unsigned len,
-                          char const *symbols, char any_symbol,
-                          struct imm_abc_vtable vtable)
+int imm__abc_init(struct imm_abc *abc, unsigned len, char const *symbols,
+                  char any_symbol, struct imm_abc_vtable vtable)
 {
     if (!imm_sym_valid_char(any_symbol)) return error(IMM_ANY_SYMBOL_OUT_RANGE);
 
@@ -84,7 +82,7 @@ static_assert(sizeof(imm_abc_typeid_t) == sizeof(uint8_t), "wrong types");
         if (!!(expr)) return e;                                                \
     } while (0)
 
-enum imm_rc imm__abc_pack(struct imm_abc const *abc, struct lip_file *file)
+int imm__abc_pack(struct imm_abc const *abc, struct lip_file *file)
 {
     lip_write_map_size(file, 4);
 
@@ -103,7 +101,7 @@ enum imm_rc imm__abc_pack(struct imm_abc const *abc, struct lip_file *file)
     return file->error ? error(IMM_IOERROR) : IMM_OK;
 }
 
-enum imm_rc imm__abc_unpack(struct imm_abc *abc, struct lip_file *file)
+int imm__abc_unpack(struct imm_abc *abc, struct lip_file *file)
 {
     if (!imm_expect_map_size(file, 4)) return error(IMM_IOERROR);
 

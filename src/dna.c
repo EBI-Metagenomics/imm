@@ -3,8 +3,8 @@
 
 struct imm_dna const imm_dna_empty = {{ABC_EMPTY}};
 
-enum imm_rc imm_dna_init(struct imm_dna *dna, char const symbols[IMM_DNA_SIZE],
-                         char any_symbol)
+int imm_dna_init(struct imm_dna *dna, char const symbols[IMM_DNA_SIZE],
+                 char any_symbol)
 {
     struct imm_abc_vtable vtable = {IMM_DNA, dna};
     return imm__abc_init(&dna->super.super, IMM_DNA_SIZE, symbols, any_symbol,

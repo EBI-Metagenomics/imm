@@ -20,12 +20,10 @@
 #include <assert.h>
 #include <limits.h>
 
-static enum imm_rc call_viterbi(struct imm_viterbi const *,
-                                struct imm_prod *prod);
-static enum imm_rc viterbi_path(struct imm_dp const *dp,
-                                struct imm_task const *task,
-                                struct imm_path *path, unsigned end_state,
-                                unsigned end_seq_len);
+static int call_viterbi(struct imm_viterbi const *, struct imm_prod *prod);
+static int viterbi_path(struct imm_dp const *dp, struct imm_task const *task,
+                        struct imm_path *path, unsigned end_state,
+                        unsigned end_seq_len);
 
 void imm_dp_init(struct imm_dp *dp, struct imm_code const *code)
 {
@@ -45,9 +43,9 @@ void imm_dp_del(struct imm_dp *dp)
     }
 }
 
-enum imm_rc imm_dp_reset(struct imm_dp *dp, struct imm_dp_args const *args)
+int imm_dp_reset(struct imm_dp *dp, struct imm_dp_args const *args)
 {
-    enum imm_rc rc = IMM_OK;
+    int rc = IMM_OK;
 
     if ((rc = imm_emis_reset(&dp->emis, dp->code, args->states, args->nstates)))
         return rc;
@@ -80,8 +78,8 @@ unsigned find_unsafe_states(struct imm_dp const *dp, unsigned *state)
     return n;
 }
 
-enum imm_rc imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
-                           struct imm_prod *prod)
+int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
+                   struct imm_prod *prod)
 {
     imm_prod_reset(prod);
     if (!task->seq) return error(IMM_NOT_SET_SEQ);
@@ -102,7 +100,7 @@ enum imm_rc imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
     assert(num_unsafe_states <= 1);
     struct imm_viterbi viterbi = {dp, task, imm_seq_size(task->seq),
                                   unsafe_state};
-    enum imm_rc rc = call_viterbi(&viterbi, prod);
+    int rc = call_viterbi(&viterbi, prod);
 
     if (elapsed_stop(&elapsed)) return error(IMM_ELAPSED_LIB_FAILED);
 
@@ -121,8 +119,7 @@ unsigned imm_dp_trans_idx(struct imm_dp *dp, unsigned src_idx, unsigned dst_idx)
     return imm_trans_table_idx(&dp->trans_table, src_idx, dst_idx);
 }
 
-enum imm_rc imm_dp_change_trans(struct imm_dp *dp, unsigned trans_idx,
-                                imm_float lprob)
+int imm_dp_change_trans(struct imm_dp *dp, unsigned trans_idx, imm_float lprob)
 {
     if (imm_unlikely(imm_lprob_is_nan(lprob)))
         return error(IMM_NAN_PROBABILITY);
@@ -231,8 +228,7 @@ static struct final_score final_score(struct imm_dp const *dp,
     return fscore;
 }
 
-static enum imm_rc call_viterbi(struct imm_viterbi const *x,
-                                struct imm_prod *prod)
+static int call_viterbi(struct imm_viterbi const *x, struct imm_prod *prod)
 {
     unsigned len = imm_eseq_len(&x->task->eseq);
     struct imm_range range = imm_range_init(0, len + 1);
@@ -246,10 +242,9 @@ static enum imm_rc call_viterbi(struct imm_viterbi const *x,
     return 0;
 }
 
-static enum imm_rc viterbi_path(struct imm_dp const *dp,
-                                struct imm_task const *task,
-                                struct imm_path *path, unsigned end_state,
-                                unsigned end_seq_len)
+static int viterbi_path(struct imm_dp const *dp, struct imm_task const *task,
+                        struct imm_path *path, unsigned end_state,
+                        unsigned end_seq_len)
 {
     unsigned row = imm_eseq_len(&task->eseq);
     unsigned state = end_state;
@@ -260,7 +255,7 @@ static enum imm_rc viterbi_path(struct imm_dp const *dp,
     {
         unsigned id = dp->state_table.ids[state];
         struct imm_step step = imm_step(id, seqlen);
-        enum imm_rc rc = imm_path_add(path, step);
+        int rc = imm_path_add(path, step);
         if (rc) return rc;
         row -= seqlen;
 

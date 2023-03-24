@@ -31,8 +31,8 @@ static void init_transitions_table(struct imm_hmm *hmm)
     hmm->transitions.avail = &hmm->transitions.data[0];
 }
 
-static enum imm_rc add_transition(struct imm_hmm *hmm, struct imm_state *src,
-                                  struct imm_state *dst, imm_float lprob)
+static int add_transition(struct imm_hmm *hmm, struct imm_state *src,
+                          struct imm_state *dst, imm_float lprob)
 {
     unsigned max_size = (unsigned)IMM_ARRAY_SIZE(hmm->transitions.data);
     if (hmm->transitions.size >= max_size)
@@ -96,7 +96,7 @@ void imm_hmm_write_dot(struct imm_hmm const *hmm, FILE *restrict fd,
     fprintf(fd, "}\n");
 }
 
-enum imm_rc imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
+int imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
 {
     if (cco_hash_hashed(&state->hnode)) return error(IMM_STATE_ALREADY_IN_HMM);
     assert(!hmm_state(hmm, state->id));
@@ -105,14 +105,12 @@ enum imm_rc imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
     return IMM_OK;
 }
 
-static enum imm_rc del_outgoing_transitions(struct imm_hmm *,
-                                            struct imm_state *);
-static enum imm_rc del_incoming_transitions(struct imm_hmm *,
-                                            struct imm_state *);
+static int del_outgoing_transitions(struct imm_hmm *, struct imm_state *);
+static int del_incoming_transitions(struct imm_hmm *, struct imm_state *);
 
-enum imm_rc imm_hmm_del_state(struct imm_hmm *hmm, struct imm_state *state)
+int imm_hmm_del_state(struct imm_hmm *hmm, struct imm_state *state)
 {
-    enum imm_rc rc = IMM_OK;
+    int rc = IMM_OK;
 
     if ((rc = del_outgoing_transitions(hmm, state))) return rc;
     if ((rc = del_incoming_transitions(hmm, state))) return rc;
@@ -123,9 +121,8 @@ enum imm_rc imm_hmm_del_state(struct imm_hmm *hmm, struct imm_state *state)
     return rc;
 }
 
-enum imm_rc imm_hmm_init_dp(struct imm_hmm const *hmm,
-                            struct imm_state const *end_state,
-                            struct imm_dp *dp)
+int imm_hmm_init_dp(struct imm_hmm const *hmm,
+                    struct imm_state const *end_state, struct imm_dp *dp)
 {
     imm_dp_init(dp, hmm->code);
     return imm_hmm_reset_dp(hmm, end_state, dp);
@@ -138,11 +135,10 @@ void imm_hmm_reset(struct imm_hmm *hmm)
     init_transitions_table(hmm);
 }
 
-enum imm_rc imm_hmm_reset_dp(struct imm_hmm const *hmm,
-                             struct imm_state const *end_state,
-                             struct imm_dp *dp)
+int imm_hmm_reset_dp(struct imm_hmm const *hmm,
+                     struct imm_state const *end_state, struct imm_dp *dp)
 {
-    enum imm_rc rc = IMM_OK;
+    int rc = IMM_OK;
     struct imm_state **states =
         malloc(sizeof(struct imm_state *) * hmm->states.size);
     if (!states) return error(IMM_NOMEM);
@@ -268,11 +264,11 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
     return lprob;
 }
 
-enum imm_rc imm_hmm_normalize_trans(struct imm_hmm const *hmm)
+int imm_hmm_normalize_trans(struct imm_hmm const *hmm)
 {
     struct imm_state *state = NULL;
     unsigned bkt = 0;
-    enum imm_rc rc = IMM_OK;
+    int rc = IMM_OK;
     cco_hash_for_each(hmm->states.tbl, bkt, state, hnode)
     {
         if ((rc = imm_hmm_normalize_state_trans(state))) break;
@@ -280,7 +276,7 @@ enum imm_rc imm_hmm_normalize_trans(struct imm_hmm const *hmm)
     return rc;
 }
 
-enum imm_rc imm_hmm_normalize_state_trans(struct imm_state *src)
+int imm_hmm_normalize_state_trans(struct imm_state *src)
 {
     if (!cco_hash_hashed(&src->hnode)) return error(IMM_STATE_NOT_FOUND);
 
@@ -302,8 +298,8 @@ enum imm_rc imm_hmm_normalize_state_trans(struct imm_state *src)
     return IMM_OK;
 }
 
-enum imm_rc imm_hmm_set_start(struct imm_hmm *hmm,
-                              struct imm_state const *state, imm_float lprob)
+int imm_hmm_set_start(struct imm_hmm *hmm, struct imm_state const *state,
+                      imm_float lprob)
 {
     if (!imm_lprob_is_finite(lprob)) return error(IMM_NON_FINITE_PROBABILITY);
 
@@ -314,8 +310,8 @@ enum imm_rc imm_hmm_set_start(struct imm_hmm *hmm,
     return IMM_OK;
 }
 
-enum imm_rc imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state *src,
-                              struct imm_state *dst, imm_float lprob)
+int imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state *src,
+                      struct imm_state *dst, imm_float lprob)
 {
     if (!imm_lprob_is_finite(lprob)) return error(IMM_NON_FINITE_PROBABILITY);
 
@@ -357,8 +353,8 @@ static struct imm_trans *hmm_trans(struct imm_hmm const *hmm,
     return NULL;
 }
 
-static enum imm_rc del_outgoing_transitions(struct imm_hmm *hmm,
-                                            struct imm_state *state)
+static int del_outgoing_transitions(struct imm_hmm *hmm,
+                                    struct imm_state *state)
 {
     if (!cco_hash_hashed(&state->hnode)) return error(IMM_STATE_NOT_FOUND);
     assert(hmm_state(hmm, state->id));
@@ -385,8 +381,8 @@ static enum imm_rc del_outgoing_transitions(struct imm_hmm *hmm,
     return IMM_OK;
 }
 
-static enum imm_rc del_incoming_transitions(struct imm_hmm *hmm,
-                                            struct imm_state *state)
+static int del_incoming_transitions(struct imm_hmm *hmm,
+                                    struct imm_state *state)
 {
     if (!cco_hash_hashed(&state->hnode)) return error(IMM_STATE_NOT_FOUND);
     assert(hmm_state(hmm, state->id));
