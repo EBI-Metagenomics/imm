@@ -23,7 +23,7 @@ imm_float imm_state_lprob(struct imm_state const *state,
 {
     if (imm_unlikely(state->abc != imm_seq_abc(seq)))
     {
-        error(IMM_DIFFERENT_ABC);
+        // error(IMM_DIFFERENT_ABC);
         return IMM_LPROB_NAN;
     }
     return state->vtable.lprob(state, seq);

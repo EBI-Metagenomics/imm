@@ -11,7 +11,7 @@ struct imm_task *imm_task_new(struct imm_dp const *dp)
     struct imm_task *task = malloc(sizeof(*task));
     if (!task)
     {
-        error(IMM_NOMEM);
+        // error(IMM_NOMEM);
         return NULL;
     }
     if (imm_matrix_init(&task->matrix, &dp->state_table))

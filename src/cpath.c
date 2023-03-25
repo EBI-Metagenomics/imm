@@ -16,7 +16,7 @@ int imm_cpath_init(struct cpath *path, struct imm_state_table const *state_tbl,
     int rc = imm__cpath_reset(path, state_tbl, trans_tbl);
     if (rc) return rc;
     path->bit = NULL;
-    return IMM_OK;
+    return 0;
 }
 
 int imm__cpath_reset(struct cpath *p, struct imm_state_table const *state_tbl,
@@ -27,11 +27,11 @@ int imm__cpath_reset(struct cpath *p, struct imm_state_table const *state_tbl,
     p->state_offset =
         imm_reallocf(p->state_offset, sizeof *p->state_offset * (n + 1));
 
-    if (!p->state_offset) return error(IMM_NOMEM);
+    if (!p->state_offset) return IMM_NOMEM;
     p->state_offset[0] = 0;
 
     p->trans_bits = imm_reallocf(p->trans_bits, sizeof *p->trans_bits * n);
-    if (n > 0 && !p->trans_bits) return error(IMM_NOMEM);
+    if (n > 0 && !p->trans_bits) return IMM_NOMEM;
 
     for (unsigned dst = 0; dst < n; ++dst)
     {
@@ -54,7 +54,7 @@ int imm__cpath_reset(struct cpath *p, struct imm_state_table const *state_tbl,
             (uint16_t)(p->state_offset[dst + 1] +
                        bits_width((uint32_t)((unsigned)depth + 1)));
     }
-    return IMM_OK;
+    return 0;
 }
 
 void imm__cpath_del(struct cpath const *path)
@@ -68,6 +68,6 @@ int imm_cpath_setup(struct cpath *path, unsigned len)
 {
     size_t size = path->state_offset[path->nstates] * len;
     path->bit = imm_bitmap_reallocf(path->bit, size);
-    if (!path->bit && size > 0) return error(IMM_NOMEM);
-    return IMM_OK;
+    if (!path->bit && size > 0) return IMM_NOMEM;
+    return 0;
 }

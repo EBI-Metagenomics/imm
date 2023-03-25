@@ -87,8 +87,8 @@ static imm_float lprob15(struct imm_state const *state,
         return imm_joint_n4_15(f, seq);
     case 5:
         return imm_joint_n5_15(f, seq);
-    default:
-        error(IMM_SEQ_OUT_OF_RANGE);
+        // default:
+        //     error(IMM_SEQ_OUT_OF_RANGE);
     }
 
     return imm_lprob_zero();
@@ -107,8 +107,8 @@ static imm_float lprob24(struct imm_state const *state,
         return imm_joint_n3_24(f, seq);
     case 4:
         return imm_joint_n4_24(f, seq);
-    default:
-        error(IMM_SEQ_OUT_OF_RANGE);
+        // default:
+        //     error(IMM_SEQ_OUT_OF_RANGE);
     }
 
     return imm_lprob_zero();
@@ -123,8 +123,8 @@ static imm_float lprob33(struct imm_state const *state,
     {
     case 3:
         return imm_joint_n3_33(f, seq);
-    default:
-        error(IMM_SEQ_OUT_OF_RANGE);
+        // default:
+        //     error(IMM_SEQ_OUT_OF_RANGE);
     }
 
     return imm_lprob_zero();

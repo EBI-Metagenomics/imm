@@ -82,17 +82,16 @@ int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
                    struct imm_prod *prod)
 {
     imm_prod_reset(prod);
-    if (!task->seq) return error(IMM_NOT_SET_SEQ);
+    if (!task->seq) return IMM_NOT_SET_SEQ;
 
-    if (dp->code->abc != imm_seq_abc(task->seq))
-        return error(IMM_DIFFERENT_ABC);
+    if (dp->code->abc != imm_seq_abc(task->seq)) return IMM_DIFFERENT_ABC;
 
     unsigned end_state = dp->state_table.end_state_idx;
     unsigned min = imm_state_table_span(&dp->state_table, end_state).min;
-    if (imm_seq_size(task->seq) < min) return error(IMM_SEQ_TOO_SHORT);
+    if (imm_seq_size(task->seq) < min) return IMM_SEQ_TOO_SHORT;
 
     struct elapsed elapsed = ELAPSED_INIT;
-    if (elapsed_start(&elapsed)) return error(IMM_ELAPSED_LIB_FAILED);
+    if (elapsed_start(&elapsed)) return IMM_ELAPSED_LIB_FAILED;
 
     unsigned unsafe_state = {0};
     unsigned num_unsafe_states = find_unsafe_states(dp, &unsafe_state);
@@ -102,7 +101,7 @@ int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
                                   unsafe_state};
     int rc = call_viterbi(&viterbi, prod);
 
-    if (elapsed_stop(&elapsed)) return error(IMM_ELAPSED_LIB_FAILED);
+    if (elapsed_stop(&elapsed)) return IMM_ELAPSED_LIB_FAILED;
 
     prod->mseconds = elapsed_milliseconds(&elapsed);
 
@@ -121,8 +120,7 @@ unsigned imm_dp_trans_idx(struct imm_dp *dp, unsigned src_idx, unsigned dst_idx)
 
 int imm_dp_change_trans(struct imm_dp *dp, unsigned trans_idx, imm_float lprob)
 {
-    if (imm_unlikely(imm_lprob_is_nan(lprob)))
-        return error(IMM_NAN_PROBABILITY);
+    if (imm_unlikely(imm_lprob_is_nan(lprob))) return IMM_NAN_PROBABILITY;
 
     imm_trans_table_change(&dp->trans_table, trans_idx, lprob);
     return IMM_OK;

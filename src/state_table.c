@@ -39,7 +39,7 @@ int imm_state_table_reset(struct imm_state_table *x,
 
     if (args->nstates > 0)
     {
-        if (!x->ids || !x->span) return error(IMM_NOMEM);
+        if (!x->ids || !x->span) return IMM_NOMEM;
     }
 
     for (unsigned i = 0; i < args->nstates; ++i)

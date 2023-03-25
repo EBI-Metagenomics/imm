@@ -35,7 +35,7 @@ static_assert(sizeof(imm_state_idx_t) == sizeof(uint16_t), "wrong types");
     {                                                                          \
         if (!!(expr))                                                          \
         {                                                                      \
-            rc = error(e);                                                     \
+            rc = (e);                                                          \
             goto cleanup;                                                      \
         }                                                                      \
     } while (0)
@@ -108,7 +108,7 @@ int imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
     struct imm_trans_table *tt = &dp->trans_table;
     struct imm_state_table *st = &dp->state_table;
 
-    if (!imm_expect_map_size(f, 10)) return error(IMM_IOERROR);
+    if (!imm_expect_map_size(f, 10)) return IMM_IOERROR;
 
     /* emission */
     ERET(!imm_expect_map_key(f, KEY_EMIS_SCORE), IMM_IOERROR);

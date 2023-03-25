@@ -42,7 +42,7 @@ static int realloc_offset(struct imm_emis *emis, unsigned nstates)
 {
     unsigned offsize = imm_emis_offset_size(nstates);
     emis->offset = imm_reallocf(emis->offset, sizeof(*emis->offset) * offsize);
-    if (!emis->offset) return error(IMM_NOMEM);
+    if (!emis->offset) return IMM_NOMEM;
     return 0;
 }
 
@@ -50,7 +50,7 @@ static int realloc_score(struct imm_emis *emis, unsigned nstates)
 {
     unsigned score_size = imm_emis_score_size(emis, nstates);
     emis->score = imm_reallocf(emis->score, sizeof(*emis->score) * score_size);
-    if (!emis->score && score_size > 0) return error(IMM_NOMEM);
+    if (!emis->score && score_size > 0) return IMM_NOMEM;
     return 0;
 }
 

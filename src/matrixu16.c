@@ -7,7 +7,7 @@
 int imm_matrixu16_init(struct imm_matrixu16 *x, unsigned rows, unsigned cols)
 {
     x->data = malloc(sizeof(*x->data) * (rows * cols));
-    if (!x->data) return error(IMM_NOMEM);
+    if (!x->data) return IMM_NOMEM;
     x->rows = rows;
     x->cols = cols;
     return 0;
@@ -49,7 +49,7 @@ void imm_matrixu16_deinit(struct imm_matrixu16 const *x) { free(x->data); }
 int imm_matrixu16_resize(struct imm_matrixu16 *x, unsigned rows, unsigned cols)
 {
     x->data = imm_reallocf(x->data, sizeof(*x->data) * (rows * cols));
-    if (!x->data && rows * cols > 0) return error(IMM_NOMEM);
+    if (!x->data && rows * cols > 0) return IMM_NOMEM;
     x->rows = rows;
     x->cols = cols;
     return 0;

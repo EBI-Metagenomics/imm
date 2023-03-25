@@ -24,7 +24,7 @@ int imm_trans_table_reset(struct imm_trans_table *x,
 
     unsigned offsize = imm_trans_table_offsize(args->nstates);
     x->offset = imm_reallocf(x->offset, sizeof(*x->offset) * offsize);
-    if (!x->offset && offsize > 0) return error(IMM_NOMEM);
+    if (!x->offset && offsize > 0) return IMM_NOMEM;
 
     x->offset[0] = 0;
 
@@ -33,7 +33,7 @@ int imm_trans_table_reset(struct imm_trans_table *x,
     {
         x->offset = NULL;
         free(x->offset);
-        return error(IMM_NOMEM);
+        return IMM_NOMEM;
     }
 
     for (unsigned i = 0; i < args->nstates; ++i)
@@ -60,7 +60,7 @@ unsigned imm_trans_table_idx(struct imm_trans_table const *x, unsigned src,
         if (imm_trans_table_source_state(x, dst, i) == src)
             return x->offset[dst] + i;
     }
-    error(IMM_TRANSITION_NOT_FOUND);
+    // error(IMM_TRANSITION_NOT_FOUND);
     return IMM_TRANS_NULL_IDX;
 }
 

@@ -21,7 +21,7 @@ int imm_matrix_reset(struct imm_matrix *x, struct imm_state_table const *tbl)
 {
     unsigned n = tbl->nstates;
     x->state_col = imm_reallocf(x->state_col, sizeof(*x->state_col) * n);
-    if (!x->state_col && n > 0) return error(IMM_NOMEM);
+    if (!x->state_col && n > 0) return IMM_NOMEM;
 
     unsigned next_col = 0;
     for (unsigned i = 0; i < n; ++i)

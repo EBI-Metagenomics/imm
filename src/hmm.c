@@ -35,11 +35,10 @@ static int add_transition(struct imm_hmm *hmm, struct imm_state *src,
                           struct imm_state *dst, imm_float lprob)
 {
     unsigned max_size = (unsigned)IMM_ARRAY_SIZE(hmm->transitions.data);
-    if (hmm->transitions.size >= max_size)
-        return error(IMM_TOO_MANY_TRANSITIONS);
+    if (hmm->transitions.size >= max_size) return IMM_TOO_MANY_TRANSITIONS;
 
     if (hmm->transitions.avail > &hmm->transitions.data[max_size - 1])
-        return error(IMM_NOMEM);
+        return IMM_NOMEM;
 
     struct imm_trans *trans = hmm->transitions.avail++;
     hmm->transitions.size++;
@@ -98,7 +97,7 @@ void imm_hmm_write_dot(struct imm_hmm const *hmm, FILE *restrict fd,
 
 int imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)
 {
-    if (cco_hash_hashed(&state->hnode)) return error(IMM_STATE_ALREADY_IN_HMM);
+    if (cco_hash_hashed(&state->hnode)) return IMM_STATE_ALREADY_IN_HMM;
     assert(!hmm_state(hmm, state->id));
     cco_hash_add(hmm->states.tbl, &state->hnode, state->id);
     hmm->states.size++;
@@ -141,16 +140,16 @@ int imm_hmm_reset_dp(struct imm_hmm const *hmm,
     int rc = IMM_OK;
     struct imm_state **states =
         malloc(sizeof(struct imm_state *) * hmm->states.size);
-    if (!states) return error(IMM_NOMEM);
+    if (!states) return IMM_NOMEM;
 
     if (!hmm_state(hmm, end_state->id))
     {
-        rc = error(IMM_END_STATE_NOT_FOUND);
+        rc = IMM_END_STATE_NOT_FOUND;
         goto cleanup;
     }
     if (!has_start_state(hmm))
     {
-        rc = error(IMM_START_STATE_NOT_FOUND);
+        rc = IMM_START_STATE_NOT_FOUND;
         goto cleanup;
     }
 
@@ -192,12 +191,12 @@ imm_float imm_hmm_trans(struct imm_hmm const *hmm, struct imm_state const *src,
 {
     if (!cco_hash_hashed(&src->hnode) || !cco_hash_hashed(&dst->hnode))
     {
-        error(IMM_STATE_NOT_FOUND);
+        // IMM_STATE_NOT_FOUND;
         return imm_lprob_nan();
     }
     struct imm_trans const *trans = hmm_trans(hmm, src, dst);
     if (trans) return trans->lprob;
-    error(IMM_TRANSITION_NOT_FOUND);
+    // IMM_TRANSITION_NOT_FOUND;
     return imm_lprob_nan();
 }
 
@@ -206,14 +205,14 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
 {
     if (hmm->code->abc != seq->abc)
     {
-        error(IMM_DIFFERENT_ABC);
+        // IMM_DIFFERENT_ABC;
         return imm_lprob_nan();
     }
 
     unsigned nsteps = imm_path_nsteps(path);
     if (nsteps == 0)
     {
-        error(IMM_PATH_NO_STEPS);
+        // IMM_PATH_NO_STEPS;
         return imm_lprob_nan();
     }
 
@@ -221,13 +220,13 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
     struct imm_state const *state = hmm_state(hmm, step->state_id);
     if (state != hmm_state(hmm, hmm->start.state_id))
     {
-        error(IMM_FIRST_STATE_NOT_STARTING);
+        // IMM_FIRST_STATE_NOT_STARTING;
         return imm_lprob_nan();
     }
 
     if (step->seqlen > imm_seq_size(seq))
     {
-        error(IMM_PATH_EMITS_MORE_SEQ);
+        // IMM_PATH_EMITS_MORE_SEQ;
         return imm_lprob_nan();
     }
 
@@ -241,14 +240,14 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
         step = imm_path_step(path, i);
         if (start + step->seqlen > imm_seq_size(seq))
         {
-            error(IMM_PATH_EMITS_MORE_SEQ);
+            // IMM_PATH_EMITS_MORE_SEQ;
             return imm_lprob_nan();
         }
 
         struct imm_state const *prev_state = state;
         if (!(state = hmm_state(hmm, step->state_id)))
         {
-            error(IMM_STATE_NOT_FOUND);
+            // IMM_STATE_NOT_FOUND;
             return imm_lprob_nan();
         }
         imm_subseq_init(&subseq, seq, start, step->seqlen);
@@ -258,7 +257,7 @@ imm_float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
 
     if (start + step->seqlen < imm_seq_size(seq))
     {
-        error(IMM_SEQ_LONGER_THAN_PATH_SYMBOLS);
+        // IMM_SEQ_LONGER_THAN_PATH_SYMBOLS;
         return imm_lprob_nan();
     }
     return lprob;
@@ -278,7 +277,7 @@ int imm_hmm_normalize_trans(struct imm_hmm const *hmm)
 
 int imm_hmm_normalize_state_trans(struct imm_state *src)
 {
-    if (!cco_hash_hashed(&src->hnode)) return error(IMM_STATE_NOT_FOUND);
+    if (!cco_hash_hashed(&src->hnode)) return IMM_STATE_NOT_FOUND;
 
     if (imm_list_empty(&src->trans.outgoing)) return IMM_OK;
 
@@ -289,7 +288,7 @@ int imm_hmm_normalize_state_trans(struct imm_state *src)
         lnorm = logaddexp(lnorm, trans->lprob);
     }
 
-    if (!imm_lprob_is_finite(lnorm)) return error(IMM_NON_FINITE_PROBABILITY);
+    if (!imm_lprob_is_finite(lnorm)) return IMM_NON_FINITE_PROBABILITY;
 
     imm_list_for_each_entry(trans, &src->trans.outgoing, outgoing)
     {
@@ -301,9 +300,9 @@ int imm_hmm_normalize_state_trans(struct imm_state *src)
 int imm_hmm_set_start(struct imm_hmm *hmm, struct imm_state const *state,
                       imm_float lprob)
 {
-    if (!imm_lprob_is_finite(lprob)) return error(IMM_NON_FINITE_PROBABILITY);
+    if (!imm_lprob_is_finite(lprob)) return IMM_NON_FINITE_PROBABILITY;
 
-    if (!cco_hash_hashed(&state->hnode)) return error(IMM_STATE_NOT_FOUND);
+    if (!cco_hash_hashed(&state->hnode)) return IMM_STATE_NOT_FOUND;
 
     hmm->start.lprob = lprob;
     hmm->start.state_id = state->id;
@@ -313,11 +312,11 @@ int imm_hmm_set_start(struct imm_hmm *hmm, struct imm_state const *state,
 int imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state *src,
                       struct imm_state *dst, imm_float lprob)
 {
-    if (!imm_lprob_is_finite(lprob)) return error(IMM_NON_FINITE_PROBABILITY);
+    if (!imm_lprob_is_finite(lprob)) return IMM_NON_FINITE_PROBABILITY;
 
-    if (!cco_hash_hashed(&src->hnode)) return error(IMM_STATE_NOT_FOUND);
+    if (!cco_hash_hashed(&src->hnode)) return IMM_STATE_NOT_FOUND;
 
-    if (!cco_hash_hashed(&dst->hnode)) return error(IMM_STATE_NOT_FOUND);
+    if (!cco_hash_hashed(&dst->hnode)) return IMM_STATE_NOT_FOUND;
 
     struct imm_trans *trans = hmm_trans(hmm, src, dst);
 
@@ -356,7 +355,7 @@ static struct imm_trans *hmm_trans(struct imm_hmm const *hmm,
 static int del_outgoing_transitions(struct imm_hmm *hmm,
                                     struct imm_state *state)
 {
-    if (!cco_hash_hashed(&state->hnode)) return error(IMM_STATE_NOT_FOUND);
+    if (!cco_hash_hashed(&state->hnode)) return IMM_STATE_NOT_FOUND;
     assert(hmm_state(hmm, state->id));
 
     struct imm_trans *t = NULL;
@@ -384,7 +383,7 @@ static int del_outgoing_transitions(struct imm_hmm *hmm,
 static int del_incoming_transitions(struct imm_hmm *hmm,
                                     struct imm_state *state)
 {
-    if (!cco_hash_hashed(&state->hnode)) return error(IMM_STATE_NOT_FOUND);
+    if (!cco_hash_hashed(&state->hnode)) return IMM_STATE_NOT_FOUND;
     assert(hmm_state(hmm, state->id));
 
     struct imm_trans *t = NULL;

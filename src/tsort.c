@@ -66,12 +66,12 @@ int imm_tsort(unsigned nstates, struct imm_state **states, unsigned start_idx)
 {
     clear_marks(nstates, states);
 
-    if (!check_mute_cycles(nstates, states)) return error(IMM_TSORT_MUTE_CYLES);
+    if (!check_mute_cycles(nstates, states)) return IMM_TSORT_MUTE_CYLES;
 
     clear_marks(nstates, states);
 
     struct imm_state **tmp = malloc(sizeof(*tmp) * nstates);
-    if (!tmp) return error(IMM_NOMEM);
+    if (!tmp) return IMM_NOMEM;
 
     unsigned end = nstates;
     visit(states[start_idx], states, &end, tmp);

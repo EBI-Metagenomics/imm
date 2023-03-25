@@ -7,7 +7,7 @@
 int imm_matrixf_init(struct imm_matrixf *x, unsigned rows, unsigned cols)
 {
     x->data = malloc(sizeof(*x->data) * (rows * cols));
-    if (!x->data) return error(IMM_NOMEM);
+    if (!x->data) return IMM_NOMEM;
     x->rows = rows;
     x->cols = cols;
     return 0;
@@ -47,7 +47,7 @@ void imm_matrixf_deinit(struct imm_matrixf const *x) { free(x->data); }
 int imm_matrixf_resize(struct imm_matrixf *x, unsigned rows, unsigned cols)
 {
     x->data = imm_reallocf(x->data, sizeof(*x->data) * (rows * cols));
-    if (!x->data && rows * cols > 0) return error(IMM_NOMEM);
+    if (!x->data && rows * cols > 0) return IMM_NOMEM;
     x->rows = rows;
     x->cols = cols;
     return 0;

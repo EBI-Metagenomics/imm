@@ -12,7 +12,7 @@ static int path_setup(struct imm_path *path)
     path->dir = 1;
     path->start = 0;
     path->steps = malloc((size_t)path->capacity);
-    if (!path->steps) return error(IMM_NOMEM);
+    if (!path->steps) return IMM_NOMEM;
     return IMM_OK;
 }
 
@@ -32,7 +32,7 @@ int imm_path_add(struct imm_path *path, struct imm_step step)
         capacity <<= 1;
         assert(capacity >= sizeof *path->steps * count);
         path->steps = imm_reallocf(path->steps, capacity);
-        if (!path->steps && capacity > 0) return error(IMM_NOMEM);
+        if (!path->steps && capacity > 0) return IMM_NOMEM;
     }
 
     path->capacity = (int)capacity;
