@@ -1,5 +1,5 @@
-#ifndef BITMAP_H
-#define BITMAP_H
+#ifndef IMM_BITMAP_H
+#define IMM_BITMAP_H
 
 unsigned long imm_bitmap_get(unsigned long *x, unsigned long start,
                              unsigned len);

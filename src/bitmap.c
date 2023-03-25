@@ -1,4 +1,4 @@
-#include "bitmap.h"
+#include "imm/bitmap.h"
 #include "bits.h"
 #include "reallocf.h"
 #include <stdlib.h>

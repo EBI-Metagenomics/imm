@@ -1,4 +1,5 @@
 #include "viterbi_generic.h"
+#include "compiler.h"
 #include "cpath.h"
 #include "imm/lprob.h"
 #include "imm/viterbi.h"
@@ -21,8 +22,8 @@ struct bt2
             UINT16_MAX                                                         \
     }
 
-static void set_trans(struct bt2 *x, imm_float score, unsigned prev_state,
-                      unsigned trans, unsigned len)
+TEMPLATE void set_trans(struct bt2 *x, imm_float score, unsigned prev_state,
+                        unsigned trans, unsigned len)
 {
     x->score = score;
     x->prev_state = prev_state;
@@ -30,8 +31,8 @@ static void set_trans(struct bt2 *x, imm_float score, unsigned prev_state,
     x->len = len;
 }
 
-static inline void set_cpath(struct cpath *path, struct bt2 const *bt,
-                             unsigned r, unsigned i)
+TEMPLATE void set_cpath(struct cpath *path, struct bt2 const *bt, unsigned r,
+                        unsigned i)
 {
     if (bt->prev_state != IMM_STATE_NULL_IDX)
     {
@@ -47,8 +48,8 @@ static inline void set_cpath(struct cpath *path, struct bt2 const *bt,
     }
 }
 
-static void generic(struct imm_viterbi const *x, unsigned row, unsigned dst,
-                    unsigned remain, bool unsafe_state)
+TEMPLATE void generic(struct imm_viterbi const *x, unsigned row, unsigned dst,
+                      unsigned remain, bool const unsafe_state)
 {
     struct bt2 bt = INIT_BT2;
     for (unsigned t = 0; t < imm_viterbi_ntrans(x, dst); ++t)

@@ -28,6 +28,31 @@
 #define __builtin_unreachable() (void)(0)
 #endif
 
+#ifndef __has_attribute
+#define __has_attribute(x) (0)
+#endif
+
+#if __has_attribute(const)
+#define CONST_ATTR __attribute__((const))
+#else
+#define CONST_ATTR
+#endif
+
+#if __has_attribute(always_inline)
+#define FORCE_INLINE_ATTR __attribute__((always_inline))
+#else
+#define FORCE_INLINE_ATTR
+#endif
+
+/*
+ * FORCE_INLINE_TEMPLATE is used to define C "templates", which take constant
+ * parameters. They must be inlined for the compiler to eliminate the constant
+ * branches.
+ *
+ * Acknowledgement: ZSTD.
+ */
+#define TEMPLATE static inline FORCE_INLINE_ATTR
+
 #define unused(arg) (void)arg;
 
 #endif

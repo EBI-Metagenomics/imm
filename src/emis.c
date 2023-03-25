@@ -102,7 +102,7 @@ static void calc_score(struct imm_emis *emis, struct imm_code const *code,
             }
         }
     }
-    imm_cartes_deinit(&cartes);
+    imm_cartes_cleanup(&cartes);
 }
 
 int imm_emis_reset(struct imm_emis *emis, struct imm_code const *code,

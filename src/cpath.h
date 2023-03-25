@@ -1,7 +1,8 @@
 #ifndef CPATH_H
 #define CPATH_H
 
-#include "bitmap.h"
+#include "compiler.h"
+#include "imm/bitmap.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -49,27 +50,27 @@ struct cpath
     uint8_t *trans_bits;
 };
 
-static inline unsigned __path_invalid(unsigned bits)
+CONST_ATTR TEMPLATE unsigned __path_invalid(unsigned bits)
 {
     return (unsigned)((1 << bits) - 1);
 }
 
-static inline unsigned __path_state_bits(struct cpath const *path, unsigned pos,
-                                         unsigned state)
+TEMPLATE unsigned __path_state_bits(struct cpath const *path, unsigned pos,
+                                    unsigned state)
 {
     (void)pos;
     return (unsigned)(path->state_offset[state + 1] -
                       path->state_offset[state]);
 }
 
-static inline unsigned __path_seqlen_bits(struct cpath const *path,
-                                          unsigned pos, unsigned state)
+TEMPLATE unsigned __path_seqlen_bits(struct cpath const *path, unsigned pos,
+                                     unsigned state)
 {
     return __path_state_bits(path, pos, state) - path->trans_bits[state];
 }
 
-static inline uint64_t start_bit(struct cpath const *path, unsigned pos,
-                                 unsigned state)
+TEMPLATE uint64_t start_bit(struct cpath const *path, unsigned pos,
+                            unsigned state)
 {
     return (uint64_t)pos * path->state_offset[path->nstates] +
            path->state_offset[state];
@@ -85,44 +86,43 @@ int imm__cpath_reset(struct cpath *, struct imm_state_table const *state_tbl,
 
 int imm_cpath_setup(struct cpath *, unsigned len);
 
-static inline unsigned cpath_seqlen(struct cpath const *path, unsigned pos,
-                                    unsigned state)
+TEMPLATE unsigned cpath_seqlen(struct cpath const *path, unsigned pos,
+                               unsigned state)
 {
     uint64_t start = start_bit(path, pos, state) + path->trans_bits[state];
     return (unsigned)imm_bitmap_get(path->bit, start,
                                     __path_seqlen_bits(path, pos, state));
 }
 
-static inline unsigned cpath_trans(struct cpath const *path, unsigned pos,
-                                   unsigned state)
+TEMPLATE unsigned cpath_trans(struct cpath const *path, unsigned pos,
+                              unsigned state)
 {
     uint64_t start = start_bit(path, pos, state);
     return (unsigned)imm_bitmap_get(path->bit, start, path->trans_bits[state]);
 }
 
-static inline bool cpath_valid(struct cpath const *path, unsigned pos,
-                               unsigned state)
+TEMPLATE bool cpath_valid(struct cpath const *path, unsigned pos,
+                          unsigned state)
 {
     return !!(__path_invalid(__path_seqlen_bits(path, pos, state)) ^
               cpath_seqlen(path, pos, state));
 }
 
-static inline void cpath_set_seqlen(struct cpath *path, unsigned pos,
-                                    unsigned state, unsigned len)
+TEMPLATE void cpath_set_seqlen(struct cpath *path, unsigned pos, unsigned state,
+                               unsigned len)
 {
     uint64_t start = start_bit(path, pos, state) + path->trans_bits[state];
     imm_bitmap_set(path->bit, len, start, __path_seqlen_bits(path, pos, state));
 }
 
-static inline void cpath_set_trans(struct cpath *path, unsigned pos,
-                                   unsigned state, unsigned trans)
+TEMPLATE void cpath_set_trans(struct cpath *path, unsigned pos, unsigned state,
+                              unsigned trans)
 {
     uint64_t start = start_bit(path, pos, state);
     imm_bitmap_set(path->bit, trans, start, path->trans_bits[state]);
 }
 
-static inline void path_invalidate(struct cpath *path, unsigned pos,
-                                   unsigned state)
+TEMPLATE void path_invalidate(struct cpath *path, unsigned pos, unsigned state)
 {
     unsigned seqlen = __path_invalid(__path_seqlen_bits(path, pos, state));
     cpath_set_seqlen(path, pos, state, seqlen);

@@ -1,6 +1,5 @@
 #include "imm/cartes.h"
-#include "error.h"
-#include "imm/imm.h"
+#include "imm/rc.h"
 #include "ipow.h"
 #include "reallocf.h"
 #include <assert.h>
@@ -15,7 +14,7 @@ void imm_cartes_init(struct imm_cartes *cartes, char const *set,
     imm_cartes_reset(cartes, set, set_size, max_times);
 }
 
-void imm_cartes_deinit(struct imm_cartes const *cartes)
+void imm_cartes_cleanup(struct imm_cartes const *cartes)
 {
     free((void *)cartes->item);
 }
@@ -25,17 +24,14 @@ char const *imm_cartes_next(struct imm_cartes *cartes)
     assert(cartes->nitems > 0);
     if (cartes->iter_idx == cartes->nitems) return NULL;
 
-    char *item = cartes->item;
+    char *it = cartes->item;
     unsigned idx = cartes->iter_idx++;
     unsigned set_size = cartes->set_size;
 
     for (unsigned i = 0; i < cartes->times; ++i)
-    {
-        item[i] =
-            cartes->set[(idx % ipow(set_size, i + 1)) / ipow(set_size, i)];
-    }
+        it[i] = cartes->set[(idx % ipow(set_size, i + 1)) / ipow(set_size, i)];
 
-    return item;
+    return it;
 }
 
 int imm_cartes_reset(struct imm_cartes *cartes, char const *set,
@@ -49,11 +45,11 @@ int imm_cartes_reset(struct imm_cartes *cartes, char const *set,
     if (new_capacity > cartes->capacity)
     {
         cartes->item = imm_reallocf(cartes->item, new_capacity);
-        if (new_capacity > 0 && !cartes->item) return error(IMM_NOMEM);
+        if (new_capacity > 0 && !cartes->item) return IMM_NOMEM;
         cartes->capacity = new_capacity;
     }
     cartes->nitems = 0;
-    return IMM_OK;
+    return 0;
 }
 
 void imm_cartes_setup(struct imm_cartes *cartes, unsigned times)

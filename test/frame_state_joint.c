@@ -51,7 +51,7 @@ static void setup_codonp(struct imm_codon_lprob *codonp)
         struct imm_codon codon = IMM_CODON(nuclt, item);
         imm_codon_lprob_set(codonp, codon, imm_log(0.001));
     }
-    imm_cartes_deinit(&iter);
+    imm_cartes_cleanup(&iter);
 
     struct imm_codon codon = IMM_CODON(nuclt, "ATG");
     imm_codon_lprob_set(codonp, codon, imm_log(0.8));
@@ -90,5 +90,5 @@ static void check_joint(struct imm_state const *state, struct imm_span span)
         }
     }
     close(imm_exp(total), 1.0);
-    imm_cartes_deinit(&iter);
+    imm_cartes_cleanup(&iter);
 }

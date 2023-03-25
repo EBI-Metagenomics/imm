@@ -18,7 +18,7 @@ struct imm_cartes
 IMM_API void imm_cartes_init(struct imm_cartes *cartes, char const *set,
                              unsigned set_size, unsigned max_times);
 
-IMM_API void imm_cartes_deinit(struct imm_cartes const *cartes);
+IMM_API void imm_cartes_cleanup(struct imm_cartes const *cartes);
 
 IMM_API char const *imm_cartes_next(struct imm_cartes *cartes);
 

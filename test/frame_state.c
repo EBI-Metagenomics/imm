@@ -195,7 +195,7 @@ void test_frame_state_lposterior(void)
         struct imm_codon codon = IMM_CODON(nuclt, codon_item);
         imm_codon_lprob_set(&codonp, codon, imm_log(0.001));
     }
-    imm_cartes_deinit(&codon_iter);
+    imm_cartes_cleanup(&codon_iter);
 
     struct imm_codon codon = IMM_CODON(nuclt, "ATG");
     imm_codon_lprob_set(&codonp, codon, imm_log(0.8));
@@ -233,11 +233,11 @@ void test_frame_state_lposterior(void)
                 lprob -= imm_codon_marg_lprob(&codonm, codon);
                 total = imm_lprob_add(total, lprob);
             }
-            imm_cartes_deinit(&seq_iter);
+            imm_cartes_cleanup(&seq_iter);
         }
         close((imm_float)exp(total), 1.0);
     }
-    imm_cartes_deinit(&codon_iter);
+    imm_cartes_cleanup(&codon_iter);
 }
 
 void test_frame_state_decode(void)

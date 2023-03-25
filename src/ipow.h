@@ -1,21 +1,11 @@
 #ifndef IPOW_H
 #define IPOW_H
 
-#include <assert.h>
-#include <stdint.h>
+#include "compiler.h"
 
-static inline unsigned long ipow(unsigned long base, unsigned exp)
+CONST_ATTR TEMPLATE unsigned long ipow(unsigned long x, unsigned e)
 {
-    unsigned long result = 1;
-
-    while (exp)
-    {
-        if (exp & 1) result *= base;
-        exp >>= 1;
-        base *= base;
-    }
-
-    return result;
+    return !e ? 1 : (e & 1 ? x : 1) * ipow(x * x, e >> 1);
 }
 
 #endif
