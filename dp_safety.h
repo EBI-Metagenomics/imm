@@ -1,0 +1,16 @@
+#ifndef DP_SAFETY_H
+#define DP_SAFETY_H
+
+#include "range.h"
+
+struct imm_dp_safety
+{
+  struct imm_range safe_future;
+  struct imm_range safe;
+  struct imm_range unsafe;
+  struct imm_range safe_past;
+};
+
+void imm_dp_safety_init(struct imm_dp_safety *x, unsigned len);
+
+#endif

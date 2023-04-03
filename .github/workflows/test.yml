@@ -4,15 +4,13 @@ on: push
 
 jobs:
   test:
-    name: Test on ${{ matrix.os }} with double precision ${{ matrix.double_precision }} and build type ${{ matrix.build_type }}
+    name: Test on ${{ matrix.os }} with build type ${{ matrix.build_type }}
     runs-on: ${{ matrix.os }}
     env:
-      IMM_DOUBLE_PRECISION: ${{ matrix.double_precision }}
       BUILD_TYPE: ${{ matrix.build_type }}
     strategy:
       matrix:
         os: [ubuntu-22.04, macos-12]
-        double_precision: ["On", "Off"]
         build_type: [Release, Debug]
 
     steps:

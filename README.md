@@ -13,7 +13,7 @@ bash -c "$(curl -fsSL https://git.io/Jz7Oa) -s EBI-Metagenomics/imm"
 ```
 mkdir build
 cd build
-cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_ALL_WARNINGS=ON ..
+cmake -DCMAKE_BUILD_TYPE=Release ..
 make
 make test
 ```
