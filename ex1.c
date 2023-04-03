@@ -39,7 +39,7 @@ struct imm_ex1 imm_ex1;
 void imm_ex1_init(unsigned core_size)
 {
   assert(core_size > 0);
-  assert(core_size <= EXAMPLE1_SIZE);
+  assert(core_size <= IMM_EX1_SIZE);
   struct imm_ex1 *m = &imm_ex1;
   imm_abc_init(&m->abc, imm_str(IMM_EX1_NUCLT_SYMBOLS),
                IMM_EX1_NUCLT_ANY_SYMBOL);

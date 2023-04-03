@@ -99,7 +99,7 @@ static struct imm_codon_marg codonm(struct imm_codon codon, float lprob)
 void imm_ex2_init(unsigned core_size, struct imm_span span)
 {
   assert(core_size > 0);
-  assert(core_size <= EXAMPLE1_SIZE);
+  assert(core_size <= IMM_EX2_SIZE);
   struct imm_ex2 *m = &imm_ex2;
   struct imm_nuclt const *nuclt = &m->dna->super;
   struct imm_abc const *abc = &nuclt->super;
