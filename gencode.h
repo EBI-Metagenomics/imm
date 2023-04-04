@@ -1,5 +1,5 @@
-#ifndef IMM_GC_H
-#define IMM_GC_H
+#ifndef IMM_GENCODE_H
+#define IMM_GENCODE_H
 
 #include "codon.h"
 #include "dna.h"

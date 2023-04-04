@@ -1,5 +1,5 @@
 #include "array_size.h"
-#include "gc.h"
+#include "gencode.h"
 #include "test_helper.h"
 
 static void gc_f(void)

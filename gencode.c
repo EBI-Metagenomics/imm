@@ -1,4 +1,4 @@
-#include "gc.h"
+#include "gencode.h"
 #include "codon.h"
 #include "dna.h"
 #include <assert.h>
