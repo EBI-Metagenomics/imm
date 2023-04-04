@@ -17,7 +17,7 @@ struct imm_gencode
   char const *base3;
 };
 
-IMM_API extern struct imm_dna const *const imm_gc_dna;
+IMM_API extern struct imm_dna const *const imm_gencode_dna;
 
 IMM_API struct imm_gencode const *imm_gencode_get(unsigned table_id);
 IMM_API unsigned imm_gencode_size(struct imm_gencode const *);
