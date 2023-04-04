@@ -5,12 +5,26 @@
 #include "dna.h"
 #include "export.h"
 
+struct imm_gencode
+{
+  char const *name1;
+  char const *name2;
+  unsigned const id;
+  char const *ncbieaa;
+  char const *sncbieaa;
+  char const *base1;
+  char const *base2;
+  char const *base3;
+};
+
 IMM_API extern struct imm_dna const *const imm_gc_dna;
-IMM_API char const *imm_gc_name1(unsigned id);
-IMM_API char const *imm_gc_name2(unsigned id);
-IMM_API unsigned imm_gc_size(unsigned id);
-IMM_API struct imm_codon imm_gc_codon(unsigned id, unsigned idx);
-IMM_API char imm_gc_aa(unsigned id, unsigned idx);
-IMM_API char imm_gc_decode(unsigned id, struct imm_codon codon);
+
+IMM_API struct imm_gencode const *imm_gencode_get(unsigned table_id);
+IMM_API unsigned imm_gencode_size(struct imm_gencode const *);
+IMM_API struct imm_codon imm_gencode_codon(struct imm_gencode const *,
+                                           unsigned idx);
+IMM_API char imm_gencode_aa(struct imm_gencode const *, unsigned idx);
+IMM_API char imm_gencode_decode(struct imm_gencode const *,
+                                struct imm_codon codon);
 
 #endif

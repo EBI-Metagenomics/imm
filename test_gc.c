@@ -4,21 +4,22 @@
 
 static void gc_f(void)
 {
-  lsequal(imm_gc_name1(1), "Standard");
-  lsequal(imm_gc_name2(1), "SGC0");
+  struct imm_gencode const *gc = imm_gencode_get(1);
+  lsequal(gc->name1, "Standard");
+  lsequal(gc->name2, "SGC0");
 
   struct imm_nuclt const *nuclt = &imm_gc_dna->super;
   struct imm_codon codons[2] = {IMM_CODON(nuclt, "TTT"),
                                 IMM_CODON(nuclt, "TTC")};
 
   unsigned idx = 0;
-  for (unsigned i = 0; i < imm_gc_size(1); ++i)
+  for (unsigned i = 0; i < imm_gencode_size(gc); ++i)
   {
-    if (imm_gc_aa(1, i) == 'F')
+    if (imm_gencode_aa(gc, i) == 'F')
     {
-      eq(imm_gc_codon(1, i).a, codons[idx].a);
-      eq(imm_gc_codon(1, i).b, codons[idx].b);
-      eq(imm_gc_codon(1, i).c, codons[idx].c);
+      eq(imm_gencode_codon(gc, i).a, codons[idx].a);
+      eq(imm_gencode_codon(gc, i).b, codons[idx].b);
+      eq(imm_gencode_codon(gc, i).c, codons[idx].c);
       idx++;
     }
   }
@@ -26,8 +27,9 @@ static void gc_f(void)
 
 static void gc_l(void)
 {
-  lsequal(imm_gc_name1(1), "Standard");
-  lsequal(imm_gc_name2(1), "SGC0");
+  struct imm_gencode const *gc = imm_gencode_get(1);
+  lsequal(gc->name1, "Standard");
+  lsequal(gc->name2, "SGC0");
 
   struct imm_nuclt const *nuclt = &imm_gc_dna->super;
   struct imm_codon codons[6] = {
@@ -36,13 +38,13 @@ static void gc_l(void)
       IMM_CODON(nuclt, "CTA"), IMM_CODON(nuclt, "CTG")};
 
   unsigned idx = 0;
-  for (unsigned i = 0; i < imm_gc_size(1); ++i)
+  for (unsigned i = 0; i < imm_gencode_size(gc); ++i)
   {
-    if (imm_gc_aa(1, i) == 'L')
+    if (imm_gencode_aa(gc, i) == 'L')
     {
-      eq(imm_gc_codon(1, i).a, codons[idx].a);
-      eq(imm_gc_codon(1, i).b, codons[idx].b);
-      eq(imm_gc_codon(1, i).c, codons[idx].c);
+      eq(imm_gencode_codon(gc, i).a, codons[idx].a);
+      eq(imm_gencode_codon(gc, i).b, codons[idx].b);
+      eq(imm_gencode_codon(gc, i).c, codons[idx].c);
       idx++;
     }
   }
@@ -50,8 +52,9 @@ static void gc_l(void)
 
 static void gc_p(void)
 {
-  lsequal(imm_gc_name1(1), "Standard");
-  lsequal(imm_gc_name2(1), "SGC0");
+  struct imm_gencode const *gc = imm_gencode_get(1);
+  lsequal(gc->name1, "Standard");
+  lsequal(gc->name2, "SGC0");
 
   struct imm_nuclt const *nuclt = &imm_gc_dna->super;
   struct imm_codon codons[4] = {
@@ -59,13 +62,13 @@ static void gc_p(void)
       IMM_CODON(nuclt, "CCG")};
 
   unsigned idx = 0;
-  for (unsigned i = 0; i < imm_gc_size(1); ++i)
+  for (unsigned i = 0; i < imm_gencode_size(gc); ++i)
   {
-    if (imm_gc_aa(1, i) == 'P')
+    if (imm_gencode_aa(gc, i) == 'P')
     {
-      eq(imm_gc_codon(1, i).a, codons[idx].a);
-      eq(imm_gc_codon(1, i).b, codons[idx].b);
-      eq(imm_gc_codon(1, i).c, codons[idx].c);
+      eq(imm_gencode_codon(gc, i).a, codons[idx].a);
+      eq(imm_gencode_codon(gc, i).b, codons[idx].b);
+      eq(imm_gencode_codon(gc, i).c, codons[idx].c);
       idx++;
     }
   }
@@ -73,11 +76,12 @@ static void gc_p(void)
 
 static void gc_decode(void)
 {
-  lsequal(imm_gc_name1(1), "Standard");
-  lsequal(imm_gc_name2(1), "SGC0");
+  struct imm_gencode const *gc = imm_gencode_get(1);
+  lsequal(gc->name1, "Standard");
+  lsequal(gc->name2, "SGC0");
   struct imm_nuclt const *nuclt = &imm_gc_dna->super;
-  eq(imm_gc_decode(1, IMM_CODON(nuclt, "CCG")), 'P');
-  eq(imm_gc_decode(1, IMM_CODON(nuclt, "TAG")), '*');
+  eq(imm_gencode_decode(gc, IMM_CODON(nuclt, "CCG")), 'P');
+  eq(imm_gencode_decode(gc, IMM_CODON(nuclt, "TAG")), '*');
 }
 
 int main(void)
