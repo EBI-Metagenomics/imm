@@ -1,7 +1,9 @@
-#ifndef IMM_GC_DB_H
-#define IMM_GC_DB_H
+#ifndef IMM_GENCODE_H
+#define IMM_GENCODE_H
 
-struct imm_gc_db
+#include "export.h"
+
+struct imm_gencode
 {
   char const *name1;
   char const *name2;
@@ -12,5 +14,7 @@ struct imm_gc_db
   char const *base2;
   char const *base3;
 };
+
+struct imm_gencode const *imm_gencode_get(unsigned table_id);
 
 #endif

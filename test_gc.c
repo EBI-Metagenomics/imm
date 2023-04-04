@@ -1,3 +1,4 @@
+#include "array_size.h"
 #include "gc.h"
 #include "test_helper.h"
 
@@ -11,7 +12,7 @@ static void gc_f(void)
                                 IMM_CODON(nuclt, "TTC")};
 
   unsigned idx = 0;
-  for (unsigned i = 0; i < imm_gc_size(); ++i)
+  for (unsigned i = 0; i < imm_gc_size(1); ++i)
   {
     if (imm_gc_aa(1, i) == 'F')
     {
@@ -35,7 +36,7 @@ static void gc_l(void)
       IMM_CODON(nuclt, "CTA"), IMM_CODON(nuclt, "CTG")};
 
   unsigned idx = 0;
-  for (unsigned i = 0; i < imm_gc_size(); ++i)
+  for (unsigned i = 0; i < imm_gc_size(1); ++i)
   {
     if (imm_gc_aa(1, i) == 'L')
     {
@@ -58,7 +59,7 @@ static void gc_p(void)
       IMM_CODON(nuclt, "CCG")};
 
   unsigned idx = 0;
-  for (unsigned i = 0; i < imm_gc_size(); ++i)
+  for (unsigned i = 0; i < imm_gc_size(1); ++i)
   {
     if (imm_gc_aa(1, i) == 'P')
     {
