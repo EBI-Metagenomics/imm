@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(imm VERSION 3.0.2 LANGUAGES C)
+project(imm VERSION 3.0.3 LANGUAGES C)
 
 include(cmake/sanitizers.cmake)
 include(cmake/warnings.cmake)
@@ -27,10 +27,8 @@ target_link_libraries(imm PRIVATE LIP::lip)
 target_link_libraries(imm PRIVATE ELAPSED::elapsed)
 target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
 
-add_custom_command(
-  TARGET imm POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/imm
-  COMMAND ${CMAKE_COMMAND} -E copy ${IMM_HEADERS} ${PROJECT_BINARY_DIR}/imm)
+file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/imm)
+file(COPY ${IMM_HEADERS} DESTINATION ${PROJECT_BINARY_DIR}/imm)
 
 if(NOT BUILD_SHARED_LIBS)
   target_compile_definitions(imm PUBLIC -DIMM_STATIC_DEFINE)
