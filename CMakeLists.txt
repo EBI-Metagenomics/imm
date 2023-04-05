@@ -6,7 +6,7 @@ include(cmake/warnings.cmake)
 include(cmake/CPM.cmake)
 
 cpmaddpackage("gh:horta/elapsed@3.1.2")
-cpmaddpackage("gh:EBI-Metagenomics/lip@0.5.0")
+cpmaddpackage("gh:EBI-Metagenomics/lip@0.5.1")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_C_STANDARD 11)

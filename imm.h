@@ -46,6 +46,7 @@ extern "C" {
 #include "imm/frame_state_33.h"
 #include "imm/gc.h"
 #include "imm/gc_db.h"
+#include "imm/gencode.h"
 #include "imm/hmm.h"
 #include "imm/hot_range.h"
 #include "imm/htable.h"

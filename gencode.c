@@ -280,10 +280,12 @@ static inline int get_idx(int table_id)
     return 26;
   }
   assert(0 && "I don't recognize such table id.");
-  return 0;
+  return -1;
 }
 
 struct imm_gencode const *imm_gencode_get(unsigned table_id)
 {
-  return &imm_gencode[get_idx((int)table_id)];
+  int idx = get_idx((int)table_id);
+  if (idx < 0) return NULL;
+  return &imm_gencode[(unsigned)idx];
 }
