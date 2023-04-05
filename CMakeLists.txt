@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(imm VERSION 3.0.1 LANGUAGES C)
+project(imm VERSION 3.0.2 LANGUAGES C)
 
 include(cmake/sanitizers.cmake)
 include(cmake/warnings.cmake)
@@ -27,20 +27,25 @@ target_link_libraries(imm PRIVATE LIP::lip)
 target_link_libraries(imm PRIVATE ELAPSED::elapsed)
 target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
 
+add_custom_command(
+  TARGET imm POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/imm
+  COMMAND ${CMAKE_COMMAND} -E copy ${IMM_HEADERS} ${PROJECT_BINARY_DIR}/imm)
+
 if(NOT BUILD_SHARED_LIBS)
   target_compile_definitions(imm PUBLIC -DIMM_STATIC_DEFINE)
 endif()
 
 target_include_directories(
   imm
-  PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+  PUBLIC $<INSTALL_INTERFACE:include>
+         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
          $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
   PRIVATE ${PROJECT_SOURCE_DIR}
 )
 
 set_target_properties(imm PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(imm PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
-target_compile_options(imm PRIVATE ${WARNING_FLAGS})
 
 install(
   TARGETS imm
@@ -48,7 +53,7 @@ install(
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
-install(FILES ${IMM_HEADERS} DESTINATION include/imm)
+install(DIRECTORY ${PROJECT_BINARY_DIR}/imm DESTINATION include)
 
 export(
   TARGETS imm
