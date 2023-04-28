@@ -9,6 +9,7 @@
 #include "state.h"
 #include "task.h"
 #include "trans_table.h"
+#include "unroll.h"
 #include "viterbi.h"
 #include "zspan.h"
 
@@ -19,13 +20,11 @@ struct bt
   unsigned len;
 };
 
-TEMPLATE void set_trans(struct bt *x, unsigned prev_state, unsigned trans,
-                        unsigned len)
-{
-  x->prev_state = prev_state;
-  x->trans = trans;
-  x->len = len;
-}
+#define BT(a, b, c)                                                            \
+  (struct bt)                                                                  \
+  {                                                                            \
+    a, b, c                                                                    \
+  }
 
 TEMPLATE void set_cpath(struct imm_cpath *path, struct bt const *bt, unsigned r,
                         unsigned i)
@@ -53,14 +52,41 @@ TEMPLATE uint8_t state_span(struct imm_viterbi const *x, unsigned i)
   return span;
 }
 
+struct tuple
+{
+  float real;
+  uint32_t integer;
+};
+
+TEMPLATE struct tuple loop2(struct imm_viterbi const *x, unsigned const row,
+                            unsigned const src, unsigned const min,
+                            unsigned const max, bool const save_path)
+{
+  float score = IMM_LPROB_ZERO;
+  unsigned length = 0;
+
+  imm_assume(max <= IMM_STATE_MAX_SEQLEN);
+
+  UNROLL(IMM_STATE_MAX_SEQLEN + 1)
+  for (unsigned i = min; i <= max; ++i)
+  {
+    float v = imm_viterbi_get_score(x, imm_cell(row - i, src, i));
+    if (score < v && save_path) length = i - min;
+    if (score < v) score = v;
+  }
+
+  return (struct tuple){score, length};
+}
+
 TEMPLATE unsigned generic2_trans(struct imm_viterbi const *x, float *score,
                                  struct bt *bt, unsigned const row,
                                  unsigned const dst, unsigned const t0,
                                  bool const save_path, bool const unsafe_state,
                                  bool const safe_past)
 {
-  *score = imm_lprob_zero();
-  *bt = (struct bt){IMM_STATE_NULL_IDX, IMM_STATE_NULL_SEQLEN, UINT16_MAX};
+  float sco = IMM_LPROB_ZERO;
+  struct bt bt_ =
+      (struct bt){IMM_STATE_NULL_IDX, IMM_STATE_NULL_SEQLEN, UINT16_MAX};
 
   unsigned t = t0;
   while (dst == x->dp->trans_table.trans[t].dst)
@@ -74,18 +100,18 @@ TEMPLATE unsigned generic2_trans(struct imm_viterbi const *x, float *score,
     if (!safe_past) max = MIN(max, row);
 
     imm_assume(max <= IMM_STATE_MAX_SEQLEN);
-#pragma clang loop unroll(enable)
-    for (unsigned len = min; len <= max; ++len)
-    {
-#pragma clang fp reassociate(on) contract(fast)
-      float v0 = imm_viterbi_get_score(x, imm_cell(row - len, src, len));
-      float v1 = x->dp->trans_table.trans[t].score;
-      float v = v0 + v1;
-      if (*score < v && save_path) set_trans(bt, src, t - t0, len - min);
-      if (*score < v) *score = v;
-    }
+
+    struct tuple y = loop2(x, row, src, min, max, save_path);
+    y.real += x->dp->trans_table.trans[t].score;
+
+    if (sco < y.real && save_path) bt_ = BT(src, t - t0, y.integer);
+    if (sco < y.real) sco = y.real;
+
     ++t;
   }
+
+  *score = sco;
+  *bt = bt_;
   return t;
 }
 
@@ -95,8 +121,9 @@ TEMPLATE unsigned hot_trans1100(struct imm_viterbi const *x, float *score,
                                 bool const unsafe_state, bool const safe_past,
                                 unsigned const src0, unsigned const src1)
 {
-  *score = imm_lprob_zero();
-  *bt = (struct bt){IMM_STATE_NULL_IDX, IMM_STATE_NULL_SEQLEN, UINT16_MAX};
+  float sco = IMM_LPROB_ZERO;
+  struct bt bt_ =
+      (struct bt){IMM_STATE_NULL_IDX, IMM_STATE_NULL_SEQLEN, UINT16_MAX};
 
   unsigned const src[2] = {src0, src1};
 
@@ -104,25 +131,26 @@ TEMPLATE unsigned hot_trans1100(struct imm_viterbi const *x, float *score,
   unsigned max[2] = {1, 0};
 
   unsigned t = t0;
-#pragma clang loop vectorize(enable)
+  UNROLL(2)
   for (int i = 0; i < 2; ++i)
   {
     if (unsafe_state) min[i] = MAX(min[i], 1U);
     if (!safe_past) max[i] = MIN(max[i], row);
 
-#pragma clang loop unroll(enable)
+    UNROLL(1)
     for (unsigned len = min[i]; len <= max[i]; ++len)
     {
-#pragma clang fp reassociate(on) contract(fast)
       float v0 = imm_viterbi_get_score(x, imm_cell(row - len, src[i], len));
       float v1 = x->dp->trans_table.trans[t].score;
       float v = v0 + v1;
-      if (*score < v && save_path) set_trans(bt, src[i], t - t0, len - min[i]);
-      if (*score < v) *score = v;
+      if (sco < v && save_path) bt_ = BT(src[i], t - t0, len - min[i]);
+      if (sco < v) sco = v;
     }
     ++t;
   }
 
+  *score = sco;
+  *bt = bt_;
   return t;
 }
 
@@ -132,8 +160,9 @@ TEMPLATE unsigned hot_trans0015(struct imm_viterbi const *x, float *score,
                                 bool const unsafe_state, bool const safe_past,
                                 unsigned const src0, unsigned const src1)
 {
-  *score = imm_lprob_zero();
-  *bt = (struct bt){IMM_STATE_NULL_IDX, IMM_STATE_NULL_SEQLEN, UINT16_MAX};
+  float sco = IMM_LPROB_ZERO;
+  struct bt bt_ =
+      (struct bt){IMM_STATE_NULL_IDX, IMM_STATE_NULL_SEQLEN, UINT16_MAX};
 
   unsigned const src[2] = {src0, src1};
 
@@ -141,26 +170,37 @@ TEMPLATE unsigned hot_trans0015(struct imm_viterbi const *x, float *score,
   unsigned max[2] = {0, 5};
 
   unsigned t = t0;
-#pragma clang loop vectorize(enable)
+  UNROLL(2)
   for (int i = 0; i < 2; ++i)
   {
     if (unsafe_state) min[i] = MAX(min[i], 1U);
     if (!safe_past) max[i] = MIN(max[i], row);
 
-#pragma clang loop unroll(enable)
-    for (unsigned len = min[i]; len <= max[i]; ++len)
-    {
-#pragma clang fp reassociate(on) contract(fast)
-      float v0 = imm_viterbi_get_score(x, imm_cell(row - len, src[i], len));
-      float v1 = x->dp->trans_table.trans[t].score;
-      float v = v0 + v1;
-      if (*score < v && save_path) set_trans(bt, src[i], t - t0, len - min[i]);
-      if (*score < v) *score = v;
-    }
+    struct tuple y = loop2(x, row, src[i], min[i], max[i], save_path);
+    y.real += x->dp->trans_table.trans[t].score;
+
+    if (sco < y.real && save_path) bt_ = BT(src[i], t - t0, y.integer);
+    if (sco < y.real) sco = y.real;
     ++t;
   }
 
+  *score = sco;
+  *bt = bt_;
   return t;
+}
+
+TEMPLATE void loop3(struct imm_viterbi const *x, unsigned const row,
+                    unsigned const dst, unsigned const min, unsigned const max,
+                    float const score)
+{
+  imm_assume(max <= IMM_STATE_MAX_SEQLEN);
+
+  UNROLL(IMM_STATE_MAX_SEQLEN + 1)
+  for (unsigned i = min; i <= max; ++i)
+  {
+    float total = score + imm_viterbi_emission(x, row, dst, i, min);
+    imm_viterbi_set_score(x, imm_cell(row, dst, i), total);
+  }
 }
 
 TEMPLATE void generic2_state(struct imm_viterbi const *x, float score,
@@ -175,19 +215,12 @@ TEMPLATE void generic2_state(struct imm_viterbi const *x, float score,
   if (save_path) set_cpath(&x->task->path, bt, row, dst);
 
   uint8_t cdst = state_span(x, dst);
-  unsigned min = imm_zspan_min(cdst);
+  unsigned const min = imm_zspan_min(cdst);
   unsigned max = imm_zspan_max(cdst);
   if (!safe_future) max = MIN(max, remain);
 
   imm_assume(max <= IMM_STATE_MAX_SEQLEN);
-#pragma clang loop unroll(enable)
-  for (unsigned len = min; len <= max; ++len)
-  {
-#pragma clang fp reassociate(on) contract(fast)
-    float v = imm_viterbi_emission(x, row, dst, len, min);
-    float total = score + v;
-    imm_viterbi_set_score(x, imm_cell(row, dst, len), total);
-  }
+  loop3(x, row, dst, min, max, score);
 }
 
 TEMPLATE void hot_state11(struct imm_viterbi const *x, float score,
@@ -201,18 +234,11 @@ TEMPLATE void hot_state11(struct imm_viterbi const *x, float score,
 
   if (save_path) set_cpath(&x->task->path, bt, row, dst);
 
-  unsigned min = 1;
+  unsigned const min = 1;
   unsigned max = 1;
   if (!safe_future) max = MIN(max, remain);
 
-#pragma clang loop vectorize(enable)
-  for (unsigned len = min; len <= max; ++len)
-  {
-#pragma clang fp reassociate(on) contract(fast)
-    float v = imm_viterbi_emission(x, row, dst, len, min);
-    float total = score + v;
-    imm_viterbi_set_score(x, imm_cell(row, dst, len), total);
-  }
+  loop3(x, row, dst, min, max, score);
 }
 
 TEMPLATE void hot_state15(struct imm_viterbi const *x, float score,
@@ -226,18 +252,11 @@ TEMPLATE void hot_state15(struct imm_viterbi const *x, float score,
 
   if (save_path) set_cpath(&x->task->path, bt, row, dst);
 
-  unsigned min = 1;
+  unsigned const min = 1;
   unsigned max = 5;
   if (!safe_future) max = MIN(max, remain);
 
-#pragma clang loop vectorize(enable)
-  for (unsigned len = min; len <= max; ++len)
-  {
-#pragma clang fp reassociate(on) contract(fast)
-    float v = imm_viterbi_emission(x, row, dst, len, min);
-    float total = score + v;
-    imm_viterbi_set_score(x, imm_cell(row, dst, len), total);
-  }
+  loop3(x, row, dst, min, max, score);
 }
 
 TEMPLATE void generic1(struct imm_viterbi const *x, bool const row0,

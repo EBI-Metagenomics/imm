@@ -7,6 +7,7 @@ include(cmake/CPM.cmake)
 
 cpmaddpackage("gh:horta/elapsed@3.1.2")
 cpmaddpackage("gh:EBI-Metagenomics/lip@0.5.1")
+find_package(OpenMP)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_C_STANDARD 11)
@@ -26,6 +27,9 @@ add_library(IMM::imm ALIAS imm)
 target_link_libraries(imm PRIVATE LIP::lip)
 target_link_libraries(imm PRIVATE ELAPSED::elapsed)
 target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
+if(OpenMP_C_FOUND)
+  target_link_libraries(imm PRIVATE OpenMP::OpenMP_C)
+endif()
 
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/imm)
 file(COPY ${IMM_HEADERS} DESTINATION ${PROJECT_BINARY_DIR}/imm)
