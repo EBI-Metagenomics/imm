@@ -46,11 +46,6 @@ struct imm_range imm_viterbi_range(struct imm_viterbi const *x, unsigned state)
   return imm_state_table_range(&x->dp->state_table, state);
 }
 
-unsigned imm_viterbi_start_state(struct imm_viterbi const *x)
-{
-  return x->dp->state_table.start.state;
-}
-
 float imm_viterbi_start_lprob(struct imm_viterbi const *x)
 {
   return x->dp->state_table.start.lprob;

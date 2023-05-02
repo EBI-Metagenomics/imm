@@ -26,8 +26,12 @@ struct imm_viterbi
 void imm_viterbi_init(struct imm_viterbi *, struct imm_dp const *,
                       struct imm_task *);
 struct imm_range imm_viterbi_range(struct imm_viterbi const *, unsigned state);
-unsigned imm_viterbi_start_state(struct imm_viterbi const *);
 float imm_viterbi_start_lprob(struct imm_viterbi const *);
+
+TEMPLATE unsigned imm_viterbi_start_state(struct imm_viterbi const *x)
+{
+  return x->dp->state_table.start.state;
+}
 
 TEMPLATE unsigned imm_viterbi_ntrans(struct imm_viterbi const *x,
                                      unsigned const dst)
