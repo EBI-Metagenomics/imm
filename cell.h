@@ -2,16 +2,17 @@
 #define IMM_CELL_H
 
 #include "compiler.h"
+#include <stdint.h>
 
 struct imm_cell
 {
   unsigned row;
-  unsigned state;
-  unsigned len;
+  uint_fast16_t state;
+  uint_fast8_t len;
 };
 
-CONST_ATTR TEMPLATE struct imm_cell imm_cell(unsigned row, unsigned state,
-                                             unsigned len)
+CONST_ATTR TEMPLATE struct imm_cell
+imm_cell(unsigned const row, uint_fast16_t const state, uint_fast8_t const len)
 {
   return (struct imm_cell){.row = row, .state = state, .len = len};
 }
