@@ -1,0 +1,73 @@
+#ifndef IMM_VITERBI_BEST_INCOMING_GET_H
+#define IMM_VITERBI_BEST_INCOMING_GET_H
+
+#include "state_range.h"
+#include "viterbi.h"
+#include "viterbi_best_score.h"
+#include "viterbi_best_trans.h"
+
+TEMPLATE void viterbi_best_incoming_get_update(
+    float const v, uint_fast8_t const w, float *score,
+    struct viterbi_best_trans *bt, uint_fast16_t const src,
+    uint_fast16_t const trans, bool const save_path)
+{
+  if (*score < v && save_path) viterbi_best_trans_set(bt, src, trans, w);
+  if (*score < v) *score = v;
+}
+
+TEMPLATE void viterbi_best_incoming_get(
+    float *score, struct viterbi_best_trans *bt, struct imm_viterbi const *x,
+    unsigned const row, struct state_range const src, uint_fast16_t const trans,
+    float const trans_score, bool const save_path)
+{
+  float v = 0;
+  uint_fast8_t w = 0;
+  viterbi_best_score_xy(&v, &w, x, row, src, save_path);
+  v += trans_score;
+
+  viterbi_best_incoming_get_update(v, w, score, bt, src.idx, trans, save_path);
+}
+
+TEMPLATE void
+viterbi_best_incoming_get_15(float *score, struct viterbi_best_trans *bt,
+                             struct imm_viterbi const *x, unsigned const row,
+                             unsigned const src, uint_fast16_t const trans,
+                             float const trans_score, bool const save_path)
+{
+  float v = 0;
+  uint_fast8_t w = 0;
+  viterbi_best_score_15(&v, &w, x, row, src, save_path);
+  v += trans_score;
+
+  viterbi_best_incoming_get_update(v, w, score, bt, src, trans, save_path);
+}
+
+TEMPLATE void
+viterbi_best_incoming_get_11(float *score, struct viterbi_best_trans *bt,
+                             struct imm_viterbi const *x, unsigned const row,
+                             unsigned const src, uint_fast16_t const trans,
+                             float const trans_score, bool const save_path)
+{
+  float v = 0;
+  uint_fast8_t w = 0;
+  viterbi_best_score_11(&v, &w, x, row, src, save_path);
+  v += trans_score;
+
+  viterbi_best_incoming_get_update(v, w, score, bt, src, trans, save_path);
+}
+
+TEMPLATE void
+viterbi_best_incoming_get_00(float *score, struct viterbi_best_trans *bt,
+                             struct imm_viterbi const *x, unsigned const row,
+                             unsigned const src, uint_fast16_t const trans,
+                             float const trans_score, bool const save_path)
+{
+  float v = 0;
+  uint_fast8_t w = 0;
+  viterbi_best_score_00(&v, &w, x, row, src, save_path);
+  v += trans_score;
+
+  viterbi_best_incoming_get_update(v, w, score, bt, src, trans, save_path);
+}
+
+#endif

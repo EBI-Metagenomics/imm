@@ -1,390 +1,22 @@
 #include "viterbi_generic.h"
-#include "assume.h"
-#include "compiler.h"
-#include "cpath.h"
 #include "hot_range.h"
-#include "lprob.h"
-#include "minmax.h"
-#include "span.h"
-#include "state.h"
-#include "task.h"
-#include "trans_table.h"
-#include "unroll.h"
+#include "range.h"
+#include "state_range.h"
 #include "viterbi.h"
-#include "zspan.h"
+#include "viterbi_best_incoming.h"
+#include "viterbi_best_trans.h"
+#include "viterbi_set_state_score.h"
 
-struct bt
+struct unsafe
 {
-  unsigned prev_state;
+  unsigned state;
   unsigned trans;
-  unsigned len;
 };
 
-#define BT(a, b, c)                                                            \
-  (struct bt)                                                                  \
-  {                                                                            \
-    a, b, c                                                                    \
-  }
-
-TEMPLATE void set_cpath(struct imm_cpath *path, struct bt const *bt, unsigned r,
-                        unsigned i)
+TEMPLATE struct unsafe unsafe_init(struct imm_viterbi const *x)
 {
-  if (bt->prev_state != IMM_STATE_NULL_IDX)
-  {
-    imm_cpath_set_trans(path, r, i, bt->trans);
-    imm_cpath_set_seqlen(path, r, i, bt->len);
-    assert(imm_cpath_trans(path, r, i) == bt->trans);
-    assert(imm_cpath_seqlen(path, r, i) == bt->len);
-  }
-  else
-  {
-    imm_cpath_invalidate(path, r, i);
-    assert(!imm_cpath_valid(path, r, i));
-  }
-}
-
-TEMPLATE uint8_t state_span(struct imm_viterbi const *x, unsigned i)
-{
-  uint8_t span = imm_viterbi_span(x, i);
-  imm_assume(imm_zspan_min(span) <= IMM_STATE_MAX_SEQLEN);
-  imm_assume(imm_zspan_max(span) <= IMM_STATE_MAX_SEQLEN);
-  imm_assume(imm_zspan_min(span) <= imm_zspan_max(span));
-  return span;
-}
-
-struct tuple
-{
-  float real;
-  uint32_t integer;
-};
-
-TEMPLATE struct tuple loop2(struct imm_viterbi const *x, unsigned const row,
-                            unsigned const src, uint_fast8_t const min,
-                            uint_fast8_t const max, bool const save_path)
-{
-  float score = IMM_LPROB_ZERO;
-  unsigned length = 0;
-
-  imm_assume(max <= IMM_STATE_MAX_SEQLEN);
-
-  UNROLL(IMM_STATE_MAX_SEQLEN + 1)
-  for (uint_fast8_t i = min; i <= max; ++i)
-  {
-    float v = imm_viterbi_get_score(x, imm_cell(row - i, src, i));
-    if (save_path)
-    {
-      if (score < v)
-      {
-        length = i - min;
-        score = v;
-      }
-    }
-    else
-    {
-      if (score < v) score = v;
-    }
-  }
-
-  return (struct tuple){score, length};
-}
-
-TEMPLATE struct imm_ctrans const *
-generic2_trans(struct imm_viterbi const *x, float *score, struct bt *bt,
-               unsigned const row, unsigned const dst,
-               struct imm_ctrans const *ts, bool const save_path,
-               bool const unsafe_state, bool const safe_past)
-{
-  float sco = IMM_LPROB_ZERO;
-  struct bt bt_ =
-      (struct bt){IMM_STATE_NULL_IDX, IMM_STATE_NULL_SEQLEN, UINT16_MAX};
-  struct imm_ctrans const *ts0 = ts;
-
-  while (dst == ts->dst)
-  {
-    unsigned src = ts->src;
-    uint8_t csrc = state_span(x, src);
-    unsigned min = imm_zspan_min(csrc);
-    unsigned max = imm_zspan_max(csrc);
-
-    if (unsafe_state) min = MAX(min, 1U);
-    if (!safe_past) max = MIN(max, row);
-
-    imm_assume(max <= IMM_STATE_MAX_SEQLEN);
-
-    struct tuple y = loop2(x, row, src, min, max, save_path);
-    y.real += ts->score;
-
-    if (save_path)
-    {
-      if (sco < y.real)
-      {
-        bt_ = BT(src, ts - ts0, y.integer);
-        sco = y.real;
-      }
-    }
-    else
-    {
-      if (sco < y.real) sco = y.real;
-    }
-
-    ++ts;
-  }
-
-  *score = sco;
-  *bt = bt_;
-  return ts;
-}
-
-TEMPLATE struct imm_ctrans const *
-hot_trans1100(struct imm_viterbi const *x, float *score, struct bt *bt,
-              unsigned const row, struct imm_ctrans const *ts,
-              bool const save_path, bool const unsafe_state,
-              bool const safe_past, unsigned const src0, unsigned const src1)
-{
-  float sco = IMM_LPROB_ZERO;
-  struct bt bt_ =
-      (struct bt){IMM_STATE_NULL_IDX, IMM_STATE_NULL_SEQLEN, UINT16_MAX};
-  struct imm_ctrans const *ts0 = ts;
-
-  unsigned const src[2] = {src0, src1};
-
-  unsigned min[2] = {1, 0};
-  unsigned max[2] = {1, 0};
-
-  UNROLL(2)
-  for (int i = 0; i < 2; ++i)
-  {
-    if (unsafe_state) min[i] = MAX(min[i], 1U);
-    if (!safe_past) max[i] = MIN(max[i], row);
-
-    struct tuple y = loop2(x, row, src[i], min[i], max[i], save_path);
-    y.real += ts->score;
-
-    if (save_path)
-    {
-      if (sco < y.real)
-      {
-        bt_ = BT(src[i], ts - ts0, y.integer);
-        sco = y.real;
-      }
-    }
-    else
-    {
-      if (sco < y.real) sco = y.real;
-    }
-    ++ts;
-  }
-
-  *score = sco;
-  *bt = bt_;
-  return ts;
-}
-
-TEMPLATE struct imm_ctrans const *
-hot_trans0015(struct imm_viterbi const *x, float *score, struct bt *bt,
-              unsigned const row, struct imm_ctrans const *ts,
-              bool const save_path, bool const unsafe_state,
-              bool const safe_past, unsigned const src0, unsigned const src1)
-{
-  float sco = IMM_LPROB_ZERO;
-  struct bt bt_ =
-      (struct bt){IMM_STATE_NULL_IDX, IMM_STATE_NULL_SEQLEN, UINT16_MAX};
-  struct imm_ctrans const *ts0 = ts;
-
-  unsigned const src[2] = {src0, src1};
-
-  unsigned min[2] = {0, 1};
-  unsigned max[2] = {0, 5};
-
-  UNROLL(2)
-  for (int i = 0; i < 2; ++i)
-  {
-    if (unsafe_state) min[i] = MAX(min[i], 1U);
-    if (!safe_past) max[i] = MIN(max[i], row);
-
-    struct tuple y = loop2(x, row, src[i], min[i], max[i], save_path);
-    y.real += ts->score;
-
-    if (save_path)
-    {
-      if (sco < y.real)
-      {
-        bt_ = BT(src[i], ts - ts0, y.integer);
-        sco = y.real;
-      }
-    }
-    else
-    {
-      if (sco < y.real) sco = y.real;
-    }
-    ++ts;
-  }
-
-  *score = sco;
-  *bt = bt_;
-  return ts;
-}
-
-TEMPLATE void loop3(struct imm_viterbi const *x, unsigned const row,
-                    unsigned const dst, unsigned const min, unsigned const max,
-                    float const score)
-{
-  imm_assume(max <= IMM_STATE_MAX_SEQLEN);
-
-  UNROLL(IMM_STATE_MAX_SEQLEN + 1)
-  for (unsigned i = min; i <= max; ++i)
-  {
-    float total = score + imm_viterbi_emission(x, row, dst, i, min);
-    imm_viterbi_set_score(x, imm_cell(row, dst, i), total);
-  }
-}
-
-TEMPLATE void generic2_state(struct imm_viterbi const *x, float score,
-                             struct bt const *bt, bool const row0,
-                             unsigned const row, unsigned const dst,
-                             unsigned const remain, bool const save_path,
-                             bool const safe_future)
-{
-  if (row0 && imm_viterbi_start_state(x) == dst)
-    score = MAX(imm_viterbi_start_lprob(x), score);
-
-  if (save_path) set_cpath(&x->task->path, bt, row, dst);
-
-  uint8_t cdst = state_span(x, dst);
-  unsigned const min = imm_zspan_min(cdst);
-  unsigned max = imm_zspan_max(cdst);
-  if (!safe_future) max = MIN(max, remain);
-
-  imm_assume(max <= IMM_STATE_MAX_SEQLEN);
-  loop3(x, row, dst, min, max, score);
-}
-
-TEMPLATE void hot_state11(struct imm_viterbi const *x, float score,
-                          struct bt const *bt, bool const row0,
-                          unsigned const row, unsigned const dst,
-                          unsigned const remain, bool const save_path,
-                          bool const safe_future)
-{
-  if (row0)
-  {
-    if (imm_viterbi_start_state(x) == dst)
-      score = MAX(imm_viterbi_start_lprob(x), score);
-  }
-
-  if (save_path) set_cpath(&x->task->path, bt, row, dst);
-
-  unsigned const min = 1;
-  unsigned max = 1;
-  if (!safe_future) max = MIN(max, remain);
-
-  loop3(x, row, dst, min, max, score);
-}
-
-TEMPLATE void hot_state15(struct imm_viterbi const *x, float score,
-                          struct bt const *bt, bool const row0,
-                          unsigned const row, unsigned const dst,
-                          unsigned const remain, bool const save_path,
-                          bool const safe_future)
-{
-  if (row0)
-  {
-    if (imm_viterbi_start_state(x) == dst)
-      score = MAX(imm_viterbi_start_lprob(x), score);
-  }
-
-  if (save_path) set_cpath(&x->task->path, bt, row, dst);
-
-  unsigned const min = 1;
-  unsigned max = 5;
-  if (!safe_future) max = MIN(max, remain);
-
-  loop3(x, row, dst, min, max, score);
-}
-
-TEMPLATE void generic1(struct imm_viterbi const *x, bool const row0,
-                       unsigned const row, unsigned const unsafe_state,
-                       unsigned const unsafe_trans0, unsigned const remain,
-                       bool const save_path, bool const safe_future,
-                       bool const safe_past, struct imm_hot_range const *hot,
-                       int const hot_code)
-{
-  float score = 0;
-  struct bt bt = {0};
-
-  generic2_trans(x, &score, &bt, row, unsafe_state,
-                 x->dp->trans_table.trans + unsafe_trans0, save_path, true,
-                 safe_past);
-  generic2_state(x, score, &bt, row0, row, unsafe_state, remain, save_path,
-                 safe_future);
-
-  struct imm_ctrans const *ts = x->dp->trans_table.trans;
-
-  if (hot_code)
-  {
-    for (unsigned i = 0; i < hot->start; ++i)
-    {
-      ts = generic2_trans(x, &score, &bt, row, i, ts, save_path, false,
-                          safe_past);
-      generic2_state(x, score, &bt, row0, row, i, remain, save_path,
-                     safe_future);
-    }
-
-    unsigned srcs[2] = {ts->src, (ts + 1)->src};
-    for (unsigned i = hot->start; i < hot->end; ++i)
-    {
-      if (hot_code == 110011)
-      {
-        assert(imm_zspan_min(hot->src_spans[0]) == 1 &&
-               imm_zspan_max(hot->src_spans[0]) == 1);
-        assert(imm_zspan_min(hot->src_spans[1]) == 0 &&
-               imm_zspan_max(hot->src_spans[1]) == 0);
-        ts = hot_trans1100(x, &score, &bt, row, ts, save_path, false, safe_past,
-                           srcs[0], srcs[1]);
-        srcs[0] += hot->pattern[0];
-        srcs[1] += hot->pattern[1];
-        assert(imm_zspan_min(hot->span) == 1 && imm_zspan_max(hot->span) == 1);
-        hot_state11(x, score, &bt, row0, row, i, remain, save_path,
-                    safe_future);
-      }
-      else if (hot_code == 1515)
-      {
-        assert(imm_zspan_min(hot->src_spans[0]) == 0 &&
-               imm_zspan_max(hot->src_spans[0]) == 0);
-        assert(imm_zspan_min(hot->src_spans[1]) == 1 &&
-               imm_zspan_max(hot->src_spans[1]) == 5);
-        ts = hot_trans0015(x, &score, &bt, row, ts, save_path, false, safe_past,
-                           srcs[0], srcs[1]);
-        srcs[0] += hot->pattern[0];
-        srcs[1] += hot->pattern[1];
-        assert(imm_zspan_min(hot->span) == 1 && imm_zspan_max(hot->span) == 1);
-        hot_state15(x, score, &bt, row0, row, i, remain, save_path,
-                    safe_future);
-      }
-      else
-      {
-        fprintf(stderr, "Dont know about: %d\n", hot_code);
-        assert(false);
-      }
-    }
-
-    for (unsigned i = hot->end; i < x->dp->state_table.nstates; ++i)
-    {
-      ts = generic2_trans(x, &score, &bt, row, i, ts, save_path, false,
-                          safe_past);
-      generic2_state(x, score, &bt, row0, row, i, remain, save_path,
-                     safe_future);
-    }
-  }
-  else
-  {
-    for (unsigned i = 0; i < x->dp->state_table.nstates; ++i)
-    {
-      ts = generic2_trans(x, &score, &bt, row, i, ts, save_path, false,
-                          safe_past);
-      generic2_state(x, score, &bt, row0, row, i, remain, save_path,
-                     safe_future);
-    }
-  }
+  unsigned t = imm_trans_table_trans0(&x->dp->trans_table, x->unsafe_state);
+  return (struct unsafe){x->unsafe_state, t};
 }
 
 CONST_ATTR TEMPLATE unsigned remains(unsigned const seqlen, unsigned const row,
@@ -395,56 +27,166 @@ CONST_ATTR TEMPLATE unsigned remains(unsigned const seqlen, unsigned const row,
   return seqlen - row;
 }
 
-TEMPLATE void generic0(struct imm_viterbi const *x, unsigned const unsafe_state,
-                       unsigned const unsafe_state_trans0,
-                       unsigned const seqlen, bool const save_path,
-                       struct imm_hot_range const *hot, int const hot_code)
+TEMPLATE struct imm_ctrans const *
+gany_state(struct imm_viterbi const *x, unsigned const row,
+           struct state_range dst, struct imm_ctrans const *t,
+           unsigned const seqlen, bool const save_path, bool const safe_future,
+           bool const safe_past, bool const unsafe_state)
 {
-  struct imm_dp_safety const *y = &x->safety;
-  unsigned const unsafe = unsafe_state_trans0;
+  float score = 0;
+  struct viterbi_best_trans bt = {0};
+  unsigned const remain = remains(seqlen, row, safe_future);
 
-  generic1(x, true, 0, unsafe_state, unsafe, remains(seqlen, 0, false),
-           save_path, false, false, hot, hot_code);
+  t = viterbi_best_incoming(&score, &bt, x, row, dst.idx, t, save_path,
+                            unsafe_state, safe_past);
+  viterbi_set_state_score(x, row, dst, remain, score, &bt, save_path,
+                          safe_future);
+  return t;
+}
+
+TEMPLATE struct imm_ctrans const *
+g1100_state(unsigned const src0, unsigned const src1, unsigned const dst,
+            struct imm_viterbi const *x, unsigned const row,
+            struct imm_ctrans const *t, unsigned const seqlen,
+            bool const save_path, bool const safe_future, bool const safe_past,
+            bool const unsafe_state)
+{
+  float score = 0;
+  struct viterbi_best_trans bt = {0};
+  unsigned const remain = remains(seqlen, row, safe_future);
+
+  t = viterbi_best_incoming_1100(&score, &bt, x, row, src0, src1, t, save_path,
+                                 unsafe_state, safe_past);
+  if (row > 0 && safe_future && safe_past)
+    viterbi_set_state_score_11_fast(x, row, dst, score, &bt, save_path);
+  else
+    viterbi_set_state_score(x, row, STATE_RANGE(dst, 1, 1), remain, score, &bt,
+                            save_path, safe_future);
+  return t;
+}
+
+TEMPLATE void gany_unsafe_state(struct imm_viterbi const *x, unsigned const row,
+                                struct unsafe const unsafe,
+                                unsigned const seqlen, bool const save_path,
+                                bool const safe_future, bool const safe_past)
+{
+  struct imm_ctrans const *t = x->dp->trans_table.trans + unsafe.trans;
+  struct state_range dst = imm_viterbi_state_range(x, unsafe.state);
+  gany_state(x, row, dst, t, seqlen, save_path, safe_future, safe_past, true);
+}
+
+TEMPLATE struct imm_ctrans const *
+gany_safe_states(struct imm_ctrans const *t, struct imm_range const states,
+                 struct imm_viterbi const *x, unsigned const row,
+                 unsigned const seqlen, bool const save_path,
+                 bool const safe_future, bool const safe_past)
+{
+  for (unsigned i = states.a; i < states.b; ++i)
+  {
+    struct state_range dst = imm_viterbi_state_range(x, i);
+    t = gany_state(x, row, dst, t, seqlen, save_path, safe_future, safe_past,
+                   false);
+  }
+  return t;
+}
+
+TEMPLATE struct imm_ctrans const *
+g1100_safe_states(struct imm_hot_range const *hot, struct imm_ctrans const *t,
+                  struct imm_range const states, struct imm_viterbi const *x,
+                  unsigned const row, unsigned const seqlen,
+                  bool const save_path, bool const safe_future,
+                  bool const safe_past)
+{
+  unsigned src[2] = {t[0].src, t[1].src};
+  for (unsigned dst = states.a; dst < states.b; ++dst)
+  {
+    t = g1100_state(src[0], src[1], dst, x, row, t, seqlen, save_path,
+                    safe_future, safe_past, false);
+    src[0] += hot->pattern[0];
+    src[1] += hot->pattern[1];
+  }
+  return t;
+}
+
+TEMPLATE void gany(struct imm_viterbi const *x, unsigned const row,
+                   struct unsafe const unsafe, unsigned const seqlen,
+                   bool const save_path, bool const safe_future,
+                   bool const safe_past)
+{
+  gany_unsafe_state(x, row, unsafe, seqlen, save_path, safe_future, safe_past);
+  struct imm_ctrans const *t = x->dp->trans_table.trans;
+  struct imm_range const r = imm_range(0, x->dp->state_table.nstates);
+  gany_safe_states(t, r, x, row, seqlen, save_path, safe_future, safe_past);
+}
+
+TEMPLATE void g1100(struct imm_hot_range const *hot,
+                    struct imm_viterbi const *x, unsigned const row,
+                    struct unsafe const unsafe, unsigned const seqlen,
+                    bool const save_path, bool const safe_future,
+                    bool const safe_past)
+{
+  gany_unsafe_state(x, row, unsafe, seqlen, save_path, safe_future, safe_past);
+
+  struct imm_ctrans const *t = x->dp->trans_table.trans;
+
+  struct imm_range r = imm_range(0, hot->start);
+  t = gany_safe_states(t, r, x, row, seqlen, save_path, safe_future, safe_past);
+
+  r = imm_range(hot->start, hot->end);
+  t = g1100_safe_states(hot, t, r, x, row, seqlen, save_path, safe_future,
+                        safe_past);
+
+  r = imm_range(hot->end, x->dp->state_table.nstates);
+  t = gany_safe_states(t, r, x, row, seqlen, save_path, safe_future, safe_past);
+}
+
+static void viterbi_gany(struct imm_viterbi const *x, unsigned const seqlen,
+                         struct unsafe unsafe, struct imm_dp_safety const *y,
+                         bool const save_path)
+{
+  gany(x, 0, unsafe, seqlen, save_path, false, false);
 
   for (unsigned r = y->safe_future.a; r < y->safe_future.b; ++r)
-    generic1(x, false, r, unsafe_state, unsafe, remains(seqlen, r, true),
-             save_path, true, false, hot, hot_code);
+    gany(x, r, unsafe, seqlen, save_path, true, false);
 
   for (unsigned r = y->safe.a; r < y->safe.b; ++r)
-    generic1(x, false, r, unsafe_state, unsafe, remains(seqlen, r, true),
-             save_path, true, true, hot, hot_code);
+    gany(x, r, unsafe, seqlen, save_path, true, true);
 
   for (unsigned r = y->unsafe.a; r < y->unsafe.b; ++r)
-    generic1(x, false, r, unsafe_state, unsafe, remains(seqlen, r, false),
-             save_path, false, false, hot, hot_code);
+    gany(x, r, unsafe, seqlen, save_path, false, false);
 
   for (unsigned r = y->safe_past.a; r < y->safe_past.b; ++r)
-    generic1(x, false, r, unsafe_state, unsafe, remains(seqlen, r, false),
-             save_path, false, true, hot, hot_code);
+    gany(x, r, unsafe, seqlen, save_path, false, true);
+}
+
+static void viterbi_g1100(struct imm_hot_range hot, struct imm_viterbi const *x,
+                          unsigned const seqlen, struct unsafe unsafe,
+                          struct imm_dp_safety const *y, bool const save_path)
+{
+  g1100(&hot, x, 0, unsafe, seqlen, save_path, false, false);
+
+  for (unsigned r = y->safe_future.a; r < y->safe_future.b; ++r)
+    g1100(&hot, x, r, unsafe, seqlen, save_path, true, false);
+
+  for (unsigned r = y->safe.a; r < y->safe.b; ++r)
+    g1100(&hot, x, r, unsafe, seqlen, save_path, true, true);
+
+  for (unsigned r = y->unsafe.a; r < y->unsafe.b; ++r)
+    g1100(&hot, x, r, unsafe, seqlen, save_path, false, false);
+
+  for (unsigned r = y->safe_past.a; r < y->safe_past.b; ++r)
+    g1100(&hot, x, r, unsafe, seqlen, save_path, false, true);
 }
 
 void imm_viterbi_generic(struct imm_viterbi const *x, unsigned const seqlen)
 {
   struct imm_hot_range hot = imm_hot_range(x);
-  // imm_hot_range_dump(&hot, stdout);
-
   int hot_code = imm_hot_range_code(&hot);
-  if (hot_code == 110011)
-  {
-    generic0(x, x->unsafe_state,
-             imm_trans_table_trans0(&x->dp->trans_table, x->unsafe_state),
-             seqlen, x->task->save_path, &hot, 110011);
-  }
-  else if (hot_code == 1515)
-  {
-    generic0(x, x->unsafe_state,
-             imm_trans_table_trans0(&x->dp->trans_table, x->unsafe_state),
-             seqlen, x->task->save_path, &hot, 1515);
-  }
-  else
-  {
-    generic0(x, x->unsafe_state,
-             imm_trans_table_trans0(&x->dp->trans_table, x->unsafe_state),
-             seqlen, x->task->save_path, &hot, 0);
-  }
+
+  struct unsafe const unsafe = unsafe_init(x);
+  struct imm_dp_safety const *y = &x->safety;
+  bool const save_path = x->task->save_path;
+
+  if (hot_code == 110011) viterbi_g1100(hot, x, seqlen, unsafe, y, save_path);
+  else viterbi_gany(x, seqlen, unsafe, y, save_path);
 }
