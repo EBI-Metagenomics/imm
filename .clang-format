@@ -2,7 +2,11 @@ BasedOnStyle: LLVM
 UseTab: Never
 IndentWidth: 2
 TabWidth: 2
-AllowShortIfStatementsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: AllIfsAndElse
+AllowShortBlocksOnASingleLine: Always
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortEnumsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: All
 BraceWrapping:
   AfterClass: true
   AfterControlStatement: true
