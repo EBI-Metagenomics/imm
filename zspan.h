@@ -15,14 +15,14 @@ CONST_ATTR TEMPLATE uint8_t imm_zspan(unsigned min, unsigned max)
   return (uint8_t)((min << 4) | max);
 }
 
-CONST_ATTR TEMPLATE unsigned imm_zspan_min(uint8_t const x)
+CONST_ATTR TEMPLATE uint_fast8_t imm_zspan_min(uint8_t const x)
 {
-  return (unsigned)(x >> 4);
+  return (uint_fast8_t)(x >> 4);
 }
 
-CONST_ATTR TEMPLATE unsigned imm_zspan_max(uint8_t const x)
+CONST_ATTR TEMPLATE uint_fast8_t imm_zspan_max(uint8_t const x)
 {
-  return (unsigned)(x & 0xF);
+  return (uint_fast8_t)(x & 0xF);
 }
 
 #endif

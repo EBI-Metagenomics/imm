@@ -55,4 +55,6 @@
 
 #define unused(arg) (void)arg;
 
+#define NOINLINE __attribute__((noinline))
+
 #endif
