@@ -1457,8 +1457,8 @@ static void msv3000_path(void)
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, -216494.453125);
   printf("MSV-path: %llu msecs\n", prod.mseconds);
-  printf("  [%u x 20000]: %.1f mins\n", imm_seq_size(&seq),
-         imm_seq_size(&seq) * prod.mseconds / 1000. / 60.);
+  printf("  [%u x 20000]: %.1f hours\n", imm_seq_size(&seq),
+         imm_seq_size(&seq) * prod.mseconds / 1000. / 60. / 60.);
 
   imm_task_del(task);
   imm_prod_cleanup(&prod);
@@ -1483,8 +1483,8 @@ static void msv3000_nopath(void)
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, -216494.453125);
   printf("MSV-nopath: %llu msecs\n", prod.mseconds);
-  printf("  [%u x 20000]: %.1f mins\n", imm_seq_size(&seq),
-         imm_seq_size(&seq) * prod.mseconds / 1000. / 60.);
+  printf("  [%u x 20000]: %.1f hours\n", imm_seq_size(&seq),
+         imm_seq_size(&seq) * prod.mseconds / 1000. / 60. / 60.);
 
   imm_task_del(task);
   imm_prod_cleanup(&prod);
