@@ -38,6 +38,12 @@
 #define CONST_ATTR
 #endif
 
+#if __has_attribute(pure)
+#define PURE_ATTR __attribute__((pure))
+#else
+#define PURE_ATTR
+#endif
+
 #if __has_attribute(always_inline)
 #define FORCE_INLINE_ATTR __attribute__((always_inline))
 #else
