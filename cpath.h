@@ -3,6 +3,7 @@
 
 #include "bitmap.h"
 #include "compiler.h"
+#include "state.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -44,8 +45,9 @@ struct imm_trans_table;
  */
 struct imm_cpath
 {
-  unsigned long *bit;
   unsigned nstates;
+  uint16_t ncols;
+  unsigned long *bit;
   uint16_t *state_offset;
   uint8_t *trans_bits;
 };
@@ -55,14 +57,14 @@ CONST_ATTR TEMPLATE unsigned imm_cpath_invalid(unsigned bits)
   return (unsigned)((1 << bits) - 1);
 }
 
-PURE_ATTR TEMPLATE uint_fast8_t imm_cpath_state_bits(struct imm_cpath const *x,
-                                                     unsigned state)
+PURE_ATTR TEMPLATE unsigned imm_cpath_state_bits(struct imm_cpath const *x,
+                                                 unsigned state)
 {
-  return (uint_fast8_t)(x->state_offset[state + 1] - x->state_offset[state]);
+  return (unsigned)(x->state_offset[state + 1] - x->state_offset[state]);
 }
 
-PURE_ATTR TEMPLATE uint_fast8_t imm_cpath_seqlen_bits(struct imm_cpath const *x,
-                                                      unsigned state)
+PURE_ATTR TEMPLATE unsigned imm_cpath_seqlen_bits(struct imm_cpath const *x,
+                                                  unsigned state)
 {
   return imm_cpath_state_bits(x, state) - x->trans_bits[state];
 }
@@ -70,8 +72,7 @@ PURE_ATTR TEMPLATE uint_fast8_t imm_cpath_seqlen_bits(struct imm_cpath const *x,
 PURE_ATTR TEMPLATE unsigned long
 imm_cpath_start_bit(struct imm_cpath const *x, unsigned pos, unsigned state)
 {
-  return (unsigned long)pos * x->state_offset[x->nstates] +
-         x->state_offset[state];
+  return (unsigned long)pos * x->ncols + x->state_offset[state];
 }
 
 void imm_cpath_cleanup(struct imm_cpath *);
@@ -110,6 +111,7 @@ TEMPLATE bool imm_cpath_valid(struct imm_cpath const *x, unsigned pos,
 TEMPLATE void imm_cpath_set_seqlen(struct imm_cpath *x, unsigned pos,
                                    unsigned state, unsigned len)
 {
+  imm_assume(len <= IMM_STATE_MAX_SEQLEN);
   unsigned long start =
       imm_cpath_start_bit(x, pos, state) + x->trans_bits[state];
   imm_bitmap_set(x->bit, len, start, imm_cpath_seqlen_bits(x, state));

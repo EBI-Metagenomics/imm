@@ -12,6 +12,8 @@
 int imm_cpath_init(struct imm_cpath *x, struct imm_state_table const *state_tbl,
                    struct imm_trans_table const *trans_tbl)
 {
+  x->nstates = 0;
+  x->ncols = 0;
   x->state_offset = NULL;
   x->trans_bits = NULL;
   int rc = imm_cpath_reset(x, state_tbl, trans_tbl);
@@ -56,6 +58,7 @@ int imm_cpath_reset(struct imm_cpath *x,
         (uint16_t)(x->state_offset[dst + 1] +
                    bits_width((uint32_t)((unsigned)depth + 1)));
   }
+  x->ncols = x->state_offset[x->nstates];
   return 0;
 }
 

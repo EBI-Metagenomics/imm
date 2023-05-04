@@ -8,19 +8,17 @@
 #define __BITS_DIV_ROUND_UP(n, d) (((n) + (d)-1) / (d))
 
 #define BITS_PER_BYTE 8
-#define BITS_TO_LONGS(nr) __BITS_DIV_ROUND_UP(nr, BITS_PER_BYTE * sizeof(long))
+#define BITS_PER_LONG (sizeof(long) * BITS_PER_BYTE)
+#define BITS_TO_LONGS(nr) __BITS_DIV_ROUND_UP(nr, BITS_PER_LONG)
 
-TEMPLATE void bits_clr(unsigned long *x, uint_fast8_t bit)
+TEMPLATE void bits_clr(unsigned long *x, unsigned bit) { *x &= ~(1UL << bit); }
+
+CONST_ATTR TEMPLATE bool bits_get(unsigned long const x, unsigned bit)
 {
-  *x &= ~(1UL << bit);
+  return !!((x >> bit) & 1UL);
 }
 
-PURE_ATTR TEMPLATE bool bits_get(unsigned long const *x, uint_fast8_t bit)
-{
-  return !!((*x >> bit) & 1UL);
-}
-
-TEMPLATE void bits_set(unsigned long *x, uint_fast8_t bit) { *x |= 1UL << bit; }
+TEMPLATE void bits_set(unsigned long *x, unsigned bit) { *x |= 1UL << bit; }
 
 CONST_ATTR TEMPLATE unsigned bits_width(uint32_t v)
 {
