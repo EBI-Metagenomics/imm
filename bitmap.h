@@ -15,7 +15,7 @@ imm_bitmap_get(unsigned long *x, unsigned long start, uint_fast8_t len)
   unsigned long val = 0;
   for (uint_fast8_t i = 0; i < len; ++i)
   {
-    unsigned long j = start + (unsigned long)i;
+    unsigned long j = start + i;
     if (bits_get(x + LONG_START(j), BIT_START(j))) bits_set(&val, i);
     else bits_clr(&val, i);
   }

@@ -4,8 +4,6 @@
 #include "compiler.h"
 #include <assert.h>
 
-#ifdef NDEBUG
-
 #if __has_builtin(__builtin_assume)
 #define imm_assume(x) __builtin_assume(x)
 #else
@@ -14,9 +12,6 @@
   {                                                                            \
     if (!(x)) __builtin_unreachable();                                         \
   } while (0);
-#endif
-#else
-#define imm_assume(x) assert(x)
 #endif
 
 #endif
