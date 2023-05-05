@@ -111,7 +111,6 @@ TEMPLATE bool imm_cpath_valid(struct imm_cpath const *x, unsigned pos,
 TEMPLATE void imm_cpath_set_seqlen(struct imm_cpath *x, unsigned pos,
                                    unsigned state, unsigned len)
 {
-  imm_assume(len <= IMM_STATE_MAX_SEQLEN);
   unsigned long start =
       imm_cpath_start_bit(x, pos, state) + x->trans_bits[state];
   imm_bitmap_set(x->bit, len, start, imm_cpath_seqlen_bits(x, state));
