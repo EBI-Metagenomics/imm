@@ -17,7 +17,7 @@ CONST_ATTR TEMPLATE unsigned long __bitmap_get(unsigned long const *x,
                                                unsigned const nbits,
                                                unsigned long val)
 {
-  imm_assume(addr <= nbits);
+  imm_assume(addr + nbits < BITS_PER_LONG);
   imm_assume(nbits <= 16);
   for (unsigned i = addr; i < addr + nbits; ++i)
   {
@@ -44,7 +44,7 @@ PURE_ATTR TEMPLATE unsigned long imm_bitmap_get(unsigned long const *x,
 TEMPLATE void __bitmap_set(unsigned long *x, unsigned long const val,
                            unsigned const addr, unsigned const nbits)
 {
-  imm_assume(addr <= nbits);
+  imm_assume(addr + nbits < BITS_PER_LONG);
   imm_assume(nbits <= 16);
   for (unsigned i = addr; i < addr + nbits; ++i)
   {

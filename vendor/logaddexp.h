@@ -1,6 +1,8 @@
 #ifndef LOGADDEXP_H
 #define LOGADDEXP_H
 
+#include "compiler.h"
+
 /* For Windows. */
 #define _USE_MATH_DEFINES
 
@@ -16,30 +18,26 @@
  * For example, `log(exp(1e3) + exp(-INFINITY))` will likely overflow,
  * while `logaddexp(1e3, -INFINITY)` will return `1e3`.
  */
-inline static double logaddexpd(double x, double y)
+CONST_ATTR TEMPLATE double logaddexpd(double x, double y)
 {
   double const tmp = x - y;
 
   if (x == y) return x + M_LN2;
 
-  if (tmp > 0)
-    return x + log1p(exp(-tmp));
-  else if (tmp <= 0)
-    return y + log1p(exp(tmp));
+  if (tmp > 0) return x + log1p(exp(-tmp));
+  else if (tmp <= 0) return y + log1p(exp(tmp));
 
   return tmp;
 }
 
-inline static float logaddexpf(float x, float y)
+CONST_ATTR TEMPLATE float logaddexpf(float x, float y)
 {
   float const tmp = x - y;
 
   if (x == y) return (float)(x + M_LN2);
 
-  if (tmp > 0)
-    return x + log1pf(expf(-tmp));
-  else if (tmp <= 0)
-    return y + log1pf(expf(tmp));
+  if (tmp > 0) return x + log1pf(expf(-tmp));
+  else if (tmp <= 0) return y + log1pf(expf(tmp));
 
   return tmp;
 }
@@ -64,15 +62,11 @@ inline static double logaddexpsd(double x, double y, double sx, double sy)
 
   if (sx > 0 && sy > 0)
   {
-    if (tmp > 0)
-      return sxx + log1p((sy / sx) * exp(-tmp));
-    else if (tmp <= 0)
-      return syy + log1p((sx / sy) * exp(tmp));
+    if (tmp > 0) return sxx + log1p((sy / sx) * exp(-tmp));
+    else if (tmp <= 0) return syy + log1p((sx / sy) * exp(tmp));
   }
-  else if (sx > 0)
-    return sxx + log1p((sy / sx) * exp(-tmp));
-  else
-    return syy + log1p((sx / sy) * exp(tmp));
+  else if (sx > 0) return sxx + log1p((sy / sx) * exp(-tmp));
+  else return syy + log1p((sx / sy) * exp(tmp));
   return tmp;
 }
 
@@ -91,15 +85,11 @@ inline static float logaddexpsf(float x, float y, float sx, float sy)
 
   if (sx > 0 && sy > 0)
   {
-    if (tmp > 0)
-      return sxx + log1pf((sy / sx) * expf(-tmp));
-    else if (tmp <= 0)
-      return syy + log1pf((sx / sy) * expf(tmp));
+    if (tmp > 0) return sxx + log1pf((sy / sx) * expf(-tmp));
+    else if (tmp <= 0) return syy + log1pf((sx / sy) * expf(tmp));
   }
-  else if (sx > 0)
-    return sxx + log1pf((sy / sx) * expf(-tmp));
-  else
-    return syy + log1pf((sx / sy) * expf(tmp));
+  else if (sx > 0) return sxx + log1pf((sy / sx) * expf(-tmp));
+  else return syy + log1pf((sx / sy) * expf(tmp));
   return tmp;
 }
 
@@ -117,10 +107,8 @@ inline static double logaddexpgd(double x, double y, double sx, double sy,
   {
     if (sx * sy > 0)
     {
-      if (sx > 0)
-        *sign = +1.0;
-      else
-        *sign = -1.0;
+      if (sx > 0) *sign = +1.0;
+      else *sign = -1.0;
       return sxx + M_LN2;
     }
     else
@@ -132,17 +120,13 @@ inline static double logaddexpgd(double x, double y, double sx, double sy,
 
   if (sxx > syy)
   {
-    if (sx >= 0.0)
-      *sign = +1.0;
-    else
-      *sign = -1.0;
+    if (sx >= 0.0) *sign = +1.0;
+    else *sign = -1.0;
   }
   else
   {
-    if (sy >= 0.0)
-      *sign = +1.0;
-    else
-      *sign = -1.0;
+    if (sy >= 0.0) *sign = +1.0;
+    else *sign = -1.0;
   }
 
   sx *= *sign;
@@ -160,10 +144,8 @@ inline static float logaddexpgf(float x, float y, float sx, float sy,
   {
     if (sx * sy > 0)
     {
-      if (sx > 0)
-        *sign = +1.0;
-      else
-        *sign = -1.0;
+      if (sx > 0) *sign = +1.0;
+      else *sign = -1.0;
       return (float)(sxx + M_LN2);
     }
     else
@@ -175,17 +157,13 @@ inline static float logaddexpgf(float x, float y, float sx, float sy,
 
   if (sxx > syy)
   {
-    if (sx >= 0.0)
-      *sign = +1.0;
-    else
-      *sign = -1.0;
+    if (sx >= 0.0) *sign = +1.0;
+    else *sign = -1.0;
   }
   else
   {
-    if (sy >= 0.0)
-      *sign = +1.0;
-    else
-      *sign = -1.0;
+    if (sy >= 0.0) *sign = +1.0;
+    else *sign = -1.0;
   }
 
   sx *= *sign;

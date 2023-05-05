@@ -2,6 +2,7 @@
 #define IMM_CODON_MARG_H
 
 #include "codon.h"
+#include "compiler.h"
 #include "export.h"
 
 /** @file codon_marg.h
@@ -41,8 +42,13 @@ IMM_API struct imm_codon_marg imm_codon_marg(struct imm_codon_lprob *);
  *
  * will evaluate the probability p(𝑋₁=𝙰,𝑋₃=𝙶).
  */
-IMM_API float imm_codon_marg_lprob(struct imm_codon_marg const *,
-                                   struct imm_codon);
+PURE_ATTR TEMPLATE float
+imm_codon_marg_lprob(struct imm_codon_marg const *codonm,
+                     struct imm_codon codon)
+{
+  return codonm->lprobs[codon.idx[0]][codon.idx[1]][codon.idx[2]];
+}
+
 IMM_API int imm_codon_marg_pack(struct imm_codon_marg const *,
                                 struct lip_file *);
 IMM_API int imm_codon_marg_unpack(struct imm_codon_marg *, struct lip_file *);

@@ -129,12 +129,6 @@ struct imm_codon_marg imm_codon_marg(struct imm_codon_lprob *codonp)
   return codonm;
 }
 
-float imm_codon_marg_lprob(struct imm_codon_marg const *codonm,
-                           struct imm_codon codon)
-{
-  return codonm->lprobs[codon.idx[0]][codon.idx[1]][codon.idx[2]];
-}
-
 #define CODON_SIZE                                                             \
   ((IMM_NUCLT_SIZE + 1) * (IMM_NUCLT_SIZE + 1) * (IMM_NUCLT_SIZE + 1))
 

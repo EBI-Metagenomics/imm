@@ -6,6 +6,7 @@
 #include "unsafe.h"
 #include "viterbi.h"
 #include "viterbi_110011.h"
+#include "viterbi_150015.h"
 #include "viterbi_any.h"
 #include "viterbi_best_incoming.h"
 #include "viterbi_best_trans.h"
@@ -38,7 +39,8 @@ void imm_viterbi_generic(struct imm_viterbi const *x, unsigned const seqlen)
   struct unsafe const unsafe = unsafe_init(x);
   struct imm_dp_safety const *y = &x->safety;
   bool const save_path = x->task->save_path;
-
   if (hot_code == 110011) viterbi_g1100(hot, x, seqlen, unsafe, y, save_path);
+  else if (hot_code == 1515)
+    viterbi_g0015(hot, x, seqlen, unsafe, y, save_path);
   else viterbi_gany(x, seqlen, unsafe, y, save_path);
 }
