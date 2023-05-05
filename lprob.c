@@ -29,4 +29,12 @@ void imm_lprob_sample(struct imm_rnd *rnd, unsigned len, float *lprobs)
     lprobs[i] = log(imm_rnd_dbl(rnd));
 }
 
+float imm_lprob_sum(unsigned len, float const *arr)
+{
+  float r = arr[0];
+  for (unsigned i = 1; i < len; ++i)
+    r = logaddexp(r, arr[i]);
+  return r;
+}
+
 float imm_lprob_zero(void) { return -INFINITY; }
