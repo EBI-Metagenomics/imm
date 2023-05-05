@@ -10,6 +10,10 @@
 // #define UNROLL _Pragma(UNROLL_TO_STRING(GCC unroll 1))
 // #endif
 
+#if defined(__clang__)
+#define UNROLL(n) _Pragma(UNROLL_TO_STRING(clang loop unroll_count(n)))
+#else
 #define UNROLL(n) _Pragma(UNROLL_TO_STRING(GCC unroll n))
+#endif
 
 #endif
