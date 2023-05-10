@@ -1,8 +1,8 @@
 #include "lprob.h"
+#include "logaddexp.h"
 #include "rnd.h"
-#include "vendor/logaddexp.h"
 
-float imm_lprob_add(float a, float b) { return logaddexp(a, b); }
+float imm_lprob_add(float a, float b) { return imm_logaddexp(a, b); }
 
 float imm_lprob_nan(void) { return NAN; }
 
@@ -27,14 +27,6 @@ void imm_lprob_sample(struct imm_rnd *rnd, unsigned len, float *lprobs)
 {
   for (unsigned i = 0; i < len; ++i)
     lprobs[i] = log(imm_rnd_dbl(rnd));
-}
-
-float imm_lprob_sum(unsigned len, float const *arr)
-{
-  float r = arr[0];
-  for (unsigned i = 1; i < len; ++i)
-    r = logaddexp(r, arr[i]);
-  return r;
 }
 
 float imm_lprob_zero(void) { return -INFINITY; }

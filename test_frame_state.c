@@ -39,8 +39,6 @@ static void run_frame_state1(float lprobs[], struct imm_span span)
   close(imm_state_lprob(s, &seq), lprobs[5]);
   seq = imm_seq(IMM_STR("ATTAA"), abc);
   close(imm_state_lprob(s, &seq), lprobs[6]);
-  seq = imm_seq(IMM_STR("ATTAAT"), abc);
-  ok(imm_lprob_is_zero(imm_state_lprob(s, &seq)));
 }
 
 static void frame_state1(void)
@@ -99,9 +97,6 @@ static void frame_state2(void)
 
   seq = imm_seq(IMM_STR("ATTAA"), abc);
   close(imm_state_lprob(s, &seq), -13.9208710471);
-
-  seq = imm_seq(IMM_STR("ATTAAT"), abc);
-  ok(imm_lprob_is_zero(imm_state_lprob(s, &seq)));
 }
 
 static void frame_state3(void)

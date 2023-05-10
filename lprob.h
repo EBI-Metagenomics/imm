@@ -3,6 +3,7 @@
 
 #include "compiler.h"
 #include "export.h"
+#include "logaddexp.h"
 #include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -20,7 +21,14 @@ IMM_API bool imm_lprob_is_zero(float);
 IMM_API bool imm_lprob_is_finite(float);
 IMM_API void imm_lprob_normalize(unsigned len, float *arr);
 IMM_API void imm_lprob_sample(struct imm_rnd *, unsigned len, float *arr);
-IMM_API float imm_lprob_sum(unsigned len, float const *arr);
 IMM_API float imm_lprob_zero(void);
+
+PURE_ATTR TEMPLATE float imm_lprob_sum(unsigned const len, float const *arr)
+{
+  float r = arr[0];
+  for (unsigned i = 1; i < len; ++i)
+    r = imm_logaddexp(r, arr[i]);
+  return r;
+}
 
 #endif

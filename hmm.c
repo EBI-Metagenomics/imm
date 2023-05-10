@@ -4,13 +4,13 @@
 #include "dp_cfg.h"
 #include "htable.h"
 #include "list.h"
+#include "logaddexp.h"
 #include "lprob.h"
 #include "path.h"
 #include "stack.h"
 #include "state.h"
 #include "subseq.h"
 #include "tsort.h"
-#include "vendor/logaddexp.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -255,7 +255,7 @@ int imm_hmm_normalize_state_trans(struct imm_state *src)
   float lnorm = imm_lprob_zero();
   imm_list_for_each_entry(trans, &src->trans.outgoing, outgoing)
   {
-    lnorm = logaddexp(lnorm, trans->lprob);
+    lnorm = imm_logaddexp(lnorm, trans->lprob);
   }
 
   if (!imm_lprob_is_finite(lnorm)) return IMM_EINVAL;
@@ -290,10 +290,8 @@ int imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state *src,
 
   struct imm_trans *trans = hmm_trans(hmm, src, dst);
 
-  if (trans)
-    trans->lprob = lprob;
-  else
-    return add_transition(hmm, src, dst, lprob);
+  if (trans) trans->lprob = lprob;
+  else return add_transition(hmm, src, dst, lprob);
 
   return 0;
 }

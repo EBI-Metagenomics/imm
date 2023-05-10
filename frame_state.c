@@ -8,6 +8,7 @@
 #include "lprob.h"
 #include "nuclt_lprob.h"
 #include "state.h"
+#include "unreachable.h"
 #include <assert.h>
 
 static float lprob15(struct imm_state const *state, struct imm_seq const *seq);
@@ -71,18 +72,12 @@ static float lprob15(struct imm_state const *state, struct imm_seq const *seq)
 
   switch (imm_seq_size(seq))
   {
-  case 1:
-    return imm_joint_n1_15(f, seq);
-  case 2:
-    return imm_joint_n2_15(f, seq);
-  case 3:
-    return imm_joint_n3_15(f, seq);
-  case 4:
-    return imm_joint_n4_15(f, seq);
-  case 5:
-    return imm_joint_n5_15(f, seq);
-    // default:
-    //     error(IMM_SEQ_OUT_OF_RANGE);
+  case 1: return imm_joint_n1_15(f, seq);
+  case 2: return imm_joint_n2_15(f, seq);
+  case 3: return imm_joint_n3_15(f, seq);
+  case 4: return imm_joint_n4_15(f, seq);
+  case 5: return imm_joint_n5_15(f, seq);
+  default: imm_unreachable();
   }
 
   return imm_lprob_zero();
@@ -94,14 +89,10 @@ static float lprob24(struct imm_state const *state, struct imm_seq const *seq)
 
   switch (imm_seq_size(seq))
   {
-  case 2:
-    return imm_joint_n2_24(f, seq);
-  case 3:
-    return imm_joint_n3_24(f, seq);
-  case 4:
-    return imm_joint_n4_24(f, seq);
-    // default:
-    //     error(IMM_SEQ_OUT_OF_RANGE);
+  case 2: return imm_joint_n2_24(f, seq);
+  case 3: return imm_joint_n3_24(f, seq);
+  case 4: return imm_joint_n4_24(f, seq);
+  default: imm_unreachable();
   }
 
   return imm_lprob_zero();
@@ -113,10 +104,8 @@ static float lprob33(struct imm_state const *state, struct imm_seq const *seq)
 
   switch (imm_seq_size(seq))
   {
-  case 3:
-    return imm_joint_n3_33(f, seq);
-    // default:
-    //     error(IMM_SEQ_OUT_OF_RANGE);
+  case 3: return imm_joint_n3_33(f, seq);
+  default: imm_unreachable();
   }
 
   return imm_lprob_zero();
