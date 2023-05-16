@@ -1,12 +1,12 @@
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(imm VERSION 3.0.7 LANGUAGES C)
+cmake_minimum_required(VERSION 3.20.2 FATAL_ERROR)
+project(imm VERSION 3.0.8 LANGUAGES C)
 
 include(cmake/sanitizers.cmake)
 include(cmake/warnings.cmake)
 include(cmake/CPM.cmake)
 
 cpmaddpackage("gh:horta/elapsed@3.1.2")
-cpmaddpackage("gh:EBI-Metagenomics/lip@0.5.1")
+cpmaddpackage("gh:EBI-Metagenomics/lip@0.5.2")
 find_package(OpenMP)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
