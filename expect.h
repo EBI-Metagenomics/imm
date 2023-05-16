@@ -1,9 +1,10 @@
 #ifndef IMM_EXPECT_H
 #define IMM_EXPECT_H
 
-#include "lip/lip.h"
 #include <stdbool.h>
 #include <stdint.h>
+
+struct lip_file;
 
 bool imm_expect_map_size(struct lip_file *, unsigned size);
 bool imm_expect_map_key(struct lip_file *, char const *key);
