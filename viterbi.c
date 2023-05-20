@@ -36,8 +36,8 @@ void imm_viterbi_init(struct imm_viterbi *x, struct imm_dp const *dp,
 {
   x->dp = dp;
   x->task = task;
-  imm_dp_safety_init(&x->safety, imm_seq_size(task->seq));
-  x->seqlen = imm_seq_size(task->seq);
+  imm_dp_safety_init(&x->safety, imm_eseq_size(task->seq));
+  x->seqlen = imm_eseq_size(task->seq);
   x->unsafe_state = find_unsafe_state(dp);
 }
 

@@ -48,16 +48,21 @@ static void dp_empty_path(void)
   imm_hmm_init(&hmm, &code);
   struct imm_prod prod = imm_prod();
 
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &code);
+
   eq(imm_hmm_add_state(&hmm, &state.super), 0);
   eq(imm_hmm_set_start(&hmm, &state.super, log(0.1)), 0);
   struct imm_dp dp;
   eq(imm_hmm_init_dp(&hmm, &state.super, &dp), 0);
 
   struct imm_task *task = imm_task_new(&dp);
-  imm_task_setup(task, &A);
+  eq(imm_eseq_setup(&eseq, &A), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   eq(imm_path_nsteps(&prod.path), 0);
 
+  imm_eseq_cleanup(&eseq);
   imm_task_del(task);
   imm_dp_del(&dp);
 }
@@ -70,6 +75,9 @@ static void dp_one_mute(void)
   imm_hmm_init(&hmm, &code);
   struct imm_prod prod = imm_prod();
 
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &code);
+
   eq(imm_hmm_add_state(&hmm, &state.super), 0);
 
   eq(imm_hmm_set_start(&hmm, &state.super, log(0.3)), 0);
@@ -79,14 +87,17 @@ static void dp_one_mute(void)
   struct imm_task *task = imm_task_new(&dp);
   eq(imm_dp_viterbi(&dp, task, &prod), IMM_ENOSEQ);
 
-  imm_task_setup(task, &EMPTY);
+  eq(imm_eseq_setup(&eseq, &EMPTY), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   eq(imm_path_nsteps(&prod.path), 1);
 
-  imm_task_setup(task, &ATT);
+  eq(imm_eseq_setup(&eseq, &ATT), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   eq(imm_path_nsteps(&prod.path), 0);
 
+  imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_task_del(task);
   imm_dp_del(&dp);
@@ -101,6 +112,9 @@ static void dp_two_mutes(void)
   struct imm_hmm hmm;
   imm_hmm_init(&hmm, &code);
   struct imm_prod prod = imm_prod();
+
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &code);
 
   eq(imm_hmm_add_state(&hmm, &state0.super), 0);
   eq(imm_hmm_add_state(&hmm, &state1.super), 0);
@@ -117,7 +131,8 @@ static void dp_two_mutes(void)
 
   eq(imm_dp_viterbi(&dp, task, &prod), IMM_ENOSEQ);
 
-  imm_task_setup(task, &EMPTY);
+  eq(imm_eseq_setup(&eseq, &EMPTY), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   eq(imm_path_nsteps(&prod.path), 2);
   eq(imm_path_step(&prod.path, 0)->seqlen, 0);
@@ -125,10 +140,12 @@ static void dp_two_mutes(void)
   eq(imm_path_step(&prod.path, 1)->seqlen, 0);
   eq(imm_path_step(&prod.path, 1)->state_id, 12);
 
-  imm_task_setup(task, &ATT);
+  eq(imm_eseq_setup(&eseq, &ATT), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   eq(imm_path_nsteps(&prod.path), 0);
 
+  imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_dp_del(&dp);
   imm_task_del(task);
@@ -141,6 +158,9 @@ static void dp_io_example1(void)
   struct imm_ex1 *m = &imm_ex1;
   struct imm_dp dp;
   eq(imm_hmm_init_dp(&imm_ex1.hmm, &m->end.super, &dp), 0);
+
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &m->code);
 
   file.fp = fopen("dp_example1.imm", "wb");
   eq(imm_dp_pack(&dp, &file), 0);
@@ -155,13 +175,16 @@ static void dp_io_example1(void)
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
   struct imm_seq seq = imm_seq(imm_str("BMMMEJBMMME"), &m->abc);
-  eq(imm_task_setup(task, &seq), 0);
+  eq(imm_eseq_setup(&eseq, &seq), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, -41.845375);
 
+  imm_eseq_cleanup(&eseq);
   imm_task_del(task);
   imm_prod_cleanup(&prod);
   imm_dp_del(&dp);
+  remove("dp_example1.imm");
 }
 
 static void dp_io_example2(void)
@@ -172,11 +195,15 @@ static void dp_io_example2(void)
   struct imm_dp dp;
   imm_hmm_init_dp(&m->hmm, &m->end.super, &dp);
 
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &m->code);
+
   struct imm_abc const *abc = &m->dna->super.super;
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
   struct imm_seq seq = imm_seq(imm_str(imm_ex2_seq), abc);
-  eq(imm_task_setup(task, &seq), 0);
+  eq(imm_eseq_setup(&eseq, &seq), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, 41.929977);
   imm_prod_cleanup(&prod);
@@ -195,13 +222,16 @@ static void dp_io_example2(void)
   task = imm_task_new(&dp);
   prod = imm_prod();
   seq = imm_seq(imm_str(imm_ex2_seq), abc);
-  eq(imm_task_setup(task, &seq), 0);
+  eq(imm_eseq_setup(&eseq, &seq), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, 41.929977);
 
+  imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_task_del(task);
   imm_dp_del(&dp);
+  remove("dp_frame.imm");
 }
 
 int main(void)

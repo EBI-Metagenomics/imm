@@ -7,10 +7,8 @@
 static unsigned state_name(unsigned id, char *name)
 {
   name[0] = 'M';
-  if (id == 0)
-    name[1] = '0';
-  else
-    name[1] = '1';
+  if (id == 0) name[1] = '0';
+  else name[1] = '1';
   name[2] = '\0';
   return 2;
 }
@@ -38,6 +36,7 @@ static void hmm_dot(void)
   ok(fd);
   imm_hmm_write_dot(&hmm, fd, state_name);
   fclose(fd);
+  remove("hmm.dot");
 }
 
 static void dp_dot(void)
@@ -65,6 +64,7 @@ static void dp_dot(void)
   ok(fd);
   imm_hmm_write_dot(&hmm, fd, &state_name);
   fclose(fd);
+  remove("dp.dot");
 }
 
 int main(void)

@@ -78,7 +78,7 @@ TEMPLATE float imm_viterbi_emission(struct imm_viterbi const *x,
                                     unsigned const row, unsigned const state,
                                     unsigned const len, unsigned const min_len)
 {
-  unsigned code = imm_eseq_get(&x->task->eseq, row, len, min_len);
+  unsigned code = imm_eseq_get(x->task->seq, row, len, min_len);
   return imm_emis_score(&x->dp->emis, state, code);
 }
 

@@ -3,10 +3,12 @@
 
 #include "code.h"
 #include "compiler.h"
+#include "export.h"
 #include "matrixu16.h"
 
-struct imm_seq;
+struct imm_abc;
 struct imm_code;
+struct imm_seq;
 
 struct imm_eseq
 {
@@ -14,11 +16,12 @@ struct imm_eseq
   struct imm_code const *code;
 };
 
-void imm_eseq_cleanup(struct imm_eseq const *);
-void imm_eseq_reset(struct imm_eseq *, struct imm_code const *);
-unsigned imm_eseq_len(struct imm_eseq const *);
-void imm_eseq_init(struct imm_eseq *, struct imm_code const *);
-int imm_eseq_setup(struct imm_eseq *, struct imm_seq const *);
+IMM_API void imm_eseq_cleanup(struct imm_eseq const *);
+IMM_API void imm_eseq_reset(struct imm_eseq *, struct imm_code const *);
+IMM_API struct imm_abc const *imm_eseq_abc(struct imm_eseq const *);
+IMM_API unsigned imm_eseq_size(struct imm_eseq const *);
+IMM_API void imm_eseq_init(struct imm_eseq *, struct imm_code const *);
+IMM_API int imm_eseq_setup(struct imm_eseq *, struct imm_seq const *);
 
 TEMPLATE unsigned imm_eseq_get(struct imm_eseq const *x, unsigned const pos,
                                unsigned const len, unsigned const min_seq)
