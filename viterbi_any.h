@@ -10,7 +10,7 @@
 #include "viterbi_best_trans.h"
 #include "viterbi_set_state_score.h"
 
-TEMPLATE struct imm_ctrans const *
+IMM_TEMPLATE struct imm_ctrans const *
 gany_state(struct imm_viterbi const *x, unsigned const row,
            struct state_range dst, struct imm_ctrans const *t,
            unsigned const seqlen, bool const save_path, bool const safe_future,
@@ -27,17 +27,19 @@ gany_state(struct imm_viterbi const *x, unsigned const row,
   return t;
 }
 
-TEMPLATE void gany_unsafe_state(struct imm_viterbi const *x, unsigned const row,
-                                struct unsafe const unsafe,
-                                unsigned const seqlen, bool const save_path,
-                                bool const safe_future, bool const safe_past)
+IMM_TEMPLATE void gany_unsafe_state(struct imm_viterbi const *x,
+                                    unsigned const row,
+                                    struct unsafe const unsafe,
+                                    unsigned const seqlen, bool const save_path,
+                                    bool const safe_future,
+                                    bool const safe_past)
 {
   struct imm_ctrans const *t = x->dp->trans_table.trans + unsafe.trans;
   struct state_range dst = imm_viterbi_state_range(x, unsafe.state);
   gany_state(x, row, dst, t, seqlen, save_path, safe_future, safe_past, true);
 }
 
-TEMPLATE struct imm_ctrans const *
+IMM_TEMPLATE struct imm_ctrans const *
 gany_safe_states(struct imm_ctrans const *t, struct imm_range const states,
                  struct imm_viterbi const *x, unsigned const row,
                  unsigned const seqlen, bool const save_path,
@@ -52,10 +54,10 @@ gany_safe_states(struct imm_ctrans const *t, struct imm_range const states,
   return t;
 }
 
-TEMPLATE void gany(struct imm_viterbi const *x, unsigned const row,
-                   struct unsafe const unsafe, unsigned const seqlen,
-                   bool const save_path, bool const safe_future,
-                   bool const safe_past)
+IMM_TEMPLATE void gany(struct imm_viterbi const *x, unsigned const row,
+                       struct unsafe const unsafe, unsigned const seqlen,
+                       bool const save_path, bool const safe_future,
+                       bool const safe_past)
 {
   gany_unsafe_state(x, row, unsafe, seqlen, save_path, safe_future, safe_past);
   struct imm_ctrans const *t = x->dp->trans_table.trans;

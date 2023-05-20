@@ -4,13 +4,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-TEMPLATE unsigned source(struct imm_viterbi const *vit, unsigned state,
-                         unsigned t)
+IMM_TEMPLATE unsigned source(struct imm_viterbi const *vit, unsigned state,
+                             unsigned t)
 {
   return imm_viterbi_source(vit, state, t);
 }
 
-TEMPLATE uint8_t span(struct imm_viterbi const *x, unsigned const state)
+IMM_TEMPLATE uint8_t span(struct imm_viterbi const *x, unsigned const state)
 {
   return imm_viterbi_span(x, state);
 }

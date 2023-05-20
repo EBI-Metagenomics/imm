@@ -11,16 +11,16 @@
 #include "viterbi_best_score.h"
 #include "viterbi_best_trans.h"
 
-TEMPLATE void viterbi_best_incoming_fix_range(struct state_range *x,
-                                              unsigned const row,
-                                              bool const unsafe_state,
-                                              bool const safe_past)
+IMM_TEMPLATE void viterbi_best_incoming_fix_range(struct state_range *x,
+                                                  unsigned const row,
+                                                  bool const unsafe_state,
+                                                  bool const safe_past)
 {
   if (unsafe_state) x->min = MAX(x->min, 1U);
   if (!safe_past) x->max = MIN(x->max, row);
 }
 
-TEMPLATE struct imm_ctrans const *
+IMM_TEMPLATE struct imm_ctrans const *
 viterbi_best_incoming(float *score, struct viterbi_best_trans *best_trans,
                       struct imm_viterbi const *x, unsigned const row,
                       uint_fast16_t const dst, struct imm_ctrans const *ctrans,
@@ -48,7 +48,7 @@ viterbi_best_incoming(float *score, struct viterbi_best_trans *best_trans,
   return ctrans;
 }
 
-TEMPLATE struct imm_ctrans const *viterbi_best_incoming_0015(
+IMM_TEMPLATE struct imm_ctrans const *viterbi_best_incoming_0015(
     float *score, struct viterbi_best_trans *best_trans,
     struct imm_viterbi const *x, unsigned const row, uint_fast16_t const src0,
     uint_fast16_t const src1, struct imm_ctrans const *ctrans,
@@ -72,7 +72,7 @@ TEMPLATE struct imm_ctrans const *viterbi_best_incoming_0015(
   return ctrans + 2;
 }
 
-TEMPLATE struct imm_ctrans const *viterbi_best_incoming_0015_fast(
+IMM_TEMPLATE struct imm_ctrans const *viterbi_best_incoming_0015_fast(
     float *score, struct viterbi_best_trans *best_trans,
     struct imm_viterbi const *x, unsigned const row, uint_fast16_t const src0,
     uint_fast16_t const src1, struct imm_ctrans const *ctrans,
@@ -91,7 +91,7 @@ TEMPLATE struct imm_ctrans const *viterbi_best_incoming_0015_fast(
   return ctrans + 2;
 }
 
-TEMPLATE struct imm_ctrans const *viterbi_best_incoming_1100(
+IMM_TEMPLATE struct imm_ctrans const *viterbi_best_incoming_1100(
     float *score, struct viterbi_best_trans *best_trans,
     struct imm_viterbi const *x, unsigned const row, uint_fast16_t const src0,
     uint_fast16_t const src1, struct imm_ctrans const *ctrans,
@@ -115,7 +115,7 @@ TEMPLATE struct imm_ctrans const *viterbi_best_incoming_1100(
   return ctrans + 2;
 }
 
-TEMPLATE struct imm_ctrans const *viterbi_best_incoming_1100_fast(
+IMM_TEMPLATE struct imm_ctrans const *viterbi_best_incoming_1100_fast(
     float *score, struct viterbi_best_trans *best_trans,
     struct imm_viterbi const *x, unsigned const row, uint_fast16_t const src0,
     uint_fast16_t const src1, struct imm_ctrans const *ctrans,

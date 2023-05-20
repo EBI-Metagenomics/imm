@@ -31,10 +31,8 @@ struct imm_range imm_range_intersect(struct imm_range x, struct imm_range y)
 {
   if (x.a <= y.a)
   {
-    if (y.a < x.b)
-      return imm_range(y.a, MIN(x.b, y.b));
-    else
-      return imm_range(x.b, x.b);
+    if (y.a < x.b) return imm_range(y.a, MIN(x.b, y.b));
+    else return imm_range(x.b, x.b);
   }
   return imm_range_intersect(y, x);
 }

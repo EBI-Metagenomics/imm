@@ -11,7 +11,7 @@
 #include "viterbi_best_trans.h"
 #include "viterbi_set_state_score.h"
 
-TEMPLATE struct imm_ctrans const *
+IMM_TEMPLATE struct imm_ctrans const *
 g1100_state(unsigned const src0, unsigned const src1, unsigned const dst,
             struct imm_viterbi const *x, unsigned const row,
             struct imm_ctrans const *t, unsigned const seqlen,
@@ -38,7 +38,7 @@ g1100_state(unsigned const src0, unsigned const src1, unsigned const dst,
   return t;
 }
 
-TEMPLATE struct imm_ctrans const *g1100_safe_states_fixed(
+IMM_TEMPLATE struct imm_ctrans const *g1100_safe_states_fixed(
     struct imm_ctrans const *t, struct imm_range const states,
     struct imm_viterbi const *x, unsigned const row, unsigned const seqlen,
     bool const save_path, bool const safe_future, bool const safe_past)
@@ -54,7 +54,7 @@ TEMPLATE struct imm_ctrans const *g1100_safe_states_fixed(
   return t;
 }
 
-TEMPLATE struct imm_ctrans const *g1100_safe_states_unfixed(
+IMM_TEMPLATE struct imm_ctrans const *g1100_safe_states_unfixed(
     struct imm_hot_range const *hot, struct imm_ctrans const *t,
     struct imm_range const states, struct imm_viterbi const *x,
     unsigned const row, unsigned const seqlen, bool const save_path,
@@ -71,7 +71,7 @@ TEMPLATE struct imm_ctrans const *g1100_safe_states_unfixed(
   return t;
 }
 
-TEMPLATE struct imm_ctrans const *
+IMM_TEMPLATE struct imm_ctrans const *
 g1100_safe_states(struct imm_hot_range const *hot, struct imm_ctrans const *t,
                   struct imm_range const states, struct imm_viterbi const *x,
                   unsigned const row, unsigned const seqlen,
@@ -86,11 +86,11 @@ g1100_safe_states(struct imm_hot_range const *hot, struct imm_ctrans const *t,
                                      safe_future, safe_past);
 }
 
-TEMPLATE void g1100(struct imm_hot_range const *hot,
-                    struct imm_viterbi const *x, unsigned const row,
-                    struct unsafe const unsafe, unsigned const seqlen,
-                    bool const save_path, bool const safe_future,
-                    bool const safe_past)
+IMM_TEMPLATE void g1100(struct imm_hot_range const *hot,
+                        struct imm_viterbi const *x, unsigned const row,
+                        struct unsafe const unsafe, unsigned const seqlen,
+                        bool const save_path, bool const safe_future,
+                        bool const safe_past)
 {
   gany_unsafe_state(x, row, unsafe, seqlen, save_path, safe_future, safe_past);
 
@@ -107,7 +107,7 @@ TEMPLATE void g1100(struct imm_hot_range const *hot,
   t = gany_safe_states(t, r, x, row, seqlen, save_path, safe_future, safe_past);
 }
 
-TEMPLATE void
+IMM_TEMPLATE void
 viterbi_g1100_template(struct imm_hot_range hot, struct imm_viterbi const *x,
                        unsigned const seqlen, struct unsafe unsafe,
                        struct imm_dp_safety const *y, bool const save_path)
@@ -127,11 +127,10 @@ viterbi_g1100_template(struct imm_hot_range hot, struct imm_viterbi const *x,
     g1100(&hot, x, r, unsafe, seqlen, save_path, false, true);
 }
 
-NOINLINE static void viterbi_g1100(struct imm_hot_range hot,
-                                   struct imm_viterbi const *x,
-                                   unsigned const seqlen, struct unsafe unsafe,
-                                   struct imm_dp_safety const *y,
-                                   bool const save_path)
+IMM_NOINLINE static void
+viterbi_g1100(struct imm_hot_range hot, struct imm_viterbi const *x,
+              unsigned const seqlen, struct unsafe unsafe,
+              struct imm_dp_safety const *y, bool const save_path)
 {
   if (save_path) viterbi_g1100_template(hot, x, seqlen, unsafe, y, true);
   else viterbi_g1100_template(hot, x, seqlen, unsafe, y, false);

@@ -12,10 +12,10 @@
 
 unsigned long *imm_bitmap_reallocf(unsigned long *, unsigned long bits);
 
-CONST_ATTR TEMPLATE unsigned long __bitmap_get(unsigned long const *x,
-                                               unsigned const addr,
-                                               unsigned const nbits,
-                                               unsigned long val)
+IMM_CONST IMM_TEMPLATE unsigned long __bitmap_get(unsigned long const *x,
+                                                  unsigned const addr,
+                                                  unsigned const nbits,
+                                                  unsigned long val)
 {
   imm_assume(addr + nbits <= BITS_PER_LONG);
   imm_assume(nbits <= 16);
@@ -27,9 +27,9 @@ CONST_ATTR TEMPLATE unsigned long __bitmap_get(unsigned long const *x,
   return val;
 }
 
-PURE_ATTR TEMPLATE unsigned long imm_bitmap_get(unsigned long const *x,
-                                                unsigned long const addr,
-                                                unsigned const nbits)
+IMM_PURE IMM_TEMPLATE unsigned long imm_bitmap_get(unsigned long const *x,
+                                                   unsigned long const addr,
+                                                   unsigned const nbits)
 {
   imm_assume(nbits <= 16);
   unsigned long const *y = x + LONG_START(addr);
@@ -41,8 +41,8 @@ PURE_ATTR TEMPLATE unsigned long imm_bitmap_get(unsigned long const *x,
   return val;
 }
 
-TEMPLATE void __bitmap_set(unsigned long *x, unsigned long const val,
-                           unsigned const addr, unsigned const nbits)
+IMM_TEMPLATE void __bitmap_set(unsigned long *x, unsigned long const val,
+                               unsigned const addr, unsigned const nbits)
 {
   imm_assume(addr + nbits <= BITS_PER_LONG);
   imm_assume(nbits <= 16);
@@ -53,8 +53,8 @@ TEMPLATE void __bitmap_set(unsigned long *x, unsigned long const val,
   }
 }
 
-TEMPLATE void imm_bitmap_set(unsigned long *x, unsigned long val,
-                             unsigned long const addr, unsigned const nbits)
+IMM_TEMPLATE void imm_bitmap_set(unsigned long *x, unsigned long val,
+                                 unsigned long const addr, unsigned const nbits)
 {
   imm_assume(nbits <= 16);
   unsigned long *y = x + LONG_START(addr);

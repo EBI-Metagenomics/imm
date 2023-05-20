@@ -31,28 +31,29 @@ void imm_trans_table_cleanup(struct imm_trans_table *);
 unsigned imm_trans_table_transsize(unsigned ntrans);
 unsigned imm_trans_table_offsize(unsigned nstates);
 
-TEMPLATE unsigned imm_trans_table_ntrans(struct imm_trans_table const *tbl,
-                                         unsigned const dst)
+IMM_TEMPLATE unsigned imm_trans_table_ntrans(struct imm_trans_table const *tbl,
+                                             unsigned const dst)
 {
   imm_assume(tbl->offset[dst + 1] >= tbl->offset[dst]);
   return (unsigned)(tbl->offset[dst + 1] - tbl->offset[dst]);
 }
 
-TEMPLATE unsigned
+IMM_TEMPLATE unsigned
 imm_trans_table_source_state(struct imm_trans_table const *tbl,
                              unsigned const dst, unsigned const trans)
 {
   return tbl->trans[tbl->offset[dst] + trans].src;
 }
 
-TEMPLATE float imm_trans_table_score(struct imm_trans_table const *tbl,
-                                     unsigned const dst, unsigned const trans)
+IMM_TEMPLATE float imm_trans_table_score(struct imm_trans_table const *tbl,
+                                         unsigned const dst,
+                                         unsigned const trans)
 {
   return tbl->trans[tbl->offset[dst] + trans].score;
 }
 
-TEMPLATE uint16_t imm_trans_table_trans0(struct imm_trans_table const *tbl,
-                                         unsigned const state)
+IMM_TEMPLATE uint16_t imm_trans_table_trans0(struct imm_trans_table const *tbl,
+                                             unsigned const state)
 {
   return tbl->offset[state];
 }

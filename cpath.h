@@ -52,24 +52,24 @@ struct imm_cpath
   uint8_t *trans_bits;
 };
 
-CONST_ATTR TEMPLATE unsigned imm_cpath_invalid(unsigned bits)
+IMM_CONST IMM_TEMPLATE unsigned imm_cpath_invalid(unsigned bits)
 {
   return (unsigned)((1 << bits) - 1);
 }
 
-PURE_ATTR TEMPLATE unsigned imm_cpath_state_bits(struct imm_cpath const *x,
-                                                 unsigned state)
+IMM_PURE IMM_TEMPLATE unsigned imm_cpath_state_bits(struct imm_cpath const *x,
+                                                    unsigned state)
 {
   return (unsigned)(x->state_offset[state + 1] - x->state_offset[state]);
 }
 
-PURE_ATTR TEMPLATE unsigned imm_cpath_seqlen_bits(struct imm_cpath const *x,
-                                                  unsigned state)
+IMM_PURE IMM_TEMPLATE unsigned imm_cpath_seqlen_bits(struct imm_cpath const *x,
+                                                     unsigned state)
 {
   return imm_cpath_state_bits(x, state) - x->trans_bits[state];
 }
 
-PURE_ATTR TEMPLATE unsigned long
+IMM_PURE IMM_TEMPLATE unsigned long
 imm_cpath_start_bit(struct imm_cpath const *x, unsigned pos, unsigned state)
 {
   return (unsigned long)pos * x->ncols + x->state_offset[state];
@@ -85,8 +85,8 @@ int imm_cpath_reset(struct imm_cpath *, struct imm_state_table const *,
 
 int imm_cpath_setup(struct imm_cpath *, unsigned len);
 
-TEMPLATE unsigned imm_cpath_seqlen(struct imm_cpath const *x, unsigned pos,
-                                   unsigned state)
+IMM_TEMPLATE unsigned imm_cpath_seqlen(struct imm_cpath const *x, unsigned pos,
+                                       unsigned state)
 {
   unsigned long start =
       imm_cpath_start_bit(x, pos, state) + x->trans_bits[state];
@@ -94,37 +94,37 @@ TEMPLATE unsigned imm_cpath_seqlen(struct imm_cpath const *x, unsigned pos,
                                   imm_cpath_seqlen_bits(x, state));
 }
 
-TEMPLATE unsigned imm_cpath_trans(struct imm_cpath const *x, unsigned pos,
-                                  unsigned state)
+IMM_TEMPLATE unsigned imm_cpath_trans(struct imm_cpath const *x, unsigned pos,
+                                      unsigned state)
 {
   unsigned long start = imm_cpath_start_bit(x, pos, state);
   return (unsigned)imm_bitmap_get(x->bit, start, x->trans_bits[state]);
 }
 
-TEMPLATE bool imm_cpath_valid(struct imm_cpath const *x, unsigned pos,
-                              unsigned state)
+IMM_TEMPLATE bool imm_cpath_valid(struct imm_cpath const *x, unsigned pos,
+                                  unsigned state)
 {
   return !!(imm_cpath_invalid(imm_cpath_seqlen_bits(x, state)) ^
             imm_cpath_seqlen(x, pos, state));
 }
 
-TEMPLATE void imm_cpath_set_seqlen(struct imm_cpath *x, unsigned pos,
-                                   unsigned state, unsigned len)
+IMM_TEMPLATE void imm_cpath_set_seqlen(struct imm_cpath *x, unsigned pos,
+                                       unsigned state, unsigned len)
 {
   unsigned long start =
       imm_cpath_start_bit(x, pos, state) + x->trans_bits[state];
   imm_bitmap_set(x->bit, len, start, imm_cpath_seqlen_bits(x, state));
 }
 
-TEMPLATE void imm_cpath_set_trans(struct imm_cpath *x, unsigned pos,
-                                  unsigned state, unsigned trans)
+IMM_TEMPLATE void imm_cpath_set_trans(struct imm_cpath *x, unsigned pos,
+                                      unsigned state, unsigned trans)
 {
   unsigned long start = imm_cpath_start_bit(x, pos, state);
   imm_bitmap_set(x->bit, trans, start, x->trans_bits[state]);
 }
 
-TEMPLATE void imm_cpath_invalidate(struct imm_cpath *x, unsigned pos,
-                                   unsigned state)
+IMM_TEMPLATE void imm_cpath_invalidate(struct imm_cpath *x, unsigned pos,
+                                       unsigned state)
 {
   unsigned seqlen = imm_cpath_invalid(imm_cpath_seqlen_bits(x, state));
   imm_cpath_set_seqlen(x, pos, state, seqlen);

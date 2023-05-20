@@ -6,7 +6,7 @@
 #include "viterbi_best_score.h"
 #include "viterbi_best_trans.h"
 
-TEMPLATE void viterbi_best_incoming_get_update(
+IMM_TEMPLATE void viterbi_best_incoming_get_update(
     float const v, uint_fast8_t const w, float *score,
     struct viterbi_best_trans *bt, uint_fast16_t const src,
     uint_fast16_t const trans, bool const save_path)
@@ -15,7 +15,7 @@ TEMPLATE void viterbi_best_incoming_get_update(
   if (*score < v) *score = v;
 }
 
-TEMPLATE void viterbi_best_incoming_get(
+IMM_TEMPLATE void viterbi_best_incoming_get(
     float *score, struct viterbi_best_trans *bt, struct imm_viterbi const *x,
     unsigned const row, struct state_range const src, uint_fast16_t const trans,
     float const trans_score, bool const save_path)
@@ -27,7 +27,7 @@ TEMPLATE void viterbi_best_incoming_get(
                                    save_path);
 }
 
-TEMPLATE void
+IMM_TEMPLATE void
 viterbi_best_incoming_get_15(float *score, struct viterbi_best_trans *bt,
                              struct imm_viterbi const *x, unsigned const row,
                              unsigned const src, uint_fast16_t const trans,
@@ -39,7 +39,7 @@ viterbi_best_incoming_get_15(float *score, struct viterbi_best_trans *bt,
   viterbi_best_incoming_get_update(t.f, t.u, score, bt, src, trans, save_path);
 }
 
-TEMPLATE void
+IMM_TEMPLATE void
 viterbi_best_incoming_get_11(float *score, struct viterbi_best_trans *bt,
                              struct imm_viterbi const *x, unsigned const row,
                              unsigned const src, uint_fast16_t const trans,
@@ -51,7 +51,7 @@ viterbi_best_incoming_get_11(float *score, struct viterbi_best_trans *bt,
   viterbi_best_incoming_get_update(t.f, t.u, score, bt, src, trans, save_path);
 }
 
-TEMPLATE void
+IMM_TEMPLATE void
 viterbi_best_incoming_get_00(float *score, struct viterbi_best_trans *bt,
                              struct imm_viterbi const *x, unsigned const row,
                              unsigned const src, uint_fast16_t const trans,

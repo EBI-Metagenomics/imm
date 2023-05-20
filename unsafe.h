@@ -10,7 +10,7 @@ struct unsafe
   unsigned trans;
 };
 
-TEMPLATE struct unsafe unsafe_init(struct imm_viterbi const *x)
+IMM_TEMPLATE struct unsafe unsafe_init(struct imm_viterbi const *x)
 {
   unsigned t = imm_trans_table_trans0(&x->dp->trans_table, x->unsafe_state);
   return (struct unsafe){x->unsafe_state, t};

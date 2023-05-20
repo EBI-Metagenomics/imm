@@ -13,10 +13,10 @@ struct viterbi_best_trans
   uint_fast8_t src_seqlen;
 };
 
-TEMPLATE void viterbi_best_trans_set(struct viterbi_best_trans *x,
-                                     uint_fast16_t const src,
-                                     uint_fast16_t const trans,
-                                     uint_fast8_t const len)
+IMM_TEMPLATE void viterbi_best_trans_set(struct viterbi_best_trans *x,
+                                         uint_fast16_t const src,
+                                         uint_fast16_t const trans,
+                                         uint_fast8_t const len)
 {
   x->src_idx = src;
   x->src_trans = trans;

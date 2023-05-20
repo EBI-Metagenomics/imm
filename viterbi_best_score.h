@@ -8,7 +8,7 @@
 #include "unroll.h"
 #include "viterbi.h"
 
-TEMPLATE void
+IMM_TEMPLATE void
 viterbi_best_score_single(struct tuple_f32_uint8 *tuple,
                           struct imm_viterbi const *x, unsigned const row,
                           uint_fast16_t const src, uint_fast8_t const min,
@@ -21,7 +21,7 @@ viterbi_best_score_single(struct tuple_f32_uint8 *tuple,
   if (tuple->f < v) tuple->f = v;
 }
 
-PURE_ATTR TEMPLATE struct tuple_f32_uint8
+IMM_PURE IMM_TEMPLATE struct tuple_f32_uint8
 viterbi_best_score_xy(struct imm_viterbi const *x, unsigned const row,
                       struct state_range const src, bool const save_path)
 {
@@ -35,7 +35,7 @@ viterbi_best_score_xy(struct imm_viterbi const *x, unsigned const row,
   return tuple;
 }
 
-PURE_ATTR TEMPLATE struct tuple_f32_uint8
+IMM_PURE IMM_TEMPLATE struct tuple_f32_uint8
 viterbi_best_score_15(struct imm_viterbi const *x, unsigned const row,
                       uint_fast16_t const src, bool const save_path)
 {
@@ -48,7 +48,7 @@ viterbi_best_score_15(struct imm_viterbi const *x, unsigned const row,
   return tuple;
 }
 
-PURE_ATTR TEMPLATE struct tuple_f32_uint8
+IMM_PURE IMM_TEMPLATE struct tuple_f32_uint8
 viterbi_best_score_11(struct imm_viterbi const *x, unsigned const row,
                       uint_fast16_t const src, bool const save_path)
 {
@@ -57,7 +57,7 @@ viterbi_best_score_11(struct imm_viterbi const *x, unsigned const row,
   return tuple;
 }
 
-PURE_ATTR TEMPLATE struct tuple_f32_uint8
+IMM_PURE IMM_TEMPLATE struct tuple_f32_uint8
 viterbi_best_score_00(struct imm_viterbi const *x, unsigned const row,
                       uint_fast16_t const src, bool const save_path)
 {

@@ -224,60 +224,33 @@ static inline int get_idx(int table_id)
 
   switch (table_id)
   {
-  case 1:
-    return 0;
-  case 2:
-    return 1;
-  case 3:
-    return 2;
-  case 4:
-    return 3;
-  case 5:
-    return 4;
-  case 6:
-    return 5;
-  case 9:
-    return 6;
-  case 10:
-    return 7;
-  case 11:
-    return 8;
-  case 12:
-    return 9;
-  case 13:
-    return 10;
-  case 14:
-    return 11;
-  case 15:
-    return 12;
-  case 16:
-    return 13;
-  case 21:
-    return 14;
-  case 22:
-    return 15;
-  case 23:
-    return 16;
-  case 24:
-    return 17;
-  case 25:
-    return 18;
-  case 26:
-    return 19;
-  case 27:
-    return 20;
-  case 28:
-    return 21;
-  case 29:
-    return 22;
-  case 30:
-    return 23;
-  case 31:
-    return 24;
-  case 32:
-    return 25;
-  case 33:
-    return 26;
+  case 1: return 0;
+  case 2: return 1;
+  case 3: return 2;
+  case 4: return 3;
+  case 5: return 4;
+  case 6: return 5;
+  case 9: return 6;
+  case 10: return 7;
+  case 11: return 8;
+  case 12: return 9;
+  case 13: return 10;
+  case 14: return 11;
+  case 15: return 12;
+  case 16: return 13;
+  case 21: return 14;
+  case 22: return 15;
+  case 23: return 16;
+  case 24: return 17;
+  case 25: return 18;
+  case 26: return 19;
+  case 27: return 20;
+  case 28: return 21;
+  case 29: return 22;
+  case 30: return 23;
+  case 31: return 24;
+  case 32: return 25;
+  case 33: return 26;
   }
   assert(0 && "I don't recognize such table id.");
   return -1;

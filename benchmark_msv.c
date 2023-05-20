@@ -1451,9 +1451,13 @@ static void msv3000_path(void)
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &m->code);
+
   // struct imm_seq seq = imm_seq(imm_str(seq1), &m->abc);
   struct imm_seq seq = imm_seq(imm_str(seq10), &m->abc);
-  eq(imm_task_setup(task, &seq), 0);
+  eq(imm_eseq_setup(&eseq, &seq), 0);
+  eq(imm_task_setup(task, &eseq), 0);
 
   imm_task_set_save_path(task, true);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
@@ -1464,6 +1468,7 @@ static void msv3000_path(void)
          pfam_core_size,
          (pfam_core_size / ((double)core_size)) * prod.mseconds / 1000. / 60.);
 
+  imm_eseq_cleanup(&eseq);
   imm_task_del(task);
   imm_prod_cleanup(&prod);
   imm_dp_del(&dp);
@@ -1481,9 +1486,13 @@ static void msv3000_nopath(void)
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &m->code);
+
   // struct imm_seq seq = imm_seq(imm_str(seq1), &m->abc);
   struct imm_seq seq = imm_seq(imm_str(seq10), &m->abc);
-  eq(imm_task_setup(task, &seq), 0);
+  eq(imm_eseq_setup(&eseq, &seq), 0);
+  eq(imm_task_setup(task, &eseq), 0);
 
   imm_task_set_save_path(task, false);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
@@ -1494,6 +1503,7 @@ static void msv3000_nopath(void)
          pfam_core_size,
          (pfam_core_size / ((double)core_size)) * prod.mseconds / 1000. / 60.);
 
+  imm_eseq_cleanup(&eseq);
   imm_task_del(task);
   imm_prod_cleanup(&prod);
   imm_dp_del(&dp);

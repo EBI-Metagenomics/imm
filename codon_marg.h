@@ -42,7 +42,7 @@ IMM_API struct imm_codon_marg imm_codon_marg(struct imm_codon_lprob *);
  *
  * will evaluate the probability p(𝑋₁=𝙰,𝑋₃=𝙶).
  */
-PURE_ATTR TEMPLATE float
+IMM_PURE IMM_TEMPLATE float
 imm_codon_marg_lprob(struct imm_codon_marg const *codonm,
                      struct imm_codon codon)
 {

@@ -32,8 +32,8 @@ struct imm_range imm_state_table_range(struct imm_state_table const *,
                                        unsigned idx);
 void imm_state_table_dump(struct imm_state_table const *);
 
-TEMPLATE uint8_t imm_state_table_span(struct imm_state_table const *x,
-                                      unsigned const state)
+IMM_TEMPLATE uint8_t imm_state_table_span(struct imm_state_table const *x,
+                                          unsigned const state)
 {
   return x->span[state];
 }
