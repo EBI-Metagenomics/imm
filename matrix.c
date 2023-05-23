@@ -39,7 +39,7 @@ void imm_matrix_cleanup(struct imm_matrix *x)
 {
   if (x)
   {
-    imm_matrixf_deinit(&x->score);
+    imm_matrixf_cleanup(&x->score);
     free((void *)x->state_col);
     x->state_col = NULL;
   }

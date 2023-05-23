@@ -15,7 +15,7 @@ void imm_matrixf_empty(struct imm_matrixf *);
 float *imm_matrixf_get_ptr(struct imm_matrixf const *, unsigned r, unsigned c);
 float const *imm_matrixf_get_ptr_c(struct imm_matrixf const *, unsigned r,
                                    unsigned c);
-void imm_matrixf_deinit(struct imm_matrixf const *);
+void imm_matrixf_cleanup(struct imm_matrixf *);
 int imm_matrixf_resize(struct imm_matrixf *, unsigned rows, unsigned cols);
 
 IMM_TEMPLATE float imm_matrixf_get(struct imm_matrixf const *x,

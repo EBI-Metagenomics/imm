@@ -2,7 +2,7 @@
 #include "code.h"
 #include "subseq.h"
 
-void imm_eseq_cleanup(struct imm_eseq const *eseq)
+void imm_eseq_cleanup(struct imm_eseq *eseq)
 {
   imm_matrixu16_cleanup(&eseq->data);
 }
