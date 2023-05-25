@@ -192,6 +192,13 @@ cleanup:
   return score;
 }
 
+float const *imm_dp_emis_table(struct imm_dp const *dp, unsigned state_id,
+                               unsigned *size)
+{
+  unsigned state_idx = imm_state_table_idx(&dp->state_table, state_id);
+  return imm_emis_table(&dp->emis, state_idx, size);
+}
+
 float imm_dp_trans_score(struct imm_dp const *dp, unsigned src, unsigned dst)
 {
   unsigned src_idx = imm_state_table_idx(&dp->state_table, src);

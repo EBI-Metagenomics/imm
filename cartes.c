@@ -14,9 +14,14 @@ void imm_cartes_init(struct imm_cartes *cartes, char const *set,
   imm_cartes_reset(cartes, set, set_size, max_times);
 }
 
-void imm_cartes_cleanup(struct imm_cartes const *cartes)
+void imm_cartes_cleanup(struct imm_cartes *cartes)
 {
-  free((void *)cartes->item);
+  if (cartes)
+  {
+    cartes->capacity = 0;
+    free((void *)cartes->item);
+    cartes->item = NULL;
+  }
 }
 
 char const *imm_cartes_next(struct imm_cartes *cartes)

@@ -56,6 +56,9 @@ IMM_API int imm_dp_unpack(struct imm_dp *, struct lip_file *);
 IMM_API float imm_dp_emis_score(struct imm_dp const *, unsigned state_id,
                                 struct imm_seq const *seq);
 
+IMM_API float const *imm_dp_emis_table(struct imm_dp const *dp,
+                                       unsigned state_id, unsigned *size);
+
 IMM_API float imm_dp_trans_score(struct imm_dp const *, unsigned src,
                                  unsigned dst);
 

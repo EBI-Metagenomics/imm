@@ -5,6 +5,7 @@
 #include "lprob.h"
 #include "rc.h"
 #include "reallocf.h"
+#include "score_table.h"
 #include "state.h"
 #include <assert.h>
 #include <stdlib.h>
@@ -78,32 +79,16 @@ static void calc_offset(struct imm_emis *emis, struct imm_code const *code,
 static void calc_score(struct imm_emis *emis, struct imm_code const *code,
                        unsigned nstates, struct imm_state **states)
 {
-  struct imm_abc const *abc = code->abc;
-  char const *set = abc->symbols;
-  unsigned set_size = abc->size;
-  struct imm_cartes cartes;
-  /* TODO: consider to avoid initing this everytime */
-  imm_cartes_init(&cartes, set, set_size, IMM_STATE_MAX_SEQLEN);
+  struct imm_score_table score_table = {0};
+  imm_score_table_init(&score_table, code);
 
   for (unsigned i = 0; i < nstates; ++i)
   {
-    unsigned min = imm_state_span(states[i]).min;
-    unsigned max = imm_state_span(states[i]).max;
-    for (unsigned len = min; len <= max; ++len)
-    {
-      imm_cartes_setup(&cartes, len);
-      char const *item = NULL;
-      while ((item = imm_cartes_next(&cartes)) != NULL)
-      {
-        struct imm_seq seq = imm_seq_unsafe(len, item, abc);
-        unsigned c = imm_code_translate(code, imm_code_encode(code, &seq), min);
-        float score = imm_state_lprob(states[i], &seq);
-        assert(!imm_lprob_is_nan(score));
-        emis->score[emis->offset[i] + c] = score;
-      }
-    }
+    float *scores = emis->score + emis->offset[i];
+    imm_score_table_scores(&score_table, states[i], scores);
   }
-  imm_cartes_cleanup(&cartes);
+
+  imm_score_table_cleanup(&score_table);
 }
 
 int imm_emis_reset(struct imm_emis *emis, struct imm_code const *code,

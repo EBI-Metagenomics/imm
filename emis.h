@@ -11,8 +11,9 @@ struct imm_emis
   uint32_t *offset; /**< Maps state to score array offset. */
 };
 
-struct imm_state;
+struct imm_cartes;
 struct imm_code;
+struct imm_state;
 
 void imm_emis_init(struct imm_emis *);
 void imm_emis_cleanup(struct imm_emis *);
@@ -25,6 +26,13 @@ TEMPLATE float imm_emis_score(struct imm_emis const *x, unsigned const state,
                               unsigned const seq_code)
 {
   return x->score[x->offset[state] + seq_code];
+}
+
+TEMPLATE float const *imm_emis_table(struct imm_emis const *x,
+                                     unsigned const state, unsigned *size)
+{
+  *size = x->offset[state + 1] - x->offset[state];
+  return &x->score[x->offset[state]];
 }
 
 #endif
