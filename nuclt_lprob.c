@@ -1,4 +1,5 @@
 #include "nuclt_lprob.h"
+#include "dump.h"
 #include "expect.h"
 #include "lip/1darray/1darray.h"
 #include "lip/lip.h"
@@ -35,6 +36,11 @@ int imm_nuclt_lprob_unpack(struct imm_nuclt_lprob *nucltp,
   imm_expect_1darr_float_type(file, IMM_NUCLT_SIZE, nucltp->lprobs);
 
   return file->error ? IMM_EIO : 0;
+}
+
+void imm_nuclt_lprob_dump(struct imm_nuclt_lprob const *x, FILE *restrict fp)
+{
+  imm_dump_array_f32(IMM_NUCLT_SIZE, x->lprobs, fp);
 }
 
 float imm__nuclt_lprob_get(struct imm_nuclt_lprob const *lprob, unsigned idx)

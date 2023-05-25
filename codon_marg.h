@@ -52,5 +52,6 @@ imm_codon_marg_lprob(struct imm_codon_marg const *codonm,
 IMM_API int imm_codon_marg_pack(struct imm_codon_marg const *,
                                 struct lip_file *);
 IMM_API int imm_codon_marg_unpack(struct imm_codon_marg *, struct lip_file *);
+IMM_API void imm_codon_marg_dump(struct imm_codon_marg const *, FILE *restrict);
 
 #endif

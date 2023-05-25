@@ -1,4 +1,5 @@
 #include "matrix.h"
+#include "fmt.h"
 #include "matrixf.h"
 #include "rc.h"
 #include "reallocf.h"
@@ -52,7 +53,7 @@ void imm_matrix_dump(struct imm_matrix *matrix, FILE *restrict fp)
     for (unsigned c = 0; c < matrix->score.cols; ++c)
     {
       if (c > 0) fputc(',', fp);
-      fprintf(fp, "%f", imm_matrixf_get(&matrix->score, r, c));
+      fprintf(fp, IMM_FMT_F32, imm_matrixf_get(&matrix->score, r, c));
     }
     fputc('\n', fp);
   }
