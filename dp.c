@@ -218,7 +218,7 @@ float imm_dp_trans_score(struct imm_dp const *dp, unsigned src, unsigned dst)
 void imm_dp_write_dot(struct imm_dp const *dp, FILE *restrict fp,
                       imm_state_name *name)
 {
-  fprintf(fp, "digraph hmm {\n");
+  fprintf(fp, "digraph dp {\n");
   for (unsigned dst = 0; dst < dp->state_table.nstates; ++dst)
   {
     for (unsigned t = 0; t < imm_trans_table_ntrans(&dp->trans_table, dst); ++t)
