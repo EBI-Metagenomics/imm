@@ -69,23 +69,12 @@ float imm_frame_cond_loglik(struct imm_frame_cond const *cond,
 
   switch (imm_seq_size(seq))
   {
-  case 1:
-    lprob = lprob_frag_given_codon1(cond, seq, codon);
-    break;
-  case 2:
-    lprob = lprob_frag_given_codon2(cond, seq, codon);
-    break;
-  case 3:
-    lprob = lprob_frag_given_codon3(cond, seq, codon);
-    break;
-  case 4:
-    lprob = lprob_frag_given_codon4(cond, seq, codon);
-    break;
-  case 5:
-    lprob = lprob_frag_given_codon5(cond, seq, codon);
-    break;
-  default:
-    return imm_lprob_nan();
+  case 1: lprob = lprob_frag_given_codon1(cond, seq, codon); break;
+  case 2: lprob = lprob_frag_given_codon2(cond, seq, codon); break;
+  case 3: lprob = lprob_frag_given_codon3(cond, seq, codon); break;
+  case 4: lprob = lprob_frag_given_codon4(cond, seq, codon); break;
+  case 5: lprob = lprob_frag_given_codon5(cond, seq, codon); break;
+  default: return imm_lprob_nan();
   }
 
   return lprob;

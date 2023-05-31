@@ -95,14 +95,14 @@ static inline unsigned __cco_fls64(uint64_t x)
   (sizeof(arr) / sizeof((arr)[0]) + __cco_must_be_array(arr))
 
 #define __CCO_UNSIGNED(x)                                                      \
-  _Generic((x), char                                                           \
-           : (unsigned char)(x), signed char                                   \
-           : (unsigned char)(x), short                                         \
-           : (unsigned short)(x), int                                          \
-           : (unsigned int)(x), long                                           \
-           : (unsigned long)(x), long long                                     \
-           : (unsigned long long)(x), default                                  \
-           : (unsigned int)(x))
+  _Generic((x),                                                                \
+      char: (unsigned char)(x),                                                \
+      signed char: (unsigned char)(x),                                         \
+      short: (unsigned short)(x),                                              \
+      int: (unsigned int)(x),                                                  \
+      long: (unsigned long)(x),                                                \
+      long long: (unsigned long long)(x),                                      \
+      default: (unsigned int)(x))
 
 /**
  * __cco_ilog2 - log base 2 of 32-bit or a 64-bit unsigned value

@@ -7,10 +7,8 @@
 static unsigned state_name(unsigned id, char *name)
 {
   name[0] = 'M';
-  if (id == 0)
-    name[1] = '0';
-  else
-    name[1] = '1';
+  if (id == 0) name[1] = '0';
+  else name[1] = '1';
   name[2] = '\0';
   return 2;
 }

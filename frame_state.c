@@ -40,10 +40,7 @@ void imm_frame_state_init(struct imm_frame_state *state, unsigned id,
 }
 
 #define CODON(A, B, C)                                                         \
-  (struct imm_codon)                                                           \
-  {                                                                            \
-    .a = (A), .b = (B), .c = (C)                                               \
-  }
+  (struct imm_codon) { .a = (A), .b = (B), .c = (C) }
 
 #define lf(A, B, C)                                                            \
   imm_codon_marg_lprob(state->codonm, CODON(nucl[A], nucl[B], nucl[C]))

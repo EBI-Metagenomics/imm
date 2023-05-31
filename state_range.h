@@ -11,9 +11,6 @@ struct state_range
 };
 
 #define STATE_RANGE(IDX, X, Y)                                                 \
-  (struct state_range)                                                         \
-  {                                                                            \
-    IDX, X, Y                                                                  \
-  }
+  (struct state_range) { IDX, X, Y }
 
 #endif

@@ -10,10 +10,7 @@ struct imm_str
 };
 
 #define IMM_STR(str)                                                           \
-  (struct imm_str)                                                             \
-  {                                                                            \
-    sizeof(str) - 1, (str)                                                     \
-  }
+  (struct imm_str) { sizeof(str) - 1, (str) }
 
 IMM_API struct imm_str imm_str(char const *);
 

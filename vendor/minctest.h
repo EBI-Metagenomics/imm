@@ -79,10 +79,7 @@ static size_t lfails = 0;
     {                                                                          \
       printf("ALL TESTS PASSED (%zu/%zu)\n", ltests, ltests);                  \
     }                                                                          \
-    else                                                                       \
-    {                                                                          \
-      printf("SOME TESTS FAILED (%zu/%zu)\n", ltests - lfails, ltests);        \
-    }                                                                          \
+    else { printf("SOME TESTS FAILED (%zu/%zu)\n", ltests - lfails, ltests); } \
   } while (0)
 
 /* Run a test. Name can be any string to print out, test is the function name to
