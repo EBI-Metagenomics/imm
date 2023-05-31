@@ -3,7 +3,8 @@
 
 #include "compiler.h"
 #include "lprob.h"
-#include "minmax.h"
+#include "max.h"
+#include "min.h"
 #include "state_range.h"
 #include "unroll.h"
 #include "viterbi.h"
@@ -16,8 +17,8 @@ TEMPLATE void viterbi_best_incoming_fix_range(struct state_range *x,
                                               bool const unsafe_state,
                                               bool const safe_past)
 {
-  if (unsafe_state) x->min = MAX(x->min, 1U);
-  if (!safe_past) x->max = MIN(x->max, row);
+  if (unsafe_state) x->min = imm_max(x->min, 1U);
+  if (!safe_past) x->max = imm_min(x->max, row);
 }
 
 TEMPLATE struct imm_ctrans const *

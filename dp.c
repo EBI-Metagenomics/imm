@@ -8,7 +8,7 @@
 #include "lip/lip.h"
 #include "lprob.h"
 #include "matrix.h"
-#include "minmax.h"
+#include "min.h"
 #include "printer.h"
 #include "prod.h"
 #include "reallocf.h"
@@ -70,7 +70,7 @@ static float read_result(struct imm_dp const *dp, struct imm_task *task,
   unsigned length = imm_eseq_len(&task->eseq);
   unsigned max_seq = imm_zspan_max(imm_state_table_span(&dp->state_table, end));
 
-  for (unsigned len = MIN(max_seq, length);; --len)
+  for (unsigned len = imm_min(max_seq, length);; --len)
   {
     struct imm_cell cell = imm_cell(length - len, end, len);
     float v = imm_matrix_get_score(&task->matrix, cell);

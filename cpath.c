@@ -1,6 +1,6 @@
 #include "cpath.h"
 #include "bits.h"
-#include "minmax.h"
+#include "max.h"
 #include "rc.h"
 #include "reallocf.h"
 #include "span.h"
@@ -46,7 +46,7 @@ int imm_cpath_reset(struct imm_cpath *x,
       unsigned src = imm_trans_table_source_state(trans_tbl, dst, i);
       unsigned min_seq = imm_zspan_min(imm_state_table_span(state_tbl, src));
       unsigned max_seq = imm_zspan_max(imm_state_table_span(state_tbl, src));
-      depth = MAX(max_seq - min_seq, depth);
+      depth = imm_max(max_seq - min_seq, depth);
     }
     x->state_offset[dst + 1] = x->state_offset[dst];
     x->trans_bits[dst] =

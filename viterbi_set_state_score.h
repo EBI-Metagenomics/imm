@@ -2,7 +2,8 @@
 #define IMM_VITERBI_SET_STATE_SCORE_H
 
 #include "compiler.h"
-#include "minmax.h"
+#include "max.h"
+#include "min.h"
 #include "viterbi.h"
 #include "viterbi_best_trans.h"
 #include "viterbi_set_scores.h"
@@ -33,10 +34,10 @@ viterbi_set_state_score(struct imm_viterbi const *x, unsigned const row,
                         bool const save_path, bool const safe_future)
 {
   if (row == 0 && imm_viterbi_start_state(x) == dst.idx)
-    score = MAX(imm_viterbi_start_lprob(x), score);
+    score = imm_max(imm_viterbi_start_lprob(x), score);
 
   if (save_path) viterbi_set_state_score_path(&x->task->path, bt, row, dst.idx);
-  if (!safe_future) dst.max = MIN(dst.max, remain);
+  if (!safe_future) dst.max = imm_min(dst.max, remain);
 
   viterbi_set_scores_xy(x, row, dst, score);
 }

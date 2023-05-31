@@ -3,7 +3,6 @@
 #include "cell.h"
 #include "dp.h"
 #include "matrix.h"
-#include "minmax.h"
 #include "span.h"
 #include "state_table.h"
 #include "task.h"

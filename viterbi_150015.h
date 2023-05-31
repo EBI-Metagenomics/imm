@@ -3,6 +3,7 @@
 
 #include "compiler.h"
 #include "hot_range.h"
+#include "max.h"
 #include "range.h"
 #include "remains.h"
 #include "unsafe.h"
@@ -114,16 +115,16 @@ viterbi_g9999_template(struct imm_hot_range hot, struct imm_viterbi const *x,
 {
   g9999(&hot, x, 0, unsafe, seqlen, save_path, false, false);
 
-  for (unsigned r = MAX(y->safe_future.a, 1U); r < y->safe_future.b; ++r)
+  for (unsigned r = imm_max(y->safe_future.a, 1U); r < y->safe_future.b; ++r)
     g9999(&hot, x, r, unsafe, seqlen, save_path, true, false);
 
-  for (unsigned r = MAX(y->safe.a, 1U); r < y->safe.b; ++r)
+  for (unsigned r = imm_max(y->safe.a, 1U); r < y->safe.b; ++r)
     g9999(&hot, x, r, unsafe, seqlen, save_path, true, true);
 
-  for (unsigned r = MAX(y->unsafe.a, 1U); r < y->unsafe.b; ++r)
+  for (unsigned r = imm_max(y->unsafe.a, 1U); r < y->unsafe.b; ++r)
     g9999(&hot, x, r, unsafe, seqlen, save_path, false, false);
 
-  for (unsigned r = MAX(y->safe_past.a, 1U); r < y->safe_past.b; ++r)
+  for (unsigned r = imm_max(y->safe_past.a, 1U); r < y->safe_past.b; ++r)
     g9999(&hot, x, r, unsafe, seqlen, save_path, false, true);
 }
 
