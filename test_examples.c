@@ -6,7 +6,7 @@
 #include "mute_state.h"
 #include "prod.h"
 #include "task.h"
-#include "test_helper.h"
+#include "vendor/minctest.h"
 
 static void example1_path(void)
 {
@@ -24,7 +24,7 @@ static void example1_path(void)
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, -49.892555);
   close(imm_hmm_loglik(&imm_ex1.hmm, &seq, &prod.path), -49.892555);
-  eq(imm_path_nsteps(&prod.path), 32);
+  eq(imm_path_nsteps(&prod.path), 32U);
 
   imm_task_del(task);
   imm_prod_cleanup(&prod);
@@ -93,7 +93,7 @@ static void example1_removed_states_nopath(void)
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, -19.313255);
   close(imm_hmm_loglik(&imm_ex1.hmm, &seq, &prod.path), -19.313255);
-  eq(imm_path_nsteps(&prod.path), 13);
+  eq(imm_path_nsteps(&prod.path), 13U);
 
   imm_task_del(task);
   imm_prod_cleanup(&prod);

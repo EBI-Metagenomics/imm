@@ -8,7 +8,7 @@
 #include "normal_state.h"
 #include "prod.h"
 #include "task.h"
-#include "test_helper.h"
+#include "vendor/minctest.h"
 
 static struct imm_abc abc;
 static struct imm_code code;
@@ -56,7 +56,7 @@ static void dp_empty_path(void)
   struct imm_task *task = imm_task_new(&dp);
   imm_task_setup(task, &A);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  eq(imm_path_nsteps(&prod.path), 0);
+  eq(imm_path_nsteps(&prod.path), 0U);
 
   imm_task_del(task);
   imm_dp_del(&dp);
@@ -81,11 +81,11 @@ static void dp_one_mute(void)
 
   imm_task_setup(task, &EMPTY);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  eq(imm_path_nsteps(&prod.path), 1);
+  eq(imm_path_nsteps(&prod.path), 1U);
 
   imm_task_setup(task, &ATT);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  eq(imm_path_nsteps(&prod.path), 0);
+  eq(imm_path_nsteps(&prod.path), 0U);
 
   imm_prod_cleanup(&prod);
   imm_task_del(task);
@@ -119,7 +119,7 @@ static void dp_two_mutes(void)
 
   imm_task_setup(task, &EMPTY);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  eq(imm_path_nsteps(&prod.path), 2);
+  eq(imm_path_nsteps(&prod.path), 2U);
   eq(imm_path_step(&prod.path, 0)->seqlen, 0);
   eq(imm_path_step(&prod.path, 0)->state_id, 0);
   eq(imm_path_step(&prod.path, 1)->seqlen, 0);
@@ -127,7 +127,7 @@ static void dp_two_mutes(void)
 
   imm_task_setup(task, &ATT);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  eq(imm_path_nsteps(&prod.path), 0);
+  eq(imm_path_nsteps(&prod.path), 0U);
 
   imm_prod_cleanup(&prod);
   imm_dp_del(&dp);

@@ -6,7 +6,7 @@
 #include "mute_state.h"
 #include "prod.h"
 #include "task.h"
-#include "test_helper.h"
+#include "vendor/minctest.h"
 
 static char const seq10[] =
     "N"
@@ -1459,7 +1459,7 @@ static void msv3000_path(void)
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, -216494.453125);
   printf("MSV-path [N=%u, M=%u]: %llu msecs\n", imm_seq_size(&seq), core_size,
-         prod.mseconds);
+         (unsigned long long)prod.mseconds);
   printf("  [N=%u, M=Pfam[%u]]: %.1f mins\n", imm_seq_size(&seq),
          pfam_core_size,
          (pfam_core_size / ((double)core_size)) * prod.mseconds / 1000. / 60.);
@@ -1489,7 +1489,7 @@ static void msv3000_nopath(void)
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, -216494.453125);
   printf("MSV-nopath [N=%u, M=%u]: %llu msecs\n", imm_seq_size(&seq), core_size,
-         prod.mseconds);
+         (unsigned long long)prod.mseconds);
   printf("  [N=%u, M=Pfam[%u]]: %.1f mins\n", imm_seq_size(&seq),
          pfam_core_size,
          (pfam_core_size / ((double)core_size)) * prod.mseconds / 1000. / 60.);

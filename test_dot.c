@@ -2,7 +2,7 @@
 #include "code.h"
 #include "hmm.h"
 #include "mute_state.h"
-#include "test_helper.h"
+#include "vendor/minctest.h"
 
 static unsigned state_name(unsigned id, char *name)
 {

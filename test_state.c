@@ -3,7 +3,7 @@
 #include "mute_state.h"
 #include "normal_state.h"
 #include "state.h"
-#include "test_helper.h"
+#include "vendor/minctest.h"
 
 static void normal_state(void)
 {
@@ -18,7 +18,7 @@ static void normal_state(void)
   struct imm_normal_state state;
   imm_normal_state_init(&state, 0, &abc, lprobs);
 
-  eq(imm_state_id(&state.super), 0);
+  eq(imm_state_id(&state.super), 0U);
   close(imm_state_lprob(&state.super, &A), log(0.25));
   close(imm_state_lprob(&state.super, &C), log(0.25));
   close(imm_state_lprob(&state.super, &G), log(0.5));
@@ -35,7 +35,7 @@ static void mute_state(void)
   struct imm_mute_state state = {0};
   imm_mute_state_init(&state, 43, &abc);
 
-  eq(imm_state_id(&state.super), 43);
+  eq(imm_state_id(&state.super), 43U);
   close(imm_state_lprob(&state.super, &EMPTY), 0.0);
   ok(imm_lprob_is_zero(imm_state_lprob(&state.super, &A)));
 }

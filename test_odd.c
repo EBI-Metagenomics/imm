@@ -9,7 +9,7 @@
 #include "prod.h"
 #include "seq.h"
 #include "task.h"
-#include "test_helper.h"
+#include "vendor/minctest.h"
 
 static unsigned state_name(unsigned id, char *name)
 {
@@ -59,7 +59,7 @@ static void odd1(void)
   struct imm_seq seq = imm_seq(IMM_STR("XX"), &abc);
   eq(imm_task_setup(task, &seq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  eq(imm_path_nsteps(&prod.path), 6);
+  eq(imm_path_nsteps(&prod.path), 6U);
   close(imm_hmm_loglik(&hmm, &seq, &prod.path), 12212.);
   close(prod.loglik, 12212.);
   imm_dp_dump_path(&dp, task, &prod, &state_name);
@@ -114,7 +114,7 @@ static void odd2(void)
   struct imm_seq seq = imm_seq(IMM_STR("XJX"), &abc);
   eq(imm_task_setup(task, &seq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  eq(imm_path_nsteps(&prod.path), 7);
+  eq(imm_path_nsteps(&prod.path), 7U);
   close(imm_hmm_loglik(&hmm, &seq, &prod.path), 0);
   close(prod.loglik, 0);
   imm_dp_dump_path(&dp, task, &prod, &state_name);

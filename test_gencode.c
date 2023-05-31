@@ -1,12 +1,12 @@
 #include "array_size.h"
 #include "gencode.h"
-#include "test_helper.h"
+#include "vendor/minctest.h"
 
 static void gc_f(void)
 {
   struct imm_gencode const *gc = imm_gencode_get(1);
-  lsequal(gc->name1, "Standard");
-  lsequal(gc->name2, "SGC0");
+  cmp(gc->name1, "Standard");
+  cmp(gc->name2, "SGC0");
 
   struct imm_nuclt const *nuclt = &imm_gencode_dna->super;
   struct imm_codon codons[2] = {IMM_CODON(nuclt, "TTT"),
@@ -28,8 +28,8 @@ static void gc_f(void)
 static void gc_l(void)
 {
   struct imm_gencode const *gc = imm_gencode_get(1);
-  lsequal(gc->name1, "Standard");
-  lsequal(gc->name2, "SGC0");
+  cmp(gc->name1, "Standard");
+  cmp(gc->name2, "SGC0");
 
   struct imm_nuclt const *nuclt = &imm_gencode_dna->super;
   struct imm_codon codons[6] = {
@@ -53,8 +53,8 @@ static void gc_l(void)
 static void gc_p(void)
 {
   struct imm_gencode const *gc = imm_gencode_get(1);
-  lsequal(gc->name1, "Standard");
-  lsequal(gc->name2, "SGC0");
+  cmp(gc->name1, "Standard");
+  cmp(gc->name2, "SGC0");
 
   struct imm_nuclt const *nuclt = &imm_gencode_dna->super;
   struct imm_codon codons[4] = {
@@ -77,8 +77,8 @@ static void gc_p(void)
 static void gc_decode(void)
 {
   struct imm_gencode const *gc = imm_gencode_get(1);
-  lsequal(gc->name1, "Standard");
-  lsequal(gc->name2, "SGC0");
+  cmp(gc->name1, "Standard");
+  cmp(gc->name2, "SGC0");
   struct imm_nuclt const *nuclt = &imm_gencode_dna->super;
   eq(imm_gencode_decode(gc, IMM_CODON(nuclt, "CCG")), 'P');
   eq(imm_gencode_decode(gc, IMM_CODON(nuclt, "TAG")), '*');

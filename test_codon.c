@@ -5,7 +5,7 @@
 #include "dna.h"
 #include "lprob.h"
 #include "seq.h"
-#include "test_helper.h"
+#include "vendor/minctest.h"
 
 static void codon_lprob(void)
 {

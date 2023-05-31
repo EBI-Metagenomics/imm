@@ -4,7 +4,7 @@
 #include "mute_state.h"
 #include "normal_state.h"
 #include "path.h"
-#include "test_helper.h"
+#include "vendor/minctest.h"
 
 static struct imm_abc abc = {0};
 static struct imm_code code = {0};

@@ -6,7 +6,7 @@
 #include "lprob.h"
 #include "nuclt_lprob.h"
 #include "state.h"
-#include "test_helper.h"
+#include "vendor/minctest.h"
 
 static void setup_codonp(struct imm_codon_lprob *codonp);
 static struct imm_nuclt_lprob setup_nucltp(struct imm_nuclt const *);
