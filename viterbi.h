@@ -31,7 +31,7 @@ float imm_viterbi_start_lprob(struct imm_viterbi const *);
 
 TEMPLATE unsigned imm_viterbi_start_state(struct imm_viterbi const *x)
 {
-  return x->dp->state_table.start.state;
+  return x->dp->state_table.start.state_idx;
 }
 
 TEMPLATE unsigned imm_viterbi_ntrans(struct imm_viterbi const *x,

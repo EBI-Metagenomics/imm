@@ -2,11 +2,13 @@
 #include "abc.h"
 #include "cartes.h"
 #include "code.h"
+#include "dump.h"
 #include "lprob.h"
 #include "rc.h"
 #include "reallocf.h"
 #include "score_table.h"
 #include "state.h"
+#include "state_table.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -114,3 +116,24 @@ unsigned imm_emis_score_size(struct imm_emis const *x, unsigned nstates)
 }
 
 unsigned imm_emis_offset_size(unsigned nstates) { return nstates + 1; }
+
+void imm_emis_dump(struct imm_emis const *x, struct imm_state_table const *st,
+                   imm_state_name *callb, FILE *restrict fp)
+{
+  char state_name[IMM_STATE_NAME_SIZE] = {0};
+
+  fprintf(fp, "score[");
+  for (unsigned i = 0; i < st->nstates; ++i)
+  {
+    if (i > 0) fputc(',', fp);
+    unsigned size = 0;
+    (*callb)(imm_state_table_id(st, i), state_name);
+    float const *score = imm_emis_table(x, i, &size);
+    fprintf(fp, "%s=", state_name);
+    imm_dump_array_f32(size, score, fp);
+  }
+  fprintf(fp, "] ");
+
+  fprintf(fp, "offset");
+  imm_dump_array_u32(st->nstates + 1, x->offset, fp);
+}

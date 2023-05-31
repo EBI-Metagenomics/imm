@@ -6,6 +6,7 @@
 #include "ctrans.h"
 #include "state.h"
 #include "trans.h"
+#include <stdio.h>
 
 struct imm_trans_table
 {
@@ -16,6 +17,7 @@ struct imm_trans_table
 };
 
 struct imm_dp_cfg;
+struct imm_state_table;
 
 void imm_trans_table_init(struct imm_trans_table *);
 int imm_trans_table_reset(struct imm_trans_table *, struct imm_dp_cfg const *);
@@ -56,5 +58,9 @@ TEMPLATE uint16_t imm_trans_table_trans0(struct imm_trans_table const *tbl,
 {
   return tbl->offset[state];
 }
+
+IMM_API void imm_trans_table_dump(struct imm_trans_table const *,
+                                  struct imm_state_table const *st,
+                                  imm_state_name *callb, FILE *restrict);
 
 #endif

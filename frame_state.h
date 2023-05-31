@@ -34,4 +34,7 @@ IMM_API float imm_frame_state_decode(struct imm_frame_state const *,
                                      struct imm_seq const *,
                                      struct imm_codon *);
 
+IMM_API void imm_frame_state_dump(struct imm_frame_state const *,
+                                  FILE *restrict);
+
 #endif

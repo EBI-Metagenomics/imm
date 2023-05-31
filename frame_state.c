@@ -1,5 +1,6 @@
 #include "frame_state.h"
 #include "codon_marg.h"
+#include "fmt.h"
 #include "frame_cond.h"
 #include "frame_state_15.h"
 #include "frame_state_24.h"
@@ -109,4 +110,17 @@ static float lprob33(struct imm_state const *state, struct imm_seq const *seq)
   }
 
   return imm_lprob_zero();
+}
+
+void imm_frame_state_dump(struct imm_frame_state const *x, FILE *restrict fp)
+{
+  fprintf(fp, "nuclt_lprob");
+  imm_nuclt_lprob_dump(x->nucltp, fp);
+  fputc(' ', fp);
+
+  fprintf(fp, "codon_marg");
+  imm_codon_marg_dump(x->codonm, fp);
+  fputc(' ', fp);
+
+  fprintf(fp, "epsilon:" IMM_FMT_F32, x->epsilon);
 }

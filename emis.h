@@ -3,7 +3,9 @@
 
 #include "compiler.h"
 #include "export.h"
+#include "state.h"
 #include <stdint.h>
+#include <stdio.h>
 
 struct imm_emis
 {
@@ -14,6 +16,7 @@ struct imm_emis
 struct imm_cartes;
 struct imm_code;
 struct imm_state;
+struct imm_state_table;
 
 void imm_emis_init(struct imm_emis *);
 void imm_emis_cleanup(struct imm_emis *);
@@ -34,5 +37,9 @@ TEMPLATE float const *imm_emis_table(struct imm_emis const *x,
   *size = x->offset[state + 1] - x->offset[state];
   return &x->score[x->offset[state]];
 }
+
+IMM_API void imm_emis_dump(struct imm_emis const *,
+                           struct imm_state_table const *y, imm_state_name *,
+                           FILE *restrict);
 
 #endif

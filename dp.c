@@ -9,6 +9,7 @@
 #include "lprob.h"
 #include "matrix.h"
 #include "minmax.h"
+#include "printer.h"
 #include "prod.h"
 #include "reallocf.h"
 #include "span.h"
@@ -214,33 +215,43 @@ float imm_dp_trans_score(struct imm_dp const *dp, unsigned src, unsigned dst)
   return imm_lprob_nan();
 }
 
-void imm_dp_write_dot(struct imm_dp const *dp, FILE *restrict fd,
+void imm_dp_write_dot(struct imm_dp const *dp, FILE *restrict fp,
                       imm_state_name *name)
 {
-  fprintf(fd, "digraph hmm {\n");
+  fprintf(fp, "digraph hmm {\n");
   for (unsigned dst = 0; dst < dp->state_table.nstates; ++dst)
   {
     for (unsigned t = 0; t < imm_trans_table_ntrans(&dp->trans_table, dst); ++t)
     {
       unsigned src = imm_trans_table_source_state(&dp->trans_table, dst, t);
 
-      char src_name[IMM_STATE_NAME_SIZE] = {'\0', '\0', '\0', '\0',
-                                            '\0', '\0', '\0', '\0'};
-      char dst_name[IMM_STATE_NAME_SIZE] = {'\0', '\0', '\0', '\0',
-                                            '\0', '\0', '\0', '\0'};
+      char src_name[IMM_STATE_NAME_SIZE] = {0};
+      char dst_name[IMM_STATE_NAME_SIZE] = {0};
 
       (*name)(imm_state_table_id(&dp->state_table, src), src_name);
       (*name)(imm_state_table_id(&dp->state_table, dst), dst_name);
-      fprintf(fd, "%s -> %s [label=%.4f];\n", src_name, dst_name,
+      fprintf(fp, "%s -> %s [label=", src_name, dst_name);
+      fprintf(fp, imm_printer_get_f32_formatter(),
               imm_trans_table_score(&dp->trans_table, dst, t));
+      fprintf(fp, "];\n");
     }
   }
-  fprintf(fd, "}\n");
+  fprintf(fp, "}\n");
 }
 
-void imm_dp_dump_state_table(struct imm_dp const *dp)
+void imm_dp_dump(struct imm_dp const *x, imm_state_name *callb,
+                 FILE *restrict fp)
 {
-  imm_state_table_dump(&dp->state_table);
+  fprintf(fp, "emis: ");
+  imm_emis_dump(&x->emis, &x->state_table, callb, fp);
+  fputc('\n', fp);
+
+  fprintf(fp, "trans_table ");
+  imm_trans_table_dump(&x->trans_table, &x->state_table, callb, fp);
+  fputc('\n', fp);
+
+  fprintf(fp, "state_table ");
+  imm_state_table_dump(&x->state_table, callb, fp);
 }
 
 void imm_dp_dump_path(struct imm_dp const *dp, struct imm_task const *task,
@@ -322,7 +333,7 @@ int imm_dp_pack(struct imm_dp const *dp, struct lip_file *f)
   lip_write_1darray_int(f, nstates, dp->state_table.ids);
 
   lip_write_cstr(f, KEY_STATE_START);
-  lip_write_int(f, dp->state_table.start.state);
+  lip_write_int(f, dp->state_table.start.state_idx);
   lip_write_cstr(f, KEY_STATE_LPROB);
   lip_write_float(f, dp->state_table.start.lprob);
   lip_write_cstr(f, KEY_STATE_END);
@@ -401,7 +412,7 @@ int imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
   lip_read_1darray_int_data(f, st->nstates, st->ids);
 
   if (!imm_expect_map_key(f, KEY_STATE_START)) goto cleanup;
-  lip_read_int(f, &dp->state_table.start.state);
+  lip_read_int(f, &dp->state_table.start.state_idx);
   if (!imm_expect_map_key(f, KEY_STATE_LPROB)) goto cleanup;
   lip_read_float(f, &dp->state_table.start.lprob);
   if (!imm_expect_map_key(f, KEY_STATE_END)) goto cleanup;

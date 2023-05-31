@@ -31,7 +31,8 @@ IMM_API int imm_dp_reset(struct imm_dp *, struct imm_dp_cfg const *);
 
 IMM_API void imm_dp_del(struct imm_dp *);
 
-IMM_API void imm_dp_dump_state_table(struct imm_dp const *);
+IMM_API void imm_dp_dump(struct imm_dp const *, imm_state_name *,
+                         FILE *restrict);
 
 IMM_API void imm_dp_dump_path(struct imm_dp const *,
                               struct imm_task const *task,
