@@ -162,6 +162,7 @@ static void dp_io_example1(void)
   imm_task_del(task);
   imm_prod_cleanup(&prod);
   imm_dp_del(&dp);
+  remove("dp_example1.imm");
 }
 
 static void dp_io_example2(void)
@@ -202,6 +203,7 @@ static void dp_io_example2(void)
   imm_prod_cleanup(&prod);
   imm_task_del(task);
   imm_dp_del(&dp);
+  remove("dp_frame.imm");
 }
 
 int main(void)

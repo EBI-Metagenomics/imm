@@ -1,20 +1,6 @@
 #ifndef IMM_COMPILER_H
 #define IMM_COMPILER_H
 
-#define STRINGIFY(s) __STRINGIFY(s)
-#define __STRINGIFY(s) #s
-
-#ifdef __FILE_NAME__
-#define LOCAL __FILE_NAME__ ":" STRINGIFY(__LINE__)
-#else
-#define LOCAL __FILE__ ":" STRINGIFY(__LINE__)
-#endif
-
-#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
-#define MEMBER_REF(var, member) ((__typeof__(var) *)0)->member
-#define MEMBER_SIZE(var, member) sizeof(MEMBER_REF((var), member))
-#define ARRAY_SIZE_OF(var, member) ARRAY_SIZE(MEMBER_REF((var), member))
-
 /*
  * __has_builtin is supported on gcc >= 10, clang >= 3 and icc >= 21.
  * In the meantime, to support gcc < 10, we implement __has_builtin
@@ -58,8 +44,6 @@
  * Acknowledgement: ZSTD.
  */
 #define TEMPLATE static inline FORCE_INLINE_ATTR
-
-#define unused(arg) (void)arg;
 
 #define NOINLINE __attribute__((noinline))
 

@@ -36,6 +36,7 @@ static void hmm_dot(void)
   ok(fd);
   imm_hmm_write_dot(&hmm, fd, state_name);
   fclose(fd);
+  remove("hmm.dot");
 }
 
 static void dp_dot(void)
@@ -63,6 +64,7 @@ static void dp_dot(void)
   ok(fd);
   imm_hmm_write_dot(&hmm, fd, &state_name);
   fclose(fd);
+  remove("dp.dot");
 }
 
 int main(void)

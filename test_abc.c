@@ -119,6 +119,8 @@ static void abc_io(void)
   eq(abc_in.size, abc_out.size);
   eq(abc_in.typeid, abc_out.typeid);
   lsequal(abc_in.symbols, abc_out.symbols);
+
+  remove("abc_io.imm");
 }
 
 static void amino_io(void)
@@ -143,6 +145,8 @@ static void amino_io(void)
   eq(in->size, out->size);
   eq(in->typeid, out->typeid);
   lsequal(in->symbols, out->symbols);
+
+  remove("amino.imm");
 }
 
 static void dna_io(void)
@@ -167,6 +171,8 @@ static void dna_io(void)
   eq(in->size, out->size);
   eq(in->typeid, out->typeid);
   lsequal(in->symbols, out->symbols);
+
+  remove("dna.imm");
 }
 
 static void rna_io(void)
@@ -191,6 +197,8 @@ static void rna_io(void)
   eq(in->size, out->size);
   eq(in->typeid, out->typeid);
   lsequal(in->symbols, out->symbols);
+
+  remove("rna.imm");
 }
 
 int main(void)
