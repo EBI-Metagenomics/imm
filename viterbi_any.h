@@ -4,11 +4,59 @@
 #include "compiler.h"
 #include "remains.h"
 #include "state_range.h"
+#include "unroll.h"
 #include "unsafe.h"
 #include "viterbi.h"
 #include "viterbi_best_incoming.h"
-#include "viterbi_best_trans.h"
-#include "viterbi_set_state_score.h"
+
+TEMPLATE void viterbi_set_state_score_path(struct imm_cpath *x,
+                                           struct viterbi_best_trans const *bt,
+                                           unsigned const r,
+                                           uint_fast16_t const dst)
+{
+  if (bt->src_idx != IMM_STATE_NULL_IDX)
+  {
+    imm_cpath_set_trans(x, r, dst, bt->src_trans);
+    imm_cpath_set_seqlen(x, r, dst, bt->src_seqlen);
+    assert(imm_cpath_trans(x, r, dst) == bt->src_trans);
+    assert(imm_cpath_seqlen(x, r, dst) == bt->src_seqlen);
+  }
+  else
+  {
+    imm_cpath_invalidate(x, r, dst);
+    assert(!imm_cpath_valid(x, r, dst));
+  }
+}
+
+TEMPLATE void viterbi_set_scores_xy(struct imm_viterbi const *x,
+                                    unsigned const row,
+                                    struct state_range const dst,
+                                    float const score)
+{
+  imm_assume(dst.max <= IMM_STATE_MAX_SEQLEN);
+
+  UNROLL(IMM_STATE_MAX_SEQLEN + 1)
+  for (uint_fast8_t i = dst.min; i <= dst.max; ++i)
+  {
+    float total = score + imm_viterbi_emission(x, row, dst.idx, i, dst.min);
+    imm_viterbi_set_score(x, imm_cell(row, dst.idx, i), total);
+  }
+}
+
+TEMPLATE void
+viterbi_set_state_score(struct imm_viterbi const *x, unsigned const row,
+                        struct state_range dst, unsigned const remain,
+                        float score, struct viterbi_best_trans const *bt,
+                        bool const save_path, bool const safe_future)
+{
+  if (row == 0 && imm_viterbi_start_state(x) == dst.idx)
+    score = imm_max(imm_viterbi_start_lprob(x), score);
+
+  if (save_path) viterbi_set_state_score_path(&x->task->path, bt, row, dst.idx);
+  if (!safe_future) dst.max = imm_min(dst.max, remain);
+
+  viterbi_set_scores_xy(x, row, dst, score);
+}
 
 TEMPLATE struct imm_ctrans const *
 gany_state(struct imm_viterbi const *x, unsigned const row,

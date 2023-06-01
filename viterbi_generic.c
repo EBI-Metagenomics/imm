@@ -7,8 +7,6 @@
 #include "viterbi.h"
 #include "viterbi_any.h"
 #include "viterbi_best_incoming.h"
-#include "viterbi_best_trans.h"
-#include "viterbi_set_state_score.h"
 
 static void viterbi_gany(struct imm_viterbi const *x, unsigned const seqlen,
                          struct unsafe unsafe, struct imm_dp_safety const *y,
