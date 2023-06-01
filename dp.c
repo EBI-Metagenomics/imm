@@ -100,7 +100,7 @@ static int unzip_path(struct imm_dp const *dp, struct imm_task const *task,
   while (valid)
   {
     unsigned id = dp->state_table.ids[state];
-    struct imm_step step = imm_step(id, seqlen);
+    struct imm_step step = imm_step(id, seqlen, 0);
     int rc = imm_path_add(path, step);
     if (rc) return rc;
     row -= seqlen;
