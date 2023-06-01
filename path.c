@@ -90,7 +90,7 @@ void imm_path_dump(struct imm_path const *x, imm_state_name *callb,
                    struct imm_seq const *seq, FILE *restrict fp)
 {
   char name[IMM_STATE_NAME_SIZE] = {0};
-  char const *y = imm_seq_str(seq);
+  char const *sequence = imm_seq_str(seq);
   for (unsigned i = 0; i < imm_path_nsteps(x); ++i)
   {
     if (i > 0) fprintf(fp, "->");
@@ -101,12 +101,12 @@ void imm_path_dump(struct imm_path const *x, imm_state_name *callb,
     fputc('[', fp);
 
     fprintf(fp, "%s,", (*callb)(state_id, name));
-    fprintf(fp, "%.*s,", seqlen, y);
+    fprintf(fp, "%.*s,", seqlen, sequence);
     fprintf(fp, imm_printer_get_f32_formatter(), score);
 
     fputc(']', fp);
 
-    y += seqlen;
+    sequence += seqlen;
   }
   fprintf(fp, "\n");
 }
