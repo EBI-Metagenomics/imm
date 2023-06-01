@@ -50,6 +50,7 @@ struct imm_cpath
   unsigned long *bit;
   uint16_t *state_offset;
   uint8_t *trans_bits;
+  float *score;
 };
 
 CONST_ATTR TEMPLATE unsigned imm_cpath_invalid(unsigned bits)

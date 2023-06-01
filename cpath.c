@@ -1,5 +1,6 @@
 #include "cpath.h"
 #include "bits.h"
+#include "defer_return.h"
 #include "max.h"
 #include "rc.h"
 #include "reallocf.h"
@@ -16,6 +17,7 @@ int imm_cpath_init(struct imm_cpath *x, struct imm_state_table const *state_tbl,
   x->ncols = 0;
   x->state_offset = NULL;
   x->trans_bits = NULL;
+  x->score = NULL;
   int rc = imm_cpath_reset(x, state_tbl, trans_tbl);
   if (rc) return rc;
   x->bit = NULL;
@@ -69,16 +71,31 @@ void imm_cpath_cleanup(struct imm_cpath *x)
     free(x->state_offset);
     free(x->trans_bits);
     free(x->bit);
+    free(x->score);
     x->state_offset = NULL;
     x->trans_bits = NULL;
     x->bit = NULL;
+    x->score = NULL;
   }
 }
 
 int imm_cpath_setup(struct imm_cpath *x, unsigned len)
 {
+  int rc = 0;
   size_t size = x->state_offset[x->nstates] * len;
   x->bit = imm_bitmap_reallocf(x->bit, size);
-  if (!x->bit && size > 0) return IMM_ENOMEM;
-  return 0;
+  if (!x->bit && size > 0) defer_return(IMM_ENOMEM);
+
+  size = sizeof(*x->score) * len;
+  x->score = imm_reallocf(x->score, size);
+  if (!x->score && size > 0) defer_return(IMM_ENOMEM);
+
+  return rc;
+
+defer:
+  free(x->bit);
+  free(x->score);
+  x->bit = NULL;
+  x->score = NULL;
+  return rc;
 }
