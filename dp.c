@@ -242,15 +242,15 @@ void imm_dp_write_dot(struct imm_dp const *dp, FILE *restrict fp,
 void imm_dp_dump(struct imm_dp const *x, imm_state_name *callb,
                  FILE *restrict fp)
 {
-  fprintf(fp, "emis: ");
+  fprintf(fp, "# emission\n\n");
   imm_emis_dump(&x->emis, &x->state_table, callb, fp);
-  fputc('\n', fp);
+  fprintf(fp, "\n");
 
-  fprintf(fp, "trans_table ");
+  fprintf(fp, "# trans_table\n\n");
   imm_trans_table_dump(&x->trans_table, &x->state_table, callb, fp);
-  fputc('\n', fp);
+  fprintf(fp, "\n");
 
-  fprintf(fp, "state_table ");
+  fprintf(fp, "# state_table\n");
   imm_state_table_dump(&x->state_table, callb, fp);
 }
 

@@ -110,29 +110,17 @@ void imm_trans_table_dump(struct imm_trans_table const *x,
                           struct imm_state_table const *st,
                           imm_state_name *callb, FILE *restrict fp)
 {
-  char state_name[IMM_STATE_NAME_SIZE] = {0};
+  char src[IMM_STATE_NAME_SIZE] = {0};
+  char dst[IMM_STATE_NAME_SIZE] = {0};
 
-  fprintf(fp, "ntrans:%u", x->ntrans);
-  fputc(' ', fp);
-
-  char const *fmt32 = imm_printer_get_f32_formatter();
-  fputc('[', fp);
   for (unsigned i = 0; i < imm_trans_table_transsize(x->ntrans); ++i)
   {
-    if (i > 0) fputc(',', fp);
-    fputc('[', fp);
-    fprintf(fp, fmt32, x->trans[i].score);
-    fputc(',', fp);
-    (*callb)(imm_state_table_id(st, x->trans[i].src), state_name);
-    fprintf(fp, "%s", state_name);
-    fputc(',', fp);
-    (*callb)(imm_state_table_id(st, x->trans[i].dst), state_name);
-    fprintf(fp, "%s", state_name);
-    fputc(']', fp);
+    (*callb)(imm_state_table_id(st, x->trans[i].src), src);
+    (*callb)(imm_state_table_id(st, x->trans[i].dst), dst);
+    fprintf(fp, "%s -> %s", src, dst);
+    fprintf(fp, " [");
+    fprintf(fp, imm_printer_get_f32_formatter(), x->trans[i].score);
+    fprintf(fp, "]\n");
   }
-  fputc(']', fp);
-  fputc(' ', fp);
-
-  fprintf(fp, "offset");
-  imm_dump_array_u16(imm_trans_table_offsize(st->nstates), x->offset, fp);
+  fprintf(fp, "\n");
 }

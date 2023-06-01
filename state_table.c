@@ -76,9 +76,9 @@ unsigned imm_state_table_id(struct imm_state_table const *x, unsigned idx)
 }
 
 struct imm_range imm_state_table_range(struct imm_state_table const *x,
-                                       unsigned state)
+                                       unsigned state_idx)
 {
-  uint8_t span = imm_state_table_span(x, state);
+  uint8_t span = imm_state_table_span(x, state_idx);
   return imm_range(imm_zspan_min(span), imm_zspan_max(span) + 1);
 }
 
@@ -86,25 +86,29 @@ void imm_state_table_dump(struct imm_state_table const *x,
                           imm_state_name *callb, FILE *restrict fp)
 {
   char state_name[IMM_STATE_NAME_SIZE] = {0};
-  fprintf(fp, "nstates:%u", x->nstates);
-  fputc(' ', fp);
-
-  fprintf(fp, "ids");
-  imm_dump_array_u16(x->nstates, x->ids, fp);
-  fputc(' ', fp);
 
   (*callb)(imm_state_table_id(x, x->start.state_idx), state_name);
   char const *fmt32 = imm_printer_get_f32_formatter();
-  fprintf(fp, "start:%s:", state_name);
-  fprintf(fp, "[idx=%" PRIu16 ", lprob=", x->start.state_idx);
+
+  fprintf(fp, "\n");
+  fprintf(fp, "start_state=%s\n", state_name);
+  fprintf(fp, "start_lprob=");
   fprintf(fp, fmt32, x->start.lprob);
-  fprintf(fp, "] ");
+  fprintf(fp, "\n");
 
   (*callb)(imm_state_table_id(x, x->end_state_idx), state_name);
-  fprintf(fp, "end_state:%s:[idx=%u]", state_name, x->end_state_idx);
-  fputc(' ', fp);
+  fprintf(fp, "end_state=%s\n", state_name);
+  fprintf(fp, "\n");
 
-  fprintf(fp, "span");
-  imm_dump_array_u8(x->nstates, x->span, fp);
-  fputc(' ', fp);
+  for (unsigned i = 0; i < x->nstates; ++i)
+  {
+    uint8_t span = imm_state_table_span(x, i);
+    uint_fast8_t min = imm_zspan_min(span);
+    uint_fast8_t max = imm_zspan_min(span);
+    struct imm_range range = imm_range(min, max + 1);
+    (*callb)(imm_state_table_id(x, i), state_name);
+    fprintf(fp, "%s=", state_name);
+    imm_range_dump(range, fp);
+    fprintf(fp, "\n");
+  }
 }

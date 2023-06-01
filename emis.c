@@ -122,18 +122,13 @@ void imm_emis_dump(struct imm_emis const *x, struct imm_state_table const *st,
 {
   char state_name[IMM_STATE_NAME_SIZE] = {0};
 
-  fprintf(fp, "score[");
   for (unsigned i = 0; i < st->nstates; ++i)
   {
-    if (i > 0) fputc(',', fp);
     unsigned size = 0;
     (*callb)(imm_state_table_id(st, i), state_name);
     float const *score = imm_emis_table(x, i, &size);
     fprintf(fp, "%s=", state_name);
     imm_dump_array_f32(size, score, fp);
+    fputc('\n', fp);
   }
-  fprintf(fp, "] ");
-
-  fprintf(fp, "offset");
-  imm_dump_array_u32(st->nstates + 1, x->offset, fp);
 }
