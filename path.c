@@ -1,6 +1,7 @@
 #include "path.h"
 #include "rc.h"
 #include "reallocf.h"
+#include "state.h"
 #include "step.h"
 #include <assert.h>
 #include <stdlib.h>
@@ -82,4 +83,19 @@ void imm_path_reverse(struct imm_path *path)
   int n = path->capacity;
   path->start = (((i % n) + n) % n) - 1;
   path->dir *= -1;
+}
+
+void imm_path_dump(struct imm_path const *x, imm_state_name *callb,
+                   struct imm_seq const *seq, FILE *restrict fp)
+{
+  char name[IMM_STATE_NAME_SIZE] = {0};
+  char const *y = imm_seq_str(seq);
+  for (unsigned i = 0; i < imm_path_nsteps(x); ++i)
+  {
+    if (i > 0) fprintf(fp, "->");
+    struct imm_step const *step = imm_path_step(x, i);
+    fprintf(fp, "[%s='%.*s']", (*callb)(step->state_id, name), step->seqlen, y);
+    y += step->seqlen;
+  }
+  fprintf(fp, "\n");
 }
