@@ -145,8 +145,8 @@ int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
   prod->loglik = read_result(dp, task, &last_state, &total_seqlen);
 
   int rc = 0;
-  if (task->save_path)
-    rc = unzip_path(dp, task, last_state, total_seqlen, &prod->path);
+  if ((rc = unzip_path(dp, task, last_state, total_seqlen, &prod->path)))
+    return rc;
 
   if (elapsed_stop(&elapsed)) return IMM_EELAPSED;
 

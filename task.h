@@ -17,13 +17,11 @@ struct imm_task
   struct imm_cpath path;
   struct imm_eseq eseq;
   struct imm_seq const *seq;
-  bool save_path;
 };
 
 IMM_API struct imm_task *imm_task_new(struct imm_dp const *dp);
 IMM_API int imm_task_reset(struct imm_task *, struct imm_dp const *dp);
 IMM_API int imm_task_setup(struct imm_task *, struct imm_seq const *seq);
-IMM_API void imm_task_set_save_path(struct imm_task *, bool save);
 IMM_API void imm_task_del(struct imm_task const *);
 
 #endif

@@ -48,7 +48,6 @@ extern "C" {
 #include "frame_state_33.h"
 #include "gencode.h"
 #include "hmm.h"
-#include "hot_range.h"
 #include "htable.h"
 #include "ipow.h"
 #include "likely.h"

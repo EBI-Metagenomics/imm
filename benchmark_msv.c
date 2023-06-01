@@ -1455,40 +1455,9 @@ static void msv3000_path(void)
   struct imm_seq seq = imm_seq(imm_str(seq10), &m->abc);
   eq(imm_task_setup(task, &seq), 0);
 
-  imm_task_set_save_path(task, true);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, -216494.453125);
   printf("MSV-path [N=%u, M=%u]: %llu msecs\n", imm_seq_size(&seq), core_size,
-         (unsigned long long)prod.mseconds);
-  printf("  [N=%u, M=Pfam[%u]]: %.1f mins\n", imm_seq_size(&seq),
-         pfam_core_size,
-         (pfam_core_size / ((double)core_size)) * prod.mseconds / 1000. / 60.);
-
-  imm_task_del(task);
-  imm_prod_cleanup(&prod);
-  imm_dp_del(&dp);
-}
-
-static void msv3000_nopath(void)
-{
-  unsigned core_size = 3000;
-  unsigned pfam_core_size = 3258786;
-  imm_ex3_init(core_size);
-
-  struct imm_ex3 *m = &imm_ex3;
-  struct imm_dp dp;
-  imm_hmm_init_dp(&imm_ex3.hmm, &m->T.super, &dp);
-  struct imm_task *task = imm_task_new(&dp);
-  struct imm_prod prod = imm_prod();
-
-  // struct imm_seq seq = imm_seq(imm_str(seq1), &m->abc);
-  struct imm_seq seq = imm_seq(imm_str(seq10), &m->abc);
-  eq(imm_task_setup(task, &seq), 0);
-
-  imm_task_set_save_path(task, false);
-  eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, -216494.453125);
-  printf("MSV-nopath [N=%u, M=%u]: %llu msecs\n", imm_seq_size(&seq), core_size,
          (unsigned long long)prod.mseconds);
   printf("  [N=%u, M=Pfam[%u]]: %.1f mins\n", imm_seq_size(&seq),
          pfam_core_size,
@@ -1503,8 +1472,5 @@ int main(void)
 {
   msv3000_path();
   msv3000_path();
-  printf("----\n");
-  msv3000_nopath();
-  msv3000_nopath();
   return 0;
 }

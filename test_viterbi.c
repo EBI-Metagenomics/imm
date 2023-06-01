@@ -59,21 +59,6 @@ static void one_mute_state(void)
   struct imm_task *task = imm_task_new(&dp);
 
   {
-    imm_task_set_save_path(task, false);
-
-    eq(imm_task_setup(task, &EMPTY), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    close(prod.loglik, log(0.5));
-
-    eq(imm_task_setup(task, &C), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    ok(imm_lprob_is_nan(prod.loglik));
-    ok(imm_lprob_is_nan(imm_hmm_loglik(&hmm, &C, &prod.path)));
-  }
-
-  {
-    imm_task_set_save_path(task, true);
-
     eq(imm_task_setup(task, &EMPTY), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, log(0.5));
@@ -114,16 +99,6 @@ static void two_mute_states(void)
   struct imm_task *task = imm_task_new(&dp);
 
   {
-    imm_task_set_save_path(task, false);
-
-    eq(imm_task_setup(task, &EMPTY), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    close(prod.loglik, log(0.5));
-  }
-
-  {
-    imm_task_set_save_path(task, true);
-
     eq(imm_task_setup(task, &EMPTY), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, log(0.5));
@@ -195,14 +170,6 @@ static void one_normal_state(void)
   eq(imm_dp_viterbi(&dp, task, &prod), IMM_ESHORTSEQ);
 
   {
-    imm_task_set_save_path(task, false);
-    eq(imm_task_setup(task, &A), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    close(prod.loglik, (log(1.0) + log(0.25)));
-  }
-
-  {
-    imm_task_set_save_path(task, true);
     eq(imm_task_setup(task, &A), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, (log(1.0) + log(0.25)));
@@ -211,15 +178,6 @@ static void one_normal_state(void)
   }
 
   {
-    imm_task_set_save_path(task, false);
-
-    eq(imm_task_setup(task, &T), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    ok(imm_lprob_is_nan(prod.loglik));
-  }
-
-  {
-    imm_task_set_save_path(task, true);
     eq(imm_task_setup(task, &T), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     ok(imm_lprob_is_nan(prod.loglik));
@@ -228,14 +186,6 @@ static void one_normal_state(void)
   }
 
   {
-    imm_task_set_save_path(task, false);
-    eq(imm_task_setup(task, &AC), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    ok(imm_lprob_is_nan(prod.loglik));
-  }
-
-  {
-    imm_task_set_save_path(task, true);
     eq(imm_task_setup(task, &AC), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     ok(imm_lprob_is_nan(prod.loglik));
@@ -249,14 +199,6 @@ static void one_normal_state(void)
   eq(imm_task_reset(task, &dp), 0);
 
   {
-    imm_task_set_save_path(task, false);
-    eq(imm_task_setup(task, &A), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    close(prod.loglik, (log(1.0) + log(0.25)));
-  }
-
-  {
-    imm_task_set_save_path(task, true);
     eq(imm_task_setup(task, &A), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, (log(1.0) + log(0.25)));
@@ -265,14 +207,6 @@ static void one_normal_state(void)
   }
 
   {
-    imm_task_set_save_path(task, false);
-    eq(imm_task_setup(task, &AA), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    close(prod.loglik, (log(0.1) + 2 * log(0.25)));
-  }
-
-  {
-    imm_task_set_save_path(task, true);
     eq(imm_task_setup(task, &AA), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, (log(0.1) + 2 * log(0.25)));
@@ -281,14 +215,6 @@ static void one_normal_state(void)
   }
 
   {
-    imm_task_set_save_path(task, false);
-    eq(imm_task_setup(task, &ACT), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    ok(imm_lprob_is_nan(prod.loglik));
-  }
-
-  {
-    imm_task_set_save_path(task, true);
     eq(imm_task_setup(task, &ACT), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     ok(imm_lprob_is_nan(prod.loglik));
@@ -302,14 +228,6 @@ static void one_normal_state(void)
   eq(imm_task_reset(task, &dp), 0);
 
   {
-    imm_task_set_save_path(task, false);
-    eq(imm_task_setup(task, &A), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    close(prod.loglik, log(0.25));
-  }
-
-  {
-    imm_task_set_save_path(task, true);
 
     eq(imm_task_setup(task, &A), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
@@ -319,16 +237,6 @@ static void one_normal_state(void)
   }
 
   {
-    imm_task_set_save_path(task, false);
-
-    eq(imm_task_setup(task, &AA), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    close(prod.loglik, (2 * log(0.25)));
-  }
-
-  {
-    imm_task_set_save_path(task, true);
-
     eq(imm_task_setup(task, &AA), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, (2 * log(0.25)));
@@ -337,16 +245,6 @@ static void one_normal_state(void)
   }
 
   {
-    imm_task_set_save_path(task, false);
-
-    eq(imm_task_setup(task, &ACT), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    ok(imm_lprob_is_nan(prod.loglik));
-  }
-
-  {
-    imm_task_set_save_path(task, true);
-
     eq(imm_task_setup(task, &ACT), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     ok(imm_lprob_is_nan(prod.loglik));
@@ -383,23 +281,6 @@ static void two_normal_states(void)
   struct imm_task *task = imm_task_new(&dp);
 
   {
-    imm_task_set_save_path(task, false);
-    eq(imm_task_setup(task, &EMPTY), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), IMM_ESHORTSEQ);
-    eq(imm_path_nsteps(&prod.path), 0U);
-    ok(imm_lprob_is_nan(imm_hmm_loglik(&hmm, &EMPTY, &prod.path)));
-    ok(imm_lprob_is_nan(prod.loglik));
-  }
-
-  {
-    imm_task_set_save_path(task, false);
-    eq(imm_task_setup(task, &A), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    close(prod.loglik, (log(0.1) + log(0.25)));
-  }
-
-  {
-    imm_task_set_save_path(task, true);
     eq(imm_task_setup(task, &A), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, (log(0.1) + log(0.25)));
@@ -408,14 +289,6 @@ static void two_normal_states(void)
   }
 
   {
-    imm_task_set_save_path(task, false);
-    eq(imm_task_setup(task, &T), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    ok(imm_lprob_is_nan(prod.loglik));
-  }
-
-  {
-    imm_task_set_save_path(task, true);
     eq(imm_task_setup(task, &T), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     ok(imm_lprob_is_nan(prod.loglik));
@@ -424,14 +297,6 @@ static void two_normal_states(void)
   }
 
   {
-    imm_task_set_save_path(task, false);
-    eq(imm_task_setup(task, &AC), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    ok(imm_lprob_is_nan(prod.loglik));
-  }
-
-  {
-    imm_task_set_save_path(task, true);
     eq(imm_task_setup(task, &AC), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     ok(imm_lprob_is_nan(prod.loglik));
@@ -445,14 +310,6 @@ static void two_normal_states(void)
 
   float des = log(0.1) + log(0.25) + log(0.3) + log(0.5);
   {
-    imm_task_set_save_path(task, false);
-    eq(imm_task_setup(task, &AT), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    close(prod.loglik, des);
-  }
-
-  {
-    imm_task_set_save_path(task, true);
     eq(imm_task_setup(task, &AT), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, des);
@@ -461,14 +318,6 @@ static void two_normal_states(void)
   }
 
   {
-    imm_task_set_save_path(task, false);
-    eq(imm_task_setup(task, &ATT), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    ok(imm_lprob_is_nan(prod.loglik));
-  }
-
-  {
-    imm_task_set_save_path(task, true);
     eq(imm_task_setup(task, &ATT), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     ok(imm_lprob_is_nan(prod.loglik));
@@ -485,16 +334,6 @@ static void two_normal_states(void)
 
   des = log(0.1) + log(0.25) + log(0.3) + 3 * log(0.5);
   {
-    imm_task_set_save_path(task, false);
-
-    eq(imm_task_setup(task, &ATT), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    close(prod.loglik, des);
-  }
-
-  {
-    imm_task_set_save_path(task, true);
-
     eq(imm_task_setup(task, &ATT), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, des);
@@ -537,14 +376,6 @@ static void normal_states(void)
   struct imm_task *task = imm_task_new(&dp);
 
   {
-    imm_task_set_save_path(task, false);
-    eq(imm_task_setup(task, &A), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    close(prod.loglik, -1.386294361120);
-  }
-
-  {
-    imm_task_set_save_path(task, true);
     eq(imm_task_setup(task, &A), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, -1.386294361120);
@@ -553,14 +384,6 @@ static void normal_states(void)
   }
 
   {
-    imm_task_set_save_path(task, false);
-    eq(imm_task_setup(task, &AG), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    close(prod.loglik, -3.178053830348);
-  }
-
-  {
-    imm_task_set_save_path(task, true);
     eq(imm_task_setup(task, &AG), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, -3.178053830348);
@@ -573,14 +396,6 @@ static void normal_states(void)
   eq(imm_task_reset(task, &dp), 0);
 
   {
-    imm_task_set_save_path(task, false);
-    eq(imm_task_setup(task, &AG), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    close(prod.loglik, -3.295836866004);
-  }
-
-  {
-    imm_task_set_save_path(task, true);
     eq(imm_task_setup(task, &AG), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, -3.295836866004);
@@ -595,14 +410,6 @@ static void normal_states(void)
   }
 
   {
-    imm_task_set_save_path(task, false);
-    eq(imm_task_setup(task, &AGT), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    ok(imm_lprob_is_nan(prod.loglik));
-  }
-
-  {
-    imm_task_set_save_path(task, true);
     eq(imm_task_setup(task, &AGT), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     ok(imm_lprob_is_nan(prod.loglik));
@@ -617,14 +424,6 @@ static void normal_states(void)
   }
 
   {
-    imm_task_set_save_path(task, false);
-    eq(imm_task_setup(task, &AGT), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    close(prod.loglik, -4.106767082221);
-  }
-
-  {
-    imm_task_set_save_path(task, true);
     eq(imm_task_setup(task, &AGT), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, -4.106767082221);
@@ -639,14 +438,6 @@ static void normal_states(void)
   }
 
   {
-    imm_task_set_save_path(task, false);
-    eq(imm_task_setup(task, &AGTC), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    ok(imm_lprob_is_nan(prod.loglik));
-  }
-
-  {
-    imm_task_set_save_path(task, true);
     eq(imm_task_setup(task, &AGTC), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     ok(imm_lprob_is_nan(prod.loglik));
@@ -661,14 +452,6 @@ static void normal_states(void)
   }
 
   {
-    imm_task_set_save_path(task, false);
-    eq(imm_task_setup(task, &AGTC), 0);
-    eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    close(prod.loglik, -6.303991659557);
-  }
-
-  {
-    imm_task_set_save_path(task, true);
     eq(imm_task_setup(task, &AGTC), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, -6.303991659557);

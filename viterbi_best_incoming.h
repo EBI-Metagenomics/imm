@@ -42,7 +42,7 @@ TEMPLATE void viterbi_best_trans_set(struct viterbi_best_trans *x,
 
 PURE_ATTR TEMPLATE struct tuple_f32_uint8
 viterbi_best_score_xy(struct imm_viterbi const *x, unsigned const row,
-                      struct state_range const src, bool const save_path)
+                      struct state_range const src)
 {
   struct tuple_f32_uint8 tuple = {IMM_LPROB_ZERO, 0};
 
@@ -53,32 +53,37 @@ viterbi_best_score_xy(struct imm_viterbi const *x, unsigned const row,
     imm_assume(row >= i);
     imm_assume(i >= src.min);
     float v = imm_viterbi_get_score(x, imm_cell(row - i, src.idx, i));
-    if (tuple.f < v && save_path) tuple.u = i - src.min;
-    if (tuple.f < v) tuple.f = v;
+    if (tuple.f < v)
+    {
+      tuple.u = i - src.min;
+      tuple.f = v;
+    }
   }
 
   return tuple;
 }
 
-TEMPLATE void viterbi_best_incoming_get(
-    float *score, struct viterbi_best_trans *bt, struct imm_viterbi const *x,
-    unsigned const row, struct state_range const src, uint_fast16_t const trans,
-    float const trans_score, bool const save_path)
+TEMPLATE void
+viterbi_best_incoming_get(float *score, struct viterbi_best_trans *bt,
+                          struct imm_viterbi const *x, unsigned const row,
+                          struct state_range const src,
+                          uint_fast16_t const trans, float const trans_score)
 {
-  struct tuple_f32_uint8 t = viterbi_best_score_xy(x, row, src, save_path);
+  struct tuple_f32_uint8 t = viterbi_best_score_xy(x, row, src);
   t.f += trans_score;
 
-  if (*score < t.f && save_path)
+  if (*score < t.f)
+  {
     viterbi_best_trans_set(bt, src.idx, trans, t.u);
-  if (*score < t.f) *score = t.f;
+    *score = t.f;
+  }
 }
 
 TEMPLATE struct imm_ctrans const *
 viterbi_best_incoming(float *score, struct viterbi_best_trans *best_trans,
                       struct imm_viterbi const *x, unsigned const row,
                       uint_fast16_t const dst, struct imm_ctrans const *ctrans,
-                      bool const save_path, bool const unsafe_state,
-                      bool const safe_past)
+                      bool const unsafe_state, bool const safe_past)
 {
   float v = IMM_LPROB_ZERO;
   VITERBI_BEST_TRANS_DECLARE(w);
@@ -92,7 +97,7 @@ viterbi_best_incoming(float *score, struct viterbi_best_trans *best_trans,
     if (unsafe_state) src.min = imm_max(src.min, 1U);
     if (!safe_past) src.max = imm_min(src.max, row);
 
-    viterbi_best_incoming_get(&v, &w, x, row, src, trans, tscore, save_path);
+    viterbi_best_incoming_get(&v, &w, x, row, src, trans, tscore);
 
     ++trans;
     ++ctrans;
