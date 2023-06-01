@@ -1,4 +1,5 @@
 #include "path.h"
+#include "printer.h"
 #include "rc.h"
 #include "reallocf.h"
 #include "state.h"
@@ -93,9 +94,19 @@ void imm_path_dump(struct imm_path const *x, imm_state_name *callb,
   for (unsigned i = 0; i < imm_path_nsteps(x); ++i)
   {
     if (i > 0) fprintf(fp, "->");
-    struct imm_step const *step = imm_path_step(x, i);
-    fprintf(fp, "[%s='%.*s']", (*callb)(step->state_id, name), step->seqlen, y);
-    y += step->seqlen;
+    unsigned state_id = imm_path_step(x, i)->state_id;
+    unsigned seqlen = imm_path_step(x, i)->seqlen;
+    float score = imm_path_step(x, i)->seqlen;
+
+    fputc('[', fp);
+
+    fprintf(fp, "%s,", (*callb)(state_id, name));
+    fprintf(fp, "%.*s,", seqlen, y);
+    fprintf(fp, imm_printer_get_f32_formatter(), score);
+
+    fputc(']', fp);
+
+    y += seqlen;
   }
   fprintf(fp, "\n");
 }
