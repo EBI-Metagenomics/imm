@@ -11,7 +11,7 @@
 #include "task.h"
 #include "vendor/minctest.h"
 
-static unsigned state_name(unsigned id, char *name)
+static char *state_name(unsigned id, char *name)
 {
   char *x = name;
   if (id == 0) *(x++) = 'B';
@@ -20,7 +20,7 @@ static unsigned state_name(unsigned id, char *name)
   if (id == 3) *(x++) = 'J';
 
   *x = '\0';
-  return (unsigned)strlen(name);
+  return name;
 }
 
 static void odd1(void)

@@ -4,13 +4,13 @@
 #include "mute_state.h"
 #include "vendor/minctest.h"
 
-static unsigned state_name(unsigned id, char *name)
+static char *state_name(unsigned id, char *name)
 {
   name[0] = 'M';
   if (id == 0) name[1] = '0';
   else name[1] = '1';
   name[2] = '\0';
-  return 2;
+  return name;
 }
 
 static void hmm_dot(void)
@@ -32,10 +32,10 @@ static void hmm_dot(void)
 
   eq(imm_hmm_set_trans(&hmm, &state0.super, &state1.super, log(0.5)), 0);
 
-  FILE *fd = fopen("hmm.dot", "w");
-  ok(fd);
-  imm_hmm_write_dot(&hmm, fd, state_name);
-  fclose(fd);
+  FILE *fp = fopen("hmm.dot", "w");
+  ok(fp);
+  imm_hmm_write_dot(&hmm, fp, state_name);
+  fclose(fp);
   remove("hmm.dot");
 }
 
@@ -60,10 +60,10 @@ static void dp_dot(void)
 
   eq(imm_hmm_set_start(&hmm, &state0.super, 0.5f), 0);
 
-  FILE *fd = fopen("dp.dot", "w");
-  ok(fd);
-  imm_hmm_write_dot(&hmm, fd, &state_name);
-  fclose(fd);
+  FILE *fp = fopen("dp.dot", "w");
+  ok(fp);
+  imm_hmm_write_dot(&hmm, fp, &state_name);
+  fclose(fp);
   remove("dp.dot");
 }
 

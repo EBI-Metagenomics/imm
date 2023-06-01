@@ -125,7 +125,7 @@ void imm_ex1_remove_deletion_states(unsigned core_size)
     imm_hmm_del_state(&m->hmm, &m->d[k].super);
 }
 
-unsigned imm_ex1_state_name(unsigned id, char *name)
+char *imm_ex1_state_name(unsigned id, char *name)
 {
   if ((id & (15U << 12)) == START) strcpy(name, "START");
   if ((id & (15U << 12)) == B)
@@ -145,5 +145,5 @@ unsigned imm_ex1_state_name(unsigned id, char *name)
   if ((id & (15U << 12)) == END) strcpy(name, "END");
   if ((id & (15U << 12)) == N) strcpy(name, "N");
   printf("Over\n");
-  return (unsigned)strlen(name);
+  return name;
 }
