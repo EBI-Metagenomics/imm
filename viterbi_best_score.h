@@ -35,35 +35,4 @@ viterbi_best_score_xy(struct imm_viterbi const *x, unsigned const row,
   return tuple;
 }
 
-PURE_ATTR TEMPLATE struct tuple_f32_uint8
-viterbi_best_score_15(struct imm_viterbi const *x, unsigned const row,
-                      uint_fast16_t const src, bool const save_path)
-{
-  struct tuple_f32_uint8 tuple = {IMM_LPROB_ZERO, 0};
-
-#pragma omp simd
-  for (uint_fast8_t i = 1; i <= 5; ++i)
-    viterbi_best_score_single(&tuple, x, row, src, 1, i, save_path);
-
-  return tuple;
-}
-
-PURE_ATTR TEMPLATE struct tuple_f32_uint8
-viterbi_best_score_11(struct imm_viterbi const *x, unsigned const row,
-                      uint_fast16_t const src, bool const save_path)
-{
-  struct tuple_f32_uint8 tuple = {IMM_LPROB_ZERO, 0};
-  viterbi_best_score_single(&tuple, x, row, src, 1, 1, save_path);
-  return tuple;
-}
-
-PURE_ATTR TEMPLATE struct tuple_f32_uint8
-viterbi_best_score_00(struct imm_viterbi const *x, unsigned const row,
-                      uint_fast16_t const src, bool const save_path)
-{
-  struct tuple_f32_uint8 tuple = {IMM_LPROB_ZERO, 0};
-  viterbi_best_score_single(&tuple, x, row, src, 0, 0, save_path);
-  return tuple;
-}
-
 #endif

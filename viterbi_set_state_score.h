@@ -42,34 +42,4 @@ viterbi_set_state_score(struct imm_viterbi const *x, unsigned const row,
   viterbi_set_scores_xy(x, row, dst, score);
 }
 
-TEMPLATE void
-viterbi_set_state_score_15_fast(struct imm_viterbi const *x, unsigned const row,
-                                uint_fast16_t const dst, float const score,
-                                struct viterbi_best_trans const *bt,
-                                bool const save_path)
-{
-  if (save_path) viterbi_set_state_score_path(&x->task->path, bt, row, dst);
-  viterbi_set_scores_15(x, row, dst, score);
-}
-
-TEMPLATE void
-viterbi_set_state_score_11_fast(struct imm_viterbi const *x, unsigned const row,
-                                uint_fast16_t const dst, float const score,
-                                struct viterbi_best_trans const *bt,
-                                bool const save_path)
-{
-  if (save_path) viterbi_set_state_score_path(&x->task->path, bt, row, dst);
-  viterbi_set_scores_11(x, row, dst, score);
-}
-
-TEMPLATE void
-viterbi_set_state_score_00_fast(struct imm_viterbi const *x, unsigned const row,
-                                uint_fast16_t const dst, float const score,
-                                struct viterbi_best_trans const *bt,
-                                bool const save_path)
-{
-  if (save_path) viterbi_set_state_score_path(&x->task->path, bt, row, dst);
-  viterbi_set_scores_00(x, row, dst, score);
-}
-
 #endif

@@ -28,27 +28,4 @@ TEMPLATE void viterbi_set_scores_xy(struct imm_viterbi const *x,
     viterbi_set_scores_single(x, row, dst.idx, dst.min, i, score);
 }
 
-TEMPLATE void viterbi_set_scores_15(struct imm_viterbi const *x,
-                                    unsigned const row, uint_fast16_t const dst,
-                                    float const score)
-{
-#pragma omp simd
-  for (uint_fast8_t i = 1; i <= 5; ++i)
-    viterbi_set_scores_single(x, row, dst, 1, i, score);
-}
-
-TEMPLATE void viterbi_set_scores_11(struct imm_viterbi const *x,
-                                    unsigned const row, uint_fast16_t const dst,
-                                    float const score)
-{
-  viterbi_set_scores_single(x, row, dst, 1, 1, score);
-}
-
-TEMPLATE void viterbi_set_scores_00(struct imm_viterbi const *x,
-                                    unsigned const row, uint_fast16_t const dst,
-                                    float const score)
-{
-  viterbi_set_scores_single(x, row, dst, 0, 0, score);
-}
-
 #endif

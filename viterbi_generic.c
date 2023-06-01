@@ -5,8 +5,6 @@
 #include "state_range.h"
 #include "unsafe.h"
 #include "viterbi.h"
-#include "viterbi_110011.h"
-#include "viterbi_150015.h"
 #include "viterbi_any.h"
 #include "viterbi_best_incoming.h"
 #include "viterbi_best_trans.h"
@@ -33,14 +31,8 @@ static void viterbi_gany(struct imm_viterbi const *x, unsigned const seqlen,
 
 void imm_viterbi_generic(struct imm_viterbi const *x, unsigned const seqlen)
 {
-  struct imm_hot_range hot = imm_hot_range(x);
-  int hot_code = imm_hot_range_code(&hot);
-
   struct unsafe const unsafe = unsafe_init(x);
   struct imm_dp_safety const *y = &x->safety;
   bool const save_path = x->task->save_path;
-  if (hot_code == 110011) viterbi_g1100(hot, x, seqlen, unsafe, y, save_path);
-  else if (hot_code == 1515)
-    viterbi_g0015(hot, x, seqlen, unsafe, y, save_path);
-  else viterbi_gany(x, seqlen, unsafe, y, save_path);
+  viterbi_gany(x, seqlen, unsafe, y, save_path);
 }

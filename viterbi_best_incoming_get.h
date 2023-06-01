@@ -27,40 +27,4 @@ TEMPLATE void viterbi_best_incoming_get(
                                    save_path);
 }
 
-TEMPLATE void
-viterbi_best_incoming_get_15(float *score, struct viterbi_best_trans *bt,
-                             struct imm_viterbi const *x, unsigned const row,
-                             unsigned const src, uint_fast16_t const trans,
-                             float const trans_score, bool const save_path)
-{
-  struct tuple_f32_uint8 t = viterbi_best_score_15(x, row, src, save_path);
-  t.f += trans_score;
-
-  viterbi_best_incoming_get_update(t.f, t.u, score, bt, src, trans, save_path);
-}
-
-TEMPLATE void
-viterbi_best_incoming_get_11(float *score, struct viterbi_best_trans *bt,
-                             struct imm_viterbi const *x, unsigned const row,
-                             unsigned const src, uint_fast16_t const trans,
-                             float const trans_score, bool const save_path)
-{
-  struct tuple_f32_uint8 t = viterbi_best_score_11(x, row, src, save_path);
-  t.f += trans_score;
-
-  viterbi_best_incoming_get_update(t.f, t.u, score, bt, src, trans, save_path);
-}
-
-TEMPLATE void
-viterbi_best_incoming_get_00(float *score, struct viterbi_best_trans *bt,
-                             struct imm_viterbi const *x, unsigned const row,
-                             unsigned const src, uint_fast16_t const trans,
-                             float const trans_score, bool const save_path)
-{
-  struct tuple_f32_uint8 t = viterbi_best_score_00(x, row, src, save_path);
-  t.f += trans_score;
-
-  viterbi_best_incoming_get_update(t.f, t.u, score, bt, src, trans, save_path);
-}
-
 #endif
