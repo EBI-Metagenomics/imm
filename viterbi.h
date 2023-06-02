@@ -39,10 +39,4 @@ imm_viterbi_start_state_idx(struct imm_viterbi const *x)
   return x->dp->state_table.start.state_idx;
 }
 
-imm_pure_template unsigned imm_viterbi_ntrans(struct imm_viterbi const *x,
-                                              unsigned dst)
-{
-  return imm_trans_table_ntrans(&x->dp->trans_table, dst);
-}
-
 #endif

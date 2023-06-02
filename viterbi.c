@@ -85,13 +85,18 @@ float imm_viterbi_start_lprob(struct imm_viterbi const *x)
   return x->dp->state_table.start.lprob;
 }
 
+imm_pure_template unsigned ntrans(struct imm_viterbi const *x, unsigned dst)
+{
+  return imm_trans_table_ntrans(&x->dp->trans_table, dst);
+}
+
 static void find_tardy_states(struct imm_viterbi *x, struct imm_dp const *dp)
 {
   unsigned n = 0;
   unsigned state_idx = 0;
   for (unsigned dst = 0; dst < dp->state_table.nstates; ++dst)
   {
-    for (unsigned t = 0; t < imm_trans_table_ntrans(&dp->trans_table, dst); ++t)
+    for (unsigned t = 0; t < ntrans(x, dst); ++t)
     {
       unsigned src = imm_trans_table_source_state(&dp->trans_table, dst, t);
       uint8_t span = state_zspan(x, src);
