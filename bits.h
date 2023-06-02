@@ -11,16 +11,19 @@
 #define BITS_PER_LONG (sizeof(long) * BITS_PER_BYTE)
 #define BITS_TO_LONGS(nr) __BITS_DIV_ROUND_UP(nr, BITS_PER_LONG)
 
-TEMPLATE void bits_clr(unsigned long *x, unsigned bit) { *x &= ~(1UL << bit); }
+imm_template void bits_clr(unsigned long *x, unsigned bit)
+{
+  *x &= ~(1UL << bit);
+}
 
-CONST_ATTR TEMPLATE bool bits_get(unsigned long const x, unsigned bit)
+imm_const_template bool bits_get(unsigned long x, unsigned bit)
 {
   return !!((x >> bit) & 1UL);
 }
 
-TEMPLATE void bits_set(unsigned long *x, unsigned bit) { *x |= 1UL << bit; }
+imm_template void bits_set(unsigned long *x, unsigned bit) { *x |= 1UL << bit; }
 
-CONST_ATTR TEMPLATE unsigned bits_width(uint32_t v)
+imm_const_template unsigned bits_width(uint32_t v)
 {
   return v ? ((unsigned)__builtin_clz(v) ^ 31) + 1 : 0;
 }

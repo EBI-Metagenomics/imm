@@ -11,7 +11,7 @@ struct imm_cell
   uint_fast8_t len;
 };
 
-CONST_ATTR TEMPLATE struct imm_cell
+imm_const_template struct imm_cell
 imm_cell(unsigned const row, uint_fast16_t const state, uint_fast8_t const len)
 {
   return (struct imm_cell){.row = row, .state = state, .len = len};

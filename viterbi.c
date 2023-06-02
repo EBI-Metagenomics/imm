@@ -10,24 +10,25 @@
 #include "task.h"
 #include "trans_table.h"
 
-TEMPLATE uint16_t start_trans_idx(struct imm_viterbi const *x,
-                                  unsigned state_idx)
+imm_pure_template uint16_t start_trans_idx(struct imm_viterbi const *x,
+                                           unsigned state_idx)
 {
   return imm_trans_table_trans_start(&x->dp->trans_table, state_idx);
 }
 
-TEMPLATE struct imm_ctrans const *start_ctrans(struct imm_viterbi const *x)
+imm_pure_template struct imm_ctrans const *
+start_ctrans(struct imm_viterbi const *x)
 {
   return imm_trans_table_ctrans_start(&x->dp->trans_table);
 }
 
-TEMPLATE void set_matrix_cell(struct imm_viterbi const *x, struct imm_cell cell,
-                              float score)
+imm_template void set_matrix_cell(struct imm_viterbi const *x,
+                                  struct imm_cell cell, float score)
 {
   imm_matrix_set_score(&x->task->matrix, cell, score);
 }
 
-TEMPLATE unsigned nstates(struct imm_viterbi const *x)
+imm_pure_template unsigned nstates(struct imm_viterbi const *x)
 {
   return x->dp->state_table.nstates;
 }
@@ -95,9 +96,9 @@ static inline struct step step_init(void)
                        IMM_STATE_NULL_SEQLEN, IMM_LPROB_ZERO};
 }
 
-TEMPLATE struct imm_ctrans const *
+imm_template struct imm_ctrans const *
 viterbi_best_incoming(struct step *best_step, struct imm_viterbi const *x,
-                      unsigned row, uint_fast16_t const dst,
+                      unsigned row, uint_fast16_t dst,
                       struct imm_ctrans const *ctrans, bool tardy_state,
                       bool safe_past)
 {
@@ -107,7 +108,7 @@ viterbi_best_incoming(struct step *best_step, struct imm_viterbi const *x,
   while (dst == ctrans->dst)
   {
     struct state_range src = imm_viterbi_state_range(x, ctrans->src);
-    float const tscore = ctrans->score;
+    float tscore = ctrans->score;
 
     if (tardy_state) src.min = imm_max(src.min, 1U);
     if (!safe_past) src.max = imm_min(src.max, row);
@@ -146,8 +147,8 @@ viterbi_best_incoming(struct step *best_step, struct imm_viterbi const *x,
   return ctrans;
 }
 
-TEMPLATE void set_path(struct imm_cpath *x, struct step const *bt, unsigned r,
-                       uint_fast16_t const dst)
+imm_template void set_path(struct imm_cpath *x, struct step const *bt,
+                           unsigned r, uint_fast16_t dst)
 {
   if (bt->src_idx != IMM_STATE_NULL_IDX)
   {
@@ -163,9 +164,9 @@ TEMPLATE void set_path(struct imm_cpath *x, struct step const *bt, unsigned r,
   }
 }
 
-TEMPLATE void set_state_score(struct imm_viterbi const *x, unsigned row,
-                              struct state_range dst, unsigned remain,
-                              struct step const *bt, bool safe_future)
+imm_template void set_state_score(struct imm_viterbi const *x, unsigned row,
+                                  struct state_range dst, unsigned remain,
+                                  struct step const *bt, bool safe_future)
 {
   float score = bt->score;
   if (row == 0 && imm_viterbi_start_state(x) == dst.idx)
@@ -184,19 +185,18 @@ TEMPLATE void set_state_score(struct imm_viterbi const *x, unsigned row,
   }
 }
 
-CONST_ATTR TEMPLATE unsigned remains(unsigned seqlen, unsigned row,
-                                     bool safe_future)
+imm_const_template unsigned remains(unsigned seqlen, unsigned row,
+                                    bool safe_future)
 {
   if (safe_future) return IMM_STATE_MAX_SEQLEN;
   if (seqlen >= IMM_STATE_MAX_SEQLEN + row) return IMM_STATE_MAX_SEQLEN;
   return seqlen - row;
 }
 
-TEMPLATE struct imm_ctrans const *on_state(struct imm_viterbi const *x,
-                                           unsigned row, struct state_range dst,
-                                           struct imm_ctrans const *t,
-                                           bool safe_future, bool safe_past,
-                                           bool tardy_state)
+imm_template struct imm_ctrans const *
+on_state(struct imm_viterbi const *x, unsigned row, struct state_range dst,
+         struct imm_ctrans const *t, bool safe_future, bool safe_past,
+         bool tardy_state)
 {
   struct step bt = {0};
   unsigned remain = remains(x->seqlen, row, safe_future);
@@ -206,20 +206,20 @@ TEMPLATE struct imm_ctrans const *on_state(struct imm_viterbi const *x,
   return t;
 }
 
-TEMPLATE void on_tardy_state(struct imm_viterbi const *x, unsigned row,
-                             struct tardy_state const tardy, bool safe_future,
-                             bool safe_past)
+imm_template void on_tardy_state(struct imm_viterbi const *x, unsigned row,
+                                 struct tardy_state const tardy,
+                                 bool safe_future, bool safe_past)
 {
   struct imm_ctrans const *t = x->dp->trans_table.trans + tardy.trans_start;
   struct state_range dst = imm_viterbi_state_range(x, tardy.state_idx);
   on_state(x, row, dst, t, safe_future, safe_past, true);
 }
 
-TEMPLATE struct imm_ctrans const *on_states(struct imm_ctrans const *t,
-                                            struct imm_range const states,
-                                            struct imm_viterbi const *x,
-                                            unsigned row, bool safe_future,
-                                            bool safe_past)
+imm_template struct imm_ctrans const *on_states(struct imm_ctrans const *t,
+                                                struct imm_range const states,
+                                                struct imm_viterbi const *x,
+                                                unsigned row, bool safe_future,
+                                                bool safe_past)
 {
   for (unsigned i = states.a; i < states.b; ++i)
   {
@@ -229,8 +229,8 @@ TEMPLATE struct imm_ctrans const *on_states(struct imm_ctrans const *t,
   return t;
 }
 
-TEMPLATE void on_row(struct imm_viterbi const *x, unsigned row,
-                     bool has_tardy_state, bool safe_future, bool safe_past)
+imm_template void on_row(struct imm_viterbi const *x, unsigned row,
+                         bool has_tardy_state, bool safe_future, bool safe_past)
 {
   if (has_tardy_state)
     on_tardy_state(x, row, x->tardy_state, safe_future, safe_past);
@@ -239,7 +239,8 @@ TEMPLATE void on_row(struct imm_viterbi const *x, unsigned row,
   on_states(t, r, x, row, safe_future, safe_past);
 }
 
-TEMPLATE void viterbi_generic(struct imm_viterbi const *x, bool has_tardy_state)
+imm_template void viterbi_generic(struct imm_viterbi const *x,
+                                  bool has_tardy_state)
 {
   struct imm_dp_safety const *y = &x->safety;
 

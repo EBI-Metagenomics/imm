@@ -18,8 +18,8 @@ void imm_matrixu16_set(struct imm_matrixu16 *, unsigned r, unsigned c,
 void imm_matrixu16_cleanup(struct imm_matrixu16 const *);
 int imm_matrixu16_resize(struct imm_matrixu16 *, unsigned rows, unsigned cols);
 
-TEMPLATE uint16_t imm_matrixu16_get(struct imm_matrixu16 const *x,
-                                    unsigned const r, unsigned const c)
+imm_pure_template uint16_t imm_matrixu16_get(struct imm_matrixu16 const *x,
+                                             unsigned r, unsigned c)
 {
   return x->data[r * x->cols + c];
 }

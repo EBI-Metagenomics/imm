@@ -19,32 +19,33 @@
 #endif
 
 #if __has_attribute(const)
-#define CONST_ATTR __attribute__((const))
+#define imm_const __attribute__((const))
 #else
-#define CONST_ATTR
+#define imm_const
 #endif
 
 #if __has_attribute(pure)
-#define PURE_ATTR __attribute__((pure))
+#define imm_pure __attribute__((pure))
 #else
-#define PURE_ATTR
+#define imm_pure
 #endif
 
 #if __has_attribute(always_inline)
-#define FORCE_INLINE_ATTR __attribute__((always_inline))
+#define imm_force_inline __attribute__((always_inline))
 #else
-#define FORCE_INLINE_ATTR
+#define imm_force_inline
 #endif
 
 /*
- * FORCE_INLINE_TEMPLATE is used to define C "templates", which take constant
+ * imm_template is used to define C "templates", which take constant
  * parameters. They must be inlined for the compiler to eliminate the constant
  * branches.
  *
  * Acknowledgement: ZSTD.
  */
-#define TEMPLATE static inline FORCE_INLINE_ATTR
+#define imm_template static inline imm_force_inline
 
-#define NOINLINE __attribute__((noinline))
+#define imm_const_template imm_const imm_template
+#define imm_pure_template imm_pure imm_template
 
 #endif

@@ -25,14 +25,14 @@ int imm_emis_reset(struct imm_emis *, struct imm_code const *,
 unsigned imm_emis_score_size(struct imm_emis const *, unsigned nstates);
 unsigned imm_emis_offset_size(unsigned nstates);
 
-TEMPLATE float imm_emis_score(struct imm_emis const *x, unsigned const state,
-                              unsigned const seq_code)
+imm_pure_template float imm_emis_score(struct imm_emis const *x, unsigned state,
+                                       unsigned seq_code)
 {
   return x->score[x->offset[state] + seq_code];
 }
 
-TEMPLATE float const *imm_emis_table(struct imm_emis const *x,
-                                     unsigned const state, unsigned *size)
+imm_template float const *imm_emis_table(struct imm_emis const *x,
+                                         unsigned state, unsigned *size)
 {
   *size = x->offset[state + 1] - x->offset[state];
   return &x->score[x->offset[state]];

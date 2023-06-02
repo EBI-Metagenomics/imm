@@ -18,14 +18,14 @@ float const *imm_matrixf_get_ptr_c(struct imm_matrixf const *, unsigned r,
 void imm_matrixf_deinit(struct imm_matrixf const *);
 int imm_matrixf_resize(struct imm_matrixf *, unsigned rows, unsigned cols);
 
-TEMPLATE float imm_matrixf_get(struct imm_matrixf const *x, unsigned const r,
-                               unsigned const c)
+imm_pure_template float imm_matrixf_get(struct imm_matrixf const *x, unsigned r,
+                                        unsigned c)
 {
   return x->data[r * x->cols + c];
 }
 
-TEMPLATE void imm_matrixf_set(struct imm_matrixf *x, unsigned const r,
-                              unsigned const c, float const v)
+imm_template void imm_matrixf_set(struct imm_matrixf *x, unsigned r, unsigned c,
+                                  float v)
 {
   x->data[r * x->cols + c] = v;
 }

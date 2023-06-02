@@ -21,16 +21,16 @@ struct imm_code
 IMM_API void imm_code_init(struct imm_code *, struct imm_abc const *);
 unsigned imm_code_encode(struct imm_code const *, struct imm_seq const *);
 
-TEMPLATE unsigned imm_code_translate(struct imm_code const *x,
-                                     unsigned const value,
-                                     unsigned const min_seq)
+imm_pure_template unsigned imm_code_translate(struct imm_code const *x,
+                                              unsigned const value,
+                                              unsigned const min_seq)
 {
   assert(value >= x->offset[min_seq]);
   return value - x->offset[min_seq];
 }
 
-TEMPLATE unsigned imm_code_size(struct imm_code const *x, unsigned min_seq,
-                                unsigned max_seq)
+imm_pure_template unsigned imm_code_size(struct imm_code const *x,
+                                         unsigned min_seq, unsigned max_seq)
 {
   return (unsigned)(x->offset[max_seq + 1] - x->offset[min_seq]);
 }
