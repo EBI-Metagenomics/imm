@@ -67,7 +67,8 @@ static float read_result(struct imm_dp const *dp, struct imm_task *task,
   unsigned seqlen = IMM_STATE_NULL_SEQLEN;
 
   unsigned length = imm_eseq_len(&task->eseq);
-  unsigned max_seq = imm_zspan_max(imm_state_table_span(&dp->state_table, end));
+  unsigned max_seq =
+      imm_zspan_max(imm_state_table_zspan(&dp->state_table, end));
 
   for (unsigned len = imm_min(max_seq, length);; --len)
   {
@@ -80,7 +81,7 @@ static float read_result(struct imm_dp const *dp, struct imm_task *task,
       seqlen = len;
     }
 
-    if (imm_zspan_min(imm_state_table_span(&dp->state_table, end)) == len)
+    if (imm_zspan_min(imm_state_table_zspan(&dp->state_table, end)) == len)
       break;
   }
   if (state != end) score = imm_lprob_nan();
@@ -111,7 +112,7 @@ static int unzip_path(struct imm_dp const *dp, struct imm_task const *task,
       unsigned len = imm_cpath_seqlen(&task->path, row, state);
       state = imm_trans_table_source_state(&dp->trans_table, state, trans);
       seqlen =
-          len + imm_zspan_min(imm_state_table_span(&dp->state_table, state));
+          len + imm_zspan_min(imm_state_table_zspan(&dp->state_table, state));
     }
   }
   imm_path_reverse(path);
@@ -128,7 +129,7 @@ int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
 
   unsigned end_state = dp->state_table.end_state_idx;
   unsigned min =
-      imm_zspan_min(imm_state_table_span(&dp->state_table, end_state));
+      imm_zspan_min(imm_state_table_zspan(&dp->state_table, end_state));
   if (imm_seq_size(task->seq) < min) return IMM_ESHORTSEQ;
 
   struct elapsed elapsed = ELAPSED_INIT;
@@ -182,7 +183,7 @@ float imm_dp_emis_score(struct imm_dp const *dp, unsigned state_id,
 
   unsigned state_idx = imm_state_table_idx(&dp->state_table, state_id);
   unsigned min =
-      imm_zspan_min(imm_state_table_span(&dp->state_table, state_idx));
+      imm_zspan_min(imm_state_table_zspan(&dp->state_table, state_idx));
 
   unsigned seq_code = imm_eseq_get(&eseq, 0, imm_seq_size(seq), min);
   score = imm_emis_score(&dp->emis, state_idx, seq_code);
@@ -263,7 +264,7 @@ void imm_dp_dump_path(struct imm_dp const *dp, struct imm_task const *task,
     struct imm_step const *step = imm_path_step(&prod->path, i);
     unsigned idx = imm_state_table_idx(&dp->state_table, step->state_id);
 
-    unsigned min = imm_zspan_min(imm_state_table_span(&dp->state_table, idx));
+    unsigned min = imm_zspan_min(imm_state_table_zspan(&dp->state_table, idx));
     unsigned seq_code = imm_eseq_get(&task->eseq, begin, step->seqlen, min);
 
     float score = imm_emis_score(&dp->emis, idx, seq_code);

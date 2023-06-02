@@ -3,6 +3,7 @@
 
 #include "assume.h"
 #include "compiler.h"
+#include "range.h"
 #include "state.h"
 #include <assert.h>
 #include <stdbool.h>
@@ -23,6 +24,11 @@ imm_const_template uint_fast8_t imm_zspan_min(uint8_t x)
 imm_const_template uint_fast8_t imm_zspan_max(uint8_t x)
 {
   return (uint_fast8_t)(x & 0xF);
+}
+
+imm_const_template struct imm_range imm_zspan_range(uint8_t x)
+{
+  return imm_range(imm_zspan_min(x), imm_zspan_max(x) + 1);
 }
 
 #endif

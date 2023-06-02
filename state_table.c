@@ -78,8 +78,7 @@ unsigned imm_state_table_id(struct imm_state_table const *x, unsigned idx)
 struct imm_range imm_state_table_range(struct imm_state_table const *x,
                                        unsigned state_idx)
 {
-  uint8_t span = imm_state_table_span(x, state_idx);
-  return imm_range(imm_zspan_min(span), imm_zspan_max(span) + 1);
+  return imm_zspan_range(imm_state_table_zspan(x, state_idx));
 }
 
 void imm_state_table_dump(struct imm_state_table const *x,
@@ -102,10 +101,7 @@ void imm_state_table_dump(struct imm_state_table const *x,
 
   for (unsigned i = 0; i < x->nstates; ++i)
   {
-    uint8_t span = imm_state_table_span(x, i);
-    uint_fast8_t min = imm_zspan_min(span);
-    uint_fast8_t max = imm_zspan_min(span);
-    struct imm_range range = imm_range(min, max + 1);
+    struct imm_range range = imm_zspan_range(imm_state_table_zspan(x, i));
     (*callb)(imm_state_table_id(x, i), state_name);
     fprintf(fp, "%s=", state_name);
     imm_range_dump(range, fp);

@@ -64,7 +64,7 @@ static void find_tardy_states(struct imm_viterbi *x, struct imm_dp const *dp)
     for (unsigned t = 0; t < imm_trans_table_ntrans(&dp->trans_table, dst); ++t)
     {
       unsigned src = imm_trans_table_source_state(&dp->trans_table, dst, t);
-      uint8_t span = imm_state_table_span(&dp->state_table, src);
+      uint8_t span = imm_state_table_zspan(&dp->state_table, src);
       if (imm_zspan_min(span) == 0 && dst < src)
       {
         n++;
@@ -169,7 +169,7 @@ imm_template void set_state_score(struct imm_viterbi const *x, unsigned row,
                                   struct step const *bt, bool safe_future)
 {
   float score = bt->score;
-  if (row == 0 && imm_viterbi_start_state(x) == dst.idx)
+  if (row == 0 && imm_viterbi_start_state_idx(x) == dst.idx)
     score = imm_max(imm_viterbi_start_lprob(x), score);
 
   set_path(&x->task->path, bt, row, dst.idx);

@@ -25,8 +25,8 @@ int imm_matrix_reset(struct imm_matrix *x, struct imm_state_table const *tbl)
   unsigned next_col = 0;
   for (unsigned i = 0; i < n; ++i)
   {
-    unsigned min = imm_zspan_min(imm_state_table_span(tbl, i));
-    unsigned max = imm_zspan_max(imm_state_table_span(tbl, i));
+    unsigned min = imm_zspan_min(imm_state_table_zspan(tbl, i));
+    unsigned max = imm_zspan_max(imm_state_table_zspan(tbl, i));
     x->state_col[i] = (int16_t)(next_col - min);
     next_col += (unsigned)(max - min + 1);
   }
