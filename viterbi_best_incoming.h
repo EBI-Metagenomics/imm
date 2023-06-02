@@ -16,12 +16,6 @@ struct viterbi_best_trans
   uint_fast8_t src_seqlen;
 };
 
-struct tuple_f32_uint8
-{
-  float f;
-  uint_fast8_t u;
-};
-
 #define VITERBI_BEST_TRANS_INIT                                                \
   {                                                                            \
     IMM_STATE_NULL_IDX, IMM_TRANS_NULL_IDX, IMM_STATE_NULL_SEQLEN              \
@@ -48,7 +42,8 @@ viterbi_best_incoming(float *score, struct viterbi_best_trans *best_trans,
     if (unsafe_state) src.min = imm_max(src.min, 1U);
     if (!safe_past) src.max = imm_min(src.max, row);
 
-    struct tuple_f32_uint8 t = {IMM_LPROB_ZERO, 0};
+    float tf = IMM_LPROB_ZERO;
+    uint_fast8_t src_seqlen = 0;
 
     imm_assume(src.max <= IMM_STATE_MAX_SEQLEN);
     UNROLL(IMM_STATE_MAX_SEQLEN + 1)
@@ -57,20 +52,20 @@ viterbi_best_incoming(float *score, struct viterbi_best_trans *best_trans,
       imm_assume(row >= i);
       imm_assume(i >= src.min);
       float v = imm_viterbi_get_score(x, imm_cell(row - i, src.idx, i));
-      if (t.f < v)
+      if (tf < v)
       {
-        t.u = i - src.min;
-        t.f = v;
+        src_seqlen = i - src.min;
+        tf = v;
       }
     }
-    t.f += tscore;
+    tf += tscore;
 
-    if (local_score < t.f)
+    if (local_score < tf)
     {
       w.src_idx = src.idx;
       w.src_trans = trans;
-      w.src_seqlen = t.u;
-      local_score = t.f;
+      w.src_seqlen = src_seqlen;
+      local_score = tf;
     }
 
     ++trans;
