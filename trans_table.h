@@ -59,6 +59,12 @@ TEMPLATE uint16_t imm_trans_table_trans_start(struct imm_trans_table const *tbl,
   return tbl->offset[state];
 }
 
+TEMPLATE struct imm_ctrans const *
+imm_trans_table_ctrans_start(struct imm_trans_table const *x)
+{
+  return x->trans;
+}
+
 IMM_API void imm_trans_table_dump(struct imm_trans_table const *,
                                   struct imm_state_table const *st,
                                   imm_state_name *callb, FILE *restrict);

@@ -36,14 +36,13 @@ TEMPLATE unsigned imm_viterbi_start_state(struct imm_viterbi const *x)
   return x->dp->state_table.start.state_idx;
 }
 
-TEMPLATE unsigned imm_viterbi_ntrans(struct imm_viterbi const *x,
-                                     unsigned const dst)
+TEMPLATE unsigned imm_viterbi_ntrans(struct imm_viterbi const *x, unsigned dst)
 {
   return imm_trans_table_ntrans(&x->dp->trans_table, dst);
 }
 
-TEMPLATE unsigned imm_viterbi_source(struct imm_viterbi const *x,
-                                     unsigned const dst, unsigned const trans)
+TEMPLATE unsigned imm_viterbi_source(struct imm_viterbi const *x, unsigned dst,
+                                     unsigned trans)
 {
   return imm_trans_table_source_state(&x->dp->trans_table, dst, trans);
 }
@@ -55,19 +54,18 @@ TEMPLATE float imm_viterbi_get_score(struct imm_viterbi const *x,
 }
 
 TEMPLATE float imm_viterbi_trans_score(struct imm_viterbi const *x,
-                                       unsigned const dst, unsigned const trans)
+                                       unsigned dst, unsigned trans)
 {
   return imm_trans_table_score(&x->dp->trans_table, dst, trans);
 }
 
-TEMPLATE uint8_t imm_viterbi_span(struct imm_viterbi const *x,
-                                  unsigned const state)
+TEMPLATE uint8_t imm_viterbi_span(struct imm_viterbi const *x, unsigned state)
 {
   return imm_state_table_span(&x->dp->state_table, state);
 }
 
 TEMPLATE struct state_range imm_viterbi_state_range(struct imm_viterbi const *x,
-                                                    unsigned const state)
+                                                    unsigned state)
 {
   uint8_t span = imm_state_table_span(&x->dp->state_table, state);
   imm_assume(imm_zspan_min(span) <= IMM_STATE_MAX_SEQLEN);
@@ -76,30 +74,12 @@ TEMPLATE struct state_range imm_viterbi_state_range(struct imm_viterbi const *x,
   return STATE_RANGE(state, imm_zspan_min(span), imm_zspan_max(span));
 }
 
-TEMPLATE float imm_viterbi_emission(struct imm_viterbi const *x,
-                                    unsigned const row, unsigned const state,
-                                    unsigned const len, unsigned const min_len)
+TEMPLATE float imm_viterbi_emission(struct imm_viterbi const *x, unsigned row,
+                                    unsigned state, unsigned len,
+                                    unsigned min_len)
 {
   unsigned code = imm_eseq_get(&x->task->eseq, row, len, min_len);
   return imm_emis_score(&x->dp->emis, state, code);
-}
-
-TEMPLATE unsigned imm_viterbi_nstates(struct imm_viterbi const *x)
-{
-  return x->dp->state_table.nstates;
-}
-
-TEMPLATE void imm_viterbi_set_score(struct imm_viterbi const *x,
-                                    struct imm_cell const cell,
-                                    float const score)
-{
-  imm_matrix_set_score(&x->task->matrix, cell, score);
-}
-
-TEMPLATE uint16_t imm_viterbi_trans_start(struct imm_viterbi const *x,
-                                          unsigned state_idx)
-{
-  return imm_trans_table_trans_start(&x->dp->trans_table, state_idx);
 }
 
 void imm_viterbi_generic(struct imm_viterbi const *);
