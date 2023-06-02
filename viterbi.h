@@ -13,6 +13,7 @@ struct imm_viterbi
 {
   struct imm_dp const *dp;
   struct imm_task *task;
+  struct imm_ctrans const *curr_trans;
   struct imm_dp_safety safety;
   unsigned seqlen;
   bool has_tardy_state;
@@ -21,6 +22,6 @@ struct imm_viterbi
 
 IMM_API void imm_viterbi_init(struct imm_viterbi *, struct imm_dp const *,
                               struct imm_task *);
-IMM_API void imm_viterbi_run(struct imm_viterbi const *);
+IMM_API void imm_viterbi_run(struct imm_viterbi *);
 
 #endif
