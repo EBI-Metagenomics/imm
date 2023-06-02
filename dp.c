@@ -138,7 +138,7 @@ int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
   struct imm_viterbi viterbi = {0};
   imm_viterbi_init(&viterbi, dp, task);
 
-  imm_viterbi_generic(&viterbi, imm_eseq_len(&task->eseq));
+  imm_viterbi_generic(&viterbi);
 
   unsigned last_state = 0;
   unsigned total_seqlen = 0;

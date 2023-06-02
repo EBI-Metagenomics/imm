@@ -4,6 +4,6 @@
 struct imm_viterbi;
 struct imm_range;
 
-void imm_viterbi_generic(struct imm_viterbi const *, unsigned const seqlen);
+void imm_viterbi_generic(struct imm_viterbi const *);
 
 #endif
