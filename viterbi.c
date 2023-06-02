@@ -1,14 +1,27 @@
 #include "viterbi.h"
 #include "assume.h"
 #include "cell.h"
+#include "compiler.h"
 #include "dp.h"
 #include "lprob.h"
 #include "matrix.h"
 #include "max.h"
+#include "range.h"
 #include "span.h"
 #include "state_table.h"
 #include "task.h"
 #include "trans_table.h"
+#include "zspan.h"
+
+imm_pure_template float start_lprob(struct imm_viterbi const *x)
+{
+  return x->dp->state_table.start.lprob;
+}
+
+imm_pure_template unsigned start_state_idx(struct imm_viterbi const *x)
+{
+  return x->dp->state_table.start.state_idx;
+}
 
 imm_pure_template uint16_t start_trans_idx(struct imm_viterbi const *x,
                                            unsigned state_idx)
@@ -72,17 +85,6 @@ void imm_viterbi_init(struct imm_viterbi *x, struct imm_dp const *dp,
   imm_dp_safety_init(&x->safety, imm_seq_size(task->seq));
   x->seqlen = imm_seq_size(task->seq);
   find_tardy_states(x, dp);
-}
-
-struct imm_range imm_viterbi_range(struct imm_viterbi const *x,
-                                   unsigned state_idx)
-{
-  return imm_state_table_range(&x->dp->state_table, state_idx);
-}
-
-float imm_viterbi_start_lprob(struct imm_viterbi const *x)
-{
-  return x->dp->state_table.start.lprob;
 }
 
 imm_pure_template unsigned ntrans(struct imm_viterbi const *x, unsigned dst)
@@ -212,8 +214,8 @@ imm_template void set_state_score(struct imm_viterbi const *x, unsigned row,
                                   struct step const *bt, bool safe_future)
 {
   float score = bt->score;
-  if (row == 0 && imm_viterbi_start_state_idx(x) == dst.idx)
-    score = imm_max(imm_viterbi_start_lprob(x), score);
+  if (row == 0 && start_state_idx(x) == dst.idx)
+    score = imm_max(start_lprob(x), score);
 
   set_path(&x->task->path, bt, row, dst.idx);
   if (!safe_future) dst.max = imm_min(dst.max, remain);
