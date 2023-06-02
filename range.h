@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-// [a, b)
+// Right-open interval: [a, b)
 struct imm_range
 {
   unsigned a;

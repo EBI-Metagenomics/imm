@@ -15,12 +15,12 @@ imm_const_template uint8_t imm_zspan(unsigned min, unsigned max)
   return (uint8_t)((min << 4) | max);
 }
 
-imm_const_template uint_fast8_t imm_zspan_min(uint8_t const x)
+imm_const_template uint_fast8_t imm_zspan_min(uint8_t x)
 {
   return (uint_fast8_t)(x >> 4);
 }
 
-imm_const_template uint_fast8_t imm_zspan_max(uint8_t const x)
+imm_const_template uint_fast8_t imm_zspan_max(uint8_t x)
 {
   return (uint_fast8_t)(x & 0xF);
 }
