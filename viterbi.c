@@ -236,11 +236,10 @@ imm_const_template unsigned remains(unsigned seqlen, unsigned row,
   return seqlen - row;
 }
 
-imm_template struct imm_ctrans const *on_state(struct imm_viterbi const *x,
-                                               unsigned row, struct state dst,
-                                               struct imm_ctrans const *t,
-                                               bool safe_future, bool safe_past,
-                                               bool tardy_state)
+imm_template struct imm_ctrans const *
+on_normal_state(struct imm_viterbi const *x, unsigned row, struct state dst,
+                struct imm_ctrans const *t, bool safe_future, bool safe_past,
+                bool tardy_state)
 {
   struct step bt = {0};
   unsigned remain = remains(x->seqlen, row, safe_future);
@@ -256,21 +255,7 @@ imm_template void on_tardy_state(struct imm_viterbi const *x, unsigned row,
 {
   struct imm_ctrans const *t = x->dp->trans_table.trans + tardy.trans_start;
   struct state dst = unwrap_state(x, tardy.state_idx);
-  on_state(x, row, dst, t, safe_future, safe_past, true);
-}
-
-imm_template struct imm_ctrans const *on_states(struct imm_ctrans const *t,
-                                                struct imm_range const states,
-                                                struct imm_viterbi const *x,
-                                                unsigned row, bool safe_future,
-                                                bool safe_past)
-{
-  for (unsigned i = states.start; i < states.stop; ++i)
-  {
-    struct state dst = unwrap_state(x, i);
-    t = on_state(x, row, dst, t, safe_future, safe_past, false);
-  }
-  return t;
+  on_normal_state(x, row, dst, t, safe_future, safe_past, true);
 }
 
 imm_template void on_row(struct imm_viterbi const *x, unsigned row,
@@ -278,9 +263,14 @@ imm_template void on_row(struct imm_viterbi const *x, unsigned row,
 {
   if (has_tardy_state)
     on_tardy_state(x, row, x->tardy_state, safe_future, safe_past);
+
   struct imm_ctrans const *t = start_ctrans(x);
-  struct imm_range const r = imm_range(0, nstates(x));
-  on_states(t, r, x, row, safe_future, safe_past);
+
+  for (unsigned i = 0; i < nstates(x); ++i)
+  {
+    struct state dst = unwrap_state(x, i);
+    t = on_normal_state(x, row, dst, t, safe_future, safe_past, false);
+  }
 }
 
 imm_template void viterbi_generic(struct imm_viterbi const *x,
