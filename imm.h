@@ -92,7 +92,6 @@ extern "C" {
 #include "trans_table.h"
 #include "tsort.h"
 #include "viterbi.h"
-#include "viterbi_generic.h"
 #include "zspan.h"
 
 #ifdef __cplusplus

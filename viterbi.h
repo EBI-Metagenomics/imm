@@ -102,4 +102,6 @@ TEMPLATE uint16_t imm_viterbi_trans_start(struct imm_viterbi const *x,
   return imm_trans_table_trans_start(&x->dp->trans_table, state_idx);
 }
 
+void imm_viterbi_generic(struct imm_viterbi const *);
+
 #endif

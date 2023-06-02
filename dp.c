@@ -20,7 +20,6 @@
 #include "trans.h"
 #include "trans_table.h"
 #include "viterbi.h"
-#include "viterbi_generic.h"
 #include "zspan.h"
 #include <assert.h>
 #include <limits.h>
