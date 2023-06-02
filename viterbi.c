@@ -221,7 +221,7 @@ imm_template struct imm_ctrans const *on_states(struct imm_ctrans const *t,
                                                 unsigned row, bool safe_future,
                                                 bool safe_past)
 {
-  for (unsigned i = states.a; i < states.b; ++i)
+  for (unsigned i = states.start; i < states.stop; ++i)
   {
     struct state_range dst = imm_viterbi_state_range(x, i);
     t = on_state(x, row, dst, t, safe_future, safe_past, false);
@@ -246,16 +246,16 @@ imm_template void viterbi_generic(struct imm_viterbi const *x,
 
   on_row(x, 0, has_tardy_state, false, false);
 
-  for (unsigned r = y->safe_future.a; r < y->safe_future.b; ++r)
+  for (unsigned r = y->safe_future.start; r < y->safe_future.stop; ++r)
     on_row(x, r, has_tardy_state, true, false);
 
-  for (unsigned r = y->safe.a; r < y->safe.b; ++r)
+  for (unsigned r = y->safe.start; r < y->safe.stop; ++r)
     on_row(x, r, has_tardy_state, true, true);
 
-  for (unsigned r = y->unsafe.a; r < y->unsafe.b; ++r)
+  for (unsigned r = y->unsafe.start; r < y->unsafe.stop; ++r)
     on_row(x, r, has_tardy_state, false, false);
 
-  for (unsigned r = y->safe_past.a; r < y->safe_past.b; ++r)
+  for (unsigned r = y->safe_past.start; r < y->safe_past.stop; ++r)
     on_row(x, r, has_tardy_state, false, true);
 }
 
