@@ -1,10 +1,79 @@
 #include "viterbi_generic.h"
+#include "lprob.h"
+#include "max.h"
 #include "range.h"
 #include "remains.h"
 #include "state_range.h"
 #include "tardy_state.h"
 #include "viterbi.h"
-#include "viterbi_best_incoming.h"
+
+struct viterbi_best_trans
+{
+  uint_fast16_t src_idx;
+  uint_fast16_t src_trans;
+  uint_fast8_t src_seqlen;
+  float score;
+};
+
+#define VITERBI_BEST_TRANS_INIT                                                \
+  {                                                                            \
+    IMM_STATE_NULL_IDX, IMM_TRANS_NULL_IDX, IMM_STATE_NULL_SEQLEN,             \
+        IMM_LPROB_ZERO,                                                        \
+  }
+
+#define VITERBI_BEST_TRANS_DECLARE(NAME)                                       \
+  struct viterbi_best_trans NAME = VITERBI_BEST_TRANS_INIT
+
+TEMPLATE struct imm_ctrans const *
+viterbi_best_incoming(struct viterbi_best_trans *best_step,
+                      struct imm_viterbi const *x, unsigned const row,
+                      uint_fast16_t const dst, struct imm_ctrans const *ctrans,
+                      bool const unsafe_state, bool const safe_past)
+{
+  VITERBI_BEST_TRANS_DECLARE(step);
+  unsigned trans = 0;
+
+  while (dst == ctrans->dst)
+  {
+    struct state_range src = imm_viterbi_state_range(x, ctrans->src);
+    float const tscore = ctrans->score;
+
+    if (unsafe_state) src.min = imm_max(src.min, 1U);
+    if (!safe_past) src.max = imm_min(src.max, row);
+
+    float tf = IMM_LPROB_ZERO;
+    uint_fast8_t src_seqlen = 0;
+
+    imm_assume(src.max <= IMM_STATE_MAX_SEQLEN);
+    UNROLL(IMM_STATE_MAX_SEQLEN + 1)
+    for (uint_fast8_t i = src.min; i <= src.max; ++i)
+    {
+      imm_assume(row >= i);
+      imm_assume(i >= src.min);
+      float v = imm_viterbi_get_score(x, imm_cell(row - i, src.idx, i));
+      if (tf < v)
+      {
+        src_seqlen = i - src.min;
+        tf = v;
+      }
+    }
+    tf += tscore;
+
+    if (step.score < tf)
+    {
+      step.src_idx = src.idx;
+      step.src_trans = trans;
+      step.src_seqlen = src_seqlen;
+      step.score = tf;
+    }
+
+    ++trans;
+    ++ctrans;
+  }
+
+  *best_step = step;
+  return ctrans;
+}
 
 TEMPLATE void set_path(struct imm_cpath *x, struct viterbi_best_trans const *bt,
                        unsigned const r, uint_fast16_t const dst)
@@ -25,9 +94,10 @@ TEMPLATE void set_path(struct imm_cpath *x, struct viterbi_best_trans const *bt,
 
 TEMPLATE void set_state_score(struct imm_viterbi const *x, unsigned const row,
                               struct state_range dst, unsigned const remain,
-                              float score, struct viterbi_best_trans const *bt,
+                              struct viterbi_best_trans const *bt,
                               bool const safe_future)
 {
+  float score = bt->score;
   if (row == 0 && imm_viterbi_start_state(x) == dst.idx)
     score = imm_max(imm_viterbi_start_lprob(x), score);
 
@@ -50,13 +120,11 @@ on_state(struct imm_viterbi const *x, unsigned const row,
          unsigned const seqlen, bool const safe_future, bool const safe_past,
          bool const unsafe_state)
 {
-  float score = 0;
   struct viterbi_best_trans bt = {0};
   unsigned const remain = remains(seqlen, row, safe_future);
 
-  t = viterbi_best_incoming(&score, &bt, x, row, dst.idx, t, unsafe_state,
-                            safe_past);
-  set_state_score(x, row, dst, remain, score, &bt, safe_future);
+  t = viterbi_best_incoming(&bt, x, row, dst.idx, t, unsafe_state, safe_past);
+  set_state_score(x, row, dst, remain, &bt, safe_future);
   return t;
 }
 
