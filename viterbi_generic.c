@@ -2,7 +2,7 @@
 #include "range.h"
 #include "remains.h"
 #include "state_range.h"
-#include "unsafe.h"
+#include "tardy_state.h"
 #include "viterbi.h"
 #include "viterbi_best_incoming.h"
 
@@ -60,20 +60,20 @@ on_state(struct imm_viterbi const *x, unsigned const row,
   return t;
 }
 
-TEMPLATE void on_unsafe_state(struct imm_viterbi const *x, unsigned const row,
-                              struct unsafe const unsafe, unsigned const seqlen,
-                              bool const safe_future, bool const safe_past)
+TEMPLATE void on_tardy_state(struct imm_viterbi const *x, unsigned const row,
+                             struct tardy_state const tardy,
+                             unsigned const seqlen, bool const safe_future,
+                             bool const safe_past)
 {
-  struct imm_ctrans const *t = x->dp->trans_table.trans + unsafe.trans;
-  struct state_range dst = imm_viterbi_state_range(x, unsafe.state);
+  struct imm_ctrans const *t = x->dp->trans_table.trans + tardy.trans_start;
+  struct state_range dst = imm_viterbi_state_range(x, tardy.state_idx);
   on_state(x, row, dst, t, seqlen, safe_future, safe_past, true);
 }
 
 TEMPLATE struct imm_ctrans const *
-on_safe_states(struct imm_ctrans const *t, struct imm_range const states,
-               struct imm_viterbi const *x, unsigned const row,
-               unsigned const seqlen, bool const safe_future,
-               bool const safe_past)
+on_states(struct imm_ctrans const *t, struct imm_range const states,
+          struct imm_viterbi const *x, unsigned const row,
+          unsigned const seqlen, bool const safe_future, bool const safe_past)
 {
   for (unsigned i = states.a; i < states.b; ++i)
   {
@@ -84,31 +84,31 @@ on_safe_states(struct imm_ctrans const *t, struct imm_range const states,
 }
 
 TEMPLATE void on_row(struct imm_viterbi const *x, unsigned const row,
-                     struct unsafe const unsafe, unsigned const seqlen,
-                     bool const safe_future, bool const safe_past)
+                     unsigned const seqlen, bool const safe_future,
+                     bool const safe_past)
 {
-  on_unsafe_state(x, row, unsafe, seqlen, safe_future, safe_past);
+  if (x->has_tardy_state)
+    on_tardy_state(x, row, x->tardy_state, seqlen, safe_future, safe_past);
   struct imm_ctrans const *t = x->dp->trans_table.trans;
   struct imm_range const r = imm_range(0, x->dp->state_table.nstates);
-  on_safe_states(t, r, x, row, seqlen, safe_future, safe_past);
+  on_states(t, r, x, row, seqlen, safe_future, safe_past);
 }
 
 void imm_viterbi_generic(struct imm_viterbi const *x, unsigned const seqlen)
 {
-  struct unsafe const unsafe = unsafe_init(x);
   struct imm_dp_safety const *y = &x->safety;
 
-  on_row(x, 0, unsafe, seqlen, false, false);
+  on_row(x, 0, seqlen, false, false);
 
   for (unsigned r = y->safe_future.a; r < y->safe_future.b; ++r)
-    on_row(x, r, unsafe, seqlen, true, false);
+    on_row(x, r, seqlen, true, false);
 
   for (unsigned r = y->safe.a; r < y->safe.b; ++r)
-    on_row(x, r, unsafe, seqlen, true, true);
+    on_row(x, r, seqlen, true, true);
 
   for (unsigned r = y->unsafe.a; r < y->unsafe.b; ++r)
-    on_row(x, r, unsafe, seqlen, false, false);
+    on_row(x, r, seqlen, false, false);
 
   for (unsigned r = y->safe_past.a; r < y->safe_past.b; ++r)
-    on_row(x, r, unsafe, seqlen, false, true);
+    on_row(x, r, seqlen, false, true);
 }

@@ -53,8 +53,8 @@ TEMPLATE float imm_trans_table_score(struct imm_trans_table const *tbl,
   return tbl->trans[tbl->offset[dst] + trans].score;
 }
 
-TEMPLATE uint16_t imm_trans_table_trans0(struct imm_trans_table const *tbl,
-                                         unsigned const state)
+TEMPLATE uint16_t imm_trans_table_trans_start(struct imm_trans_table const *tbl,
+                                              unsigned const state)
 {
   return tbl->offset[state];
 }

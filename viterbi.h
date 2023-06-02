@@ -8,6 +8,7 @@
 #include "dp_safety.h"
 #include "range.h"
 #include "state_range.h"
+#include "tardy_state.h"
 #include "task.h"
 #include "trans_table.h"
 #include "zspan.h"
@@ -21,7 +22,8 @@ struct imm_viterbi
   struct imm_task *task;
   struct imm_dp_safety safety;
   unsigned seqlen;
-  unsigned unsafe_state;
+  bool has_tardy_state;
+  struct tardy_state tardy_state;
 };
 
 void imm_viterbi_init(struct imm_viterbi *, struct imm_dp const *,
@@ -97,7 +99,7 @@ TEMPLATE void imm_viterbi_set_score(struct imm_viterbi const *x,
 TEMPLATE uint16_t imm_viterbi_trans0(struct imm_viterbi const *x,
                                      unsigned const state)
 {
-  return imm_trans_table_trans0(&x->dp->trans_table, state);
+  return imm_trans_table_trans_start(&x->dp->trans_table, state);
 }
 
 #endif
