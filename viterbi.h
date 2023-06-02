@@ -25,9 +25,12 @@ struct imm_viterbi
   struct tardy_state tardy_state;
 };
 
-void imm_viterbi_init(struct imm_viterbi *, struct imm_dp const *,
-                      struct imm_task *);
-struct imm_range imm_viterbi_range(struct imm_viterbi const *, unsigned state);
+IMM_API void imm_viterbi_init(struct imm_viterbi *, struct imm_dp const *,
+                              struct imm_task *);
+IMM_API void imm_viterbi_run(struct imm_viterbi const *);
+
+struct imm_range imm_viterbi_range(struct imm_viterbi const *,
+                                   unsigned state_idx);
 float imm_viterbi_start_lprob(struct imm_viterbi const *);
 
 imm_pure_template unsigned
@@ -41,40 +44,5 @@ imm_pure_template unsigned imm_viterbi_ntrans(struct imm_viterbi const *x,
 {
   return imm_trans_table_ntrans(&x->dp->trans_table, dst);
 }
-
-imm_pure_template unsigned
-imm_viterbi_source_state_idx(struct imm_viterbi const *x, unsigned dst,
-                             unsigned trans)
-{
-  return imm_trans_table_source_state(&x->dp->trans_table, dst, trans);
-}
-
-imm_pure_template float imm_viterbi_get_score(struct imm_viterbi const *x,
-                                              struct imm_cell cell)
-{
-  return imm_matrix_get_score(&x->task->matrix, cell);
-}
-
-imm_pure_template float imm_viterbi_trans_score(struct imm_viterbi const *x,
-                                                unsigned dst, unsigned trans)
-{
-  return imm_trans_table_score(&x->dp->trans_table, dst, trans);
-}
-
-imm_pure_template uint8_t imm_viterbi_state_span(struct imm_viterbi const *x,
-                                                 unsigned state_idx)
-{
-  return imm_state_table_zspan(&x->dp->state_table, state_idx);
-}
-
-imm_pure_template float imm_viterbi_emission(struct imm_viterbi const *x,
-                                             unsigned row, unsigned state_idx,
-                                             unsigned len, unsigned min_len)
-{
-  unsigned code = imm_eseq_get(&x->task->eseq, row, len, min_len);
-  return imm_emis_score(&x->dp->emis, state_idx, code);
-}
-
-void imm_viterbi_generic(struct imm_viterbi const *);
 
 #endif

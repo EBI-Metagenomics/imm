@@ -22,10 +22,16 @@ start_ctrans(struct imm_viterbi const *x)
   return imm_trans_table_ctrans_start(&x->dp->trans_table);
 }
 
-imm_template void set_matrix_cell(struct imm_viterbi const *x,
-                                  struct imm_cell cell, float score)
+imm_template void set_matrix_cell_score(struct imm_viterbi const *x,
+                                        struct imm_cell cell, float score)
 {
   imm_matrix_set_score(&x->task->matrix, cell, score);
+}
+
+imm_pure_template float get_matrix_cell_score(struct imm_viterbi const *x,
+                                              struct imm_cell cell)
+{
+  return imm_matrix_get_score(&x->task->matrix, cell);
 }
 
 imm_pure_template unsigned nstates(struct imm_viterbi const *x)
@@ -40,10 +46,16 @@ struct state
   uint_fast8_t max;
 };
 
+imm_pure_template uint8_t state_zspan(struct imm_viterbi const *x,
+                                      unsigned state_idx)
+{
+  return imm_state_table_zspan(&x->dp->state_table, state_idx);
+}
+
 imm_pure_template struct state unwrap_state(struct imm_viterbi const *x,
                                             unsigned state_idx)
 {
-  uint8_t span = imm_state_table_zspan(&x->dp->state_table, state_idx);
+  uint8_t span = state_zspan(x, state_idx);
   imm_assume(imm_zspan_min(span) <= IMM_STATE_MAX_SEQLEN);
   imm_assume(imm_zspan_max(span) <= IMM_STATE_MAX_SEQLEN);
   imm_assume(imm_zspan_min(span) <= imm_zspan_max(span));
@@ -62,9 +74,10 @@ void imm_viterbi_init(struct imm_viterbi *x, struct imm_dp const *dp,
   find_tardy_states(x, dp);
 }
 
-struct imm_range imm_viterbi_range(struct imm_viterbi const *x, unsigned state)
+struct imm_range imm_viterbi_range(struct imm_viterbi const *x,
+                                   unsigned state_idx)
 {
-  return imm_state_table_range(&x->dp->state_table, state);
+  return imm_state_table_range(&x->dp->state_table, state_idx);
 }
 
 float imm_viterbi_start_lprob(struct imm_viterbi const *x)
@@ -81,7 +94,7 @@ static void find_tardy_states(struct imm_viterbi *x, struct imm_dp const *dp)
     for (unsigned t = 0; t < imm_trans_table_ntrans(&dp->trans_table, dst); ++t)
     {
       unsigned src = imm_trans_table_source_state(&dp->trans_table, dst, t);
-      uint8_t span = imm_state_table_zspan(&dp->state_table, src);
+      uint8_t span = state_zspan(x, src);
       if (imm_zspan_min(span) == 0 && dst < src)
       {
         n++;
@@ -139,7 +152,7 @@ viterbi_best_incoming(struct step *best_step, struct imm_viterbi const *x,
     {
       imm_assume(row >= i);
       imm_assume(i >= src.min);
-      float v = imm_viterbi_get_score(x, imm_cell(row - i, src.idx, i));
+      float v = get_matrix_cell_score(x, imm_cell(row - i, src.idx, i));
       if (tf < v)
       {
         src_seqlen = i - src.min;
@@ -181,6 +194,14 @@ imm_template void set_path(struct imm_cpath *x, struct step const *bt,
   }
 }
 
+imm_pure_template float emission_score(struct imm_viterbi const *x,
+                                       struct state state, unsigned row,
+                                       unsigned len)
+{
+  unsigned code = imm_eseq_get(&x->task->eseq, row, len, state.min);
+  return imm_emis_score(&x->dp->emis, state.idx, code);
+}
+
 imm_template void set_state_score(struct imm_viterbi const *x, unsigned row,
                                   struct state dst, unsigned remain,
                                   struct step const *bt, bool safe_future)
@@ -197,8 +218,8 @@ imm_template void set_state_score(struct imm_viterbi const *x, unsigned row,
   UNROLL(IMM_STATE_MAX_SEQLEN + 1)
   for (uint_fast8_t i = dst.min; i <= dst.max; ++i)
   {
-    float total = score + imm_viterbi_emission(x, row, dst.idx, i, dst.min);
-    set_matrix_cell(x, imm_cell(row, dst.idx, i), total);
+    float total = score + emission_score(x, dst, row, i);
+    set_matrix_cell_score(x, imm_cell(row, dst.idx, i), total);
   }
 }
 
@@ -277,7 +298,7 @@ imm_template void viterbi_generic(struct imm_viterbi const *x,
     on_row(x, r, has_tardy_state, false, true);
 }
 
-void imm_viterbi_generic(struct imm_viterbi const *x)
+void imm_viterbi_run(struct imm_viterbi const *x)
 {
   if (x->has_tardy_state) viterbi_generic(x, true);
   else viterbi_generic(x, false);
