@@ -51,8 +51,8 @@ static void find_tardy_states(struct imm_viterbi *x, struct imm_dp const *dp)
   // We don't support more than 1 tardy state at the moment.
   assert(n <= 1);
   (void)n;
-  unsigned trans0 = imm_trans_table_trans_start(&dp->trans_table, state_idx);
+  unsigned trans_idx = imm_viterbi_trans_start(x, state_idx);
 
   x->has_tardy_state = n > 0;
-  x->tardy_state = (struct tardy_state){state_idx, trans0};
+  x->tardy_state = (struct tardy_state){state_idx, trans_idx};
 }

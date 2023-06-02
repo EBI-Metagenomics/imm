@@ -96,10 +96,10 @@ TEMPLATE void imm_viterbi_set_score(struct imm_viterbi const *x,
   imm_matrix_set_score(&x->task->matrix, cell, score);
 }
 
-TEMPLATE uint16_t imm_viterbi_trans0(struct imm_viterbi const *x,
-                                     unsigned const state)
+TEMPLATE uint16_t imm_viterbi_trans_start(struct imm_viterbi const *x,
+                                          unsigned state_idx)
 {
-  return imm_trans_table_trans_start(&x->dp->trans_table, state);
+  return imm_trans_table_trans_start(&x->dp->trans_table, state_idx);
 }
 
 #endif
