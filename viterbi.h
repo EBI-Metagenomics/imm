@@ -7,7 +7,6 @@
 #include "dp.h"
 #include "dp_safety.h"
 #include "range.h"
-#include "state_range.h"
 #include "tardy_state.h"
 #include "task.h"
 #include "trans_table.h"
@@ -66,16 +65,6 @@ imm_pure_template uint8_t imm_viterbi_state_span(struct imm_viterbi const *x,
                                                  unsigned state_idx)
 {
   return imm_state_table_zspan(&x->dp->state_table, state_idx);
-}
-
-imm_pure_template struct state_range
-imm_viterbi_state_range(struct imm_viterbi const *x, unsigned state_idx)
-{
-  uint8_t span = imm_state_table_zspan(&x->dp->state_table, state_idx);
-  imm_assume(imm_zspan_min(span) <= IMM_STATE_MAX_SEQLEN);
-  imm_assume(imm_zspan_max(span) <= IMM_STATE_MAX_SEQLEN);
-  imm_assume(imm_zspan_min(span) <= imm_zspan_max(span));
-  return STATE_RANGE(state_idx, imm_zspan_min(span), imm_zspan_max(span));
 }
 
 imm_pure_template float imm_viterbi_emission(struct imm_viterbi const *x,

@@ -33,6 +33,23 @@ imm_pure_template unsigned nstates(struct imm_viterbi const *x)
   return x->dp->state_table.nstates;
 }
 
+struct state
+{
+  uint_fast16_t idx;
+  uint_fast8_t min;
+  uint_fast8_t max;
+};
+
+imm_pure_template struct state unwrap_state(struct imm_viterbi const *x,
+                                            unsigned state_idx)
+{
+  uint8_t span = imm_state_table_zspan(&x->dp->state_table, state_idx);
+  imm_assume(imm_zspan_min(span) <= IMM_STATE_MAX_SEQLEN);
+  imm_assume(imm_zspan_max(span) <= IMM_STATE_MAX_SEQLEN);
+  imm_assume(imm_zspan_min(span) <= imm_zspan_max(span));
+  return (struct state){state_idx, imm_zspan_min(span), imm_zspan_max(span)};
+}
+
 static void find_tardy_states(struct imm_viterbi *, struct imm_dp const *);
 
 void imm_viterbi_init(struct imm_viterbi *x, struct imm_dp const *dp,
@@ -107,7 +124,7 @@ viterbi_best_incoming(struct step *best_step, struct imm_viterbi const *x,
 
   while (dst == ctrans->dst)
   {
-    struct state_range src = imm_viterbi_state_range(x, ctrans->src);
+    struct state src = unwrap_state(x, ctrans->src);
     float tscore = ctrans->score;
 
     if (tardy_state) src.min = imm_max(src.min, 1U);
@@ -165,7 +182,7 @@ imm_template void set_path(struct imm_cpath *x, struct step const *bt,
 }
 
 imm_template void set_state_score(struct imm_viterbi const *x, unsigned row,
-                                  struct state_range dst, unsigned remain,
+                                  struct state dst, unsigned remain,
                                   struct step const *bt, bool safe_future)
 {
   float score = bt->score;
@@ -193,10 +210,11 @@ imm_const_template unsigned remains(unsigned seqlen, unsigned row,
   return seqlen - row;
 }
 
-imm_template struct imm_ctrans const *
-on_state(struct imm_viterbi const *x, unsigned row, struct state_range dst,
-         struct imm_ctrans const *t, bool safe_future, bool safe_past,
-         bool tardy_state)
+imm_template struct imm_ctrans const *on_state(struct imm_viterbi const *x,
+                                               unsigned row, struct state dst,
+                                               struct imm_ctrans const *t,
+                                               bool safe_future, bool safe_past,
+                                               bool tardy_state)
 {
   struct step bt = {0};
   unsigned remain = remains(x->seqlen, row, safe_future);
@@ -211,7 +229,7 @@ imm_template void on_tardy_state(struct imm_viterbi const *x, unsigned row,
                                  bool safe_future, bool safe_past)
 {
   struct imm_ctrans const *t = x->dp->trans_table.trans + tardy.trans_start;
-  struct state_range dst = imm_viterbi_state_range(x, tardy.state_idx);
+  struct state dst = unwrap_state(x, tardy.state_idx);
   on_state(x, row, dst, t, safe_future, safe_past, true);
 }
 
@@ -223,7 +241,7 @@ imm_template struct imm_ctrans const *on_states(struct imm_ctrans const *t,
 {
   for (unsigned i = states.start; i < states.stop; ++i)
   {
-    struct state_range dst = imm_viterbi_state_range(x, i);
+    struct state dst = unwrap_state(x, i);
     t = on_state(x, row, dst, t, safe_future, safe_past, false);
   }
   return t;
