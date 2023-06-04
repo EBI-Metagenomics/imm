@@ -27,7 +27,8 @@ imm_pure_template float imm_matrix_get_score(struct imm_matrix const *x,
                                              struct imm_cell y)
 {
   uint_fast8_t row = y.row % IMM_MATRIX_NROWS;
-  uint_fast16_t col = (uint_fast16_t)(x->state_col[y.state_idx] + y.seqlen);
+  uint_fast16_t col =
+      (uint_fast16_t)(x->state_col[y.state_idx] + y.emission_length);
   return imm_matrixf_get(&x->score, row, col);
 }
 
@@ -35,7 +36,8 @@ imm_template void imm_matrix_set_score(struct imm_matrix *x, struct imm_cell y,
                                        float score)
 {
   uint_fast8_t row = y.row % IMM_MATRIX_NROWS;
-  uint_fast16_t col = (uint_fast16_t)(x->state_col[y.state_idx] + y.seqlen);
+  uint_fast16_t col =
+      (uint_fast16_t)(x->state_col[y.state_idx] + y.emission_length);
   imm_matrixf_set(&x->score, row, (unsigned)col, score);
 }
 

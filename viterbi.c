@@ -52,10 +52,10 @@ imm_template void set_matrix_cell_score(struct imm_viterbi const *x,
 
 imm_pure_template float get_matrix_cell_score(struct imm_viterbi const *x,
                                               unsigned row, uint_fast16_t src,
-                                              uint_fast8_t seqlen)
+                                              uint_fast8_t emission_length)
 {
-  imm_assume(row >= seqlen);
-  struct imm_cell cell = imm_cell(row - seqlen, src, seqlen);
+  imm_assume(row >= emission_length);
+  struct imm_cell cell = imm_cell(row - emission_length, src, emission_length);
   return imm_matrix_get_score(&x->task->matrix, cell);
 }
 
