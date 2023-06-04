@@ -51,8 +51,11 @@ imm_template void set_matrix_cell_score(struct imm_viterbi const *x,
 }
 
 imm_pure_template float get_matrix_cell_score(struct imm_viterbi const *x,
-                                              struct imm_cell cell)
+                                              unsigned row, uint_fast16_t src,
+                                              uint_fast8_t seqlen)
 {
+  imm_assume(row >= seqlen);
+  struct imm_cell cell = imm_cell(row - seqlen, src, seqlen);
   return imm_matrix_get_score(&x->task->matrix, cell);
 }
 
@@ -134,7 +137,7 @@ struct step
 {
   uint_fast16_t src_idx;
   uint_fast16_t src_trans;
-  uint_fast8_t src_seqlen;
+  uint_fast8_t src_seqlen_idx;
   float score;
 };
 
@@ -144,10 +147,9 @@ static inline struct step step_init(void)
                        IMM_STATE_NULL_SEQLEN, IMM_LPROB_ZERO};
 }
 
-imm_template void viterbi_best_incoming(struct step *best_step,
-                                        struct imm_viterbi *x, unsigned row,
-                                        uint_fast16_t dst, bool tardy_state,
-                                        bool safe_past)
+imm_template struct step best_step(struct imm_viterbi *x, unsigned row,
+                                   uint_fast16_t dst, bool tardy_state,
+                                   bool safe_past)
 {
   struct step step = step_init();
   unsigned trans = 0;
@@ -155,42 +157,39 @@ imm_template void viterbi_best_incoming(struct step *best_step,
   while (dst == x->curr_trans->dst)
   {
     struct state src = unwrap_state(x, x->curr_trans->src);
-    float tscore = x->curr_trans->score;
 
     if (tardy_state) src.min = imm_max(src.min, 1U);
     if (!safe_past) src.max = imm_min(src.max, row);
 
-    float tf = IMM_LPROB_ZERO;
-    uint_fast8_t src_seqlen = 0;
+    float score = IMM_LPROB_ZERO;
+    uint_fast8_t seqlen_idx = 0;
 
     imm_assume(src.max <= IMM_STATE_MAX_SEQLEN);
     UNROLL(IMM_STATE_MAX_SEQLEN + 1)
     for (uint_fast8_t i = src.min; i <= src.max; ++i)
     {
-      imm_assume(row >= i);
-      imm_assume(i >= src.min);
-      float v = get_matrix_cell_score(x, imm_cell(row - i, src.idx, i));
-      if (tf < v)
+      float v = get_matrix_cell_score(x, row, src.idx, i);
+      if (score < v)
       {
-        src_seqlen = i - src.min;
-        tf = v;
+        seqlen_idx = i - src.min;
+        score = v;
       }
     }
-    tf += tscore;
+    score += x->curr_trans->score;
 
-    if (step.score < tf)
+    if (step.score < score)
     {
       step.src_idx = src.idx;
       step.src_trans = trans;
-      step.src_seqlen = src_seqlen;
-      step.score = tf;
+      step.src_seqlen_idx = seqlen_idx;
+      step.score = score;
     }
 
     ++trans;
     viterbi_ctrans_next(x);
   }
 
-  *best_step = step;
+  return step;
 }
 
 imm_template void set_path(struct imm_cpath *x, struct step const *bt,
@@ -199,9 +198,9 @@ imm_template void set_path(struct imm_cpath *x, struct step const *bt,
   if (bt->src_idx != IMM_STATE_NULL_IDX)
   {
     imm_cpath_set_trans(x, r, dst, bt->src_trans);
-    imm_cpath_set_seqlen(x, r, dst, bt->src_seqlen);
+    imm_cpath_set_seqlen_idx(x, r, dst, bt->src_seqlen_idx);
     assert(imm_cpath_trans(x, r, dst) == bt->src_trans);
-    assert(imm_cpath_seqlen(x, r, dst) == bt->src_seqlen);
+    assert(imm_cpath_seqlen_idx(x, r, dst) == bt->src_seqlen_idx);
   }
   else
   {
@@ -251,11 +250,10 @@ imm_template void on_normal_state(struct imm_viterbi *x, unsigned row,
                                   struct state dst, bool safe_future,
                                   bool safe_past, bool tardy_state)
 {
-  struct step bt = {0};
   unsigned remain = remains(x->seqlen, row, safe_future);
 
-  viterbi_best_incoming(&bt, x, row, dst.idx, tardy_state, safe_past);
-  set_state_score(x, row, dst, remain, &bt, safe_future);
+  struct step step = best_step(x, row, dst.idx, tardy_state, safe_past);
+  set_state_score(x, row, dst, remain, &step, safe_future);
 }
 
 imm_template void on_tardy_state(struct imm_viterbi *x, unsigned row,

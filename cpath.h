@@ -86,8 +86,8 @@ int imm_cpath_reset(struct imm_cpath *, struct imm_state_table const *,
 
 int imm_cpath_setup(struct imm_cpath *, unsigned len);
 
-imm_pure_template unsigned imm_cpath_seqlen(struct imm_cpath const *x,
-                                            unsigned pos, unsigned state)
+imm_pure_template unsigned imm_cpath_seqlen_idx(struct imm_cpath const *x,
+                                                unsigned pos, unsigned state)
 {
   unsigned long start =
       imm_cpath_start_bit(x, pos, state) + x->trans_bits[state];
@@ -106,11 +106,11 @@ imm_pure_template bool imm_cpath_valid(struct imm_cpath const *x, unsigned pos,
                                        unsigned state)
 {
   return !!(imm_cpath_invalid(imm_cpath_seqlen_bits(x, state)) ^
-            imm_cpath_seqlen(x, pos, state));
+            imm_cpath_seqlen_idx(x, pos, state));
 }
 
-imm_template void imm_cpath_set_seqlen(struct imm_cpath *x, unsigned pos,
-                                       unsigned state, unsigned len)
+imm_template void imm_cpath_set_seqlen_idx(struct imm_cpath *x, unsigned pos,
+                                           unsigned state, unsigned len)
 {
   unsigned long start =
       imm_cpath_start_bit(x, pos, state) + x->trans_bits[state];
@@ -128,7 +128,7 @@ imm_template void imm_cpath_invalidate(struct imm_cpath *x, unsigned pos,
                                        unsigned state)
 {
   unsigned seqlen = imm_cpath_invalid(imm_cpath_seqlen_bits(x, state));
-  imm_cpath_set_seqlen(x, pos, state, seqlen);
+  imm_cpath_set_seqlen_idx(x, pos, state, seqlen);
 }
 
 #endif

@@ -109,7 +109,7 @@ static int unzip_path(struct imm_dp const *dp, struct imm_task const *task,
     if (valid)
     {
       unsigned trans = imm_cpath_trans(&task->path, row, state);
-      unsigned len = imm_cpath_seqlen(&task->path, row, state);
+      unsigned len = imm_cpath_seqlen_idx(&task->path, row, state);
       state = imm_trans_table_source_state(&dp->trans_table, state, trans);
       seqlen =
           len + imm_zspan_min(imm_state_table_zspan(&dp->state_table, state));
