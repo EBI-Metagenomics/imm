@@ -113,7 +113,7 @@ static size_t lfails = 0;
       char _bufb_mt[64] = {0};                                                 \
       _minctest_sprintf(_bufa_mt, a);                                          \
       _minctest_sprintf(_bufb_mt, b);                                          \
-      printf("%s:%d (%s != %s)\n", __FILE__, __LINE__, _bufa_mt, _bufa_mt);    \
+      printf("%s:%d (%s != %s)\n", __FILE__, __LINE__, _bufa_mt, _bufb_mt);    \
     }                                                                          \
   } while (0);
 
