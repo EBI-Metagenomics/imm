@@ -99,3 +99,18 @@ defer:
   x->score = NULL;
   return rc;
 }
+
+void imm_cpath_dump(struct imm_cpath const *x, FILE *restrict fp)
+{
+  for (unsigned i = 0; i < x->ncols; ++i)
+  {
+    for (unsigned j = 0; j < x->nstates; ++j)
+    {
+      if (j > 0) fputc(',', fp);
+      fprintf(fp, "(%u, %u, %d)", imm_cpath_trans(x, i, j),
+              imm_cpath_seqlen_idx(x, i, j), imm_cpath_valid(x, i, j));
+    }
+    fprintf(fp, "\n");
+  }
+  fprintf(fp, "\n");
+}

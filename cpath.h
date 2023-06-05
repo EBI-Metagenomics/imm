@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 
 struct imm_state_table;
 struct imm_trans_table;
@@ -85,6 +86,8 @@ int imm_cpath_reset(struct imm_cpath *, struct imm_state_table const *,
                     struct imm_trans_table const *);
 
 int imm_cpath_setup(struct imm_cpath *, unsigned len);
+
+void imm_cpath_dump(struct imm_cpath const *, FILE *restrict);
 
 imm_pure_template unsigned imm_cpath_seqlen_idx(struct imm_cpath const *x,
                                                 unsigned pos, unsigned state)
