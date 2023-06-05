@@ -28,7 +28,7 @@ struct imm_task *imm_task_new(struct imm_dp const *dp)
   }
   imm_eseq_init(&task->eseq, dp->code);
   task->seq = NULL;
-  imm_trellis_init(&task->trellis);
+  imm_trellis_init(&task->trellis, &dp->state_table, &dp->trans_table);
   return task;
 }
 
