@@ -6,6 +6,7 @@
 #include "export.h"
 #include "matrix.h"
 #include "rc.h"
+#include "trellis.h"
 #include <stdbool.h>
 
 struct imm_dp;
@@ -17,6 +18,7 @@ struct imm_task
   struct imm_cpath path;
   struct imm_eseq eseq;
   struct imm_seq const *seq;
+  struct imm_trellis trellis;
 };
 
 IMM_API struct imm_task *imm_task_new(struct imm_dp const *dp);

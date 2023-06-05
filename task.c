@@ -28,6 +28,7 @@ struct imm_task *imm_task_new(struct imm_dp const *dp)
   }
   imm_eseq_init(&task->eseq, dp->code);
   task->seq = NULL;
+  imm_trellis_init(&task->trellis);
   return task;
 }
 
@@ -46,7 +47,11 @@ int imm_task_reset(struct imm_task *x, struct imm_dp const *dp)
 int imm_task_setup(struct imm_task *x, struct imm_seq const *seq)
 {
   x->seq = seq;
+  // TODO: memory leak
   int rc = imm_cpath_setup(&x->path, imm_seq_size(seq) + 1);
+  if (rc) return rc;
+  // TODO: memory leak
+  rc = imm_trellis_setup(&x->trellis, imm_seq_size(seq) + 1, x->path.nstates);
   if (rc) return rc;
   return imm_eseq_setup(&x->eseq, seq);
 }
@@ -58,6 +63,7 @@ void imm_task_del(struct imm_task const *x)
     imm_matrix_cleanup((struct imm_matrix *)&x->matrix);
     imm_cpath_cleanup((struct imm_cpath *)&x->path);
     imm_eseq_cleanup(&x->eseq);
+    imm_trellis_cleanup((struct imm_trellis *)&x->trellis);
     free((void *)x);
   }
 }
