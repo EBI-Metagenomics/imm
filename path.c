@@ -86,10 +86,17 @@ void imm_path_reverse(struct imm_path *path)
   path->dir *= -1;
 }
 
+static char *id_state_name(unsigned id, char *name)
+{
+  sprintf(name, "%u", id);
+  return name;
+}
+
 void imm_path_dump(struct imm_path const *x, imm_state_name *callb,
                    struct imm_seq const *seq, FILE *restrict fp)
 {
   char name[IMM_STATE_NAME_SIZE] = {0};
+  if (!callb) callb = &id_state_name;
   char const *sequence = imm_seq_str(seq);
   for (unsigned i = 0; i < imm_path_nsteps(x); ++i)
   {
