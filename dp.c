@@ -92,7 +92,8 @@ static float read_result(struct imm_dp const *dp, struct imm_task *task,
 }
 
 static int unzip_path(struct imm_dp const *dp, struct imm_task const *task,
-                      unsigned state, unsigned seqlen, struct imm_path *path)
+                      unsigned state, unsigned seqlen, struct imm_path *path,
+                      float total)
 {
   unsigned row = imm_eseq_len(&task->eseq);
   bool valid = seqlen != IMM_STATE_NULL_SEQLEN;
@@ -100,12 +101,13 @@ static int unzip_path(struct imm_dp const *dp, struct imm_task const *task,
   while (valid)
   {
     unsigned id = dp->state_table.ids[state];
-    struct imm_step step = imm_step(id, seqlen, 0);
+    struct imm_step step = imm_step(id, seqlen, total);
     int rc = imm_path_add(path, step);
     if (rc) return rc;
     row -= seqlen;
 
     valid = imm_cpath_valid(&task->path, row, state);
+    float score = imm_cpath_get_score(&task->path, row, state);
     if (valid)
     {
       unsigned trans = imm_cpath_trans(&task->path, row, state);
@@ -113,6 +115,8 @@ static int unzip_path(struct imm_dp const *dp, struct imm_task const *task,
       state = imm_trans_table_source_state(&dp->trans_table, state, trans);
       seqlen =
           len + imm_zspan_min(imm_state_table_zspan(&dp->state_table, state));
+      imm_path_step(path, 0)->score = total - score;
+      total -= imm_path_step(path, 0)->score;
     }
   }
   imm_path_reverse(path);
@@ -145,7 +149,8 @@ int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
   prod->loglik = read_result(dp, task, &last_state, &total_seqlen);
 
   int rc = 0;
-  if ((rc = unzip_path(dp, task, last_state, total_seqlen, &prod->path)))
+  if ((rc = unzip_path(dp, task, last_state, total_seqlen, &prod->path,
+                       prod->loglik)))
     return rc;
 
   if (elapsed_stop(&elapsed)) return IMM_EELAPSED;

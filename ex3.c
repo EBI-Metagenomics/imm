@@ -115,7 +115,7 @@ void imm_ex3_init(unsigned core_size)
   set_transitions(&imm_ex3);
 }
 
-unsigned imm_ex3_state_name(unsigned id, char *name)
+char *imm_ex3_state_name(unsigned id, char *name)
 {
   if ((id & (15U << 12)) == M_ID)
     snprintf(name, IMM_STATE_NAME_SIZE, "M%u", (id & (0xFFFF >> 4)));
@@ -130,7 +130,7 @@ unsigned imm_ex3_state_name(unsigned id, char *name)
 
   if ((id & (15U << 12)) == J_ID) strcpy(name, "J");
 
-  return (unsigned)strlen(name);
+  return name;
 }
 
 struct imm_ex3 imm_ex3 = {0};

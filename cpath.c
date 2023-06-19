@@ -14,6 +14,7 @@ int imm_cpath_init(struct imm_cpath *x, struct imm_state_table const *state_tbl,
                    struct imm_trans_table const *trans_tbl)
 {
   x->nstates = 0;
+  x->length = 0;
   x->ncols = 0;
   x->state_offset = NULL;
   x->trans_bits = NULL;
@@ -82,11 +83,12 @@ void imm_cpath_cleanup(struct imm_cpath *x)
 int imm_cpath_setup(struct imm_cpath *x, unsigned len)
 {
   int rc = 0;
-  size_t size = x->state_offset[x->nstates] * len;
+  x->length = len;
+  size_t size = x->state_offset[x->nstates] * x->length;
   x->bit = imm_bitmap_reallocf(x->bit, size);
   if (!x->bit && size > 0) defer_return(IMM_ENOMEM);
 
-  size = sizeof(*x->score) * len;
+  size = sizeof(*x->score) * (x->length * x->nstates);
   x->score = imm_reallocf(x->score, size);
   if (!x->score && size > 0) defer_return(IMM_ENOMEM);
 
@@ -102,15 +104,15 @@ defer:
 
 void imm_cpath_dump(struct imm_cpath const *x, FILE *restrict fp)
 {
-  for (unsigned i = 0; i < x->ncols; ++i)
+  for (unsigned i = 0; i < x->length; ++i)
   {
     for (unsigned j = 0; j < x->nstates; ++j)
     {
       if (j > 0) fputc(',', fp);
-      fprintf(fp, "(%u, %u, %d)", imm_cpath_trans(x, i, j),
-              imm_cpath_seqlen_idx(x, i, j), imm_cpath_valid(x, i, j));
+      fprintf(fp, "(trans=%u, seqlen_idx=%u, score=%.7g, valid=%d)",
+              imm_cpath_trans(x, i, j), imm_cpath_seqlen_idx(x, i, j),
+              imm_cpath_get_score(x, i, j), imm_cpath_valid(x, i, j));
     }
     fprintf(fp, "\n");
   }
-  fprintf(fp, "\n");
 }

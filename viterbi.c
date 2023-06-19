@@ -199,6 +199,7 @@ imm_template void set_path(struct imm_cpath *x, struct step const *bt,
   {
     imm_cpath_set_trans(x, r, dst, bt->src_trans);
     imm_cpath_set_seqlen_idx(x, r, dst, bt->src_seqlen_idx);
+    imm_cpath_set_score(x, r, dst, bt->score);
     assert(imm_cpath_trans(x, r, dst) == bt->src_trans);
     assert(imm_cpath_seqlen_idx(x, r, dst) == bt->src_seqlen_idx);
   }

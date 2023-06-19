@@ -32,6 +32,6 @@ extern struct imm_ex3 imm_ex3;
 extern char const imm_ex3_seq1[];
 
 void imm_ex3_init(unsigned core_size);
-unsigned imm_ex3_state_name(unsigned id, char *name);
+char *imm_ex3_state_name(unsigned id, char *name);
 
 #endif

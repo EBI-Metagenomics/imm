@@ -103,7 +103,7 @@ void imm_path_dump(struct imm_path const *x, imm_state_name *callb,
     if (i > 0) fprintf(fp, "->");
     unsigned state_id = imm_path_step(x, i)->state_id;
     unsigned seqlen = imm_path_step(x, i)->seqlen;
-    float score = imm_path_step(x, i)->seqlen;
+    float score = imm_path_step(x, i)->score;
 
     fputc('[', fp);
 

@@ -3,6 +3,7 @@
 
 #include "bitmap.h"
 #include "compiler.h"
+#include "lprob.h"
 #include "state.h"
 #include <stdbool.h>
 #include <stddef.h>
@@ -47,6 +48,7 @@ struct imm_trans_table;
 struct imm_cpath
 {
   unsigned nstates;
+  unsigned length;
   uint16_t ncols;
   unsigned long *bit;
   uint16_t *state_offset;
@@ -127,11 +129,24 @@ imm_template void imm_cpath_set_trans(struct imm_cpath *x, unsigned pos,
   imm_bitmap_set(x->bit, trans, start, x->trans_bits[state]);
 }
 
+imm_template void imm_cpath_set_score(struct imm_cpath *x, unsigned pos,
+                                      unsigned state, float score)
+{
+  x->score[pos * x->nstates + state] = score;
+}
+
+imm_template float imm_cpath_get_score(struct imm_cpath const *x, unsigned pos,
+                                       unsigned state)
+{
+  return x->score[pos * x->nstates + state];
+}
+
 imm_template void imm_cpath_invalidate(struct imm_cpath *x, unsigned pos,
                                        unsigned state)
 {
   unsigned seqlen = imm_cpath_invalid(imm_cpath_seqlen_bits(x, state));
   imm_cpath_set_seqlen_idx(x, pos, state, seqlen);
+  imm_cpath_set_score(x, pos, state, IMM_LPROB_NAN);
 }
 
 #endif
