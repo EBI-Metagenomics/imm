@@ -42,6 +42,9 @@ static void odd1(void)
   struct imm_hmm hmm = {0};
   imm_hmm_init(&hmm, &code);
 
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &code);
+
   imm_hmm_add_state(&hmm, &B.super);
   imm_hmm_add_state(&hmm, &X.super);
   imm_hmm_add_state(&hmm, &E.super);
@@ -57,15 +60,17 @@ static void odd1(void)
   struct imm_prod prod = imm_prod();
 
   struct imm_seq seq = imm_seq(IMM_STR("XX"), &abc);
-  eq(imm_task_setup(task, &seq), 0);
+  eq(imm_eseq_setup(&eseq, &seq), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   eq(imm_path_nsteps(&prod.path), 6U);
   close(imm_hmm_loglik(&hmm, &seq, &prod.path), 12212.);
   close(prod.loglik, 12212.);
-  imm_dp_dump_path(&dp, task, &prod, &state_name);
+  imm_dp_dump_path(&dp, task, &prod, &seq, &state_name);
   imm_hmm_write_dot(&hmm, stdout, &state_name);
   imm_dp_write_dot(&dp, stdout, &state_name);
 
+  imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_dp_del(&dp);
   imm_task_del(task);
@@ -111,16 +116,21 @@ static void odd2(void)
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &code);
+
   struct imm_seq seq = imm_seq(IMM_STR("XJX"), &abc);
-  eq(imm_task_setup(task, &seq), 0);
+  eq(imm_eseq_setup(&eseq, &seq), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   eq(imm_path_nsteps(&prod.path), 7U);
   close(imm_hmm_loglik(&hmm, &seq, &prod.path), 0);
   close(prod.loglik, 0);
-  imm_dp_dump_path(&dp, task, &prod, &state_name);
+  imm_dp_dump_path(&dp, task, &prod, &seq, &state_name);
   imm_hmm_write_dot(&hmm, stdout, &state_name);
   imm_dp_write_dot(&dp, stdout, &state_name);
 
+  imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_dp_del(&dp);
   imm_task_del(task);

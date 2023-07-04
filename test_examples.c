@@ -18,13 +18,18 @@ static void example1_path(void)
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &m->code);
+
   struct imm_seq seq = imm_seq(imm_str("BMIMIMMMEJBMIIMIME"), &m->abc);
-  eq(imm_task_setup(task, &seq), 0);
+  eq(imm_eseq_setup(&eseq, &seq), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, -49.892555);
   close(imm_hmm_loglik(&imm_ex1.hmm, &seq, &prod.path), -49.892555);
   eq(imm_path_nsteps(&prod.path), 32U);
 
+  imm_eseq_cleanup(&eseq);
   imm_task_del(task);
   imm_prod_cleanup(&prod);
   imm_dp_del(&dp);
@@ -42,11 +47,16 @@ static void example1_removed_states_path(void)
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &m->code);
+
   struct imm_seq seq = imm_seq(imm_str("BMMMEJBMMME"), &m->abc);
-  eq(imm_task_setup(task, &seq), 0);
+  eq(imm_eseq_setup(&eseq, &seq), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, -19.313255);
 
+  imm_eseq_cleanup(&eseq);
   imm_task_del(task);
   imm_prod_cleanup(&prod);
   imm_dp_del(&dp);
@@ -62,15 +72,20 @@ static void example2_15(void)
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &m->code);
+
   struct imm_nuclt const *nuclt = &m->dna->super;
   struct imm_abc const *abc = &nuclt->super;
 
   struct imm_seq seq = imm_seq(imm_str(imm_ex2_seq), abc);
-  eq(imm_task_setup(task, &seq), 0);
+  eq(imm_eseq_setup(&eseq, &seq), 0);
+  eq(imm_task_setup(task, &eseq), 0);
 
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, 41.929977);
 
+  imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_task_del(task);
   imm_dp_del(&dp);
@@ -86,15 +101,20 @@ static void example2_24(void)
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &m->code);
+
   struct imm_nuclt const *nuclt = &m->dna->super;
   struct imm_abc const *abc = &nuclt->super;
 
   struct imm_seq seq = imm_seq(imm_str(imm_ex2_seq), abc);
-  eq(imm_task_setup(task, &seq), 0);
+  eq(imm_eseq_setup(&eseq, &seq), 0);
+  eq(imm_task_setup(task, &eseq), 0);
 
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, -84.087013);
 
+  imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_task_del(task);
   imm_dp_del(&dp);
@@ -110,15 +130,20 @@ static void example2_33(void)
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &m->code);
+
   struct imm_nuclt const *nuclt = &m->dna->super;
   struct imm_abc const *abc = &nuclt->super;
 
   struct imm_seq seq = imm_seq(imm_str(imm_ex2_seq), abc);
-  eq(imm_task_setup(task, &seq), 0);
+  eq(imm_eseq_setup(&eseq, &seq), 0);
+  eq(imm_task_setup(task, &eseq), 0);
 
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   ok(imm_lprob_is_nan(prod.loglik));
 
+  imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_task_del(task);
   imm_dp_del(&dp);
@@ -134,12 +159,17 @@ static void msv10(void)
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &m->code);
+
   struct imm_seq seq = imm_seq(imm_str(imm_ex3_seq1), &m->abc);
-  eq(imm_task_setup(task, &seq), 0);
+  eq(imm_eseq_setup(&eseq, &seq), 0);
+  eq(imm_task_setup(task, &eseq), 0);
 
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, -7072.540039);
 
+  imm_eseq_cleanup(&eseq);
   imm_task_del(task);
   imm_prod_cleanup(&prod);
   imm_dp_del(&dp);

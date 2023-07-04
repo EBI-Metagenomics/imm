@@ -58,21 +58,27 @@ static void one_mute_state(void)
   imm_hmm_init_dp(&hmm, &state.super, &dp);
   struct imm_task *task = imm_task_new(&dp);
 
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &code);
+
   {
-    eq(imm_task_setup(task, &EMPTY), 0);
+    eq(imm_eseq_setup(&eseq, &EMPTY), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, log(0.5));
     close(imm_hmm_loglik(&hmm, &EMPTY, &prod.path), log(0.5));
     eq(imm_path_nsteps(&prod.path), 1U);
     if ((int)1 == (unsigned)2U) return;
 
-    eq(imm_task_setup(task, &C), 0);
+    eq(imm_eseq_setup(&eseq, &C), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     ok(imm_lprob_is_nan(prod.loglik));
     ok(imm_lprob_is_nan(imm_hmm_loglik(&hmm, &C, &prod.path)));
     eq(imm_path_nsteps(&prod.path), 0U);
   }
 
+  imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_dp_del(&dp);
   imm_task_del(task);
@@ -98,8 +104,12 @@ static void two_mute_states(void)
   imm_hmm_init_dp(&hmm, &state0.super, &dp);
   struct imm_task *task = imm_task_new(&dp);
 
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &code);
+
   {
-    eq(imm_task_setup(task, &EMPTY), 0);
+    eq(imm_eseq_setup(&eseq, &EMPTY), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, log(0.5));
     close(imm_hmm_loglik(&hmm, &EMPTY, &prod.path), log(0.5));
@@ -112,7 +122,8 @@ static void two_mute_states(void)
   imm_hmm_init_dp(&hmm, &state1.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &EMPTY), 0);
+  eq(imm_eseq_setup(&eseq, &EMPTY), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   eq(imm_path_nsteps(&prod.path), 2U);
   eq(imm_path_step(&prod.path, 0)->state_id, 0);
@@ -122,6 +133,7 @@ static void two_mute_states(void)
   close(imm_hmm_loglik(&hmm, &EMPTY, &prod.path), log(0.5) + log(0.1));
   close(prod.loglik, log(0.5) + log(0.1));
 
+  imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_task_del(task);
   imm_dp_del(&dp);
@@ -166,11 +178,16 @@ static void one_normal_state(void)
   imm_hmm_init_dp(&hmm, &state.super, &dp);
   struct imm_task *task = imm_task_new(&dp);
 
-  eq(imm_task_setup(task, &EMPTY), 0);
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &code);
+
+  eq(imm_eseq_setup(&eseq, &EMPTY), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), IMM_ESHORTSEQ);
 
   {
-    eq(imm_task_setup(task, &A), 0);
+    eq(imm_eseq_setup(&eseq, &A), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, (log(1.0) + log(0.25)));
     close(imm_hmm_loglik(&hmm, &A, &prod.path), (log(1.0) + log(0.25)));
@@ -178,7 +195,8 @@ static void one_normal_state(void)
   }
 
   {
-    eq(imm_task_setup(task, &T), 0);
+    eq(imm_eseq_setup(&eseq, &T), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     ok(imm_lprob_is_nan(prod.loglik));
     ok(imm_lprob_is_nan(imm_hmm_loglik(&hmm, &T, &prod.path)));
@@ -186,7 +204,8 @@ static void one_normal_state(void)
   }
 
   {
-    eq(imm_task_setup(task, &AC), 0);
+    eq(imm_eseq_setup(&eseq, &AC), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     ok(imm_lprob_is_nan(prod.loglik));
     ok(imm_lprob_is_nan(imm_hmm_loglik(&hmm, &AC, &prod.path)));
@@ -199,7 +218,8 @@ static void one_normal_state(void)
   eq(imm_task_reset(task, &dp), 0);
 
   {
-    eq(imm_task_setup(task, &A), 0);
+    eq(imm_eseq_setup(&eseq, &A), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, (log(1.0) + log(0.25)));
     close(imm_hmm_loglik(&hmm, &A, &prod.path), (log(1.0) + log(0.25)));
@@ -207,7 +227,8 @@ static void one_normal_state(void)
   }
 
   {
-    eq(imm_task_setup(task, &AA), 0);
+    eq(imm_eseq_setup(&eseq, &AA), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, (log(0.1) + 2 * log(0.25)));
     close(imm_hmm_loglik(&hmm, &AA, &prod.path), (log(0.1) + 2 * log(0.25)));
@@ -215,7 +236,8 @@ static void one_normal_state(void)
   }
 
   {
-    eq(imm_task_setup(task, &ACT), 0);
+    eq(imm_eseq_setup(&eseq, &ACT), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     ok(imm_lprob_is_nan(prod.loglik));
     ok(imm_lprob_is_nan(imm_hmm_loglik(&hmm, &ACT, &prod.path)));
@@ -229,7 +251,8 @@ static void one_normal_state(void)
 
   {
 
-    eq(imm_task_setup(task, &A), 0);
+    eq(imm_eseq_setup(&eseq, &A), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, log(0.25));
     close(imm_hmm_loglik(&hmm, &A, &prod.path), log(0.25));
@@ -237,7 +260,8 @@ static void one_normal_state(void)
   }
 
   {
-    eq(imm_task_setup(task, &AA), 0);
+    eq(imm_eseq_setup(&eseq, &AA), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, (2 * log(0.25)));
     close(imm_hmm_loglik(&hmm, &AA, &prod.path), (2 * log(0.25)));
@@ -245,13 +269,15 @@ static void one_normal_state(void)
   }
 
   {
-    eq(imm_task_setup(task, &ACT), 0);
+    eq(imm_eseq_setup(&eseq, &ACT), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     ok(imm_lprob_is_nan(prod.loglik));
     ok(imm_lprob_is_nan(imm_hmm_loglik(&hmm, &ACT, &prod.path)));
     eq(imm_path_nsteps(&prod.path), 0U);
   }
 
+  imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_task_del(task);
   imm_dp_del(&dp);
@@ -280,8 +306,12 @@ static void two_normal_states(void)
   imm_hmm_init_dp(&hmm, &state0.super, &dp);
   struct imm_task *task = imm_task_new(&dp);
 
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &code);
+
   {
-    eq(imm_task_setup(task, &A), 0);
+    eq(imm_eseq_setup(&eseq, &A), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, (log(0.1) + log(0.25)));
     close(imm_hmm_loglik(&hmm, &A, &prod.path), (log(0.1) + log(0.25)));
@@ -289,7 +319,8 @@ static void two_normal_states(void)
   }
 
   {
-    eq(imm_task_setup(task, &T), 0);
+    eq(imm_eseq_setup(&eseq, &T), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     ok(imm_lprob_is_nan(prod.loglik));
     ok(imm_lprob_is_nan(imm_hmm_loglik(&hmm, &T, &prod.path)));
@@ -297,7 +328,8 @@ static void two_normal_states(void)
   }
 
   {
-    eq(imm_task_setup(task, &AC), 0);
+    eq(imm_eseq_setup(&eseq, &AC), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     ok(imm_lprob_is_nan(prod.loglik));
     ok(imm_lprob_is_nan(imm_hmm_loglik(&hmm, &AC, &prod.path)));
@@ -310,7 +342,8 @@ static void two_normal_states(void)
 
   float des = log(0.1) + log(0.25) + log(0.3) + log(0.5);
   {
-    eq(imm_task_setup(task, &AT), 0);
+    eq(imm_eseq_setup(&eseq, &AT), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, des);
     close(imm_hmm_loglik(&hmm, &AT, &prod.path), des);
@@ -318,7 +351,8 @@ static void two_normal_states(void)
   }
 
   {
-    eq(imm_task_setup(task, &ATT), 0);
+    eq(imm_eseq_setup(&eseq, &ATT), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     ok(imm_lprob_is_nan(prod.loglik));
     ok(imm_lprob_is_nan(imm_hmm_loglik(&hmm, &ATT, &prod.path)));
@@ -334,13 +368,15 @@ static void two_normal_states(void)
 
   des = log(0.1) + log(0.25) + log(0.3) + 3 * log(0.5);
   {
-    eq(imm_task_setup(task, &ATT), 0);
+    eq(imm_eseq_setup(&eseq, &ATT), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, des);
     close(imm_hmm_loglik(&hmm, &ATT, &prod.path), des);
     eq(imm_path_nsteps(&prod.path), 3U);
   }
 
+  imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_task_del(task);
   imm_dp_del(&dp);
@@ -375,8 +411,12 @@ static void normal_states(void)
   imm_hmm_init_dp(&hmm, &state0.super, &dp);
   struct imm_task *task = imm_task_new(&dp);
 
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &code);
+
   {
-    eq(imm_task_setup(task, &A), 0);
+    eq(imm_eseq_setup(&eseq, &A), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, -1.386294361120);
     close(imm_hmm_loglik(&hmm, &A, &prod.path), -1.386294361120);
@@ -384,7 +424,8 @@ static void normal_states(void)
   }
 
   {
-    eq(imm_task_setup(task, &AG), 0);
+    eq(imm_eseq_setup(&eseq, &AG), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, -3.178053830348);
     close(imm_hmm_loglik(&hmm, &AG, &prod.path), -3.178053830348);
@@ -396,7 +437,8 @@ static void normal_states(void)
   eq(imm_task_reset(task, &dp), 0);
 
   {
-    eq(imm_task_setup(task, &AG), 0);
+    eq(imm_eseq_setup(&eseq, &AG), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, -3.295836866004);
     close(imm_hmm_loglik(&hmm, &AG, &prod.path), -3.295836866004);
@@ -410,7 +452,8 @@ static void normal_states(void)
   }
 
   {
-    eq(imm_task_setup(task, &AGT), 0);
+    eq(imm_eseq_setup(&eseq, &AGT), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     ok(imm_lprob_is_nan(prod.loglik));
     ok(imm_lprob_is_nan(imm_hmm_loglik(&hmm, &AGT, &prod.path)));
@@ -424,7 +467,8 @@ static void normal_states(void)
   }
 
   {
-    eq(imm_task_setup(task, &AGT), 0);
+    eq(imm_eseq_setup(&eseq, &AGT), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, -4.106767082221);
     close(imm_hmm_loglik(&hmm, &AGT, &prod.path), -4.106767082221);
@@ -438,7 +482,8 @@ static void normal_states(void)
   }
 
   {
-    eq(imm_task_setup(task, &AGTC), 0);
+    eq(imm_eseq_setup(&eseq, &AGTC), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     ok(imm_lprob_is_nan(prod.loglik));
     ok(imm_lprob_is_nan(imm_hmm_loglik(&hmm, &AGTC, &prod.path)));
@@ -452,7 +497,8 @@ static void normal_states(void)
   }
 
   {
-    eq(imm_task_setup(task, &AGTC), 0);
+    eq(imm_eseq_setup(&eseq, &AGTC), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, -6.303991659557);
     close(imm_hmm_loglik(&hmm, &AGTC, &prod.path), -6.303991659557);
@@ -473,7 +519,8 @@ static void normal_states(void)
   imm_hmm_init_dp(&hmm, &state0.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &EMPTY), 0);
+  eq(imm_eseq_setup(&eseq, &EMPTY), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), IMM_ESHORTSEQ);
   eq(imm_path_nsteps(&prod.path), 0U);
 
@@ -481,7 +528,8 @@ static void normal_states(void)
   imm_hmm_init_dp(&hmm, &state1.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &EMPTY), 0);
+  eq(imm_eseq_setup(&eseq, &EMPTY), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), IMM_ESHORTSEQ);
   eq(imm_path_nsteps(&prod.path), 0U);
 
@@ -490,7 +538,8 @@ static void normal_states(void)
   eq(imm_task_reset(task, &dp), 0);
 
   {
-    eq(imm_task_setup(task, &A), 0);
+    eq(imm_eseq_setup(&eseq, &A), 0);
+    eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, (log(0.25)));
     close(imm_hmm_loglik(&hmm, &A, &prod.path), log(0.25));
@@ -503,13 +552,15 @@ static void normal_states(void)
   imm_hmm_init_dp(&hmm, &state0.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &A), 0);
+  eq(imm_eseq_setup(&eseq, &A), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.25)));
   close(imm_hmm_loglik(&hmm, &A, &prod.path), (log(0.25)));
   eq(imm_path_nsteps(&prod.path), 1U);
 
-  eq(imm_task_setup(task, &AA), 0);
+  eq(imm_eseq_setup(&eseq, &AA), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (2 * log(0.25) + log(0.9)));
   close(imm_hmm_loglik(&hmm, &AA, &prod.path), (2 * log(0.25) + log(0.9)));
@@ -521,18 +572,21 @@ static void normal_states(void)
   imm_hmm_init_dp(&hmm, &state0.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &A), 0);
+  eq(imm_eseq_setup(&eseq, &A), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.25)));
   close(imm_hmm_loglik(&hmm, &A, &prod.path), (log(0.25)));
   eq(imm_path_nsteps(&prod.path), 1U);
 
-  eq(imm_task_setup(task, &AA), 0);
+  eq(imm_eseq_setup(&eseq, &AA), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (2 * log(0.25) + log(0.9)));
   close(imm_hmm_loglik(&hmm, &AA, &prod.path), (2 * log(0.25) + log(0.9)));
   eq(imm_path_nsteps(&prod.path), 2U);
 
+  imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_task_del(task);
   imm_dp_del(&dp);
@@ -579,7 +633,11 @@ static void profile1(void)
   imm_hmm_init_dp(&hmm, &end.super, &dp);
   struct imm_task *task = imm_task_new(&dp);
 
-  eq(imm_task_setup(task, &EMPTY_ab), 0);
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &code_ab);
+
+  eq(imm_eseq_setup(&eseq, &EMPTY_ab), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.1) + log(1.0)));
 
@@ -590,7 +648,8 @@ static void profile1(void)
   imm_hmm_init_dp(&hmm, &D0.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &EMPTY_ab), 0);
+  eq(imm_eseq_setup(&eseq, &EMPTY_ab), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.1)));
 
@@ -601,7 +660,8 @@ static void profile1(void)
   imm_hmm_init_dp(&hmm, &start.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &EMPTY_ab), 0);
+  eq(imm_eseq_setup(&eseq, &EMPTY_ab), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(1.0)));
 
@@ -612,7 +672,8 @@ static void profile1(void)
   imm_hmm_init_dp(&hmm, &M0.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &EMPTY_ab), 0);
+  eq(imm_eseq_setup(&eseq, &EMPTY_ab), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), IMM_ESHORTSEQ);
   eq(imm_path_nsteps(&prod.path), 0U);
   ok(imm_lprob_is_nan(imm_hmm_loglik(&hmm, &EMPTY_ab, &prod.path)));
@@ -623,7 +684,8 @@ static void profile1(void)
   eq(imm_task_reset(task, &dp), 0);
 
   float des = log(0.5) + log(0.4);
-  eq(imm_task_setup(task, &A_ab), 0);
+  eq(imm_eseq_setup(&eseq, &A_ab), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (des));
 
@@ -635,7 +697,8 @@ static void profile1(void)
   eq(imm_task_reset(task, &dp), 0);
 
   des = log(0.5) + log(0.4) + log(0.8);
-  eq(imm_task_setup(task, &A_ab), 0);
+  eq(imm_eseq_setup(&eseq, &A_ab), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (des));
 
@@ -646,7 +709,8 @@ static void profile1(void)
   imm_hmm_init_dp(&hmm, &M0.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &B_ab), 0);
+  eq(imm_eseq_setup(&eseq, &B_ab), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.5) + log(0.2)));
 
@@ -658,7 +722,8 @@ static void profile1(void)
   eq(imm_task_reset(task, &dp), 0);
 
   des = log(0.5) + log(0.2) + log(0.8);
-  eq(imm_task_setup(task, &B_ab), 0);
+  eq(imm_eseq_setup(&eseq, &B_ab), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (des));
 
@@ -666,7 +731,8 @@ static void profile1(void)
   eq(imm_path_nsteps(&prod.path), 3U);
 
   des = log(0.5) + log(0.4) + log(0.1) + log(0.5);
-  eq(imm_task_setup(task, &AA_ab), 0);
+  eq(imm_eseq_setup(&eseq, &AA_ab), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (des));
 
@@ -674,13 +740,15 @@ static void profile1(void)
   eq(imm_path_nsteps(&prod.path), 4U);
 
   des = log(0.5) + log(0.4) + log(0.1) + log(0.2) + 2 * log(0.5);
-  eq(imm_task_setup(task, &AAB_ab), 0);
+  eq(imm_eseq_setup(&eseq, &AAB_ab), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (des));
 
   close(imm_hmm_loglik(&hmm, &AAB_ab, &prod.path), (des));
   eq(imm_path_nsteps(&prod.path), 5U);
 
+  imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_dp_del(&dp);
   imm_task_del(task);
@@ -764,7 +832,11 @@ static void profile2(void)
   imm_hmm_init_dp(&hmm, &M2.super, &dp);
   struct imm_task *task = imm_task_new(&dp);
 
-  eq(imm_task_setup(task, &A), 0);
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &code);
+
+  eq(imm_eseq_setup(&eseq, &A), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.05)));
 
@@ -775,21 +847,24 @@ static void profile2(void)
   imm_hmm_init_dp(&hmm, &M2.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &C), 0);
+  eq(imm_eseq_setup(&eseq, &C), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.05)));
 
   close(imm_hmm_loglik(&hmm, &C, &prod.path), (log(0.05)));
   eq(imm_path_nsteps(&prod.path), 2U);
 
-  eq(imm_task_setup(task, &G), 0);
+  eq(imm_eseq_setup(&eseq, &G), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.05)));
 
   close(imm_hmm_loglik(&hmm, &G, &prod.path), (log(0.05)));
   eq(imm_path_nsteps(&prod.path), 2U);
 
-  eq(imm_task_setup(task, &T), 0);
+  eq(imm_eseq_setup(&eseq, &T), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.05)));
 
@@ -800,28 +875,32 @@ static void profile2(void)
   imm_hmm_init_dp(&hmm, &end.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &A), 0);
+  eq(imm_eseq_setup(&eseq, &A), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.6)));
 
   close(imm_hmm_loglik(&hmm, &A, &prod.path), (log(0.6)));
   eq(imm_path_nsteps(&prod.path), 3U);
 
-  eq(imm_task_setup(task, &C), 0);
+  eq(imm_eseq_setup(&eseq, &C), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.05)));
 
   close(imm_hmm_loglik(&hmm, &C, &prod.path), (log(0.05)));
   eq(imm_path_nsteps(&prod.path), 3U);
 
-  eq(imm_task_setup(task, &G), 0);
+  eq(imm_eseq_setup(&eseq, &G), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.6)));
 
   close(imm_hmm_loglik(&hmm, &G, &prod.path), (log(0.6)));
   eq(imm_path_nsteps(&prod.path), 3U);
 
-  eq(imm_task_setup(task, &T), 0);
+  eq(imm_eseq_setup(&eseq, &T), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.05)));
 
@@ -832,7 +911,8 @@ static void profile2(void)
   imm_hmm_init_dp(&hmm, &M1.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &A), 0);
+  eq(imm_eseq_setup(&eseq, &A), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.6)));
 
@@ -843,7 +923,8 @@ static void profile2(void)
   imm_hmm_init_dp(&hmm, &end.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &GA), 0);
+  eq(imm_eseq_setup(&eseq, &GA), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (2 * log(0.6)));
 
@@ -854,7 +935,8 @@ static void profile2(void)
   imm_hmm_init_dp(&hmm, &I0.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &GT), 0);
+  eq(imm_eseq_setup(&eseq, &GT), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.6) + log(0.2) + log(0.7)));
 
@@ -867,7 +949,8 @@ static void profile2(void)
   eq(imm_task_reset(task, &dp), 0);
 
   float des = log(0.6) + log(0.2) + 3 * log(0.7) + 3 * log(0.5) + log(0.6);
-  eq(imm_task_setup(task, &GTTTA), 0);
+  eq(imm_eseq_setup(&eseq, &GTTTA), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (des));
 
@@ -876,7 +959,8 @@ static void profile2(void)
 
   des =
       log(0.6) + log(0.2) + 3 * log(0.7) + 3 * log(0.5) + log(0.6) + log(0.05);
-  eq(imm_task_setup(task, &GTTTAC), 0);
+  eq(imm_eseq_setup(&eseq, &GTTTAC), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (des));
 
@@ -889,7 +973,8 @@ static void profile2(void)
 
   des = log(0.6) + log(0.2) + 3 * log(0.7) + 3 * log(0.5) + log(0.6) +
         log(0.2) + log(0.1) + log(0.5) + log(0.05);
-  eq(imm_task_setup(task, &GTTTACA), 0);
+  eq(imm_eseq_setup(&eseq, &GTTTACA), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (des));
 
@@ -902,7 +987,8 @@ static void profile2(void)
 
   des = log(0.6) + log(0.2) + 5 * log(0.5) + 3 * log(0.7) + 2 * log(0.1) +
         log(0.6);
-  eq(imm_task_setup(task, &GTTTACA), 0);
+  eq(imm_eseq_setup(&eseq, &GTTTACA), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (des));
 
@@ -915,13 +1001,15 @@ static void profile2(void)
 
   des = log(0.6) + log(0.2) + 5 * log(0.5) + 3 * log(0.7) + 2 * log(0.1) +
         log(0.6);
-  eq(imm_task_setup(task, &GTTTACA), 0);
+  eq(imm_eseq_setup(&eseq, &GTTTACA), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (des));
 
   close(imm_hmm_loglik(&hmm, &GTTTACA, &prod.path), (des));
   eq(imm_path_nsteps(&prod.path), 9U);
 
+  imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_task_del(task);
   imm_dp_del(&dp);
@@ -963,7 +1051,11 @@ static void profile_delete(void)
   imm_hmm_init_dp(&hmm, &N0.super, &dp);
   struct imm_task *task = imm_task_new(&dp);
 
-  eq(imm_task_setup(task, &A_ab), 0);
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &code_ab);
+
+  eq(imm_eseq_setup(&eseq, &A_ab), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.5)));
 
@@ -974,7 +1066,8 @@ static void profile_delete(void)
   imm_hmm_init_dp(&hmm, &M.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &A_ab), 0);
+  eq(imm_eseq_setup(&eseq, &A_ab), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (2 * log(0.5)));
 
@@ -985,7 +1078,8 @@ static void profile_delete(void)
   imm_hmm_init_dp(&hmm, &N2.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &AB_ab), 0);
+  eq(imm_eseq_setup(&eseq, &AB_ab), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (4 * log(0.5)));
 
@@ -996,13 +1090,15 @@ static void profile_delete(void)
   imm_hmm_init_dp(&hmm, &M.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &A_ab), 0);
+  eq(imm_eseq_setup(&eseq, &A_ab), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (2 * log(0.5)));
 
   close(imm_hmm_loglik(&hmm, &A_ab, &prod.path), (2 * log(0.5)));
   eq(imm_path_nsteps(&prod.path), 2U);
 
+  imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_task_del(task);
   imm_dp_del(&dp);
@@ -1126,7 +1222,11 @@ static void global_profile(void)
   imm_hmm_init_dp(&hmm, &start.super, &dp);
   struct imm_task *task = imm_task_new(&dp);
 
-  eq(imm_task_setup(task, &C_z), 0);
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &code_z);
+
+  eq(imm_eseq_setup(&eseq, &C_z), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   ok(imm_lprob_is_nan(prod.loglik));
 
@@ -1137,28 +1237,32 @@ static void global_profile(void)
   imm_hmm_init_dp(&hmm, &B.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &C_z), 0);
+  eq(imm_eseq_setup(&eseq, &C_z), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(1.0)));
 
   close(imm_hmm_loglik(&hmm, &C_z, &prod.path), (log(1.0)));
   eq(imm_path_nsteps(&prod.path), 2U);
 
-  eq(imm_task_setup(task, &CC_z), 0);
+  eq(imm_eseq_setup(&eseq, &CC_z), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(1.0)));
 
   close(imm_hmm_loglik(&hmm, &CC_z, &prod.path), (log(1.0)));
   eq(imm_path_nsteps(&prod.path), 3U);
 
-  eq(imm_task_setup(task, &CCC_z), 0);
+  eq(imm_eseq_setup(&eseq, &CCC_z), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(1.0)));
 
   close(imm_hmm_loglik(&hmm, &CCC_z, &prod.path), (log(1.0)));
   eq(imm_path_nsteps(&prod.path), 4U);
 
-  eq(imm_task_setup(task, &CCA_z), 0);
+  eq(imm_eseq_setup(&eseq, &CCA_z), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.01)));
 
@@ -1169,7 +1273,8 @@ static void global_profile(void)
   imm_hmm_init_dp(&hmm, &M0.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &CCA_z), 0);
+  eq(imm_eseq_setup(&eseq, &CCA_z), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.9)));
 
@@ -1180,7 +1285,8 @@ static void global_profile(void)
   imm_hmm_init_dp(&hmm, &M1.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &CCAB_z), 0);
+  eq(imm_eseq_setup(&eseq, &CCAB_z), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (2 * log(0.9)));
 
@@ -1191,14 +1297,16 @@ static void global_profile(void)
   imm_hmm_init_dp(&hmm, &I0.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &CCAB_z), 0);
+  eq(imm_eseq_setup(&eseq, &CCAB_z), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.9 * 0.5 * 0.1)));
 
   close(imm_hmm_loglik(&hmm, &CCAB_z, &prod.path), (log(0.9 * 0.5 * 0.1)));
   eq(imm_path_nsteps(&prod.path), 5U);
 
-  eq(imm_task_setup(task, &CCABB_z), 0);
+  eq(imm_eseq_setup(&eseq, &CCABB_z), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.9) + 2 * (log(0.05))));
 
@@ -1211,7 +1319,8 @@ static void global_profile(void)
   eq(imm_task_reset(task, &dp), 0);
 
   float des = log(0.9) + log(0.5) + log(0.1) + log(0.5) + log(0.01);
-  eq(imm_task_setup(task, &CCABA_z), 0);
+  eq(imm_eseq_setup(&eseq, &CCABA_z), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (des));
 
@@ -1222,7 +1331,8 @@ static void global_profile(void)
   imm_hmm_init_dp(&hmm, &D1.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &AA_z), 0);
+  eq(imm_eseq_setup(&eseq, &AA_z), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.01) + log(0.9)));
 
@@ -1233,7 +1343,8 @@ static void global_profile(void)
   imm_hmm_init_dp(&hmm, &D2.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &AA_z), 0);
+  eq(imm_eseq_setup(&eseq, &AA_z), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.01) + log(0.9)));
 
@@ -1244,7 +1355,8 @@ static void global_profile(void)
   imm_hmm_init_dp(&hmm, &E.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  eq(imm_task_setup(task, &AA_z), 0);
+  eq(imm_eseq_setup(&eseq, &AA_z), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.01) + log(0.9)));
 
@@ -1256,13 +1368,15 @@ static void global_profile(void)
   eq(imm_task_reset(task, &dp), 0);
 
   des = log(0.01) + log(0.9) + log(0.5);
-  eq(imm_task_setup(task, &AAB_z), 0);
+  eq(imm_eseq_setup(&eseq, &AAB_z), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (des));
 
   close(imm_hmm_loglik(&hmm, &AAB_z, &prod.path), (des));
   eq(imm_path_nsteps(&prod.path), 5U);
 
+  imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_task_del(task);
   imm_dp_del(&dp);
@@ -1311,7 +1425,11 @@ static void cycle_mute_ending(void)
   imm_hmm_init_dp(&hmm, &end.super, &dp);
   struct imm_task *task = imm_task_new(&dp);
 
-  eq(imm_task_setup(task, &A_ab), 0);
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &code_ab);
+
+  eq(imm_eseq_setup(&eseq, &A_ab), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (-13.815510557964272));
 
@@ -1323,11 +1441,13 @@ static void cycle_mute_ending(void)
 
   imm_dp_change_trans(&dp, BM, log(1.0));
 
-  eq(imm_task_setup(task, &A_ab), 0);
+  eq(imm_eseq_setup(&eseq, &A_ab), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   eq(imm_path_nsteps(&prod.path), 5U);
   close(prod.loglik, -11.5129254650);
 
+  imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_task_del(task);
   imm_dp_del(&dp);

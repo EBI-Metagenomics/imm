@@ -66,7 +66,7 @@ static float read_result(struct imm_dp const *dp, struct imm_task *task,
   unsigned state = IMM_STATE_NULL_IDX;
   unsigned seqlen = IMM_STATE_NULL_SEQLEN;
 
-  unsigned length = imm_eseq_len(&task->eseq);
+  unsigned length = imm_eseq_size(task->seq);
   unsigned max_seq =
       imm_zspan_max(imm_state_table_zspan(&dp->state_table, end));
 
@@ -95,7 +95,7 @@ static int unzip_path(struct imm_dp const *dp, struct imm_task const *task,
                       unsigned state, unsigned seqlen, struct imm_path *path,
                       float total)
 {
-  unsigned row = imm_eseq_len(&task->eseq);
+  unsigned row = imm_eseq_size(task->seq);
   bool valid = seqlen != IMM_STATE_NULL_SEQLEN;
 
   while (valid)
@@ -129,12 +129,12 @@ int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
   imm_prod_reset(prod);
   if (!task->seq) return IMM_ENOSEQ;
 
-  if (dp->code->abc != imm_seq_abc(task->seq)) return IMM_EDIFFABC;
+  if (dp->code->abc != imm_eseq_abc(task->seq)) return IMM_EDIFFABC;
 
   unsigned end_state = dp->state_table.end_state_idx;
   unsigned min =
       imm_zspan_min(imm_state_table_zspan(&dp->state_table, end_state));
-  if (imm_seq_size(task->seq) < min) return IMM_ESHORTSEQ;
+  if (imm_eseq_size(task->seq) < min) return IMM_ESHORTSEQ;
 
   struct elapsed elapsed = ELAPSED_INIT;
   if (elapsed_start(&elapsed)) return IMM_EELAPSED;
@@ -236,7 +236,7 @@ void imm_dp_write_dot(struct imm_dp const *dp, FILE *restrict fp,
       (*name)(imm_state_table_id(&dp->state_table, src), src_name);
       (*name)(imm_state_table_id(&dp->state_table, dst), dst_name);
       fprintf(fp, "%s -> %s [label=", src_name, dst_name);
-      fprintf(fp, imm_printer_get_f32_formatter(),
+      fprintf(fp, imm_printer_get_f32fmt(),
               imm_trans_table_score(&dp->trans_table, dst, t));
       fprintf(fp, "];\n");
     }
@@ -260,7 +260,8 @@ void imm_dp_dump(struct imm_dp const *x, imm_state_name *callb,
 }
 
 void imm_dp_dump_path(struct imm_dp const *dp, struct imm_task const *task,
-                      struct imm_prod const *prod, imm_state_name *callb)
+                      struct imm_prod const *prod, struct imm_seq const *seq,
+                      imm_state_name *callb)
 {
   char name[IMM_STATE_NAME_SIZE] = {0};
   unsigned begin = 0;
@@ -270,10 +271,10 @@ void imm_dp_dump_path(struct imm_dp const *dp, struct imm_task const *task,
     unsigned idx = imm_state_table_idx(&dp->state_table, step->state_id);
 
     unsigned min = imm_zspan_min(imm_state_table_zspan(&dp->state_table, idx));
-    unsigned seq_code = imm_eseq_get(&task->eseq, begin, step->seqlen, min);
+    unsigned seq_code = imm_eseq_get(task->seq, begin, step->seqlen, min);
 
     float score = imm_emis_score(&dp->emis, idx, seq_code);
-    struct imm_seq subseq = imm_subseq(task->seq, begin, step->seqlen);
+    struct imm_seq subseq = imm_subseq(seq, begin, step->seqlen);
     (*callb)(step->state_id, name);
     printf("<%s,%.*s,%.4f>\n", name, subseq.size, subseq.str, score);
     begin += step->seqlen;

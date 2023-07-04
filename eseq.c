@@ -2,7 +2,7 @@
 #include "code.h"
 #include "subseq.h"
 
-void imm_eseq_cleanup(struct imm_eseq const *eseq)
+void imm_eseq_cleanup(struct imm_eseq *eseq)
 {
   imm_matrixu16_cleanup(&eseq->data);
 }
@@ -18,7 +18,12 @@ void imm_eseq_reset(struct imm_eseq *eseq, struct imm_code const *code)
   eseq->code = code;
 }
 
-unsigned imm_eseq_len(struct imm_eseq const *eseq)
+struct imm_abc const *imm_eseq_abc(struct imm_eseq const *eseq)
+{
+  return eseq->code->abc;
+}
+
+unsigned imm_eseq_size(struct imm_eseq const *eseq)
 {
   return eseq->data.rows - 1;
 }

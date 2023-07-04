@@ -96,8 +96,8 @@ void imm_viterbi_init(struct imm_viterbi *x, struct imm_dp const *dp,
   x->task = task;
   x->curr_trans = NULL;
   viterbi_ctrans_rewind(x);
-  imm_dp_safety_init(&x->safety, imm_seq_size(task->seq));
-  x->seqlen = imm_seq_size(task->seq);
+  imm_dp_safety_init(&x->safety, imm_eseq_size(task->seq));
+  x->seqlen = imm_eseq_size(task->seq);
   find_tardy_states(x, dp);
 }
 
@@ -214,7 +214,7 @@ imm_pure_template float emission_score(struct imm_viterbi const *x,
                                        struct state state, unsigned row,
                                        unsigned len)
 {
-  unsigned code = imm_eseq_get(&x->task->eseq, row, len, state.min);
+  unsigned code = imm_eseq_get(x->task->seq, row, len, state.min);
   return imm_emis_score(&x->dp->emis, state.idx, code);
 }
 

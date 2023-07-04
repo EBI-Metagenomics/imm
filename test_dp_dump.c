@@ -23,15 +23,20 @@ static void dp_dump_ex1_path(void)
   struct imm_dp dp;
   eq(imm_hmm_init_dp(&imm_ex1.hmm, &m->end.super, &dp), 0);
 
+  struct imm_eseq eseq = {0};
+  imm_eseq_init(&eseq, &m->code);
+
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
   struct imm_seq seq = imm_seq(imm_str("BMMMEJBMMME"), &m->abc);
-  eq(imm_task_setup(task, &seq), 0);
+  eq(imm_eseq_setup(&eseq, &seq), 0);
+  eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, -41.845375);
 
   imm_path_dump(&prod.path, &imm_ex1_state_name, &seq, stdout);
 
+  imm_eseq_cleanup(&eseq);
   imm_task_del(task);
   imm_prod_cleanup(&prod);
   imm_dp_del(&dp);

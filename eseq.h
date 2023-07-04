@@ -15,9 +15,10 @@ struct imm_eseq
   struct imm_code const *code;
 };
 
-IMM_API void imm_eseq_cleanup(struct imm_eseq const *);
+IMM_API void imm_eseq_cleanup(struct imm_eseq *);
 IMM_API void imm_eseq_reset(struct imm_eseq *, struct imm_code const *);
-IMM_API unsigned imm_eseq_len(struct imm_eseq const *);
+IMM_API struct imm_abc const *imm_eseq_abc(struct imm_eseq const *);
+IMM_API unsigned imm_eseq_size(struct imm_eseq const *);
 IMM_API void imm_eseq_init(struct imm_eseq *, struct imm_code const *);
 IMM_API int imm_eseq_setup(struct imm_eseq *, struct imm_seq const *);
 
