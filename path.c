@@ -109,7 +109,7 @@ void imm_path_dump(struct imm_path const *x, imm_state_name *callb,
 
     fprintf(fp, "%s,", (*callb)(state_id, name));
     fprintf(fp, "%.*s,", seqlen, sequence);
-    fprintf(fp, imm_printer_get_f32_formatter(), score);
+    fprintf(fp, imm_printer_get_f32fmt(), score);
 
     fputc(']', fp);
 

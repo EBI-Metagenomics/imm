@@ -87,7 +87,7 @@ void imm_state_table_dump(struct imm_state_table const *x,
   char state_name[IMM_STATE_NAME_SIZE] = {0};
 
   (*callb)(imm_state_table_id(x, x->start.state_idx), state_name);
-  char const *fmt32 = imm_printer_get_f32_formatter();
+  char const *fmt32 = imm_printer_get_f32fmt();
 
   fprintf(fp, "\n");
   fprintf(fp, "start_state=%s\n", state_name);

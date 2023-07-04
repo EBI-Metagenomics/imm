@@ -119,7 +119,7 @@ void imm_trans_table_dump(struct imm_trans_table const *x,
     (*callb)(imm_state_table_id(st, x->trans[i].dst), dst);
     fprintf(fp, "%s -> %s", src, dst);
     fprintf(fp, " [");
-    fprintf(fp, imm_printer_get_f32_formatter(), x->trans[i].score);
+    fprintf(fp, imm_printer_get_f32fmt(), x->trans[i].score);
     fprintf(fp, "]\n");
   }
   fprintf(fp, "\n");
