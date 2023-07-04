@@ -14,7 +14,7 @@ int imm_matrixu16_init(struct imm_matrixu16 *x, unsigned rows, unsigned cols)
 
 void imm_matrixu16_empty(struct imm_matrixu16 *x)
 {
-  x->data = NULL;
+  imm_matrixu16_cleanup(x);
   x->rows = 0;
   x->cols = 0;
 }
@@ -25,7 +25,11 @@ void imm_matrixu16_set(struct imm_matrixu16 *x, unsigned r, unsigned c,
   x->data[r * x->cols + c] = v;
 }
 
-void imm_matrixu16_cleanup(struct imm_matrixu16 const *x) { free(x->data); }
+void imm_matrixu16_cleanup(struct imm_matrixu16 *x)
+{
+  free(x->data);
+  x->data = NULL;
+}
 
 int imm_matrixu16_resize(struct imm_matrixu16 *x, unsigned rows, unsigned cols)
 {
