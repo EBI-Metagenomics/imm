@@ -1,6 +1,5 @@
 #include "state_table.h"
 #include "assume.h"
-#include "cspan.h"
 #include "dp.h"
 #include "dp_cfg.h"
 #include "dump.h"

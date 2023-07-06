@@ -23,7 +23,6 @@ extern "C" {
 #include "compiler.h"
 #include "container.h"
 #include "cpath.h"
-#include "cspan.h"
 #include "defer_return.h"
 #include "dna.h"
 #include "dp.h"
