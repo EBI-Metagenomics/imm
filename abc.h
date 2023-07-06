@@ -4,7 +4,6 @@
 #include "export.h"
 #include "str.h"
 #include "sym.h"
-#include <stdio.h>
 
 #define IMM_ABC_MAX_SIZE (31U)
 #define IMM_ABC_TYPEID_SIZE 10
