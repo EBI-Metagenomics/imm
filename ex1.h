@@ -37,10 +37,10 @@ struct imm_ex1
   } null;
 };
 
-void imm_ex1_init(unsigned core_size);
-void imm_ex1_remove_insertion_states(unsigned core_size);
-void imm_ex1_remove_deletion_states(unsigned core_size);
-unsigned imm_ex1_state_name(unsigned id, char *name);
+IMM_API void imm_ex1_init(unsigned core_size);
+IMM_API void imm_ex1_remove_insertion_states(unsigned core_size);
+IMM_API void imm_ex1_remove_deletion_states(unsigned core_size);
+IMM_API char *imm_ex1_state_name(unsigned id, char *name);
 
 extern struct imm_ex1 imm_ex1;
 

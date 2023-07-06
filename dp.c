@@ -8,7 +8,8 @@
 #include "lip/lip.h"
 #include "lprob.h"
 #include "matrix.h"
-#include "minmax.h"
+#include "min.h"
+#include "printer.h"
 #include "prod.h"
 #include "reallocf.h"
 #include "span.h"
@@ -19,7 +20,6 @@
 #include "trans.h"
 #include "trans_table.h"
 #include "viterbi.h"
-#include "viterbi_generic.h"
 #include "zspan.h"
 #include <assert.h>
 #include <limits.h>
@@ -67,9 +67,10 @@ static float read_result(struct imm_dp const *dp, struct imm_task *task,
   unsigned seqlen = IMM_STATE_NULL_SEQLEN;
 
   unsigned length = imm_eseq_size(task->seq);
-  unsigned max_seq = imm_zspan_max(imm_state_table_span(&dp->state_table, end));
+  unsigned max_seq =
+      imm_zspan_max(imm_state_table_zspan(&dp->state_table, end));
 
-  for (unsigned len = MIN(max_seq, length);; --len)
+  for (unsigned len = imm_min(max_seq, length);; --len)
   {
     struct imm_cell cell = imm_cell(length - len, end, len);
     float v = imm_matrix_get_score(&task->matrix, cell);
@@ -80,7 +81,7 @@ static float read_result(struct imm_dp const *dp, struct imm_task *task,
       seqlen = len;
     }
 
-    if (imm_zspan_min(imm_state_table_span(&dp->state_table, end)) == len)
+    if (imm_zspan_min(imm_state_table_zspan(&dp->state_table, end)) == len)
       break;
   }
   if (state != end) score = imm_lprob_nan();
@@ -91,7 +92,8 @@ static float read_result(struct imm_dp const *dp, struct imm_task *task,
 }
 
 static int unzip_path(struct imm_dp const *dp, struct imm_task const *task,
-                      unsigned state, unsigned seqlen, struct imm_path *path)
+                      unsigned state, unsigned seqlen, struct imm_path *path,
+                      float total)
 {
   unsigned row = imm_eseq_size(task->seq);
   bool valid = seqlen != IMM_STATE_NULL_SEQLEN;
@@ -99,19 +101,22 @@ static int unzip_path(struct imm_dp const *dp, struct imm_task const *task,
   while (valid)
   {
     unsigned id = dp->state_table.ids[state];
-    struct imm_step step = imm_step(id, seqlen);
+    struct imm_step step = imm_step(id, seqlen, total);
     int rc = imm_path_add(path, step);
     if (rc) return rc;
     row -= seqlen;
 
     valid = imm_cpath_valid(&task->path, row, state);
+    float score = imm_cpath_get_score(&task->path, row, state);
     if (valid)
     {
       unsigned trans = imm_cpath_trans(&task->path, row, state);
-      unsigned len = imm_cpath_seqlen(&task->path, row, state);
+      unsigned len = imm_cpath_seqlen_idx(&task->path, row, state);
       state = imm_trans_table_source_state(&dp->trans_table, state, trans);
       seqlen =
-          len + imm_zspan_min(imm_state_table_span(&dp->state_table, state));
+          len + imm_zspan_min(imm_state_table_zspan(&dp->state_table, state));
+      imm_path_step(path, 0)->score = total - score;
+      total -= imm_path_step(path, 0)->score;
     }
   }
   imm_path_reverse(path);
@@ -128,7 +133,7 @@ int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
 
   unsigned end_state = dp->state_table.end_state_idx;
   unsigned min =
-      imm_zspan_min(imm_state_table_span(&dp->state_table, end_state));
+      imm_zspan_min(imm_state_table_zspan(&dp->state_table, end_state));
   if (imm_eseq_size(task->seq) < min) return IMM_ESHORTSEQ;
 
   struct elapsed elapsed = ELAPSED_INIT;
@@ -137,15 +142,16 @@ int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
   struct imm_viterbi viterbi = {0};
   imm_viterbi_init(&viterbi, dp, task);
 
-  imm_viterbi_generic(&viterbi, imm_eseq_size(task->seq));
+  imm_viterbi_run(&viterbi);
 
   unsigned last_state = 0;
   unsigned total_seqlen = 0;
   prod->loglik = read_result(dp, task, &last_state, &total_seqlen);
 
   int rc = 0;
-  if (task->save_path)
-    rc = unzip_path(dp, task, last_state, total_seqlen, &prod->path);
+  if ((rc = unzip_path(dp, task, last_state, total_seqlen, &prod->path,
+                       prod->loglik)))
+    return rc;
 
   if (elapsed_stop(&elapsed)) return IMM_EELAPSED;
 
@@ -182,7 +188,7 @@ float imm_dp_emis_score(struct imm_dp const *dp, unsigned state_id,
 
   unsigned state_idx = imm_state_table_idx(&dp->state_table, state_id);
   unsigned min =
-      imm_zspan_min(imm_state_table_span(&dp->state_table, state_idx));
+      imm_zspan_min(imm_state_table_zspan(&dp->state_table, state_idx));
 
   unsigned seq_code = imm_eseq_get(&eseq, 0, imm_seq_size(seq), min);
   score = imm_emis_score(&dp->emis, state_idx, seq_code);
@@ -190,6 +196,13 @@ float imm_dp_emis_score(struct imm_dp const *dp, unsigned state_id,
 cleanup:
   imm_eseq_cleanup(&eseq);
   return score;
+}
+
+float const *imm_dp_emis_table(struct imm_dp const *dp, unsigned state_id,
+                               unsigned *size)
+{
+  unsigned state_idx = imm_state_table_idx(&dp->state_table, state_id);
+  return imm_emis_table(&dp->emis, state_idx, size);
 }
 
 float imm_dp_trans_score(struct imm_dp const *dp, unsigned src, unsigned dst)
@@ -207,33 +220,43 @@ float imm_dp_trans_score(struct imm_dp const *dp, unsigned src, unsigned dst)
   return imm_lprob_nan();
 }
 
-void imm_dp_write_dot(struct imm_dp const *dp, FILE *restrict fd,
+void imm_dp_write_dot(struct imm_dp const *dp, FILE *restrict fp,
                       imm_state_name *name)
 {
-  fprintf(fd, "digraph hmm {\n");
+  fprintf(fp, "digraph dp {\n");
   for (unsigned dst = 0; dst < dp->state_table.nstates; ++dst)
   {
     for (unsigned t = 0; t < imm_trans_table_ntrans(&dp->trans_table, dst); ++t)
     {
       unsigned src = imm_trans_table_source_state(&dp->trans_table, dst, t);
 
-      char src_name[IMM_STATE_NAME_SIZE] = {'\0', '\0', '\0', '\0',
-                                            '\0', '\0', '\0', '\0'};
-      char dst_name[IMM_STATE_NAME_SIZE] = {'\0', '\0', '\0', '\0',
-                                            '\0', '\0', '\0', '\0'};
+      char src_name[IMM_STATE_NAME_SIZE] = {0};
+      char dst_name[IMM_STATE_NAME_SIZE] = {0};
 
       (*name)(imm_state_table_id(&dp->state_table, src), src_name);
       (*name)(imm_state_table_id(&dp->state_table, dst), dst_name);
-      fprintf(fd, "%s -> %s [label=%.4f];\n", src_name, dst_name,
+      fprintf(fp, "%s -> %s [label=", src_name, dst_name);
+      fprintf(fp, imm_printer_get_f32fmt(),
               imm_trans_table_score(&dp->trans_table, dst, t));
+      fprintf(fp, "];\n");
     }
   }
-  fprintf(fd, "}\n");
+  fprintf(fp, "}\n");
 }
 
-void imm_dp_dump_state_table(struct imm_dp const *dp)
+void imm_dp_dump(struct imm_dp const *x, imm_state_name *callb,
+                 FILE *restrict fp)
 {
-  imm_state_table_dump(&dp->state_table);
+  fprintf(fp, "# emission\n\n");
+  imm_emis_dump(&x->emis, &x->state_table, callb, fp);
+  fprintf(fp, "\n");
+
+  fprintf(fp, "# trans_table\n\n");
+  imm_trans_table_dump(&x->trans_table, &x->state_table, callb, fp);
+  fprintf(fp, "\n");
+
+  fprintf(fp, "# state_table\n");
+  imm_state_table_dump(&x->state_table, callb, fp);
 }
 
 void imm_dp_dump_path(struct imm_dp const *dp, struct imm_task const *task,
@@ -247,7 +270,7 @@ void imm_dp_dump_path(struct imm_dp const *dp, struct imm_task const *task,
     struct imm_step const *step = imm_path_step(&prod->path, i);
     unsigned idx = imm_state_table_idx(&dp->state_table, step->state_id);
 
-    unsigned min = imm_zspan_min(imm_state_table_span(&dp->state_table, idx));
+    unsigned min = imm_zspan_min(imm_state_table_zspan(&dp->state_table, idx));
     unsigned seq_code = imm_eseq_get(task->seq, begin, step->seqlen, min);
 
     float score = imm_emis_score(&dp->emis, idx, seq_code);
@@ -316,7 +339,7 @@ int imm_dp_pack(struct imm_dp const *dp, struct lip_file *f)
   lip_write_1darray_int(f, nstates, dp->state_table.ids);
 
   lip_write_cstr(f, KEY_STATE_START);
-  lip_write_int(f, dp->state_table.start.state);
+  lip_write_int(f, dp->state_table.start.state_idx);
   lip_write_cstr(f, KEY_STATE_LPROB);
   lip_write_float(f, dp->state_table.start.lprob);
   lip_write_cstr(f, KEY_STATE_END);
@@ -395,7 +418,7 @@ int imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
   lip_read_1darray_int_data(f, st->nstates, st->ids);
 
   if (!imm_expect_map_key(f, KEY_STATE_START)) goto cleanup;
-  lip_read_int(f, &dp->state_table.start.state);
+  lip_read_int(f, &dp->state_table.start.state_idx);
   if (!imm_expect_map_key(f, KEY_STATE_LPROB)) goto cleanup;
   lip_read_float(f, &dp->state_table.start.lprob);
   if (!imm_expect_map_key(f, KEY_STATE_END)) goto cleanup;

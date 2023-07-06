@@ -2,10 +2,13 @@
 #include "abc.h"
 #include "cartes.h"
 #include "code.h"
+#include "dump.h"
 #include "lprob.h"
 #include "rc.h"
 #include "reallocf.h"
+#include "score_table.h"
 #include "state.h"
+#include "state_table.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -78,32 +81,16 @@ static void calc_offset(struct imm_emis *emis, struct imm_code const *code,
 static void calc_score(struct imm_emis *emis, struct imm_code const *code,
                        unsigned nstates, struct imm_state **states)
 {
-  struct imm_abc const *abc = code->abc;
-  char const *set = abc->symbols;
-  unsigned set_size = abc->size;
-  struct imm_cartes cartes;
-  /* TODO: consider to avoid initing this everytime */
-  imm_cartes_init(&cartes, set, set_size, IMM_STATE_MAX_SEQLEN);
+  struct imm_score_table score_table = {0};
+  imm_score_table_init(&score_table, code);
 
   for (unsigned i = 0; i < nstates; ++i)
   {
-    unsigned min = imm_state_span(states[i]).min;
-    unsigned max = imm_state_span(states[i]).max;
-    for (unsigned len = min; len <= max; ++len)
-    {
-      imm_cartes_setup(&cartes, len);
-      char const *item = NULL;
-      while ((item = imm_cartes_next(&cartes)) != NULL)
-      {
-        struct imm_seq seq = imm_seq_unsafe(len, item, abc);
-        unsigned c = imm_code_translate(code, imm_code_encode(code, &seq), min);
-        float score = imm_state_lprob(states[i], &seq);
-        assert(!imm_lprob_is_nan(score));
-        emis->score[emis->offset[i] + c] = score;
-      }
-    }
+    float *scores = emis->score + emis->offset[i];
+    imm_score_table_scores(&score_table, states[i], scores);
   }
-  imm_cartes_cleanup(&cartes);
+
+  imm_score_table_cleanup(&score_table);
 }
 
 int imm_emis_reset(struct imm_emis *emis, struct imm_code const *code,
@@ -129,3 +116,19 @@ unsigned imm_emis_score_size(struct imm_emis const *x, unsigned nstates)
 }
 
 unsigned imm_emis_offset_size(unsigned nstates) { return nstates + 1; }
+
+void imm_emis_dump(struct imm_emis const *x, struct imm_state_table const *st,
+                   imm_state_name *callb, FILE *restrict fp)
+{
+  char state_name[IMM_STATE_NAME_SIZE] = {0};
+
+  for (unsigned i = 0; i < st->nstates; ++i)
+  {
+    unsigned size = 0;
+    (*callb)(imm_state_table_id(st, i), state_name);
+    float const *score = imm_emis_table(x, i, &size);
+    fprintf(fp, "%s=", state_name);
+    imm_dump_array_f32(size, score, fp);
+    fputc('\n', fp);
+  }
+}

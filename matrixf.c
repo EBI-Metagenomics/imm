@@ -14,7 +14,7 @@ int imm_matrixf_init(struct imm_matrixf *x, unsigned rows, unsigned cols)
 
 void imm_matrixf_empty(struct imm_matrixf *x)
 {
-  x->data = NULL;
+  imm_matrixf_cleanup(x);
   x->rows = 0;
   x->cols = 0;
 }
@@ -30,7 +30,11 @@ float const *imm_matrixf_get_ptr_c(struct imm_matrixf const *x, unsigned r,
   return x->data + (r * x->cols + c);
 }
 
-void imm_matrixf_deinit(struct imm_matrixf const *x) { free(x->data); }
+void imm_matrixf_cleanup(struct imm_matrixf *x)
+{
+  free(x->data);
+  x->data = NULL;
+}
 
 int imm_matrixf_resize(struct imm_matrixf *x, unsigned rows, unsigned cols)
 {

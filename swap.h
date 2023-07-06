@@ -1,12 +1,11 @@
-#ifndef SWAP_H
-#define SWAP_H
+#ifndef IMM_SWAP_H
+#define IMM_SWAP_H
 
-#define swap(a, b)                                                             \
-  do                                                                           \
-  {                                                                            \
-    __typeof__(a) t = (a);                                                     \
+#define imm_swap(a, b)                                                         \
+  ({                                                                           \
+    __typeof__(a) _t = (a);                                                    \
     (a) = (b);                                                                 \
-    (b) = t;                                                                   \
-  } while (0);
+    (b) = _t;                                                                  \
+  })
 
 #endif

@@ -15,11 +15,11 @@ int imm_matrixu16_init(struct imm_matrixu16 *, unsigned rows, unsigned cols);
 void imm_matrixu16_empty(struct imm_matrixu16 *);
 void imm_matrixu16_set(struct imm_matrixu16 *, unsigned r, unsigned c,
                        uint16_t v);
-void imm_matrixu16_cleanup(struct imm_matrixu16 const *);
+void imm_matrixu16_cleanup(struct imm_matrixu16 *);
 int imm_matrixu16_resize(struct imm_matrixu16 *, unsigned rows, unsigned cols);
 
-IMM_TEMPLATE uint16_t imm_matrixu16_get(struct imm_matrixu16 const *x,
-                                        unsigned const r, unsigned const c)
+imm_pure_template uint16_t imm_matrixu16_get(struct imm_matrixu16 const *x,
+                                             unsigned r, unsigned c)
 {
   return x->data[r * x->cols + c];
 }

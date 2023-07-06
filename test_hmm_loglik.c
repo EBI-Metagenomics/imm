@@ -4,7 +4,7 @@
 #include "mute_state.h"
 #include "normal_state.h"
 #include "path.h"
-#include "test_helper.h"
+#include "vendor/minctest.h"
 
 static struct imm_abc abc = {0};
 static struct imm_code code = {0};
@@ -30,7 +30,7 @@ static void hmm_loglik_single_state(void)
   eq(imm_hmm_normalize_trans(&hmm), 0);
 
   struct imm_path path = imm_path();
-  imm_path_add(&path, imm_step(imm_state_id(&state.super), 1));
+  imm_path_add(&path, imm_step(imm_state_id(&state.super), 1, 0));
   close(imm_hmm_loglik(&hmm, &A, &path), log(0.5) + log(0.25));
   imm_path_reset(&path);
 
@@ -43,12 +43,12 @@ static void hmm_loglik_single_state(void)
   ok(!imm_lprob_is_finite(imm_hmm_loglik(&hmm, &A, &path)));
   imm_path_reset(&path);
 
-  imm_path_add(&path, imm_step(imm_state_id(&state.super), 1));
+  imm_path_add(&path, imm_step(imm_state_id(&state.super), 1, 0));
   ok(!imm_lprob_is_finite(imm_hmm_loglik(&hmm, &AG, &path)));
   imm_path_reset(&path);
 
-  imm_path_add(&path, imm_step(imm_state_id(&state.super), 1));
-  imm_path_add(&path, imm_step(imm_state_id(&state.super), 1));
+  imm_path_add(&path, imm_step(imm_state_id(&state.super), 1, 0));
+  imm_path_add(&path, imm_step(imm_state_id(&state.super), 1, 0));
   ok(!imm_lprob_is_finite(imm_hmm_loglik(&hmm, &AA, &path)));
   imm_path_reset(&path);
 
@@ -59,15 +59,15 @@ static void hmm_loglik_single_state(void)
   eq(imm_hmm_set_trans(&hmm, &state.super, &state.super, log(0.5)), 0);
   imm_path_reset(&path);
 
-  imm_path_add(&path, imm_step(imm_state_id(&state.super), 1));
-  imm_path_add(&path, imm_step(imm_state_id(&state.super), 1));
+  imm_path_add(&path, imm_step(imm_state_id(&state.super), 1, 0));
+  imm_path_add(&path, imm_step(imm_state_id(&state.super), 1, 0));
   close(imm_hmm_loglik(&hmm, &AA, &path), 2 * log(0.5) + 2 * log(0.25));
   imm_path_reset(&path);
 
   ok(imm_hmm_normalize_trans(&hmm) == 0);
   imm_path_reset(&path);
-  imm_path_add(&path, imm_step(imm_state_id(&state.super), 1));
-  imm_path_add(&path, imm_step(imm_state_id(&state.super), 1));
+  imm_path_add(&path, imm_step(imm_state_id(&state.super), 1, 0));
+  imm_path_add(&path, imm_step(imm_state_id(&state.super), 1, 0));
   close(imm_hmm_loglik(&hmm, &AA, &path), log(0.5) + 2 * log(0.25));
 
   imm_path_cleanup(&path);
@@ -96,26 +96,26 @@ static void hmm_loglik_two_states(void)
   imm_hmm_set_trans(&hmm, &state1.super, &state1.super, log(1.0));
 
   struct imm_path path = imm_path();
-  imm_path_add(&path, imm_step(imm_state_id(&state0.super), 1));
+  imm_path_add(&path, imm_step(imm_state_id(&state0.super), 1, 0));
   close(imm_hmm_loglik(&hmm, &A, &path), -1.3862943611);
   imm_path_reset(&path);
 
-  imm_path_add(&path, imm_step(imm_state_id(&state0.super), 1));
+  imm_path_add(&path, imm_step(imm_state_id(&state0.super), 1, 0));
   ok(imm_lprob_is_zero(imm_hmm_loglik(&hmm, &T, &path)));
   imm_path_reset(&path);
 
-  imm_path_add(&path, imm_step(imm_state_id(&state1.super), 1));
+  imm_path_add(&path, imm_step(imm_state_id(&state1.super), 1, 0));
   ok(!imm_lprob_is_finite(imm_hmm_loglik(&hmm, &G, &path)));
   imm_path_reset(&path);
 
   ok(imm_hmm_normalize_trans(&hmm) == 0);
 
-  imm_path_add(&path, imm_step(imm_state_id(&state0.super), 1));
+  imm_path_add(&path, imm_step(imm_state_id(&state0.super), 1, 0));
   close(imm_hmm_loglik(&hmm, &G, &path), -0.6931471806);
   imm_path_reset(&path);
 
-  imm_path_add(&path, imm_step(imm_state_id(&state0.super), 1));
-  imm_path_add(&path, imm_step(imm_state_id(&state1.super), 1));
+  imm_path_add(&path, imm_step(imm_state_id(&state0.super), 1, 0));
+  imm_path_add(&path, imm_step(imm_state_id(&state1.super), 1, 0));
   close(imm_hmm_loglik(&hmm, &GT, &path), -1.0986122887);
 
   imm_path_cleanup(&path);
@@ -145,7 +145,7 @@ static void hmm_loglik_mute_state(void)
   ok(imm_lprob_is_nan(imm_hmm_loglik(&hmm, &G, &path)));
   imm_path_reset(&path);
 
-  imm_path_add(&path, imm_step(imm_state_id(&state.super), 0));
+  imm_path_add(&path, imm_step(imm_state_id(&state.super), 0, 0));
   close(imm_hmm_loglik(&hmm, &EMPTY, &path), 0.0);
   imm_path_reset(&path);
 
@@ -175,8 +175,8 @@ static void hmm_loglik_two_mute_states(void)
   imm_hmm_set_trans(&hmm, &S0.super, &S1.super, 0.0);
 
   struct imm_path path = imm_path();
-  imm_path_add(&path, imm_step(imm_state_id(&S0.super), 0));
-  imm_path_add(&path, imm_step(imm_state_id(&S1.super), 0));
+  imm_path_add(&path, imm_step(imm_state_id(&S0.super), 0, 0));
+  imm_path_add(&path, imm_step(imm_state_id(&S1.super), 0, 0));
   close(imm_hmm_loglik(&hmm, &EMPTY, &path), 0.0);
 
   imm_path_cleanup(&path);
@@ -219,9 +219,9 @@ static void hmm_loglik_invalid(void)
   imm_hmm_normalize_trans(&hmm);
 
   struct imm_path path = imm_path();
-  imm_path_add(&path, imm_step(imm_state_id(&S.super), 0));
-  imm_path_add(&path, imm_step(imm_state_id(&M2.super), 1));
-  imm_path_add(&path, imm_step(imm_state_id(&E.super), 0));
+  imm_path_add(&path, imm_step(imm_state_id(&S.super), 0, 0));
+  imm_path_add(&path, imm_step(imm_state_id(&M2.super), 1, 0));
+  imm_path_add(&path, imm_step(imm_state_id(&E.super), 0, 0));
   ok(!imm_lprob_is_finite(imm_hmm_loglik(&hmm, &C, &path)));
 
   imm_path_cleanup(&path);

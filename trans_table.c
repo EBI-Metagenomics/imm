@@ -1,13 +1,18 @@
 #include "trans_table.h"
 #include "defer_return.h"
 #include "dp_cfg.h"
+#include "dump.h"
+#include "fmt.h"
 #include "htable.h"
 #include "list.h"
 #include "lprob.h"
+#include "printer.h"
 #include "rc.h"
 #include "reallocf.h"
+#include "state_table.h"
 #include "trans.h"
 #include <assert.h>
+#include <inttypes.h>
 #include <limits.h>
 #include <stdlib.h>
 
@@ -100,3 +105,22 @@ void imm_trans_table_cleanup(struct imm_trans_table *x)
 unsigned imm_trans_table_transsize(unsigned ntrans) { return ntrans + 1; }
 
 unsigned imm_trans_table_offsize(unsigned nstates) { return nstates + 1; }
+
+void imm_trans_table_dump(struct imm_trans_table const *x,
+                          struct imm_state_table const *st,
+                          imm_state_name *callb, FILE *restrict fp)
+{
+  char src[IMM_STATE_NAME_SIZE] = {0};
+  char dst[IMM_STATE_NAME_SIZE] = {0};
+
+  for (unsigned i = 0; i < x->ntrans; ++i)
+  {
+    (*callb)(imm_state_table_id(st, x->trans[i].src), src);
+    (*callb)(imm_state_table_id(st, x->trans[i].dst), dst);
+    fprintf(fp, "%s -> %s", src, dst);
+    fprintf(fp, " [");
+    fprintf(fp, imm_printer_get_f32fmt(), x->trans[i].score);
+    fprintf(fp, "]\n");
+  }
+  fprintf(fp, "\n");
+}

@@ -34,7 +34,7 @@ struct imm_state
   int mark;
 };
 
-typedef unsigned(imm_state_name)(unsigned id, char *name);
+typedef char *(imm_state_name)(unsigned id, char *name);
 
 IMM_API struct imm_abc const *imm_state_abc(struct imm_state const *);
 IMM_API unsigned imm_state_id(struct imm_state const *);

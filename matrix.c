@@ -1,4 +1,5 @@
 #include "matrix.h"
+#include "fmt.h"
 #include "matrixf.h"
 #include "rc.h"
 #include "reallocf.h"
@@ -24,8 +25,8 @@ int imm_matrix_reset(struct imm_matrix *x, struct imm_state_table const *tbl)
   unsigned next_col = 0;
   for (unsigned i = 0; i < n; ++i)
   {
-    unsigned min = imm_zspan_min(imm_state_table_span(tbl, i));
-    unsigned max = imm_zspan_max(imm_state_table_span(tbl, i));
+    unsigned min = imm_zspan_min(imm_state_table_zspan(tbl, i));
+    unsigned max = imm_zspan_max(imm_state_table_zspan(tbl, i));
     x->state_col[i] = (int16_t)(next_col - min);
     next_col += (unsigned)(max - min + 1);
   }
@@ -39,7 +40,7 @@ void imm_matrix_cleanup(struct imm_matrix *x)
 {
   if (x)
   {
-    imm_matrixf_deinit(&x->score);
+    imm_matrixf_cleanup(&x->score);
     free((void *)x->state_col);
     x->state_col = NULL;
   }
@@ -52,7 +53,7 @@ void imm_matrix_dump(struct imm_matrix *matrix, FILE *restrict fp)
     for (unsigned c = 0; c < matrix->score.cols; ++c)
     {
       if (c > 0) fputc(',', fp);
-      fprintf(fp, "%f", imm_matrixf_get(&matrix->score, r, c));
+      fprintf(fp, IMM_FMT_F32, imm_matrixf_get(&matrix->score, r, c));
     }
     fputc('\n', fp);
   }

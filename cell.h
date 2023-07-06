@@ -7,14 +7,15 @@
 struct imm_cell
 {
   unsigned row;
-  uint_fast16_t state;
-  uint_fast8_t len;
+  uint_fast16_t state_idx;
+  uint_fast8_t emission_length;
 };
 
-IMM_CONST IMM_TEMPLATE struct imm_cell
-imm_cell(unsigned const row, uint_fast16_t const state, uint_fast8_t const len)
+imm_const_template struct imm_cell
+imm_cell(unsigned row, uint_fast16_t state_idx, uint_fast8_t emission_length)
 {
-  return (struct imm_cell){.row = row, .state = state, .len = len};
+  return (struct imm_cell){
+      .row = row, .state_idx = state_idx, .emission_length = emission_length};
 }
 
 #endif

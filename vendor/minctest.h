@@ -24,37 +24,8 @@
  *
  */
 
-/*
- * MINCTEST - Minimal testing library for C
- *
- *
- * Example:
- *
- *      void test1() {
- *           lok('a' == 'a');
- *      }
- *
- *      void test2() {
- *           lequal(5, 6);
- *           lfequal(5.5, 5.6);
- *      }
- *
- *      int main() {
- *           lrun("test1", test1);
- *           lrun("test2", test2);
- *           lresults();
- *           return lfails != 0;
- *      }
- *
- *
- *
- * Hints:
- *      All functions/variables start with the letter 'l'.
- *
- */
-
-#ifndef __MINCTEST_H__
-#define __MINCTEST_H__
+#ifndef MINCTEST_H
+#define MINCTEST_H
 
 #include <math.h>
 #include <stdio.h>
@@ -98,7 +69,7 @@ static size_t lfails = 0;
   } while (0)
 
 /* Assert a true statement. */
-#define lok(test)                                                              \
+#define _minctest_ok(test)                                                     \
   do                                                                           \
   {                                                                            \
     ++ltests;                                                                  \
@@ -109,39 +80,69 @@ static size_t lfails = 0;
     }                                                                          \
   } while (0)
 
+#define _minctest_sprintf(buf, val)                                            \
+  sprintf(buf,                                                                 \
+          _Generic((val) + 0,                                                  \
+          char *: "%s",                                                        \
+          char const *: "%s",                                                  \
+          signed char: "%d",                                                   \
+          unsigned char: "%u",                                                 \
+          short: "%d",                                                         \
+          unsigned short: "%u",                                                \
+          int: "%d",                                                           \
+          long: "%ld",                                                         \
+          long long: "%lld",                                                   \
+          unsigned: "%u",                                                      \
+          unsigned long: "%lu",                                                \
+          unsigned long long: "%llu",                                          \
+          float: "%.9g",                                                       \
+          double: "%.17g",                                                     \
+          long double: "%Lf",                                                  \
+          default: _Generic((val - val), ptrdiff_t: "%p", default: "undef")),  \
+          (val))
+
 /* Prototype to assert equal. */
-#define lequal_base(equality, a, b, format)                                    \
+#define _minctest_eq_base(equality, a, b)                                      \
   do                                                                           \
   {                                                                            \
     ++ltests;                                                                  \
     if (!(equality))                                                           \
     {                                                                          \
       ++lfails;                                                                \
-      printf("%s:%d (" format " != " format ")\n", __FILE__, __LINE__, (a),    \
-             (b));                                                             \
+      char _bufa_mt[64] = {0};                                                 \
+      char _bufb_mt[64] = {0};                                                 \
+      _minctest_sprintf(_bufa_mt, a);                                          \
+      _minctest_sprintf(_bufb_mt, b);                                          \
+      printf("%s:%d (%s != %s)\n", __FILE__, __LINE__, _bufa_mt, _bufb_mt);    \
     }                                                                          \
   } while (0);
 
 /* Assert two integers are equal. */
-#define lequal(a, b, format)                                                   \
+#define _minctest_eq(a, b)                                                     \
   ({                                                                           \
-    __typeof__(a) _a = (a);                                                    \
-    __typeof__(b) _b = (b);                                                    \
-    lequal_base((_a) == (_b), _a, _b, format)                                  \
+    __typeof__((a) + 0) _a = (a);                                              \
+    __typeof__((b) + 0) _b = (b);                                              \
+    _minctest_eq_base((_a) == (_b), _a, _b)                                    \
   })
 
 /* Assert two floats are equal (Within LTEST_FLOAT_TOLERANCE). */
-#define lfequal(a, b)                                                          \
+#define _minctest_close(a, b)                                                  \
   ({                                                                           \
     __typeof__(a) _a = (a);                                                    \
     __typeof__(b) _b = (b);                                                    \
-    lequal_base(fabs((double)(_a) - (double)(_b)) <= LTEST_FLOAT_TOLERANCE &&  \
-                    fabs((double)(_a) - (double)(_b)) ==                       \
-                        fabs((double)(_a) - (double)(_b)),                     \
-                (double)(_a), (double)(_b), "%f")                              \
+    _minctest_eq_base(fabs((double)(_a) - (double)(_b)) <=                     \
+                              LTEST_FLOAT_TOLERANCE &&                         \
+                          fabs((double)(_a) - (double)(_b)) ==                 \
+                              fabs((double)(_a) - (double)(_b)),               \
+                      (double)(_a), (double)(_b))                              \
   })
 
 /* Assert two strings are equal. */
-#define lsequal(a, b) lequal_base(strcmp(a, b) == 0, a, b, "%s")
+#define _minctest_cmp(a, b) _minctest_eq_base(strcmp(a, b) == 0, a, b)
 
-#endif /*__MINCTEST_H__*/
+#define eq(a, b) _minctest_eq(a, b)
+#define close(a, b) _minctest_close(a, b)
+#define ok(x) _minctest_ok(x)
+#define cmp(a, b) _minctest_cmp(a, b)
+
+#endif

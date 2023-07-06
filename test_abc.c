@@ -7,20 +7,20 @@
 #include "lprob.h"
 #include "rc.h"
 #include "rna.h"
-#include "test_helper.h"
+#include "vendor/minctest.h"
 
 static void standard_usage(void)
 {
   struct imm_abc abc = {0};
   eq(imm_abc_init(&abc, IMM_STR("ACGT"), '*'), 0);
-  eq(imm_abc_symbol_idx(&abc, 'G'), 2);
-  eq(imm_abc_size(&abc), 4);
+  eq(imm_abc_symbol_idx(&abc, 'G'), 2U);
+  eq(imm_abc_size(&abc), 4U);
   ok(imm_abc_has_symbol(&abc, 'C'));
   ok(!imm_abc_has_symbol(&abc, 'L'));
-  eq(imm_abc_symbol_type(&abc, 'A'), IMM_SYM_NORMAL);
-  eq(imm_abc_symbol_type(&abc, '*'), IMM_SYM_ANY);
-  eq(imm_abc_symbol_type(&abc, 'L'), IMM_SYM_NULL);
-  eq(abc.typeid, IMM_ABC);
+  eq((int)imm_abc_symbol_type(&abc, 'A'), IMM_SYM_NORMAL);
+  eq((int)imm_abc_symbol_type(&abc, '*'), IMM_SYM_ANY);
+  eq((int)imm_abc_symbol_type(&abc, 'L'), IMM_SYM_NULL);
+  eq((int)abc.typeid, IMM_ABC);
 }
 
 static void duplicated_alphabet(void)
@@ -54,7 +54,7 @@ static void union_size(void)
   struct imm_abc abc = {0};
   eq(imm_abc_init(&abc, IMM_STR("ACT"), '*'), 0);
   char data[] = "ACAAAAAAAAC*AATT*G";
-  eq(imm_abc_union_size(&abc, imm_str(data)), 1);
+  eq(imm_abc_union_size(&abc, imm_str(data)), 1U);
 }
 
 static void get_lprob(void)
@@ -85,7 +85,7 @@ static void amino_success(void)
   ok(imm_abc_has_symbol(&amino->super, 'A'));
   ok(!imm_abc_has_symbol(&amino->super, 'B'));
 
-  eq(amino->super.typeid, IMM_AMINO);
+  eq((int)amino->super.typeid, IMM_AMINO);
 }
 
 static void amino_lprob(void)
@@ -118,7 +118,7 @@ static void abc_io(void)
   eq(abc_in.any_symbol_id, abc_out.any_symbol_id);
   eq(abc_in.size, abc_out.size);
   eq(abc_in.typeid, abc_out.typeid);
-  lsequal(abc_in.symbols, abc_out.symbols);
+  cmp(abc_in.symbols, abc_out.symbols);
 
   remove("abc_io.imm");
 }
@@ -144,7 +144,7 @@ static void amino_io(void)
   eq(in->any_symbol_id, out->any_symbol_id);
   eq(in->size, out->size);
   eq(in->typeid, out->typeid);
-  lsequal(in->symbols, out->symbols);
+  cmp(in->symbols, out->symbols);
 
   remove("amino.imm");
 }
@@ -170,7 +170,7 @@ static void dna_io(void)
   eq(in->any_symbol_id, out->any_symbol_id);
   eq(in->size, out->size);
   eq(in->typeid, out->typeid);
-  lsequal(in->symbols, out->symbols);
+  cmp(in->symbols, out->symbols);
 
   remove("dna.imm");
 }
@@ -196,7 +196,7 @@ static void rna_io(void)
   eq(in->any_symbol_id, out->any_symbol_id);
   eq(in->size, out->size);
   eq(in->typeid, out->typeid);
-  lsequal(in->symbols, out->symbols);
+  cmp(in->symbols, out->symbols);
 
   remove("rna.imm");
 }

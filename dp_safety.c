@@ -39,8 +39,8 @@ void imm_dp_safety_init(struct imm_dp_safety *x, unsigned len)
   assert(imm_range_empty(tmp));
 
   if (imm_range_empty(x->safe))
-    imm_range_set(&x->unsafe, x->safe_future.b, x->safe_past.a);
-  else imm_range_set(&x->unsafe, x->safe.b, x->safe.b);
+    imm_range_set(&x->unsafe, x->safe_future.stop, x->safe_past.start);
+  else imm_range_set(&x->unsafe, x->safe.stop, x->safe.stop);
 
   assert(imm_range_empty(x->safe) || imm_range_empty(x->unsafe));
 }

@@ -23,7 +23,7 @@ IMM_API void imm_lprob_normalize(unsigned len, float *arr);
 IMM_API void imm_lprob_sample(struct imm_rnd *, unsigned len, float *arr);
 IMM_API float imm_lprob_zero(void);
 
-IMM_PURE IMM_TEMPLATE float imm_lprob_sum(unsigned const len, float const *arr)
+imm_pure_template float imm_lprob_sum(unsigned len, float const *arr)
 {
   float r = arr[0];
   for (unsigned i = 1; i < len; ++i)

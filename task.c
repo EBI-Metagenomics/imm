@@ -24,7 +24,7 @@ struct imm_task *imm_task_new(struct imm_dp const *dp)
   }
   task->code = dp->code;
   task->seq = NULL;
-  task->save_path = true;
+  imm_trellis_init(&task->trellis, &dp->state_table, &dp->trans_table);
   return task;
 }
 
@@ -42,12 +42,13 @@ int imm_task_reset(struct imm_task *x, struct imm_dp const *dp)
 int imm_task_setup(struct imm_task *x, struct imm_eseq const *seq)
 {
   x->seq = seq;
-  return imm_cpath_setup(&x->path, imm_eseq_size(seq) + 1);
-}
-
-void imm_task_set_save_path(struct imm_task *x, bool save)
-{
-  x->save_path = save;
+  // TODO: memory leak
+  int rc = imm_cpath_setup(&x->path, imm_eseq_size(seq) + 1);
+  if (rc) return rc;
+  // TODO: memory leak
+  rc = imm_trellis_setup(&x->trellis, imm_eseq_size(seq) + 1, x->path.nstates);
+  if (rc) return rc;
+  return rc;
 }
 
 void imm_task_del(struct imm_task const *x)
@@ -56,6 +57,7 @@ void imm_task_del(struct imm_task const *x)
   {
     imm_matrix_cleanup((struct imm_matrix *)&x->matrix);
     imm_cpath_cleanup((struct imm_cpath *)&x->path);
+    imm_trellis_cleanup((struct imm_trellis *)&x->trellis);
     free((void *)x);
   }
 }

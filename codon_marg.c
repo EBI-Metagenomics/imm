@@ -1,6 +1,7 @@
 #include "codon_marg.h"
 #include "abc.h"
 #include "codon_lprob.h"
+#include "dump.h"
 #include "expect.h"
 #include "lip/1darray/1darray.h"
 #include "lip/lip.h"
@@ -147,4 +148,10 @@ int imm_codon_marg_unpack(struct imm_codon_marg *codonm, struct lip_file *file)
   if (!imm_expect_1darr_float_type(file, CODON_SIZE, lprobs)) return IMM_EIO;
 
   return file->error ? IMM_EIO : 0;
+}
+
+void imm_codon_marg_dump(struct imm_codon_marg const *x, FILE *restrict fp)
+{
+  size_t n = (IMM_NUCLT_SIZE + 1) * (IMM_NUCLT_SIZE + 1) * (IMM_NUCLT_SIZE + 1);
+  imm_dump_array_f32(n, (float const *)x->lprobs, fp);
 }

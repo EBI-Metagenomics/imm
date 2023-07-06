@@ -16,7 +16,7 @@ struct imm_state_table
   uint16_t *ids;
   struct
   {
-    uint16_t state;
+    uint16_t state_idx;
     float lprob;
   } start;
   unsigned end_state_idx;
@@ -30,12 +30,13 @@ unsigned imm_state_table_idx(struct imm_state_table const *, unsigned id);
 unsigned imm_state_table_id(struct imm_state_table const *, unsigned idx);
 struct imm_range imm_state_table_range(struct imm_state_table const *,
                                        unsigned idx);
-void imm_state_table_dump(struct imm_state_table const *);
+void imm_state_table_dump(struct imm_state_table const *, imm_state_name *,
+                          FILE *restrict);
 
-IMM_TEMPLATE uint8_t imm_state_table_span(struct imm_state_table const *x,
-                                          unsigned const state)
+imm_pure_template uint8_t imm_state_table_zspan(struct imm_state_table const *x,
+                                                unsigned state_idx)
 {
-  return x->span[state];
+  return x->span[state_idx];
 }
 
 #endif

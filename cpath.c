@@ -1,6 +1,7 @@
 #include "cpath.h"
 #include "bits.h"
-#include "minmax.h"
+#include "defer_return.h"
+#include "max.h"
 #include "rc.h"
 #include "reallocf.h"
 #include "span.h"
@@ -13,9 +14,11 @@ int imm_cpath_init(struct imm_cpath *x, struct imm_state_table const *state_tbl,
                    struct imm_trans_table const *trans_tbl)
 {
   x->nstates = 0;
+  x->length = 0;
   x->ncols = 0;
   x->state_offset = NULL;
   x->trans_bits = NULL;
+  x->score = NULL;
   int rc = imm_cpath_reset(x, state_tbl, trans_tbl);
   if (rc) return rc;
   x->bit = NULL;
@@ -44,9 +47,9 @@ int imm_cpath_reset(struct imm_cpath *x,
     {
 
       unsigned src = imm_trans_table_source_state(trans_tbl, dst, i);
-      unsigned min_seq = imm_zspan_min(imm_state_table_span(state_tbl, src));
-      unsigned max_seq = imm_zspan_max(imm_state_table_span(state_tbl, src));
-      depth = MAX(max_seq - min_seq, depth);
+      unsigned min_seq = imm_zspan_min(imm_state_table_zspan(state_tbl, src));
+      unsigned max_seq = imm_zspan_max(imm_state_table_zspan(state_tbl, src));
+      depth = imm_max(max_seq - min_seq, depth);
     }
     x->state_offset[dst + 1] = x->state_offset[dst];
     x->trans_bits[dst] =
@@ -69,16 +72,47 @@ void imm_cpath_cleanup(struct imm_cpath *x)
     free(x->state_offset);
     free(x->trans_bits);
     free(x->bit);
+    free(x->score);
     x->state_offset = NULL;
     x->trans_bits = NULL;
     x->bit = NULL;
+    x->score = NULL;
   }
 }
 
 int imm_cpath_setup(struct imm_cpath *x, unsigned len)
 {
-  size_t size = x->state_offset[x->nstates] * len;
+  int rc = 0;
+  x->length = len;
+  size_t size = x->state_offset[x->nstates] * x->length;
   x->bit = imm_bitmap_reallocf(x->bit, size);
-  if (!x->bit && size > 0) return IMM_ENOMEM;
-  return 0;
+  if (!x->bit && size > 0) defer_return(IMM_ENOMEM);
+
+  size = sizeof(*x->score) * (x->length * x->nstates);
+  x->score = imm_reallocf(x->score, size);
+  if (!x->score && size > 0) defer_return(IMM_ENOMEM);
+
+  return rc;
+
+defer:
+  free(x->bit);
+  free(x->score);
+  x->bit = NULL;
+  x->score = NULL;
+  return rc;
+}
+
+void imm_cpath_dump(struct imm_cpath const *x, FILE *restrict fp)
+{
+  for (unsigned i = 0; i < x->length; ++i)
+  {
+    for (unsigned j = 0; j < x->nstates; ++j)
+    {
+      if (j > 0) fputc(',', fp);
+      fprintf(fp, "(trans=%u, seqlen_idx=%u, score=%.7g, valid=%d)",
+              imm_cpath_trans(x, i, j), imm_cpath_seqlen_idx(x, i, j),
+              imm_cpath_get_score(x, i, j), imm_cpath_valid(x, i, j));
+    }
+    fprintf(fp, "\n");
+  }
 }

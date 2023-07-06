@@ -1,16 +1,10 @@
 #ifndef IMM_VITERBI_H
 #define IMM_VITERBI_H
 
-#include "assume.h"
-#include "cell.h"
-#include "compiler.h"
-#include "dp.h"
 #include "dp_safety.h"
-#include "range.h"
-#include "state_range.h"
-#include "task.h"
-#include "trans_table.h"
-#include "zspan.h"
+#include "export.h"
+#include "tardy_state.h"
+#include <stdbool.h>
 
 struct imm_dp;
 struct imm_task;
@@ -19,89 +13,15 @@ struct imm_viterbi
 {
   struct imm_dp const *dp;
   struct imm_task *task;
+  struct imm_ctrans const *curr_trans;
   struct imm_dp_safety safety;
   unsigned seqlen;
-  unsigned unsafe_state;
+  bool has_tardy_state;
+  struct tardy_state tardy_state;
 };
 
-void imm_viterbi_init(struct imm_viterbi *, struct imm_dp const *,
-                      struct imm_task *);
-struct imm_range imm_viterbi_range(struct imm_viterbi const *, unsigned state);
-float imm_viterbi_start_lprob(struct imm_viterbi const *);
-
-IMM_TEMPLATE unsigned imm_viterbi_start_state(struct imm_viterbi const *x)
-{
-  return x->dp->state_table.start.state;
-}
-
-IMM_TEMPLATE unsigned imm_viterbi_ntrans(struct imm_viterbi const *x,
-                                         unsigned const dst)
-{
-  return imm_trans_table_ntrans(&x->dp->trans_table, dst);
-}
-
-IMM_TEMPLATE unsigned imm_viterbi_source(struct imm_viterbi const *x,
-                                         unsigned const dst,
-                                         unsigned const trans)
-{
-  return imm_trans_table_source_state(&x->dp->trans_table, dst, trans);
-}
-
-IMM_TEMPLATE float imm_viterbi_get_score(struct imm_viterbi const *x,
-                                         struct imm_cell const cell)
-{
-  return imm_matrix_get_score(&x->task->matrix, cell);
-}
-
-IMM_TEMPLATE float imm_viterbi_trans_score(struct imm_viterbi const *x,
-                                           unsigned const dst,
-                                           unsigned const trans)
-{
-  return imm_trans_table_score(&x->dp->trans_table, dst, trans);
-}
-
-IMM_TEMPLATE uint8_t imm_viterbi_span(struct imm_viterbi const *x,
-                                      unsigned const state)
-{
-  return imm_state_table_span(&x->dp->state_table, state);
-}
-
-IMM_TEMPLATE struct state_range
-imm_viterbi_state_range(struct imm_viterbi const *x, unsigned const state)
-{
-  uint8_t span = imm_state_table_span(&x->dp->state_table, state);
-  imm_assume(imm_zspan_min(span) <= IMM_STATE_MAX_SEQLEN);
-  imm_assume(imm_zspan_max(span) <= IMM_STATE_MAX_SEQLEN);
-  imm_assume(imm_zspan_min(span) <= imm_zspan_max(span));
-  return STATE_RANGE(state, imm_zspan_min(span), imm_zspan_max(span));
-}
-
-IMM_TEMPLATE float imm_viterbi_emission(struct imm_viterbi const *x,
-                                        unsigned const row,
-                                        unsigned const state,
-                                        unsigned const len,
-                                        unsigned const min_len)
-{
-  unsigned code = imm_eseq_get(x->task->seq, row, len, min_len);
-  return imm_emis_score(&x->dp->emis, state, code);
-}
-
-IMM_TEMPLATE unsigned imm_viterbi_nstates(struct imm_viterbi const *x)
-{
-  return x->dp->state_table.nstates;
-}
-
-IMM_TEMPLATE void imm_viterbi_set_score(struct imm_viterbi const *x,
-                                        struct imm_cell const cell,
-                                        float const score)
-{
-  imm_matrix_set_score(&x->task->matrix, cell, score);
-}
-
-IMM_TEMPLATE uint16_t imm_viterbi_trans0(struct imm_viterbi const *x,
-                                         unsigned const state)
-{
-  return imm_trans_table_trans0(&x->dp->trans_table, state);
-}
+IMM_API void imm_viterbi_init(struct imm_viterbi *, struct imm_dp const *,
+                              struct imm_task *);
+IMM_API void imm_viterbi_run(struct imm_viterbi *);
 
 #endif

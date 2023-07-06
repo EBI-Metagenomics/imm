@@ -1,5 +1,5 @@
-#ifndef DP_SAFETY_H
-#define DP_SAFETY_H
+#ifndef IMM_DP_SAFETY_H
+#define IMM_DP_SAFETY_H
 
 #include "range.h"
 
