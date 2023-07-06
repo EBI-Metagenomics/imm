@@ -25,7 +25,7 @@ IMM_API bool imm_list_empty(struct imm_list const *head);
   for (pos = (head)->next, n = pos->next; !imm_list_is_head(pos, (head));      \
        pos = n, n = pos->next)
 
-#define imm_list_entry(ptr, type, member) imm_cof(ptr, type, member)
+#define imm_list_entry(ptr, type, member) imm_container(ptr, type, member)
 
 #define imm_list_first_entry(ptr, type, member)                                \
   imm_list_entry((ptr)->next, type, member)

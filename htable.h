@@ -288,7 +288,7 @@ static inline int cco_hlist_unhashed(struct cco_hnode const *h)
   return !h->pprev;
 }
 
-#define cco_hlist_entry(ptr, type, member) imm_cof(ptr, type, member)
+#define cco_hlist_entry(ptr, type, member) imm_container(ptr, type, member)
 
 #define cco_hlist_entry_safe(ptr, type, member)                                \
   ({                                                                           \

@@ -334,7 +334,7 @@ static int del_outgoing_transitions(struct imm_hmm *hmm,
     struct imm_list *n = NULL;
     imm_list_for_each_safe(pos, n, &dst->trans.incoming)
     {
-      struct imm_trans *x = imm_cof(pos, struct imm_trans, incoming);
+      struct imm_trans *x = imm_container(pos, struct imm_trans, incoming);
       if (x == t)
       {
         imm_list_del(pos);
@@ -362,7 +362,7 @@ static int del_incoming_transitions(struct imm_hmm *hmm,
     struct imm_list *n = NULL;
     imm_list_for_each_safe(pos, n, &src->trans.outgoing)
     {
-      struct imm_trans *x = imm_cof(pos, struct imm_trans, outgoing);
+      struct imm_trans *x = imm_container(pos, struct imm_trans, outgoing);
       if (x == t)
       {
         imm_list_del(pos);
