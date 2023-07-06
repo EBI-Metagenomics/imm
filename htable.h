@@ -1,7 +1,7 @@
 #ifndef IMM_HTABLE_H
 #define IMM_HTABLE_H
 
-#include "cof.h"
+#include "container.h"
 
 /* ---- cco_compiler module begin ------------------------------------------- */
 #ifndef __has_builtin

@@ -1,5 +1,5 @@
-#ifndef IMM_COF_H
-#define IMM_COF_H
+#ifndef IMM_CONTAINER_H
+#define IMM_CONTAINER_H
 
 #define imm_container(ptr, type, member)                                       \
   ({                                                                           \
