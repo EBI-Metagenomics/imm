@@ -3,7 +3,6 @@
 
 #include "amino.h"
 #include "export.h"
-#include "lprob.h"
 
 struct imm_amino_lprob
 {
@@ -14,6 +13,5 @@ struct imm_amino_lprob
 IMM_API struct imm_amino_lprob imm_amino_lprob(struct imm_amino const *,
                                                float const *lprobs);
 IMM_API float imm_amino_lprob_get(struct imm_amino_lprob const *, char symbol);
-float imm__amino_lprob_get(struct imm_amino_lprob const *, unsigned idx);
 
 #endif

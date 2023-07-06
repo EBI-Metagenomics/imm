@@ -15,10 +15,5 @@ float imm_amino_lprob_get(struct imm_amino_lprob const *lprob, char symbol)
 {
   struct imm_abc const *abc = &lprob->amino->super;
   assert(imm_abc_has_symbol(abc, symbol));
-  return imm__amino_lprob_get(lprob, imm_abc_symbol_idx(abc, symbol));
-}
-
-float imm__amino_lprob_get(struct imm_amino_lprob const *lprob, unsigned idx)
-{
-  return lprob->lprobs[idx];
+  return lprob->lprobs[imm_abc_symbol_idx(abc, symbol)];
 }
