@@ -50,8 +50,8 @@ IMM_API char const *imm_abc_symbols(struct imm_abc const *);
 IMM_API unsigned imm_abc_union_size(struct imm_abc const *, struct imm_str seq);
 IMM_API bool imm_abc_typeid_valid(unsigned typeid);
 IMM_API char const *imm_abc_typeid_name(enum imm_abc_typeid typeid);
-IMM_API int imm_abc_pack(struct imm_abc const *, struct lip_file *file);
-IMM_API int imm_abc_unpack(struct imm_abc *, struct lip_file *file);
+IMM_API int imm_abc_pack(struct imm_abc const *, struct lip_file *);
+IMM_API int imm_abc_unpack(struct imm_abc *, struct lip_file *);
 
 unsigned imm__abc_symbol_idx(struct imm_abc const *, unsigned id);
 enum imm_sym_type imm__abc_symbol_type(struct imm_abc const *, unsigned id);
