@@ -165,12 +165,12 @@ int imm_hmm_reset_dp(struct imm_hmm const *hmm,
   if ((rc = imm_tsort(hmm->states.size, states, start_idx))) goto cleanup;
   set_state_indices(hmm, states);
 
-  struct imm_dp_cfg cfg = {0};
-  imm_dp_cfg_set_ntrans(&cfg, hmm->transitions.size);
-  imm_dp_cfg_set_states(&cfg, hmm->states.size, states);
-  imm_dp_cfg_set_start(&cfg, hmm_state(hmm, hmm->start.state_id),
-                       hmm->start.lprob);
-  imm_dp_cfg_set_end(&cfg, end_state);
+  struct imm_dp_cfg cfg = {.ntrans = hmm->transitions.size,
+                           .nstates = hmm->states.size,
+                           .states = states,
+                           .start.state = hmm_state(hmm, hmm->start.state_id),
+                           .start.lprob = hmm->start.lprob,
+                           .end_state = end_state};
 
   imm_dp_reset(dp, &cfg);
 
