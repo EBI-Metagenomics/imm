@@ -2,14 +2,12 @@
 #define IMM_BITS_H
 
 #include "compiler.h"
+#include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
 
-#define __BITS_DIV_ROUND_UP(n, d) (((n) + (d)-1) / (d))
-
-#define BITS_PER_BYTE 8
-#define BITS_PER_LONG (sizeof(long) * BITS_PER_BYTE)
-#define BITS_TO_LONGS(nr) __BITS_DIV_ROUND_UP(nr, BITS_PER_LONG)
+#define IMM_BITS_PER_BYTE CHAR_BIT
+#define IMM_BITS_COUNT(T) (sizeof(T) * IMM_BITS_PER_BYTE)
 
 imm_template void bits_clr(unsigned long *x, unsigned bit)
 {

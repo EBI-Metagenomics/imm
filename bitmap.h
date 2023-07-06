@@ -5,10 +5,9 @@
 #include "bits.h"
 #include "compiler.h"
 #include "min.h"
-#include "unroll.h"
 
-#define LONG_START(bit) (bit / BITS_PER_LONG)
-#define BIT_START(bit) (bit % BITS_PER_LONG)
+#define IMM_BITMAP_LONG(bit) (bit / IMM_BITS_COUNT(long))
+#define IMM_BITMAP_BIT(bit) (bit % IMM_BITS_COUNT(long))
 
 unsigned long *imm_bitmap_reallocf(unsigned long *, unsigned long bits);
 
@@ -16,7 +15,7 @@ imm_pure_template unsigned long __bitmap_get(unsigned long const *x,
                                              unsigned addr, unsigned nbits,
                                              unsigned long val)
 {
-  imm_assume(addr + nbits <= BITS_PER_LONG);
+  imm_assume(addr + nbits <= IMM_BITS_COUNT(long));
   imm_assume(nbits <= 16);
   for (unsigned i = addr; i < addr + nbits; ++i)
   {
@@ -31,19 +30,19 @@ imm_pure imm_template unsigned long imm_bitmap_get(unsigned long const *x,
                                                    unsigned const nbits)
 {
   imm_assume(nbits <= 16);
-  unsigned long const *y = x + LONG_START(addr);
+  unsigned long const *y = x + IMM_BITMAP_LONG(addr);
 
   unsigned long val = 0;
-  unsigned cut = imm_min(nbits, BITS_PER_LONG - BIT_START(addr));
+  unsigned cut = imm_min(nbits, IMM_BITS_COUNT(long) - IMM_BITMAP_BIT(addr));
   val = __bitmap_get(y + 1, 0, nbits - cut, val) << cut;
-  val = __bitmap_get(y, BIT_START(addr), cut, val);
+  val = __bitmap_get(y, IMM_BITMAP_BIT(addr), cut, val);
   return val;
 }
 
 imm_template void __bitmap_set(unsigned long *x, unsigned long val,
                                unsigned addr, unsigned nbits)
 {
-  imm_assume(addr + nbits <= BITS_PER_LONG);
+  imm_assume(addr + nbits <= IMM_BITS_COUNT(long));
   imm_assume(nbits <= 16);
   for (unsigned i = addr; i < addr + nbits; ++i)
   {
@@ -56,10 +55,10 @@ imm_template void imm_bitmap_set(unsigned long *x, unsigned long val,
                                  unsigned long addr, unsigned nbits)
 {
   imm_assume(nbits <= 16);
-  unsigned long *y = x + LONG_START(addr);
+  unsigned long *y = x + IMM_BITMAP_LONG(addr);
 
-  unsigned cut = imm_min(nbits, BITS_PER_LONG - BIT_START(addr));
-  __bitmap_set(y, val, BIT_START(addr), cut);
+  unsigned cut = imm_min(nbits, IMM_BITS_COUNT(long) - IMM_BITMAP_BIT(addr));
+  __bitmap_set(y, val, IMM_BITMAP_BIT(addr), cut);
   __bitmap_set(y + 1, val >> cut, 0, nbits - cut);
 }
 
