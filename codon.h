@@ -3,7 +3,6 @@
 
 #include "export.h"
 #include "nuclt.h"
-#include <assert.h>
 
 struct imm_codon
 {

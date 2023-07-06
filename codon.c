@@ -1,4 +1,5 @@
 #include "codon.h"
+#include <assert.h>
 
 void imm_codon_set(struct imm_codon *codon, unsigned id_a, unsigned id_b,
                    unsigned id_c)
