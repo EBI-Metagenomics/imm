@@ -13,7 +13,6 @@ extern "C" {
 #include "assume.h"
 #include "bitmap.h"
 #include "bits.h"
-#include "btrans.h"
 #include "cartes.h"
 #include "cell.h"
 #include "code.h"
