@@ -1,6 +1,7 @@
 #include "codon_lprob.h"
 #include "lprob.h"
 #include "nuclt.h"
+#include <assert.h>
 
 struct imm_codon_lprob imm_codon_lprob(struct imm_nuclt const *nuclt)
 {
