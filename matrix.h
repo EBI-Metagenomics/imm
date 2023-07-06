@@ -1,7 +1,6 @@
 #ifndef IMM_MATRIX_H
 #define IMM_MATRIX_H
 
-#include "assume.h"
 #include "cell.h"
 #include "compiler.h"
 #include "matrixf.h"
@@ -18,9 +17,9 @@ struct imm_matrix
   int16_t *state_col;
 };
 
-void imm_matrix_cleanup(struct imm_matrix *);
 int imm_matrix_init(struct imm_matrix *, struct imm_state_table const *);
 int imm_matrix_reset(struct imm_matrix *, struct imm_state_table const *);
+void imm_matrix_cleanup(struct imm_matrix *);
 void imm_matrix_dump(struct imm_matrix *, FILE *restrict);
 
 imm_pure_template float imm_matrix_get_score(struct imm_matrix const *x,
