@@ -1454,9 +1454,6 @@ static void msv3000_path(void)
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &m->code);
 
-  struct imm_eseq eseq = {0};
-  imm_eseq_init(&eseq, &m->code);
-
   // struct imm_seq seq = imm_seq(imm_str(seq1), &m->abc);
   struct imm_seq seq = imm_seq(imm_str(seq10), &m->abc);
   eq(imm_eseq_setup(&eseq, &seq), 0);

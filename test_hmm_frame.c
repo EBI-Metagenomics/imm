@@ -45,9 +45,6 @@ static void hmm_frame_state_len1(void)
   struct imm_hmm hmm;
   imm_hmm_init(&hmm, &code);
 
-  struct imm_eseq eseq = {0};
-  imm_eseq_init(&eseq, &code);
-
   struct imm_frame_state state;
   imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f,
                        (struct imm_span){1, 5});
@@ -108,9 +105,6 @@ static void hmm_frame_state_len2(void)
 
   imm_hmm_add_state(&hmm, &state.super);
   imm_hmm_set_start(&hmm, &state.super, log(1.0));
-
-  struct imm_eseq eseq = {0};
-  imm_eseq_init(&eseq, &code);
 
   struct imm_path path = imm_path();
   imm_path_add(&path, imm_step(state.super.id, 2, 0));
@@ -189,9 +183,6 @@ static void hmm_frame_state_len3(void)
   imm_hmm_add_state(&hmm, &state.super);
   imm_hmm_set_start(&hmm, &state.super, log(1.0));
 
-  struct imm_eseq eseq = {0};
-  imm_eseq_init(&eseq, &code);
-
   struct imm_path path = imm_path();
   imm_path_add(&path, imm_step(state.super.id, 3, 0));
   struct imm_seq seq = imm_seq(IMM_STR("ATC"), abc);
@@ -243,9 +234,6 @@ static void hmm_frame_state_len4(void)
   imm_hmm_add_state(&hmm, &state.super);
   imm_hmm_set_start(&hmm, &state.super, log(1.0));
 
-  struct imm_eseq eseq = {0};
-  imm_eseq_init(&eseq, &code);
-
   struct imm_path path = imm_path();
   imm_path_add(&path, imm_step(state.super.id, 4, 0));
   struct imm_seq seq = imm_seq(IMM_STR("ATCC"), abc);
@@ -283,9 +271,6 @@ static void hmm_frame_state_len5(void)
 
   imm_hmm_add_state(&hmm, &state.super);
   imm_hmm_set_start(&hmm, &state.super, log(1.0));
-
-  struct imm_eseq eseq = {0};
-  imm_eseq_init(&eseq, &code);
 
   struct imm_path path = imm_path();
   imm_path_add(&path, imm_step(state.super.id, 5, 0));

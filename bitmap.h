@@ -4,7 +4,7 @@
 #include "assume.h"
 #include "bits.h"
 #include "compiler.h"
-#include "minmax.h"
+#include "min.h"
 #include "unroll.h"
 
 #define LONG_START(bit) (bit / BITS_PER_LONG)
@@ -26,7 +26,7 @@ imm_pure_template unsigned long __bitmap_get(unsigned long const *x,
   return val;
 }
 
-IMM_PURE IMM_TEMPLATE unsigned long imm_bitmap_get(unsigned long const *x,
+imm_pure imm_template unsigned long imm_bitmap_get(unsigned long const *x,
                                                    unsigned long const addr,
                                                    unsigned const nbits)
 {

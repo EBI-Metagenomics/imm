@@ -21,9 +21,6 @@ static void example1_path(void)
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &m->code);
 
-  struct imm_eseq eseq = {0};
-  imm_eseq_init(&eseq, &m->code);
-
   struct imm_seq seq = imm_seq(imm_str("BMIMIMMMEJBMIIMIME"), &m->abc);
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
@@ -49,9 +46,6 @@ static void example1_removed_states_path(void)
   imm_hmm_init_dp(&imm_ex1.hmm, &m->end.super, &dp);
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
-
-  struct imm_eseq eseq = {0};
-  imm_eseq_init(&eseq, &m->code);
 
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &m->code);

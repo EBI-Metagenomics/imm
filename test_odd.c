@@ -119,9 +119,6 @@ static void odd2(void)
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
-  struct imm_eseq eseq = {0};
-  imm_eseq_init(&eseq, &code);
-
   struct imm_seq seq = imm_seq(IMM_STR("XJX"), &abc);
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);

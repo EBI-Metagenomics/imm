@@ -61,9 +61,6 @@ static void one_mute_state(void)
   imm_hmm_init_dp(&hmm, &state.super, &dp);
   struct imm_task *task = imm_task_new(&dp);
 
-  struct imm_eseq eseq = {0};
-  imm_eseq_init(&eseq, &code);
-
   {
     eq(imm_eseq_setup(&eseq, &EMPTY), 0);
     eq(imm_task_setup(task, &eseq), 0);
@@ -109,9 +106,6 @@ static void two_mute_states(void)
   struct imm_dp dp;
   imm_hmm_init_dp(&hmm, &state0.super, &dp);
   struct imm_task *task = imm_task_new(&dp);
-
-  struct imm_eseq eseq = {0};
-  imm_eseq_init(&eseq, &code);
 
   {
     eq(imm_eseq_setup(&eseq, &EMPTY), 0);
@@ -186,9 +180,6 @@ static void one_normal_state(void)
   struct imm_dp dp;
   imm_hmm_init_dp(&hmm, &state.super, &dp);
   struct imm_task *task = imm_task_new(&dp);
-
-  struct imm_eseq eseq = {0};
-  imm_eseq_init(&eseq, &code);
 
   eq(imm_eseq_setup(&eseq, &EMPTY), 0);
   eq(imm_task_setup(task, &eseq), 0);
@@ -318,9 +309,6 @@ static void two_normal_states(void)
   imm_hmm_init_dp(&hmm, &state0.super, &dp);
   struct imm_task *task = imm_task_new(&dp);
 
-  struct imm_eseq eseq = {0};
-  imm_eseq_init(&eseq, &code);
-
   {
     eq(imm_eseq_setup(&eseq, &A), 0);
     eq(imm_task_setup(task, &eseq), 0);
@@ -425,9 +413,6 @@ static void normal_states(void)
   struct imm_dp dp;
   imm_hmm_init_dp(&hmm, &state0.super, &dp);
   struct imm_task *task = imm_task_new(&dp);
-
-  struct imm_eseq eseq = {0};
-  imm_eseq_init(&eseq, &code);
 
   {
     eq(imm_eseq_setup(&eseq, &A), 0);
@@ -651,9 +636,6 @@ static void profile1(void)
   imm_hmm_init_dp(&hmm, &end.super, &dp);
   struct imm_task *task = imm_task_new(&dp);
 
-  struct imm_eseq eseq = {0};
-  imm_eseq_init(&eseq, &code_ab);
-
   eq(imm_eseq_setup(&eseq, &EMPTY_ab), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
@@ -852,9 +834,6 @@ static void profile2(void)
   struct imm_dp dp;
   imm_hmm_init_dp(&hmm, &M2.super, &dp);
   struct imm_task *task = imm_task_new(&dp);
-
-  struct imm_eseq eseq = {0};
-  imm_eseq_init(&eseq, &code);
 
   eq(imm_eseq_setup(&eseq, &A), 0);
   eq(imm_task_setup(task, &eseq), 0);
@@ -1075,9 +1054,6 @@ static void profile_delete(void)
   imm_hmm_init_dp(&hmm, &N0.super, &dp);
   struct imm_task *task = imm_task_new(&dp);
 
-  struct imm_eseq eseq = {0};
-  imm_eseq_init(&eseq, &code_ab);
-
   eq(imm_eseq_setup(&eseq, &A_ab), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
@@ -1248,9 +1224,6 @@ static void global_profile(void)
   struct imm_dp dp;
   imm_hmm_init_dp(&hmm, &start.super, &dp);
   struct imm_task *task = imm_task_new(&dp);
-
-  struct imm_eseq eseq = {0};
-  imm_eseq_init(&eseq, &code_z);
 
   eq(imm_eseq_setup(&eseq, &C_z), 0);
   eq(imm_task_setup(task, &eseq), 0);
@@ -1454,9 +1427,6 @@ static void cycle_mute_ending(void)
   struct imm_dp dp;
   imm_hmm_init_dp(&hmm, &end.super, &dp);
   struct imm_task *task = imm_task_new(&dp);
-
-  struct imm_eseq eseq = {0};
-  imm_eseq_init(&eseq, &code_ab);
 
   eq(imm_eseq_setup(&eseq, &A_ab), 0);
   eq(imm_task_setup(task, &eseq), 0);
