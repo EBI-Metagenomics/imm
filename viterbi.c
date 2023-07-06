@@ -11,6 +11,7 @@
 #include "state_table.h"
 #include "task.h"
 #include "trans_table.h"
+#include "unroll.h"
 #include "zspan.h"
 
 imm_pure_template float start_lprob(struct imm_viterbi const *x)

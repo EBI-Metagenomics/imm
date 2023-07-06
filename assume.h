@@ -2,7 +2,6 @@
 #define IMM_ASSUME_H
 
 #include "compiler.h"
-#include <assert.h>
 
 #if __has_builtin(__builtin_assume)
 #define imm_assume(x) __builtin_assume(x)
