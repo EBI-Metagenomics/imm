@@ -4,6 +4,7 @@
 #include "codon.h"
 #include "compiler.h"
 #include "export.h"
+#include <stdio.h>
 
 /** @file codon_marg.h
  * Codon marginalization module.

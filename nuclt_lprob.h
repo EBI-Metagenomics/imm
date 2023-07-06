@@ -3,6 +3,7 @@
 
 #include "export.h"
 #include "nuclt.h"
+#include <stdio.h>
 
 struct imm_nuclt_lprob
 {
