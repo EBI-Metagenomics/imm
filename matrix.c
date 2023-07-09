@@ -53,7 +53,7 @@ void imm_matrix_dump(struct imm_matrix *matrix, FILE *restrict fp)
     for (unsigned c = 0; c < matrix->score.cols; ++c)
     {
       if (c > 0) fputc(',', fp);
-      fprintf(fp, IMM_FMT_F32, imm_matrixf_get(&matrix->score, r, c));
+      fprintf(fp, imm_fmt_get_f32(), imm_matrixf_get(&matrix->score, r, c));
     }
     fputc('\n', fp);
   }

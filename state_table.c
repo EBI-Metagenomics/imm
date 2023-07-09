@@ -5,7 +5,6 @@
 #include "dump.h"
 #include "fmt.h"
 #include "lprob.h"
-#include "printer.h"
 #include "rc.h"
 #include "reallocf.h"
 #include "state.h"
@@ -86,7 +85,7 @@ void imm_state_table_dump(struct imm_state_table const *x,
   char state_name[IMM_STATE_NAME_SIZE] = {0};
 
   (*callb)(imm_state_table_id(x, x->start.state_idx), state_name);
-  char const *fmt32 = imm_printer_get_f32fmt();
+  char const *fmt32 = imm_fmt_get_f32();
 
   fprintf(fp, "\n");
   fprintf(fp, "start_state=%s\n", state_name);

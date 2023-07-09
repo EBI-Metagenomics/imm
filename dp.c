@@ -3,13 +3,13 @@
 #include "elapsed/elapsed.h"
 #include "emis.h"
 #include "expect.h"
+#include "fmt.h"
 #include "likely.h"
 #include "lip/1darray/1darray.h"
 #include "lip/lip.h"
 #include "lprob.h"
 #include "matrix.h"
 #include "min.h"
-#include "printer.h"
 #include "prod.h"
 #include "reallocf.h"
 #include "span.h"
@@ -236,7 +236,7 @@ void imm_dp_write_dot(struct imm_dp const *dp, FILE *restrict fp,
       (*name)(imm_state_table_id(&dp->state_table, src), src_name);
       (*name)(imm_state_table_id(&dp->state_table, dst), dst_name);
       fprintf(fp, "%s -> %s [label=", src_name, dst_name);
-      fprintf(fp, imm_printer_get_f32fmt(),
+      fprintf(fp, imm_fmt_get_f32(),
               imm_trans_table_score(&dp->trans_table, dst, t));
       fprintf(fp, "];\n");
     }

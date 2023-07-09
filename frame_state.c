@@ -119,5 +119,6 @@ void imm_frame_state_dump(struct imm_frame_state const *x, FILE *restrict fp)
   imm_codon_marg_dump(x->codonm, fp);
   fputc(' ', fp);
 
-  fprintf(fp, "epsilon:" IMM_FMT_F32, x->epsilon);
+  fprintf(fp, "epsilon:");
+  fprintf(fp, imm_fmt_get_f32(), x->epsilon);
 }

@@ -1,5 +1,5 @@
 #include "path.h"
-#include "printer.h"
+#include "fmt.h"
 #include "rc.h"
 #include "reallocf.h"
 #include "state.h"
@@ -109,7 +109,7 @@ void imm_path_dump(struct imm_path const *x, imm_state_name *callb,
 
     fprintf(fp, "%s,", (*callb)(state_id, name));
     fprintf(fp, "%.*s,", seqlen, sequence);
-    fprintf(fp, imm_printer_get_f32fmt(), score);
+    fprintf(fp, imm_fmt_get_f32(), score);
 
     fputc(']', fp);
 
