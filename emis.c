@@ -63,16 +63,12 @@ static void calc_offset(struct imm_emis *emis, struct imm_code const *code,
                         unsigned nstates, struct imm_state **states)
 {
   emis->offset[0] = 0;
-  unsigned min = imm_state_span(states[0]).min;
-  unsigned max = imm_state_span(states[0]).max;
-  unsigned size = imm_code_size(code, min, max);
+  unsigned size = imm_code_size(code, imm_state_span(states[0]));
   for (unsigned i = 1; i < nstates; ++i)
   {
     assert(size <= UINT32_MAX);
     emis->offset[i] = (uint32_t)size;
-    min = imm_state_span(states[i]).min;
-    max = imm_state_span(states[i]).max;
-    size += imm_code_size(code, min, max);
+    size += imm_code_size(code, imm_state_span(states[i]));
   }
   assert(size <= UINT32_MAX);
   emis->offset[nstates] = (uint32_t)size;

@@ -93,7 +93,7 @@ static void frame_state_joint15(void)
   struct imm_nuclt_lprob nucltp = setup_nucltp(nuclt);
   struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
-  test_frame_state_joint(&nucltp, &codonm, (struct imm_span){1, 5});
+  test_frame_state_joint(&nucltp, &codonm, imm_span(1, 5));
 }
 
 static void frame_state_joint24(void)
@@ -105,7 +105,7 @@ static void frame_state_joint24(void)
   struct imm_nuclt_lprob nucltp = setup_nucltp(nuclt);
   struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
-  test_frame_state_joint(&nucltp, &codonm, (struct imm_span){2, 4});
+  test_frame_state_joint(&nucltp, &codonm, imm_span(2, 4));
 }
 
 static void frame_state_joint33(void)
@@ -117,7 +117,7 @@ static void frame_state_joint33(void)
   struct imm_nuclt_lprob nucltp = setup_nucltp(nuclt);
   struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
-  test_frame_state_joint(&nucltp, &codonm, (struct imm_span){3, 3});
+  test_frame_state_joint(&nucltp, &codonm, imm_span(3, 3));
 }
 
 int main(void)

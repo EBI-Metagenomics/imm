@@ -20,5 +20,5 @@ void imm_normal_state_init(struct imm_normal_state *state, unsigned id,
 {
   state->lprobs = lprobs;
   struct imm_state_vtable vtable = {lprob, IMM_NORMAL_STATE, state};
-  imm_state_init(&state->super, id, abc, vtable, (struct imm_span){1, 1});
+  imm_state_init(&state->super, id, abc, vtable, imm_span(1, 1));
 }

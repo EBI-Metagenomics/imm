@@ -30,9 +30,9 @@ imm_pure_template unsigned imm_code_translate(struct imm_code const *x,
 }
 
 imm_pure_template unsigned imm_code_size(struct imm_code const *x,
-                                         unsigned min_seq, unsigned max_seq)
+                                         struct imm_span span)
 {
-  return (unsigned)(x->offset[max_seq + 1] - x->offset[min_seq]);
+  return (unsigned)(x->offset[span.max + 1] - x->offset[span.min]);
 }
 
 #endif

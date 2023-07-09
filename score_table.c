@@ -22,9 +22,7 @@ void imm_score_table_cleanup(struct imm_score_table *x)
 unsigned imm_score_table_size(struct imm_score_table const *x,
                               struct imm_state const *state)
 {
-  unsigned min = imm_state_span(state).min;
-  unsigned max = imm_state_span(state).max;
-  return imm_code_size(x->code, min, max);
+  return imm_code_size(x->code, imm_state_span(state));
 }
 
 void imm_score_table_scores(struct imm_score_table *x,

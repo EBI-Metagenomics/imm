@@ -14,5 +14,5 @@ void imm_mute_state_init(struct imm_mute_state *x, unsigned id,
                          struct imm_abc const *abc)
 {
   struct imm_state_vtable vtable = {lprob, IMM_MUTE_STATE, x};
-  imm_state_init(&x->super, id, abc, vtable, (struct imm_span){0, 0});
+  imm_state_init(&x->super, id, abc, vtable, imm_span(0, 0));
 }

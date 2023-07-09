@@ -24,5 +24,5 @@ void imm_codon_state_init(struct imm_codon_state *state, unsigned id,
   state->codonp = codonp;
   struct imm_state_vtable vtable = {lprob, IMM_CODON_STATE, state};
   struct imm_abc const *abc = &codonp->nuclt->super;
-  imm_state_init(&state->super, id, abc, vtable, (struct imm_span){3, 3});
+  imm_state_init(&state->super, id, abc, vtable, imm_span(3, 3));
 }

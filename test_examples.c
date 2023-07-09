@@ -64,7 +64,7 @@ static void example1_removed_states_path(void)
 
 static void example2_15(void)
 {
-  imm_ex2_init(10, (struct imm_span){1, 5});
+  imm_ex2_init(10, imm_span(1, 5));
 
   struct imm_ex2 *m = &imm_ex2;
   struct imm_dp dp;
@@ -93,7 +93,7 @@ static void example2_15(void)
 
 static void example2_24(void)
 {
-  imm_ex2_init(10, (struct imm_span){2, 4});
+  imm_ex2_init(10, imm_span(2, 4));
 
   struct imm_ex2 *m = &imm_ex2;
   struct imm_dp dp;
@@ -122,7 +122,7 @@ static void example2_24(void)
 
 static void example2_33(void)
 {
-  imm_ex2_init(10, (struct imm_span){3, 3});
+  imm_ex2_init(10, imm_span(3, 3));
 
   struct imm_ex2 *m = &imm_ex2;
   struct imm_dp dp;

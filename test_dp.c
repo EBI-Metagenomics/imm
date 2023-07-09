@@ -190,7 +190,7 @@ static void dp_io_example1(void)
 static void dp_io_example2(void)
 {
   struct lip_file file = {0};
-  imm_ex2_init(10, (struct imm_span){1, 5});
+  imm_ex2_init(10, imm_span(1, 5));
   struct imm_ex2 *m = &imm_ex2;
   struct imm_dp dp;
   imm_hmm_init_dp(&m->hmm, &m->end.super, &dp);
