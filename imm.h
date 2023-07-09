@@ -51,7 +51,6 @@ extern "C" {
 #include "subseq.h"
 #include "sym.h"
 #include "task.h"
-#include "trans.h"
 #include "viterbi.h"
 
 #ifdef __cplusplus
