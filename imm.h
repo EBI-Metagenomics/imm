@@ -27,7 +27,6 @@ extern "C" {
 #include "dna.h"
 #include "dp.h"
 #include "dp_cfg.h"
-#include "dp_code.h"
 #include "dp_safety.h"
 #include "dump.h"
 #include "emis.h"
