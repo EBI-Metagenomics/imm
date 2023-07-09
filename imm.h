@@ -36,7 +36,6 @@ extern "C" {
 #include "ex2.h"
 #include "ex3.h"
 #include "expect.h"
-#include "float_max.h"
 #include "frame_cond.h"
 #include "frame_epsilon.h"
 #include "frame_state.h"
