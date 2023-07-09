@@ -15,7 +15,7 @@ static void gc_f(void)
   unsigned idx = 0;
   for (unsigned i = 0; i < imm_gencode_size(gc); ++i)
   {
-    if (imm_gencode_aa(gc, i) == 'F')
+    if (imm_gencode_amino_acid(gc, i) == 'F')
     {
       eq(imm_gencode_codon(gc, i).a, codons[idx].a);
       eq(imm_gencode_codon(gc, i).b, codons[idx].b);
@@ -40,7 +40,7 @@ static void gc_l(void)
   unsigned idx = 0;
   for (unsigned i = 0; i < imm_gencode_size(gc); ++i)
   {
-    if (imm_gencode_aa(gc, i) == 'L')
+    if (imm_gencode_amino_acid(gc, i) == 'L')
     {
       eq(imm_gencode_codon(gc, i).a, codons[idx].a);
       eq(imm_gencode_codon(gc, i).b, codons[idx].b);
@@ -64,7 +64,7 @@ static void gc_p(void)
   unsigned idx = 0;
   for (unsigned i = 0; i < imm_gencode_size(gc); ++i)
   {
-    if (imm_gencode_aa(gc, i) == 'P')
+    if (imm_gencode_amino_acid(gc, i) == 'P')
     {
       eq(imm_gencode_codon(gc, i).a, codons[idx].a);
       eq(imm_gencode_codon(gc, i).b, codons[idx].b);
