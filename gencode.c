@@ -22,7 +22,7 @@ struct imm_codon imm_gencode_codon(struct imm_gencode const *x, unsigned idx)
                                 x->base3[idx]);
 }
 
-char imm_gencode_amino_acid(struct imm_gencode const *x, unsigned idx)
+char imm_gencode_amino(struct imm_gencode const *x, unsigned idx)
 {
   return x->ncbieaa[idx];
 }
