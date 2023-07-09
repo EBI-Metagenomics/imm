@@ -1,5 +1,5 @@
-#ifndef DEFER_RETURN_H
-#define DEFER_RETURN_H
+#ifndef IMM_DEFER_RETURN_H
+#define IMM_DEFER_RETURN_H
 
 #define defer_return(x)                                                        \
   do                                                                           \
