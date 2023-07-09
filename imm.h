@@ -19,7 +19,6 @@ extern "C" {
 #include "codon_state.h"
 #include "dna.h"
 #include "dp.h"
-#include "dp_cfg.h"
 #include "eseq.h"
 #include "frame_cond.h"
 #include "frame_epsilon.h"
