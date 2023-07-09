@@ -1,9 +1,9 @@
 #ifndef IMM_CODON_MARG_H
 #define IMM_CODON_MARG_H
 
+#include "api.h"
 #include "codon.h"
 #include "compiler.h"
-#include "export.h"
 #include <stdio.h>
 
 /** @file codon_marg.h

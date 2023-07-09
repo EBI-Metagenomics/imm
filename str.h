@@ -1,7 +1,7 @@
 #ifndef IMM_STR_H
 #define IMM_STR_H
 
-#include "export.h"
+#include "api.h"
 
 struct imm_str
 {

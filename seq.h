@@ -1,7 +1,7 @@
 #ifndef IMM_SEQ_H
 #define IMM_SEQ_H
 
-#include "export.h"
+#include "api.h"
 #include "str.h"
 
 struct imm_abc;

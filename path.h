@@ -1,7 +1,7 @@
 #ifndef IMM_PATH_H
 #define IMM_PATH_H
 
-#include "export.h"
+#include "api.h"
 #include "state.h"
 #include "step.h"
 #include <stddef.h>

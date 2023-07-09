@@ -1,7 +1,7 @@
 #ifndef IMM_TRELLIS_H
 #define IMM_TRELLIS_H
 
-#include "export.h"
+#include "api.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>

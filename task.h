@@ -1,9 +1,9 @@
 #ifndef IMM_TASK_H
 #define IMM_TASK_H
 
+#include "api.h"
 #include "cpath.h"
 #include "eseq.h"
-#include "export.h"
 #include "matrix.h"
 #include "rc.h"
 #include "trellis.h"

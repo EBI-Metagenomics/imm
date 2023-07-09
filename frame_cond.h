@@ -1,7 +1,7 @@
 #ifndef IMM_FRAME_COND_H
 #define IMM_FRAME_COND_H
 
-#include "export.h"
+#include "api.h"
 #include "frame_epsilon.h"
 #include "frame_state.h"
 

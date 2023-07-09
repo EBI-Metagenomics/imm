@@ -1,7 +1,7 @@
 #ifndef IMM_PRINTER_H
 #define IMM_PRINTER_H
 
-#include "export.h"
+#include "api.h"
 
 IMM_API void imm_printer_set_f32fmt(char const *);
 IMM_API void imm_printer_set_f64fmt(char const *);

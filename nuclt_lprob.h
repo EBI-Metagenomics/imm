@@ -1,7 +1,7 @@
 #ifndef IMM_NUCLT_LPROB_H
 #define IMM_NUCLT_LPROB_H
 
-#include "export.h"
+#include "api.h"
 #include "nuclt.h"
 #include <stdio.h>
 

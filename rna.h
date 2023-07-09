@@ -1,7 +1,7 @@
 #ifndef IMM_RNA_H
 #define IMM_RNA_H
 
-#include "export.h"
+#include "api.h"
 #include "nuclt.h"
 
 #define IMM_RNA_ANY_SYMBOL 'X'

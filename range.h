@@ -1,7 +1,7 @@
 #ifndef IMM_RANGE_H
 #define IMM_RANGE_H
 
-#include "export.h"
+#include "api.h"
 #include <stdbool.h>
 #include <stdio.h>
 

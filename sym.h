@@ -1,7 +1,7 @@
 #ifndef IMM_SYM_H
 #define IMM_SYM_H
 
-#include "export.h"
+#include "api.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>

@@ -1,9 +1,9 @@
 #ifndef IMM_DP_H
 #define IMM_DP_H
 
+#include "api.h"
 #include "code.h"
 #include "emis.h"
-#include "export.h"
 #include "float.h"
 #include "state_table.h"
 #include "trans.h"

@@ -1,8 +1,8 @@
 #ifndef IMM_HMM_H
 #define IMM_HMM_H
 
+#include "api.h"
 #include "code.h"
-#include "export.h"
 #include "pair.h"
 #include "rc.h"
 #include "state.h"

@@ -1,7 +1,7 @@
 #ifndef IMM_RND_H
 #define IMM_RND_H
 
-#include "export.h"
+#include "api.h"
 #include <stdint.h>
 
 struct imm_rnd

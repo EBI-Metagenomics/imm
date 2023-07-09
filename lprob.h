@@ -1,8 +1,8 @@
 #ifndef IMM_LPROB_H
 #define IMM_LPROB_H
 
+#include "api.h"
 #include "compiler.h"
-#include "export.h"
 #include "logaddexp.h"
 #include <math.h>
 #include <stdbool.h>

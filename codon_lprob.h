@@ -1,8 +1,8 @@
 #ifndef IMM_CODON_LPROB_H
 #define IMM_CODON_LPROB_H
 
+#include "api.h"
 #include "codon.h"
-#include "export.h"
 
 struct imm_nuclt;
 

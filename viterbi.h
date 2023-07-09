@@ -1,8 +1,8 @@
 #ifndef IMM_VITERBI_H
 #define IMM_VITERBI_H
 
+#include "api.h"
 #include "dp_safety.h"
-#include "export.h"
 #include "tardy_state.h"
 #include <stdbool.h>
 

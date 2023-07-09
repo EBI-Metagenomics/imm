@@ -1,7 +1,7 @@
 #ifndef IMM_DNA_H
 #define IMM_DNA_H
 
-#include "export.h"
+#include "api.h"
 #include "nuclt.h"
 
 #define IMM_DNA_ANY_SYMBOL 'X'

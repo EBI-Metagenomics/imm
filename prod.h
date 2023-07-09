@@ -1,7 +1,7 @@
 #ifndef IMM_PROD_H
 #define IMM_PROD_H
 
-#include "export.h"
+#include "api.h"
 #include "path.h"
 
 struct imm_seq;

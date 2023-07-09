@@ -1,8 +1,8 @@
 #ifndef IMM_LIST_H
 #define IMM_LIST_H
 
+#include "api.h"
 #include "container.h"
-#include "export.h"
 #include <stdbool.h>
 
 struct imm_list

@@ -1,8 +1,8 @@
 #ifndef IMM_EMIS_H
 #define IMM_EMIS_H
 
+#include "api.h"
 #include "compiler.h"
-#include "export.h"
 #include "state.h"
 #include <stdint.h>
 #include <stdio.h>
