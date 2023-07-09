@@ -47,7 +47,6 @@ extern "C" {
 #include "ipow.h"
 #include "likely.h"
 #include "list.h"
-#include "logsum.h"
 #include "lprob.h"
 #include "matrix.h"
 #include "matrixf.h"
