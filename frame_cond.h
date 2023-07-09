@@ -11,7 +11,7 @@ struct imm_seq;
 
 struct imm_frame_cond
 {
-  struct imm_frame_epsilon eps;
+  struct imm_frame_epsilon epsilon;
   struct imm_nuclt_lprob const *nucltp;
   struct imm_codon_marg const *codonm;
 };

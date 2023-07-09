@@ -103,7 +103,7 @@ static float lprob_frag_given_codon1(struct imm_frame_cond const *cond,
 
   unsigned const z[1] = {imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[0])};
 
-  float c = 2 * cond->eps.loge + 2 * cond->eps.log1e;
+  float c = 2 * cond->epsilon.loge + 2 * cond->epsilon.log1e;
 
   return c + log((x[0] == z[0]) + (x[1] == z[0]) + (x[2] == z[0])) - log(3);
 }
@@ -120,12 +120,12 @@ static float lprob_frag_given_codon2(struct imm_frame_cond const *cond,
   float lprob_z1 = imm__nuclt_lprob_get(cond->nucltp, z[0]);
   float lprob_z2 = imm__nuclt_lprob_get(cond->nucltp, z[1]);
 
-  float c1 = log(2) + cond->eps.loge + cond->eps.log1e * 3 - log(3);
+  float c1 = log(2) + cond->epsilon.loge + cond->epsilon.log1e * 3 - log(3);
   float v0 = c1 + log((x[1] == z[0]) * (x[2] == z[1]) +
                       (x[0] == z[0]) * (x[2] == z[1]) +
                       (x[0] == z[0]) * (x[1] == z[1]));
 
-  float c2 = 3 * cond->eps.loge + cond->eps.log1e - log(3);
+  float c2 = 3 * cond->epsilon.loge + cond->epsilon.log1e - log(3);
 
   float v1 =
       c2 + log((x[0] == z[0]) + (x[1] == z[0]) + (x[2] == z[0])) + lprob_z2;
@@ -135,7 +135,7 @@ static float lprob_frag_given_codon2(struct imm_frame_cond const *cond,
   return logaddexp3(v0, v1, v2);
 }
 
-static float lprob_frag_given_codon3(struct imm_frame_cond const *c,
+static float lprob_frag_given_codon3(struct imm_frame_cond const *cond,
                                      struct imm_seq const *seq,
                                      struct imm_codon const *codon)
 {
@@ -145,14 +145,16 @@ static float lprob_frag_given_codon3(struct imm_frame_cond const *c,
                    imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[1]),
                    imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[2])};
 
-  float lprob_z1 = imm__nuclt_lprob_get(c->nucltp, z[0]);
-  float lprob_z2 = imm__nuclt_lprob_get(c->nucltp, z[1]);
-  float lprob_z3 = imm__nuclt_lprob_get(c->nucltp, z[2]);
+  float lprob_z1 = imm__nuclt_lprob_get(cond->nucltp, z[0]);
+  float lprob_z2 = imm__nuclt_lprob_get(cond->nucltp, z[1]);
+  float lprob_z3 = imm__nuclt_lprob_get(cond->nucltp, z[2]);
 
-  float v0 =
-      4 * c->eps.log1e + log((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[2]));
+  float loge = cond->epsilon.loge;
+  float log1e = cond->epsilon.log1e;
 
-  float c1 = log(4) + 2 * c->eps.loge + 2 * c->eps.log1e - log(9);
+  float v0 = 4 * log1e + log((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[2]));
+
+  float c1 = log(4) + 2 * loge + 2 * log1e - log(9);
 
   float v1 =
       c1 +
@@ -172,7 +174,7 @@ static float lprob_frag_given_codon3(struct imm_frame_cond const *c,
           (x[0] == z[0]) * (x[1] == z[1])) +
       lprob_z3;
 
-  float c2 = 4 * c->eps.loge - log(9);
+  float c2 = 4 * loge - log(9);
 
   float v4 = c2 + log((x[0] == z[2]) + (x[1] == z[2]) + (x[2] == z[2])) +
              lprob_z1 + lprob_z2;
@@ -225,8 +227,9 @@ static float lprob_frag_given_codon4(struct imm_frame_cond const *cond,
                     log((x[0] == z[0]) * (x[1] == z[2])) + lprob_z2 + lprob_z4,
                     log((x[0] == z[0]) * (x[1] == z[1])) + lprob_z3 + lprob_z4);
 
-  return imm_lprob_add(cond->eps.loge + cond->eps.log1e * 3 - log(2) + v0,
-                       3 * cond->eps.loge + cond->eps.log1e - log(9) + v1);
+  return imm_lprob_add(
+      cond->epsilon.loge + cond->epsilon.log1e * 3 - log(2) + v0,
+      3 * cond->epsilon.loge + cond->epsilon.log1e - log(9) + v1);
 }
 
 static float lprob_frag_given_codon5(struct imm_frame_cond const *cond,
@@ -268,5 +271,5 @@ static float lprob_frag_given_codon5(struct imm_frame_cond const *cond,
                    lprob_z4 + lprob_z5 +
                        log((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[2])), );
 
-  return 2 * cond->eps.loge + 2 * cond->eps.log1e - log(10) + v;
+  return 2 * cond->epsilon.loge + 2 * cond->epsilon.log1e - log(10) + v;
 }
