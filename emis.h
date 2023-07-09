@@ -39,7 +39,7 @@ imm_template float const *imm_emis_table(struct imm_emis const *x,
 }
 
 IMM_API void imm_emis_dump(struct imm_emis const *,
-                           struct imm_state_table const *y, imm_state_name *,
+                           struct imm_state_table const *, imm_state_name *,
                            FILE *restrict);
 
 #endif
