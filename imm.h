@@ -39,6 +39,7 @@ extern "C" {
 #include "prod.h"
 #include "rc.h"
 #include "rna.h"
+#include "rnd.h"
 #include "seq.h"
 #include "span.h"
 #include "state.h"
