@@ -2,20 +2,15 @@
 #include "code.h"
 #include "subseq.h"
 
+void imm_eseq_init(struct imm_eseq *eseq, struct imm_code const *code)
+{
+  imm_matrixu16_init(&eseq->data, 1, 1);
+  eseq->code = code;
+}
+
 void imm_eseq_cleanup(struct imm_eseq *eseq)
 {
   imm_matrixu16_cleanup(&eseq->data);
-}
-
-void imm_eseq_init(struct imm_eseq *eseq, struct imm_code const *code)
-{
-  imm_matrixu16_empty(&eseq->data);
-  imm_eseq_reset(eseq, code);
-}
-
-void imm_eseq_reset(struct imm_eseq *eseq, struct imm_code const *code)
-{
-  eseq->code = code;
 }
 
 struct imm_abc const *imm_eseq_abc(struct imm_eseq const *eseq)
