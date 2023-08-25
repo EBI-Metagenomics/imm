@@ -40,6 +40,7 @@ extern "C" {
 #include "rc.h"
 #include "rna.h"
 #include "rnd.h"
+#include "score_table.h"
 #include "seq.h"
 #include "span.h"
 #include "state.h"
