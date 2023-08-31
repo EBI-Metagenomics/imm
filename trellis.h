@@ -50,11 +50,11 @@ static inline void imm_trellis_seek(struct imm_trellis *x, unsigned seqpos,
 }
 
 static inline void imm_trellis_push(struct imm_trellis *x, float score,
-                                    uint16_t trans, uint8_t emislen)
+                                    uint16_t trans, uint8_t emissize)
 {
   x->position->score = score;
   x->position->transition = trans;
-  x->position->emission_size = emislen;
+  x->position->emission_size = emissize;
   x->position++;
 }
 

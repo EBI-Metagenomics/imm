@@ -138,6 +138,7 @@ struct step
 {
   uint_fast16_t src_idx;
   uint_fast16_t src_trans;
+  uint_fast8_t src_emissize;
   uint_fast8_t src_seqlen_idx;
   float score;
 };
@@ -145,7 +146,8 @@ struct step
 static inline struct step step_init(void)
 {
   return (struct step){IMM_STATE_NULL_IDX, IMM_TRANS_NULL_IDX,
-                       IMM_STATE_NULL_SEQLEN, IMM_LPROB_ZERO};
+                       IMM_STATE_NULL_SEQLEN, IMM_STATE_NULL_SEQLEN,
+                       IMM_LPROB_ZERO};
 }
 
 imm_template struct step best_step(struct imm_viterbi *x, unsigned row,
@@ -163,6 +165,7 @@ imm_template struct step best_step(struct imm_viterbi *x, unsigned row,
     if (!safe_past) src.max = imm_min(src.max, row);
 
     float score = IMM_LPROB_ZERO;
+    uint_fast8_t emissize = 0;
     uint_fast8_t seqlen_idx = 0;
 
     imm_assume(src.max <= IMM_STATE_MAX_SEQLEN);
@@ -172,6 +175,7 @@ imm_template struct step best_step(struct imm_viterbi *x, unsigned row,
       float v = get_matrix_cell_score(x, row, src.idx, i);
       if (score < v)
       {
+        emissize = i;
         seqlen_idx = i - src.min;
         score = v;
       }
@@ -182,6 +186,7 @@ imm_template struct step best_step(struct imm_viterbi *x, unsigned row,
     {
       step.src_idx = src.idx;
       step.src_trans = trans;
+      step.src_emissize = emissize;
       step.src_seqlen_idx = seqlen_idx;
       step.score = score;
     }
@@ -211,6 +216,20 @@ imm_template void set_path(struct imm_cpath *x, struct step const *bt,
   }
 }
 
+imm_template void set_trellis(struct imm_trellis *x, struct step const *bt,
+                              unsigned r, uint_fast16_t dst)
+{
+  if (bt->src_idx != IMM_STATE_NULL_IDX)
+  {
+    (void)r;
+    (void)dst;
+    assert(r == imm_trellis_sequence_idx(x));
+    assert(dst == imm_trellis_state_idx(x));
+    imm_trellis_push(x, bt->score, bt->src_trans, bt->src_emissize);
+  }
+  else imm_trellis_push(x, IMM_LPROB_NAN, 0, 0);
+}
+
 imm_pure_template float emission_score(struct imm_viterbi const *x,
                                        struct state state, unsigned row,
                                        unsigned len)
@@ -228,6 +247,7 @@ imm_template void set_state_score(struct imm_viterbi const *x, unsigned row,
     score = imm_max(start_lprob(x), score);
 
   set_path(&x->task->path, bt, row, dst.idx);
+  set_trellis(&x->task->trellis, bt, row, dst.idx);
   if (!safe_future) dst.max = imm_min(dst.max, remain);
 
   imm_assume(dst.max <= IMM_STATE_MAX_SEQLEN);
@@ -271,8 +291,12 @@ imm_template void on_row(struct imm_viterbi *x, unsigned row,
                          bool has_tardy_state, bool safe_future, bool safe_past)
 {
   if (has_tardy_state)
+  {
+    imm_trellis_seek(&x->task->trellis, row, x->tardy_state.state_idx);
     on_tardy_state(x, row, x->tardy_state, safe_future, safe_past);
+  }
 
+  imm_trellis_seek(&x->task->trellis, row, 0);
   viterbi_ctrans_rewind(x);
 
   for (unsigned i = 0; i < nstates(x); ++i)
