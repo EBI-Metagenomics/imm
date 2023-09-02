@@ -15,13 +15,13 @@ void imm_trellis_init(struct imm_trellis *x,
   x->capacity = 0;
   x->sequence_size = 0;
   x->num_states = 0;
-  x->position = NULL;
+  x->head = NULL;
   x->pool = NULL;
 }
 
 int imm_trellis_setup(struct imm_trellis *x, unsigned seqsize, unsigned nstates)
 {
-  size_t size = sizeof(struct imm_trellis_node) * (seqsize * nstates);
+  size_t size = sizeof(struct imm_node) * (seqsize * nstates);
   if (size > x->capacity)
   {
     if (!(x->pool = imm_reallocf(x->pool, size)))
@@ -33,7 +33,7 @@ int imm_trellis_setup(struct imm_trellis *x, unsigned seqsize, unsigned nstates)
 
   x->sequence_size = seqsize;
   x->num_states = nstates;
-  imm_trellis_rewind(x);
+  x->head = x->pool;
   return 0;
 }
 
@@ -46,51 +46,63 @@ void imm_trellis_cleanup(struct imm_trellis *x)
     x->capacity = 0;
     x->sequence_size = 0;
     x->num_states = 0;
-    x->position = NULL;
+    x->head = NULL;
     free(x->pool);
     x->pool = NULL;
   }
 }
 
-IMM_API unsigned imm_trellis_state_id(struct imm_trellis const *x)
+IMM_INLINE unsigned state_id_at(struct imm_trellis const *x,
+                                struct imm_node const *node)
 {
-  return imm_state_table_id(x->state_table, imm_trellis_state_idx(x));
+  return imm_state_table_id(x->state_table, imm_trellis_state_idx_at(x, node));
 }
 
-bool imm_trellis_step_back(struct imm_trellis *x)
+unsigned imm_trellis_state_id(struct imm_trellis const *x)
 {
-  struct imm_trellis_node *node = x->position;
-  unsigned len = node->emission_size;
-  unsigned dst = imm_trellis_state_idx(x);
-  unsigned src =
-      imm_trans_table_source_state(x->trans_table, dst, node->transition);
+  return state_id_at(x, x->head);
+}
 
-  node -= len * x->num_states;
-  node += src;
-  node -= dst;
+bool imm_trellis_back(struct imm_trellis *x)
+{
+  if (!imm_trellis_has_back(x)) return false;
 
-  if (node < x->pool)
-  {
-    x->position = x->pool;
-    return false;
-  }
-  x->position = node;
+  struct imm_node *h = imm_trellis_head(x);
+  imm_trellis_seek(x, imm_trellis_sequence_idx(x) - h->emission_size,
+                   h->state_source);
+
   return true;
 }
 
-void imm_trellis_dump(struct imm_trellis const *x, FILE *restrict fp)
+static char *id_state_name(unsigned id, char *name)
 {
-  struct imm_trellis_node const *node = x->pool;
+  sprintf(name, "%u", id);
+  return name;
+}
+
+void imm_trellis_dump(struct imm_trellis const *x, imm_state_name *callb,
+                      FILE *restrict fp)
+{
+  char name[IMM_STATE_NAME_SIZE] = {0};
+  if (!callb) callb = &id_state_name;
+
+  // HEADER
+  for (unsigned i = 0; i < x->num_states; ++i)
+  {
+    if (i > 0) fputc(',', fp);
+    fputs((*callb)(state_id_at(x, imm_trellis_at(x, 0, i)), name), fp);
+  }
+  fputc('\n', fp);
+
+  // BODY
   for (unsigned i = 0; i < x->sequence_size; ++i)
   {
     for (unsigned j = 0; j < x->num_states; ++j)
     {
       if (j > 0) fputc(',', fp);
-      fprintf(fp, "(%u, %u, %.9g)", node->transition, node->emission_size,
-              node->score);
-      node++;
+      imm_node_dump(imm_trellis_at(x, i, j), x->state_table, callb, fp);
     }
-    fprintf(fp, "\n");
+    fputc('\n', fp);
   }
-  fprintf(fp, "\n");
+  fputc('\n', fp);
 }
