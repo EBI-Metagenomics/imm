@@ -305,7 +305,7 @@ imm_template void on_row(struct imm_viterbi *x, unsigned row,
   for (unsigned i = 0; i < nstates(x); ++i)
   {
     struct state dst = unwrap_state(x, i);
-    fprintf(stderr, "on_row: inside_loop (i=%u,dst.idx=%u)\n", i, dst.idx);
+    fprintf(stderr, "on_row: inside_loop (i=%u, dst.idx=%u, imm_trellis_state_idx(&x->task->trellis)=%u, pool=%p, head=%p)\n", i, dst.idx, imm_trellis_state_idx(&x->task->trellis), x->task->trellis.pool, x->task->trellis.head);
     on_normal_state(x, row, dst, safe_future, safe_past, false);
   }
 }
