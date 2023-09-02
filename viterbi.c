@@ -216,8 +216,9 @@ imm_template void set_path(struct imm_cpath *x, struct step const *bt,
   }
 }
 
-imm_template void set_trellis(struct imm_trellis *x, struct step const *bt,
-                              unsigned r, uint_fast16_t dst)
+imm_template void set_trellis(struct imm_trellis *x, float score,
+                              struct step const *bt, unsigned r,
+                              uint_fast16_t dst)
 {
   if (bt->src_idx != IMM_STATE_NULL_IDX)
   {
@@ -225,7 +226,7 @@ imm_template void set_trellis(struct imm_trellis *x, struct step const *bt,
     (void)dst;
     assert(r == imm_trellis_sequence_idx(x));
     assert(dst == imm_trellis_state_idx(x));
-    imm_trellis_push(x, bt->score, bt->src_trans, bt->src_emissize);
+    imm_trellis_push(x, score, bt->src_idx, bt->src_emissize);
   }
   else imm_trellis_push(x, IMM_LPROB_NAN, 0, 0);
 }
@@ -247,7 +248,7 @@ imm_template void set_state_score(struct imm_viterbi const *x, unsigned row,
     score = imm_max(start_lprob(x), score);
 
   set_path(&x->task->path, bt, row, dst.idx);
-  set_trellis(&x->task->trellis, bt, row, dst.idx);
+  set_trellis(&x->task->trellis, score, bt, row, dst.idx);
   if (!safe_future) dst.max = imm_min(dst.max, remain);
 
   imm_assume(dst.max <= IMM_STATE_MAX_SEQLEN);
