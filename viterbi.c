@@ -220,6 +220,11 @@ imm_template void set_trellis(struct imm_trellis *x, float score,
     (void)r;
     (void)dst;
     assert(r == imm_trellis_sequence_idx(x));
+    if (dst != imm_trellis_state_idx(x))
+    {
+      fprintf(stderr, "dst != imm_trellis_state_idx(x): %u != %u\n", dst,
+              imm_trellis_state_idx(x));
+    }
     assert(dst == imm_trellis_state_idx(x));
     imm_trellis_push(x, score, bt->src_idx, bt->src_emissize);
   }
@@ -239,8 +244,7 @@ imm_template void set_state_score(struct imm_viterbi const *x, unsigned row,
                                   struct step const *bt, bool safe_future)
 {
   float score = bt->score;
-  if (row == 0 && start_state_idx(x) == dst.idx)
-    score = imm_max(0.0, score);
+  if (row == 0 && start_state_idx(x) == dst.idx) score = imm_max(0.0, score);
 
   set_path(&x->task->path, bt, row, dst.idx);
   set_trellis(&x->task->trellis, score, bt, row, dst.idx);
