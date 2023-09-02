@@ -76,9 +76,16 @@ static void set_state_indices(struct imm_hmm const *hmm,
   }
 }
 
-void imm_hmm_write_dot(struct imm_hmm const *hmm, FILE *restrict fd,
-                       imm_state_name *name)
+static char *id_state_name(unsigned id, char *name)
 {
+  sprintf(name, "%u", id);
+  return name;
+}
+
+void imm_hmm_write_dot(struct imm_hmm const *hmm, FILE *restrict fd,
+                       imm_state_name *callb)
+{
+  if (!callb) callb = &id_state_name;
   fprintf(fd, "digraph hmm {\n");
   struct imm_trans *t = NULL;
   unsigned bkt = 0;
@@ -90,8 +97,8 @@ void imm_hmm_write_dot(struct imm_hmm const *hmm, FILE *restrict fd,
                                           '\0', '\0', '\0', '\0'};
     struct imm_state *src = hmm_state(hmm, t->pair.id.src);
     struct imm_state *dst = hmm_state(hmm, t->pair.id.dst);
-    (*name)(src->id, src_name);
-    (*name)(dst->id, dst_name);
+    (*callb)(src->id, src_name);
+    (*callb)(dst->id, dst_name);
     fprintf(fd, "%s -> %s [label=%.4f];\n", src_name, dst_name, t->lprob);
   }
   fprintf(fd, "}\n");
