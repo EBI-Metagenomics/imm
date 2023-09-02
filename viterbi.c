@@ -292,15 +292,18 @@ imm_template void on_row(struct imm_viterbi *x, unsigned row,
 {
   if (has_tardy_state)
   {
+    fprintf(stderr, "on_row: tardy\n");
     imm_trellis_seek(&x->task->trellis, row, x->tardy_state.state_idx);
     on_tardy_state(x, row, x->tardy_state, safe_future, safe_past);
   }
 
+  fprintf(stderr, "on_row: trellis_seek\n");
   imm_trellis_seek(&x->task->trellis, row, 0);
   viterbi_ctrans_rewind(x);
 
   for (unsigned i = 0; i < nstates(x); ++i)
   {
+    fprintf(stderr, "on_row: inside_loop\n");
     struct state dst = unwrap_state(x, i);
     on_normal_state(x, row, dst, safe_future, safe_past, false);
   }
