@@ -290,6 +290,7 @@ imm_template void on_tardy_state(struct imm_viterbi *x, unsigned row,
 imm_template void on_row(struct imm_viterbi *x, unsigned row,
                          bool has_tardy_state, bool safe_future, bool safe_past)
 {
+  fprintf(stderr, "on_row: just_entered\n");
   if (has_tardy_state)
   {
     fprintf(stderr, "on_row: tardy\n");
@@ -303,8 +304,8 @@ imm_template void on_row(struct imm_viterbi *x, unsigned row,
 
   for (unsigned i = 0; i < nstates(x); ++i)
   {
-    fprintf(stderr, "on_row: inside_loop\n");
     struct state dst = unwrap_state(x, i);
+    fprintf(stderr, "on_row: inside_loop (i=%u,dst.idx=%u)\n", i, dst.idx);
     on_normal_state(x, row, dst, safe_future, safe_past, false);
   }
 }
