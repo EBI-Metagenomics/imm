@@ -16,8 +16,7 @@
 
 static inline void start_init(struct imm_hmm *hmm)
 {
-  hmm->start.lprob = imm_lprob_nan();
-  hmm->start.state_id = IMM_STATE_NULL_ID;
+  hmm->start_state_id = IMM_STATE_NULL_ID;
 }
 
 static void init_states_table(struct imm_hmm *hmm)
@@ -53,7 +52,7 @@ static int add_transition(struct imm_hmm *hmm, struct imm_state *src,
 
 static inline bool has_start_state(struct imm_hmm const *hmm)
 {
-  return hmm->start.state_id != IMM_STATE_NULL_ID;
+  return hmm->start_state_id != IMM_STATE_NULL_ID;
 }
 
 static struct imm_state *hmm_state(struct imm_hmm const *hmm,
@@ -168,15 +167,14 @@ int imm_hmm_reset_dp(struct imm_hmm const *hmm,
   cco_hash_for_each(hmm->states.tbl, bkt, state, hnode) { states[i++] = state; }
   set_state_indices(hmm, states);
 
-  unsigned start_idx = hmm_state(hmm, hmm->start.state_id)->idx;
+  unsigned start_idx = hmm_state(hmm, hmm->start_state_id)->idx;
   if ((rc = imm_tsort(hmm->states.size, states, start_idx))) goto cleanup;
   set_state_indices(hmm, states);
 
   struct imm_dp_cfg cfg = {.ntrans = hmm->transitions.size,
                            .nstates = hmm->states.size,
                            .states = states,
-                           .start.state = hmm_state(hmm, hmm->start.state_id),
-                           .start.lprob = hmm->start.lprob,
+                           .start_state = hmm_state(hmm, hmm->start_state_id),
                            .end_state = end_state};
 
   imm_dp_reset(dp, &cfg);
@@ -184,11 +182,6 @@ int imm_hmm_reset_dp(struct imm_hmm const *hmm,
 cleanup:
   free(states);
   return rc;
-}
-
-float imm_hmm_start_lprob(struct imm_hmm const *hmm)
-{
-  return hmm->start.lprob;
 }
 
 static struct imm_trans *hmm_trans(struct imm_hmm const *hmm,
@@ -215,12 +208,12 @@ float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
 
   struct imm_step const *step = imm_path_step(path, 0);
   struct imm_state const *state = hmm_state(hmm, step->state_id);
-  if (state != hmm_state(hmm, hmm->start.state_id)) return imm_lprob_nan();
+  if (state != hmm_state(hmm, hmm->start_state_id)) return imm_lprob_nan();
 
   if (step->seqlen > imm_seq_size(seq)) return imm_lprob_nan();
 
   struct imm_seq subseq = imm_subseq(seq, 0, step->seqlen);
-  float lprob = hmm->start.lprob + imm_state_lprob(state, &subseq);
+  float lprob = imm_state_lprob(state, &subseq);
 
   unsigned start = 0;
   for (unsigned i = 1; i < nsteps; ++i)
@@ -274,15 +267,10 @@ int imm_hmm_normalize_state_trans(struct imm_state *src)
   return 0;
 }
 
-int imm_hmm_set_start(struct imm_hmm *hmm, struct imm_state const *state,
-                      float lprob)
+int imm_hmm_set_start(struct imm_hmm *hmm, struct imm_state const *state)
 {
-  if (!imm_lprob_is_finite(lprob)) return IMM_EINVAL;
-
   if (!cco_hash_hashed(&state->hnode)) return IMM_ENOTFOUND;
-
-  hmm->start.lprob = lprob;
-  hmm->start.state_id = state->id;
+  hmm->start_state_id = state->id;
   return 0;
 }
 

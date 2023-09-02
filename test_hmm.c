@@ -62,7 +62,7 @@ static void hmm_wrong_states(void)
 
   eq(imm_hmm_add_state(&hmm, &state0.super), 0);
 
-  eq(imm_hmm_set_start(&hmm, &state1.super, log(0.3)), IMM_ENOTFOUND);
+  eq(imm_hmm_set_start(&hmm, &state1.super), IMM_ENOTFOUND);
 
   eq(imm_hmm_set_trans(&hmm, &state0.super, &state1.super, log(0.3)),
      IMM_ENOTFOUND);

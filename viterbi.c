@@ -14,14 +14,9 @@
 #include "unroll.h"
 #include "zspan.h"
 
-imm_pure_template float start_lprob(struct imm_viterbi const *x)
-{
-  return x->dp->state_table.start.lprob;
-}
-
 imm_pure_template unsigned start_state_idx(struct imm_viterbi const *x)
 {
-  return x->dp->state_table.start.state_idx;
+  return x->dp->state_table.start_state_idx;
 }
 
 imm_pure_template uint16_t start_trans_idx(struct imm_viterbi const *x,
@@ -245,7 +240,7 @@ imm_template void set_state_score(struct imm_viterbi const *x, unsigned row,
 {
   float score = bt->score;
   if (row == 0 && start_state_idx(x) == dst.idx)
-    score = imm_max(start_lprob(x), score);
+    score = imm_max(0.0, score);
 
   set_path(&x->task->path, bt, row, dst.idx);
   set_trellis(&x->task->trellis, score, bt, row, dst.idx);

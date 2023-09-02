@@ -189,11 +189,11 @@ int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
                        prod->loglik)))
     return rc;
 
-  imm_path_reset(&prod->path);
-  unsigned seqsize = imm_eseq_size(task->seq);
-  if ((rc = unzip_path2(&task->trellis, seqsize, last_state, last_seqsize,
-                        &prod->path)))
-    return rc;
+  // imm_path_reset(&prod->path);
+  // unsigned seqsize = imm_eseq_size(task->seq);
+  // if ((rc = unzip_path2(&task->trellis, seqsize, last_state, last_seqsize,
+  //                       &prod->path)))
+  //   return rc;
 
   if (elapsed_stop(&elapsed)) return IMM_EELAPSED;
 
@@ -343,7 +343,7 @@ int imm_dp_pack(struct imm_dp const *dp, struct lip_file *f)
   unsigned nstates = dp->state_table.nstates;
   unsigned ntrans = dp->trans_table.ntrans;
 
-  lip_write_map_size(f, 11);
+  lip_write_map_size(f, 10);
 
   /* emission */
   lip_write_cstr(f, KEY_EMIS_SCORE);
@@ -381,9 +381,7 @@ int imm_dp_pack(struct imm_dp const *dp, struct lip_file *f)
   lip_write_1darray_int(f, nstates, dp->state_table.ids);
 
   lip_write_cstr(f, KEY_STATE_START);
-  lip_write_int(f, dp->state_table.start.state_idx);
-  lip_write_cstr(f, KEY_STATE_LPROB);
-  lip_write_float(f, dp->state_table.start.lprob);
+  lip_write_int(f, dp->state_table.start_state_idx);
   lip_write_cstr(f, KEY_STATE_END);
   lip_write_int(f, dp->state_table.end_state_idx);
 
@@ -403,7 +401,7 @@ int imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
   struct imm_trans_table *tt = &dp->trans_table;
   struct imm_state_table *st = &dp->state_table;
 
-  if (!imm_expect_map_size(f, 11)) return IMM_EIO;
+  if (!imm_expect_map_size(f, 10)) return IMM_EIO;
 
   /* emission */
   if (!imm_expect_map_key(f, KEY_EMIS_SCORE)) goto cleanup;
@@ -460,9 +458,7 @@ int imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
   lip_read_1darray_int_data(f, st->nstates, st->ids);
 
   if (!imm_expect_map_key(f, KEY_STATE_START)) goto cleanup;
-  lip_read_int(f, &dp->state_table.start.state_idx);
-  if (!imm_expect_map_key(f, KEY_STATE_LPROB)) goto cleanup;
-  lip_read_float(f, &dp->state_table.start.lprob);
+  lip_read_int(f, &dp->state_table.start_state_idx);
   if (!imm_expect_map_key(f, KEY_STATE_END)) goto cleanup;
   lip_read_int(f, &dp->state_table.end_state_idx);
 

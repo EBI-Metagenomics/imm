@@ -26,12 +26,12 @@ static void hmm_loglik_single_state(void)
   imm_hmm_init(&hmm, &code);
 
   eq(imm_hmm_add_state(&hmm, &state.super), 0);
-  eq(imm_hmm_set_start(&hmm, &state.super, log(0.5)), 0);
+  eq(imm_hmm_set_start(&hmm, &state.super), 0);
   eq(imm_hmm_normalize_trans(&hmm), 0);
 
   struct imm_path path = imm_path();
   imm_path_add(&path, imm_step(imm_state_id(&state.super), 1, 0));
-  close(imm_hmm_loglik(&hmm, &A, &path), log(0.5) + log(0.25));
+  close(imm_hmm_loglik(&hmm, &A, &path), log(1.0) + log(0.25));
   imm_path_reset(&path);
 
   ok(!imm_lprob_is_finite(imm_hmm_loglik(&hmm, &A, &path)));
@@ -61,14 +61,14 @@ static void hmm_loglik_single_state(void)
 
   imm_path_add(&path, imm_step(imm_state_id(&state.super), 1, 0));
   imm_path_add(&path, imm_step(imm_state_id(&state.super), 1, 0));
-  close(imm_hmm_loglik(&hmm, &AA, &path), 2 * log(0.5) + 2 * log(0.25));
+  close(imm_hmm_loglik(&hmm, &AA, &path), log(0.25) + 3 * log(0.5));
   imm_path_reset(&path);
 
   ok(imm_hmm_normalize_trans(&hmm) == 0);
   imm_path_reset(&path);
   imm_path_add(&path, imm_step(imm_state_id(&state.super), 1, 0));
   imm_path_add(&path, imm_step(imm_state_id(&state.super), 1, 0));
-  close(imm_hmm_loglik(&hmm, &AA, &path), log(0.5) + 2 * log(0.25));
+  close(imm_hmm_loglik(&hmm, &AA, &path), log(1.0) + 2 * log(0.25));
 
   imm_path_cleanup(&path);
 }
@@ -88,7 +88,7 @@ static void hmm_loglik_two_states(void)
   imm_normal_state_init(&state1, 1, &abc, lprobs1);
 
   imm_hmm_add_state(&hmm, &state0.super);
-  imm_hmm_set_start(&hmm, &state0.super, log(1.0));
+  imm_hmm_set_start(&hmm, &state0.super);
   imm_hmm_add_state(&hmm, &state1.super);
 
   imm_hmm_set_trans(&hmm, &state0.super, &state0.super, log(0.1));
@@ -131,7 +131,7 @@ static void hmm_loglik_mute_state(void)
   imm_mute_state_init(&state, 0, &abc);
 
   imm_hmm_add_state(&hmm, &state.super);
-  imm_hmm_set_start(&hmm, &state.super, log(1.0));
+  imm_hmm_set_start(&hmm, &state.super);
 
   imm_hmm_set_trans(&hmm, &state.super, &state.super, log(0.1));
 
@@ -169,7 +169,7 @@ static void hmm_loglik_two_mute_states(void)
   imm_mute_state_init(&S1, 1, &abc);
 
   imm_hmm_add_state(&hmm, &S0.super);
-  imm_hmm_set_start(&hmm, &S0.super, 0.0);
+  imm_hmm_set_start(&hmm, &S0.super);
   imm_hmm_add_state(&hmm, &S1.super);
 
   imm_hmm_set_trans(&hmm, &S0.super, &S1.super, 0.0);
@@ -196,7 +196,7 @@ static void hmm_loglik_invalid(void)
   struct imm_mute_state S;
   imm_mute_state_init(&S, 0, &abc_ac);
   imm_hmm_add_state(&hmm, &S.super);
-  imm_hmm_set_start(&hmm, &S.super, 0.0);
+  imm_hmm_set_start(&hmm, &S.super);
 
   struct imm_mute_state M1;
   imm_mute_state_init(&M1, 1, &abc_ac);

@@ -49,7 +49,7 @@ void imm_ex1_init(unsigned core_size)
 
   imm_mute_state_init(&m->start, START, &m->abc);
   imm_hmm_add_state(&m->hmm, &m->start.super);
-  imm_hmm_set_start(&m->hmm, &m->start.super, log(1.0));
+  imm_hmm_set_start(&m->hmm, &m->start.super);
 
   imm_mute_state_init(&m->end, END, &m->abc);
   imm_hmm_add_state(&m->hmm, &m->end.super);
@@ -107,7 +107,7 @@ void imm_ex1_init(unsigned core_size)
   imm_hmm_init(&m->null.hmm, &m->code);
   imm_normal_state_init(&m->null.n, N, &m->abc, n_lprobs);
   imm_hmm_add_state(&m->null.hmm, &m->null.n.super);
-  imm_hmm_set_start(&m->null.hmm, &m->null.n.super, log(1.0));
+  imm_hmm_set_start(&m->null.hmm, &m->null.n.super);
   SET_TRANS(&m->null.hmm, m->null.n, m->null.n, log(0.2));
 }
 

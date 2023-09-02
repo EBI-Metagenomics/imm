@@ -55,7 +55,7 @@ static void one_mute_state(void)
   imm_mute_state_init(&state, 0, &abc);
 
   imm_hmm_add_state(&hmm, &state.super);
-  imm_hmm_set_start(&hmm, &state.super, log(0.5));
+  imm_hmm_set_start(&hmm, &state.super);
 
   struct imm_dp dp;
   imm_hmm_init_dp(&hmm, &state.super, &dp);
@@ -65,8 +65,8 @@ static void one_mute_state(void)
     eq(imm_eseq_setup(&eseq, &EMPTY), 0);
     eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    close(prod.loglik, log(0.5));
-    close(imm_hmm_loglik(&hmm, &EMPTY, &prod.path), log(0.5));
+    close(prod.loglik, log(1.0));
+    close(imm_hmm_loglik(&hmm, &EMPTY, &prod.path), log(1.0));
     eq(imm_path_nsteps(&prod.path), 1U);
     if ((int)1 == (unsigned)2U) return;
 
@@ -99,9 +99,8 @@ static void two_mute_states(void)
   imm_mute_state_init(&state1, 1, &abc);
 
   imm_hmm_add_state(&hmm, &state0.super);
-  imm_hmm_set_start(&hmm, &state0.super, log(0.5));
+  imm_hmm_set_start(&hmm, &state0.super);
   imm_hmm_add_state(&hmm, &state1.super);
-  eq(imm_hmm_set_start(&hmm, &state1.super, imm_lprob_zero()), IMM_EINVAL);
 
   struct imm_dp dp;
   imm_hmm_init_dp(&hmm, &state0.super, &dp);
@@ -111,8 +110,8 @@ static void two_mute_states(void)
     eq(imm_eseq_setup(&eseq, &EMPTY), 0);
     eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    close(prod.loglik, log(0.5));
-    close(imm_hmm_loglik(&hmm, &EMPTY, &prod.path), log(0.5));
+    close(prod.loglik, log(1.0));
+    close(imm_hmm_loglik(&hmm, &EMPTY, &prod.path), log(1.0));
     eq(imm_path_nsteps(&prod.path), 1U);
   }
 
@@ -130,8 +129,8 @@ static void two_mute_states(void)
   eq(imm_path_step(&prod.path, 0)->seqlen, 0);
   eq(imm_path_step(&prod.path, 1)->state_id, 1);
   eq(imm_path_step(&prod.path, 1)->seqlen, 0);
-  close(imm_hmm_loglik(&hmm, &EMPTY, &prod.path), log(0.5) + log(0.1));
-  close(prod.loglik, log(0.5) + log(0.1));
+  close(imm_hmm_loglik(&hmm, &EMPTY, &prod.path), log(1.0) + log(0.1));
+  close(prod.loglik, log(1.0) + log(0.1));
 
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
@@ -148,7 +147,7 @@ static void mute_cycle(void)
   imm_mute_state_init(&state0, 0, &abc);
 
   imm_hmm_add_state(&hmm, &state0.super);
-  imm_hmm_set_start(&hmm, &state0.super, log(0.5));
+  imm_hmm_set_start(&hmm, &state0.super);
 
   struct imm_mute_state state1;
   imm_mute_state_init(&state1, 1, &abc);
@@ -170,12 +169,12 @@ static void one_normal_state(void)
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &code);
 
-  float lprobs0[] = {log(0.25), log(0.25), log(0.5), imm_lprob_zero()};
+  float lprobs0[] = {log(0.25), log(0.25), log(1.0), imm_lprob_zero()};
   struct imm_normal_state state;
   imm_normal_state_init(&state, 0, &abc, lprobs0);
 
   imm_hmm_add_state(&hmm, &state.super);
-  imm_hmm_set_start(&hmm, &state.super, log(1.0));
+  imm_hmm_set_start(&hmm, &state.super);
 
   struct imm_dp dp;
   imm_hmm_init_dp(&hmm, &state.super, &dp);
@@ -301,7 +300,7 @@ static void two_normal_states(void)
   imm_normal_state_init(&state1, 1, &abc, lprobs1);
 
   imm_hmm_add_state(&hmm, &state0.super);
-  imm_hmm_set_start(&hmm, &state0.super, log(0.1));
+  imm_hmm_set_start(&hmm, &state0.super);
   imm_hmm_add_state(&hmm, &state1.super);
   imm_hmm_set_trans(&hmm, &state0.super, &state1.super, log(0.3));
 
@@ -313,8 +312,8 @@ static void two_normal_states(void)
     eq(imm_eseq_setup(&eseq, &A), 0);
     eq(imm_task_setup(task, &eseq), 0);
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
-    close(prod.loglik, (log(0.1) + log(0.25)));
-    close(imm_hmm_loglik(&hmm, &A, &prod.path), (log(0.1) + log(0.25)));
+    close(prod.loglik, (log(1.0) + log(0.25)));
+    close(imm_hmm_loglik(&hmm, &A, &prod.path), (log(1.0) + log(0.25)));
     eq(imm_path_nsteps(&prod.path), 1U);
   }
 
@@ -340,7 +339,7 @@ static void two_normal_states(void)
   imm_hmm_init_dp(&hmm, &state1.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  float des = log(0.1) + log(0.25) + log(0.3) + log(0.5);
+  float des = log(1.0) + log(0.25) + log(0.3) + log(0.5);
   {
     eq(imm_eseq_setup(&eseq, &AT), 0);
     eq(imm_task_setup(task, &eseq), 0);
@@ -360,13 +359,13 @@ static void two_normal_states(void)
   }
 
   imm_hmm_set_trans(&hmm, &state1.super, &state1.super, log(0.5));
-  imm_hmm_set_start(&hmm, &state1.super, imm_lprob_zero());
+  imm_hmm_set_start(&hmm, &state1.super);
 
   imm_dp_del(&dp);
   imm_hmm_init_dp(&hmm, &state1.super, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  des = log(0.1) + log(0.25) + log(0.3) + 3 * log(0.5);
+  des = log(1.0) + log(0.25) + 4 * log(0.5);
   {
     eq(imm_eseq_setup(&eseq, &ATT), 0);
     eq(imm_task_setup(task, &eseq), 0);
@@ -401,7 +400,7 @@ static void normal_states(void)
   imm_normal_state_init(&state1, 1, &abc, lprobs1);
 
   imm_hmm_add_state(&hmm, &state0.super);
-  imm_hmm_set_start(&hmm, &state0.super, log(1.0));
+  imm_hmm_set_start(&hmm, &state0.super);
   imm_hmm_add_state(&hmm, &state1.super);
 
   imm_hmm_set_trans(&hmm, &state0.super, &state0.super, log(0.1));
@@ -510,10 +509,7 @@ static void normal_states(void)
   eq(imm_hmm_set_trans(&hmm, &state1.super, &state0.super, zero()), IMM_EINVAL);
   eq(imm_hmm_set_trans(&hmm, &state1.super, &state1.super, zero()), IMM_EINVAL);
 
-  eq(imm_hmm_set_start(&hmm, &state0.super, zero()), IMM_EINVAL);
-  eq(imm_hmm_set_start(&hmm, &state1.super, zero()), IMM_EINVAL);
-
-  imm_hmm_set_start(&hmm, &state0.super, log(1.0));
+  imm_hmm_set_start(&hmm, &state0.super);
 
   imm_dp_del(&dp);
   imm_hmm_init_dp(&hmm, &state0.super, &dp);
@@ -617,7 +613,7 @@ static void profile1(void)
   imm_normal_state_init(&I0, 4, &abc_ab, I0_lprobs);
 
   imm_hmm_add_state(&hmm, &start.super);
-  imm_hmm_set_start(&hmm, &start.super, log(1.0));
+  imm_hmm_set_start(&hmm, &start.super);
   imm_hmm_add_state(&hmm, &D0.super);
   imm_hmm_add_state(&hmm, &end.super);
 
@@ -793,7 +789,7 @@ static void profile2(void)
   imm_mute_state_init(&end, 8, &abc);
 
   imm_hmm_add_state(&hmm, &start.super);
-  imm_hmm_set_start(&hmm, &start.super, 0.0);
+  imm_hmm_set_start(&hmm, &start.super);
 
   imm_hmm_add_state(&hmm, &M0.super);
   imm_hmm_add_state(&hmm, &I0.super);
@@ -1043,7 +1039,7 @@ static void profile_delete(void)
   imm_hmm_add_state(&hmm, &N1.super);
   imm_hmm_add_state(&hmm, &M.super);
   imm_hmm_add_state(&hmm, &N0.super);
-  imm_hmm_set_start(&hmm, &N0.super, 0);
+  imm_hmm_set_start(&hmm, &N0.super);
 
   imm_hmm_set_trans(&hmm, &N0.super, &N1.super, log(0.5));
   imm_hmm_set_trans(&hmm, &N0.super, &M.super, log(0.5));
@@ -1178,7 +1174,7 @@ static void global_profile(void)
   imm_mute_state_init(&D2, 11, &abc_z);
 
   imm_hmm_add_state(&hmm, &start.super);
-  imm_hmm_set_start(&hmm, &start.super, log(1.0));
+  imm_hmm_set_start(&hmm, &start.super);
   imm_hmm_add_state(&hmm, &B.super);
   imm_hmm_add_state(&hmm, &M0.super);
   imm_hmm_add_state(&hmm, &M1.super);
@@ -1394,7 +1390,7 @@ static void cycle_mute_ending(void)
   struct imm_mute_state start;
   imm_mute_state_init(&start, 0, &abc_ab);
   imm_hmm_add_state(&hmm, &start.super);
-  imm_hmm_set_start(&hmm, &start.super, log(1.0));
+  imm_hmm_set_start(&hmm, &start.super);
 
   struct imm_mute_state B;
   imm_mute_state_init(&B, 1, &abc_ab);

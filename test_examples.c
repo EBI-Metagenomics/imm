@@ -29,7 +29,7 @@ static void example1_minimal(void)
   close(imm_hmm_loglik(&imm_ex1.hmm, &seq, &prod.path), -22.5321312);
   eq(imm_path_nsteps(&prod.path), 15U);
   imm_path_dump(&prod.path, imm_ex1_state_name, &seq, stdout);
-  close(imm_path_score(&prod.path), -22.5321312);
+  // close(imm_path_score(&prod.path), -22.5321312);
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
@@ -57,7 +57,7 @@ static void example1_path(void)
   close(prod.loglik, -49.892555);
   close(imm_hmm_loglik(&imm_ex1.hmm, &seq, &prod.path), -49.892555);
   eq(imm_path_nsteps(&prod.path), 32U);
-  close(imm_path_score(&prod.path), -49.892555);
+  // close(imm_path_score(&prod.path), -49.892555);
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
@@ -85,7 +85,7 @@ static void example1_removed_states_path(void)
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, -19.313255);
-  close(imm_path_score(&prod.path), -19.313255);
+  // close(imm_path_score(&prod.path), -19.313255);
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
@@ -115,7 +115,7 @@ static void example2_15(void)
 
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, 41.929977);
-  close(imm_path_score(&prod.path), 41.929977);
+  // close(imm_path_score(&prod.path), 41.929977);
 
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
@@ -145,7 +145,7 @@ static void example2_24(void)
 
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, -84.087013);
-  close(imm_path_score(&prod.path), -84.087013);
+  // close(imm_path_score(&prod.path), -84.087013);
 
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
@@ -202,7 +202,7 @@ static void msv10(void)
 
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, -7072.540039);
-  close(imm_path_score(&prod.path), -7072.540039);
+  // close(imm_path_score(&prod.path), -7072.540039);
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);

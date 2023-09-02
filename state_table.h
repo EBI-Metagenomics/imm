@@ -14,11 +14,7 @@ struct imm_state_table
 {
   unsigned nstates;
   uint16_t *ids;
-  struct
-  {
-    uint16_t state_idx;
-    float lprob;
-  } start;
+  uint16_t start_state_idx;
   unsigned end_state_idx;
   uint8_t *span;
 };

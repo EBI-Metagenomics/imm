@@ -17,8 +17,7 @@ void imm_state_table_init(struct imm_state_table *x)
 {
   x->nstates = IMM_NSTATES_NULL;
   x->ids = NULL;
-  x->start.state_idx = IMM_STATE_NULL_IDX;
-  x->start.lprob = imm_lprob_nan();
+  x->start_state_idx = IMM_STATE_NULL_IDX;
   x->end_state_idx = IMM_STATE_NULL_IDX;
   x->span = NULL;
 }
@@ -53,8 +52,7 @@ int imm_state_table_reset(struct imm_state_table *x,
                            imm_state_span(cfg->states[i]).max);
   }
 
-  x->start.lprob = cfg->start.lprob;
-  x->start.state_idx = (uint16_t)cfg->start.state->idx;
+  x->start_state_idx = (uint16_t)cfg->start_state->idx;
   x->end_state_idx = cfg->end_state->idx;
   return 0;
 }
@@ -84,13 +82,9 @@ void imm_state_table_dump(struct imm_state_table const *x,
 {
   char state_name[IMM_STATE_NAME_SIZE] = {0};
 
-  (*callb)(imm_state_table_id(x, x->start.state_idx), state_name);
-  char const *fmt32 = imm_fmt_get_f32();
-
+  (*callb)(imm_state_table_id(x, x->start_state_idx), state_name);
   fprintf(fp, "\n");
   fprintf(fp, "start_state=%s\n", state_name);
-  fprintf(fp, "start_lprob=");
-  fprintf(fp, fmt32, x->start.lprob);
   fprintf(fp, "\n");
 
   (*callb)(imm_state_table_id(x, x->end_state_idx), state_name);

@@ -73,7 +73,7 @@ static void add_states(struct imm_ex3 *x)
 
 static void set_transitions(struct imm_ex3 *x)
 {
-  imm_hmm_set_start(&x->hmm, &x->S.super, ONE);
+  imm_hmm_set_start(&x->hmm, &x->S.super);
 
   SET_TRANS(&x->hmm, x->S, x->N, log(0.1));
   SET_TRANS(&x->hmm, x->N, x->N, log(0.2));

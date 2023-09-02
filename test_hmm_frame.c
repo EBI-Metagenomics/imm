@@ -25,7 +25,7 @@ static void hmm_frame_state_0eps(void)
   imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.0f, imm_span(1, 5));
 
   imm_hmm_add_state(&hmm, &state.super);
-  imm_hmm_set_start(&hmm, &state.super, log(1.0));
+  imm_hmm_set_start(&hmm, &state.super);
 
   struct imm_path path = imm_path();
   imm_path_add(&path, imm_step(state.super.id, 3, 0));
@@ -48,7 +48,7 @@ static void hmm_frame_state_len1(void)
   imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, imm_span(1, 5));
 
   imm_hmm_add_state(&hmm, &state.super);
-  imm_hmm_set_start(&hmm, &state.super, log(1.0));
+  imm_hmm_set_start(&hmm, &state.super);
 
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &code);
@@ -101,7 +101,7 @@ static void hmm_frame_state_len2(void)
   imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, imm_span(1, 5));
 
   imm_hmm_add_state(&hmm, &state.super);
-  imm_hmm_set_start(&hmm, &state.super, log(1.0));
+  imm_hmm_set_start(&hmm, &state.super);
 
   struct imm_path path = imm_path();
   imm_path_add(&path, imm_step(state.super.id, 2, 0));
@@ -177,7 +177,7 @@ static void hmm_frame_state_len3(void)
   imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, imm_span(1, 5));
 
   imm_hmm_add_state(&hmm, &state.super);
-  imm_hmm_set_start(&hmm, &state.super, log(1.0));
+  imm_hmm_set_start(&hmm, &state.super);
 
   struct imm_path path = imm_path();
   imm_path_add(&path, imm_step(state.super.id, 3, 0));
@@ -227,7 +227,7 @@ static void hmm_frame_state_len4(void)
   imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, imm_span(1, 5));
 
   imm_hmm_add_state(&hmm, &state.super);
-  imm_hmm_set_start(&hmm, &state.super, log(1.0));
+  imm_hmm_set_start(&hmm, &state.super);
 
   struct imm_path path = imm_path();
   imm_path_add(&path, imm_step(state.super.id, 4, 0));
@@ -264,7 +264,7 @@ static void hmm_frame_state_len5(void)
   imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, imm_span(1, 5));
 
   imm_hmm_add_state(&hmm, &state.super);
-  imm_hmm_set_start(&hmm, &state.super, log(1.0));
+  imm_hmm_set_start(&hmm, &state.super);
 
   struct imm_path path = imm_path();
   imm_path_add(&path, imm_step(state.super.id, 5, 0));

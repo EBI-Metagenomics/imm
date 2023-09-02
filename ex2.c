@@ -120,7 +120,7 @@ void imm_ex2_init(unsigned core_size, struct imm_span span)
 
   imm_mute_state_init(&m->start, START, abc);
   imm_hmm_add_state(&m->hmm, &m->start.super);
-  imm_hmm_set_start(&m->hmm, &m->start.super, log(1.0));
+  imm_hmm_set_start(&m->hmm, &m->start.super);
 
   imm_mute_state_init(&m->end, END, abc);
   imm_hmm_add_state(&m->hmm, &m->end.super);
@@ -178,7 +178,7 @@ void imm_ex2_init(unsigned core_size, struct imm_span span)
   imm_hmm_init(&m->null.hmm, &m->code);
   imm_frame_state_init(&m->null.n, N, &m->nucltp, &m->null.n_marg, eps, span);
   imm_hmm_add_state(&m->null.hmm, &m->null.n.super);
-  imm_hmm_set_start(&m->null.hmm, &m->null.n.super, log(1.0));
+  imm_hmm_set_start(&m->null.hmm, &m->null.n.super);
   SET_TRANS(m->null.hmm, m->null.n, m->null.n, log(0.2));
 }
 

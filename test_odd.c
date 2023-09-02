@@ -49,7 +49,7 @@ static void odd1(void)
   imm_hmm_add_state(&hmm, &X.super);
   imm_hmm_add_state(&hmm, &E.super);
 
-  imm_hmm_set_start(&hmm, &B.super, 10.0);
+  imm_hmm_set_start(&hmm, &B.super);
   imm_hmm_set_trans(&hmm, &B.super, &X.super, 100.);
   imm_hmm_set_trans(&hmm, &X.super, &E.super, 1000.);
   imm_hmm_set_trans(&hmm, &E.super, &B.super, 10000.);
@@ -64,8 +64,8 @@ static void odd1(void)
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   eq(imm_path_nsteps(&prod.path), 6U);
-  close(imm_hmm_loglik(&hmm, &seq, &prod.path), 12212.);
-  close(prod.loglik, 12212.);
+  close(imm_hmm_loglik(&hmm, &seq, &prod.path), 12202.);
+  close(prod.loglik, 12202.);
   imm_dp_dump_path(&dp, task, &prod, &seq, &state_name);
   imm_hmm_write_dot(&hmm, stdout, &state_name);
   imm_dp_write_dot(&dp, stdout, &state_name);
@@ -106,7 +106,7 @@ static void odd2(void)
   imm_hmm_add_state(&hmm, &E.super);
   imm_hmm_add_state(&hmm, &J.super);
 
-  imm_hmm_set_start(&hmm, &B.super, 0.);
+  imm_hmm_set_start(&hmm, &B.super);
   imm_hmm_set_trans(&hmm, &B.super, &X.super, 0.);
   imm_hmm_set_trans(&hmm, &X.super, &E.super, 0.);
   imm_hmm_set_trans(&hmm, &E.super, &B.super, 0.);
