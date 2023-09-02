@@ -67,7 +67,7 @@ IMM_INLINE void imm_trellis_seek(struct imm_trellis *x, unsigned seqpos,
   assert(x->head >= x->pool && x->head < x->pool + imm_trellis_size(x));
 }
 
-IMM_PURE void imm_trellis_push(struct imm_trellis *x, float score,
+IMM_INLINE void imm_trellis_push(struct imm_trellis *x, float score,
                                uint16_t state_source, uint8_t emissize)
 {
   x->head->score = score;
