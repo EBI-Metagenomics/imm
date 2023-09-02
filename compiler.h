@@ -43,4 +43,8 @@
 #define imm_const_template imm_const imm_template
 #define imm_pure_template imm_pure imm_template
 
+#define IMM_INLINE static inline
+#define IMM_PURE imm_pure imm_template
+#define IMM_CONST imm_const imm_template
+
 #endif
