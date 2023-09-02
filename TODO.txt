@@ -1,2 +1,3 @@
 - Fix the "suspicious usage of sizeof(sizeof(...))" caused whenever we use the macro `cco_hash_for_each_possible`
 - imm_state_name should return char* instead of unsigned
+- normalise names: seqlen -> seqsize, emislen -> emissize, emission_length -> emission_size, etc.
