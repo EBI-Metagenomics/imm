@@ -1,5 +1,6 @@
 #include "path.h"
 #include "fmt.h"
+#include "lprob.h"
 #include "rc.h"
 #include "reallocf.h"
 #include "state.h"
@@ -92,6 +93,17 @@ static char *id_state_name(unsigned id, char *name)
   return name;
 }
 
+float imm_path_score(struct imm_path const *x)
+{
+  if (imm_path_nsteps(x) == 0) return IMM_LPROB_NAN;
+
+  float score = imm_path_step(x, 0)->score;
+  for (unsigned i = 1; i < imm_path_nsteps(x); ++i)
+    score += imm_path_step(x, i)->score;
+
+  return score;
+}
+
 void imm_path_dump(struct imm_path const *x, imm_state_name *callb,
                    struct imm_seq const *seq, FILE *restrict fp)
 {
@@ -100,20 +112,20 @@ void imm_path_dump(struct imm_path const *x, imm_state_name *callb,
   char const *sequence = imm_seq_str(seq);
   for (unsigned i = 0; i < imm_path_nsteps(x); ++i)
   {
-    if (i > 0) fprintf(fp, "->");
+    if (i > 0) fputc(',', fp);
     unsigned state_id = imm_path_step(x, i)->state_id;
     unsigned seqlen = imm_path_step(x, i)->seqlen;
     float score = imm_path_step(x, i)->score;
 
-    fputc('[', fp);
+    fputc('(', fp);
 
-    fprintf(fp, "%s,", (*callb)(state_id, name));
-    fprintf(fp, "%.*s,", seqlen, sequence);
+    fprintf(fp, "%s;", (*callb)(state_id, name));
+    fprintf(fp, "%.*s;", seqlen, sequence);
     fprintf(fp, imm_fmt_get_f32(), score);
 
-    fputc(']', fp);
+    fputc(')', fp);
 
     sequence += seqlen;
   }
-  fprintf(fp, "\n");
+  fputc('\n', fp);
 }
