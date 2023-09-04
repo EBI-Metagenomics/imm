@@ -211,11 +211,11 @@ imm_template void set_path(struct imm_cpath *x, struct step const *bt,
   }
 }
 
-imm_template void set_trellis(struct imm_trellis *x, float score,
-                              struct step const *bt, unsigned r,
+imm_template void set_trellis(struct imm_trellis *x, float score, unsigned r,
+                              uint_fast16_t src, uint_fast8_t emissize,
                               uint_fast16_t dst)
 {
-  if (bt->src_idx != IMM_STATE_NULL_IDX)
+  if (src != IMM_STATE_NULL_IDX)
   {
     (void)r;
     (void)dst;
@@ -226,9 +226,9 @@ imm_template void set_trellis(struct imm_trellis *x, float score,
               imm_trellis_state_idx(x));
     }
     assert(dst == imm_trellis_state_idx(x));
-    imm_trellis_push(x, score, bt->src_idx, bt->src_emissize);
+    imm_trellis_push(x, score, src, emissize);
   }
-  else imm_trellis_push(x, IMM_LPROB_NAN, 0, 0);
+  // else imm_trellis_push(x, IMM_LPROB_NAN, 0, 0);
 }
 
 imm_pure_template float emission_score(struct imm_viterbi const *x,
@@ -244,10 +244,19 @@ imm_template void set_state_score(struct imm_viterbi const *x, unsigned row,
                                   struct step const *bt, bool safe_future)
 {
   float score = bt->score;
-  if (row == 0 && start_state_idx(x) == dst.idx) score = imm_max(0.0, score);
+  if (row == 0 && start_state_idx(x) == dst.idx)
+  {
+    score = imm_max(0.0, score);
+    imm_trellis_seek(&x->task->trellis, 0, dst.idx);
+    imm_trellis_push(&x->task->trellis, 0, start_state_idx(x), 0);
+  }
+  else
+  {
+    // set_trellis(&x->task->trellis, score, row, bt->src_idx, bt->src_emissize,
+    //             dst.idx);
+  }
 
   set_path(&x->task->path, bt, row, dst.idx);
-  set_trellis(&x->task->trellis, score, bt, row, dst.idx);
   if (!safe_future) dst.max = imm_min(dst.max, remain);
 
   imm_assume(dst.max <= IMM_STATE_MAX_SEQLEN);
@@ -257,6 +266,8 @@ imm_template void set_state_score(struct imm_viterbi const *x, unsigned row,
   {
     float total = score + emission_score(x, dst, row, i);
     set_matrix_cell_score(x, imm_cell(row, dst.idx, i), total);
+    imm_trellis_seek(&x->task->trellis, row + i, dst.idx);
+    set_trellis(&x->task->trellis, total, row + i, bt->src_idx, i, dst.idx);
   }
 }
 
@@ -308,6 +319,8 @@ imm_template void on_row(struct imm_viterbi *x, unsigned row,
 
 imm_template void viterbi_generic(struct imm_viterbi *x, bool has_tardy_state)
 {
+  set_matrix_cell_score(x, imm_cell(0, start_state_idx(x), 0), 0);
+
   struct imm_dp_safety const *y = &x->safety;
 
   on_row(x, 0, has_tardy_state, false, false);

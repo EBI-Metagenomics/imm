@@ -92,69 +92,32 @@ static float read_result(struct imm_dp const *dp, struct imm_task *task,
   return score;
 }
 
-static int unzip_path(struct imm_dp const *dp, struct imm_task const *task,
-                      unsigned state, unsigned seqlen, struct imm_path *path,
-                      float total)
-{
-  unsigned row = imm_eseq_size(task->seq);
-  bool valid = seqlen != IMM_STATE_NULL_SEQLEN;
-
-  while (valid)
-  {
-    unsigned id = dp->state_table.ids[state];
-    struct imm_step step = imm_step(id, seqlen, total);
-    int rc = imm_path_add(path, step);
-    if (rc) return rc;
-    row -= seqlen;
-
-    valid = imm_cpath_valid(&task->path, row, state);
-    float score = imm_cpath_get_score(&task->path, row, state);
-    if (valid)
-    {
-      unsigned trans = imm_cpath_trans(&task->path, row, state);
-      unsigned len = imm_cpath_seqlen_idx(&task->path, row, state);
-      state = imm_trans_table_source_state(&dp->trans_table, state, trans);
-      seqlen =
-          len + imm_zspan_min(imm_state_table_zspan(&dp->state_table, state));
-      imm_path_step(path, 0)->score = total - score;
-      total -= imm_path_step(path, 0)->score;
-    }
-  }
-  imm_path_reverse(path);
-  return 0;
-}
-
-static int unzip_path2(struct imm_trellis *x, unsigned seq_size,
-                       unsigned end_state, unsigned last_emis_size,
-                       struct imm_path *path)
+static int unzip_path(struct imm_trellis *x, unsigned seq_size,
+                      unsigned end_state, unsigned last_emis_size,
+                      struct imm_path *path, unsigned start_state)
 {
   int rc = 0;
   if (last_emis_size == IMM_STATE_NULL_SEQLEN) return rc;
-  imm_trellis_dump(x, NULL, stdout);
 
   imm_trellis_seek(x, seq_size, end_state);
   assert(imm_trellis_state_idx(x) == end_state);
-  // if (imm_lprob_is_nan(imm_trellis_head(x)->score)) return 0;
-  // if (!imm_trellis_has_back(x)) return 0;
-
-  struct imm_step step = imm_step(imm_trellis_state_id(x), last_emis_size, 0);
-  // printf("state_idx: %u\n", imm_trellis_state_idx(x));
-  if ((rc = imm_path_add(path, step))) return rc;
 
   unsigned size = imm_trellis_head(x)->emission_size;
   float last_score = imm_trellis_head(x)->score;
+  struct imm_step step = imm_step(imm_trellis_state_id(x), size, last_score);
+  if ((rc = imm_path_add(path, step))) return rc;
 
-  while (imm_trellis_back(x))
+  while (imm_trellis_state_idx(x) != start_state ||
+         imm_trellis_sequence_idx(x) != 0)
   {
-    float score = last_score - imm_trellis_head(x)->score;
+    imm_trellis_back(x);
+    float score = imm_trellis_head(x)->score;
+    size = imm_trellis_head(x)->emission_size;
     if (imm_lprob_is_nan(score)) score = last_score;
     struct imm_step step = imm_step(imm_trellis_state_id(x), size, score);
-    // printf("state_idx: %u\n", imm_trellis_state_idx(x));
     if ((rc = imm_path_add(path, step))) return rc;
-    size = imm_trellis_head(x)->emission_size;
     last_score = imm_trellis_head(x)->score;
   }
-
   imm_path_reverse(path);
   return 0;
 }
@@ -185,15 +148,12 @@ int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
   prod->loglik = read_result(dp, task, &last_state, &last_seqsize);
 
   int rc = 0;
-  if ((rc = unzip_path(dp, task, last_state, last_seqsize, &prod->path,
-                       prod->loglik)))
-    return rc;
 
-  // imm_path_reset(&prod->path);
-  // unsigned seqsize = imm_eseq_size(task->seq);
-  // if ((rc = unzip_path2(&task->trellis, seqsize, last_state, last_seqsize,
-  //                       &prod->path)))
-  //   return rc;
+  imm_path_reset(&prod->path);
+  unsigned seqsize = imm_eseq_size(task->seq);
+  if ((rc = unzip_path(&task->trellis, seqsize, last_state, last_seqsize,
+                       &prod->path, dp->state_table.start_state_idx)))
+    return rc;
 
   if (elapsed_stop(&elapsed)) return IMM_EELAPSED;
 
