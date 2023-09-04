@@ -103,8 +103,8 @@ static int unzip_path(struct imm_trellis *x, unsigned seq_size,
   assert(imm_trellis_state_idx(x) == end_state);
 
   unsigned size = imm_trellis_head(x)->emission_size;
-  float last_score = imm_trellis_head(x)->score;
-  struct imm_step step = imm_step(imm_trellis_state_id(x), size, last_score);
+  float score = imm_trellis_head(x)->score;
+  struct imm_step step = imm_step(imm_trellis_state_id(x), size, score);
   if ((rc = imm_path_add(path, step))) return rc;
 
   while (imm_trellis_state_idx(x) != start_state ||
@@ -113,11 +113,12 @@ static int unzip_path(struct imm_trellis *x, unsigned seq_size,
     imm_trellis_back(x);
     float score = imm_trellis_head(x)->score;
     size = imm_trellis_head(x)->emission_size;
-    if (imm_lprob_is_nan(score)) score = last_score;
     struct imm_step step = imm_step(imm_trellis_state_id(x), size, score);
     if ((rc = imm_path_add(path, step))) return rc;
-    last_score = imm_trellis_head(x)->score;
   }
+  for (unsigned i = 0; i < imm_path_nsteps(path) + 1; ++i)
+    imm_path_step(path, i)->score -= imm_path_step(path, i + 1)->score;
+  imm_path_step(path, imm_path_nsteps(path) - 1)->score = 0;
   imm_path_reverse(path);
   return 0;
 }
