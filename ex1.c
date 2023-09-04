@@ -24,6 +24,7 @@
 #define J ((uint16_t)(6U << 12))
 #define END ((uint16_t)(7U << 12))
 #define N ((uint16_t)(8U << 12))
+#define NSTART ((uint16_t)(9U << 12))
 
 static float b_lprobs[] = {ONE, ZERO, ZERO, ZERO, ZERO};
 static float m_lprobs[] = {ZERO, ONE, ZERO, ZERO, ZERO};
@@ -49,7 +50,7 @@ void imm_ex1_init(unsigned core_size)
 
   imm_mute_state_init(&m->start, START, &m->abc);
   imm_hmm_add_state(&m->hmm, &m->start.super);
-  imm_hmm_set_start(&m->hmm, &m->start.super);
+  imm_hmm_set_start(&m->hmm, &m->start);
 
   imm_mute_state_init(&m->end, END, &m->abc);
   imm_hmm_add_state(&m->hmm, &m->end.super);
@@ -105,9 +106,12 @@ void imm_ex1_init(unsigned core_size)
   }
 
   imm_hmm_init(&m->null.hmm, &m->code);
+  imm_mute_state_init(&m->null.nstart, NSTART, &m->abc);
   imm_normal_state_init(&m->null.n, N, &m->abc, n_lprobs);
+  imm_hmm_add_state(&m->null.hmm, &m->null.nstart.super);
   imm_hmm_add_state(&m->null.hmm, &m->null.n.super);
-  imm_hmm_set_start(&m->null.hmm, &m->null.n.super);
+  imm_hmm_set_trans(&m->null.hmm, &m->null.nstart.super, &m->null.n.super, 0);
+  imm_hmm_set_start(&m->null.hmm, &m->null.nstart);
   SET_TRANS(&m->null.hmm, m->null.n, m->null.n, log(0.2));
 }
 

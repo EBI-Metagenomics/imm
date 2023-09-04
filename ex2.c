@@ -24,6 +24,7 @@
 #define J ((uint16_t)(6U << 11))
 #define END ((uint16_t)(7U << 11))
 #define N ((uint16_t)(8U << 11))
+#define NSTART ((uint16_t)(9U << 11))
 
 #define SET_TRANS(hmm, a, b, v) imm_hmm_set_trans(&hmm, &a.super, &b.super, v)
 
@@ -120,7 +121,7 @@ void imm_ex2_init(unsigned core_size, struct imm_span span)
 
   imm_mute_state_init(&m->start, START, abc);
   imm_hmm_add_state(&m->hmm, &m->start.super);
-  imm_hmm_set_start(&m->hmm, &m->start.super);
+  imm_hmm_set_start(&m->hmm, &m->start);
 
   imm_mute_state_init(&m->end, END, abc);
   imm_hmm_add_state(&m->hmm, &m->end.super);
@@ -178,7 +179,9 @@ void imm_ex2_init(unsigned core_size, struct imm_span span)
   imm_hmm_init(&m->null.hmm, &m->code);
   imm_frame_state_init(&m->null.n, N, &m->nucltp, &m->null.n_marg, eps, span);
   imm_hmm_add_state(&m->null.hmm, &m->null.n.super);
-  imm_hmm_set_start(&m->null.hmm, &m->null.n.super);
+  imm_hmm_add_state(&m->null.hmm, &m->null.n.super);
+  imm_hmm_set_trans(&m->null.hmm, &m->null.nstart.super, &m->null.n.super, 0);
+  imm_hmm_set_start(&m->null.hmm, &m->null.nstart);
   SET_TRANS(m->null.hmm, m->null.n, m->null.n, log(0.2));
 }
 

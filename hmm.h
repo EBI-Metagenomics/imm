@@ -14,6 +14,7 @@ struct imm_hmm;
 struct imm_path;
 struct imm_seq;
 struct imm_state;
+struct imm_mute_state;
 
 struct imm_hmm
 {
@@ -71,7 +72,7 @@ IMM_API int imm_hmm_normalize_trans(struct imm_hmm const *hmm);
 IMM_API int imm_hmm_normalize_state_trans(struct imm_state *src);
 
 IMM_API int imm_hmm_set_start(struct imm_hmm *hmm,
-                              struct imm_state const *state);
+                              struct imm_mute_state const *state);
 
 IMM_API int imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state *src,
                               struct imm_state *dst, float lprob);

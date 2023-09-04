@@ -55,7 +55,7 @@ static void one_mute_state(void)
   imm_mute_state_init(&state, 0, &abc);
 
   imm_hmm_add_state(&hmm, &state.super);
-  imm_hmm_set_start(&hmm, &state.super);
+  imm_hmm_set_start(&hmm, &state);
 
   struct imm_dp dp;
   imm_hmm_init_dp(&hmm, &state.super, &dp);
@@ -99,7 +99,7 @@ static void two_mute_states(void)
   imm_mute_state_init(&state1, 1, &abc);
 
   imm_hmm_add_state(&hmm, &state0.super);
-  imm_hmm_set_start(&hmm, &state0.super);
+  imm_hmm_set_start(&hmm, &state0);
   imm_hmm_add_state(&hmm, &state1.super);
 
   struct imm_dp dp;
@@ -147,7 +147,7 @@ static void mute_cycle(void)
   imm_mute_state_init(&state0, 0, &abc);
 
   imm_hmm_add_state(&hmm, &state0.super);
-  imm_hmm_set_start(&hmm, &state0.super);
+  imm_hmm_set_start(&hmm, &state0);
 
   struct imm_mute_state state1;
   imm_mute_state_init(&state1, 1, &abc);
@@ -173,8 +173,13 @@ static void one_normal_state(void)
   struct imm_normal_state state;
   imm_normal_state_init(&state, 0, &abc, lprobs0);
 
+  struct imm_mute_state start = {0};
+  imm_mute_state_init(&start, 1, &abc);
+
+  imm_hmm_add_state(&hmm, &start.super);
   imm_hmm_add_state(&hmm, &state.super);
-  imm_hmm_set_start(&hmm, &state.super);
+  imm_hmm_set_trans(&hmm, &start.super, &state.super, 0);
+  imm_hmm_set_start(&hmm, &start);
 
   struct imm_dp dp;
   imm_hmm_init_dp(&hmm, &state.super, &dp);
@@ -190,7 +195,7 @@ static void one_normal_state(void)
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, (log(1.0) + log(0.25)));
     close(imm_hmm_loglik(&hmm, &A, &prod.path), (log(1.0) + log(0.25)));
-    eq(imm_path_nsteps(&prod.path), 1U);
+    eq(imm_path_nsteps(&prod.path), 2U);
   }
 
   {
@@ -222,7 +227,7 @@ static void one_normal_state(void)
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, (log(1.0) + log(0.25)));
     close(imm_hmm_loglik(&hmm, &A, &prod.path), (log(1.0) + log(0.25)));
-    eq(imm_path_nsteps(&prod.path), 1U);
+    eq(imm_path_nsteps(&prod.path), 2U);
   }
 
   {
@@ -231,7 +236,7 @@ static void one_normal_state(void)
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, (log(0.1) + 2 * log(0.25)));
     close(imm_hmm_loglik(&hmm, &AA, &prod.path), (log(0.1) + 2 * log(0.25)));
-    eq(imm_path_nsteps(&prod.path), 2U);
+    eq(imm_path_nsteps(&prod.path), 3U);
   }
 
   {
@@ -255,7 +260,7 @@ static void one_normal_state(void)
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, log(0.25));
     close(imm_hmm_loglik(&hmm, &A, &prod.path), log(0.25));
-    eq(imm_path_nsteps(&prod.path), 1U);
+    eq(imm_path_nsteps(&prod.path), 2U);
   }
 
   {
@@ -264,7 +269,7 @@ static void one_normal_state(void)
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, (2 * log(0.25)));
     close(imm_hmm_loglik(&hmm, &AA, &prod.path), (2 * log(0.25)));
-    eq(imm_path_nsteps(&prod.path), 2U);
+    eq(imm_path_nsteps(&prod.path), 3U);
   }
 
   {
@@ -299,8 +304,16 @@ static void two_normal_states(void)
   struct imm_normal_state state1;
   imm_normal_state_init(&state1, 1, &abc, lprobs1);
 
+  struct imm_mute_state start0 = {0};
+  imm_mute_state_init(&start0, 2, &abc);
+
+  struct imm_mute_state start1 = {0};
+  imm_mute_state_init(&start1, 3, &abc);
+
+  imm_hmm_add_state(&hmm, &start0.super);
   imm_hmm_add_state(&hmm, &state0.super);
-  imm_hmm_set_start(&hmm, &state0.super);
+  imm_hmm_set_trans(&hmm, &start0.super, &state0.super, 0);
+  imm_hmm_set_start(&hmm, &start0);
   imm_hmm_add_state(&hmm, &state1.super);
   imm_hmm_set_trans(&hmm, &state0.super, &state1.super, log(0.3));
 
@@ -314,7 +327,7 @@ static void two_normal_states(void)
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, (log(1.0) + log(0.25)));
     close(imm_hmm_loglik(&hmm, &A, &prod.path), (log(1.0) + log(0.25)));
-    eq(imm_path_nsteps(&prod.path), 1U);
+    eq(imm_path_nsteps(&prod.path), 2U);
   }
 
   {
@@ -346,7 +359,7 @@ static void two_normal_states(void)
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, des);
     close(imm_hmm_loglik(&hmm, &AT, &prod.path), des);
-    eq(imm_path_nsteps(&prod.path), 2U);
+    eq(imm_path_nsteps(&prod.path), 3U);
   }
 
   {
@@ -358,8 +371,10 @@ static void two_normal_states(void)
     eq(imm_path_nsteps(&prod.path), 0U);
   }
 
+  imm_hmm_add_state(&hmm, &start1.super);
   imm_hmm_set_trans(&hmm, &state1.super, &state1.super, log(0.5));
-  imm_hmm_set_start(&hmm, &state1.super);
+  imm_hmm_set_trans(&hmm, &start1.super, &state1.super, 0);
+  imm_hmm_set_start(&hmm, &start1);
 
   imm_dp_del(&dp);
   imm_hmm_init_dp(&hmm, &state1.super, &dp);
@@ -372,7 +387,7 @@ static void two_normal_states(void)
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, des);
     close(imm_hmm_loglik(&hmm, &ATT, &prod.path), des);
-    eq(imm_path_nsteps(&prod.path), 3U);
+    eq(imm_path_nsteps(&prod.path), 4U);
   }
 
   imm_eseq_cleanup(&eseq);
@@ -399,8 +414,13 @@ static void normal_states(void)
   struct imm_normal_state state1;
   imm_normal_state_init(&state1, 1, &abc, lprobs1);
 
+  struct imm_mute_state start = {0};
+  imm_mute_state_init(&start, 2, &abc);
+
+  imm_hmm_add_state(&hmm, &start.super);
   imm_hmm_add_state(&hmm, &state0.super);
-  imm_hmm_set_start(&hmm, &state0.super);
+  imm_hmm_set_trans(&hmm, &start.super, &state0.super, 0);
+  imm_hmm_set_start(&hmm, &start);
   imm_hmm_add_state(&hmm, &state1.super);
 
   imm_hmm_set_trans(&hmm, &state0.super, &state0.super, log(0.1));
@@ -419,7 +439,7 @@ static void normal_states(void)
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, -1.386294361120);
     close(imm_hmm_loglik(&hmm, &A, &prod.path), -1.386294361120);
-    eq(imm_path_nsteps(&prod.path), 1U);
+    eq(imm_path_nsteps(&prod.path), 2U);
   }
 
   {
@@ -428,7 +448,7 @@ static void normal_states(void)
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, -3.178053830348);
     close(imm_hmm_loglik(&hmm, &AG, &prod.path), -3.178053830348);
-    eq(imm_path_nsteps(&prod.path), 2U);
+    eq(imm_path_nsteps(&prod.path), 3U);
   }
 
   imm_dp_del(&dp);
@@ -441,7 +461,7 @@ static void normal_states(void)
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, -3.295836866004);
     close(imm_hmm_loglik(&hmm, &AG, &prod.path), -3.295836866004);
-    eq(imm_path_nsteps(&prod.path), 2U);
+    eq(imm_path_nsteps(&prod.path), 3U);
   }
 
   {
@@ -471,7 +491,7 @@ static void normal_states(void)
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, -4.106767082221);
     close(imm_hmm_loglik(&hmm, &AGT, &prod.path), -4.106767082221);
-    eq(imm_path_nsteps(&prod.path), 3U);
+    eq(imm_path_nsteps(&prod.path), 4U);
   }
 
   {
@@ -501,15 +521,13 @@ static void normal_states(void)
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, -6.303991659557);
     close(imm_hmm_loglik(&hmm, &AGTC, &prod.path), -6.303991659557);
-    eq(imm_path_nsteps(&prod.path), 4U);
+    eq(imm_path_nsteps(&prod.path), 5U);
   }
 
   eq(imm_hmm_set_trans(&hmm, &state0.super, &state0.super, zero()), IMM_EINVAL);
   eq(imm_hmm_set_trans(&hmm, &state0.super, &state1.super, zero()), IMM_EINVAL);
   eq(imm_hmm_set_trans(&hmm, &state1.super, &state0.super, zero()), IMM_EINVAL);
   eq(imm_hmm_set_trans(&hmm, &state1.super, &state1.super, zero()), IMM_EINVAL);
-
-  imm_hmm_set_start(&hmm, &state0.super);
 
   imm_dp_del(&dp);
   imm_hmm_init_dp(&hmm, &state0.super, &dp);
@@ -539,7 +557,7 @@ static void normal_states(void)
     eq(imm_dp_viterbi(&dp, task, &prod), 0);
     close(prod.loglik, (log(0.25)));
     close(imm_hmm_loglik(&hmm, &A, &prod.path), log(0.25));
-    eq(imm_path_nsteps(&prod.path), 1U);
+    eq(imm_path_nsteps(&prod.path), 2U);
   }
 
   imm_hmm_set_trans(&hmm, &state0.super, &state0.super, log(0.9));
@@ -553,14 +571,14 @@ static void normal_states(void)
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.25)));
   close(imm_hmm_loglik(&hmm, &A, &prod.path), (log(0.25)));
-  eq(imm_path_nsteps(&prod.path), 1U);
+  eq(imm_path_nsteps(&prod.path), 2U);
 
   eq(imm_eseq_setup(&eseq, &AA), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (2 * log(0.25) + log(0.9)));
   close(imm_hmm_loglik(&hmm, &AA, &prod.path), (2 * log(0.25) + log(0.9)));
-  eq(imm_path_nsteps(&prod.path), 2U);
+  eq(imm_path_nsteps(&prod.path), 3U);
 
   imm_hmm_set_trans(&hmm, &state0.super, &state1.super, log(0.2));
 
@@ -573,14 +591,14 @@ static void normal_states(void)
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (log(0.25)));
   close(imm_hmm_loglik(&hmm, &A, &prod.path), (log(0.25)));
-  eq(imm_path_nsteps(&prod.path), 1U);
+  eq(imm_path_nsteps(&prod.path), 2U);
 
   eq(imm_eseq_setup(&eseq, &AA), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, (2 * log(0.25) + log(0.9)));
   close(imm_hmm_loglik(&hmm, &AA, &prod.path), (2 * log(0.25) + log(0.9)));
-  eq(imm_path_nsteps(&prod.path), 2U);
+  eq(imm_path_nsteps(&prod.path), 3U);
 
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
@@ -613,7 +631,7 @@ static void profile1(void)
   imm_normal_state_init(&I0, 4, &abc_ab, I0_lprobs);
 
   imm_hmm_add_state(&hmm, &start.super);
-  imm_hmm_set_start(&hmm, &start.super);
+  imm_hmm_set_start(&hmm, &start);
   imm_hmm_add_state(&hmm, &D0.super);
   imm_hmm_add_state(&hmm, &end.super);
 
@@ -789,7 +807,7 @@ static void profile2(void)
   imm_mute_state_init(&end, 8, &abc);
 
   imm_hmm_add_state(&hmm, &start.super);
-  imm_hmm_set_start(&hmm, &start.super);
+  imm_hmm_set_start(&hmm, &start);
 
   imm_hmm_add_state(&hmm, &M0.super);
   imm_hmm_add_state(&hmm, &I0.super);
@@ -1035,11 +1053,16 @@ static void profile_delete(void)
   struct imm_normal_state N2;
   imm_normal_state_init(&N2, 3, &abc_ab, N2_lprobs);
 
+  struct imm_mute_state start = {0};
+  imm_mute_state_init(&start, 4, &abc_ab);
+
   imm_hmm_add_state(&hmm, &N2.super);
   imm_hmm_add_state(&hmm, &N1.super);
   imm_hmm_add_state(&hmm, &M.super);
   imm_hmm_add_state(&hmm, &N0.super);
-  imm_hmm_set_start(&hmm, &N0.super);
+  imm_hmm_add_state(&hmm, &start.super);
+  imm_hmm_set_trans(&hmm, &start.super, &N0.super, 0);
+  imm_hmm_set_start(&hmm, &start);
 
   imm_hmm_set_trans(&hmm, &N0.super, &N1.super, log(0.5));
   imm_hmm_set_trans(&hmm, &N0.super, &M.super, log(0.5));
@@ -1056,7 +1079,7 @@ static void profile_delete(void)
   close(prod.loglik, (log(0.5)));
 
   close(imm_hmm_loglik(&hmm, &A_ab, &prod.path), (log(0.5)));
-  eq(imm_path_nsteps(&prod.path), 1U);
+  eq(imm_path_nsteps(&prod.path), 2U);
 
   imm_dp_del(&dp);
   imm_hmm_init_dp(&hmm, &M.super, &dp);
@@ -1068,7 +1091,7 @@ static void profile_delete(void)
   close(prod.loglik, (2 * log(0.5)));
 
   close(imm_hmm_loglik(&hmm, &A_ab, &prod.path), (2 * log(0.5)));
-  eq(imm_path_nsteps(&prod.path), 2U);
+  eq(imm_path_nsteps(&prod.path), 3U);
 
   imm_dp_del(&dp);
   imm_hmm_init_dp(&hmm, &N2.super, &dp);
@@ -1080,7 +1103,7 @@ static void profile_delete(void)
   close(prod.loglik, (4 * log(0.5)));
 
   close(imm_hmm_loglik(&hmm, &AB_ab, &prod.path), (4 * log(0.5)));
-  eq(imm_path_nsteps(&prod.path), 3U);
+  eq(imm_path_nsteps(&prod.path), 4U);
 
   imm_dp_del(&dp);
   imm_hmm_init_dp(&hmm, &M.super, &dp);
@@ -1092,7 +1115,7 @@ static void profile_delete(void)
   close(prod.loglik, (2 * log(0.5)));
 
   close(imm_hmm_loglik(&hmm, &A_ab, &prod.path), (2 * log(0.5)));
-  eq(imm_path_nsteps(&prod.path), 2U);
+  eq(imm_path_nsteps(&prod.path), 3U);
 
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
@@ -1174,7 +1197,7 @@ static void global_profile(void)
   imm_mute_state_init(&D2, 11, &abc_z);
 
   imm_hmm_add_state(&hmm, &start.super);
-  imm_hmm_set_start(&hmm, &start.super);
+  imm_hmm_set_start(&hmm, &start);
   imm_hmm_add_state(&hmm, &B.super);
   imm_hmm_add_state(&hmm, &M0.super);
   imm_hmm_add_state(&hmm, &M1.super);
@@ -1390,7 +1413,7 @@ static void cycle_mute_ending(void)
   struct imm_mute_state start;
   imm_mute_state_init(&start, 0, &abc_ab);
   imm_hmm_add_state(&hmm, &start.super);
-  imm_hmm_set_start(&hmm, &start.super);
+  imm_hmm_set_start(&hmm, &start);
 
   struct imm_mute_state B;
   imm_mute_state_init(&B, 1, &abc_ab);

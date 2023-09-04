@@ -49,7 +49,7 @@ static void odd1(void)
   imm_hmm_add_state(&hmm, &X.super);
   imm_hmm_add_state(&hmm, &E.super);
 
-  imm_hmm_set_start(&hmm, &B.super);
+  imm_hmm_set_start(&hmm, &B);
   imm_hmm_set_trans(&hmm, &B.super, &X.super, 100.);
   imm_hmm_set_trans(&hmm, &X.super, &E.super, 1000.);
   imm_hmm_set_trans(&hmm, &E.super, &B.super, 10000.);
@@ -106,7 +106,7 @@ static void odd2(void)
   imm_hmm_add_state(&hmm, &E.super);
   imm_hmm_add_state(&hmm, &J.super);
 
-  imm_hmm_set_start(&hmm, &B.super);
+  imm_hmm_set_start(&hmm, &B);
   imm_hmm_set_trans(&hmm, &B.super, &X.super, 0.);
   imm_hmm_set_trans(&hmm, &X.super, &E.super, 0.);
   imm_hmm_set_trans(&hmm, &E.super, &B.super, 0.);

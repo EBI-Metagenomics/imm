@@ -34,6 +34,7 @@ struct imm_ex2
   struct
   {
     struct imm_hmm hmm;
+    struct imm_mute_state nstart;
     struct imm_frame_state n;
     struct imm_codon_marg n_marg;
   } null;

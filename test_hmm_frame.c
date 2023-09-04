@@ -4,6 +4,7 @@
 #include "frame_state.h"
 #include "hmm.h"
 #include "lprob.h"
+#include "mute_state.h"
 #include "path.h"
 #include "prod.h"
 #include "task.h"
@@ -21,13 +22,19 @@ static void hmm_frame_state_0eps(void)
   struct imm_hmm hmm;
   imm_hmm_init(&hmm, &code);
 
+  struct imm_mute_state start = {0};
+  imm_mute_state_init(&start, 1, &nucltp.nuclt->super);
+
   struct imm_frame_state state;
   imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.0f, imm_span(1, 5));
 
+  imm_hmm_add_state(&hmm, &start.super);
   imm_hmm_add_state(&hmm, &state.super);
-  imm_hmm_set_start(&hmm, &state.super);
+  imm_hmm_set_trans(&hmm, &start.super, &state.super, 0);
+  imm_hmm_set_start(&hmm, &start);
 
   struct imm_path path = imm_path();
+  imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 3, 0));
   struct imm_seq seq = imm_seq(IMM_STR("ATT"), abc);
   close(imm_hmm_loglik(&hmm, &seq, &path), -2.3025850930);
@@ -44,21 +51,28 @@ static void hmm_frame_state_len1(void)
   struct imm_hmm hmm;
   imm_hmm_init(&hmm, &code);
 
+  struct imm_mute_state start = {0};
+  imm_mute_state_init(&start, 1, &nucltp.nuclt->super);
+
   struct imm_frame_state state;
   imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, imm_span(1, 5));
 
+  imm_hmm_add_state(&hmm, &start.super);
   imm_hmm_add_state(&hmm, &state.super);
-  imm_hmm_set_start(&hmm, &state.super);
+  imm_hmm_set_trans(&hmm, &start.super, &state.super, 0);
+  imm_hmm_set_start(&hmm, &start);
 
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &code);
 
   struct imm_path path = imm_path();
+  imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 1, 0));
   struct imm_seq seq = imm_seq(IMM_STR("A"), abc);
   close(imm_hmm_loglik(&hmm, &seq, &path), -6.0198639951);
 
   imm_path_reset(&path);
+  imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 1, 0));
   seq = imm_seq(IMM_STR("C"), abc);
   close(imm_hmm_loglik(&hmm, &seq, &path), -7.1184762838);
@@ -97,28 +111,37 @@ static void hmm_frame_state_len2(void)
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &code);
 
+  struct imm_mute_state start = {0};
+  imm_mute_state_init(&start, 1, &nucltp.nuclt->super);
+
   struct imm_frame_state state;
   imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, imm_span(1, 5));
 
+  imm_hmm_add_state(&hmm, &start.super);
   imm_hmm_add_state(&hmm, &state.super);
-  imm_hmm_set_start(&hmm, &state.super);
+  imm_hmm_set_trans(&hmm, &start.super, &state.super, 0);
+  imm_hmm_set_start(&hmm, &start);
 
   struct imm_path path = imm_path();
+  imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 2, 0));
   struct imm_seq seq = imm_seq(IMM_STR("AA"), abc);
   close(imm_hmm_loglik(&hmm, &seq, &path), -8.9102357365);
 
   imm_path_reset(&path);
+  imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 2, 0));
   seq = imm_seq(IMM_STR("TG"), abc);
   close(imm_hmm_loglik(&hmm, &seq, &path), -3.2434246877);
 
   imm_path_reset(&path);
+  imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 2, 0));
   seq = imm_seq(IMM_STR("CC"), abc);
   close(imm_hmm_loglik(&hmm, &seq, &path), -4.2250228758);
 
   imm_path_reset(&path);
+  imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 2, 0));
   seq = imm_seq(IMM_STR("TT"), abc);
   close(imm_hmm_loglik(&hmm, &seq, &path), -5.3267168311);
@@ -173,18 +196,25 @@ static void hmm_frame_state_len3(void)
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &code);
 
+  struct imm_mute_state start = {0};
+  imm_mute_state_init(&start, 1, &nucltp.nuclt->super);
+
   struct imm_frame_state state;
   imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, imm_span(1, 5));
 
+  imm_hmm_add_state(&hmm, &start.super);
   imm_hmm_add_state(&hmm, &state.super);
-  imm_hmm_set_start(&hmm, &state.super);
+  imm_hmm_set_trans(&hmm, &start.super, &state.super, 0);
+  imm_hmm_set_start(&hmm, &start);
 
   struct imm_path path = imm_path();
+  imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 3, 0));
   struct imm_seq seq = imm_seq(IMM_STR("ATC"), abc);
   close(imm_hmm_loglik(&hmm, &seq, &path), -7.0123444607);
 
   imm_path_reset(&path);
+  imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 3, 0));
   seq = imm_seq(IMM_STR("ATG"), abc);
   close(imm_hmm_loglik(&hmm, &seq, &path), -0.6397933781);
@@ -223,13 +253,19 @@ static void hmm_frame_state_len4(void)
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &code);
 
+  struct imm_mute_state start = {0};
+  imm_mute_state_init(&start, 1, &nucltp.nuclt->super);
+
   struct imm_frame_state state;
   imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, imm_span(1, 5));
 
+  imm_hmm_add_state(&hmm, &start.super);
   imm_hmm_add_state(&hmm, &state.super);
-  imm_hmm_set_start(&hmm, &state.super);
+  imm_hmm_set_trans(&hmm, &start.super, &state.super, 0);
+  imm_hmm_set_start(&hmm, &start);
 
   struct imm_path path = imm_path();
+  imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 4, 0));
   struct imm_seq seq = imm_seq(IMM_STR("ATCC"), abc);
   close(imm_hmm_loglik(&hmm, &seq, &path), -11.9829290512);
@@ -260,18 +296,25 @@ static void hmm_frame_state_len5(void)
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &code);
 
+  struct imm_mute_state start = {0};
+  imm_mute_state_init(&start, 1, &nucltp.nuclt->super);
+
   struct imm_frame_state state;
   imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, imm_span(1, 5));
 
+  imm_hmm_add_state(&hmm, &start.super);
   imm_hmm_add_state(&hmm, &state.super);
-  imm_hmm_set_start(&hmm, &state.super);
+  imm_hmm_set_trans(&hmm, &start.super, &state.super, 0);
+  imm_hmm_set_start(&hmm, &start);
 
   struct imm_path path = imm_path();
+  imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 5, 0));
   struct imm_seq seq = imm_seq(IMM_STR("ACGTA"), abc);
   ok(imm_lprob_is_zero(imm_hmm_loglik(&hmm, &seq, &path)));
 
   imm_path_reset(&path);
+  imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 5, 0));
   seq = imm_seq(IMM_STR("ACTAG"), abc);
   close(imm_hmm_loglik(&hmm, &seq, &path), -10.1142085574);

@@ -58,7 +58,7 @@ static void dp_dot(void)
 
   eq(imm_hmm_set_trans(&hmm, &state0.super, &state1.super, log(0.5)), 0);
 
-  eq(imm_hmm_set_start(&hmm, &state0.super), 0);
+  eq(imm_hmm_set_start(&hmm, &state0), 0);
 
   FILE *fp = fopen("dp.dot", "w");
   ok(fp);

@@ -6,6 +6,7 @@
 #include "list.h"
 #include "logaddexp.h"
 #include "lprob.h"
+#include "mute_state.h"
 #include "path.h"
 #include "stack.h"
 #include "state.h"
@@ -267,10 +268,10 @@ int imm_hmm_normalize_state_trans(struct imm_state *src)
   return 0;
 }
 
-int imm_hmm_set_start(struct imm_hmm *hmm, struct imm_state const *state)
+int imm_hmm_set_start(struct imm_hmm *hmm, struct imm_mute_state const *state)
 {
-  if (!cco_hash_hashed(&state->hnode)) return IMM_ENOTFOUND;
-  hmm->start_state_id = state->id;
+  if (!cco_hash_hashed(&state->super.hnode)) return IMM_ENOTFOUND;
+  hmm->start_state_id = state->super.id;
   return 0;
 }
 

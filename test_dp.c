@@ -31,7 +31,7 @@ static void dp_illegal(void)
   eq(imm_hmm_init_dp(&hmm, &state.super, &dp), IMM_ENOSTART);
   imm_dp_del(&dp);
 
-  eq(imm_hmm_set_start(&hmm, &state.super), 0);
+  eq(imm_hmm_set_start(&hmm, &state), 0);
   eq(imm_hmm_init_dp(&hmm, &state.super, &dp), 0);
   imm_dp_del(&dp);
 
@@ -52,7 +52,7 @@ static void dp_empty_path(void)
   imm_eseq_init(&eseq, &code);
 
   eq(imm_hmm_add_state(&hmm, &state.super), 0);
-  eq(imm_hmm_set_start(&hmm, &state.super), 0);
+  eq(imm_hmm_set_start(&hmm, &state), 0);
   struct imm_dp dp;
   eq(imm_hmm_init_dp(&hmm, &state.super, &dp), 0);
 
@@ -80,7 +80,7 @@ static void dp_one_mute(void)
 
   eq(imm_hmm_add_state(&hmm, &state.super), 0);
 
-  eq(imm_hmm_set_start(&hmm, &state.super), 0);
+  eq(imm_hmm_set_start(&hmm, &state), 0);
   struct imm_dp dp;
   eq(imm_hmm_init_dp(&hmm, &state.super, &dp), 0);
 
@@ -124,7 +124,7 @@ static void dp_two_mutes(void)
   struct imm_dp dp;
   eq(imm_hmm_init_dp(&hmm, &state1.super, &dp), IMM_ENOSTART);
 
-  eq(imm_hmm_set_start(&hmm, &state0.super), 0);
+  eq(imm_hmm_set_start(&hmm, &state0), 0);
   eq(imm_hmm_init_dp(&hmm, &state1.super, &dp), 0);
 
   struct imm_task *task = imm_task_new(&dp);
