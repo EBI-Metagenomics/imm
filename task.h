@@ -2,7 +2,6 @@
 #define IMM_TASK_H
 
 #include "api.h"
-#include "cpath.h"
 #include "eseq.h"
 #include "matrix.h"
 #include "rc.h"
@@ -16,9 +15,9 @@ struct imm_eseq;
 struct imm_task
 {
   struct imm_matrix matrix;
-  struct imm_cpath path;
   struct imm_code const *code;
   struct imm_eseq const *seq;
+  unsigned num_states;
   struct imm_trellis trellis;
 };
 

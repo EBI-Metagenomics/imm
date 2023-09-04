@@ -6,6 +6,7 @@
 #include "lprob.h"
 #include "matrix.h"
 #include "max.h"
+#include "min.h"
 #include "range.h"
 #include "span.h"
 #include "state_table.h"
@@ -193,24 +194,6 @@ imm_template struct step best_step(struct imm_viterbi *x, unsigned row,
   return step;
 }
 
-imm_template void set_path(struct imm_cpath *x, struct step const *bt,
-                           unsigned r, uint_fast16_t dst)
-{
-  if (bt->src_idx != IMM_STATE_NULL_IDX)
-  {
-    imm_cpath_set_trans(x, r, dst, bt->src_trans);
-    imm_cpath_set_seqlen_idx(x, r, dst, bt->src_seqlen_idx);
-    imm_cpath_set_score(x, r, dst, bt->score);
-    assert(imm_cpath_trans(x, r, dst) == bt->src_trans);
-    assert(imm_cpath_seqlen_idx(x, r, dst) == bt->src_seqlen_idx);
-  }
-  else
-  {
-    imm_cpath_invalidate(x, r, dst);
-    assert(!imm_cpath_valid(x, r, dst));
-  }
-}
-
 imm_template void set_trellis(struct imm_trellis *x, float score, unsigned r,
                               uint_fast16_t src, uint_fast8_t emissize,
                               uint_fast16_t dst)
@@ -256,7 +239,6 @@ imm_template void set_state_score(struct imm_viterbi const *x, unsigned row,
     //             dst.idx);
   }
 
-  set_path(&x->task->path, bt, row, dst.idx);
   if (!safe_future) dst.max = imm_min(dst.max, remain);
 
   imm_assume(dst.max <= IMM_STATE_MAX_SEQLEN);
