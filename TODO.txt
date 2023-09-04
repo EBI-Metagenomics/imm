@@ -1,3 +1,6 @@
 - Fix the "suspicious usage of sizeof(sizeof(...))" caused whenever we use the macro `cco_hash_for_each_possible`
 - imm_state_name should return char* instead of unsigned
 - normalise names: seqlen -> seqsize, emislen -> emissize, emission_length -> emission_size, etc.
+- imm_hmm_write_dot should be imm_hmm_dump instead
+- assert that not transitions points to the starting state
+- would be nice to start e end state having indices [0, last_one]
