@@ -104,5 +104,4 @@ void imm_trellis_dump(struct imm_trellis const *x, imm_state_name *callb,
     }
     fputc('\n', fp);
   }
-  fputc('\n', fp);
 }
