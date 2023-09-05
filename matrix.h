@@ -22,8 +22,8 @@ int imm_matrix_reset(struct imm_matrix *, struct imm_state_table const *);
 void imm_matrix_cleanup(struct imm_matrix *);
 void imm_matrix_dump(struct imm_matrix *, FILE *restrict);
 
-imm_pure_template float imm_matrix_get_score(struct imm_matrix const *x,
-                                             struct imm_cell y)
+IMM_PURE float imm_matrix_get_score(struct imm_matrix const *x,
+                                    struct imm_cell y)
 {
   uint_fast8_t row = y.row % IMM_MATRIX_NROWS;
   uint_fast16_t col =
@@ -31,8 +31,8 @@ imm_pure_template float imm_matrix_get_score(struct imm_matrix const *x,
   return imm_matrixf_get(&x->score, row, col);
 }
 
-imm_template void imm_matrix_set_score(struct imm_matrix *x, struct imm_cell y,
-                                       float score)
+IMM_INLINE void imm_matrix_set_score(struct imm_matrix *x, struct imm_cell y,
+                                     float score)
 {
   uint_fast8_t row = y.row % IMM_MATRIX_NROWS;
   uint_fast16_t col =
