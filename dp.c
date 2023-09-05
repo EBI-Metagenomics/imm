@@ -116,7 +116,7 @@ static int unzip_path(struct imm_trellis *x, unsigned seq_size,
     struct imm_step step = imm_step(imm_trellis_state_id(x), size, score);
     if ((rc = imm_path_add(path, step))) return rc;
   }
-  for (unsigned i = 0; i < imm_path_nsteps(path) + 1; ++i)
+  for (unsigned i = 0; i < imm_path_nsteps(path) - 1; ++i)
     imm_path_step(path, i)->score -= imm_path_step(path, i + 1)->score;
   imm_path_step(path, imm_path_nsteps(path) - 1)->score = 0;
   imm_path_reverse(path);
