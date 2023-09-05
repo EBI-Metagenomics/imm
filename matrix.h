@@ -21,7 +21,8 @@ struct imm_matrix
 int imm_matrix_init(struct imm_matrix *, struct imm_state_table const *);
 int imm_matrix_reset(struct imm_matrix *, struct imm_state_table const *);
 void imm_matrix_cleanup(struct imm_matrix *);
-void imm_matrix_dump(struct imm_matrix const *, FILE *restrict);
+void imm_matrix_dump(struct imm_matrix const *, imm_state_name *,
+                     FILE *restrict);
 
 IMM_PURE float imm_matrix_get_score(struct imm_matrix const *x,
                                     struct imm_cell y)
