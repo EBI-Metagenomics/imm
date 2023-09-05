@@ -4,3 +4,4 @@
 - imm_hmm_write_dot should be imm_hmm_dump instead
 - assert that not transitions points to the starting state
 - would be nice to start e end state having indices [0, last_one]
+- compiler.h macros are too much
