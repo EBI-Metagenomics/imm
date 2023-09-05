@@ -211,6 +211,7 @@ imm_template void set_trellis(struct imm_trellis *x, float score, unsigned r,
     assert(dst == imm_trellis_state_idx(x));
     imm_trellis_push(x, score, src, emissize);
   }
+  else x->head++;
   // else imm_trellis_push(x, IMM_LPROB_NAN, 0, 0);
 }
 
@@ -230,11 +231,13 @@ imm_template void set_state_score(struct imm_viterbi const *x, unsigned row,
   if (row == 0 && start_state_idx(x) == dst.idx)
   {
     score = imm_max(0.0, score);
-    imm_trellis_seek(&x->task->trellis, 0, dst.idx);
-    imm_trellis_push(&x->task->trellis, 0, start_state_idx(x), 0);
+    // imm_trellis_seek(&x->task->trellis, 0, dst.idx);
+    imm_trellis_push(&x->task->trellis, score, start_state_idx(x), 0);
   }
   else
   {
+    set_trellis(&x->task->trellis, score, row, bt->src_idx, bt->src_emissize,
+                dst.idx);
     // set_trellis(&x->task->trellis, score, row, bt->src_idx, bt->src_emissize,
     //             dst.idx);
   }
@@ -248,8 +251,8 @@ imm_template void set_state_score(struct imm_viterbi const *x, unsigned row,
   {
     float total = score + emission_score(x, dst, row, i);
     set_matrix_cell_score(x, imm_cell(row, dst.idx, i), total);
-    imm_trellis_seek(&x->task->trellis, row + i, dst.idx);
-    set_trellis(&x->task->trellis, total, row + i, bt->src_idx, i, dst.idx);
+    // imm_trellis_seek(&x->task->trellis, row + i, dst.idx);
+    // set_trellis(&x->task->trellis, total, row + i, bt->src_idx, i, dst.idx);
   }
 }
 
