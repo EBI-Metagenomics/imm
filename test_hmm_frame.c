@@ -100,7 +100,7 @@ static void hmm_frame_state_len1(void)
   imm_task_del(task);
   imm_path_cleanup(&path);
   imm_prod_cleanup(&prod);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
 }
 
 static void hmm_frame_state_len2(void)
@@ -183,7 +183,7 @@ static void hmm_frame_state_len2(void)
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
   imm_prod_cleanup(&prod);
   imm_path_cleanup(&path);
 }
@@ -240,7 +240,7 @@ static void hmm_frame_state_len3(void)
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
   imm_prod_cleanup(&prod);
   imm_path_cleanup(&path);
 }
@@ -283,7 +283,7 @@ static void hmm_frame_state_len4(void)
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
   imm_prod_cleanup(&prod);
   imm_path_cleanup(&path);
 }
@@ -340,7 +340,7 @@ static void hmm_frame_state_len5(void)
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
   imm_prod_cleanup(&prod);
   imm_path_cleanup(&path);
 }

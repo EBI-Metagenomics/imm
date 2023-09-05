@@ -72,7 +72,7 @@ static void odd1(void)
 
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
   imm_task_del(task);
 }
 
@@ -132,7 +132,7 @@ static void odd2(void)
 
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
   imm_task_del(task);
 }
 

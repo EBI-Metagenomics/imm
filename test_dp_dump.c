@@ -13,7 +13,7 @@ static void dp_dump_ex1(void)
   imm_dp_dump(&dp, &imm_ex1_state_name, fp);
   fclose(fp);
 
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
   remove("dp_ex1.dump");
 }
 
@@ -40,7 +40,7 @@ static void dp_dump_ex1_path(void)
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
   imm_prod_cleanup(&prod);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
 }
 
 int main(void)

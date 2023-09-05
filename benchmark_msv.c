@@ -1470,7 +1470,7 @@ static void msv3000_path(void)
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
   imm_prod_cleanup(&prod);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
 }
 
 int main(void)

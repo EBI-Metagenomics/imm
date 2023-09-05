@@ -25,19 +25,19 @@ static void dp_illegal(void)
 
   struct imm_dp dp;
   eq(imm_hmm_init_dp(&hmm, &state.super, &dp), IMM_ENOEND);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
 
   eq(imm_hmm_add_state(&hmm, &state.super), 0);
   eq(imm_hmm_init_dp(&hmm, &state.super, &dp), IMM_ENOSTART);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
 
   eq(imm_hmm_set_start(&hmm, &state), 0);
   eq(imm_hmm_init_dp(&hmm, &state.super, &dp), 0);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
 
   eq(imm_hmm_set_trans(&hmm, &state.super, &state.super, log(0.5)), 0);
   eq(imm_hmm_init_dp(&hmm, &state.super, &dp), IMM_EMUTECYLES);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
 }
 
 static void dp_empty_path(void)
@@ -64,7 +64,7 @@ static void dp_empty_path(void)
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
 }
 
 static void dp_one_mute(void)
@@ -100,7 +100,7 @@ static void dp_one_mute(void)
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_task_del(task);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
 }
 
 static void dp_two_mutes(void)
@@ -147,7 +147,7 @@ static void dp_two_mutes(void)
 
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
   imm_task_del(task);
 }
 
@@ -165,7 +165,7 @@ static void dp_io_example1(void)
   file.fp = fopen("dp_example1.imm", "wb");
   eq(imm_dp_pack(&dp, &file), 0);
   fclose(file.fp);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
 
   imm_dp_init(&dp, &m->code);
   file.fp = fopen("dp_example1.imm", "rb");
@@ -183,7 +183,7 @@ static void dp_io_example1(void)
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
   imm_prod_cleanup(&prod);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
   remove("dp_example1.imm");
 }
 
@@ -212,7 +212,7 @@ static void dp_io_example2(void)
   file.fp = fopen("dp_frame.imm", "wb");
   eq(imm_dp_pack(&dp, &file), 0);
   fclose(file.fp);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
 
   imm_dp_init(&dp, &m->code);
   file.fp = fopen("dp_frame.imm", "rb");
@@ -230,7 +230,7 @@ static void dp_io_example2(void)
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_task_del(task);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
   remove("dp_frame.imm");
 }
 

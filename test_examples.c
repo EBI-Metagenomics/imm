@@ -33,7 +33,7 @@ static void example1_minimal(void)
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
   imm_prod_cleanup(&prod);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
 }
 
 static void example1_path(void)
@@ -61,7 +61,7 @@ static void example1_path(void)
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
   imm_prod_cleanup(&prod);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
 }
 
 static void example1_removed_states_path(void)
@@ -89,7 +89,7 @@ static void example1_removed_states_path(void)
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
   imm_prod_cleanup(&prod);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
 }
 
 static void example2_15(void)
@@ -119,7 +119,7 @@ static void example2_15(void)
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_task_del(task);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
 }
 
 static void example2_24(void)
@@ -149,7 +149,7 @@ static void example2_24(void)
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_task_del(task);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
 }
 
 static void example2_33(void)
@@ -179,7 +179,7 @@ static void example2_33(void)
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
   imm_task_del(task);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
 }
 
 static void msv10(void)
@@ -206,7 +206,7 @@ static void msv10(void)
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
   imm_prod_cleanup(&prod);
-  imm_dp_del(&dp);
+  imm_dp_cleanup(&dp);
 }
 
 int main(void)

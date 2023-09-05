@@ -63,21 +63,22 @@
 // Notice that the first transition captures no letter, the second on
 // captures letter A, and the last one captures CG via the Frame state.
 //
-// 
+//
 // A sequence of size (n-1) will have a trellis diagram with n stages
 // (represented by n columns of @'s above). A HMM with m states will have
 // a trellis diagram with m rows. A transition can be represented by a triplet:
 //
 //   (k,Si,h,Sj)
-// 
+//
 // for which h is the stage, Si and Sj are the source and destination states,
 // and k is number of of captured letters. In particular, the path solution
 // from the previous diagram can be described by the sequence
 //
 //   (0,S0,0,S1),(1,S1,1,S2),(2,S2,2,S3)
 //
-// A triplet (k,Si,h,Sj) is stored in this implementation by saving the source state
-// Si and emission size k in `struct imm_node` at `imm_trellis_at(trellis, h, Sj)`.
+// A triplet (k,Si,h,Sj) is stored in this implementation by saving the source
+// state Si and emission size k in `struct imm_node` at `imm_trellis_at(trellis,
+// h, Sj)`.
 
 struct imm_state_table;
 

@@ -34,7 +34,7 @@ void imm_dp_init(struct imm_dp *dp, struct imm_code const *code)
   imm_state_table_init(&dp->state_table);
 }
 
-void imm_dp_del(struct imm_dp *dp)
+void imm_dp_cleanup(struct imm_dp *dp)
 {
   if (dp)
   {

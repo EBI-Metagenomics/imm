@@ -29,7 +29,7 @@ struct lip_file;
 IMM_API void imm_dp_init(struct imm_dp *, struct imm_code const *);
 IMM_API int imm_dp_reset(struct imm_dp *, struct imm_dp_cfg const *);
 
-IMM_API void imm_dp_del(struct imm_dp *);
+IMM_API void imm_dp_cleanup(struct imm_dp *);
 
 IMM_API void imm_dp_dump(struct imm_dp const *, imm_state_name *,
                          FILE *restrict);
