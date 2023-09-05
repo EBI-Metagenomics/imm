@@ -92,14 +92,6 @@ static float read_result(struct imm_dp const *dp, struct imm_task *task,
   return score;
 }
 
-char *tmp_name(unsigned id, char *name)
-{
-  if (id == 1) name[0] = 'S';
-  else name[0] = 'E';
-  name[1] = '\0';
-  return name;
-}
-
 static int unzip_path(struct imm_trellis *x, unsigned seq_size,
                       unsigned end_state, unsigned last_emis_size,
                       struct imm_path *path, unsigned start_state)
@@ -109,7 +101,6 @@ static int unzip_path(struct imm_trellis *x, unsigned seq_size,
 
   imm_trellis_seek(x, seq_size, end_state);
   assert(imm_trellis_state_idx(x) == end_state);
-  imm_trellis_dump(x, tmp_name, stdout);
 
   unsigned size = last_emis_size;
   float score = imm_trellis_head(x)->score;
@@ -276,6 +267,7 @@ void imm_dp_dump_path(struct imm_dp const *dp, struct imm_task const *task,
                       imm_state_name *callb)
 {
   char name[IMM_STATE_NAME_SIZE] = {0};
+  if (!callb) callb = &imm_state_default_name;
   unsigned begin = 0;
   for (unsigned i = 0; i < imm_path_nsteps(&prod->path); ++i)
   {

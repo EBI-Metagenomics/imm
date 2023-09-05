@@ -67,17 +67,11 @@ void imm_trellis_back(struct imm_trellis *x)
                    h->state_source);
 }
 
-static char *id_state_name(unsigned id, char *name)
-{
-  sprintf(name, "%u", id);
-  return name;
-}
-
 void imm_trellis_dump(struct imm_trellis const *x, imm_state_name *callb,
                       FILE *restrict fp)
 {
   char name[IMM_STATE_NAME_SIZE] = {0};
-  if (!callb) callb = &id_state_name;
+  if (!callb) callb = &imm_state_default_name;
 
   // HEADER
   for (unsigned i = 0; i < x->num_states; ++i)

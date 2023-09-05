@@ -111,6 +111,7 @@ void imm_trans_table_dump(struct imm_trans_table const *x,
 {
   char src[IMM_STATE_NAME_SIZE] = {0};
   char dst[IMM_STATE_NAME_SIZE] = {0};
+  if (!callb) callb = &imm_state_default_name;
 
   for (unsigned i = 0; i < x->ntrans; ++i)
   {

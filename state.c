@@ -2,6 +2,7 @@
 #include "likely.h"
 #include "list.h"
 #include "lprob.h"
+#include <stdio.h>
 
 struct imm_abc const *imm_state_abc(struct imm_state const *x)
 {
@@ -45,4 +46,10 @@ void imm_state_init(struct imm_state *x, unsigned id, struct imm_abc const *abc,
   imm_list_init(&x->trans.incoming);
   cco_hnode_init(&x->hnode);
   x->mark = 0;
+}
+
+char *imm_state_default_name(unsigned id, char *name)
+{
+  snprintf(name, IMM_STATE_NAME_SIZE, "%u", id);
+  return name;
 }

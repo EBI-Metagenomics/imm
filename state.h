@@ -43,8 +43,9 @@ IMM_API float imm_state_lprob(struct imm_state const *, struct imm_seq const *);
 IMM_API struct imm_span imm_state_span(struct imm_state const *);
 IMM_API enum imm_state_typeid imm_state_typeid(struct imm_state const *);
 IMM_API void imm_state_detach(struct imm_state *);
-
-void imm_state_init(struct imm_state *, unsigned id, struct imm_abc const *,
-                    struct imm_state_vtable, struct imm_span);
+IMM_API void imm_state_init(struct imm_state *, unsigned id,
+                            struct imm_abc const *, struct imm_state_vtable,
+                            struct imm_span);
+IMM_API char *imm_state_default_name(unsigned id, char *name);
 
 #endif

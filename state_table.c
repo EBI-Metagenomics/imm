@@ -80,22 +80,23 @@ struct imm_range imm_state_table_range(struct imm_state_table const *x,
 void imm_state_table_dump(struct imm_state_table const *x,
                           imm_state_name *callb, FILE *restrict fp)
 {
-  char state_name[IMM_STATE_NAME_SIZE] = {0};
+  char name[IMM_STATE_NAME_SIZE] = {0};
+  if (!callb) callb = &imm_state_default_name;
 
-  (*callb)(imm_state_table_id(x, x->start_state_idx), state_name);
+  (*callb)(imm_state_table_id(x, x->start_state_idx), name);
   fprintf(fp, "\n");
-  fprintf(fp, "start_state=%s\n", state_name);
+  fprintf(fp, "start_state=%s\n", name);
   fprintf(fp, "\n");
 
-  (*callb)(imm_state_table_id(x, x->end_state_idx), state_name);
-  fprintf(fp, "end_state=%s\n", state_name);
+  (*callb)(imm_state_table_id(x, x->end_state_idx), name);
+  fprintf(fp, "end_state=%s\n", name);
   fprintf(fp, "\n");
 
   for (unsigned i = 0; i < x->nstates; ++i)
   {
     struct imm_range range = imm_zspan_range(imm_state_table_zspan(x, i));
-    (*callb)(imm_state_table_id(x, i), state_name);
-    fprintf(fp, "%s=", state_name);
+    (*callb)(imm_state_table_id(x, i), name);
+    fprintf(fp, "%s=", name);
     imm_range_dump(range, fp);
     fprintf(fp, "\n");
   }
