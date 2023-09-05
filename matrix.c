@@ -59,8 +59,7 @@ void imm_matrix_dump(struct imm_matrix const *x, FILE *restrict fp)
       for (unsigned j = range.start; j < range.stop; ++j)
       {
         if (c > 0) fputc(',', fp);
-        fprintf(fp, imm_fmt_get_f32(),
-                imm_matrix_get_score(x, imm_cell(r, i, j)));
+        fprintf(fp, imm_f32(), imm_matrix_get_score(x, imm_cell(r, i, j)));
         c++;
       }
     }
