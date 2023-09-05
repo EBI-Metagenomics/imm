@@ -92,6 +92,14 @@ static float read_result(struct imm_dp const *dp, struct imm_task *task,
   return score;
 }
 
+char *tmp_name(unsigned id, char *name)
+{
+  if (id == 1) name[0] = 'S';
+  else name[0] = 'E';
+  name[1] = '\0';
+  return name;
+}
+
 static int unzip_path(struct imm_trellis *x, unsigned seq_size,
                       unsigned end_state, unsigned last_emis_size,
                       struct imm_path *path, unsigned start_state)
@@ -101,8 +109,9 @@ static int unzip_path(struct imm_trellis *x, unsigned seq_size,
 
   imm_trellis_seek(x, seq_size, end_state);
   assert(imm_trellis_state_idx(x) == end_state);
+  imm_trellis_dump(x, tmp_name, stdout);
 
-  unsigned size = imm_trellis_head(x)->emission_size;
+  unsigned size = last_emis_size;
   float score = imm_trellis_head(x)->score;
   struct imm_step step = imm_step(imm_trellis_state_id(x), size, score);
   if ((rc = imm_path_add(path, step))) return rc;
@@ -110,9 +119,9 @@ static int unzip_path(struct imm_trellis *x, unsigned seq_size,
   while (imm_trellis_state_idx(x) != start_state ||
          imm_trellis_stage_idx(x) != 0)
   {
+    size = imm_trellis_head(x)->emission_size;
     imm_trellis_back(x);
     float score = imm_trellis_head(x)->score;
-    size = imm_trellis_head(x)->emission_size;
     struct imm_step step = imm_step(imm_trellis_state_id(x), size, score);
     if ((rc = imm_path_add(path, step))) return rc;
   }
