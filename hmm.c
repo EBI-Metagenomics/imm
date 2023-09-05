@@ -82,11 +82,11 @@ static char *id_state_name(unsigned id, char *name)
   return name;
 }
 
-void imm_hmm_write_dot(struct imm_hmm const *hmm, FILE *restrict fd,
-                       imm_state_name *callb)
+void imm_hmm_dump(struct imm_hmm const *hmm, FILE *restrict fp,
+                  imm_state_name *callb)
 {
   if (!callb) callb = &id_state_name;
-  fprintf(fd, "digraph hmm {\n");
+  fprintf(fp, "digraph hmm {\n");
   struct imm_trans *t = NULL;
   unsigned bkt = 0;
   cco_hash_for_each(hmm->transitions.tbl, bkt, t, hnode)
@@ -99,9 +99,9 @@ void imm_hmm_write_dot(struct imm_hmm const *hmm, FILE *restrict fd,
     struct imm_state *dst = hmm_state(hmm, t->pair.id.dst);
     (*callb)(src->id, src_name);
     (*callb)(dst->id, dst_name);
-    fprintf(fd, "%s -> %s [label=%.4f];\n", src_name, dst_name, t->lprob);
+    fprintf(fp, "%s -> %s [label=%.4f];\n", src_name, dst_name, t->lprob);
   }
-  fprintf(fd, "}\n");
+  fprintf(fp, "}\n");
 }
 
 int imm_hmm_add_state(struct imm_hmm *hmm, struct imm_state *state)

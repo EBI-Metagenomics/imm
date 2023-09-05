@@ -67,7 +67,7 @@ static void odd1(void)
   close(imm_hmm_loglik(&hmm, &seq, &prod.path), 12202.);
   close(prod.loglik, 12202.);
   imm_dp_dump_path(&dp, task, &prod, &seq, &state_name);
-  imm_hmm_write_dot(&hmm, stdout, &state_name);
+  imm_hmm_dump(&hmm, stdout, &state_name);
   imm_dp_write_dot(&dp, stdout, &state_name);
 
   imm_eseq_cleanup(&eseq);
@@ -127,7 +127,7 @@ static void odd2(void)
   close(imm_hmm_loglik(&hmm, &seq, &prod.path), 0);
   close(prod.loglik, 0);
   imm_dp_dump_path(&dp, task, &prod, &seq, &state_name);
-  imm_hmm_write_dot(&hmm, stdout, &state_name);
+  imm_hmm_dump(&hmm, stdout, &state_name);
   imm_dp_write_dot(&dp, stdout, &state_name);
 
   imm_eseq_cleanup(&eseq);
