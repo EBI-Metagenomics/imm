@@ -32,8 +32,7 @@ int imm_task_reset(struct imm_task *x, struct imm_dp const *dp)
 int imm_task_setup(struct imm_task *x, struct imm_eseq const *seq)
 {
   x->seq = seq;
-  unsigned seqsize = imm_eseq_size(seq) + 1;
-  return imm_trellis_setup(&x->trellis, seqsize, x->num_states);
+  return imm_trellis_setup(&x->trellis, imm_eseq_size(seq), x->num_states);
 }
 
 void imm_task_del(struct imm_task const *x)
