@@ -108,7 +108,7 @@ static int unzip_path(struct imm_trellis *x, unsigned seq_size,
   if ((rc = imm_path_add(path, step))) return rc;
 
   while (imm_trellis_state_idx(x) != start_state ||
-         imm_trellis_sequence_idx(x) != 0)
+         imm_trellis_stage_idx(x) != 0)
   {
     imm_trellis_back(x);
     float score = imm_trellis_head(x)->score;

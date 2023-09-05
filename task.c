@@ -18,7 +18,7 @@ struct imm_task *imm_task_new(struct imm_dp const *dp)
   x->code = dp->code;
   x->seq = NULL;
   x->num_states = dp->state_table.nstates;
-  imm_trellis_init(&x->trellis, &dp->state_table, &dp->trans_table);
+  imm_trellis_init(&x->trellis, &dp->state_table);
   return x;
 }
 

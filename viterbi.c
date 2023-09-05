@@ -202,7 +202,7 @@ imm_template void set_trellis(struct imm_trellis *x, float score, unsigned r,
   {
     (void)r;
     (void)dst;
-    assert(r == imm_trellis_sequence_idx(x));
+    assert(r == imm_trellis_stage_idx(x));
     if (dst != imm_trellis_state_idx(x))
     {
       fprintf(stderr, "dst != imm_trellis_state_idx(x): %u != %u\n", dst,
