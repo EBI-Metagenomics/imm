@@ -37,8 +37,8 @@ struct imm_hmm
   } transitions;
 };
 
-IMM_API void imm_hmm_dump(struct imm_hmm const *, FILE *restrict,
-                          imm_state_name *);
+IMM_API void imm_hmm_dump(struct imm_hmm const *, imm_state_name *,
+                          FILE *restrict);
 IMM_API int imm_hmm_add_state(struct imm_hmm *, struct imm_state *);
 IMM_API int imm_hmm_del_state(struct imm_hmm *, struct imm_state *);
 IMM_API int imm_hmm_init_dp(struct imm_hmm const *,

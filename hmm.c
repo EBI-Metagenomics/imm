@@ -82,8 +82,8 @@ static char *id_state_name(unsigned id, char *name)
   return name;
 }
 
-void imm_hmm_dump(struct imm_hmm const *hmm, FILE *restrict fp,
-                  imm_state_name *callb)
+void imm_hmm_dump(struct imm_hmm const *hmm, imm_state_name *callb,
+                  FILE *restrict fp)
 {
   if (!callb) callb = &id_state_name;
   fprintf(fp, "digraph hmm {\n");

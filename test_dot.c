@@ -34,7 +34,7 @@ static void hmm_dot(void)
 
   FILE *fp = fopen("hmm.dot", "w");
   ok(fp);
-  imm_hmm_dump(&hmm, fp, state_name);
+  imm_hmm_dump(&hmm, state_name, fp);
   fclose(fp);
   remove("hmm.dot");
 }
@@ -62,7 +62,7 @@ static void dp_dot(void)
 
   FILE *fp = fopen("dp.dot", "w");
   ok(fp);
-  imm_hmm_dump(&hmm, fp, &state_name);
+  imm_hmm_dump(&hmm, &state_name, fp);
   fclose(fp);
   remove("dp.dot");
 }
