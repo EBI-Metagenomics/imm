@@ -41,6 +41,7 @@ int imm_path_add(struct imm_path *path, struct imm_step step)
   }
 
   path->capacity = (int)capacity;
+  assert(path->capacity >= 0);
   imm_path_add_unsafe(path, step);
   return rc;
 }
