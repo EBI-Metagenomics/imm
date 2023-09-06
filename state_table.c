@@ -23,8 +23,7 @@ void imm_state_table_init(struct imm_state_table *x)
   x->state_name_callback = NULL;
 }
 
-void imm_viterbi_set_state_name(struct imm_state_table *x,
-                                imm_state_name *callb)
+void imm_state_table_set_name(struct imm_state_table *x, imm_state_name *callb)
 {
   x->state_name_callback = callb;
 }
