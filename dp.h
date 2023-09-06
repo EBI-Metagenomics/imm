@@ -28,16 +28,15 @@ struct lip_file;
 
 IMM_API void imm_dp_init(struct imm_dp *, struct imm_code const *);
 IMM_API int imm_dp_reset(struct imm_dp *, struct imm_dp_cfg const *);
+IMM_API void imm_dp_set_state_name(struct imm_dp *, imm_state_name *);
 
 IMM_API void imm_dp_cleanup(struct imm_dp *);
 
-IMM_API void imm_dp_dump(struct imm_dp const *, imm_state_name *,
-                         FILE *restrict);
+IMM_API void imm_dp_dump(struct imm_dp const *, FILE *restrict);
 
-IMM_API void imm_dp_dump_path(struct imm_dp const *,
-                              struct imm_task const *task,
-                              struct imm_prod const *prod,
-                              struct imm_seq const *, imm_state_name *callb);
+IMM_API void imm_dp_dump_path(struct imm_dp const *, struct imm_task const *,
+                              struct imm_prod const *, struct imm_seq const *,
+                              FILE *restrict);
 
 IMM_API unsigned imm_dp_nstates(struct imm_dp const *);
 

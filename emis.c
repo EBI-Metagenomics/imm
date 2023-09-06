@@ -114,17 +114,13 @@ unsigned imm_emis_score_size(struct imm_emis const *x, unsigned nstates)
 unsigned imm_emis_offset_size(unsigned nstates) { return nstates + 1; }
 
 void imm_emis_dump(struct imm_emis const *x, struct imm_state_table const *st,
-                   imm_state_name *callb, FILE *restrict fp)
+                   FILE *restrict fp)
 {
-  char name[IMM_STATE_NAME_SIZE] = {0};
-  if (!callb) callb = &imm_state_default_name;
-
   for (unsigned i = 0; i < st->nstates; ++i)
   {
     unsigned size = 0;
-    (*callb)(imm_state_table_id(st, i), name);
     float const *score = imm_emis_table(x, i, &size);
-    fprintf(fp, "%s=", name);
+    fprintf(fp, "%s=", imm_state_table_name(st, i));
     imm_dump_array_f32(size, score, fp);
     fputc('\n', fp);
   }
