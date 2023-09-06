@@ -20,6 +20,7 @@ struct imm_matrix
 
 int imm_matrix_init(struct imm_matrix *, struct imm_state_table const *);
 int imm_matrix_reset(struct imm_matrix *, struct imm_state_table const *);
+void imm_matrix_prepare(struct imm_matrix *);
 void imm_matrix_cleanup(struct imm_matrix *);
 void imm_matrix_dump(struct imm_matrix const *, FILE *restrict);
 

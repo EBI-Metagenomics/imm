@@ -12,6 +12,7 @@ struct imm_matrixf
 
 int imm_matrixf_init(struct imm_matrixf *, unsigned rows, unsigned cols);
 void imm_matrixf_empty(struct imm_matrixf *);
+void imm_matrixf_fill(struct imm_matrixf *, float);
 float *imm_matrixf_get_ptr(struct imm_matrixf const *, unsigned r, unsigned c);
 float const *imm_matrixf_get_ptr_c(struct imm_matrixf const *, unsigned r,
                                    unsigned c);

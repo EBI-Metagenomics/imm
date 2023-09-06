@@ -1,5 +1,6 @@
 #include "matrix.h"
 #include "fmt.h"
+#include "lprob.h"
 #include "matrixf.h"
 #include "rc.h"
 #include "reallocf.h"
@@ -35,6 +36,11 @@ int imm_matrix_reset(struct imm_matrix *x, struct imm_state_table const *tbl)
   if ((rc = imm_matrixf_resize(&x->score, IMM_MATRIX_NROWS, next_col)))
     return rc;
   return rc;
+}
+
+void imm_matrix_prepare(struct imm_matrix *x)
+{
+  imm_matrixf_fill(&x->score, IMM_LPROB_NAN);
 }
 
 void imm_matrix_cleanup(struct imm_matrix *x)

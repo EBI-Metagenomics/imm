@@ -19,6 +19,12 @@ void imm_matrixf_empty(struct imm_matrixf *x)
   x->cols = 0;
 }
 
+void imm_matrixf_fill(struct imm_matrixf *x, float v)
+{
+  for (size_t i = 0; i < x->rows * x->cols; ++i)
+    x->data[i] = v;
+}
+
 float *imm_matrixf_get_ptr(struct imm_matrixf const *x, unsigned r, unsigned c)
 {
   return x->data + (r * x->cols + c);

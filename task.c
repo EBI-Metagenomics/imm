@@ -29,6 +29,8 @@ int imm_task_reset(struct imm_task *x, struct imm_dp const *dp)
   return imm_matrix_reset(&x->matrix, &dp->state_table);
 }
 
+void imm_task_prepare(struct imm_task *x) { imm_matrix_prepare(&x->matrix); }
+
 int imm_task_setup(struct imm_task *x, struct imm_eseq const *seq)
 {
   x->seq = seq;
