@@ -20,7 +20,7 @@ void imm_state_table_init(struct imm_state_table *x)
   x->start_state_idx = IMM_STATE_NULL_IDX;
   x->end_state_idx = IMM_STATE_NULL_IDX;
   x->span = NULL;
-  x->state_name_callback = NULL;
+  x->state_name_callback = &imm_state_default_name;
 }
 
 void imm_state_table_set_name(struct imm_state_table *x, imm_state_name *callb)

@@ -48,12 +48,8 @@ void imm_matrix_cleanup(struct imm_matrix *x)
   }
 }
 
-void imm_matrix_dump(struct imm_matrix const *x, imm_state_name *callb,
-                     FILE *restrict fp)
+void imm_matrix_dump(struct imm_matrix const *x, FILE *restrict fp)
 {
-  char name[IMM_STATE_NAME_SIZE] = {0};
-  if (!callb) callb = &imm_state_default_name;
-
   // Header
   unsigned c = 0;
   for (unsigned i = 0; i < x->state_table->nstates; ++i)
@@ -62,8 +58,7 @@ void imm_matrix_dump(struct imm_matrix const *x, imm_state_name *callb,
     for (unsigned j = range.start; j < range.stop; ++j)
     {
       if (c > 0) fputc(',', fp);
-      (*callb)(imm_state_table_id(x->state_table, i), name);
-      fprintf(fp, "%s:%u", name, j);
+      fprintf(fp, "%s:%u", imm_state_table_name(x->state_table, i), j);
       c++;
     }
   }

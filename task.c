@@ -44,3 +44,8 @@ void imm_task_del(struct imm_task const *x)
     free((void *)x);
   }
 }
+
+void imm_task_dump(struct imm_task const *x, FILE *restrict fp)
+{
+  imm_matrix_dump(&x->matrix, fp);
+}
