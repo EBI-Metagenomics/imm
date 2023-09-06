@@ -20,14 +20,13 @@ void imm_state_table_init(struct imm_state_table *x)
   x->start_state_idx = IMM_STATE_NULL_IDX;
   x->end_state_idx = IMM_STATE_NULL_IDX;
   x->span = NULL;
-  x->debug.state_name[0] = '\0';
-  x->debug.state_name_callback = NULL;
+  x->state_name_callback = NULL;
 }
 
 void imm_viterbi_set_state_name(struct imm_state_table *x,
                                 imm_state_name *callb)
 {
-  x->debug.state_name_callback = callb;
+  x->state_name_callback = callb;
 }
 
 void imm_state_table_cleanup(struct imm_state_table *x)
@@ -38,8 +37,7 @@ void imm_state_table_cleanup(struct imm_state_table *x)
     x->ids = NULL;
     free(x->span);
     x->span = NULL;
-    x->debug.state_name[0] = '\0';
-    x->debug.state_name_callback = NULL;
+    x->state_name_callback = NULL;
   }
 }
 
@@ -76,11 +74,10 @@ unsigned imm_state_table_idx(struct imm_state_table const *x, unsigned state_id)
   return UINT_MAX;
 }
 
-char *imm_state_table_name(struct imm_state_table *x, unsigned idx)
+char *imm_state_table_name(struct imm_state_table const *x, unsigned idx)
 {
-  x->debug.state_name[0] = '\0';
-  return (*x->debug.state_name_callback)(imm_state_table_id(x, idx),
-                                         x->debug.state_name);
+  static char name[IMM_STATE_NAME_SIZE] = {0};
+  return (*x->state_name_callback)(imm_state_table_id(x, idx), name);
 }
 
 unsigned imm_state_table_id(struct imm_state_table const *x, unsigned idx)
@@ -94,26 +91,19 @@ struct imm_range imm_state_table_range(struct imm_state_table const *x,
   return imm_zspan_range(imm_state_table_zspan(x, state_idx));
 }
 
-void imm_state_table_dump(struct imm_state_table const *x,
-                          imm_state_name *callb, FILE *restrict fp)
+void imm_state_table_dump(struct imm_state_table const *x, FILE *restrict fp)
 {
-  char name[IMM_STATE_NAME_SIZE] = {0};
-  if (!callb) callb = &imm_state_default_name;
-
-  (*callb)(imm_state_table_id(x, x->start_state_idx), name);
   fprintf(fp, "\n");
-  fprintf(fp, "start_state=%s\n", name);
+  fprintf(fp, "start_state=%s\n", imm_state_table_name(x, x->start_state_idx));
   fprintf(fp, "\n");
 
-  (*callb)(imm_state_table_id(x, x->end_state_idx), name);
-  fprintf(fp, "end_state=%s\n", name);
+  fprintf(fp, "end_state=%s\n", imm_state_table_name(x, x->end_state_idx));
   fprintf(fp, "\n");
 
   for (unsigned i = 0; i < x->nstates; ++i)
   {
     struct imm_range range = imm_zspan_range(imm_state_table_zspan(x, i));
-    (*callb)(imm_state_table_id(x, i), name);
-    fprintf(fp, "%s=", name);
+    fprintf(fp, "%s=", imm_state_table_name(x, i));
     imm_range_dump(range, fp);
     fprintf(fp, "\n");
   }
