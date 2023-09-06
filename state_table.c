@@ -20,6 +20,14 @@ void imm_state_table_init(struct imm_state_table *x)
   x->start_state_idx = IMM_STATE_NULL_IDX;
   x->end_state_idx = IMM_STATE_NULL_IDX;
   x->span = NULL;
+  x->debug.state_name[0] = '\0';
+  x->debug.state_name_callback = NULL;
+}
+
+void imm_viterbi_set_state_name(struct imm_state_table *x,
+                                imm_state_name *callb)
+{
+  x->debug.state_name_callback = callb;
 }
 
 void imm_state_table_cleanup(struct imm_state_table *x)
@@ -30,6 +38,8 @@ void imm_state_table_cleanup(struct imm_state_table *x)
     x->ids = NULL;
     free(x->span);
     x->span = NULL;
+    x->debug.state_name[0] = '\0';
+    x->debug.state_name_callback = NULL;
   }
 }
 
@@ -64,6 +74,13 @@ unsigned imm_state_table_idx(struct imm_state_table const *x, unsigned state_id)
     if (x->ids[idx] == state_id) return idx;
   }
   return UINT_MAX;
+}
+
+char *imm_state_table_name(struct imm_state_table *x, unsigned idx)
+{
+  x->debug.state_name[0] = '\0';
+  return (*x->debug.state_name_callback)(imm_state_table_id(x, idx),
+                                         x->debug.state_name);
 }
 
 unsigned imm_state_table_id(struct imm_state_table const *x, unsigned idx)
