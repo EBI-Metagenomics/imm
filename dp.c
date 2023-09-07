@@ -60,7 +60,7 @@ int imm_dp_reset(struct imm_dp *dp, struct imm_dp_cfg const *cfg)
 
 void imm_dp_set_state_name(struct imm_dp *x, imm_state_name *callb)
 {
-  imm_state_table_set_name(&x->state_table, callb);
+  imm_state_table_debug_setup(&x->state_table, callb);
 }
 
 static float read_result(struct imm_dp const *dp, struct imm_task *task,
@@ -97,35 +97,25 @@ static float read_result(struct imm_dp const *dp, struct imm_task *task,
   return score;
 }
 
-static int unzip_path(struct imm_trellis *x, unsigned seq_size,
-                      unsigned end_state, unsigned last_emis_size,
-                      struct imm_path *path, unsigned start_state)
+static void unzip_path(struct imm_trellis *x, unsigned start_state,
+                        unsigned end_state, unsigned seq_size,
+                        struct imm_path *path)
 {
-  int rc = 0;
-  if (last_emis_size == IMM_STATE_NULL_SEQLEN) return rc;
-
+  // imm_trellis_dump(x, stdout);
   imm_trellis_seek(x, seq_size, end_state);
-  assert(imm_trellis_state_idx(x) == end_state);
+  if (imm_lprob_is_nan(imm_trellis_head(x)->score)) return;
 
-  unsigned size = last_emis_size;
-  float score = imm_trellis_head(x)->score;
-  struct imm_step step = imm_step(imm_trellis_state_id(x), size, score);
-  if ((rc = imm_path_add(path, step))) return rc;
-
-  while (imm_trellis_state_idx(x) != start_state ||
-         imm_trellis_stage_idx(x) != 0)
+  unsigned size = 0;
+  while (imm_trellis_state_idx(x) != start_state || imm_trellis_stage_idx(x))
   {
+    float score = imm_trellis_head(x)->score;
+    imm_path_add(path, imm_step(imm_trellis_state_id(x), size, score));
+
     size = imm_trellis_head(x)->emission_size;
     imm_trellis_back(x);
-    float score = imm_trellis_head(x)->score;
-    struct imm_step step = imm_step(imm_trellis_state_id(x), size, score);
-    if ((rc = imm_path_add(path, step))) return rc;
   }
-  for (unsigned i = 0; i < imm_path_nsteps(path) - 1; ++i)
-    imm_path_step(path, i)->score -= imm_path_step(path, i + 1)->score;
-  imm_path_step(path, imm_path_nsteps(path) - 1)->score = 0;
+  imm_path_add(path, imm_step(imm_trellis_state_id(x), size, 0));
   imm_path_reverse(path);
-  return 0;
 }
 
 int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
@@ -136,6 +126,7 @@ int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
 
   if (dp->code->abc != imm_eseq_abc(task->seq)) return IMM_EDIFFABC;
 
+  unsigned start_state = dp->state_table.start_state_idx;
   unsigned end_state = dp->state_table.end_state_idx;
   unsigned min =
       imm_zspan_min(imm_state_table_zspan(&dp->state_table, end_state));
@@ -157,9 +148,8 @@ int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
 
   imm_path_reset(&prod->path);
   unsigned seqsize = imm_eseq_size(task->seq);
-  if ((rc = unzip_path(&task->trellis, seqsize, last_state, last_seqsize,
-                       &prod->path, dp->state_table.start_state_idx)))
-    return rc;
+  unzip_path(&task->trellis, start_state, end_state, seqsize, &prod->path);
+  return rc;
 
   if (elapsed_stop(&elapsed)) return IMM_EELAPSED;
 

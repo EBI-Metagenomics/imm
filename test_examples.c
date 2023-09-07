@@ -14,7 +14,7 @@ static void example1_minimal(void)
 
   struct imm_ex1 *m = &imm_ex1;
   struct imm_dp dp;
-  imm_hmm_init_dp(&imm_ex1.hmm, &m->end.super, &dp);
+  imm_hmm_init_dp(&imm_ex1.hmm, &dp);
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
@@ -42,7 +42,7 @@ static void example1_path(void)
 
   struct imm_ex1 *m = &imm_ex1;
   struct imm_dp dp;
-  imm_hmm_init_dp(&imm_ex1.hmm, &m->end.super, &dp);
+  imm_hmm_init_dp(&imm_ex1.hmm, &dp);
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
@@ -72,7 +72,7 @@ static void example1_removed_states_path(void)
 
   struct imm_ex1 *m = &imm_ex1;
   struct imm_dp dp;
-  imm_hmm_init_dp(&imm_ex1.hmm, &m->end.super, &dp);
+  imm_hmm_init_dp(&imm_ex1.hmm, &dp);
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
@@ -98,7 +98,7 @@ static void example2_15(void)
 
   struct imm_ex2 *m = &imm_ex2;
   struct imm_dp dp;
-  imm_hmm_init_dp(&m->hmm, &m->end.super, &dp);
+  imm_hmm_init_dp(&m->hmm, &dp);
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
@@ -128,7 +128,7 @@ static void example2_24(void)
 
   struct imm_ex2 *m = &imm_ex2;
   struct imm_dp dp;
-  imm_hmm_init_dp(&m->hmm, &m->end.super, &dp);
+  imm_hmm_init_dp(&m->hmm, &dp);
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
@@ -158,7 +158,7 @@ static void example2_33(void)
 
   struct imm_ex2 *m = &imm_ex2;
   struct imm_dp dp;
-  imm_hmm_init_dp(&m->hmm, &m->end.super, &dp);
+  imm_hmm_init_dp(&m->hmm, &dp);
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
@@ -188,7 +188,7 @@ static void msv10(void)
 
   struct imm_ex3 *m = &imm_ex3;
   struct imm_dp dp;
-  imm_hmm_init_dp(&imm_ex3.hmm, &m->T.super, &dp);
+  imm_hmm_init_dp(&imm_ex3.hmm, &dp);
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 

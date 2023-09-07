@@ -19,6 +19,8 @@ enum imm_rc
   IMM_ENOSEQ        = 13,
   IMM_ESHORTSEQ     = 14,
   IMM_EELAPSED      = 15,
+  IMM_EDSTSTART     = 16,
+  IMM_ESRCEND       = 17,
 };
 // clang-format on
 

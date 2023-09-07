@@ -19,11 +19,14 @@ struct imm_state_table
   uint8_t *span;
 
   // Debugging purpose
-  imm_state_name *state_name_callback;
+  struct
+  {
+    imm_state_name *state_name;
+  } debug;
 };
 
 void imm_state_table_init(struct imm_state_table *);
-void imm_state_table_set_name(struct imm_state_table *, imm_state_name *);
+void imm_state_table_debug_setup(struct imm_state_table *, imm_state_name *);
 void imm_state_table_cleanup(struct imm_state_table *);
 int imm_state_table_reset(struct imm_state_table *, struct imm_dp_cfg const *);
 unsigned imm_state_table_idx(struct imm_state_table const *, unsigned id);

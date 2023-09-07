@@ -21,6 +21,7 @@ struct imm_hmm
 {
   struct imm_code const *code;
   unsigned start_state_id;
+  unsigned end_state_id;
 
   struct
   {
@@ -41,8 +42,7 @@ IMM_API void imm_hmm_dump(struct imm_hmm const *, imm_state_name *,
                           FILE *restrict);
 IMM_API int imm_hmm_add_state(struct imm_hmm *, struct imm_state *);
 IMM_API int imm_hmm_del_state(struct imm_hmm *, struct imm_state *);
-IMM_API int imm_hmm_init_dp(struct imm_hmm const *,
-                            struct imm_state const *end_state, struct imm_dp *);
+IMM_API int imm_hmm_init_dp(struct imm_hmm const *, struct imm_dp *);
 IMM_API void imm_hmm_reset(struct imm_hmm *);
 
 IMM_INLINE void imm_hmm_init(struct imm_hmm *x, struct imm_code const *code)
@@ -51,9 +51,7 @@ IMM_INLINE void imm_hmm_init(struct imm_hmm *x, struct imm_code const *code)
   imm_hmm_reset(x);
 }
 
-IMM_API int imm_hmm_reset_dp(struct imm_hmm const *,
-                             struct imm_state const *end_state,
-                             struct imm_dp *);
+IMM_API int imm_hmm_reset_dp(struct imm_hmm const *, struct imm_dp *);
 
 IMM_API float imm_hmm_trans(struct imm_hmm const *, struct imm_state const *src,
                             struct imm_state const *dst);
@@ -66,6 +64,7 @@ IMM_API int imm_hmm_normalize_trans(struct imm_hmm const *);
 IMM_API int imm_hmm_normalize_state_trans(struct imm_state *src);
 
 IMM_API int imm_hmm_set_start(struct imm_hmm *, struct imm_mute_state const *);
+IMM_API int imm_hmm_set_end(struct imm_hmm *, struct imm_mute_state const *);
 
 IMM_API int imm_hmm_set_trans(struct imm_hmm *, struct imm_state *src,
                               struct imm_state *dst, float lprob);

@@ -12,6 +12,7 @@
 #include <inttypes.h>
 #include <limits.h>
 #include <stdlib.h>
+#include <string.h>
 
 void imm_state_table_init(struct imm_state_table *x)
 {
@@ -20,12 +21,13 @@ void imm_state_table_init(struct imm_state_table *x)
   x->start_state_idx = IMM_STATE_NULL_IDX;
   x->end_state_idx = IMM_STATE_NULL_IDX;
   x->span = NULL;
-  x->state_name_callback = &imm_state_default_name;
+  x->debug.state_name = &imm_state_default_name;
 }
 
-void imm_state_table_set_name(struct imm_state_table *x, imm_state_name *callb)
+void imm_state_table_debug_setup(struct imm_state_table *x,
+                                 imm_state_name *callb)
 {
-  x->state_name_callback = callb;
+  x->debug.state_name = callb;
 }
 
 void imm_state_table_cleanup(struct imm_state_table *x)
@@ -36,7 +38,7 @@ void imm_state_table_cleanup(struct imm_state_table *x)
     x->ids = NULL;
     free(x->span);
     x->span = NULL;
-    x->state_name_callback = NULL;
+    x->debug.state_name = NULL;
   }
 }
 
@@ -76,7 +78,8 @@ unsigned imm_state_table_idx(struct imm_state_table const *x, unsigned state_id)
 char *imm_state_table_name(struct imm_state_table const *x, unsigned idx)
 {
   static char name[IMM_STATE_NAME_SIZE] = {0};
-  return (*x->state_name_callback)(imm_state_table_id(x, idx), name);
+  if (idx == IMM_STATE_NULL_IDX) return strcpy(name, "?");
+  return (*x->debug.state_name)(imm_state_table_id(x, idx), name);
 }
 
 unsigned imm_state_table_id(struct imm_state_table const *x, unsigned idx)

@@ -20,6 +20,11 @@ static inline void start_init(struct imm_hmm *hmm)
   hmm->start_state_id = IMM_STATE_NULL_ID;
 }
 
+static inline void end_init(struct imm_hmm *hmm)
+{
+  hmm->end_state_id = IMM_STATE_NULL_ID;
+}
+
 static void init_states_table(struct imm_hmm *hmm)
 {
   hmm->states.size = 0;
@@ -54,6 +59,11 @@ static int add_transition(struct imm_hmm *hmm, struct imm_state *src,
 static inline bool has_start_state(struct imm_hmm const *hmm)
 {
   return hmm->start_state_id != IMM_STATE_NULL_ID;
+}
+
+static inline bool has_end_state(struct imm_hmm const *hmm)
+{
+  return hmm->end_state_id != IMM_STATE_NULL_ID;
 }
 
 static struct imm_state *hmm_state(struct imm_hmm const *hmm,
@@ -129,36 +139,67 @@ int imm_hmm_del_state(struct imm_hmm *hmm, struct imm_state *state)
   return rc;
 }
 
-int imm_hmm_init_dp(struct imm_hmm const *hmm,
-                    struct imm_state const *end_state, struct imm_dp *dp)
+int imm_hmm_init_dp(struct imm_hmm const *hmm, struct imm_dp *dp)
 {
   imm_dp_init(dp, hmm->code);
-  return imm_hmm_reset_dp(hmm, end_state, dp);
+  return imm_hmm_reset_dp(hmm, dp);
 }
 
 void imm_hmm_reset(struct imm_hmm *hmm)
 {
   start_init(hmm);
+  end_init(hmm);
   init_states_table(hmm);
   init_transitions_table(hmm);
 }
 
-int imm_hmm_reset_dp(struct imm_hmm const *hmm,
-                     struct imm_state const *end_state, struct imm_dp *dp)
+static bool has_dst_start(struct imm_hmm const *x)
+{
+  struct imm_trans *t = NULL;
+  unsigned bkt = 0;
+  cco_hash_for_each(x->transitions.tbl, bkt, t, hnode)
+  {
+    if (t->pair.id.dst == x->start_state_id) return true;
+  }
+  return false;
+}
+
+static bool has_src_end(struct imm_hmm const *x)
+{
+  struct imm_trans *t = NULL;
+  unsigned bkt = 0;
+  cco_hash_for_each(x->transitions.tbl, bkt, t, hnode)
+  {
+    if (t->pair.id.src == x->end_state_id) return true;
+  }
+  return false;
+}
+
+int imm_hmm_reset_dp(struct imm_hmm const *hmm, struct imm_dp *dp)
 {
   int rc = 0;
   struct imm_state **states =
       malloc(sizeof(struct imm_state *) * hmm->states.size);
   if (!states) return IMM_ENOMEM;
 
-  if (!hmm_state(hmm, end_state->id))
+  if (!has_start_state(hmm))
+  {
+    rc = IMM_ENOSTART;
+    goto cleanup;
+  }
+  if (!has_end_state(hmm))
   {
     rc = IMM_ENOEND;
     goto cleanup;
   }
-  if (!has_start_state(hmm))
+  if (has_dst_start(hmm))
   {
-    rc = IMM_ENOSTART;
+    rc = IMM_EDSTSTART;
+    goto cleanup;
+  }
+  if (has_src_end(hmm))
+  {
+    rc = IMM_ESRCEND;
     goto cleanup;
   }
 
@@ -176,7 +217,7 @@ int imm_hmm_reset_dp(struct imm_hmm const *hmm,
                            .nstates = hmm->states.size,
                            .states = states,
                            .start_state = hmm_state(hmm, hmm->start_state_id),
-                           .end_state = end_state};
+                           .end_state = hmm_state(hmm, hmm->end_state_id)};
 
   imm_dp_reset(dp, &cfg);
 
@@ -268,10 +309,17 @@ int imm_hmm_normalize_state_trans(struct imm_state *src)
   return 0;
 }
 
-int imm_hmm_set_start(struct imm_hmm *hmm, struct imm_mute_state const *state)
+int imm_hmm_set_start(struct imm_hmm *x, struct imm_mute_state const *state)
 {
   if (!cco_hash_hashed(&state->super.hnode)) return IMM_ENOTFOUND;
-  hmm->start_state_id = state->super.id;
+  x->start_state_id = state->super.id;
+  return 0;
+}
+
+int imm_hmm_set_end(struct imm_hmm *x, struct imm_mute_state const *state)
+{
+  if (!cco_hash_hashed(&state->super.hnode)) return IMM_ENOTFOUND;
+  x->end_state_id = state->super.id;
   return 0;
 }
 

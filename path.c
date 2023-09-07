@@ -91,12 +91,7 @@ void imm_path_reverse(struct imm_path *path)
 float imm_path_score(struct imm_path const *x)
 {
   if (imm_path_nsteps(x) == 0) return IMM_LPROB_NAN;
-
-  float score = imm_path_step(x, 0)->score;
-  for (unsigned i = 1; i < imm_path_nsteps(x); ++i)
-    score += imm_path_step(x, i)->score;
-
-  return score;
+  return imm_path_step(x, imm_path_nsteps(x) - 1)->score;
 }
 
 void imm_path_dump(struct imm_path const *x, imm_state_name *callb,

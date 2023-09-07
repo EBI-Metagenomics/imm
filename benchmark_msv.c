@@ -1447,7 +1447,7 @@ static void msv3000_path(void)
 
   struct imm_ex3 *m = &imm_ex3;
   struct imm_dp dp;
-  imm_hmm_init_dp(&imm_ex3.hmm, &m->T.super, &dp);
+  imm_hmm_init_dp(&imm_ex3.hmm, &dp);
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 

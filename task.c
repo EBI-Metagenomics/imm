@@ -19,6 +19,7 @@ struct imm_task *imm_task_new(struct imm_dp const *dp)
   x->seq = NULL;
   x->num_states = dp->state_table.nstates;
   imm_trellis_init(&x->trellis, &dp->state_table);
+  x->debug.seq = NULL;
   return x;
 }
 
@@ -26,10 +27,15 @@ int imm_task_reset(struct imm_task *x, struct imm_dp const *dp)
 {
   x->seq = NULL;
   x->num_states = dp->state_table.nstates;
+  x->debug.seq = NULL;
   return imm_matrix_reset(&x->matrix, &dp->state_table);
 }
 
-void imm_task_prepare(struct imm_task *x) { imm_matrix_prepare(&x->matrix); }
+void imm_task_prepare(struct imm_task *x)
+{
+  imm_matrix_prepare(&x->matrix);
+  imm_trellis_prepare(&x->trellis);
+}
 
 int imm_task_setup(struct imm_task *x, struct imm_eseq const *seq)
 {
@@ -50,4 +56,9 @@ void imm_task_del(struct imm_task const *x)
 void imm_task_dump(struct imm_task const *x, FILE *restrict fp)
 {
   imm_matrix_dump(&x->matrix, fp);
+}
+
+void imm_task_debug_setup(struct imm_task *x, char const *seq)
+{
+  x->debug.seq = seq;
 }

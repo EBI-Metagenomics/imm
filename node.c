@@ -1,12 +1,14 @@
 #include "node.h"
 #include "state_table.h"
+#include <string.h>
 
-void imm_node_dump(struct imm_node const *x,
-                   struct imm_state_table const *state_table,
-                   imm_state_name *callb, FILE *restrict fp)
+void imm_node_dump(struct imm_node const *x, struct imm_state_table const *st,
+                   FILE *restrict fp)
 {
-  char name[IMM_STATE_NAME_SIZE] = {0};
-  if (!callb) callb = &imm_state_default_name;
-  unsigned id = imm_state_table_id(state_table, x->state_source);
-  fprintf(fp, "(%s;%u;%.9g)", (*callb)(id, name), x->emission_size, x->score);
+  char emis_size[16] = {0};
+  if (x->emission_size == IMM_STATE_NULL_SEQLEN) strcpy(emis_size, "?");
+  else sprintf(emis_size, "%u", x->emission_size);
+
+  fprintf(fp, "(%s;%s;%.9g)", imm_state_table_name(st, x->state_source),
+          emis_size, x->score);
 }

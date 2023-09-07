@@ -8,6 +8,7 @@ enum imm_state_typeid
   IMM_NORMAL_STATE = 2,
   IMM_CODON_STATE = 3,
   IMM_FRAME_STATE = 4,
+  IMM_TABLE_STATE = 4,
 };
 
 #endif

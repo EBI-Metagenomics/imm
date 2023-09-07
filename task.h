@@ -20,6 +20,12 @@ struct imm_task
   struct imm_eseq const *seq;
   unsigned num_states;
   struct imm_trellis trellis;
+
+  // Debugging purpose
+  struct
+  {
+    char const *seq;
+  } debug;
 };
 
 IMM_API struct imm_task *imm_task_new(struct imm_dp const *);
@@ -28,5 +34,6 @@ IMM_API void imm_task_prepare(struct imm_task *);
 IMM_API int imm_task_setup(struct imm_task *, struct imm_eseq const *);
 IMM_API void imm_task_del(struct imm_task const *);
 IMM_API void imm_task_dump(struct imm_task const *, FILE *restrict);
+IMM_API void imm_task_debug_setup(struct imm_task *, char const *seq);
 
 #endif

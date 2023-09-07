@@ -35,6 +35,7 @@ struct imm_ex1
     struct imm_hmm hmm;
     struct imm_mute_state nstart;
     struct imm_normal_state n;
+    struct imm_mute_state nend;
   } null;
 };
 
