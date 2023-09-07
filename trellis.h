@@ -97,11 +97,11 @@ IMM_API void imm_trellis_init(struct imm_trellis *,
 IMM_API int imm_trellis_setup(struct imm_trellis *, unsigned seqsize,
                               unsigned nstates);
 IMM_API void imm_trellis_cleanup(struct imm_trellis *);
+IMM_API void imm_trellis_prepare(struct imm_trellis *);
 
 IMM_API unsigned imm_trellis_state_id(struct imm_trellis const *);
 IMM_API void imm_trellis_back(struct imm_trellis *);
-IMM_API void imm_trellis_dump(struct imm_trellis const *, imm_state_name *,
-                              FILE *restrict);
+IMM_API void imm_trellis_dump(struct imm_trellis const *, FILE *restrict);
 
 IMM_INLINE void imm_trellis_rewind(struct imm_trellis *x) { x->head = x->pool; }
 

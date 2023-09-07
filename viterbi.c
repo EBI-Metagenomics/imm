@@ -14,6 +14,7 @@
 #include "trans_table.h"
 #include "unroll.h"
 #include "zspan.h"
+#include <string.h>
 
 imm_pure_template unsigned start_state_idx(struct imm_viterbi const *x)
 {
@@ -136,13 +137,16 @@ struct step
   uint_fast16_t src_trans;
   uint_fast8_t src_emissize;
   uint_fast8_t src_seqlen_idx;
+  float emis_score;
+  float trans_score;
   float score;
 };
 
 static inline struct step step_init(void)
 {
-  return (struct step){IMM_STATE_NULL_IDX, IMM_TRANS_NULL_IDX,
+  return (struct step){IMM_STATE_NULL_IDX,    IMM_TRANS_NULL_IDX,
                        IMM_STATE_NULL_SEQLEN, IMM_STATE_NULL_SEQLEN,
+                       IMM_LPROB_ZERO,        IMM_LPROB_ZERO,
                        IMM_LPROB_ZERO};
 }
 
@@ -184,6 +188,8 @@ imm_template struct step best_step(struct imm_viterbi *x, unsigned row,
       step.src_trans = trans;
       step.src_emissize = emissize;
       step.src_seqlen_idx = seqlen_idx;
+      step.emis_score = score - x->curr_trans->score;
+      step.trans_score = x->curr_trans->score;
       step.score = score;
     }
 
@@ -192,27 +198,6 @@ imm_template struct step best_step(struct imm_viterbi *x, unsigned row,
   }
 
   return step;
-}
-
-imm_template void set_trellis(struct imm_trellis *x, float score, unsigned r,
-                              uint_fast16_t src, uint_fast8_t emissize,
-                              uint_fast16_t dst)
-{
-  if (src != IMM_STATE_NULL_IDX)
-  {
-    (void)r;
-    (void)dst;
-    assert(r == imm_trellis_stage_idx(x));
-    if (dst != imm_trellis_state_idx(x))
-    {
-      fprintf(stderr, "dst != imm_trellis_state_idx(x): %u != %u\n", dst,
-              imm_trellis_state_idx(x));
-    }
-    assert(dst == imm_trellis_state_idx(x));
-    imm_trellis_push(x, score, src, emissize);
-  }
-  else x->head++;
-  // else imm_trellis_push(x, IMM_LPROB_NAN, 0, 0);
 }
 
 imm_pure_template float emission_score(struct imm_viterbi const *x,
@@ -228,19 +213,20 @@ imm_template void set_state_score(struct imm_viterbi const *x, unsigned row,
                                   struct step const *bt, bool safe_future)
 {
   float score = bt->score;
-  if (row == 0 && start_state_idx(x) == dst.idx)
-  {
-    score = imm_max(0.0, score);
-    // imm_trellis_seek(&x->task->trellis, 0, dst.idx);
-    imm_trellis_push(&x->task->trellis, score, start_state_idx(x), 0);
-  }
-  else
-  {
-    set_trellis(&x->task->trellis, score, row, bt->src_idx, bt->src_emissize,
-                dst.idx);
-    // set_trellis(&x->task->trellis, score, row, bt->src_idx, bt->src_emissize,
-    //             dst.idx);
-  }
+  // if (row == 0 && start_state_idx(x) == dst.idx)
+  // {
+  //   score = imm_max(0.0, score);
+  //   // imm_trellis_seek(&x->task->trellis, 0, dst.idx);
+  //   imm_trellis_push(&x->task->trellis, score, start_state_idx(x), 0);
+  // }
+  // else
+  // {
+  if (bt->src_idx != IMM_STATE_NULL_IDX)
+    imm_trellis_push(&x->task->trellis, score, bt->src_idx, bt->src_emissize);
+  else x->task->trellis.head++;
+  // set_trellis(&x->task->trellis, score, row, bt->src_idx, bt->src_emissize,
+  //             dst.idx);
+  // }
 
   if (!safe_future) dst.max = imm_min(dst.max, remain);
 
@@ -249,10 +235,22 @@ imm_template void set_state_score(struct imm_viterbi const *x, unsigned row,
   UNROLL(IMM_STATE_MAX_SEQLEN + 1)
   for (uint_fast8_t i = dst.min; i <= dst.max; ++i)
   {
-    float total = score + emission_score(x, dst, row, i);
+    float emis_score = emission_score(x, dst, row, i);
+    float total = score + emis_score;
     set_matrix_cell_score(x, imm_cell(row, dst.idx, i), total);
-    // imm_trellis_seek(&x->task->trellis, row + i, dst.idx);
-    // set_trellis(&x->task->trellis, total, row + i, bt->src_idx, i, dst.idx);
+
+    char src_name[IMM_STATE_NAME_SIZE] = {0};
+    char dst_name[IMM_STATE_NAME_SIZE] = {0};
+    strcpy(src_name, imm_state_table_name(&x->dp->state_table, bt->src_idx));
+    strcpy(dst_name, imm_state_table_name(&x->dp->state_table, dst.idx));
+
+    // float prev_score = bt->score - bt->trans_score;
+    // printf("    [%s] --> [%s] : %g + %g + %g = %g : \"%.*s\" \"%.*s\"\n",
+    //        src_name, dst_name, prev_score, bt->trans_score, emis_score,
+    //        total, row, x->task->debug.seq, i, x->task->debug.seq + row);
+
+    // imm_task_dump(x->task, stdout);
+    // printf("\n");
   }
 }
 
@@ -295,9 +293,18 @@ imm_template void on_row(struct imm_viterbi *x, unsigned row,
   imm_trellis_seek(&x->task->trellis, row, 0);
   viterbi_ctrans_rewind(x);
 
+  // printf("row=%u\n", row);
   for (unsigned i = 0; i < nstates(x); ++i)
   {
     struct state dst = unwrap_state(x, i);
+    // printf("  [ ] --> [%s]\n",
+    // imm_state_table_name(&x->dp->state_table, dst.idx));
+    if (row == 0 && start_state_idx(x) == dst.idx)
+    {
+      // printf("    ...\n");
+      x->task->trellis.head++;
+      continue;
+    }
     on_normal_state(x, row, dst, safe_future, safe_past, false);
   }
 }
@@ -305,6 +312,11 @@ imm_template void on_row(struct imm_viterbi *x, unsigned row,
 imm_template void viterbi_generic(struct imm_viterbi *x, bool has_tardy_state)
 {
   set_matrix_cell_score(x, imm_cell(0, start_state_idx(x), 0), 0);
+  imm_trellis_seek(&x->task->trellis, 0, start_state_idx(x));
+  imm_trellis_push(&x->task->trellis, 0, IMM_STATE_NULL_IDX,
+                   IMM_STATE_NULL_SEQLEN);
+  // printf("Matrix begins as\n\n");
+  // imm_task_dump(x->task, stdout);
 
   struct imm_dp_safety const *y = &x->safety;
 
@@ -325,6 +337,7 @@ imm_template void viterbi_generic(struct imm_viterbi *x, bool has_tardy_state)
 
 void imm_viterbi_run(struct imm_viterbi *x)
 {
+  imm_task_prepare(x->task);
   if (x->has_tardy_state) viterbi_generic(x, true);
   else viterbi_generic(x, false);
 }
