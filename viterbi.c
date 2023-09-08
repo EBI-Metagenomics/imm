@@ -239,10 +239,10 @@ imm_template void set_state_score(struct imm_viterbi const *x, unsigned row,
     float total = score + emis_score;
     set_matrix_cell_score(x, imm_cell(row, dst.idx, i), total);
 
-    char src_name[IMM_STATE_NAME_SIZE] = {0};
-    char dst_name[IMM_STATE_NAME_SIZE] = {0};
-    strcpy(src_name, imm_state_table_name(&x->dp->state_table, bt->src_idx));
-    strcpy(dst_name, imm_state_table_name(&x->dp->state_table, dst.idx));
+    // char src_name[IMM_STATE_NAME_SIZE] = {0};
+    // char dst_name[IMM_STATE_NAME_SIZE] = {0};
+    // strcpy(src_name, imm_state_table_name(&x->dp->state_table, bt->src_idx));
+    // strcpy(dst_name, imm_state_table_name(&x->dp->state_table, dst.idx));
 
     // float prev_score = bt->score - bt->trans_score;
     // printf("    [%s] --> [%s] : %g + %g + %g = %g : \"%.*s\" \"%.*s\"\n",
