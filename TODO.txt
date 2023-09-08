@@ -5,3 +5,4 @@
 - assert that not transitions points to the starting state
 - would be nice to start e end state having indices [0, last_one]
 - compiler.h macros are too much
+- have a schematic way to debug (specially debug viterbi and trellis)
