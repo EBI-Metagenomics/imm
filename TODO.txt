@@ -6,3 +6,4 @@
 - would be nice to start e end state having indices [0, last_one]
 - compiler.h macros are too much
 - have a schematic way to debug (specially debug viterbi and trellis)
+- remove state_table dependency from trellis so it can be used more easily by other libraries
