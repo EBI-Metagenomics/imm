@@ -22,8 +22,8 @@ IMM_API void imm_code_init(struct imm_code *, struct imm_abc const *);
 IMM_API unsigned imm_code_encode(struct imm_code const *,
                                  struct imm_seq const *);
 
-imm_pure_template unsigned imm_code_translate(struct imm_code const *x,
-                                              unsigned value, unsigned min_seq)
+IMM_PURE unsigned imm_code_translate(struct imm_code const *x, unsigned value,
+                                     unsigned min_seq)
 {
   assert(value >= x->offset[min_seq]);
   return value - x->offset[min_seq];

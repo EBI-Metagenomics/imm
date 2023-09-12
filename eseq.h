@@ -22,8 +22,8 @@ IMM_API struct imm_abc const *imm_eseq_abc(struct imm_eseq const *);
 IMM_API unsigned imm_eseq_size(struct imm_eseq const *);
 IMM_API int imm_eseq_setup(struct imm_eseq *, struct imm_seq const *);
 
-imm_pure_template unsigned imm_eseq_get(struct imm_eseq const *x, unsigned pos,
-                                        unsigned size, unsigned min_seq)
+IMM_PURE unsigned imm_eseq_get(struct imm_eseq const *x, unsigned pos,
+                               unsigned size, unsigned min_seq)
 {
   uint16_t val = imm_matrixu16_get(&x->data, pos, size);
   return imm_code_translate(x->code, val, min_seq);

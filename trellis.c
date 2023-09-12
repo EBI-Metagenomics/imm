@@ -5,10 +5,9 @@
 #include "state_table.h"
 #include <stdlib.h>
 
-void imm_trellis_init(struct imm_trellis *x,
-                      struct imm_state_table const *state_table)
+void imm_trellis_init(struct imm_trellis *x)
 {
-  x->state_table = state_table;
+  x->state_table = NULL;
   x->capacity = 0;
   x->num_stages = 0;
   x->num_states = 0;
@@ -60,15 +59,10 @@ void imm_trellis_prepare(struct imm_trellis *x)
   imm_trellis_rewind(x);
 }
 
-IMM_INLINE unsigned state_id_at(struct imm_trellis const *x,
-                                struct imm_node const *head)
+void imm_trellis_set_state_table(struct imm_trellis *x,
+                                 struct imm_state_table const *st)
 {
-  return imm_state_table_id(x->state_table, imm_trellis_state_idx_at(x, head));
-}
-
-unsigned imm_trellis_state_id(struct imm_trellis const *x)
-{
-  return state_id_at(x, x->head);
+  x->state_table = st;
 }
 
 void imm_trellis_back(struct imm_trellis *x)
@@ -80,6 +74,7 @@ void imm_trellis_back(struct imm_trellis *x)
 
 void imm_trellis_dump(struct imm_trellis const *x, FILE *restrict fp)
 {
+  assert(x->state_table);
   // HEADER
   for (unsigned i = 0; i < x->num_states; ++i)
   {

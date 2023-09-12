@@ -80,8 +80,6 @@
 // state Si and emission size k in `struct imm_node` at `imm_trellis_at(trellis,
 // h, Sj)`.
 
-struct imm_state_table;
-
 struct imm_trellis
 {
   struct imm_state_table const *state_table;
@@ -92,14 +90,14 @@ struct imm_trellis
   struct imm_node *pool;
 };
 
-IMM_API void imm_trellis_init(struct imm_trellis *,
-                              struct imm_state_table const *);
+IMM_API void imm_trellis_init(struct imm_trellis *);
 IMM_API int imm_trellis_setup(struct imm_trellis *, unsigned seqsize,
                               unsigned nstates);
 IMM_API void imm_trellis_cleanup(struct imm_trellis *);
 IMM_API void imm_trellis_prepare(struct imm_trellis *);
+IMM_API void imm_trellis_set_state_table(struct imm_trellis *,
+                                         struct imm_state_table const *);
 
-IMM_API unsigned imm_trellis_state_id(struct imm_trellis const *);
 IMM_API void imm_trellis_back(struct imm_trellis *);
 IMM_API void imm_trellis_dump(struct imm_trellis const *, FILE *restrict);
 

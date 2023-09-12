@@ -97,58 +97,58 @@ static float read_result(struct imm_dp const *dp, struct imm_task *task,
   return score;
 }
 
-static void unzip_path(struct imm_trellis *x, unsigned start_state,
-                        unsigned end_state, unsigned seq_size,
-                        struct imm_path *path)
+static void unzip_path(struct imm_trellis *x, struct imm_state_table const *st,
+                       unsigned seq_size, struct imm_path *path)
 {
-  // imm_trellis_dump(x, stdout);
-  imm_trellis_seek(x, seq_size, end_state);
+  imm_trellis_seek(x, seq_size, st->end_state_idx);
   if (imm_lprob_is_nan(imm_trellis_head(x)->score)) return;
 
   unsigned size = 0;
+  unsigned start_state = st->start_state_idx;
   while (imm_trellis_state_idx(x) != start_state || imm_trellis_stage_idx(x))
   {
+    unsigned id = imm_state_table_id(st, imm_trellis_state_idx(x));
     float score = imm_trellis_head(x)->score;
-    imm_path_add(path, imm_step(imm_trellis_state_id(x), size, score));
+    imm_path_add(path, imm_step(id, size, score));
 
     size = imm_trellis_head(x)->emission_size;
     imm_trellis_back(x);
   }
-  imm_path_add(path, imm_step(imm_trellis_state_id(x), size, 0));
+  unsigned id = imm_state_table_id(st, imm_trellis_state_idx(x));
+  imm_path_add(path, imm_step(id, size, 0));
   imm_path_reverse(path);
 }
 
-int imm_dp_viterbi(struct imm_dp const *dp, struct imm_task *task,
+int imm_dp_viterbi(struct imm_dp const *x, struct imm_task *task,
                    struct imm_prod *prod)
 {
   imm_prod_reset(prod);
   if (!task->seq) return IMM_ENOSEQ;
 
-  if (dp->code->abc != imm_eseq_abc(task->seq)) return IMM_EDIFFABC;
+  if (x->code->abc != imm_eseq_abc(task->seq)) return IMM_EDIFFABC;
 
-  unsigned start_state = dp->state_table.start_state_idx;
-  unsigned end_state = dp->state_table.end_state_idx;
+  unsigned end_state = x->state_table.end_state_idx;
   unsigned min =
-      imm_zspan_min(imm_state_table_zspan(&dp->state_table, end_state));
+      imm_zspan_min(imm_state_table_zspan(&x->state_table, end_state));
   if (imm_eseq_size(task->seq) < min) return IMM_ESHORTSEQ;
 
   struct elapsed elapsed = ELAPSED_INIT;
   if (elapsed_start(&elapsed)) return IMM_EELAPSED;
 
   struct imm_viterbi viterbi = {0};
-  imm_viterbi_init(&viterbi, dp, task);
+  imm_viterbi_init(&viterbi, x, task);
 
   imm_viterbi_run(&viterbi);
 
   unsigned last_state = 0;
   unsigned last_seqsize = 0;
-  prod->loglik = read_result(dp, task, &last_state, &last_seqsize);
+  prod->loglik = read_result(x, task, &last_state, &last_seqsize);
 
   int rc = 0;
 
   imm_path_reset(&prod->path);
   unsigned seqsize = imm_eseq_size(task->seq);
-  unzip_path(&task->trellis, start_state, end_state, seqsize, &prod->path);
+  unzip_path(&task->trellis, &x->state_table, seqsize, &prod->path);
   return rc;
 
   if (elapsed_stop(&elapsed)) return IMM_EELAPSED;

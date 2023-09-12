@@ -18,7 +18,6 @@ bool imm_lprob_is_finite(float a)
 void imm_lprob_normalize(unsigned len, float *arr)
 {
   float lnorm = imm_lprob_sum(len, arr);
-#pragma omp simd
   for (unsigned i = 0; i < len; ++i)
     arr[i] -= lnorm;
 }
