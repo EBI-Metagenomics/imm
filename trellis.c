@@ -7,7 +7,8 @@
 
 void imm_trellis_init(struct imm_trellis *x)
 {
-  x->state_table = NULL;
+  x->ids = NULL;
+  x->state_name = &imm_state_default_name;
   x->capacity = 0;
   x->num_stages = 0;
   x->num_states = 0;
@@ -38,7 +39,8 @@ void imm_trellis_cleanup(struct imm_trellis *x)
 {
   if (x)
   {
-    x->state_table = NULL;
+    x->ids = NULL;
+    x->state_name = NULL;
     x->capacity = 0;
     x->num_stages = 0;
     x->num_states = 0;
@@ -59,10 +61,11 @@ void imm_trellis_prepare(struct imm_trellis *x)
   imm_trellis_rewind(x);
 }
 
-void imm_trellis_set_state_table(struct imm_trellis *x,
-                                 struct imm_state_table const *st)
+void imm_trellis_set_ids(struct imm_trellis *x, uint16_t *ids) { x->ids = ids; }
+
+void imm_trellis_set_state_name(struct imm_trellis *x, imm_state_name *callb)
 {
-  x->state_table = st;
+  x->state_name = callb;
 }
 
 void imm_trellis_back(struct imm_trellis *x)
@@ -74,13 +77,16 @@ void imm_trellis_back(struct imm_trellis *x)
 
 void imm_trellis_dump(struct imm_trellis const *x, FILE *restrict fp)
 {
-  assert(x->state_table);
+  char name[IMM_STATE_NAME_SIZE] = {0};
+  assert(x->ids);
+  assert(x->state_name);
   // HEADER
   for (unsigned i = 0; i < x->num_states; ++i)
   {
     if (i > 0) fputc(',', fp);
     unsigned idx = imm_trellis_state_idx_at(x, imm_trellis_at(x, 0, i));
-    fputs(imm_state_table_name(x->state_table, idx), fp);
+    if (idx == IMM_STATE_NULL_IDX) fputs("?", fp);
+    else fputs((*x->state_name)(x->ids[idx], name), fp);
   }
   fputc('\n', fp);
 
@@ -90,7 +96,7 @@ void imm_trellis_dump(struct imm_trellis const *x, FILE *restrict fp)
     for (unsigned j = 0; j < x->num_states; ++j)
     {
       if (j > 0) fputc(',', fp);
-      imm_node_dump(imm_trellis_at(x, i, j), x->state_table, fp);
+      imm_node_dump(imm_trellis_at(x, i, j), x->ids, x->state_name, fp);
     }
     fputc('\n', fp);
   }

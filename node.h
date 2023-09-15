@@ -20,8 +20,8 @@ struct imm_state_table;
 // TODO: I would like this to be 4 bytes instead
 static_assert(sizeof(struct imm_node) == 8, "");
 
-IMM_API void imm_node_dump(struct imm_node const *,
-                           struct imm_state_table const *, FILE *restrict);
+IMM_API void imm_node_dump(struct imm_node const *, uint16_t *ids,
+                           imm_state_name *, FILE *restrict);
 
 IMM_INLINE void imm_node_invalidate(struct imm_node *x)
 {

@@ -96,6 +96,8 @@ static void states_sne(void)
   close(prod.loglik, 7);
   imm_path_dump(&prod.path, &state_name, &seq, stdout);
   close(imm_path_score(&prod.path), 7);
+  imm_trellis_set_ids(&task->trellis, dp.state_table.ids);
+  imm_trellis_set_state_name(&task->trellis, &state_name);
   imm_trellis_dump(&task->trellis, stdout);
 
   ASSERT_SEQ(prod.path, 0, S, 0, 0);
@@ -145,6 +147,8 @@ static void states_sne_no_solution(void)
   ok(imm_lprob_is_nan(prod.loglik));
   imm_path_dump(&prod.path, &state_name, &seq, stdout);
   ok(imm_lprob_is_nan(imm_path_score(&prod.path)));
+  imm_trellis_set_ids(&task->trellis, dp.state_table.ids);
+  imm_trellis_set_state_name(&task->trellis, &state_name);
   imm_trellis_dump(&task->trellis, stdout);
 
   eq(imm_path_nsteps(&prod.path), 0);
@@ -197,6 +201,8 @@ static void states_ste(void)
   close(prod.loglik, 34);
   imm_path_dump(&prod.path, &state_name, &seq, stdout);
   close(imm_path_score(&prod.path), 34);
+  imm_trellis_set_ids(&task->trellis, dp.state_table.ids);
+  imm_trellis_set_state_name(&task->trellis, &state_name);
   imm_trellis_dump(&task->trellis, stdout);
 
   ASSERT_SEQ(prod.path, 0, S, 0, 0);
@@ -245,6 +251,8 @@ static void states_ste_2(void)
   close(prod.loglik, 47);
   imm_path_dump(&prod.path, &state_name, &seq, stdout);
   close(imm_path_score(&prod.path), 47);
+  imm_trellis_set_ids(&task->trellis, dp.state_table.ids);
+  imm_trellis_set_state_name(&task->trellis, &state_name);
   imm_trellis_dump(&task->trellis, stdout);
 
   ASSERT_SEQ(prod.path, 0, S, 0, 0);

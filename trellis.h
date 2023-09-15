@@ -82,7 +82,8 @@
 
 struct imm_trellis
 {
-  struct imm_state_table const *state_table;
+  uint16_t *ids;
+  imm_state_name *state_name;
   size_t capacity;
   unsigned num_stages;
   unsigned num_states;
@@ -95,8 +96,8 @@ IMM_API int imm_trellis_setup(struct imm_trellis *, unsigned seqsize,
                               unsigned nstates);
 IMM_API void imm_trellis_cleanup(struct imm_trellis *);
 IMM_API void imm_trellis_prepare(struct imm_trellis *);
-IMM_API void imm_trellis_set_state_table(struct imm_trellis *,
-                                         struct imm_state_table const *);
+IMM_API void imm_trellis_set_ids(struct imm_trellis *, uint16_t *ids);
+IMM_API void imm_trellis_set_state_name(struct imm_trellis *, imm_state_name *);
 
 IMM_API void imm_trellis_back(struct imm_trellis *);
 IMM_API void imm_trellis_dump(struct imm_trellis const *, FILE *restrict);
