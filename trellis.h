@@ -127,13 +127,15 @@ IMM_INLINE void imm_trellis_seek(struct imm_trellis *x, unsigned stage,
   assert(x->head >= x->pool && x->head < x->pool + imm_trellis_size(x));
 }
 
+IMM_INLINE void imm_trellis_next(struct imm_trellis *x) { x->head++; }
+
 IMM_INLINE void imm_trellis_push(struct imm_trellis *x, float score,
                                  uint16_t state_source, uint8_t emissize)
 {
   x->head->score = score;
   x->head->state_source = state_source;
   x->head->emission_size = emissize;
-  x->head++;
+  imm_trellis_next(x);
 }
 
 IMM_PURE unsigned imm_trellis_state_idx_at(struct imm_trellis const *x,
