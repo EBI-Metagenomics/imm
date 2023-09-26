@@ -1,7 +1,7 @@
 #ifndef IMM_PAIR_H
 #define IMM_PAIR_H
 
-#include <assert.h>
+#include "static_assert.h"
 #include <stdint.h>
 
 struct imm_pair
@@ -29,7 +29,7 @@ struct imm_pair
   } idx;
 };
 
-static_assert(sizeof(struct imm_pair) == 8, "struct pair must be packed");
+imm_static_assert(sizeof(struct imm_pair) == 8, "struct pair must be packed");
 
 struct imm_pair imm_pair(unsigned src_id, unsigned dst_id);
 

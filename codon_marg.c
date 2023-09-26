@@ -8,9 +8,9 @@
 #include "lprob.h"
 #include "nuclt.h"
 #include "rc.h"
-#include <assert.h>
+#include "static_assert.h"
 
-static_assert(IMM_NUCLT_SIZE == 4, "nuclt size expected to be four");
+imm_static_assert(IMM_NUCLT_SIZE == 4, "nuclt size expected to be four");
 
 struct codon_iter
 {

@@ -1,6 +1,6 @@
 #include "dp.h"
+#include "clock.h"
 #include "dp_cfg.h"
-#include "elapsed/elapsed.h"
 #include "emis.h"
 #include "ex1.h"
 #include "expect.h"
@@ -132,8 +132,7 @@ int imm_dp_viterbi(struct imm_dp const *x, struct imm_task *task,
       imm_zspan_min(imm_state_table_zspan(&x->state_table, end_state));
   if (imm_eseq_size(task->seq) < min) return IMM_ESHORTSEQ;
 
-  struct elapsed elapsed = ELAPSED_INIT;
-  if (elapsed_start(&elapsed)) return IMM_EELAPSED;
+  long start = imm_clock();
 
   struct imm_viterbi viterbi = {0};
   imm_viterbi_init(&viterbi, x, task);
@@ -151,9 +150,7 @@ int imm_dp_viterbi(struct imm_dp const *x, struct imm_task *task,
   unzip_path(&task->trellis, &x->state_table, seqsize, &prod->path);
   return rc;
 
-  if (elapsed_stop(&elapsed)) return IMM_EELAPSED;
-
-  prod->mseconds = elapsed_milliseconds(&elapsed);
+  prod->mseconds = imm_clock() - start;
 
   return rc;
 }

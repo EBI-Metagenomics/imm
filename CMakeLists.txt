@@ -1,12 +1,11 @@
 cmake_minimum_required(VERSION 3.20.2 FATAL_ERROR)
-project(imm VERSION 5.0.4 LANGUAGES C)
+project(imm VERSION 5.0.5 LANGUAGES C)
 
 include(cmake/sanitizers.cmake)
 include(cmake/warnings.cmake)
 include(cmake/CPM.cmake)
 
-cpmaddpackage("gh:horta/elapsed@3.1.2")
-cpmaddpackage("gh:EBI-Metagenomics/lip@0.5.2")
+cpmaddpackage("gh:EBI-Metagenomics/lip@0.5.3")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_C_STANDARD 11)
@@ -24,7 +23,6 @@ list(FILTER IMM_SOURCES EXCLUDE REGEX "benchmark_.*")
 add_library(imm ${IMM_SOURCES})
 add_library(IMM::imm ALIAS imm)
 target_link_libraries(imm PRIVATE LIP::lip)
-target_link_libraries(imm PRIVATE ELAPSED::elapsed)
 target_link_libraries(imm INTERFACE $<$<BOOL:${UNIX}>:m>)
 
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/imm)

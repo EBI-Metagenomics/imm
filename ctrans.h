@@ -1,7 +1,7 @@
 #ifndef IMM_CTRANS_H
 #define IMM_CTRANS_H
 
-#include <assert.h>
+#include "static_assert.h"
 #include <stdint.h>
 
 struct imm_ctrans
@@ -11,6 +11,6 @@ struct imm_ctrans
   uint16_t dst; /**< Destination state. */
 };
 
-static_assert(sizeof(struct imm_ctrans) == 8, "");
+imm_static_assert(sizeof(struct imm_ctrans) == 8, "");
 
 #endif

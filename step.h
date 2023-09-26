@@ -3,6 +3,7 @@
 
 #include "api.h"
 #include "state.h"
+#include "static_assert.h"
 #include <assert.h>
 #include <stdalign.h>
 #include <stdint.h>
@@ -14,8 +15,8 @@ struct imm_step
   float score;
 };
 
-static_assert(sizeof(struct imm_step) == 8, "struct pair must be packed");
-static_assert(alignof(struct imm_step) == 4, "struct pair must align to 4");
+imm_static_assert(sizeof(struct imm_step) == 8, "struct pair must be packed");
+imm_static_assert(alignof(struct imm_step) == 4, "struct pair must align to 4");
 
 IMM_API struct imm_step imm_step(unsigned state_id, unsigned seqlen,
                                  float score);

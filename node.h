@@ -4,7 +4,7 @@
 #include "api.h"
 #include "lprob.h"
 #include "state.h"
-#include <assert.h>
+#include "static_assert.h"
 #include <stdint.h>
 #include <stdio.h>
 
@@ -18,7 +18,7 @@ struct imm_node
 struct imm_state_table;
 
 // TODO: I would like this to be 4 bytes instead
-static_assert(sizeof(struct imm_node) == 8, "");
+imm_static_assert(sizeof(struct imm_node) == 8, "");
 
 IMM_API void imm_node_dump(struct imm_node const *, uint16_t *ids,
                            imm_state_name *, FILE *restrict);

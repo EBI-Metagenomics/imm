@@ -2,7 +2,6 @@
 
 include(CMakeFindDependencyMacro)
 
-find_dependency(elapsed)
 find_dependency(lip)
 
 if (NOT TARGET IMM::imm)
@@ -10,5 +9,4 @@ if (NOT TARGET IMM::imm)
 endif()
 
 check_required_components(imm)
-check_required_components(elapsed)
 check_required_components(lip)
