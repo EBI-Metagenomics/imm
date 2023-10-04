@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.20.2 FATAL_ERROR)
-project(imm VERSION 5.0.5 LANGUAGES C)
+project(imm VERSION 5.0.6 LANGUAGES C)
 
 include(cmake/sanitizers.cmake)
 include(cmake/warnings.cmake)
 include(cmake/CPM.cmake)
 
-cpmaddpackage("gh:EBI-Metagenomics/lip@0.5.3")
+cpmaddpackage("gh:EBI-Metagenomics/lip@0.5.4")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_C_STANDARD 11)

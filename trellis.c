@@ -20,13 +20,10 @@ int imm_trellis_setup(struct imm_trellis *x, unsigned seqsize, unsigned nstates)
 {
   unsigned num_stages = seqsize + 1;
   size_t size = sizeof(struct imm_node) * (num_stages * nstates);
-  if (size > x->capacity)
+  if (!(x->pool = imm_reallocf(x->pool, size)))
   {
-    if (!(x->pool = imm_reallocf(x->pool, size)))
-    {
-      imm_trellis_cleanup(x);
-      return IMM_ENOMEM;
-    }
+    imm_trellis_cleanup(x);
+    return IMM_ENOMEM;
   }
 
   x->num_stages = num_stages;
