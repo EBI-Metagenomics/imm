@@ -52,7 +52,6 @@ extern "C" {
 #include "state_vtable.h"
 #include "step.h"
 #include "str.h"
-#include "subseq.h"
 #include "sym.h"
 #include "task.h"
 #include "viterbi.h"

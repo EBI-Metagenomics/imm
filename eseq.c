@@ -1,6 +1,5 @@
 #include "eseq.h"
 #include "code.h"
-#include "subseq.h"
 
 void imm_eseq_init(struct imm_eseq *eseq, struct imm_code const *code)
 {
@@ -37,8 +36,8 @@ int imm_eseq_setup(struct imm_eseq *eseq, struct imm_seq const *seq)
     {
       if (i + len > imm_seq_size(seq)) break;
 
-      struct imm_seq subseq = imm_subseq(seq, i, len);
-      unsigned code = imm_code_encode(eseq->code, &subseq);
+      struct imm_seq t = imm_seq_slice(seq, imm_range(i, i + len));
+      unsigned code = imm_code_encode(eseq->code, &t);
       imm_matrixu16_set(&eseq->data, i, len, (uint16_t)code);
     }
   }

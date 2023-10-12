@@ -16,7 +16,6 @@
 #include "span.h"
 #include "state.h"
 #include "state_table.h"
-#include "subseq.h"
 #include "task.h"
 #include "trans.h"
 #include "trans_table.h"
@@ -267,7 +266,8 @@ void imm_dp_dump_path(struct imm_dp const *x, struct imm_task const *t,
     unsigned seq_code = imm_eseq_get(t->seq, begin, step->seqlen, min);
 
     float score = imm_emis_score(&x->emis, idx, seq_code);
-    struct imm_seq subseq = imm_subseq(seq, begin, step->seqlen);
+    struct imm_range range = imm_range(begin, begin + step->seqlen);
+    struct imm_seq subseq = imm_seq_slice(seq, range);
     fprintf(fp, "<%s,%.*s,%.4f>\n", imm_state_table_name(&x->state_table, idx),
             subseq.str.size, subseq.str.data, score);
     begin += step->seqlen;

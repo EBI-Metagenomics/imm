@@ -10,7 +10,6 @@
 #include "path.h"
 #include "stack.h"
 #include "state.h"
-#include "subseq.h"
 #include "tsort.h"
 #include <assert.h>
 #include <stdlib.h>
@@ -254,7 +253,7 @@ float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
 
   if (step->seqlen > imm_seq_size(seq)) return imm_lprob_nan();
 
-  struct imm_seq subseq = imm_subseq(seq, 0, step->seqlen);
+  struct imm_seq subseq = imm_seq_slice(seq, imm_range(0, step->seqlen));
   float lprob = imm_state_lprob(state, &subseq);
 
   unsigned start = 0;
@@ -266,7 +265,7 @@ float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
 
     struct imm_state const *prev_state = state;
     if (!(state = hmm_state(hmm, step->state_id))) return imm_lprob_nan();
-    imm_subseq_init(&subseq, seq, start, step->seqlen);
+    subseq = imm_seq_slice(seq, imm_range(start, start + step->seqlen));
     lprob += imm_hmm_trans(hmm, prev_state, state);
     lprob += imm_state_lprob(state, &subseq);
   }
