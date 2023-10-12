@@ -39,28 +39,26 @@
 #define IMM_HAS_ATTRIBUTE(x) (0)
 #endif
 
-#if IMM_HAS_ATTRIBUTE(unused)
-#define IMM_UNUSED __attribute__((unused))
+#if IMM_HAS_ATTRIBUTE(const)
+#define IMM_CONST_ATTRIBUTE __attribute__((const))
 #else
-#define IMM_UNUSED
+#define IMM_CONST_ATTRIBUTE
 #endif
 
 #if IMM_HAS_ATTRIBUTE(always_inline)
-#define IMM_INLINE static inline __attribute__((always_inline))
+#define IMM_ALWAYS_INLINE_ATTRIBUTE __attribute__((always_inline))
 #else
-#define IMM_INLINE static inline
-#endif
-
-#if IMM_HAS_ATTRIBUTE(const)
-#define IMM_CONST IMM_INLINE __attribute__((const))
-#else
-#define IMM_CONST IMM_INLINE
+#define IMM_ALWAYS_INLINE_ATTRIBUTE
 #endif
 
 #if IMM_HAS_ATTRIBUTE(pure)
-#define IMM_PURE IMM_INLINE __attribute__((pure))
+#define IMM_PURE_ATTRIBUTE __attribute__((pure))
 #else
-#define IMM_PURE IMM_INLINE
+#define IMM_PURE_ATTRIBUTE
 #endif
+
+#define IMM_INLINE static inline IMM_ALWAYS_INLINE_ATTRIBUTE
+#define IMM_CONST IMM_INLINE IMM_CONST_ATTRIBUTE
+#define IMM_PURE IMM_INLINE IMM_PURE_ATTRIBUTE
 
 #endif
