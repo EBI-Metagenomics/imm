@@ -44,7 +44,7 @@ int imm_eseq_setup(struct imm_eseq *eseq, struct imm_seq const *seq)
   return rc;
 }
 
-struct imm_eseq imm_eseq_slice(struct imm_eseq *x, struct imm_range r)
+struct imm_eseq imm_eseq_slice(struct imm_eseq const *x, struct imm_range r)
 {
   assert(r.start + imm_range_size(r) <= x->data.rows);
   uint16_t *ptr = x->data.data + r.start;
