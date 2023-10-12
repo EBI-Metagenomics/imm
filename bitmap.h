@@ -11,9 +11,8 @@
 
 unsigned long *imm_bitmap_reallocf(unsigned long *, unsigned long bits);
 
-imm_pure_template unsigned long __bitmap_get(unsigned long const *x,
-                                             unsigned addr, unsigned nbits,
-                                             unsigned long val)
+IMM_PURE unsigned long __bitmap_get(unsigned long const *x, unsigned addr,
+                                    unsigned nbits, unsigned long val)
 {
   imm_assume(addr + nbits <= IMM_BITS_COUNT(long));
   imm_assume(nbits <= 16);
@@ -25,9 +24,9 @@ imm_pure_template unsigned long __bitmap_get(unsigned long const *x,
   return val;
 }
 
-imm_pure imm_template unsigned long imm_bitmap_get(unsigned long const *x,
-                                                   unsigned long const addr,
-                                                   unsigned const nbits)
+IMM_PURE unsigned long imm_bitmap_get(unsigned long const *x,
+                                      unsigned long const addr,
+                                      unsigned const nbits)
 {
   imm_assume(nbits <= 16);
   unsigned long const *y = x + IMM_BITMAP_LONG(addr);
@@ -39,8 +38,8 @@ imm_pure imm_template unsigned long imm_bitmap_get(unsigned long const *x,
   return val;
 }
 
-imm_template void __bitmap_set(unsigned long *x, unsigned long val,
-                               unsigned addr, unsigned nbits)
+IMM_INLINE void __bitmap_set(unsigned long *x, unsigned long val, unsigned addr,
+                             unsigned nbits)
 {
   imm_assume(addr + nbits <= IMM_BITS_COUNT(long));
   imm_assume(nbits <= 16);
@@ -51,8 +50,8 @@ imm_template void __bitmap_set(unsigned long *x, unsigned long val,
   }
 }
 
-imm_template void imm_bitmap_set(unsigned long *x, unsigned long val,
-                                 unsigned long addr, unsigned nbits)
+IMM_INLINE void imm_bitmap_set(unsigned long *x, unsigned long val,
+                               unsigned long addr, unsigned nbits)
 {
   imm_assume(nbits <= 16);
   unsigned long *y = x + IMM_BITMAP_LONG(addr);

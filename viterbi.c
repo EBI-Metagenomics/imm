@@ -16,48 +16,45 @@
 #include "zspan.h"
 #include <string.h>
 
-imm_pure_template unsigned start_state_idx(struct imm_viterbi const *x)
+IMM_PURE unsigned start_state_idx(struct imm_viterbi const *x)
 {
   return x->dp->state_table.start_state_idx;
 }
 
-imm_pure_template uint16_t start_trans_idx(struct imm_viterbi const *x,
-                                           unsigned state_idx)
+IMM_PURE uint16_t start_trans_idx(struct imm_viterbi const *x,
+                                  unsigned state_idx)
 {
   return imm_trans_table_trans_start(&x->dp->trans_table, state_idx);
 }
 
-imm_template void viterbi_ctrans_rewind(struct imm_viterbi *x)
+IMM_INLINE void viterbi_ctrans_rewind(struct imm_viterbi *x)
 {
   x->curr_trans = imm_trans_table_ctrans_start(&x->dp->trans_table);
 }
 
-imm_template void viterbi_ctrans_seek(struct imm_viterbi *x, unsigned trans_idx)
+IMM_INLINE void viterbi_ctrans_seek(struct imm_viterbi *x, unsigned trans_idx)
 {
   x->curr_trans = x->dp->trans_table.trans + trans_idx;
 }
 
-imm_template void viterbi_ctrans_next(struct imm_viterbi *x)
-{
-  x->curr_trans++;
-}
+IMM_INLINE void viterbi_ctrans_next(struct imm_viterbi *x) { x->curr_trans++; }
 
-imm_template void set_matrix_cell_score(struct imm_viterbi const *x,
-                                        struct imm_cell cell, float score)
+IMM_INLINE void set_matrix_cell_score(struct imm_viterbi const *x,
+                                      struct imm_cell cell, float score)
 {
   imm_matrix_set_score(&x->task->matrix, cell, score);
 }
 
-imm_pure_template float get_matrix_cell_score(struct imm_viterbi const *x,
-                                              unsigned row, uint_fast16_t src,
-                                              uint_fast8_t emission_length)
+IMM_PURE float get_matrix_cell_score(struct imm_viterbi const *x, unsigned row,
+                                     uint_fast16_t src,
+                                     uint_fast8_t emission_length)
 {
   imm_assume(row >= emission_length);
   struct imm_cell cell = imm_cell(row - emission_length, src, emission_length);
   return imm_matrix_get_score(&x->task->matrix, cell);
 }
 
-imm_pure_template unsigned nstates(struct imm_viterbi const *x)
+IMM_PURE unsigned nstates(struct imm_viterbi const *x)
 {
   return x->dp->state_table.nstates;
 }
@@ -69,14 +66,13 @@ struct state
   uint_fast8_t max;
 };
 
-imm_pure_template uint8_t state_zspan(struct imm_viterbi const *x,
-                                      unsigned state_idx)
+IMM_PURE uint8_t state_zspan(struct imm_viterbi const *x, unsigned state_idx)
 {
   return imm_state_table_zspan(&x->dp->state_table, state_idx);
 }
 
-imm_pure_template struct state unwrap_state(struct imm_viterbi const *x,
-                                            unsigned state_idx)
+IMM_PURE struct state unwrap_state(struct imm_viterbi const *x,
+                                   unsigned state_idx)
 {
   uint8_t span = state_zspan(x, state_idx);
   imm_assume(imm_zspan_min(span) <= IMM_STATE_MAX_SEQLEN);
@@ -99,7 +95,7 @@ void imm_viterbi_init(struct imm_viterbi *x, struct imm_dp const *dp,
   find_tardy_states(x, dp);
 }
 
-imm_pure_template unsigned ntrans(struct imm_viterbi const *x, unsigned dst)
+IMM_PURE unsigned ntrans(struct imm_viterbi const *x, unsigned dst)
 {
   return imm_trans_table_ntrans(&x->dp->trans_table, dst);
 }
@@ -150,9 +146,9 @@ static inline struct step step_init(void)
                        IMM_LPROB_ZERO};
 }
 
-imm_template struct step best_step(struct imm_viterbi *x, unsigned row,
-                                   uint_fast16_t dst, bool tardy_state,
-                                   bool safe_past)
+IMM_INLINE struct step best_step(struct imm_viterbi *x, unsigned row,
+                                 uint_fast16_t dst, bool tardy_state,
+                                 bool safe_past)
 {
   struct step step = step_init();
   unsigned trans = 0;
@@ -200,17 +196,16 @@ imm_template struct step best_step(struct imm_viterbi *x, unsigned row,
   return step;
 }
 
-imm_pure_template float emission_score(struct imm_viterbi const *x,
-                                       struct state state, unsigned row,
-                                       unsigned len)
+IMM_PURE float emission_score(struct imm_viterbi const *x, struct state state,
+                              unsigned row, unsigned len)
 {
   unsigned code = imm_eseq_get(x->task->seq, row, len, state.min);
   return imm_emis_score(&x->dp->emis, state.idx, code);
 }
 
-imm_template void set_state_score(struct imm_viterbi const *x, unsigned row,
-                                  struct state dst, unsigned remain,
-                                  struct step const *bt, bool safe_future)
+IMM_INLINE void set_state_score(struct imm_viterbi const *x, unsigned row,
+                                struct state dst, unsigned remain,
+                                struct step const *bt, bool safe_future)
 {
   float score = bt->score;
   // if (row == 0 && start_state_idx(x) == dst.idx)
@@ -254,17 +249,16 @@ imm_template void set_state_score(struct imm_viterbi const *x, unsigned row,
   }
 }
 
-imm_const_template unsigned remains(unsigned seqlen, unsigned row,
-                                    bool safe_future)
+IMM_CONST unsigned remains(unsigned seqlen, unsigned row, bool safe_future)
 {
   if (safe_future) return IMM_STATE_MAX_SEQLEN;
   if (seqlen >= IMM_STATE_MAX_SEQLEN + row) return IMM_STATE_MAX_SEQLEN;
   return seqlen - row;
 }
 
-imm_template void on_normal_state(struct imm_viterbi *x, unsigned row,
-                                  struct state dst, bool safe_future,
-                                  bool safe_past, bool tardy_state)
+IMM_INLINE void on_normal_state(struct imm_viterbi *x, unsigned row,
+                                struct state dst, bool safe_future,
+                                bool safe_past, bool tardy_state)
 {
   unsigned remain = remains(x->seqlen, row, safe_future);
 
@@ -272,17 +266,17 @@ imm_template void on_normal_state(struct imm_viterbi *x, unsigned row,
   set_state_score(x, row, dst, remain, &step, safe_future);
 }
 
-imm_template void on_tardy_state(struct imm_viterbi *x, unsigned row,
-                                 struct tardy_state const tardy,
-                                 bool safe_future, bool safe_past)
+IMM_INLINE void on_tardy_state(struct imm_viterbi *x, unsigned row,
+                               struct tardy_state const tardy, bool safe_future,
+                               bool safe_past)
 {
   viterbi_ctrans_seek(x, tardy.trans_start);
   struct state dst = unwrap_state(x, tardy.state_idx);
   on_normal_state(x, row, dst, safe_future, safe_past, true);
 }
 
-imm_template void on_row(struct imm_viterbi *x, unsigned row,
-                         bool has_tardy_state, bool safe_future, bool safe_past)
+IMM_INLINE void on_row(struct imm_viterbi *x, unsigned row,
+                       bool has_tardy_state, bool safe_future, bool safe_past)
 {
   if (has_tardy_state)
   {
@@ -309,7 +303,7 @@ imm_template void on_row(struct imm_viterbi *x, unsigned row,
   }
 }
 
-imm_template void viterbi_generic(struct imm_viterbi *x, bool has_tardy_state)
+IMM_INLINE void viterbi_generic(struct imm_viterbi *x, bool has_tardy_state)
 {
   set_matrix_cell_score(x, imm_cell(0, start_state_idx(x), 0), 0);
   imm_trellis_seek(&x->task->trellis, 0, start_state_idx(x));

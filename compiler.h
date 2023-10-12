@@ -1,50 +1,46 @@
 #ifndef IMM_COMPILER_H
 #define IMM_COMPILER_H
 
-#ifndef __has_builtin
-#define __has_builtin(x) (0)
-#endif
-
-#if !__has_builtin(__builtin_unreachable)
-#define __builtin_unreachable() (void)(0)
-#endif
-
-#ifndef __has_attribute
-#define __has_attribute(x) (0)
-#endif
-
-#if __has_attribute(const)
-#define imm_const __attribute__((const))
+#ifdef __has_builtin
+#define IMM_HAS_BUILTIN(x) __has_builtin(x)
 #else
-#define imm_const
+#define IMM_HAS_BUILTIN(x) (0)
 #endif
 
-#if __has_attribute(pure)
-#define imm_pure __attribute__((pure))
+#if IMM_HAS_BUILTIN(__builtin_unreachable)
+#define IMM_UNREACHABLE() __builtin_unreachable()
 #else
-#define imm_pure
+#define IMM_UNREACHABLE() (void)(0)
 #endif
 
-#if __has_attribute(always_inline)
-#define imm_force_inline __attribute__((always_inline))
+#ifdef __has_attribute
+#define IMM_HAS_ATTRIBUTE(x) __has_attribute(x)
 #else
-#define imm_force_inline
+#define IMM_HAS_ATTRIBUTE(x) (0)
 #endif
 
-/*
- * imm_template is used to define C "templates", which take constant
- * parameters. They must be inlined for the compiler to eliminate the constant
- * branches.
- *
- * Acknowledgement: ZSTD.
- */
-#define imm_template static inline imm_force_inline
+#if IMM_HAS_ATTRIBUTE(unused)
+#define IMM_UNUSED __attribute__((unused))
+#else
+#define IMM_UNUSED
+#endif
 
-#define imm_const_template imm_const imm_template
-#define imm_pure_template imm_pure imm_template
-
+#if IMM_HAS_ATTRIBUTE(always_inline)
+#define IMM_INLINE static inline __attribute__((always_inline))
+#else
 #define IMM_INLINE static inline
-#define IMM_PURE imm_pure imm_template
-#define IMM_CONST imm_const imm_template
+#endif
+
+#if IMM_HAS_ATTRIBUTE(const)
+#define IMM_CONST IMM_INLINE __attribute__((const))
+#else
+#define IMM_CONST IMM_INLINE
+#endif
+
+#if IMM_HAS_ATTRIBUTE(pure)
+#define IMM_PURE IMM_INLINE __attribute__((pure))
+#else
+#define IMM_PURE IMM_INLINE
+#endif
 
 #endif

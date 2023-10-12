@@ -33,33 +33,32 @@ void imm_trans_table_cleanup(struct imm_trans_table *);
 unsigned imm_trans_table_transsize(unsigned ntrans);
 unsigned imm_trans_table_offsize(unsigned nstates);
 
-imm_pure_template unsigned
-imm_trans_table_ntrans(struct imm_trans_table const *x, unsigned dst)
+IMM_PURE unsigned imm_trans_table_ntrans(struct imm_trans_table const *x,
+                                         unsigned dst)
 {
   imm_assume(x->offset[dst + 1] >= x->offset[dst]);
   return (unsigned)(x->offset[dst + 1] - x->offset[dst]);
 }
 
-imm_pure_template unsigned
-imm_trans_table_source_state(struct imm_trans_table const *x, unsigned dst,
-                             unsigned trans)
+IMM_PURE unsigned imm_trans_table_source_state(struct imm_trans_table const *x,
+                                               unsigned dst, unsigned trans)
 {
   return x->trans[x->offset[dst] + trans].src;
 }
 
-imm_pure_template float imm_trans_table_score(struct imm_trans_table const *x,
-                                              unsigned dst, unsigned trans)
+IMM_PURE float imm_trans_table_score(struct imm_trans_table const *x,
+                                     unsigned dst, unsigned trans)
 {
   return x->trans[x->offset[dst] + trans].score;
 }
 
-imm_pure_template uint16_t
-imm_trans_table_trans_start(struct imm_trans_table const *x, unsigned state)
+IMM_PURE uint16_t imm_trans_table_trans_start(struct imm_trans_table const *x,
+                                              unsigned state)
 {
   return x->offset[state];
 }
 
-imm_pure_template struct imm_ctrans const *
+IMM_PURE struct imm_ctrans const *
 imm_trans_table_ctrans_start(struct imm_trans_table const *x)
 {
   return x->trans;

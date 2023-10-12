@@ -18,7 +18,7 @@
  * For example, `log(exp(1e3) + exp(-INFINITY))` will likely overflow,
  * while `logaddexp(1e3, -INFINITY)` will return `1e3`.
  */
-imm_const_template float imm_logaddexp(float x, float y)
+IMM_CONST float imm_logaddexp(float x, float y)
 {
   float const tmp = x - y;
 

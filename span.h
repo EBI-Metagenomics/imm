@@ -9,7 +9,7 @@ struct imm_span
   unsigned max;
 };
 
-imm_const_template struct imm_span imm_span(unsigned min, unsigned max)
+IMM_CONST struct imm_span imm_span(unsigned min, unsigned max)
 {
   return (struct imm_span){min, max};
 }

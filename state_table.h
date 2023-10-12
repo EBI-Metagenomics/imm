@@ -36,8 +36,8 @@ struct imm_range imm_state_table_range(struct imm_state_table const *,
                                        unsigned idx);
 void imm_state_table_dump(struct imm_state_table const *, FILE *restrict);
 
-imm_pure_template uint8_t imm_state_table_zspan(struct imm_state_table const *x,
-                                                unsigned state_idx)
+IMM_PURE uint8_t imm_state_table_zspan(struct imm_state_table const *x,
+                                       unsigned state_idx)
 {
   return x->span[state_idx];
 }
