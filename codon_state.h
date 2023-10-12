@@ -1,7 +1,7 @@
 #ifndef IMM_CODON_STATE_H
 #define IMM_CODON_STATE_H
 
-#include "api.h"
+#include "compiler.h"
 #include "state.h"
 
 struct imm_codon_lprob;

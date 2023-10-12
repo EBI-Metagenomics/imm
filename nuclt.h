@@ -2,7 +2,7 @@
 #define IMM_NUCLT_H
 
 #include "abc.h"
-#include "api.h"
+#include "compiler.h"
 
 #define IMM_NUCLT_ANY_SYMBOL 'X'
 #define IMM_NUCLT_SYMBOLS "ACGT"

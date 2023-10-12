@@ -1,8 +1,8 @@
 #ifndef IMM_NUCLT_CODE_H
 #define IMM_NUCLT_CODE_H
 
-#include "api.h"
 #include "code.h"
+#include "compiler.h"
 #include "nuclt.h"
 
 struct imm_nuclt;

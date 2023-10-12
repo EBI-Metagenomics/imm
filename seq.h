@@ -1,7 +1,7 @@
 #ifndef IMM_SEQ_H
 #define IMM_SEQ_H
 
-#include "api.h"
+#include "compiler.h"
 #include "range.h"
 #include "str.h"
 

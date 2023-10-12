@@ -1,7 +1,7 @@
 #ifndef IMM_STR_H
 #define IMM_STR_H
 
-#include "api.h"
+#include "compiler.h"
 #include "range.h"
 
 struct imm_str

@@ -1,7 +1,6 @@
 #ifndef IMM_HMM_H
 #define IMM_HMM_H
 
-#include "api.h"
 #include "code.h"
 #include "compiler.h"
 #include "pair.h"

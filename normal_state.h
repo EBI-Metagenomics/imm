@@ -1,7 +1,7 @@
 #ifndef IMM_NORMAL_STATE_H
 #define IMM_NORMAL_STATE_H
 
-#include "api.h"
+#include "compiler.h"
 #include "state.h"
 
 struct imm_abc;

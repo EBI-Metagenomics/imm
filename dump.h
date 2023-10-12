@@ -1,7 +1,7 @@
 #ifndef IMM_DUMP_H
 #define IMM_DUMP_H
 
-#include "api.h"
+#include "compiler.h"
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>

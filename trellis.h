@@ -1,7 +1,7 @@
 #ifndef IMM_TRELLIS_H
 #define IMM_TRELLIS_H
 
-#include "api.h"
+#include "compiler.h"
 #include "lprob.h"
 #include "node.h"
 #include "state.h"

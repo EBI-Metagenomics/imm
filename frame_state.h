@@ -1,8 +1,8 @@
 #ifndef IMM_FRAME_STATE_H
 #define IMM_FRAME_STATE_H
 
-#include "api.h"
 #include "codon_marg.h"
+#include "compiler.h"
 #include "frame_epsilon.h"
 #include "nuclt_lprob.h"
 #include "span.h"

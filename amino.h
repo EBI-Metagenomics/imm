@@ -2,7 +2,7 @@
 #define IMM_AMINO_H
 
 #include "abc.h"
-#include "api.h"
+#include "compiler.h"
 
 #define IMM_AMINO_ANY_SYMBOL 'X'
 #define IMM_AMINO_SYMBOLS "ACDEFGHIKLMNPQRSTVWY"

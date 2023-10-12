@@ -1,7 +1,7 @@
 #ifndef IMM_NODE_H
 #define IMM_NODE_H
 
-#include "api.h"
+#include "compiler.h"
 #include "lprob.h"
 #include "state.h"
 #include "static_assert.h"

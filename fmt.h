@@ -1,7 +1,6 @@
 #ifndef IMM_FMT_H
 #define IMM_FMT_H
 
-#include "api.h"
 #include "compiler.h"
 
 IMM_API void imm_fmt_set_f32(char const *);

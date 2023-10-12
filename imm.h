@@ -9,7 +9,6 @@ extern "C" {
 #include "abc_lprob.h"
 #include "amino.h"
 #include "amino_lprob.h"
-#include "api.h"
 #include "cartes.h"
 #include "cell.h"
 #include "clock.h"

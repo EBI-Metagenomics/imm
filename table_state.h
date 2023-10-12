@@ -1,7 +1,7 @@
 #ifndef IMM_TABLE_STATE_H
 #define IMM_TABLE_STATE_H
 
-#include "api.h"
+#include "compiler.h"
 #include "span.h"
 #include "state.h"
 

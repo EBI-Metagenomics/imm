@@ -1,7 +1,6 @@
 #ifndef IMM_EMIS_H
 #define IMM_EMIS_H
 
-#include "api.h"
 #include "compiler.h"
 #include "state.h"
 #include <stdint.h>
@@ -26,13 +25,13 @@ unsigned imm_emis_score_size(struct imm_emis const *, unsigned nstates);
 unsigned imm_emis_offset_size(unsigned nstates);
 
 IMM_PURE float imm_emis_score(struct imm_emis const *x, unsigned state,
-                                       unsigned seq_code)
+                              unsigned seq_code)
 {
   return x->score[x->offset[state] + seq_code];
 }
 
-IMM_INLINE float const *imm_emis_table(struct imm_emis const *x,
-                                         unsigned state, unsigned *size)
+IMM_INLINE float const *imm_emis_table(struct imm_emis const *x, unsigned state,
+                                       unsigned *size)
 {
   *size = x->offset[state + 1] - x->offset[state];
   return &x->score[x->offset[state]];

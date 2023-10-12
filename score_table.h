@@ -1,8 +1,8 @@
 #ifndef IMM_SCORE_TABLE_H
 #define IMM_SCORE_TABLE_H
 
-#include "api.h"
 #include "cartes.h"
+#include "compiler.h"
 
 struct imm_score_table
 {

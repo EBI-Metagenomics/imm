@@ -1,7 +1,6 @@
 #ifndef IMM_ESEQ_H
 #define IMM_ESEQ_H
 
-#include "api.h"
 #include "code.h"
 #include "compiler.h"
 #include "matrixu16.h"

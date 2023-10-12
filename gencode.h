@@ -1,8 +1,8 @@
 #ifndef IMM_GENCODE_H
 #define IMM_GENCODE_H
 
-#include "api.h"
 #include "codon.h"
+#include "compiler.h"
 #include "dna.h"
 
 struct imm_gencode

@@ -1,7 +1,7 @@
 #ifndef IMM_CODON_H
 #define IMM_CODON_H
 
-#include "api.h"
+#include "compiler.h"
 #include "nuclt.h"
 
 struct imm_codon

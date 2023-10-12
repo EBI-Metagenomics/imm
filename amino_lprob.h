@@ -2,7 +2,7 @@
 #define IMM_AMINO_LPROB_H
 
 #include "amino.h"
-#include "api.h"
+#include "compiler.h"
 
 struct imm_amino_lprob
 {

@@ -1,7 +1,6 @@
 #ifndef IMM_ABC_H
 #define IMM_ABC_H
 
-#include "api.h"
 #include "str.h"
 #include "sym.h"
 
