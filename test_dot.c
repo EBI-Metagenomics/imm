@@ -16,7 +16,7 @@ static char *state_name(unsigned id, char *name)
 static void hmm_dot(void)
 {
   struct imm_abc abc;
-  imm_abc_init(&abc, IMM_STR("ACGT"), '*');
+  imm_abc_init(&abc, imm_str("ACGT"), '*');
   struct imm_code code;
   imm_code_init(&code, &abc);
 
@@ -42,7 +42,7 @@ static void hmm_dot(void)
 static void dp_dot(void)
 {
   struct imm_abc abc;
-  imm_abc_init(&abc, IMM_STR("ACGT"), '*');
+  imm_abc_init(&abc, imm_str("ACGT"), '*');
   struct imm_code code;
   imm_code_init(&code, &abc);
 

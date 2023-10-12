@@ -12,7 +12,7 @@
 static void standard_usage(void)
 {
   struct imm_abc abc = {0};
-  eq(imm_abc_init(&abc, IMM_STR("ACGT"), '*'), 0);
+  eq(imm_abc_init(&abc, imm_str("ACGT"), '*'), 0);
   eq(imm_abc_symbol_idx(&abc, 'G'), 2U);
   eq(imm_abc_size(&abc), 4U);
   ok(imm_abc_has_symbol(&abc, 'C'));
@@ -26,13 +26,13 @@ static void standard_usage(void)
 static void duplicated_alphabet(void)
 {
   struct imm_abc abc = {0};
-  eq(imm_abc_init(&abc, IMM_STR("ACTC"), '*'), IMM_EINVAL);
+  eq(imm_abc_init(&abc, imm_str("ACTC"), '*'), IMM_EINVAL);
 }
 
 static void duplicated_any_symbol(void)
 {
   struct imm_abc abc = {0};
-  eq(imm_abc_init(&abc, IMM_STR("AC*T"), '*'), IMM_EINVAL);
+  eq(imm_abc_init(&abc, imm_str("AC*T"), '*'), IMM_EINVAL);
 }
 
 static void symbol_outside_range(void)
@@ -46,13 +46,13 @@ static void symbol_outside_range(void)
 static void any_symbol_outside_range(void)
 {
   struct imm_abc abc = {0};
-  eq(imm_abc_init(&abc, IMM_STR("ACGT"), 3), IMM_EINVAL);
+  eq(imm_abc_init(&abc, imm_str("ACGT"), 3), IMM_EINVAL);
 }
 
 static void union_size(void)
 {
   struct imm_abc abc = {0};
-  eq(imm_abc_init(&abc, IMM_STR("ACT"), '*'), 0);
+  eq(imm_abc_init(&abc, imm_str("ACT"), '*'), 0);
   char data[] = "ACAAAAAAAAC*AATT*G";
   eq(imm_abc_union_size(&abc, imm_str(data)), 1U);
 }
@@ -60,7 +60,7 @@ static void union_size(void)
 static void get_lprob(void)
 {
   struct imm_abc abc = {0};
-  eq(imm_abc_init(&abc, IMM_STR("ACGT"), 'X'), 0);
+  eq(imm_abc_init(&abc, imm_str("ACGT"), 'X'), 0);
 
   float const lprobs[4] = {log(0.2), log(0.01), log(1.0), log(0.5)};
   struct imm_abc_lprob lprob = imm_abc_lprob(&abc, lprobs);
@@ -103,7 +103,7 @@ static void abc_io(void)
   struct lip_file file = {0};
   struct imm_abc abc_out = {0};
 
-  imm_abc_init(&abc_out, IMM_STR("ACGT"), '*');
+  imm_abc_init(&abc_out, imm_str("ACGT"), '*');
 
   file.fp = fopen("abc_io.imm", "wb");
   eq(imm_abc_pack(&abc_out, &file), 0);

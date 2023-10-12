@@ -269,7 +269,7 @@ void imm_dp_dump_path(struct imm_dp const *x, struct imm_task const *t,
     float score = imm_emis_score(&x->emis, idx, seq_code);
     struct imm_seq subseq = imm_subseq(seq, begin, step->seqlen);
     fprintf(fp, "<%s,%.*s,%.4f>\n", imm_state_table_name(&x->state_table, idx),
-            subseq.size, subseq.str, score);
+            subseq.str.size, subseq.str.data, score);
     begin += step->seqlen;
   }
 }

@@ -203,9 +203,9 @@ static void hmm_loglik_two_mute_states(void)
 static void hmm_loglik_invalid(void)
 {
   struct imm_abc abc_ac = {0};
-  imm_abc_init(&abc_ac, IMM_STR("AC"), '*');
+  imm_abc_init(&abc_ac, imm_str("AC"), '*');
 
-  struct imm_seq C = imm_seq(IMM_STR("C"), &abc_ac);
+  struct imm_seq C = imm_seq(imm_str("C"), &abc_ac);
 
   struct imm_hmm hmm;
   imm_code_init(&code, &abc_ac);
@@ -259,15 +259,15 @@ static void hmm_loglik_no_state(void)
 
 int main(void)
 {
-  imm_abc_init(&abc, IMM_STR("ACGT"), '*');
+  imm_abc_init(&abc, imm_str("ACGT"), '*');
   imm_code_init(&code, &abc);
-  EMPTY = imm_seq(IMM_STR(""), &abc);
-  A = imm_seq(IMM_STR("A"), &abc);
-  T = imm_seq(IMM_STR("T"), &abc);
-  G = imm_seq(IMM_STR("G"), &abc);
-  AG = imm_seq(IMM_STR("AG"), &abc);
-  AA = imm_seq(IMM_STR("AA"), &abc);
-  GT = imm_seq(IMM_STR("GT"), &abc);
+  EMPTY = imm_seq(imm_str(""), &abc);
+  A = imm_seq(imm_str("A"), &abc);
+  T = imm_seq(imm_str("T"), &abc);
+  G = imm_seq(imm_str("G"), &abc);
+  AG = imm_seq(imm_str("AG"), &abc);
+  AA = imm_seq(imm_str("AA"), &abc);
+  GT = imm_seq(imm_str("GT"), &abc);
   lrun("hmm_loglik_single_state", hmm_loglik_single_state);
   lrun("hmm_loglik_two_states", hmm_loglik_two_states);
   lrun("hmm_loglik_mute_state", hmm_loglik_mute_state);

@@ -255,11 +255,11 @@ static void dp_io_example2(void)
 
 int main(void)
 {
-  imm_abc_init(&abc, IMM_STR("ACGT"), '*');
+  imm_abc_init(&abc, imm_str("ACGT"), '*');
   imm_code_init(&code, &abc);
-  EMPTY = imm_seq(IMM_STR(""), &abc);
-  A = imm_seq(IMM_STR("A"), &abc);
-  ATT = imm_seq(IMM_STR("ATT"), &abc);
+  EMPTY = imm_seq(imm_str(""), &abc);
+  A = imm_seq(imm_str("A"), &abc);
+  ATT = imm_seq(imm_str("ATT"), &abc);
 
   lrun("dp_illegal", dp_illegal);
   lrun("dp_empty_path", dp_empty_path);

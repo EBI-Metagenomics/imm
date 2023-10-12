@@ -41,7 +41,7 @@ static char *state_name(unsigned id, char *name)
 static void odd1(void)
 {
   struct imm_abc abc = {0};
-  eq(imm_abc_init(&abc, IMM_STR("XJ"), '*'), 0);
+  eq(imm_abc_init(&abc, imm_str("XJ"), '*'), 0);
 
   struct imm_mute_state b = {0};
   imm_mute_state_init(&b, B, &abc);
@@ -88,7 +88,7 @@ static void odd1(void)
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
-  struct imm_seq seq = imm_seq(IMM_STR("XX"), &abc);
+  struct imm_seq seq = imm_seq(imm_str("XX"), &abc);
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
@@ -115,7 +115,7 @@ static void odd1(void)
 static void odd2(void)
 {
   struct imm_abc abc = {0};
-  eq(imm_abc_init(&abc, IMM_STR("XJ"), '*'), 0);
+  eq(imm_abc_init(&abc, imm_str("XJ"), '*'), 0);
 
   struct imm_mute_state b = {0};
   imm_mute_state_init(&b, B, &abc);
@@ -167,7 +167,7 @@ static void odd2(void)
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
-  struct imm_seq seq = imm_seq(IMM_STR("XJX"), &abc);
+  struct imm_seq seq = imm_seq(imm_str("XJX"), &abc);
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);

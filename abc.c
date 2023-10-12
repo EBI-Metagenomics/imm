@@ -12,7 +12,7 @@
 
 int imm_abc_init(struct imm_abc *abc, struct imm_str symbols, char any_symbol)
 {
-  return imm__abc_init(abc, symbols.len, symbols.data, any_symbol, IMM_ABC);
+  return imm__abc_init(abc, symbols.size, symbols.data, any_symbol, IMM_ABC);
 }
 
 char imm_abc_any_symbol(struct imm_abc const *abc)
@@ -56,7 +56,7 @@ char const *imm_abc_symbols(struct imm_abc const *abc) { return abc->symbols; }
 unsigned imm_abc_union_size(struct imm_abc const *abc, struct imm_str seq)
 {
   unsigned size = 0;
-  for (unsigned i = 0; i < seq.len; ++i)
+  for (unsigned i = 0; i < seq.size; ++i)
   {
     char const any = imm_abc_any_symbol(abc);
     size += !imm_abc_has_symbol(abc, seq.data[i]) && seq.data[i] != any;

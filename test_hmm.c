@@ -77,7 +77,7 @@ static void hmm_wrong_states(void)
 
 int main(void)
 {
-  imm_abc_init(&abc, IMM_STR("ACGT"), '*');
+  imm_abc_init(&abc, imm_str("ACGT"), '*');
   imm_code_init(&code, &abc);
   lrun("hmm_state_id", hmm_state_id);
   lrun("hmm_set_trans", hmm_set_trans);

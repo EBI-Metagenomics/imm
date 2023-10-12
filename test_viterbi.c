@@ -392,35 +392,35 @@ static void profile2(void)
 
 int main(void)
 {
-  imm_abc_init(&abc, IMM_STR("ACGT"), '*');
+  imm_abc_init(&abc, imm_str("ACGT"), '*');
   imm_code_init(&code, &abc);
-  EMPTY = imm_seq(IMM_STR(""), &abc);
-  A = imm_seq(IMM_STR("A"), &abc);
-  C = imm_seq(IMM_STR("C"), &abc);
-  G = imm_seq(IMM_STR("G"), &abc);
-  T = imm_seq(IMM_STR("T"), &abc);
-  AA = imm_seq(IMM_STR("AA"), &abc);
-  AC = imm_seq(IMM_STR("AC"), &abc);
-  AG = imm_seq(IMM_STR("AG"), &abc);
-  AT = imm_seq(IMM_STR("AT"), &abc);
-  ACT = imm_seq(IMM_STR("ACT"), &abc);
-  AGT = imm_seq(IMM_STR("AGT"), &abc);
-  ATT = imm_seq(IMM_STR("ATT"), &abc);
-  AGTC = imm_seq(IMM_STR("AGTC"), &abc);
-  GA = imm_seq(IMM_STR("GA"), &abc);
-  GT = imm_seq(IMM_STR("GT"), &abc);
-  GTTTA = imm_seq(IMM_STR("GTTTA"), &abc);
-  GTTTAC = imm_seq(IMM_STR("GTTTAC"), &abc);
-  GTTTACA = imm_seq(IMM_STR("GTTTACA"), &abc);
+  EMPTY = imm_seq(imm_str(""), &abc);
+  A = imm_seq(imm_str("A"), &abc);
+  C = imm_seq(imm_str("C"), &abc);
+  G = imm_seq(imm_str("G"), &abc);
+  T = imm_seq(imm_str("T"), &abc);
+  AA = imm_seq(imm_str("AA"), &abc);
+  AC = imm_seq(imm_str("AC"), &abc);
+  AG = imm_seq(imm_str("AG"), &abc);
+  AT = imm_seq(imm_str("AT"), &abc);
+  ACT = imm_seq(imm_str("ACT"), &abc);
+  AGT = imm_seq(imm_str("AGT"), &abc);
+  ATT = imm_seq(imm_str("ATT"), &abc);
+  AGTC = imm_seq(imm_str("AGTC"), &abc);
+  GA = imm_seq(imm_str("GA"), &abc);
+  GT = imm_seq(imm_str("GT"), &abc);
+  GTTTA = imm_seq(imm_str("GTTTA"), &abc);
+  GTTTAC = imm_seq(imm_str("GTTTAC"), &abc);
+  GTTTACA = imm_seq(imm_str("GTTTACA"), &abc);
 
-  imm_abc_init(&abc_ab, IMM_STR("AB"), '*');
+  imm_abc_init(&abc_ab, imm_str("AB"), '*');
   imm_code_init(&code_ab, &abc_ab);
-  EMPTY_ab = imm_seq(IMM_STR(""), &abc_ab);
-  A_ab = imm_seq(IMM_STR("A"), &abc_ab);
-  B_ab = imm_seq(IMM_STR("B"), &abc_ab);
-  AA_ab = imm_seq(IMM_STR("AA"), &abc_ab);
-  AB_ab = imm_seq(IMM_STR("AB"), &abc_ab);
-  AAB_ab = imm_seq(IMM_STR("AAB"), &abc_ab);
+  EMPTY_ab = imm_seq(imm_str(""), &abc_ab);
+  A_ab = imm_seq(imm_str("A"), &abc_ab);
+  B_ab = imm_seq(imm_str("B"), &abc_ab);
+  AA_ab = imm_seq(imm_str("AA"), &abc_ab);
+  AB_ab = imm_seq(imm_str("AB"), &abc_ab);
+  AAB_ab = imm_seq(imm_str("AAB"), &abc_ab);
 
   lrun("profile1", profile1);
   lrun("profile2", profile2);
