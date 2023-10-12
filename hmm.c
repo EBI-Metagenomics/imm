@@ -88,7 +88,7 @@ static void set_state_indices(struct imm_hmm const *hmm,
 
 static char *id_state_name(unsigned id, char *name)
 {
-  sprintf(name, "%u", id);
+  snprintf(name, IMM_STATE_NAME_SIZE, "%u", id);
   return name;
 }
 

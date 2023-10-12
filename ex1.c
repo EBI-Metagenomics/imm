@@ -142,11 +142,12 @@ void imm_ex1_remove_deletion_states(unsigned core_size)
 
 char *imm_ex1_state_name(unsigned id, char *name)
 {
+  unsigned idx = id & (0xFFFF >> 4);
   if ((id & (15U << 12)) == START) strcpy(name, "START");
-  if ((id & (15U << 12)) == B) { strcpy(name, "B"); }
-  if ((id & (15U << 12)) == M) { sprintf(name, "M%u", (id & (0xFFFF >> 4))); }
-  if ((id & (15U << 12)) == I) sprintf(name, "I%u", (id & (0xFFFF >> 4)));
-  if ((id & (15U << 12)) == D) sprintf(name, "D%u", (id & (0xFFFF >> 4)));
+  if ((id & (15U << 12)) == B) strcpy(name, "B");
+  if ((id & (15U << 12)) == M) snprintf(name, IMM_STATE_NAME_SIZE, "M%u", idx);
+  if ((id & (15U << 12)) == I) snprintf(name, IMM_STATE_NAME_SIZE, "I%u", idx);
+  if ((id & (15U << 12)) == D) snprintf(name, IMM_STATE_NAME_SIZE, "D%u", idx);
   if ((id & (15U << 12)) == E) strcpy(name, "E");
   if ((id & (15U << 12)) == J) strcpy(name, "J");
   if ((id & (15U << 12)) == END) strcpy(name, "END");
