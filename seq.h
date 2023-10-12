@@ -20,7 +20,6 @@ IMM_API struct imm_abc const *imm_seq_abc(struct imm_seq const *);
 IMM_API unsigned imm_seq_size(struct imm_seq const *);
 IMM_API char const *imm_seq_data(struct imm_seq const *);
 IMM_API unsigned imm_seq_symbol_idx(struct imm_seq const *, unsigned i);
-IMM_API struct imm_seq imm_seq_slice(struct imm_seq const *,
-                                     struct imm_range range);
+IMM_API struct imm_seq imm_seq_slice(struct imm_seq const *, struct imm_range);
 
 #endif
