@@ -39,7 +39,7 @@ void imm_score_table_scores(struct imm_score_table *x,
     char const *item = NULL;
     while ((item = imm_cartes_next(&x->cartes)) != NULL)
     {
-      struct imm_seq seq = imm_seq((struct imm_str){len, item}, abc);
+      struct imm_seq seq = imm_seq_unsafe((struct imm_str){len, item}, abc);
       unsigned c = imm_code_translate(code, imm_code_encode(code, &seq), min);
       float score = imm_state_lprob(state, &seq);
       assert(!imm_lprob_is_nan(score));

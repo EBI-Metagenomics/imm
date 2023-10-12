@@ -80,10 +80,10 @@ static void codon_state(void)
   imm_codon_state_init(&state, 0, &codonp);
   const struct imm_state *s = &state.super;
 
-  struct imm_seq seq = imm_seq(imm_str("ATG"), abc);
+  struct imm_seq seq = imm_seq_unsafe(imm_str("ATG"), abc);
   close(imm_state_lprob(s, &seq), log(0.8 / 0.9));
 
-  seq = imm_seq(imm_str("AG"), abc);
+  seq = imm_seq_unsafe(imm_str("AG"), abc);
   ok(imm_lprob_is_nan(imm_state_lprob(s, &seq)));
 }
 

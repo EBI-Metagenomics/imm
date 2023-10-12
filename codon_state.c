@@ -11,9 +11,9 @@ static float lprob(struct imm_state const *state, struct imm_seq const *seq)
   struct imm_codon_lprob const *codonp = codon_state->codonp;
   struct imm_codon codon = {
       .nuclt = codonp->nuclt,
-      .a = imm_abc_symbol_idx(state->abc, imm_seq_str(seq)[0]),
-      .b = imm_abc_symbol_idx(state->abc, imm_seq_str(seq)[1]),
-      .c = imm_abc_symbol_idx(state->abc, imm_seq_str(seq)[2])};
+      .a = imm_abc_symbol_idx(state->abc, imm_seq_data(seq)[0]),
+      .b = imm_abc_symbol_idx(state->abc, imm_seq_data(seq)[1]),
+      .c = imm_abc_symbol_idx(state->abc, imm_seq_data(seq)[2])};
 
   return imm_codon_lprob_get(codonp, codon);
 }

@@ -101,7 +101,7 @@ static float lprob_frag_given_codon1(struct imm_frame_cond const *cond,
 {
   unsigned const *x = codon->idx;
 
-  unsigned const z[1] = {imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[0])};
+  unsigned const z[1] = {imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[0])};
 
   float c = 2 * cond->epsilon.loge + 2 * cond->epsilon.log1e;
 
@@ -114,8 +114,8 @@ static float lprob_frag_given_codon2(struct imm_frame_cond const *cond,
 {
   unsigned const *x = codon->idx;
 
-  unsigned z[2] = {imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[0]),
-                   imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[1])};
+  unsigned z[2] = {imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[0]),
+                   imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[1])};
 
   float lprob_z1 = imm__nuclt_lprob_get(cond->nucltp, z[0]);
   float lprob_z2 = imm__nuclt_lprob_get(cond->nucltp, z[1]);
@@ -141,9 +141,9 @@ static float lprob_frag_given_codon3(struct imm_frame_cond const *cond,
 {
   unsigned const *x = codon->idx;
 
-  unsigned z[3] = {imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[0]),
-                   imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[1]),
-                   imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[2])};
+  unsigned z[3] = {imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[0]),
+                   imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[1]),
+                   imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[2])};
 
   float lprob_z1 = imm__nuclt_lprob_get(cond->nucltp, z[0]);
   float lprob_z2 = imm__nuclt_lprob_get(cond->nucltp, z[1]);
@@ -192,10 +192,10 @@ static float lprob_frag_given_codon4(struct imm_frame_cond const *cond,
 {
   unsigned const *x = codon->idx;
 
-  unsigned z[4] = {imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[0]),
-                   imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[1]),
-                   imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[2]),
-                   imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[3])};
+  unsigned z[4] = {imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[0]),
+                   imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[1]),
+                   imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[2]),
+                   imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[3])};
 
   float lprob_z1 = imm__nuclt_lprob_get(cond->nucltp, z[0]);
   float lprob_z2 = imm__nuclt_lprob_get(cond->nucltp, z[1]);
@@ -238,11 +238,11 @@ static float lprob_frag_given_codon5(struct imm_frame_cond const *cond,
 {
   unsigned const *x = codon->idx;
 
-  unsigned z[5] = {imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[0]),
-                   imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[1]),
-                   imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[2]),
-                   imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[3]),
-                   imm_abc_symbol_idx(seq->abc, imm_seq_str(seq)[4])};
+  unsigned z[5] = {imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[0]),
+                   imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[1]),
+                   imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[2]),
+                   imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[3]),
+                   imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[4])};
 
   float lprob_z1 = imm__nuclt_lprob_get(cond->nucltp, z[0]);
   float lprob_z2 = imm__nuclt_lprob_get(cond->nucltp, z[1]);

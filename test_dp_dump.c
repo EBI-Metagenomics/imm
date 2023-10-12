@@ -29,7 +29,7 @@ static void dp_dump_ex1_path(void)
 
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
-  struct imm_seq seq = imm_seq(imm_str("BMMMEJBMMME"), &m->abc);
+  struct imm_seq seq = imm_seq_unsafe(imm_str("BMMMEJBMMME"), &m->abc);
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);

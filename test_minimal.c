@@ -86,10 +86,10 @@ static void states_sne(void)
 
   struct imm_task *task = imm_task_new(&dp);
 
-  struct imm_seq seq = imm_seq(imm_str("A"), abc);
+  struct imm_seq seq = imm_seq_unsafe(imm_str("A"), abc);
   imm_eseq_setup(&eseq, &seq);
   imm_task_setup(task, &eseq);
-  imm_task_debug_setup(task, imm_seq_str(&seq));
+  imm_task_debug_setup(task, imm_seq_data(&seq));
 
   imm_dp_set_state_name(&dp, &state_name);
   imm_dp_viterbi(&dp, task, &prod);
@@ -137,10 +137,10 @@ static void states_sne_no_solution(void)
 
   struct imm_task *task = imm_task_new(&dp);
 
-  struct imm_seq seq = imm_seq(imm_str("AC"), abc);
+  struct imm_seq seq = imm_seq_unsafe(imm_str("AC"), abc);
   imm_eseq_setup(&eseq, &seq);
   imm_task_setup(task, &eseq);
-  imm_task_debug_setup(task, imm_seq_str(&seq));
+  imm_task_debug_setup(task, imm_seq_data(&seq));
 
   imm_dp_set_state_name(&dp, &state_name);
   imm_dp_viterbi(&dp, task, &prod);
@@ -191,10 +191,10 @@ static void states_ste(void)
 
   struct imm_task *task = imm_task_new(&dp);
 
-  struct imm_seq seq = imm_seq(imm_str("AGC"), abc);
+  struct imm_seq seq = imm_seq_unsafe(imm_str("AGC"), abc);
   imm_eseq_setup(&eseq, &seq);
   imm_task_setup(task, &eseq);
-  imm_task_debug_setup(task, imm_seq_str(&seq));
+  imm_task_debug_setup(task, imm_seq_data(&seq));
 
   imm_dp_set_state_name(&dp, &state_name);
   imm_dp_viterbi(&dp, task, &prod);
@@ -241,10 +241,10 @@ static void states_ste_2(void)
 
   struct imm_task *task = imm_task_new(&dp);
 
-  struct imm_seq seq = imm_seq(imm_str("AGCA"), abc);
+  struct imm_seq seq = imm_seq_unsafe(imm_str("AGCA"), abc);
   imm_eseq_setup(&eseq, &seq);
   imm_task_setup(task, &eseq);
-  imm_task_debug_setup(task, imm_seq_str(&seq));
+  imm_task_debug_setup(task, imm_seq_data(&seq));
 
   imm_dp_set_state_name(&dp, &state_name);
   imm_dp_viterbi(&dp, task, &prod);

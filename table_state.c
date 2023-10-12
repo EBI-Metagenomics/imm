@@ -3,7 +3,7 @@
 static float lprob(struct imm_state const *state, struct imm_seq const *seq)
 {
   struct imm_table_state const *x = state->vtable.derived;
-  return (*x->callback)(imm_seq_size(seq), imm_seq_str(seq));
+  return (*x->callback)(imm_seq_size(seq), imm_seq_data(seq));
 }
 
 void imm_table_state_init(struct imm_table_state *x, unsigned id,

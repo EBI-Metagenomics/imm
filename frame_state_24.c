@@ -26,8 +26,8 @@ float imm_joint_n2_24(struct imm_frame_state const *state,
                       struct imm_seq const *seq)
 {
   struct imm_abc const *abc = &state->codonm->nuclt->super;
-  unsigned nucl[3] = {imm_abc_symbol_idx(abc, imm_seq_str(seq)[0]),
-                      imm_abc_symbol_idx(abc, imm_seq_str(seq)[1]),
+  unsigned nucl[3] = {imm_abc_symbol_idx(abc, imm_seq_data(seq)[0]),
+                      imm_abc_symbol_idx(abc, imm_seq_data(seq)[1]),
                       imm_abc_any_symbol_idx(abc)};
   unsigned _ = imm_array_size(nucl) - 1;
 
@@ -58,9 +58,9 @@ float imm_joint_n3_24(struct imm_frame_state const *state,
                       struct imm_seq const *seq)
 {
   struct imm_abc const *abc = &state->codonm->nuclt->super;
-  unsigned nucl[4] = {imm_abc_symbol_idx(abc, imm_seq_str(seq)[0]),
-                      imm_abc_symbol_idx(abc, imm_seq_str(seq)[1]),
-                      imm_abc_symbol_idx(abc, imm_seq_str(seq)[2]),
+  unsigned nucl[4] = {imm_abc_symbol_idx(abc, imm_seq_data(seq)[0]),
+                      imm_abc_symbol_idx(abc, imm_seq_data(seq)[1]),
+                      imm_abc_symbol_idx(abc, imm_seq_data(seq)[2]),
                       imm_abc_any_symbol_idx(abc)};
   unsigned _ = imm_array_size(nucl) - 1;
 
@@ -99,10 +99,10 @@ float imm_joint_n4_24(struct imm_frame_state const *state,
                       struct imm_seq const *seq)
 {
   struct imm_abc const *abc = &state->codonm->nuclt->super;
-  unsigned nucl[5] = {imm_abc_symbol_idx(abc, imm_seq_str(seq)[0]),
-                      imm_abc_symbol_idx(abc, imm_seq_str(seq)[1]),
-                      imm_abc_symbol_idx(abc, imm_seq_str(seq)[2]),
-                      imm_abc_symbol_idx(abc, imm_seq_str(seq)[3]),
+  unsigned nucl[5] = {imm_abc_symbol_idx(abc, imm_seq_data(seq)[0]),
+                      imm_abc_symbol_idx(abc, imm_seq_data(seq)[1]),
+                      imm_abc_symbol_idx(abc, imm_seq_data(seq)[2]),
+                      imm_abc_symbol_idx(abc, imm_seq_data(seq)[3]),
                       imm_abc_any_symbol_idx(abc)};
 
   float i0 = imm__nuclt_lprob_get(state->nucltp, nucl[0]);

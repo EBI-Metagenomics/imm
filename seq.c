@@ -3,7 +3,7 @@
 #include "rc.h"
 #include <assert.h>
 
-struct imm_seq imm_seq(struct imm_str str, struct imm_abc const *abc)
+struct imm_seq imm_seq_unsafe(struct imm_str str, struct imm_abc const *abc)
 {
   for (unsigned i = 0; i < str.size; ++i)
   {
@@ -36,7 +36,7 @@ struct imm_abc const *imm_seq_abc(struct imm_seq const *seq)
 
 unsigned imm_seq_size(struct imm_seq const *seq) { return seq->str.size; }
 
-char const *imm_seq_str(struct imm_seq const *seq) { return seq->str.data; }
+char const *imm_seq_data(struct imm_seq const *seq) { return seq->str.data; }
 
 unsigned imm_seq_symbol_idx(struct imm_seq const *seq, unsigned i)
 {
@@ -45,5 +45,5 @@ unsigned imm_seq_symbol_idx(struct imm_seq const *seq, unsigned i)
 
 struct imm_seq imm_seq_slice(struct imm_seq const *x, struct imm_range range)
 {
-  return imm_seq(imm_str_slice(x->str, range), x->abc);
+  return imm_seq_unsafe(imm_str_slice(x->str, range), x->abc);
 }

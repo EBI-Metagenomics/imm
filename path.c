@@ -99,7 +99,7 @@ void imm_path_dump(struct imm_path const *x, imm_state_name *callb,
 {
   char name[IMM_STATE_NAME_SIZE] = {0};
   if (!callb) callb = &imm_state_default_name;
-  char const *sequence = imm_seq_str(seq);
+  char const *sequence = imm_seq_data(seq);
   for (unsigned i = 0; i < imm_path_nsteps(x); ++i)
   {
     if (i > 0) fputc(',', fp);

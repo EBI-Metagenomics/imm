@@ -21,7 +21,7 @@ static void example1_minimal(void)
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &m->code);
 
-  struct imm_seq seq = imm_seq(imm_str("BMIMEJBMIME"), &m->abc);
+  struct imm_seq seq = imm_seq_unsafe(imm_str("BMIMEJBMIME"), &m->abc);
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
@@ -49,7 +49,7 @@ static void example1_path(void)
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &m->code);
 
-  struct imm_seq seq = imm_seq(imm_str("BMIMIMMMEJBMIIMIME"), &m->abc);
+  struct imm_seq seq = imm_seq_unsafe(imm_str("BMIMIMMMEJBMIIMIME"), &m->abc);
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
@@ -79,7 +79,7 @@ static void example1_removed_states_path(void)
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &m->code);
 
-  struct imm_seq seq = imm_seq(imm_str("BMMMEJBMMME"), &m->abc);
+  struct imm_seq seq = imm_seq_unsafe(imm_str("BMMMEJBMMME"), &m->abc);
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
@@ -108,7 +108,7 @@ static void example2_15(void)
   struct imm_nuclt const *nuclt = &m->dna->super;
   struct imm_abc const *abc = &nuclt->super;
 
-  struct imm_seq seq = imm_seq(imm_str(imm_ex2_seq), abc);
+  struct imm_seq seq = imm_seq_unsafe(imm_str(imm_ex2_seq), abc);
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
 
@@ -138,7 +138,7 @@ static void example2_24(void)
   struct imm_nuclt const *nuclt = &m->dna->super;
   struct imm_abc const *abc = &nuclt->super;
 
-  struct imm_seq seq = imm_seq(imm_str(imm_ex2_seq), abc);
+  struct imm_seq seq = imm_seq_unsafe(imm_str(imm_ex2_seq), abc);
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
 
@@ -168,7 +168,7 @@ static void example2_33(void)
   struct imm_nuclt const *nuclt = &m->dna->super;
   struct imm_abc const *abc = &nuclt->super;
 
-  struct imm_seq seq = imm_seq(imm_str(imm_ex2_seq), abc);
+  struct imm_seq seq = imm_seq_unsafe(imm_str(imm_ex2_seq), abc);
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
 
@@ -195,7 +195,7 @@ static void msv10(void)
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &m->code);
 
-  struct imm_seq seq = imm_seq(imm_str(imm_ex3_seq1), &m->abc);
+  struct imm_seq seq = imm_seq_unsafe(imm_str(imm_ex3_seq1), &m->abc);
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
 

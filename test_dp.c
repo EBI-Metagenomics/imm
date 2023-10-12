@@ -193,7 +193,7 @@ static void dp_io_example1(void)
 
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
-  struct imm_seq seq = imm_seq(imm_str("BMMMEJBMMME"), &m->abc);
+  struct imm_seq seq = imm_seq_unsafe(imm_str("BMMMEJBMMME"), &m->abc);
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
@@ -220,7 +220,7 @@ static void dp_io_example2(void)
   struct imm_abc const *abc = &m->dna->super.super;
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
-  struct imm_seq seq = imm_seq(imm_str(imm_ex2_seq), abc);
+  struct imm_seq seq = imm_seq_unsafe(imm_str(imm_ex2_seq), abc);
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
@@ -240,7 +240,7 @@ static void dp_io_example2(void)
 
   task = imm_task_new(&dp);
   prod = imm_prod();
-  seq = imm_seq(imm_str(imm_ex2_seq), abc);
+  seq = imm_seq_unsafe(imm_str(imm_ex2_seq), abc);
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
@@ -257,9 +257,9 @@ int main(void)
 {
   imm_abc_init(&abc, imm_str("ACGT"), '*');
   imm_code_init(&code, &abc);
-  EMPTY = imm_seq(imm_str(""), &abc);
-  A = imm_seq(imm_str("A"), &abc);
-  ATT = imm_seq(imm_str("ATT"), &abc);
+  EMPTY = imm_seq_unsafe(imm_str(""), &abc);
+  A = imm_seq_unsafe(imm_str("A"), &abc);
+  ATT = imm_seq_unsafe(imm_str("ATT"), &abc);
 
   lrun("dp_illegal", dp_illegal);
   lrun("dp_empty_path", dp_empty_path);

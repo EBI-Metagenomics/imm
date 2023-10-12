@@ -76,7 +76,7 @@ static void check_joint(struct imm_state const *state, struct imm_span span)
     char const *seq = NULL;
     while ((seq = imm_cartes_next(&iter)) != NULL)
     {
-      struct imm_seq tmp = imm_seq((struct imm_str){times, seq}, abc);
+      struct imm_seq tmp = imm_seq_unsafe((struct imm_str){times, seq}, abc);
       total = imm_lprob_add(total, imm_state_lprob(state, &tmp));
     }
   }

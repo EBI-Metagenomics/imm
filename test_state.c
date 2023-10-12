@@ -9,10 +9,10 @@ static void normal_state(void)
 {
   struct imm_abc abc = {0};
   imm_abc_init(&abc, imm_str("ACGT"), '*');
-  struct imm_seq A = imm_seq(imm_str("A"), &abc);
-  struct imm_seq C = imm_seq(imm_str("C"), &abc);
-  struct imm_seq G = imm_seq(imm_str("G"), &abc);
-  struct imm_seq T = imm_seq(imm_str("T"), &abc);
+  struct imm_seq A = imm_seq_unsafe(imm_str("A"), &abc);
+  struct imm_seq C = imm_seq_unsafe(imm_str("C"), &abc);
+  struct imm_seq G = imm_seq_unsafe(imm_str("G"), &abc);
+  struct imm_seq T = imm_seq_unsafe(imm_str("T"), &abc);
 
   float const lprobs[] = {log(0.25), log(0.25), log(0.5), imm_lprob_zero()};
   struct imm_normal_state state;
@@ -29,8 +29,8 @@ static void mute_state(void)
 {
   struct imm_abc abc = {0};
   imm_abc_init(&abc, imm_str("ACGT"), '*');
-  struct imm_seq EMPTY = imm_seq(imm_str(""), &abc);
-  struct imm_seq A = imm_seq(imm_str("A"), &abc);
+  struct imm_seq EMPTY = imm_seq_unsafe(imm_str(""), &abc);
+  struct imm_seq A = imm_seq_unsafe(imm_str("A"), &abc);
 
   struct imm_mute_state state = {0};
   imm_mute_state_init(&state, 43, &abc);
