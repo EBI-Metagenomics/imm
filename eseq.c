@@ -43,3 +43,11 @@ int imm_eseq_setup(struct imm_eseq *eseq, struct imm_seq const *seq)
   }
   return rc;
 }
+
+struct imm_eseq imm_eseq_slice(struct imm_eseq *x, struct imm_range r)
+{
+  assert(r.start + imm_range_size(r) <= x->data.rows);
+  uint16_t *ptr = x->data.data + r.start;
+  struct imm_matrixu16 m = {ptr, imm_range_size(r), x->data.cols};
+  return (struct imm_eseq){m, x->code};
+}
