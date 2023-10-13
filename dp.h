@@ -38,29 +38,22 @@ IMM_API void imm_dp_dump_path(struct imm_dp const *, struct imm_task const *,
                               struct imm_prod const *, struct imm_seq const *,
                               FILE *restrict);
 
-IMM_API unsigned imm_dp_nstates(struct imm_dp const *);
-
-IMM_API unsigned imm_dp_trans_idx(struct imm_dp *, unsigned src_idx,
-                                  unsigned dst_idx);
-
-IMM_API int imm_dp_change_trans(struct imm_dp *, unsigned trans_idx,
-                                float lprob);
-
+IMM_API int imm_dp_nstates(struct imm_dp const *);
+IMM_API int imm_dp_trans_idx(struct imm_dp *, int src_idx, int dst_idx);
+IMM_API int imm_dp_change_trans(struct imm_dp *, int trans_idx, float lprob);
 IMM_API int imm_dp_viterbi(struct imm_dp const *, struct imm_task *task,
                            struct imm_prod *prod);
 
 IMM_API int imm_dp_pack(struct imm_dp const *, struct lip_file *);
-
 IMM_API int imm_dp_unpack(struct imm_dp *, struct lip_file *);
 
-IMM_API float imm_dp_emis_score(struct imm_dp const *, unsigned state_id,
+IMM_API float imm_dp_emis_score(struct imm_dp const *, int state_id,
                                 struct imm_seq const *seq);
 
-IMM_API float const *imm_dp_emis_table(struct imm_dp const *dp,
-                                       unsigned state_id, unsigned *size);
+IMM_API float const *imm_dp_emis_table(struct imm_dp const *dp, int state_id,
+                                       int *size);
 
-IMM_API float imm_dp_trans_score(struct imm_dp const *, unsigned src,
-                                 unsigned dst);
+IMM_API float imm_dp_trans_score(struct imm_dp const *, int src, int dst);
 
 IMM_API void imm_dp_write_dot(struct imm_dp const *, FILE *restrict,
                               imm_state_name *);

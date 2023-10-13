@@ -63,21 +63,21 @@ void imm_dp_set_state_name(struct imm_dp *x, imm_state_name *callb)
 }
 
 static float read_result(struct imm_dp const *dp, struct imm_task *task,
-                         unsigned *last_state, unsigned *last_seqsize)
+                         int *last_state, int *last_seqsize)
 {
   float score = imm_lprob_zero();
-  unsigned end = dp->state_table.end_state_idx;
+  int end = dp->state_table.end_state_idx;
 
-  unsigned state = IMM_STATE_NULL_IDX;
-  unsigned seqsize = IMM_STATE_NULL_SEQLEN;
+  int state = IMM_STATE_NULL_IDX;
+  int seqsize = IMM_STATE_NULL_SEQLEN;
 
-  unsigned length = imm_eseq_size(task->seq);
-  unsigned max_seq =
-      imm_zspan_max(imm_state_table_zspan(&dp->state_table, end));
+  int length = imm_eseq_size(task->seq);
+  int max_seq = imm_zspan_max(imm_state_table_zspan(&dp->state_table, end));
 
-  for (unsigned len = imm_min(max_seq, length);; --len)
+  for (int len = imm_min(max_seq, length);; --len)
   {
-    struct imm_cell cell = imm_cell(length - len, end, len);
+    struct imm_cell cell =
+        imm_cell(length - len, (int_fast16_t)end, (int_fast8_t)len);
     float v = imm_matrix_get_score(&task->matrix, cell);
     if (v > score)
     {
@@ -97,23 +97,23 @@ static float read_result(struct imm_dp const *dp, struct imm_task *task,
 }
 
 static void unzip_path(struct imm_trellis *x, struct imm_state_table const *st,
-                       unsigned seq_size, struct imm_path *path)
+                       int seq_size, struct imm_path *path)
 {
   imm_trellis_seek(x, seq_size, st->end_state_idx);
   if (imm_lprob_is_nan(imm_trellis_head(x)->score)) return;
 
-  unsigned size = 0;
-  unsigned start_state = st->start_state_idx;
+  int size = 0;
+  int start_state = st->start_state_idx;
   while (imm_trellis_state_idx(x) != start_state || imm_trellis_stage_idx(x))
   {
-    unsigned id = imm_state_table_id(st, imm_trellis_state_idx(x));
+    int id = imm_state_table_id(st, imm_trellis_state_idx(x));
     float score = imm_trellis_head(x)->score;
     imm_path_add(path, imm_step(id, size, score));
 
     size = imm_trellis_head(x)->emission_size;
     imm_trellis_back(x);
   }
-  unsigned id = imm_state_table_id(st, imm_trellis_state_idx(x));
+  int id = imm_state_table_id(st, imm_trellis_state_idx(x));
   imm_path_add(path, imm_step(id, size, 0));
   imm_path_reverse(path);
 }
@@ -126,9 +126,8 @@ int imm_dp_viterbi(struct imm_dp const *x, struct imm_task *task,
 
   if (x->code->abc != imm_eseq_abc(task->seq)) return IMM_EDIFFABC;
 
-  unsigned end_state = x->state_table.end_state_idx;
-  unsigned min =
-      imm_zspan_min(imm_state_table_zspan(&x->state_table, end_state));
+  int end_state = x->state_table.end_state_idx;
+  int min = imm_zspan_min(imm_state_table_zspan(&x->state_table, end_state));
   if (imm_eseq_size(task->seq) < min) return IMM_ESHORTSEQ;
 
   long start = imm_clock();
@@ -138,33 +137,30 @@ int imm_dp_viterbi(struct imm_dp const *x, struct imm_task *task,
 
   imm_viterbi_run(&viterbi);
 
-  unsigned last_state = 0;
-  unsigned last_seqsize = 0;
+  int last_state = 0;
+  int last_seqsize = 0;
   prod->loglik = read_result(x, task, &last_state, &last_seqsize);
 
   int rc = 0;
 
   imm_path_reset(&prod->path);
-  unsigned seqsize = imm_eseq_size(task->seq);
+  int seqsize = imm_eseq_size(task->seq);
   unzip_path(&task->trellis, &x->state_table, seqsize, &prod->path);
   return rc;
 
-  prod->mseconds = imm_clock() - start;
+  prod->mseconds = (uint64_t)(imm_clock() - start);
 
   return rc;
 }
 
-unsigned imm_dp_nstates(struct imm_dp const *dp)
-{
-  return dp->state_table.nstates;
-}
+int imm_dp_nstates(struct imm_dp const *dp) { return dp->state_table.nstates; }
 
-unsigned imm_dp_trans_idx(struct imm_dp *dp, unsigned src_idx, unsigned dst_idx)
+int imm_dp_trans_idx(struct imm_dp *dp, int src_idx, int dst_idx)
 {
   return imm_trans_table_idx(&dp->trans_table, src_idx, dst_idx);
 }
 
-int imm_dp_change_trans(struct imm_dp *dp, unsigned trans_idx, float lprob)
+int imm_dp_change_trans(struct imm_dp *dp, int trans_idx, float lprob)
 {
   if (imm_unlikely(imm_lprob_is_nan(lprob))) return IMM_EINVAL;
 
@@ -172,7 +168,7 @@ int imm_dp_change_trans(struct imm_dp *dp, unsigned trans_idx, float lprob)
   return 0;
 }
 
-float imm_dp_emis_score(struct imm_dp const *dp, unsigned state_id,
+float imm_dp_emis_score(struct imm_dp const *dp, int state_id,
                         struct imm_seq const *seq)
 {
   struct imm_eseq eseq = {0};
@@ -180,11 +176,10 @@ float imm_dp_emis_score(struct imm_dp const *dp, unsigned state_id,
   float score = imm_lprob_nan();
   if (imm_eseq_setup(&eseq, seq)) goto cleanup;
 
-  unsigned state_idx = imm_state_table_idx(&dp->state_table, state_id);
-  unsigned min =
-      imm_zspan_min(imm_state_table_zspan(&dp->state_table, state_idx));
+  int state_idx = imm_state_table_idx(&dp->state_table, state_id);
+  int min = imm_zspan_min(imm_state_table_zspan(&dp->state_table, state_idx));
 
-  unsigned seq_code = imm_eseq_get(&eseq, 0, imm_seq_size(seq), min);
+  int seq_code = imm_eseq_get(&eseq, 0, imm_seq_size(seq), min);
   score = imm_emis_score(&dp->emis, state_idx, seq_code);
 
 cleanup:
@@ -192,21 +187,20 @@ cleanup:
   return score;
 }
 
-float const *imm_dp_emis_table(struct imm_dp const *dp, unsigned state_id,
-                               unsigned *size)
+float const *imm_dp_emis_table(struct imm_dp const *dp, int state_id, int *size)
 {
-  unsigned state_idx = imm_state_table_idx(&dp->state_table, state_id);
+  int state_idx = imm_state_table_idx(&dp->state_table, state_id);
   return imm_emis_table(&dp->emis, state_idx, size);
 }
 
-float imm_dp_trans_score(struct imm_dp const *dp, unsigned src, unsigned dst)
+float imm_dp_trans_score(struct imm_dp const *dp, int src, int dst)
 {
-  unsigned src_idx = imm_state_table_idx(&dp->state_table, src);
-  unsigned dst_idx = imm_state_table_idx(&dp->state_table, dst);
+  int src_idx = imm_state_table_idx(&dp->state_table, src);
+  int dst_idx = imm_state_table_idx(&dp->state_table, dst);
 
-  if (src_idx == UINT_MAX || dst_idx == UINT_MAX) return imm_lprob_nan();
+  if (src_idx == INT_MAX || dst_idx == INT_MAX) return imm_lprob_nan();
 
-  for (unsigned i = 0; i < dp->trans_table.ntrans; ++i)
+  for (int i = 0; i < dp->trans_table.ntrans; ++i)
   {
     if (imm_trans_table_source_state(&dp->trans_table, dst_idx, i) == src_idx)
       return imm_trans_table_score(&dp->trans_table, dst_idx, i);
@@ -218,11 +212,11 @@ void imm_dp_write_dot(struct imm_dp const *dp, FILE *restrict fp,
                       imm_state_name *name)
 {
   fprintf(fp, "digraph dp {\n");
-  for (unsigned dst = 0; dst < dp->state_table.nstates; ++dst)
+  for (int dst = 0; dst < dp->state_table.nstates; ++dst)
   {
-    for (unsigned t = 0; t < imm_trans_table_ntrans(&dp->trans_table, dst); ++t)
+    for (int t = 0; t < imm_trans_table_ntrans(&dp->trans_table, dst); ++t)
     {
-      unsigned src = imm_trans_table_source_state(&dp->trans_table, dst, t);
+      int src = imm_trans_table_source_state(&dp->trans_table, dst, t);
 
       char src_name[IMM_STATE_NAME_SIZE] = {0};
       char dst_name[IMM_STATE_NAME_SIZE] = {0};
@@ -256,21 +250,21 @@ void imm_dp_dump_path(struct imm_dp const *x, struct imm_task const *t,
                       struct imm_prod const *prod, struct imm_seq const *seq,
                       FILE *restrict fp)
 {
-  unsigned begin = 0;
-  for (unsigned i = 0; i < imm_path_nsteps(&prod->path); ++i)
+  int begin = 0;
+  for (int i = 0; i < imm_path_nsteps(&prod->path); ++i)
   {
     struct imm_step const *step = imm_path_step(&prod->path, i);
-    unsigned idx = imm_state_table_idx(&x->state_table, step->state_id);
+    int idx = imm_state_table_idx(&x->state_table, step->state_id);
 
-    unsigned min = imm_zspan_min(imm_state_table_zspan(&x->state_table, idx));
-    unsigned seq_code = imm_eseq_get(t->seq, begin, step->seqlen, min);
+    int min = imm_zspan_min(imm_state_table_zspan(&x->state_table, idx));
+    int seq_code = imm_eseq_get(t->seq, begin, step->seqsize, min);
 
     float score = imm_emis_score(&x->emis, idx, seq_code);
-    struct imm_range range = imm_range(begin, begin + step->seqlen);
+    struct imm_range range = imm_range(begin, begin + step->seqsize);
     struct imm_seq subseq = imm_seq_slice(seq, range);
     fprintf(fp, "<%s,%.*s,%.4f>\n", imm_state_table_name(&x->state_table, idx),
             subseq.str.size, subseq.str.data, score);
-    begin += step->seqlen;
+    begin += step->seqsize;
   }
 }
 
@@ -288,48 +282,54 @@ void imm_dp_dump_path(struct imm_dp const *x, struct imm_task const *t,
 #define KEY_STATE_END "state_end"
 #define KEY_STATE_SPAN "state_span"
 
+union size
+{
+  int i;
+  unsigned u;
+};
+
 int imm_dp_pack(struct imm_dp const *dp, struct lip_file *f)
 {
-  unsigned size = 0;
-  unsigned nstates = dp->state_table.nstates;
-  unsigned ntrans = dp->trans_table.ntrans;
+  union size size = {0};
+  int nstates = dp->state_table.nstates;
+  int ntrans = dp->trans_table.ntrans;
 
   lip_write_map_size(f, 10);
 
   /* emission */
   lip_write_cstr(f, KEY_EMIS_SCORE);
-  size = imm_emis_score_size(&dp->emis, nstates);
-  lip_write_1darray_float(f, size, dp->emis.score);
+  size.i = imm_emis_score_size(&dp->emis, nstates);
+  lip_write_1darray_float(f, size.u, dp->emis.score);
 
   lip_write_cstr(f, KEY_EMIS_OFFSET);
   lip_write_1darray_int(f, imm_emis_offset_size(nstates), dp->emis.offset);
 
   /* trans_table */
-  size = imm_trans_table_transsize(ntrans);
+  size.i = imm_trans_table_transsize(ntrans);
   lip_write_cstr(f, KEY_TRANS_SCORE);
-  lip_write_1darray_size_type(f, size, LIP_1DARRAY_F32);
-  for (unsigned i = 0; i < size; ++i)
+  lip_write_1darray_size_type(f, size.u, LIP_1DARRAY_F32);
+  for (int i = 0; i < size.i; ++i)
     lip_write_1darray_float_item(f, dp->trans_table.trans[i].score);
 
-  size = imm_trans_table_transsize(ntrans);
+  size.i = imm_trans_table_transsize(ntrans);
   lip_write_cstr(f, KEY_TRANS_SRC);
-  lip_write_1darray_size_type(f, size, LIP_1DARRAY_UINT16);
-  for (unsigned i = 0; i < size; ++i)
+  lip_write_1darray_size_type(f, size.u, LIP_1DARRAY_INT16);
+  for (int i = 0; i < size.i; ++i)
     lip_write_1darray_int_item(f, dp->trans_table.trans[i].src);
 
-  size = imm_trans_table_transsize(ntrans);
+  size.i = imm_trans_table_transsize(ntrans);
   lip_write_cstr(f, KEY_TRANS_DST);
-  lip_write_1darray_size_type(f, size, LIP_1DARRAY_UINT16);
-  for (unsigned i = 0; i < size; ++i)
+  lip_write_1darray_size_type(f, size.u, LIP_1DARRAY_INT16);
+  for (int i = 0; i < size.i; ++i)
     lip_write_1darray_int_item(f, dp->trans_table.trans[i].dst);
 
-  size = imm_trans_table_offsize(nstates);
+  size.i = imm_trans_table_offsize(nstates);
   lip_write_cstr(f, KEY_TRANS_OFFSET);
-  lip_write_1darray_int(f, size, dp->trans_table.offset);
+  lip_write_1darray_int(f, size.u, dp->trans_table.offset);
 
   /* state_table */
   lip_write_cstr(f, KEY_STATE_IDS);
-  lip_write_1darray_int(f, nstates, dp->state_table.ids);
+  lip_write_1darray_int(f, ((unsigned)nstates), dp->state_table.ids);
 
   lip_write_cstr(f, KEY_STATE_START);
   lip_write_int(f, dp->state_table.start_state_idx);
@@ -337,8 +337,8 @@ int imm_dp_pack(struct imm_dp const *dp, struct lip_file *f)
   lip_write_int(f, dp->state_table.end_state_idx);
 
   lip_write_cstr(f, KEY_STATE_SPAN);
-  lip_write_1darray_size_type(f, nstates, LIP_1DARRAY_UINT8);
-  for (unsigned i = 0; i < nstates; ++i)
+  lip_write_1darray_size_type(f, (unsigned)nstates, LIP_1DARRAY_INT8);
+  for (int i = 0; i < nstates; ++i)
     lip_write_1darray_int_item(f, dp->state_table.span[i]);
 
   return f->error ? IMM_EIO : 0;
@@ -346,7 +346,7 @@ int imm_dp_pack(struct imm_dp const *dp, struct lip_file *f)
 
 int imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
 {
-  unsigned size = 0;
+  union size size = {0};
   enum lip_1darray_type type = 0;
   struct imm_emis *e = &dp->emis;
   struct imm_trans_table *tt = &dp->trans_table;
@@ -356,57 +356,58 @@ int imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
 
   /* emission */
   if (!imm_expect_map_key(f, KEY_EMIS_SCORE)) goto cleanup;
-  lip_read_1darray_size_type(f, &size, &type);
+  lip_read_1darray_size_type(f, &size.u, &type);
   if (type != LIP_1DARRAY_F32) goto cleanup;
-  e->score = imm_reallocf(e->score, sizeof(*e->score) * size);
-  if (!e->score && size > 0) goto cleanup;
-  lip_read_1darray_float_data(f, size, e->score);
+  e->score = imm_reallocf(e->score, sizeof(*e->score) * size.u);
+  if (!e->score && size.i > 0) goto cleanup;
+  lip_read_1darray_float_data(f, size.u, e->score);
 
   if (!imm_expect_map_key(f, KEY_EMIS_OFFSET)) goto cleanup;
-  lip_read_1darray_size_type(f, &size, &type);
-  if (type != LIP_1DARRAY_UINT32) goto cleanup;
-  e->offset = imm_reallocf(e->offset, sizeof(*e->offset) * size);
-  if (!e->offset && size > 0) goto cleanup;
-  lip_read_1darray_int_data(f, size, e->offset);
+  lip_read_1darray_size_type(f, &size.u, &type);
+  if (type != LIP_1DARRAY_INT32) goto cleanup;
+  e->offset = imm_reallocf(e->offset, sizeof(*e->offset) * size.u);
+  if (!e->offset && size.i > 0) goto cleanup;
+  lip_read_1darray_int_data(f, size.u, e->offset);
 
   /* trans_table */
   if (!imm_expect_map_key(f, KEY_TRANS_SCORE)) goto cleanup;
-  lip_read_1darray_size_type(f, &size, &type);
+  lip_read_1darray_size_type(f, &size.u, &type);
   if (type != LIP_1DARRAY_F32) goto cleanup;
-  tt->trans = imm_reallocf(tt->trans, sizeof(*tt->trans) * size);
-  if (!tt->trans && size > 0) goto cleanup;
-  tt->ntrans = size - 1;
-  for (unsigned i = 0; i < size; ++i)
+  tt->trans = imm_reallocf(tt->trans, sizeof(*tt->trans) * size.u);
+  if (!tt->trans && size.i > 0) goto cleanup;
+  tt->ntrans = size.i - 1;
+  for (int i = 0; i < size.i; ++i)
     lip_read_1darray_float_item(f, &tt->trans[i].score);
 
   if (!imm_expect_map_key(f, KEY_TRANS_SRC)) goto cleanup;
-  lip_read_1darray_size_type(f, &size, &type);
-  if (type != LIP_1DARRAY_UINT16) goto cleanup;
-  if (imm_trans_table_transsize(tt->ntrans) != size) goto cleanup;
-  for (unsigned i = 0; i < size; ++i)
+  lip_read_1darray_size_type(f, &size.u, &type);
+  if (type != LIP_1DARRAY_INT16) goto cleanup;
+  if (imm_trans_table_transsize(tt->ntrans) != size.i) goto cleanup;
+  for (int i = 0; i < size.i; ++i)
     lip_read_1darray_int_item(f, &tt->trans[i].src);
 
   if (!imm_expect_map_key(f, KEY_TRANS_DST)) goto cleanup;
-  lip_read_1darray_size_type(f, &size, &type);
-  if (type != LIP_1DARRAY_UINT16) goto cleanup;
-  if (imm_trans_table_transsize(tt->ntrans) != size) goto cleanup;
-  for (unsigned i = 0; i < size; ++i)
+  lip_read_1darray_size_type(f, &size.u, &type);
+  if (type != LIP_1DARRAY_INT16) goto cleanup;
+  if (imm_trans_table_transsize(tt->ntrans) != size.i) goto cleanup;
+  for (int i = 0; i < size.i; ++i)
     lip_read_1darray_int_item(f, &tt->trans[i].dst);
 
   if (!imm_expect_map_key(f, KEY_TRANS_OFFSET)) goto cleanup;
-  lip_read_1darray_size_type(f, &size, &type);
-  if (type != LIP_1DARRAY_UINT16) goto cleanup;
-  tt->offset = imm_reallocf(tt->offset, sizeof(*tt->offset) * size);
-  if (!tt->offset && size > 0) goto cleanup;
-  lip_read_1darray_int_data(f, size, tt->offset);
+  lip_read_1darray_size_type(f, &size.u, &type);
+  if (type != LIP_1DARRAY_INT16) goto cleanup;
+  tt->offset = imm_reallocf(tt->offset, sizeof(*tt->offset) * size.u);
+  if (!tt->offset && size.i > 0) goto cleanup;
+  lip_read_1darray_int_data(f, size.u, tt->offset);
 
   /* state_table */
   if (!imm_expect_map_key(f, KEY_STATE_IDS)) goto cleanup;
-  lip_read_1darray_size_type(f, &st->nstates, &type);
-  if (type != LIP_1DARRAY_UINT16) goto cleanup;
-  st->ids = imm_reallocf(st->ids, sizeof(*st->ids) * st->nstates);
+  lip_read_1darray_size_type(f, &size.u, &type);
+  st->nstates = size.i;
+  if (type != LIP_1DARRAY_INT16) goto cleanup;
+  st->ids = imm_reallocf(st->ids, sizeof(*st->ids) * (unsigned)st->nstates);
   if (!st->ids && st->nstates > 0) goto cleanup;
-  lip_read_1darray_int_data(f, st->nstates, st->ids);
+  lip_read_1darray_int_data(f, ((unsigned)st->nstates), st->ids);
 
   if (!imm_expect_map_key(f, KEY_STATE_START)) goto cleanup;
   lip_read_int(f, &dp->state_table.start_state_idx);
@@ -414,12 +415,12 @@ int imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
   lip_read_int(f, &dp->state_table.end_state_idx);
 
   if (!imm_expect_map_key(f, KEY_STATE_SPAN)) goto cleanup;
-  lip_read_1darray_size_type(f, &size, &type);
-  if (st->nstates != size) goto cleanup;
+  lip_read_1darray_size_type(f, &size.u, &type);
+  if (st->nstates != size.i) goto cleanup;
   if (type != LIP_1DARRAY_UINT8) goto cleanup;
-  st->span = imm_reallocf(st->span, sizeof(*st->span) * size);
-  if (!st->span && size > 0) goto cleanup;
-  for (unsigned i = 0; i < size; ++i)
+  st->span = imm_reallocf(st->span, sizeof(*st->span) * size.u);
+  if (!st->span && size.i > 0) goto cleanup;
+  for (int i = 0; i < size.i; ++i)
     lip_read_1darray_int_item(f, (st->span + i));
 
   if (!f->error) return 0;
