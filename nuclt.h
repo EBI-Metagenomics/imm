@@ -15,6 +15,6 @@ struct imm_nuclt
 
 IMM_API int imm_nuclt_init(struct imm_nuclt *, char const symbols[],
                            char any_symbol);
-IMM_API unsigned imm_nuclt_size(struct imm_nuclt const *);
+IMM_API int imm_nuclt_size(struct imm_nuclt const *);
 
 #endif

@@ -6,7 +6,7 @@ int imm_nuclt_init(struct imm_nuclt *x, char const *symbols, char any_symbol)
                        IMM_NUCLT);
 }
 
-unsigned imm_nuclt_size(struct imm_nuclt const *x)
+int imm_nuclt_size(struct imm_nuclt const *x)
 {
   (void)x;
   return IMM_NUCLT_SIZE;

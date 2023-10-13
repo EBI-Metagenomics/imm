@@ -1,8 +1,7 @@
 #include "codon.h"
 #include <assert.h>
 
-void imm_codon_set(struct imm_codon *codon, unsigned id_a, unsigned id_b,
-                   unsigned id_c)
+void imm_codon_set(struct imm_codon *codon, int id_a, int id_b, int id_c)
 {
   struct imm_abc const *abc = &codon->nuclt->super;
 
@@ -30,8 +29,8 @@ char imm_codon_csym(struct imm_codon const *codon)
   return imm_abc_symbols(&codon->nuclt->super)[codon->c];
 }
 
-struct imm_codon imm_codon(struct imm_nuclt const *nuclt, unsigned id_a,
-                           unsigned id_b, unsigned id_c)
+struct imm_codon imm_codon(struct imm_nuclt const *nuclt, int id_a, int id_b,
+                           int id_c)
 {
   struct imm_codon codon = {.nuclt = nuclt};
   imm_codon_set(&codon, id_a, id_b, id_c);
@@ -40,7 +39,7 @@ struct imm_codon imm_codon(struct imm_nuclt const *nuclt, unsigned id_a,
 
 struct imm_codon imm_codon_any(struct imm_nuclt const *nuclt)
 {
-  unsigned any = imm_abc_any_symbol_id(&nuclt->super);
+  int any = imm_abc_any_symbol_id(&nuclt->super);
   return imm_codon(nuclt, any, any, any);
 }
 
