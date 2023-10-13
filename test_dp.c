@@ -74,7 +74,7 @@ static void dp_empty_path(void)
   eq(imm_eseq_setup(&eseq, &A), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  eq(imm_path_nsteps(&prod.path), 0U);
+  eq(imm_path_nsteps(&prod.path), 0);
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
@@ -105,12 +105,12 @@ static void dp_one_mute(void)
   eq(imm_eseq_setup(&eseq, &EMPTY), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  eq(imm_path_nsteps(&prod.path), 1U);
+  eq(imm_path_nsteps(&prod.path), 1);
 
   eq(imm_eseq_setup(&eseq, &ATT), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  eq(imm_path_nsteps(&prod.path), 0U);
+  eq(imm_path_nsteps(&prod.path), 0);
 
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
@@ -153,7 +153,7 @@ static void dp_two_mutes(void)
   eq(imm_eseq_setup(&eseq, &EMPTY), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  eq(imm_path_nsteps(&prod.path), 2U);
+  eq(imm_path_nsteps(&prod.path), 2);
   eq(imm_path_step(&prod.path, 0)->seqsize, 0);
   eq(imm_path_step(&prod.path, 0)->state_id, 0);
   eq(imm_path_step(&prod.path, 1)->seqsize, 0);
@@ -162,7 +162,7 @@ static void dp_two_mutes(void)
   eq(imm_eseq_setup(&eseq, &ATT), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  eq(imm_path_nsteps(&prod.path), 0U);
+  eq(imm_path_nsteps(&prod.path), 0);
 
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);

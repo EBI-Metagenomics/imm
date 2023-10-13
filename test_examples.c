@@ -27,7 +27,7 @@ static void example1_minimal(void)
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, -22.5321312);
   close(imm_hmm_loglik(&imm_ex1.hmm, &seq, &prod.path), -22.5321312);
-  eq(imm_path_nsteps(&prod.path), 15U);
+  eq(imm_path_nsteps(&prod.path), 15);
   close(imm_path_score(&prod.path), -22.5321312);
 
   imm_eseq_cleanup(&eseq);
@@ -55,7 +55,7 @@ static void example1_path(void)
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, -49.892555);
   close(imm_hmm_loglik(&imm_ex1.hmm, &seq, &prod.path), -49.892555);
-  eq(imm_path_nsteps(&prod.path), 32U);
+  eq(imm_path_nsteps(&prod.path), 32);
   close(imm_path_score(&prod.path), -49.892555);
 
   imm_eseq_cleanup(&eseq);

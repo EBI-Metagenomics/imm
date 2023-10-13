@@ -92,7 +92,7 @@ static void odd1(void)
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  eq(imm_path_nsteps(&prod.path), 8U);
+  eq(imm_path_nsteps(&prod.path), 8);
   close(imm_hmm_loglik(&hmm, &seq, &prod.path), 12202.);
   close(prod.loglik, 12202.);
   imm_dp_set_state_name(&dp, &state_name);
@@ -171,7 +171,7 @@ static void odd2(void)
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  eq(imm_path_nsteps(&prod.path), 9U);
+  eq(imm_path_nsteps(&prod.path), 9);
   close(imm_path_score(&prod.path), 0);
   close(imm_hmm_loglik(&hmm, &seq, &prod.path), 0);
   close(prod.loglik, 0);
