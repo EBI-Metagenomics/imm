@@ -12,10 +12,10 @@ struct imm_pair
     {
       struct
       {
-        uint16_t src;
-        uint16_t dst;
+        int16_t src;
+        int16_t dst;
       };
-      uint32_t key;
+      int32_t key;
     };
   } id;
 
@@ -23,14 +23,14 @@ struct imm_pair
   {
     struct
     {
-      uint16_t src;
-      uint16_t dst;
+      int16_t src;
+      int16_t dst;
     };
   } idx;
 };
 
 imm_static_assert(sizeof(struct imm_pair) == 8, "struct pair must be packed");
 
-struct imm_pair imm_pair(unsigned src_id, unsigned dst_id);
+struct imm_pair imm_pair(int src_id, int dst_id);
 
 #endif
