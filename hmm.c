@@ -79,14 +79,14 @@ static void set_state_indices(struct imm_hmm const *hmm,
   {
     struct imm_state *src = hmm_state(hmm, trans->pair.id.src);
     struct imm_state *dst = hmm_state(hmm, trans->pair.id.dst);
-    trans->pair.idx.src = (uint16_t)src->idx;
-    trans->pair.idx.dst = (uint16_t)dst->idx;
+    trans->pair.idx.src = (int16_t)src->idx;
+    trans->pair.idx.dst = (int16_t)dst->idx;
   }
 }
 
 static char *id_state_name(int id, char *name)
 {
-  snprintf(name, IMM_STATE_NAME_SIZE, "%u", id);
+  snprintf(name, IMM_STATE_NAME_SIZE, "%d", id);
   return name;
 }
 
@@ -251,26 +251,26 @@ float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
   struct imm_state const *state = hmm_state(hmm, step->state_id);
   if (state != hmm_state(hmm, hmm->start_state_id)) return imm_lprob_nan();
 
-  if (step->seqlen > imm_seq_size(seq)) return imm_lprob_nan();
+  if (step->seqsize > imm_seq_size(seq)) return imm_lprob_nan();
 
-  struct imm_seq subseq = imm_seq_slice(seq, imm_range(0, step->seqlen));
+  struct imm_seq subseq = imm_seq_slice(seq, imm_range(0, step->seqsize));
   float lprob = imm_state_lprob(state, &subseq);
 
   int start = 0;
   for (int i = 1; i < nsteps; ++i)
   {
-    start += step->seqlen;
+    start += step->seqsize;
     step = imm_path_step(path, i);
-    if (start + step->seqlen > imm_seq_size(seq)) return imm_lprob_nan();
+    if (start + step->seqsize > imm_seq_size(seq)) return imm_lprob_nan();
 
     struct imm_state const *prev_state = state;
     if (!(state = hmm_state(hmm, step->state_id))) return imm_lprob_nan();
-    subseq = imm_seq_slice(seq, imm_range(start, start + step->seqlen));
+    subseq = imm_seq_slice(seq, imm_range(start, start + step->seqsize));
     lprob += imm_hmm_trans(hmm, prev_state, state);
     lprob += imm_state_lprob(state, &subseq);
   }
 
-  if (start + step->seqlen < imm_seq_size(seq)) return imm_lprob_nan();
+  if (start + step->seqsize < imm_seq_size(seq)) return imm_lprob_nan();
   return lprob;
 }
 

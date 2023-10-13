@@ -6,28 +6,28 @@
 
 struct imm_dna const *const imm_gencode_dna = &imm_dna_iupac;
 
-char const *imm_gc_name1(unsigned id) { return imm_gencode_get(id)->name1; }
+char const *imm_gc_name1(int id) { return imm_gencode_get(id)->name1; }
 
-char const *imm_gc_name2(unsigned id) { return imm_gencode_get(id)->name2; }
+char const *imm_gc_name2(int id) { return imm_gencode_get(id)->name2; }
 
-unsigned imm_gencode_size(struct imm_gencode const *x)
+int imm_gencode_size(struct imm_gencode const *x)
 {
-  return (unsigned)strlen(x->ncbieaa);
+  return (int)strlen(x->ncbieaa);
 }
 
-struct imm_codon imm_gencode_codon(struct imm_gencode const *x, unsigned idx)
+struct imm_codon imm_gencode_codon(struct imm_gencode const *x, int idx)
 {
   struct imm_nuclt const *nuclt = &imm_gencode_dna->super;
   return imm_codon_from_symbols(nuclt, x->base1[idx], x->base2[idx],
                                 x->base3[idx]);
 }
 
-char imm_gencode_amino(struct imm_gencode const *x, unsigned idx)
+char imm_gencode_amino(struct imm_gencode const *x, int idx)
 {
   return x->ncbieaa[idx];
 }
 
-static unsigned perfect_hash(char key);
+static int perfect_hash(char key);
 
 char imm_gencode_decode(struct imm_gencode const *x, struct imm_codon codon)
 {
@@ -35,21 +35,17 @@ char imm_gencode_decode(struct imm_gencode const *x, struct imm_codon codon)
   char const a = imm_abc_symbols(&imm_gencode_dna->super.super)[codon.a];
   char const b = imm_abc_symbols(&imm_gencode_dna->super.super)[codon.b];
   char const c = imm_abc_symbols(&imm_gencode_dna->super.super)[codon.c];
-  unsigned const i[3] = {perfect_hash(a), perfect_hash(b), perfect_hash(c)};
+  int const i[3] = {perfect_hash(a), perfect_hash(b), perfect_hash(c)};
   return aa[i[0] * 4 * 4 + i[1] * 4 + i[2]];
 }
 
-static inline unsigned hash_func(unsigned key, unsigned t)
-{
-  return (t * key) % 8;
-}
+static inline int hash_func(int key, int t) { return (t * key) % 8; }
 
-static unsigned perfect_hash(char key)
+static int perfect_hash(char key)
 {
   /* Generated using perfect-hash Python package */
-  unsigned k = (unsigned)key;
-  static unsigned const G[] = {0, 1, 0, 2, 0, 3, 0, 0};
-  return (G[hash_func(k, 'D')] + G[hash_func(k, 's')]) % 8;
+  static int const G[] = {0, 1, 0, 2, 0, 3, 0, 0};
+  return (G[hash_func(key, 'D')] + G[hash_func(key, 's')]) % 8;
 }
 
 struct imm_gencode const imm_gencode[] = {
@@ -256,9 +252,9 @@ static inline int get_idx(int table_id)
   return -1;
 }
 
-struct imm_gencode const *imm_gencode_get(unsigned table_id)
+struct imm_gencode const *imm_gencode_get(int table_id)
 {
-  int idx = get_idx((int)table_id);
+  int idx = get_idx(table_id);
   if (idx < 0) return NULL;
-  return &imm_gencode[(unsigned)idx];
+  return &imm_gencode[idx];
 }
