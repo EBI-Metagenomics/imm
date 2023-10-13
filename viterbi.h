@@ -15,7 +15,7 @@ struct imm_viterbi
   struct imm_task *task;
   struct imm_ctrans const *curr_trans;
   struct imm_dp_safety safety;
-  unsigned seqlen;
+  int seqsize;
   bool has_tardy_state;
   struct tardy_state tardy_state;
 };
