@@ -12,11 +12,11 @@ struct imm_dp_cfg;
 
 struct imm_state_table
 {
-  unsigned nstates;
-  uint16_t *ids;
-  uint16_t start_state_idx;
-  unsigned end_state_idx;
-  uint8_t *span;
+  int nstates;
+  int16_t *ids;
+  int16_t start_state_idx;
+  int end_state_idx;
+  int8_t *span;
 
   // Debugging purpose
   struct
@@ -29,15 +29,14 @@ void imm_state_table_init(struct imm_state_table *);
 void imm_state_table_debug_setup(struct imm_state_table *, imm_state_name *);
 void imm_state_table_cleanup(struct imm_state_table *);
 int imm_state_table_reset(struct imm_state_table *, struct imm_dp_cfg const *);
-unsigned imm_state_table_idx(struct imm_state_table const *, unsigned id);
-char *imm_state_table_name(struct imm_state_table const *, unsigned idx);
-unsigned imm_state_table_id(struct imm_state_table const *, unsigned idx);
-struct imm_range imm_state_table_range(struct imm_state_table const *,
-                                       unsigned idx);
+int imm_state_table_idx(struct imm_state_table const *, int id);
+char *imm_state_table_name(struct imm_state_table const *, int idx);
+int imm_state_table_id(struct imm_state_table const *, int idx);
+struct imm_range imm_state_table_range(struct imm_state_table const *, int idx);
 void imm_state_table_dump(struct imm_state_table const *, FILE *restrict);
 
-IMM_PURE uint8_t imm_state_table_zspan(struct imm_state_table const *x,
-                                       unsigned state_idx)
+IMM_PURE int8_t imm_state_table_zspan(struct imm_state_table const *x,
+                                      int state_idx)
 {
   return x->span[state_idx];
 }

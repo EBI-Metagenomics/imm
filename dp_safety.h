@@ -11,6 +11,6 @@ struct imm_dp_safety
   struct imm_range safe_past;
 };
 
-void imm_dp_safety_init(struct imm_dp_safety *x, unsigned len);
+void imm_dp_safety_init(struct imm_dp_safety *x, int size);
 
 #endif

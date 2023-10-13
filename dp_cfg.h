@@ -3,8 +3,8 @@
 
 struct imm_dp_cfg
 {
-  unsigned ntrans;
-  unsigned nstates;
+  int ntrans;
+  int nstates;
   struct imm_state **states;
   struct imm_state const *start_state;
   struct imm_state const *end_state;

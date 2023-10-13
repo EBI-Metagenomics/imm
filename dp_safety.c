@@ -3,29 +3,29 @@
 #include <assert.h>
 
 // Define as:
-//   lowest row such that r >= max(max_seq) > 0 for every r in [row, seqlen].
-static struct imm_range safe_past(unsigned seqlen)
+//   lowest row such that r >= max(max_seq) > 0 for every r in [row, seqsize].
+static struct imm_range safe_past(int seqsize)
 {
   assert(IMM_STATE_MAX_SEQLEN > 0);
-  if (seqlen >= IMM_STATE_MAX_SEQLEN)
-    return imm_range(IMM_STATE_MAX_SEQLEN, seqlen + 1);
-  return imm_range(seqlen + 1, seqlen + 1);
+  if (seqsize >= IMM_STATE_MAX_SEQLEN)
+    return imm_range(IMM_STATE_MAX_SEQLEN, seqsize + 1);
+  return imm_range(seqsize + 1, seqsize + 1);
 }
 
 // Define as:
-//   greatest row such that seqlen >= max(max_seq) + r for every
+//   greatest row such that seqsize >= max(max_seq) + r for every
 //   r in (0, row].
-static struct imm_range safe_future(unsigned seqlen)
+static struct imm_range safe_future(int seqsize)
 {
-  if (seqlen >= IMM_STATE_MAX_SEQLEN)
-    return imm_range(1, seqlen - IMM_STATE_MAX_SEQLEN + 1);
+  if (seqsize >= IMM_STATE_MAX_SEQLEN)
+    return imm_range(1, seqsize - IMM_STATE_MAX_SEQLEN + 1);
   return imm_range(1, 1);
 }
 
-void imm_dp_safety_init(struct imm_dp_safety *x, unsigned len)
+void imm_dp_safety_init(struct imm_dp_safety *x, int size)
 {
-  struct imm_range past = safe_past(len);
-  struct imm_range future = safe_future(len);
+  struct imm_range past = safe_past(size);
+  struct imm_range future = safe_future(size);
   x->safe = imm_range_intersect(past, future);
 
   struct imm_range tmp = {0};

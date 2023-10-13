@@ -9,13 +9,13 @@ static float lprob(struct imm_state const *state, struct imm_seq const *seq)
   if (imm_seq_size(seq) == 1)
   {
     struct imm_abc const *abc = imm_state_abc(state);
-    unsigned idx = imm_abc_symbol_idx(abc, seq->str.data[0]);
+    int idx = imm_abc_symbol_idx(abc, seq->str.data[0]);
     if (idx != IMM_SYM_NULL_IDX) return normal->lprobs[idx];
   }
   return imm_lprob_zero();
 }
 
-void imm_normal_state_init(struct imm_normal_state *state, unsigned id,
+void imm_normal_state_init(struct imm_normal_state *state, int id,
                            struct imm_abc const *abc, float const *lprobs)
 {
   state->lprobs = lprobs;

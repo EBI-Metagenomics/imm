@@ -12,7 +12,7 @@ struct imm_normal_state
   float const *lprobs;
 };
 
-IMM_API void imm_normal_state_init(struct imm_normal_state *, unsigned id,
+IMM_API void imm_normal_state_init(struct imm_normal_state *, int id,
                                    struct imm_abc const *, float const *lprobs);
 
 #endif
