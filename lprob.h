@@ -18,14 +18,14 @@ IMM_API float imm_lprob_nan(void);
 IMM_API bool imm_lprob_is_nan(float);
 IMM_API bool imm_lprob_is_zero(float);
 IMM_API bool imm_lprob_is_finite(float);
-IMM_API void imm_lprob_normalize(unsigned len, float *arr);
-IMM_API void imm_lprob_sample(struct imm_rnd *, unsigned len, float *arr);
+IMM_API void imm_lprob_normalize(int size, float *arr);
+IMM_API void imm_lprob_sample(struct imm_rnd *, int size, float *arr);
 IMM_API float imm_lprob_zero(void);
 
-IMM_PURE float imm_lprob_sum(unsigned len, float const *arr)
+IMM_PURE float imm_lprob_sum(int size, float const *arr)
 {
   float r = arr[0];
-  for (unsigned i = 1; i < len; ++i)
+  for (int i = 1; i < size; ++i)
     r = imm_logaddexp(r, arr[i]);
   return r;
 }

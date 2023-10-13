@@ -15,17 +15,17 @@ bool imm_lprob_is_finite(float a)
   return !imm_lprob_is_nan(a) && !imm_lprob_is_zero(a);
 }
 
-void imm_lprob_normalize(unsigned len, float *arr)
+void imm_lprob_normalize(int size, float *arr)
 {
-  float lnorm = imm_lprob_sum(len, arr);
-  for (unsigned i = 0; i < len; ++i)
+  float lnorm = imm_lprob_sum(size, arr);
+  for (int i = 0; i < size; ++i)
     arr[i] -= lnorm;
 }
 
-void imm_lprob_sample(struct imm_rnd *rnd, unsigned len, float *lprobs)
+void imm_lprob_sample(struct imm_rnd *rnd, int size, float *lprobs)
 {
-  for (unsigned i = 0; i < len; ++i)
-    lprobs[i] = log(imm_rnd_dbl(rnd));
+  for (int i = 0; i < size; ++i)
+    lprobs[i] = (float)log(imm_rnd_dbl(rnd));
 }
 
 float imm_lprob_zero(void) { return -INFINITY; }

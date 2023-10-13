@@ -19,18 +19,18 @@ struct imm_mute_state;
 struct imm_hmm
 {
   struct imm_code const *code;
-  unsigned start_state_id;
-  unsigned end_state_id;
+  int start_state_id;
+  int end_state_id;
 
   struct
   {
-    unsigned size;
+    int size;
     CCO_HASH_DECLARE(tbl, IMM_TRANS_MAX_SIZE - 1);
   } states;
 
   struct
   {
-    unsigned size;
+    int size;
     CCO_HASH_DECLARE(tbl, IMM_TRANS_MAX_SIZE - 1);
     struct imm_trans data[(1 << IMM_TRANS_MAX_SIZE)];
     struct imm_trans *avail;

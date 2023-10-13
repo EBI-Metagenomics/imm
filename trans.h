@@ -6,7 +6,7 @@
 #include "pair.h"
 #include <stdint.h>
 
-#define IMM_TRANS_NULL_IDX UINT16_MAX
+#define IMM_TRANS_NULL_IDX INT16_MAX
 #define IMM_TRANS_MAX_SIZE 15
 
 struct imm_trans
@@ -18,7 +18,7 @@ struct imm_trans
   struct cco_hnode hnode;
 };
 
-void imm_trans_init(struct imm_trans *, unsigned src, unsigned dst,
+void imm_trans_init(struct imm_trans *, int src, int dst,
                     float lprob);
 
 #endif

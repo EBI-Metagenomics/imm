@@ -91,18 +91,19 @@ int imm__abc_symbol_type(struct imm_abc const *abc, int id)
   return IMM_SYM_NULL;
 }
 
-int imm__abc_init(struct imm_abc *x, int len, char const *symbols,
+int imm__abc_init(struct imm_abc *x, int size, char const *symbols,
                   char any_symbol, int typeid)
 {
+  assert(size >= 0);
   x->typeid = typeid;
   if (!imm_sym_valid_char(any_symbol)) return IMM_EINVAL;
 
-  if (len == 0) return IMM_EINVAL;
+  if (size == 0) return IMM_EINVAL;
 
-  if (len > IMM_ABC_MAX_SIZE || len > IMM_SYM_SIZE) return IMM_EMANYSYMBOLS;
+  if (size > IMM_ABC_MAX_SIZE || size > IMM_SYM_SIZE) return IMM_EMANYSYMBOLS;
 
-  x->size = len;
-  memcpy(x->symbols, symbols, sizeof *x->symbols * len);
+  x->size = size;
+  memcpy(x->symbols, symbols, sizeof(*x->symbols) * (unsigned)size);
   x->symbols[x->size] = '\0';
   imm_sym_init(&x->sym);
   x->any_symbol_id = imm_sym_id(any_symbol);

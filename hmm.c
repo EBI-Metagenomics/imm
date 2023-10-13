@@ -40,7 +40,7 @@ static void init_transitions_table(struct imm_hmm *hmm)
 static int add_transition(struct imm_hmm *hmm, struct imm_state *src,
                           struct imm_state *dst, float lprob)
 {
-  unsigned max_size = (unsigned)imm_array_size(hmm->transitions.data);
+  int max_size = (int)imm_array_size(hmm->transitions.data);
   if (hmm->transitions.size >= max_size) return IMM_EMANYTRANS;
 
   if (hmm->transitions.avail > &hmm->transitions.data[max_size - 1])
@@ -65,13 +65,12 @@ static inline bool has_end_state(struct imm_hmm const *hmm)
   return hmm->end_state_id != IMM_STATE_NULL_ID;
 }
 
-static struct imm_state *hmm_state(struct imm_hmm const *hmm,
-                                   unsigned state_id);
+static struct imm_state *hmm_state(struct imm_hmm const *hmm, int state_id);
 
 static void set_state_indices(struct imm_hmm const *hmm,
                               struct imm_state **states)
 {
-  for (unsigned i = 0; i < hmm->states.size; ++i)
+  for (int i = 0; i < hmm->states.size; ++i)
     states[i]->idx = i;
 
   struct imm_trans *trans = NULL;
@@ -85,7 +84,7 @@ static void set_state_indices(struct imm_hmm const *hmm,
   }
 }
 
-static char *id_state_name(unsigned id, char *name)
+static char *id_state_name(int id, char *name)
 {
   snprintf(name, IMM_STATE_NAME_SIZE, "%u", id);
   return name;
@@ -177,8 +176,9 @@ static bool has_src_end(struct imm_hmm const *x)
 int imm_hmm_reset_dp(struct imm_hmm const *hmm, struct imm_dp *dp)
 {
   int rc = 0;
+  assert(hmm->states.size >= 0);
   struct imm_state **states =
-      malloc(sizeof(struct imm_state *) * hmm->states.size);
+      malloc(sizeof(struct imm_state *) * (unsigned)hmm->states.size);
   if (!states) return IMM_ENOMEM;
 
   if (!has_start_state(hmm))
@@ -203,12 +203,12 @@ int imm_hmm_reset_dp(struct imm_hmm const *hmm, struct imm_dp *dp)
   }
 
   unsigned bkt = 0;
-  unsigned i = 0;
+  int i = 0;
   struct imm_state *state = NULL;
   cco_hash_for_each(hmm->states.tbl, bkt, state, hnode) { states[i++] = state; }
   set_state_indices(hmm, states);
 
-  unsigned start_idx = hmm_state(hmm, hmm->start_state_id)->idx;
+  int start_idx = hmm_state(hmm, hmm->start_state_id)->idx;
   if ((rc = imm_tsort(hmm->states.size, states, start_idx))) goto cleanup;
   set_state_indices(hmm, states);
 
@@ -244,7 +244,7 @@ float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
 {
   if (hmm->code->abc != seq->abc) return imm_lprob_nan();
 
-  unsigned nsteps = imm_path_nsteps(path);
+  int nsteps = imm_path_nsteps(path);
   if (nsteps == 0) return imm_lprob_nan();
 
   struct imm_step const *step = imm_path_step(path, 0);
@@ -256,8 +256,8 @@ float imm_hmm_loglik(struct imm_hmm const *hmm, struct imm_seq const *seq,
   struct imm_seq subseq = imm_seq_slice(seq, imm_range(0, step->seqlen));
   float lprob = imm_state_lprob(state, &subseq);
 
-  unsigned start = 0;
-  for (unsigned i = 1; i < nsteps; ++i)
+  int start = 0;
+  for (int i = 1; i < nsteps; ++i)
   {
     start += step->seqlen;
     step = imm_path_step(path, i);
@@ -339,7 +339,7 @@ int imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state *src,
   return 0;
 }
 
-static struct imm_state *hmm_state(struct imm_hmm const *hmm, unsigned state_id)
+static struct imm_state *hmm_state(struct imm_hmm const *hmm, int state_id)
 {
   struct imm_state *state = NULL;
   cco_hash_for_each_possible(hmm->states.tbl, state, hnode, state_id)

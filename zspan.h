@@ -9,24 +9,18 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-IMM_CONST uint8_t imm_zspan(unsigned min, unsigned max)
+IMM_CONST int8_t imm_zspan(int min, int max)
 {
   imm_assume(min <= IMM_STATE_MAX_SEQLEN);
   imm_assume(max <= IMM_STATE_MAX_SEQLEN);
-  return (uint8_t)((min << 4) | max);
+  return (int8_t)((min << 4) | max);
 }
 
-IMM_CONST uint_fast8_t imm_zspan_min(uint8_t x)
-{
-  return (uint_fast8_t)(x >> 4);
-}
+IMM_CONST int_fast8_t imm_zspan_min(int8_t x) { return (int_fast8_t)(x >> 4); }
 
-IMM_CONST uint_fast8_t imm_zspan_max(uint8_t x)
-{
-  return (uint_fast8_t)(x & 0xF);
-}
+IMM_CONST int_fast8_t imm_zspan_max(int8_t x) { return (int_fast8_t)(x & 0xF); }
 
-IMM_CONST struct imm_range imm_zspan_range(uint8_t x)
+IMM_CONST struct imm_range imm_zspan_range(int8_t x)
 {
   return imm_range(imm_zspan_min(x), imm_zspan_max(x) + 1);
 }
