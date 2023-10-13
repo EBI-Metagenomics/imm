@@ -3,9 +3,9 @@
 #include "reallocf.h"
 #include <stdlib.h>
 
-int imm_matrixf_init(struct imm_matrixf *x, unsigned rows, unsigned cols)
+int imm_matrixf_init(struct imm_matrixf *x, int rows, int cols)
 {
-  x->data = malloc(sizeof(*x->data) * (rows * cols));
+  x->data = malloc(sizeof(*x->data) * (size_t)(rows * cols));
   if (!x->data) return IMM_ENOMEM;
   x->rows = rows;
   x->cols = cols;
@@ -21,17 +21,16 @@ void imm_matrixf_empty(struct imm_matrixf *x)
 
 void imm_matrixf_fill(struct imm_matrixf *x, float v)
 {
-  for (size_t i = 0; i < x->rows * x->cols; ++i)
+  for (int i = 0; i < x->rows * x->cols; ++i)
     x->data[i] = v;
 }
 
-float *imm_matrixf_get_ptr(struct imm_matrixf const *x, unsigned r, unsigned c)
+float *imm_matrixf_get_ptr(struct imm_matrixf const *x, int r, int c)
 {
   return x->data + (r * x->cols + c);
 }
 
-float const *imm_matrixf_get_ptr_c(struct imm_matrixf const *x, unsigned r,
-                                   unsigned c)
+float const *imm_matrixf_get_ptr_c(struct imm_matrixf const *x, int r, int c)
 {
   return x->data + (r * x->cols + c);
 }
@@ -42,9 +41,9 @@ void imm_matrixf_cleanup(struct imm_matrixf *x)
   x->data = NULL;
 }
 
-int imm_matrixf_resize(struct imm_matrixf *x, unsigned rows, unsigned cols)
+int imm_matrixf_resize(struct imm_matrixf *x, int rows, int cols)
 {
-  x->data = imm_reallocf(x->data, sizeof(*x->data) * (rows * cols));
+  x->data = imm_reallocf(x->data, sizeof(*x->data) * (size_t)(rows * cols));
   if (!x->data && rows * cols > 0) return IMM_ENOMEM;
   x->rows = rows;
   x->cols = cols;
