@@ -30,7 +30,7 @@ static void setup_codonp(struct imm_codon_lprob *codonp)
   struct imm_nuclt const *nuclt = codonp->nuclt;
   struct imm_abc const *abc = &nuclt->super;
   char const *symbols = imm_abc_symbols(abc);
-  unsigned length = imm_abc_size(abc);
+  int length = imm_abc_size(abc);
 
   struct imm_cartes iter;
   imm_cartes_init(&iter, symbols, length, 3);
@@ -40,23 +40,23 @@ static void setup_codonp(struct imm_codon_lprob *codonp)
   while ((item = imm_cartes_next(&iter)) != NULL)
   {
     struct imm_codon codon = IMM_CODON(nuclt, item);
-    imm_codon_lprob_set(codonp, codon, log(0.001));
+    imm_codon_lprob_set(codonp, codon, logf(0.001f));
   }
   imm_cartes_cleanup(&iter);
 
   struct imm_codon codon = IMM_CODON(nuclt, "ATG");
-  imm_codon_lprob_set(codonp, codon, log(0.8));
+  imm_codon_lprob_set(codonp, codon, logf(0.8f));
   codon = IMM_CODON(nuclt, "ATT");
-  imm_codon_lprob_set(codonp, codon, log(0.1));
+  imm_codon_lprob_set(codonp, codon, logf(0.1f));
   codon = IMM_CODON(nuclt, "GTC");
-  imm_codon_lprob_set(codonp, codon, log(0.4));
+  imm_codon_lprob_set(codonp, codon, logf(0.4f));
 
   imm_codon_lprob_normalize(codonp);
 }
 
 static struct imm_nuclt_lprob setup_nucltp(struct imm_nuclt const *nuclt)
 {
-  float arr[] = {log(0.1), log(0.2), log(0.3), log(0.4)};
+  float arr[] = {logf(0.1f), logf(0.2f), logf(0.3f), logf(0.4f)};
   return imm_nuclt_lprob(nuclt, arr);
 }
 
@@ -64,12 +64,12 @@ static void check_joint(struct imm_state const *state, struct imm_span span)
 {
   struct imm_abc const *abc = imm_state_abc(state);
   char const *symbols = imm_abc_symbols(abc);
-  unsigned length = imm_abc_size(abc);
+  int length = imm_abc_size(abc);
 
   struct imm_cartes iter;
   imm_cartes_init(&iter, symbols, length, span.max);
   float total = imm_lprob_zero();
-  for (unsigned times = span.min; times <= span.max; ++times)
+  for (int times = span.min; times <= span.max; ++times)
   {
     imm_cartes_setup(&iter, times);
 

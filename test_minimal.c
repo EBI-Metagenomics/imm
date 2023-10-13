@@ -42,7 +42,7 @@ static void cleanup(void)
   imm_eseq_cleanup(&eseq);
 }
 
-static char *state_name(unsigned id, char *name)
+static char *state_name(int id, char *name)
 {
   if (id == S) strcpy(name, "S");
   else if (id == N) strcpy(name, "N");
@@ -56,7 +56,7 @@ static char *state_name(unsigned id, char *name)
   do                                                                           \
   {                                                                            \
     eq(imm_path_step(&PATH, IDX)->state_id, STATE_ID);                         \
-    eq(imm_path_step(&PATH, IDX)->seqlen, SEQSIZE);                            \
+    eq(imm_path_step(&PATH, IDX)->seqsize, SEQSIZE);                           \
     close(imm_path_step(&PATH, IDX)->score, SCORE);                            \
   } while (0);
 
@@ -158,10 +158,10 @@ static void states_sne_no_solution(void)
   cleanup();
 }
 
-static float table_lprob(unsigned size, char const *seq)
+static float table_lprob(int size, char const *seq)
 {
-  if (size == 1 && strncmp(seq, "A", size) == 0) return 10;
-  else if (size == 2 && strncmp(seq, "GC", size) == 0) return 15;
+  if (size == 1 && strncmp(seq, "A", (unsigned)size) == 0) return 10;
+  else if (size == 2 && strncmp(seq, "GC", (unsigned)size) == 0) return 15;
   return IMM_LPROB_ZERO;
 }
 

@@ -1441,8 +1441,8 @@ static char const seq10[] =
 
 static void msv3000_path(void)
 {
-  unsigned core_size = 3000;
-  unsigned pfam_core_size = 3258786;
+  int core_size = 3000;
+  int pfam_core_size = 3258786;
   imm_ex3_init(core_size);
 
   struct imm_ex3 *m = &imm_ex3;
@@ -1462,10 +1462,11 @@ static void msv3000_path(void)
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, -216494.453125);
   printf("MSV-path [N=%u, M=%u]: %llu msecs\n", imm_seq_size(&seq), core_size,
-         (unsigned long long)prod.mseconds);
+         (int long long)prod.mseconds);
   printf("  [N=%u, M=Pfam[%u]]: %.1f mins\n", imm_seq_size(&seq),
          pfam_core_size,
-         (pfam_core_size / ((double)core_size)) * prod.mseconds / 1000. / 60.);
+         (pfam_core_size / ((double)core_size)) * (double)prod.mseconds /
+             1000. / 60.);
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);

@@ -62,12 +62,12 @@ static void get_lprob(void)
   struct imm_abc abc = {0};
   eq(imm_abc_init(&abc, imm_str("ACGT"), 'X'), 0);
 
-  float const lprobs[4] = {log(0.2), log(0.01), log(1.0), log(0.5)};
+  float const lprobs[4] = {logf(0.2f), logf(0.01f), logf(1.0f), logf(0.5f)};
   struct imm_abc_lprob lprob = imm_abc_lprob(&abc, lprobs);
 
-  close(imm_abc_lprob_get(&lprob, 'A'), log(0.2));
-  close(imm_abc_lprob_get(&lprob, 'C'), log(0.01));
-  close(imm_abc_lprob_get(&lprob, 'T'), log(0.5));
+  close(imm_abc_lprob_get(&lprob, 'A'), logf(0.2f));
+  close(imm_abc_lprob_get(&lprob, 'C'), logf(0.01f));
+  close(imm_abc_lprob_get(&lprob, 'T'), logf(0.5f));
 }
 
 static void amino_success(void)
@@ -75,7 +75,7 @@ static void amino_success(void)
   char const symbols[IMM_AMINO_SIZE + 1] = IMM_AMINO_SYMBOLS;
 
   struct imm_amino const *amino = &imm_amino_iupac;
-  for (unsigned i = 0; i < imm_abc_size(&amino->super); ++i)
+  for (int i = 0; i < imm_abc_size(&amino->super); ++i)
   {
     eq(imm_abc_symbols(&amino->super)[i], symbols[i]);
     eq(imm_abc_symbol_idx(&amino->super, symbols[i]), i);
@@ -90,12 +90,12 @@ static void amino_success(void)
 
 static void amino_lprob(void)
 {
-  float const array[] = {imm_lprob_zero(), log(1), [19] = log(19)};
+  float const array[] = {imm_lprob_zero(), logf(1), [19] = logf(19)};
   struct imm_amino_lprob lprob = imm_amino_lprob(&imm_amino_iupac, array);
 
   ok(imm_lprob_is_zero(imm_amino_lprob_get(&lprob, 'A')));
-  close(imm_amino_lprob_get(&lprob, 'C'), log(1));
-  close(imm_amino_lprob_get(&lprob, 'Y'), log(19));
+  close(imm_amino_lprob_get(&lprob, 'C'), logf(1));
+  close(imm_amino_lprob_get(&lprob, 'Y'), logf(19));
 }
 
 static void abc_io(void)

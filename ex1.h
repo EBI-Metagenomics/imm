@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define IMM_EX1_SIZE 3000U
+#define IMM_EX1_SIZE 3000
 #define IMM_EX1_NUCLT_ANY_SYMBOL '*'
 #define IMM_EX1_NUCLT_SYMBOLS "BMIEJ"
 
@@ -21,7 +21,7 @@ struct imm_ex1
   struct imm_abc abc;
   struct imm_code code;
   struct imm_hmm hmm;
-  unsigned core_size;
+  int core_size;
   struct imm_mute_state start;
   struct imm_normal_state b;
   struct imm_normal_state j;
@@ -39,10 +39,10 @@ struct imm_ex1
   } null;
 };
 
-IMM_API void imm_ex1_init(unsigned core_size);
-IMM_API void imm_ex1_remove_insertion_states(unsigned core_size);
-IMM_API void imm_ex1_remove_deletion_states(unsigned core_size);
-IMM_API char *imm_ex1_state_name(unsigned id, char *name);
+IMM_API void imm_ex1_init(int core_size);
+IMM_API void imm_ex1_remove_insertion_states(int core_size);
+IMM_API void imm_ex1_remove_deletion_states(int core_size);
+IMM_API char *imm_ex1_state_name(int id, char *name);
 
 extern struct imm_ex1 imm_ex1;
 

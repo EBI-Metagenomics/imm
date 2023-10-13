@@ -11,7 +11,7 @@
 #include "task.h"
 #include "vendor/minctest.h"
 
-static char *state_name(unsigned id, char *name)
+static char *state_name(int id, char *name)
 {
   char *x = name;
   if (id == 0) *(x++) = 'B';
@@ -27,7 +27,7 @@ static char *state_name(unsigned id, char *name)
   do                                                                           \
   {                                                                            \
     eq(imm_path_step(&PATH, IDX)->state_id, STATE_ID);                         \
-    eq(imm_path_step(&PATH, IDX)->seqlen, SEQSIZE);                            \
+    eq(imm_path_step(&PATH, IDX)->seqsize, SEQSIZE);                           \
     close(imm_path_step(&PATH, IDX)->score, SCORE);                            \
   } while (0);
 

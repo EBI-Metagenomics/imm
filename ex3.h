@@ -8,7 +8,7 @@
 #include "normal_state.h"
 #include "state.h"
 
-#define IMM_EX3_SIZE 3000U
+#define IMM_EX3_SIZE 3000
 #define IMM_EX3_NUCLT_ANY_SYMBOL '*'
 #define IMM_EX3_NUCLT_SYMBOLS "NMCJ"
 
@@ -17,7 +17,7 @@ struct imm_ex3
   struct imm_abc abc;
   struct imm_code code;
   struct imm_hmm hmm;
-  unsigned core_size;
+  int core_size;
   struct imm_mute_state S;
   struct imm_normal_state N;
   struct imm_mute_state B;
@@ -31,7 +31,7 @@ struct imm_ex3
 extern struct imm_ex3 imm_ex3;
 extern char const imm_ex3_seq1[];
 
-void imm_ex3_init(unsigned core_size);
-char *imm_ex3_state_name(unsigned id, char *name);
+void imm_ex3_init(int core_size);
+char *imm_ex3_state_name(int id, char *name);
 
 #endif

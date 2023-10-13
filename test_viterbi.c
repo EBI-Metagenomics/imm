@@ -59,11 +59,11 @@ static void profile1(void)
   struct imm_mute_state end;
   imm_mute_state_init(&end, 2, &abc_ab);
 
-  float M0_lprobs[] = {log(0.4), log(0.2)};
+  float M0_lprobs[] = {logf(0.4f), logf(0.2f)};
   struct imm_normal_state M0;
   imm_normal_state_init(&M0, 3, &abc_ab, M0_lprobs);
 
-  float I0_lprobs[] = {log(0.5), log(0.5)};
+  float I0_lprobs[] = {logf(0.5f), logf(0.5f)};
   struct imm_normal_state I0;
   imm_normal_state_init(&I0, 4, &abc_ab, I0_lprobs);
 
@@ -77,13 +77,13 @@ static void profile1(void)
   imm_hmm_add_state(&hmm, &M0.super);
   imm_hmm_add_state(&hmm, &I0.super);
 
-  imm_hmm_set_trans(&hmm, &start.super, &D0.super, log(0.1));
-  imm_hmm_set_trans(&hmm, &D0.super, &end.super, log(1.0));
-  imm_hmm_set_trans(&hmm, &start.super, &M0.super, log(0.5));
-  imm_hmm_set_trans(&hmm, &M0.super, &end.super, log(0.8));
-  imm_hmm_set_trans(&hmm, &M0.super, &I0.super, log(0.1));
-  imm_hmm_set_trans(&hmm, &I0.super, &I0.super, log(0.2));
-  imm_hmm_set_trans(&hmm, &I0.super, &end.super, log(1.0));
+  imm_hmm_set_trans(&hmm, &start.super, &D0.super, logf(0.1f));
+  imm_hmm_set_trans(&hmm, &D0.super, &end.super, logf(1.0f));
+  imm_hmm_set_trans(&hmm, &start.super, &M0.super, logf(0.5f));
+  imm_hmm_set_trans(&hmm, &M0.super, &end.super, logf(0.8f));
+  imm_hmm_set_trans(&hmm, &M0.super, &I0.super, logf(0.1f));
+  imm_hmm_set_trans(&hmm, &I0.super, &I0.super, logf(0.2f));
+  imm_hmm_set_trans(&hmm, &I0.super, &end.super, logf(1.0f));
 
   struct imm_dp dp;
   eq(imm_hmm_init_dp(&hmm, &dp), 0);
@@ -92,18 +92,18 @@ static void profile1(void)
   eq(imm_eseq_setup(&eseq, &EMPTY_ab), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, (log(0.1) + log(1.0)));
+  close(prod.loglik, (logf(0.1f) + logf(1.0f)));
 
-  close(imm_hmm_loglik(&hmm, &EMPTY_ab, &prod.path), log(0.1) + log(1.0));
+  close(imm_hmm_loglik(&hmm, &EMPTY_ab, &prod.path), logf(0.1f) + logf(1.0f));
   eq(imm_path_nsteps(&prod.path), 3U);
-  close(imm_path_score(&prod.path), log(0.1) + log(1.0));
+  close(imm_path_score(&prod.path), logf(0.1f) + logf(1.0f));
 
   imm_dp_cleanup(&dp);
   imm_hmm_set_end(&hmm, &end);
   imm_hmm_init_dp(&hmm, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  float des = log(0.5) + log(0.4) + log(0.8);
+  float des = logf(0.5f) + logf(0.4f) + logf(0.8f);
   eq(imm_eseq_setup(&eseq, &A_ab), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
@@ -118,7 +118,7 @@ static void profile1(void)
   imm_hmm_init_dp(&hmm, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  des = log(0.5) + log(0.2) + log(0.8);
+  des = logf(0.5f) + logf(0.2f) + logf(0.8f);
   eq(imm_eseq_setup(&eseq, &B_ab), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
@@ -128,7 +128,7 @@ static void profile1(void)
   eq(imm_path_nsteps(&prod.path), 3U);
   close(imm_path_score(&prod.path), des);
 
-  des = log(0.5) + log(0.4) + log(0.1) + log(0.5);
+  des = logf(0.5f) + logf(0.4f) + logf(0.1f) + logf(0.5f);
   eq(imm_eseq_setup(&eseq, &AA_ab), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
@@ -138,7 +138,7 @@ static void profile1(void)
   eq(imm_path_nsteps(&prod.path), 4U);
   close(imm_path_score(&prod.path), des);
 
-  des = log(0.5) + log(0.4) + log(0.1) + log(0.2) + 2 * log(0.5);
+  des = logf(0.5f) + logf(0.4f) + logf(0.1f) + logf(0.2f) + 2 * logf(0.5f);
   eq(imm_eseq_setup(&eseq, &AAB_ab), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
@@ -166,11 +166,11 @@ static void profile2(void)
   struct imm_mute_state start;
   imm_mute_state_init(&start, 0, &abc);
 
-  float ins_lprobs[] = {log(0.1), log(0.1), log(0.1), log(0.7)};
+  float ins_lprobs[] = {logf(0.1f), logf(0.1f), logf(0.1f), logf(0.7f)};
 
-  float M0_lprobs[] = {log(0.4), zero(), log(0.6), zero()};
-  float M1_lprobs[] = {log(0.6), zero(), log(0.4), zero()};
-  float M2_lprobs[] = {log(0.05), log(0.05), log(0.05), log(0.05)};
+  float M0_lprobs[] = {logf(0.4f), zero(), logf(0.6f), zero()};
+  float M1_lprobs[] = {logf(0.6f), zero(), logf(0.4f), zero()};
+  float M2_lprobs[] = {logf(0.05f), logf(0.05f), logf(0.05f), logf(0.05f)};
 
   struct imm_normal_state M0;
   imm_normal_state_init(&M0, 1, &abc, M0_lprobs);
@@ -218,19 +218,19 @@ static void profile2(void)
   imm_hmm_set_trans(&hmm, &M1.super, &end.super, 0.0);
   imm_hmm_set_trans(&hmm, &M2.super, &end.super, 0.0);
 
-  imm_hmm_set_trans(&hmm, &M0.super, &I0.super, log(0.2));
-  imm_hmm_set_trans(&hmm, &M0.super, &D1.super, log(0.1));
-  imm_hmm_set_trans(&hmm, &I0.super, &I0.super, log(0.5));
-  imm_hmm_set_trans(&hmm, &I0.super, &M1.super, log(0.5));
+  imm_hmm_set_trans(&hmm, &M0.super, &I0.super, logf(0.2f));
+  imm_hmm_set_trans(&hmm, &M0.super, &D1.super, logf(0.1f));
+  imm_hmm_set_trans(&hmm, &I0.super, &I0.super, logf(0.5f));
+  imm_hmm_set_trans(&hmm, &I0.super, &M1.super, logf(0.5f));
 
-  imm_hmm_set_trans(&hmm, &M1.super, &D2.super, log(0.1));
-  imm_hmm_set_trans(&hmm, &M1.super, &I1.super, log(0.2));
-  imm_hmm_set_trans(&hmm, &I1.super, &I1.super, log(0.5));
-  imm_hmm_set_trans(&hmm, &I1.super, &M2.super, log(0.5));
-  imm_hmm_set_trans(&hmm, &D1.super, &D2.super, log(0.3));
-  imm_hmm_set_trans(&hmm, &D1.super, &M2.super, log(0.7));
+  imm_hmm_set_trans(&hmm, &M1.super, &D2.super, logf(0.1f));
+  imm_hmm_set_trans(&hmm, &M1.super, &I1.super, logf(0.2f));
+  imm_hmm_set_trans(&hmm, &I1.super, &I1.super, logf(0.5f));
+  imm_hmm_set_trans(&hmm, &I1.super, &M2.super, logf(0.5f));
+  imm_hmm_set_trans(&hmm, &D1.super, &D2.super, logf(0.3f));
+  imm_hmm_set_trans(&hmm, &D1.super, &M2.super, logf(0.7f));
 
-  imm_hmm_set_trans(&hmm, &D2.super, &end.super, log(1.0));
+  imm_hmm_set_trans(&hmm, &D2.super, &end.super, logf(1.0f));
 
   struct imm_dp dp;
   imm_hmm_init_dp(&hmm, &dp);
@@ -240,20 +240,20 @@ static void profile2(void)
   eq(imm_eseq_setup(&eseq, &C), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, log(0.05));
+  close(prod.loglik, logf(0.05f));
 
-  close(imm_hmm_loglik(&hmm, &C, &prod.path), log(0.05));
+  close(imm_hmm_loglik(&hmm, &C, &prod.path), logf(0.05f));
   eq(imm_path_nsteps(&prod.path), 3U);
-  close(imm_path_score(&prod.path), log(0.05));
+  close(imm_path_score(&prod.path), logf(0.05f));
 
   eq(imm_eseq_setup(&eseq, &T), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, log(0.05));
+  close(prod.loglik, logf(0.05f));
 
-  close(imm_hmm_loglik(&hmm, &T, &prod.path), log(0.05));
+  close(imm_hmm_loglik(&hmm, &T, &prod.path), logf(0.05f));
   eq(imm_path_nsteps(&prod.path), 3U);
-  close(imm_path_score(&prod.path), log(0.05));
+  close(imm_path_score(&prod.path), logf(0.05f));
 
   imm_dp_cleanup(&dp);
   imm_hmm_init_dp(&hmm, &dp);
@@ -262,38 +262,38 @@ static void profile2(void)
   eq(imm_eseq_setup(&eseq, &A), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, log(0.6));
+  close(prod.loglik, logf(0.6f));
 
-  close(imm_hmm_loglik(&hmm, &A, &prod.path), log(0.6));
+  close(imm_hmm_loglik(&hmm, &A, &prod.path), logf(0.6f));
   eq(imm_path_nsteps(&prod.path), 3U);
-  close(imm_path_score(&prod.path), log(0.6));
+  close(imm_path_score(&prod.path), logf(0.6f));
 
   eq(imm_eseq_setup(&eseq, &C), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, log(0.05));
+  close(prod.loglik, logf(0.05f));
 
-  close(imm_hmm_loglik(&hmm, &C, &prod.path), log(0.05));
+  close(imm_hmm_loglik(&hmm, &C, &prod.path), logf(0.05f));
   eq(imm_path_nsteps(&prod.path), 3U);
-  close(imm_path_score(&prod.path), log(0.05));
+  close(imm_path_score(&prod.path), logf(0.05f));
 
   eq(imm_eseq_setup(&eseq, &G), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, log(0.6));
+  close(prod.loglik, logf(0.6f));
 
-  close(imm_hmm_loglik(&hmm, &G, &prod.path), log(0.6));
+  close(imm_hmm_loglik(&hmm, &G, &prod.path), logf(0.6f));
   eq(imm_path_nsteps(&prod.path), 3U);
-  close(imm_path_score(&prod.path), log(0.6));
+  close(imm_path_score(&prod.path), logf(0.6f));
 
   eq(imm_eseq_setup(&eseq, &T), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, log(0.05));
+  close(prod.loglik, logf(0.05f));
 
-  close(imm_hmm_loglik(&hmm, &T, &prod.path), log(0.05));
+  close(imm_hmm_loglik(&hmm, &T, &prod.path), logf(0.05f));
   eq(imm_path_nsteps(&prod.path), 3U);
-  close(imm_path_score(&prod.path), log(0.05));
+  close(imm_path_score(&prod.path), logf(0.05f));
 
   imm_dp_cleanup(&dp);
   imm_hmm_init_dp(&hmm, &dp);
@@ -302,11 +302,11 @@ static void profile2(void)
   eq(imm_eseq_setup(&eseq, &A), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, log(0.6));
+  close(prod.loglik, logf(0.6f));
 
-  close(imm_hmm_loglik(&hmm, &A, &prod.path), log(0.6));
+  close(imm_hmm_loglik(&hmm, &A, &prod.path), logf(0.6f));
   eq(imm_path_nsteps(&prod.path), 3U);
-  close(imm_path_score(&prod.path), log(0.6));
+  close(imm_path_score(&prod.path), logf(0.6f));
 
   imm_dp_cleanup(&dp);
   imm_hmm_init_dp(&hmm, &dp);
@@ -315,11 +315,11 @@ static void profile2(void)
   eq(imm_eseq_setup(&eseq, &GA), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, 2 * log(0.6));
+  close(prod.loglik, 2 * logf(0.6f));
 
-  close(imm_hmm_loglik(&hmm, &GA, &prod.path), 2 * log(0.6));
+  close(imm_hmm_loglik(&hmm, &GA, &prod.path), 2 * logf(0.6f));
   eq(imm_path_nsteps(&prod.path), 4U);
-  close(imm_path_score(&prod.path), 2 * log(0.6));
+  close(imm_path_score(&prod.path), 2 * logf(0.6f));
 
   imm_dp_cleanup(&dp);
   imm_hmm_init_dp(&hmm, &dp);
@@ -329,7 +329,8 @@ static void profile2(void)
   imm_hmm_init_dp(&hmm, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  float des = log(0.6) + log(0.2) + 3 * log(0.7) + 3 * log(0.5) + log(0.6);
+  float des =
+      logf(0.6f) + logf(0.2f) + 3 * logf(0.7f) + 3 * logf(0.5f) + logf(0.6f);
   eq(imm_eseq_setup(&eseq, &GTTTA), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
@@ -339,8 +340,8 @@ static void profile2(void)
   eq(imm_path_nsteps(&prod.path), 7U);
   close(imm_path_score(&prod.path), des);
 
-  des =
-      log(0.6) + log(0.2) + 3 * log(0.7) + 3 * log(0.5) + log(0.6) + log(0.05);
+  des = logf(0.6f) + logf(0.2f) + 3 * logf(0.7f) + 3 * logf(0.5f) + logf(0.6f) +
+        logf(0.05f);
   eq(imm_eseq_setup(&eseq, &GTTTAC), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
@@ -358,8 +359,8 @@ static void profile2(void)
   imm_hmm_init_dp(&hmm, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  des = log(0.6) + log(0.2) + 5 * log(0.5) + 3 * log(0.7) + 2 * log(0.1) +
-        log(0.6);
+  des = logf(0.6f) + logf(0.2f) + 5 * logf(0.5f) + 3 * logf(0.7f) +
+        2 * logf(0.1f) + logf(0.6f);
   eq(imm_eseq_setup(&eseq, &GTTTACA), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
@@ -373,8 +374,8 @@ static void profile2(void)
   imm_hmm_init_dp(&hmm, &dp);
   eq(imm_task_reset(task, &dp), 0);
 
-  des = log(0.6) + log(0.2) + 5 * log(0.5) + 3 * log(0.7) + 2 * log(0.1) +
-        log(0.6);
+  des = logf(0.6f) + logf(0.2f) + 5 * logf(0.5f) + 3 * logf(0.7f) +
+        2 * logf(0.1f) + logf(0.6f);
   eq(imm_eseq_setup(&eseq, &GTTTACA), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);

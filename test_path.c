@@ -14,8 +14,8 @@ static void normal_path(void)
   eq(imm_path_step(&path, 0)->state_id, state_ids[0]);
   eq(imm_path_step(&path, 1)->state_id, state_ids[1]);
 
-  eq(imm_path_step(&path, 0)->seqlen, seqlens[0]);
-  eq(imm_path_step(&path, 1)->seqlen, seqlens[1]);
+  eq(imm_path_step(&path, 0)->seqsize, seqlens[0]);
+  eq(imm_path_step(&path, 1)->seqsize, seqlens[1]);
 
   imm_path_cleanup(&path);
 }
@@ -30,7 +30,7 @@ static void long_path(void)
   for (uint16_t i = 0; i < 1 << 14; ++i)
   {
     eq(imm_path_step(&path, i)->state_id, i);
-    eq(imm_path_step(&path, i)->seqlen, i % 16);
+    eq(imm_path_step(&path, i)->seqsize, i % 16);
   }
 
   imm_path_reset(&path);
@@ -41,7 +41,7 @@ static void long_path(void)
   for (uint16_t i = 0; i < 1 << 14; ++i)
   {
     eq(imm_path_step(&path, i)->state_id, i);
-    eq(imm_path_step(&path, i)->seqlen, i % 16);
+    eq(imm_path_step(&path, i)->seqsize, i % 16);
   }
 
   imm_path_cleanup(&path);

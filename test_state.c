@@ -14,14 +14,15 @@ static void normal_state(void)
   struct imm_seq G = imm_seq_unsafe(imm_str("G"), &abc);
   struct imm_seq T = imm_seq_unsafe(imm_str("T"), &abc);
 
-  float const lprobs[] = {log(0.25), log(0.25), log(0.5), imm_lprob_zero()};
+  float const lprobs[] = {logf(0.25f), logf(0.25f), logf(0.5f),
+                          imm_lprob_zero()};
   struct imm_normal_state state;
   imm_normal_state_init(&state, 0, &abc, lprobs);
 
   eq(imm_state_id(&state.super), 0U);
-  close(imm_state_lprob(&state.super, &A), log(0.25));
-  close(imm_state_lprob(&state.super, &C), log(0.25));
-  close(imm_state_lprob(&state.super, &G), log(0.5));
+  close(imm_state_lprob(&state.super, &A), logf(0.25f));
+  close(imm_state_lprob(&state.super, &C), logf(0.25f));
+  close(imm_state_lprob(&state.super, &G), logf(0.5f));
   ok(imm_lprob_is_zero(imm_state_lprob(&state.super, &T)));
 }
 

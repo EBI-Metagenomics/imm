@@ -60,7 +60,7 @@ void imm_trellis_prepare(struct imm_trellis *x)
   imm_trellis_rewind(x);
 }
 
-void imm_trellis_set_ids(struct imm_trellis *x, uint16_t *ids) { x->ids = ids; }
+void imm_trellis_set_ids(struct imm_trellis *x, int16_t *ids) { x->ids = ids; }
 
 void imm_trellis_set_state_name(struct imm_trellis *x, imm_state_name *callb)
 {

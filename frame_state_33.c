@@ -15,9 +15,9 @@ float imm_joint_n3_33(struct imm_frame_state const *state,
                       struct imm_seq const *seq)
 {
   struct imm_abc const *abc = &state->codonm->nuclt->super;
-  unsigned const nucl[4] = {imm_abc_symbol_idx(abc, imm_seq_data(seq)[0]),
-                            imm_abc_symbol_idx(abc, imm_seq_data(seq)[1]),
-                            imm_abc_symbol_idx(abc, imm_seq_data(seq)[2]),
-                            imm_abc_any_symbol_idx(abc)};
+  int const nucl[4] = {imm_abc_symbol_idx(abc, imm_seq_data(seq)[0]),
+                       imm_abc_symbol_idx(abc, imm_seq_data(seq)[1]),
+                       imm_abc_symbol_idx(abc, imm_seq_data(seq)[2]),
+                       imm_abc_any_symbol_idx(abc)};
   return lf(0, 1, 2);
 }

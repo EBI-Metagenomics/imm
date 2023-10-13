@@ -13,7 +13,7 @@
 #define lf(A, B, C)                                                            \
   imm_codon_marg_lprob(state->codonm, codon(nucl[A], nucl[B], nucl[C]))
 
-static inline float ln(float x) { return log(x); }
+static inline float ln(float x) { return logf(x); }
 
 // p(S=(s0,s1))
 //     = p(S=(s0,s1)|N=2) * p(N=2)
@@ -26,10 +26,10 @@ float imm_joint_n2_24(struct imm_frame_state const *state,
                       struct imm_seq const *seq)
 {
   struct imm_abc const *abc = &state->codonm->nuclt->super;
-  unsigned nucl[3] = {imm_abc_symbol_idx(abc, imm_seq_data(seq)[0]),
-                      imm_abc_symbol_idx(abc, imm_seq_data(seq)[1]),
-                      imm_abc_any_symbol_idx(abc)};
-  unsigned _ = imm_array_size(nucl) - 1;
+  int nucl[3] = {imm_abc_symbol_idx(abc, imm_seq_data(seq)[0]),
+                 imm_abc_symbol_idx(abc, imm_seq_data(seq)[1]),
+                 imm_abc_any_symbol_idx(abc)};
+  int _ = imm_array_size(nucl) - 1;
 
   // exp(c) = p(T=dn)
   float c = 1 * state->eps.loge + 1 * state->eps.log1e;
@@ -58,11 +58,11 @@ float imm_joint_n3_24(struct imm_frame_state const *state,
                       struct imm_seq const *seq)
 {
   struct imm_abc const *abc = &state->codonm->nuclt->super;
-  unsigned nucl[4] = {imm_abc_symbol_idx(abc, imm_seq_data(seq)[0]),
-                      imm_abc_symbol_idx(abc, imm_seq_data(seq)[1]),
-                      imm_abc_symbol_idx(abc, imm_seq_data(seq)[2]),
-                      imm_abc_any_symbol_idx(abc)};
-  unsigned _ = imm_array_size(nucl) - 1;
+  int nucl[4] = {imm_abc_symbol_idx(abc, imm_seq_data(seq)[0]),
+                 imm_abc_symbol_idx(abc, imm_seq_data(seq)[1]),
+                 imm_abc_symbol_idx(abc, imm_seq_data(seq)[2]),
+                 imm_abc_any_symbol_idx(abc)};
+  int _ = imm_array_size(nucl) - 1;
 
   float i0 = imm__nuclt_lprob_get(state->nucltp, nucl[0]);
   float i1 = imm__nuclt_lprob_get(state->nucltp, nucl[1]);
@@ -99,11 +99,11 @@ float imm_joint_n4_24(struct imm_frame_state const *state,
                       struct imm_seq const *seq)
 {
   struct imm_abc const *abc = &state->codonm->nuclt->super;
-  unsigned nucl[5] = {imm_abc_symbol_idx(abc, imm_seq_data(seq)[0]),
-                      imm_abc_symbol_idx(abc, imm_seq_data(seq)[1]),
-                      imm_abc_symbol_idx(abc, imm_seq_data(seq)[2]),
-                      imm_abc_symbol_idx(abc, imm_seq_data(seq)[3]),
-                      imm_abc_any_symbol_idx(abc)};
+  int nucl[5] = {imm_abc_symbol_idx(abc, imm_seq_data(seq)[0]),
+                 imm_abc_symbol_idx(abc, imm_seq_data(seq)[1]),
+                 imm_abc_symbol_idx(abc, imm_seq_data(seq)[2]),
+                 imm_abc_symbol_idx(abc, imm_seq_data(seq)[3]),
+                 imm_abc_any_symbol_idx(abc)};
 
   float i0 = imm__nuclt_lprob_get(state->nucltp, nucl[0]);
   float i1 = imm__nuclt_lprob_get(state->nucltp, nucl[1]);

@@ -32,6 +32,8 @@ extern "C" {
 #include "gencode.h"
 #include "hmm.h"
 #include "lprob.h"
+#include "max.h"
+#include "min.h"
 #include "mute_state.h"
 #include "normal_state.h"
 #include "nuclt.h"

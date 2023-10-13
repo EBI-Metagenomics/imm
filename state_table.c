@@ -45,7 +45,7 @@ void imm_state_table_cleanup(struct imm_state_table *x)
 int imm_state_table_reset(struct imm_state_table *x,
                           struct imm_dp_cfg const *cfg)
 {
-  assert(cfg->nstates >= 0);
+  assert(cfg->nstates > 0);
   x->nstates = cfg->nstates;
   x->ids = imm_reallocf(x->ids, sizeof(*x->ids) * (size_t)cfg->nstates);
   x->span = imm_reallocf(x->span, sizeof(*x->span) * (size_t)cfg->nstates);

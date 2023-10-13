@@ -34,7 +34,7 @@
 #define lf(A, B, C)                                                            \
   imm_codon_marg_lprob(state->codonm, codon(nucl[A], nucl[B], nucl[C]))
 
-static inline float ln(float x) { return log(x); }
+static inline float ln(float x) { return logf(x); }
 
 // p(S=(s0,))
 //     = p(S=(s0,)|N=1) * p(N=1)
@@ -47,9 +47,9 @@ float imm_joint_n1_15(struct imm_frame_state const *state,
                       struct imm_seq const *seq)
 {
   struct imm_abc const *abc = &state->codonm->nuclt->super;
-  unsigned nucl[2] = {imm_abc_symbol_idx(abc, imm_seq_data(seq)[0]),
-                      imm_abc_any_symbol_idx(abc)};
-  unsigned _ = imm_array_size(nucl) - 1;
+  int nucl[2] = {imm_abc_symbol_idx(abc, imm_seq_data(seq)[0]),
+                 imm_abc_any_symbol_idx(abc)};
+  int _ = imm_array_size(nucl) - 1;
 
   // exp(c) = p(N=1) = p(T=ddnn)
   float c = 2 * state->eps.loge + 2 * state->eps.log1e;
@@ -83,10 +83,10 @@ float imm_joint_n2_15(struct imm_frame_state const *state,
                       struct imm_seq const *seq)
 {
   struct imm_abc const *abc = &state->codonm->nuclt->super;
-  unsigned nucl[3] = {imm_abc_symbol_idx(abc, imm_seq_data(seq)[0]),
-                      imm_abc_symbol_idx(abc, imm_seq_data(seq)[1]),
-                      imm_abc_any_symbol_idx(abc)};
-  unsigned _ = imm_array_size(nucl) - 1;
+  int nucl[3] = {imm_abc_symbol_idx(abc, imm_seq_data(seq)[0]),
+                 imm_abc_symbol_idx(abc, imm_seq_data(seq)[1]),
+                 imm_abc_any_symbol_idx(abc)};
+  int _ = imm_array_size(nucl) - 1;
 
   float i0 = imm__nuclt_lprob_get(state->nucltp, nucl[0]);
   float i1 = imm__nuclt_lprob_get(state->nucltp, nucl[1]);
@@ -137,11 +137,11 @@ float imm_joint_n3_15(struct imm_frame_state const *state,
                       struct imm_seq const *seq)
 {
   struct imm_abc const *abc = &state->codonm->nuclt->super;
-  unsigned nucl[4] = {imm_abc_symbol_idx(abc, imm_seq_data(seq)[0]),
-                      imm_abc_symbol_idx(abc, imm_seq_data(seq)[1]),
-                      imm_abc_symbol_idx(abc, imm_seq_data(seq)[2]),
-                      imm_abc_any_symbol_idx(abc)};
-  unsigned _ = imm_array_size(nucl) - 1;
+  int nucl[4] = {imm_abc_symbol_idx(abc, imm_seq_data(seq)[0]),
+                 imm_abc_symbol_idx(abc, imm_seq_data(seq)[1]),
+                 imm_abc_symbol_idx(abc, imm_seq_data(seq)[2]),
+                 imm_abc_any_symbol_idx(abc)};
+  int _ = imm_array_size(nucl) - 1;
 
   float i0 = imm__nuclt_lprob_get(state->nucltp, nucl[0]);
   float i1 = imm__nuclt_lprob_get(state->nucltp, nucl[1]);
@@ -197,12 +197,12 @@ float imm_joint_n4_15(struct imm_frame_state const *state,
                       struct imm_seq const *seq)
 {
   struct imm_abc const *abc = &state->codonm->nuclt->super;
-  unsigned nucl[5] = {imm_abc_symbol_idx(abc, imm_seq_data(seq)[0]),
-                      imm_abc_symbol_idx(abc, imm_seq_data(seq)[1]),
-                      imm_abc_symbol_idx(abc, imm_seq_data(seq)[2]),
-                      imm_abc_symbol_idx(abc, imm_seq_data(seq)[3]),
-                      imm_abc_any_symbol_idx(abc)};
-  unsigned _ = imm_array_size(nucl) - 1;
+  int nucl[5] = {imm_abc_symbol_idx(abc, imm_seq_data(seq)[0]),
+                 imm_abc_symbol_idx(abc, imm_seq_data(seq)[1]),
+                 imm_abc_symbol_idx(abc, imm_seq_data(seq)[2]),
+                 imm_abc_symbol_idx(abc, imm_seq_data(seq)[3]),
+                 imm_abc_any_symbol_idx(abc)};
+  int _ = imm_array_size(nucl) - 1;
 
   float i0 = imm__nuclt_lprob_get(state->nucltp, nucl[0]);
   float i1 = imm__nuclt_lprob_get(state->nucltp, nucl[1]);
@@ -247,12 +247,12 @@ float imm_joint_n5_15(struct imm_frame_state const *state,
                       struct imm_seq const *seq)
 {
   struct imm_abc const *abc = &state->codonm->nuclt->super;
-  unsigned nucl[6] = {imm_abc_symbol_idx(abc, imm_seq_data(seq)[0]),
-                      imm_abc_symbol_idx(abc, imm_seq_data(seq)[1]),
-                      imm_abc_symbol_idx(abc, imm_seq_data(seq)[2]),
-                      imm_abc_symbol_idx(abc, imm_seq_data(seq)[3]),
-                      imm_abc_symbol_idx(abc, imm_seq_data(seq)[4]),
-                      imm_abc_any_symbol_idx(abc)};
+  int nucl[6] = {imm_abc_symbol_idx(abc, imm_seq_data(seq)[0]),
+                 imm_abc_symbol_idx(abc, imm_seq_data(seq)[1]),
+                 imm_abc_symbol_idx(abc, imm_seq_data(seq)[2]),
+                 imm_abc_symbol_idx(abc, imm_seq_data(seq)[3]),
+                 imm_abc_symbol_idx(abc, imm_seq_data(seq)[4]),
+                 imm_abc_any_symbol_idx(abc)};
 
   float i0 = imm__nuclt_lprob_get(state->nucltp, nucl[0]);
   float i1 = imm__nuclt_lprob_get(state->nucltp, nucl[1]);
@@ -269,7 +269,7 @@ float imm_joint_n5_15(struct imm_frame_state const *state,
                    logsum(i1 + i2 + lf(0, 3, 4), i1 + i3 + lf(0, 2, 4)),
                    logsum(i1 + i4 + lf(0, 2, 3), i2 + i3 + lf(0, 1, 4)),
                    logsum(i2 + i4 + lf(0, 1, 3), i3 + i4 + lf(0, 1, 2))) -
-            log(10);
+            logf(10);
 
   return c + p;
 }

@@ -16,11 +16,11 @@ static void codon_lprob(void)
   struct imm_codon codon = IMM_CODON(nuclt, "ACC");
 
   ok(imm_lprob_is_zero(imm_codon_lprob_get(&codonp, codon)));
-  imm_codon_lprob_set(&codonp, codon, log(0.5));
-  close(imm_codon_lprob_get(&codonp, codon), log(0.5));
+  imm_codon_lprob_set(&codonp, codon, logf(0.5f));
+  close(imm_codon_lprob_get(&codonp, codon), logf(0.5f));
 
   imm_codon_lprob_normalize(&codonp);
-  close(imm_codon_lprob_get(&codonp, codon), log(1.0));
+  close(imm_codon_lprob_get(&codonp, codon), logf(1.0f));
 
   codon = IMM_CODON(nuclt, "ACX");
   ok(imm_lprob_is_zero(imm_codon_lprob_get(&codonp, codon)));
@@ -31,14 +31,14 @@ static void codonm_nonmarginal(void)
   struct imm_nuclt const *nuclt = &imm_dna_iupac.super;
   struct imm_codon_lprob codonp = imm_codon_lprob(nuclt);
 
-  imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, "ATG"), log(0.8));
-  imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, "ATT"), log(0.1));
+  imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, "ATG"), logf(0.8f));
+  imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, "ATT"), logf(0.1f));
 
   struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
-  close(imm_codon_marg_lprob(&codonm, IMM_CODON(nuclt, "ATG")), log(0.8));
+  close(imm_codon_marg_lprob(&codonm, IMM_CODON(nuclt, "ATG")), logf(0.8f));
 
-  close(imm_codon_marg_lprob(&codonm, IMM_CODON(nuclt, "ATT")), log(0.1));
+  close(imm_codon_marg_lprob(&codonm, IMM_CODON(nuclt, "ATT")), logf(0.1f));
 
   ok(imm_lprob_is_zero(imm_codon_marg_lprob(&codonm, IMM_CODON(nuclt, "TTT"))));
 }
@@ -48,19 +48,19 @@ static void codonm_marginal(void)
   struct imm_nuclt const *nuclt = &imm_dna_iupac.super;
   struct imm_codon_lprob codonp = imm_codon_lprob(nuclt);
 
-  imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, "ATG"), log(0.8));
-  imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, "ATT"), log(0.1));
+  imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, "ATG"), logf(0.8f));
+  imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, "ATT"), logf(0.1f));
 
   struct imm_codon_marg codonm = imm_codon_marg(&codonp);
 
-  close(imm_codon_marg_lprob(&codonm, IMM_CODON(nuclt, "ATG")), log(0.8));
-  close(imm_codon_marg_lprob(&codonm, IMM_CODON(nuclt, "ATT")), log(0.1));
-  close(imm_codon_marg_lprob(&codonm, IMM_CODON(nuclt, "ATX")), log(0.9));
-  close(imm_codon_marg_lprob(&codonm, IMM_CODON(nuclt, "AXX")), log(0.9));
-  close(imm_codon_marg_lprob(&codonm, IMM_CODON(nuclt, "XXX")), log(0.9));
-  close(imm_codon_marg_lprob(&codonm, IMM_CODON(nuclt, "XTX")), log(0.9));
-  close(imm_codon_marg_lprob(&codonm, IMM_CODON(nuclt, "XXG")), log(0.8));
-  close(imm_codon_marg_lprob(&codonm, IMM_CODON(nuclt, "XXT")), log(0.1));
+  close(imm_codon_marg_lprob(&codonm, IMM_CODON(nuclt, "ATG")), logf(0.8f));
+  close(imm_codon_marg_lprob(&codonm, IMM_CODON(nuclt, "ATT")), logf(0.1f));
+  close(imm_codon_marg_lprob(&codonm, IMM_CODON(nuclt, "ATX")), logf(0.9f));
+  close(imm_codon_marg_lprob(&codonm, IMM_CODON(nuclt, "AXX")), logf(0.9f));
+  close(imm_codon_marg_lprob(&codonm, IMM_CODON(nuclt, "XXX")), logf(0.9f));
+  close(imm_codon_marg_lprob(&codonm, IMM_CODON(nuclt, "XTX")), logf(0.9f));
+  close(imm_codon_marg_lprob(&codonm, IMM_CODON(nuclt, "XXG")), logf(0.8f));
+  close(imm_codon_marg_lprob(&codonm, IMM_CODON(nuclt, "XXT")), logf(0.1f));
 }
 
 static void codon_state(void)
@@ -72,16 +72,16 @@ static void codon_state(void)
   struct imm_codon_lprob codonp = imm_codon_lprob(&nuclt);
   struct imm_codon codon = IMM_CODON(&nuclt, "ATG");
 
-  imm_codon_lprob_set(&codonp, codon, log(0.8 / 0.9));
+  imm_codon_lprob_set(&codonp, codon, logf(0.8f / 0.9f));
   codon = IMM_CODON(&nuclt, "ATT");
-  imm_codon_lprob_set(&codonp, codon, log(0.1 / 0.9));
+  imm_codon_lprob_set(&codonp, codon, logf(0.1f / 0.9f));
 
   struct imm_codon_state state = {0};
   imm_codon_state_init(&state, 0, &codonp);
   const struct imm_state *s = &state.super;
 
   struct imm_seq seq = imm_seq_unsafe(imm_str("ATG"), abc);
-  close(imm_state_lprob(s, &seq), log(0.8 / 0.9));
+  close(imm_state_lprob(s, &seq), logf(0.8f / 0.9f));
 
   seq = imm_seq_unsafe(imm_str("AG"), abc);
   ok(imm_lprob_is_nan(imm_state_lprob(s, &seq)));

@@ -382,12 +382,12 @@ int main(void)
   imm_code_init(&code, abc);
 
   nucltp = imm_nuclt_lprob(
-      nuclt, (float[]){log(0.25), log(0.25), log(0.5), imm_lprob_zero()});
+      nuclt, (float[]){logf(0.25), logf(0.25), logf(0.5), imm_lprob_zero()});
 
   codonp = imm_codon_lprob(nuclt);
-  imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, "ATG"), log(0.8));
-  imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, "ATT"), log(0.1));
-  imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, "CCC"), log(0.1));
+  imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, "ATG"), logf(0.8f));
+  imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, "ATT"), logf(0.1f));
+  imm_codon_lprob_set(&codonp, IMM_CODON(nuclt, "CCC"), logf(0.1f));
 
   codonm = imm_codon_marg(&codonp);
 

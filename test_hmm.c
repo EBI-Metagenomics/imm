@@ -29,7 +29,7 @@ static void hmm_set_trans(void)
   eq(imm_hmm_add_state(&hmm, &state0.super), 0);
   eq(imm_hmm_add_state(&hmm, &state1.super), 0);
 
-  eq(imm_hmm_set_trans(&hmm, &state0.super, &state1.super, log(0.5)), 0);
+  eq(imm_hmm_set_trans(&hmm, &state0.super, &state1.super, logf(0.5f)), 0);
 }
 
 static void hmm_del_state(void)
@@ -44,7 +44,7 @@ static void hmm_del_state(void)
   eq(imm_hmm_add_state(&hmm, &state0.super), 0);
   eq(imm_hmm_add_state(&hmm, &state1.super), 0);
 
-  eq(imm_hmm_set_trans(&hmm, &state0.super, &state1.super, log(0.5)), 0);
+  eq(imm_hmm_set_trans(&hmm, &state0.super, &state1.super, logf(0.5f)), 0);
 
   eq(imm_hmm_del_state(&hmm, &state0.super), 0);
   eq(imm_hmm_del_state(&hmm, &state1.super), 0);
@@ -64,10 +64,10 @@ static void hmm_wrong_states(void)
 
   eq(imm_hmm_set_start(&hmm, &state1), IMM_ENOTFOUND);
 
-  eq(imm_hmm_set_trans(&hmm, &state0.super, &state1.super, log(0.3)),
+  eq(imm_hmm_set_trans(&hmm, &state0.super, &state1.super, logf(0.3f)),
      IMM_ENOTFOUND);
 
-  eq(imm_hmm_set_trans(&hmm, &state1.super, &state0.super, log(0.3)),
+  eq(imm_hmm_set_trans(&hmm, &state1.super, &state0.super, logf(0.3f)),
      IMM_ENOTFOUND);
 
   eq(imm_hmm_normalize_state_trans(&state1.super), IMM_ENOTFOUND);

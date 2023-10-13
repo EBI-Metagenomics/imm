@@ -45,7 +45,7 @@ static void initialise_states(struct imm_ex3 *x)
   imm_normal_state_init(&x->N, N_ID, &x->abc, N_LPROBS);
   imm_mute_state_init(&x->B, B_ID, &x->abc);
 
-  for (unsigned k = 0; k < x->core_size; ++k)
+  for (int k = 0; k < x->core_size; ++k)
     imm_normal_state_init(&x->M[k], M_ID | k, &x->abc, M_LPROBS);
 
   imm_mute_state_init(&x->E, E_ID, &x->abc);
@@ -61,7 +61,7 @@ static void add_states(struct imm_ex3 *x)
   imm_hmm_add_state(&x->hmm, &x->N.super);
   imm_hmm_add_state(&x->hmm, &x->B.super);
 
-  for (unsigned k = 0; k < x->core_size; ++k)
+  for (int k = 0; k < x->core_size; ++k)
     imm_hmm_add_state(&x->hmm, &x->M[k].super);
 
   imm_hmm_add_state(&x->hmm, &x->E.super);
@@ -76,31 +76,31 @@ static void set_transitions(struct imm_ex3 *x)
   imm_hmm_set_start(&x->hmm, &x->S);
   imm_hmm_set_end(&x->hmm, &x->T);
 
-  SET_TRANS(&x->hmm, x->S, x->N, log(0.1));
-  SET_TRANS(&x->hmm, x->N, x->N, log(0.2));
-  SET_TRANS(&x->hmm, x->N, x->B, log(0.3));
-  SET_TRANS(&x->hmm, x->S, x->B, log(0.4));
+  SET_TRANS(&x->hmm, x->S, x->N, logf(0.1f));
+  SET_TRANS(&x->hmm, x->N, x->N, logf(0.2f));
+  SET_TRANS(&x->hmm, x->N, x->B, logf(0.3f));
+  SET_TRANS(&x->hmm, x->S, x->B, logf(0.4f));
 
-  for (unsigned k = 0; k < x->core_size; ++k)
-    SET_TRANS(&x->hmm, x->B, x->M[k], log(0.11));
+  for (int k = 0; k < x->core_size; ++k)
+    SET_TRANS(&x->hmm, x->B, x->M[k], logf(0.11f));
 
-  for (unsigned k = 1; k < x->core_size; ++k)
-    SET_TRANS(&x->hmm, x->M[k - 1], x->M[k], log(0.12));
+  for (int k = 1; k < x->core_size; ++k)
+    SET_TRANS(&x->hmm, x->M[k - 1], x->M[k], logf(0.12f));
 
-  SET_TRANS(&x->hmm, x->M[x->core_size - 1], x->E, log(0.13));
+  SET_TRANS(&x->hmm, x->M[x->core_size - 1], x->E, logf(0.13f));
 
-  SET_TRANS(&x->hmm, x->E, x->C, log(0.1));
-  SET_TRANS(&x->hmm, x->C, x->C, log(0.2));
-  SET_TRANS(&x->hmm, x->C, x->T, log(0.3));
-  SET_TRANS(&x->hmm, x->E, x->T, log(0.4));
+  SET_TRANS(&x->hmm, x->E, x->C, logf(0.1f));
+  SET_TRANS(&x->hmm, x->C, x->C, logf(0.2f));
+  SET_TRANS(&x->hmm, x->C, x->T, logf(0.3f));
+  SET_TRANS(&x->hmm, x->E, x->T, logf(0.4f));
 
-  SET_TRANS(&x->hmm, x->E, x->J, log(0.5));
-  SET_TRANS(&x->hmm, x->J, x->J, log(0.6));
-  SET_TRANS(&x->hmm, x->J, x->B, log(0.7));
-  SET_TRANS(&x->hmm, x->E, x->B, log(0.8));
+  SET_TRANS(&x->hmm, x->E, x->J, logf(0.5f));
+  SET_TRANS(&x->hmm, x->J, x->J, logf(0.6f));
+  SET_TRANS(&x->hmm, x->J, x->B, logf(0.7f));
+  SET_TRANS(&x->hmm, x->E, x->B, logf(0.8f));
 }
 
-void imm_ex3_init(unsigned core_size)
+void imm_ex3_init(int core_size)
 {
   assert(core_size > 0);
   assert(core_size <= IMM_EX3_SIZE);
@@ -116,20 +116,20 @@ void imm_ex3_init(unsigned core_size)
   set_transitions(&imm_ex3);
 }
 
-char *imm_ex3_state_name(unsigned id, char *name)
+char *imm_ex3_state_name(int id, char *name)
 {
-  if ((id & (15U << 12)) == M_ID)
-    snprintf(name, IMM_STATE_NAME_SIZE, "M%u", (id & (0xFFFF >> 4)));
+  if ((id & (15 << 12)) == M_ID)
+    snprintf(name, IMM_STATE_NAME_SIZE, "M%d", (id & (0xFFFF >> 4)));
 
-  if ((id & (15U << 12)) == S_ID) strcpy(name, "S");
-  if ((id & (15U << 12)) == N_ID) strcpy(name, "N");
-  if ((id & (15U << 12)) == B_ID) strcpy(name, "B");
+  if ((id & (15 << 12)) == S_ID) strcpy(name, "S");
+  if ((id & (15 << 12)) == N_ID) strcpy(name, "N");
+  if ((id & (15 << 12)) == B_ID) strcpy(name, "B");
 
-  if ((id & (15U << 12)) == E_ID) strcpy(name, "E");
-  if ((id & (15U << 12)) == C_ID) strcpy(name, "C");
-  if ((id & (15U << 12)) == T_ID) strcpy(name, "T");
+  if ((id & (15 << 12)) == E_ID) strcpy(name, "E");
+  if ((id & (15 << 12)) == C_ID) strcpy(name, "C");
+  if ((id & (15 << 12)) == T_ID) strcpy(name, "T");
 
-  if ((id & (15U << 12)) == J_ID) strcpy(name, "J");
+  if ((id & (15 << 12)) == J_ID) strcpy(name, "J");
 
   return name;
 }

@@ -12,8 +12,8 @@ static void gc_f(void)
   struct imm_codon codons[2] = {IMM_CODON(nuclt, "TTT"),
                                 IMM_CODON(nuclt, "TTC")};
 
-  unsigned idx = 0;
-  for (unsigned i = 0; i < imm_gencode_size(gc); ++i)
+  int idx = 0;
+  for (int i = 0; i < imm_gencode_size(gc); ++i)
   {
     if (imm_gencode_amino(gc, i) == 'F')
     {
@@ -37,8 +37,8 @@ static void gc_l(void)
       IMM_CODON(nuclt, "CTT"), IMM_CODON(nuclt, "CTC"),
       IMM_CODON(nuclt, "CTA"), IMM_CODON(nuclt, "CTG")};
 
-  unsigned idx = 0;
-  for (unsigned i = 0; i < imm_gencode_size(gc); ++i)
+  int idx = 0;
+  for (int i = 0; i < imm_gencode_size(gc); ++i)
   {
     if (imm_gencode_amino(gc, i) == 'L')
     {
@@ -61,8 +61,8 @@ static void gc_p(void)
       IMM_CODON(nuclt, "CCT"), IMM_CODON(nuclt, "CCC"), IMM_CODON(nuclt, "CCA"),
       IMM_CODON(nuclt, "CCG")};
 
-  unsigned idx = 0;
-  for (unsigned i = 0; i < imm_gencode_size(gc); ++i)
+  int idx = 0;
+  for (int i = 0; i < imm_gencode_size(gc); ++i)
   {
     if (imm_gencode_amino(gc, i) == 'P')
     {

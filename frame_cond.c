@@ -30,17 +30,17 @@ static float lprob_frag_given_codon5(struct imm_frame_cond const *cond,
 float imm_frame_cond_decode(struct imm_frame_cond const *cond,
                             struct imm_seq const *seq, struct imm_codon *codon)
 {
-  unsigned const n = imm_nuclt_size(cond->nucltp->nuclt);
+  int const n = imm_nuclt_size(cond->nucltp->nuclt);
 
   float max_lprob = imm_lprob_zero();
   struct imm_codon tmp;
   tmp.nuclt = cond->nucltp->nuclt;
 
-  for (unsigned i0 = 0; i0 < n; ++i0)
+  for (int i0 = 0; i0 < n; ++i0)
   {
-    for (unsigned i1 = 0; i1 < n; ++i1)
+    for (int i1 = 0; i1 < n; ++i1)
     {
-      for (unsigned i2 = 0; i2 < n; ++i2)
+      for (int i2 = 0; i2 < n; ++i2)
       {
 
         tmp.a = i0;
@@ -99,38 +99,38 @@ static float lprob_frag_given_codon1(struct imm_frame_cond const *cond,
                                      struct imm_seq const *seq,
                                      struct imm_codon const *codon)
 {
-  unsigned const *x = codon->idx;
+  int const *x = codon->idx;
 
-  unsigned const z[1] = {imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[0])};
+  int const z[1] = {imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[0])};
 
   float c = 2 * cond->epsilon.loge + 2 * cond->epsilon.log1e;
 
-  return c + log((x[0] == z[0]) + (x[1] == z[0]) + (x[2] == z[0])) - log(3);
+  return c + logf((x[0] == z[0]) + (x[1] == z[0]) + (x[2] == z[0])) - logf(3);
 }
 
 static float lprob_frag_given_codon2(struct imm_frame_cond const *cond,
                                      struct imm_seq const *seq,
                                      struct imm_codon const *codon)
 {
-  unsigned const *x = codon->idx;
+  int const *x = codon->idx;
 
-  unsigned z[2] = {imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[0]),
-                   imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[1])};
+  int z[2] = {imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[0]),
+              imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[1])};
 
   float lprob_z1 = imm__nuclt_lprob_get(cond->nucltp, z[0]);
   float lprob_z2 = imm__nuclt_lprob_get(cond->nucltp, z[1]);
 
-  float c1 = log(2) + cond->epsilon.loge + cond->epsilon.log1e * 3 - log(3);
-  float v0 = c1 + log((x[1] == z[0]) * (x[2] == z[1]) +
-                      (x[0] == z[0]) * (x[2] == z[1]) +
-                      (x[0] == z[0]) * (x[1] == z[1]));
+  float c1 = logf(2) + cond->epsilon.loge + cond->epsilon.log1e * 3 - logf(3);
+  float v0 = c1 + logf((x[1] == z[0]) * (x[2] == z[1]) +
+                       (x[0] == z[0]) * (x[2] == z[1]) +
+                       (x[0] == z[0]) * (x[1] == z[1]));
 
-  float c2 = 3 * cond->epsilon.loge + cond->epsilon.log1e - log(3);
+  float c2 = 3 * cond->epsilon.loge + cond->epsilon.log1e - logf(3);
 
   float v1 =
-      c2 + log((x[0] == z[0]) + (x[1] == z[0]) + (x[2] == z[0])) + lprob_z2;
+      c2 + logf((x[0] == z[0]) + (x[1] == z[0]) + (x[2] == z[0])) + lprob_z2;
   float v2 =
-      c2 + log((x[0] == z[1]) + (x[1] == z[1]) + (x[2] == z[1])) + lprob_z1;
+      c2 + logf((x[0] == z[1]) + (x[1] == z[1]) + (x[2] == z[1])) + lprob_z1;
 
   return logaddexp3(v0, v1, v2);
 }
@@ -139,11 +139,11 @@ static float lprob_frag_given_codon3(struct imm_frame_cond const *cond,
                                      struct imm_seq const *seq,
                                      struct imm_codon const *codon)
 {
-  unsigned const *x = codon->idx;
+  int const *x = codon->idx;
 
-  unsigned z[3] = {imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[0]),
-                   imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[1]),
-                   imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[2])};
+  int z[3] = {imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[0]),
+              imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[1]),
+              imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[2])};
 
   float lprob_z1 = imm__nuclt_lprob_get(cond->nucltp, z[0]);
   float lprob_z2 = imm__nuclt_lprob_get(cond->nucltp, z[1]);
@@ -152,35 +152,35 @@ static float lprob_frag_given_codon3(struct imm_frame_cond const *cond,
   float loge = cond->epsilon.loge;
   float log1e = cond->epsilon.log1e;
 
-  float v0 = 4 * log1e + log((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[2]));
+  float v0 = 4 * log1e + logf((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[2]));
 
-  float c1 = log(4) + 2 * loge + 2 * log1e - log(9);
+  float c1 = logf(4) + 2 * loge + 2 * log1e - logf(9);
 
   float v1 =
       c1 +
-      log((x[1] == z[1]) * (x[2] == z[2]) + (x[0] == z[1]) * (x[2] == z[2]) +
-          (x[0] == z[1]) * (x[1] == z[2])) +
+      logf((x[1] == z[1]) * (x[2] == z[2]) + (x[0] == z[1]) * (x[2] == z[2]) +
+           (x[0] == z[1]) * (x[1] == z[2])) +
       lprob_z1;
 
   float v2 =
       c1 +
-      log((x[1] == z[0]) * (x[2] == z[2]) + (x[0] == z[0]) * (x[2] == z[2]) +
-          (x[0] == z[0]) * (x[1] == z[2])) +
+      logf((x[1] == z[0]) * (x[2] == z[2]) + (x[0] == z[0]) * (x[2] == z[2]) +
+           (x[0] == z[0]) * (x[1] == z[2])) +
       lprob_z2;
 
   float v3 =
       c1 +
-      log((x[1] == z[0]) * (x[2] == z[1]) + (x[0] == z[0]) * (x[2] == z[1]) +
-          (x[0] == z[0]) * (x[1] == z[1])) +
+      logf((x[1] == z[0]) * (x[2] == z[1]) + (x[0] == z[0]) * (x[2] == z[1]) +
+           (x[0] == z[0]) * (x[1] == z[1])) +
       lprob_z3;
 
-  float c2 = 4 * loge - log(9);
+  float c2 = 4 * loge - logf(9);
 
-  float v4 = c2 + log((x[0] == z[2]) + (x[1] == z[2]) + (x[2] == z[2])) +
+  float v4 = c2 + logf((x[0] == z[2]) + (x[1] == z[2]) + (x[2] == z[2])) +
              lprob_z1 + lprob_z2;
-  float v5 = c2 + log((x[0] == z[1]) + (x[1] == z[1]) + (x[2] == z[1])) +
+  float v5 = c2 + logf((x[0] == z[1]) + (x[1] == z[1]) + (x[2] == z[1])) +
              lprob_z1 + lprob_z3;
-  float v6 = c2 + log((x[0] == z[0]) + (x[1] == z[0]) + (x[2] == z[0])) +
+  float v6 = c2 + logf((x[0] == z[0]) + (x[1] == z[0]) + (x[2] == z[0])) +
              lprob_z2 + lprob_z3;
 
   return logsum(v0, v1, v2, v3, v4, v5, v6);
@@ -190,12 +190,12 @@ static float lprob_frag_given_codon4(struct imm_frame_cond const *cond,
                                      struct imm_seq const *seq,
                                      struct imm_codon const *codon)
 {
-  unsigned const *x = codon->idx;
+  int const *x = codon->idx;
 
-  unsigned z[4] = {imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[0]),
-                   imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[1]),
-                   imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[2]),
-                   imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[3])};
+  int z[4] = {imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[0]),
+              imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[1]),
+              imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[2]),
+              imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[3])};
 
   float lprob_z1 = imm__nuclt_lprob_get(cond->nucltp, z[0]);
   float lprob_z2 = imm__nuclt_lprob_get(cond->nucltp, z[1]);
@@ -203,46 +203,47 @@ static float lprob_frag_given_codon4(struct imm_frame_cond const *cond,
   float lprob_z4 = imm__nuclt_lprob_get(cond->nucltp, z[3]);
 
   float v0 =
-      logsum(log((x[0] == z[1]) * (x[1] == z[2]) * (x[2] == z[3])) + lprob_z1,
-             log((x[0] == z[0]) * (x[1] == z[2]) * (x[2] == z[3])) + lprob_z2,
-             log((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[3])) + lprob_z3,
-             log((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[2])) + lprob_z4);
+      logsum(logf((x[0] == z[1]) * (x[1] == z[2]) * (x[2] == z[3])) + lprob_z1,
+             logf((x[0] == z[0]) * (x[1] == z[2]) * (x[2] == z[3])) + lprob_z2,
+             logf((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[3])) + lprob_z3,
+             logf((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[2])) + lprob_z4);
 
-  float v1 = logsum(log((x[1] == z[2]) * (x[2] == z[3])) + lprob_z1 + lprob_z2,
-                    log((x[1] == z[1]) * (x[2] == z[3])) + lprob_z1 + lprob_z3,
-                    log((x[1] == z[1]) * (x[2] == z[2])) + lprob_z1 + lprob_z4,
-                    log((x[1] == z[0]) * (x[2] == z[3])) + lprob_z2 + lprob_z3,
-                    log((x[1] == z[0]) * (x[2] == z[2])) + lprob_z2 + lprob_z4,
-                    log((x[1] == z[0]) * (x[2] == z[1])) + lprob_z3 + lprob_z4,
-                    log((x[0] == z[2]) * (x[2] == z[3])) + lprob_z1 + lprob_z2,
-                    log((x[0] == z[1]) * (x[2] == z[3])) + lprob_z1 + lprob_z3,
-                    log((x[0] == z[1]) * (x[2] == z[2])) + lprob_z1 + lprob_z4,
-                    log((x[0] == z[0]) * (x[2] == z[3])) + lprob_z2 + lprob_z3,
-                    log((x[0] == z[0]) * (x[2] == z[2])) + lprob_z2 + lprob_z4,
-                    log((x[0] == z[0]) * (x[2] == z[1])) + lprob_z3 + lprob_z4,
-                    log((x[0] == z[2]) * (x[1] == z[3])) + lprob_z1 + lprob_z2,
-                    log((x[0] == z[1]) * (x[1] == z[3])) + lprob_z1 + lprob_z3,
-                    log((x[0] == z[1]) * (x[1] == z[2])) + lprob_z1 + lprob_z4,
-                    log((x[0] == z[0]) * (x[1] == z[3])) + lprob_z2 + lprob_z3,
-                    log((x[0] == z[0]) * (x[1] == z[2])) + lprob_z2 + lprob_z4,
-                    log((x[0] == z[0]) * (x[1] == z[1])) + lprob_z3 + lprob_z4);
+  float v1 =
+      logsum(logf((x[1] == z[2]) * (x[2] == z[3])) + lprob_z1 + lprob_z2,
+             logf((x[1] == z[1]) * (x[2] == z[3])) + lprob_z1 + lprob_z3,
+             logf((x[1] == z[1]) * (x[2] == z[2])) + lprob_z1 + lprob_z4,
+             logf((x[1] == z[0]) * (x[2] == z[3])) + lprob_z2 + lprob_z3,
+             logf((x[1] == z[0]) * (x[2] == z[2])) + lprob_z2 + lprob_z4,
+             logf((x[1] == z[0]) * (x[2] == z[1])) + lprob_z3 + lprob_z4,
+             logf((x[0] == z[2]) * (x[2] == z[3])) + lprob_z1 + lprob_z2,
+             logf((x[0] == z[1]) * (x[2] == z[3])) + lprob_z1 + lprob_z3,
+             logf((x[0] == z[1]) * (x[2] == z[2])) + lprob_z1 + lprob_z4,
+             logf((x[0] == z[0]) * (x[2] == z[3])) + lprob_z2 + lprob_z3,
+             logf((x[0] == z[0]) * (x[2] == z[2])) + lprob_z2 + lprob_z4,
+             logf((x[0] == z[0]) * (x[2] == z[1])) + lprob_z3 + lprob_z4,
+             logf((x[0] == z[2]) * (x[1] == z[3])) + lprob_z1 + lprob_z2,
+             logf((x[0] == z[1]) * (x[1] == z[3])) + lprob_z1 + lprob_z3,
+             logf((x[0] == z[1]) * (x[1] == z[2])) + lprob_z1 + lprob_z4,
+             logf((x[0] == z[0]) * (x[1] == z[3])) + lprob_z2 + lprob_z3,
+             logf((x[0] == z[0]) * (x[1] == z[2])) + lprob_z2 + lprob_z4,
+             logf((x[0] == z[0]) * (x[1] == z[1])) + lprob_z3 + lprob_z4);
 
   return imm_lprob_add(
-      cond->epsilon.loge + cond->epsilon.log1e * 3 - log(2) + v0,
-      3 * cond->epsilon.loge + cond->epsilon.log1e - log(9) + v1);
+      cond->epsilon.loge + cond->epsilon.log1e * 3 - logf(2) + v0,
+      3 * cond->epsilon.loge + cond->epsilon.log1e - logf(9) + v1);
 }
 
 static float lprob_frag_given_codon5(struct imm_frame_cond const *cond,
                                      struct imm_seq const *seq,
                                      struct imm_codon const *codon)
 {
-  unsigned const *x = codon->idx;
+  int const *x = codon->idx;
 
-  unsigned z[5] = {imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[0]),
-                   imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[1]),
-                   imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[2]),
-                   imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[3]),
-                   imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[4])};
+  int z[5] = {imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[0]),
+              imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[1]),
+              imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[2]),
+              imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[3]),
+              imm_abc_symbol_idx(seq->abc, imm_seq_data(seq)[4])};
 
   float lprob_z1 = imm__nuclt_lprob_get(cond->nucltp, z[0]);
   float lprob_z2 = imm__nuclt_lprob_get(cond->nucltp, z[1]);
@@ -250,26 +251,27 @@ static float lprob_frag_given_codon5(struct imm_frame_cond const *cond,
   float lprob_z4 = imm__nuclt_lprob_get(cond->nucltp, z[3]);
   float lprob_z5 = imm__nuclt_lprob_get(cond->nucltp, z[4]);
 
-  float v = logsum(lprob_z1 + lprob_z2 +
-                       log((x[0] == z[2]) * (x[1] == z[3]) * (x[2] == z[4])),
-                   lprob_z1 + lprob_z3 +
-                       log((x[0] == z[1]) * (x[1] == z[3]) * (x[2] == z[4])),
-                   lprob_z1 + lprob_z4 +
-                       log((x[0] == z[1]) * (x[1] == z[2]) * (x[2] == z[4])),
-                   lprob_z1 + lprob_z5 +
-                       log((x[0] == z[1]) * (x[1] == z[2]) * (x[2] == z[3])),
-                   lprob_z2 + lprob_z3 +
-                       log((x[0] == z[0]) * (x[1] == z[3]) * (x[2] == z[4])),
-                   lprob_z2 + lprob_z4 +
-                       log((x[0] == z[0]) * (x[1] == z[2]) * (x[2] == z[4])),
-                   lprob_z2 + lprob_z5 +
-                       log((x[0] == z[0]) * (x[1] == z[2]) * (x[2] == z[3])),
-                   lprob_z3 + lprob_z4 +
-                       log((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[4])),
-                   lprob_z3 + lprob_z5 +
-                       log((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[3])),
-                   lprob_z4 + lprob_z5 +
-                       log((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[2])), );
+  float v =
+      logsum(lprob_z1 + lprob_z2 +
+                 logf((x[0] == z[2]) * (x[1] == z[3]) * (x[2] == z[4])),
+             lprob_z1 + lprob_z3 +
+                 logf((x[0] == z[1]) * (x[1] == z[3]) * (x[2] == z[4])),
+             lprob_z1 + lprob_z4 +
+                 logf((x[0] == z[1]) * (x[1] == z[2]) * (x[2] == z[4])),
+             lprob_z1 + lprob_z5 +
+                 logf((x[0] == z[1]) * (x[1] == z[2]) * (x[2] == z[3])),
+             lprob_z2 + lprob_z3 +
+                 logf((x[0] == z[0]) * (x[1] == z[3]) * (x[2] == z[4])),
+             lprob_z2 + lprob_z4 +
+                 logf((x[0] == z[0]) * (x[1] == z[2]) * (x[2] == z[4])),
+             lprob_z2 + lprob_z5 +
+                 logf((x[0] == z[0]) * (x[1] == z[2]) * (x[2] == z[3])),
+             lprob_z3 + lprob_z4 +
+                 logf((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[4])),
+             lprob_z3 + lprob_z5 +
+                 logf((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[3])),
+             lprob_z4 + lprob_z5 +
+                 logf((x[0] == z[0]) * (x[1] == z[1]) * (x[2] == z[2])), );
 
-  return 2 * cond->epsilon.loge + 2 * cond->epsilon.log1e - log(10) + v;
+  return 2 * cond->epsilon.loge + 2 * cond->epsilon.log1e - logf(10) + v;
 }

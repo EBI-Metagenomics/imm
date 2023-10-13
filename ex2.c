@@ -36,58 +36,58 @@ struct imm_ex2 imm_ex2 = {.dna = &imm_dna_iupac};
 static struct imm_codon_lprob create_codonp(struct imm_nuclt const *nuclt)
 {
   struct imm_codon_lprob codonp = imm_codon_lprob(nuclt);
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "AAA"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "AAC"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "AAG"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "AAT"), log(0.0023173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "ACA"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "ACG"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "ACT"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "AGC"), log(0.0029114));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "AGG"), log(0.0029003));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "AGT"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "ATA"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "ATG"), log(0.0049178));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "ATT"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "CAA"), log(0.0029478));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "CAC"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "CAG"), log(0.0029123));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "CAT"), log(0.0009133));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "CCA"), log(0.0029179));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "CCG"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "CCT"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "CGC"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "CGG"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "CGT"), log(0.0041183));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "CTA"), log(0.0038173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "CTG"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "CTT"), log(0.0029111));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "GAA"), log(0.0019173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "GAC"), log(0.0029103));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "GAG"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "GAT"), log(0.0029103));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "GCA"), log(0.0003138));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "GCG"), log(0.0039173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "GCT"), log(0.0029103));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "GGC"), log(0.0019173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "GGG"), log(0.0009173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "GGT"), log(0.0029143));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "GTA"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "GTG"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "GTT"), log(0.0029171));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "TAA"), log(0.0099113));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "TAC"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "TAG"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "TAT"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "TCA"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "TCG"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "TCT"), log(0.0020173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "TGC"), log(0.0029193));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "TGG"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "TGT"), log(0.0029173));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "TTA"), log(0.0089193));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "TTG"), log(0.0029138));
-  SET_CODONP(&codonp, IMM_CODON(nuclt, "TTT"), log(0.0089183));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "AAA"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "AAC"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "AAG"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "AAT"), logf(0.0023173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "ACA"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "ACG"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "ACT"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "AGC"), logf(0.0029114f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "AGG"), logf(0.0029003f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "AGT"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "ATA"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "ATG"), logf(0.0049178f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "ATT"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "CAA"), logf(0.0029478f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "CAC"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "CAG"), logf(0.0029123f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "CAT"), logf(0.0009133f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "CCA"), logf(0.0029179f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "CCG"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "CCT"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "CGC"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "CGG"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "CGT"), logf(0.0041183f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "CTA"), logf(0.0038173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "CTG"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "CTT"), logf(0.0029111f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "GAA"), logf(0.0019173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "GAC"), logf(0.0029103f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "GAG"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "GAT"), logf(0.0029103f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "GCA"), logf(0.0003138f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "GCG"), logf(0.0039173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "GCT"), logf(0.0029103f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "GGC"), logf(0.0019173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "GGG"), logf(0.0009173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "GGT"), logf(0.0029143f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "GTA"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "GTG"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "GTT"), logf(0.0029171f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "TAA"), logf(0.0099113f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "TAC"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "TAG"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "TAT"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "TCA"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "TCG"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "TCT"), logf(0.0020173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "TGC"), logf(0.0029193f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "TGG"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "TGT"), logf(0.0029173f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "TTA"), logf(0.0089193f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "TTG"), logf(0.0029138f));
+  SET_CODONP(&codonp, IMM_CODON(nuclt, "TTT"), logf(0.0089183f));
   return codonp;
 }
 
@@ -98,7 +98,7 @@ static struct imm_codon_marg codonm(struct imm_codon codon, float lprob)
   return imm_codon_marg(&codonp);
 }
 
-void imm_ex2_init(unsigned core_size, struct imm_span span)
+void imm_ex2_init(int core_size, struct imm_span span)
 {
   assert(core_size > 0);
   assert(core_size <= IMM_EX2_SIZE);
@@ -109,16 +109,16 @@ void imm_ex2_init(unsigned core_size, struct imm_span span)
   imm_hmm_init(&m->hmm, &m->code);
   m->core_size = core_size;
 
-  float eps = (float)0.01;
+  float eps = 0.01f;
   m->nucltp = imm_nuclt_lprob(
-      nuclt, (float[]){log(0.25), log(0.25), log(0.45), log(0.05)});
+      nuclt, (float[]){logf(0.25f), logf(0.25f), logf(0.45f), logf(0.05f)});
 
-  m->m_marg = codonm(IMM_CODON(nuclt, "ACG"), log(100.0));
-  m->i_marg = codonm(IMM_CODON(nuclt, "CGT"), log(100.0));
-  m->b_marg = codonm(IMM_CODON(nuclt, "AAA"), log(100.0));
-  m->e_marg = codonm(IMM_CODON(nuclt, "CCC"), log(100.0));
-  m->j_marg = codonm(IMM_CODON(nuclt, "GGG"), log(100.0));
-  m->null.n_marg = codonm(IMM_CODON(nuclt, "GTG"), log(13.0));
+  m->m_marg = codonm(IMM_CODON(nuclt, "ACG"), logf(100.0));
+  m->i_marg = codonm(IMM_CODON(nuclt, "CGT"), logf(100.0));
+  m->b_marg = codonm(IMM_CODON(nuclt, "AAA"), logf(100.0));
+  m->e_marg = codonm(IMM_CODON(nuclt, "CCC"), logf(100.0));
+  m->j_marg = codonm(IMM_CODON(nuclt, "GGG"), logf(100.0));
+  m->null.n_marg = codonm(IMM_CODON(nuclt, "GTG"), logf(13.0));
 
   imm_mute_state_init(&m->start, START, abc);
   imm_hmm_add_state(&m->hmm, &m->start.super);
@@ -137,15 +137,15 @@ void imm_ex2_init(unsigned core_size, struct imm_span span)
   imm_frame_state_init(&m->j, J, &m->nucltp, &m->j_marg, eps, span);
   imm_hmm_add_state(&m->hmm, &m->j.super);
 
-  SET_TRANS(m->hmm, m->start, m->b, log(0.2));
-  SET_TRANS(m->hmm, m->b, m->b, log(0.2));
-  SET_TRANS(m->hmm, m->e, m->e, log(0.2));
-  SET_TRANS(m->hmm, m->j, m->j, log(0.2));
-  SET_TRANS(m->hmm, m->e, m->j, log(0.2));
-  SET_TRANS(m->hmm, m->j, m->b, log(0.2));
-  SET_TRANS(m->hmm, m->e, m->end, log(0.2));
+  SET_TRANS(m->hmm, m->start, m->b, logf(0.2f));
+  SET_TRANS(m->hmm, m->b, m->b, logf(0.2f));
+  SET_TRANS(m->hmm, m->e, m->e, logf(0.2f));
+  SET_TRANS(m->hmm, m->j, m->j, logf(0.2f));
+  SET_TRANS(m->hmm, m->e, m->j, logf(0.2f));
+  SET_TRANS(m->hmm, m->j, m->b, logf(0.2f));
+  SET_TRANS(m->hmm, m->e, m->end, logf(0.2f));
 
-  for (unsigned k = 0; k < core_size; ++k)
+  for (int k = 0; k < core_size; ++k)
   {
     imm_frame_state_init(m->m + k, M | k, &m->nucltp, &m->m_marg, eps, span);
     imm_frame_state_init(m->i + k, I | k, &m->nucltp, &m->i_marg, eps, span);
@@ -155,26 +155,26 @@ void imm_ex2_init(unsigned core_size, struct imm_span span)
     imm_hmm_add_state(&m->hmm, &m->i[k].super);
     imm_hmm_add_state(&m->hmm, &m->d[k].super);
 
-    if (k == 0) SET_TRANS(m->hmm, m->b, m->m[0], log(0.2));
+    if (k == 0) SET_TRANS(m->hmm, m->b, m->m[0], logf(0.2f));
 
-    SET_TRANS(m->hmm, m->m[k], m->i[k], log(0.2));
-    SET_TRANS(m->hmm, m->i[k], m->i[k], log(0.2));
+    SET_TRANS(m->hmm, m->m[k], m->i[k], logf(0.2f));
+    SET_TRANS(m->hmm, m->i[k], m->i[k], logf(0.2f));
 
     if (k > 0)
     {
-      SET_TRANS(m->hmm, m->m[k - 1], m->m[k], log(0.2));
-      SET_TRANS(m->hmm, m->d[k - 1], m->m[k], log(0.2));
-      SET_TRANS(m->hmm, m->i[k - 1], m->m[k], log(0.2));
+      SET_TRANS(m->hmm, m->m[k - 1], m->m[k], logf(0.2f));
+      SET_TRANS(m->hmm, m->d[k - 1], m->m[k], logf(0.2f));
+      SET_TRANS(m->hmm, m->i[k - 1], m->m[k], logf(0.2f));
 
-      SET_TRANS(m->hmm, m->m[k - 1], m->d[k], log(0.2));
-      SET_TRANS(m->hmm, m->d[k - 1], m->d[k], log(0.2));
+      SET_TRANS(m->hmm, m->m[k - 1], m->d[k], logf(0.2f));
+      SET_TRANS(m->hmm, m->d[k - 1], m->d[k], logf(0.2f));
     }
 
     if (k == core_size - 1)
     {
-      SET_TRANS(m->hmm, m->m[k], m->e, log(0.2));
-      SET_TRANS(m->hmm, m->d[k], m->e, log(0.2));
-      SET_TRANS(m->hmm, m->i[k], m->e, log(0.2));
+      SET_TRANS(m->hmm, m->m[k], m->e, logf(0.2f));
+      SET_TRANS(m->hmm, m->d[k], m->e, logf(0.2f));
+      SET_TRANS(m->hmm, m->i[k], m->e, logf(0.2f));
     }
   }
 
@@ -191,7 +191,7 @@ void imm_ex2_init(unsigned core_size, struct imm_span span)
 
   imm_hmm_set_trans(&m->null.hmm, &m->null.nstart.super, &m->null.n.super, 0);
   imm_hmm_set_trans(&m->null.hmm, &m->null.n.super, &m->null.nend.super, 0);
-  SET_TRANS(m->null.hmm, m->null.n, m->null.n, log(0.2));
+  SET_TRANS(m->null.hmm, m->null.n, m->null.n, logf(0.2f));
 
   imm_hmm_set_start(&m->null.hmm, &m->null.nstart);
   imm_hmm_set_end(&m->null.hmm, &m->null.nend);

@@ -417,7 +417,7 @@ int imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
   if (!imm_expect_map_key(f, KEY_STATE_SPAN)) goto cleanup;
   lip_read_1darray_size_type(f, &size.u, &type);
   if (st->nstates != size.i) goto cleanup;
-  if (type != LIP_1DARRAY_UINT8) goto cleanup;
+  if (type != LIP_1DARRAY_INT8) goto cleanup;
   st->span = imm_reallocf(st->span, sizeof(*st->span) * size.u);
   if (!st->span && size.i > 0) goto cleanup;
   for (int i = 0; i < size.i; ++i)

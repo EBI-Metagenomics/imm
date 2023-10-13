@@ -45,7 +45,7 @@ static void dp_illegal(void)
   eq(imm_hmm_add_state(&hmm, &start.super), 0);
   eq(imm_hmm_add_state(&hmm, &end.super), 0);
   eq(imm_hmm_set_trans(&hmm, &start.super, &state.super, 0), 0);
-  eq(imm_hmm_set_trans(&hmm, &state.super, &state.super, log(0.5)), 0);
+  eq(imm_hmm_set_trans(&hmm, &state.super, &state.super, logf(0.5f)), 0);
   eq(imm_hmm_set_trans(&hmm, &state.super, &end.super, 0), 0);
   eq(imm_hmm_set_start(&hmm, &start), 0);
   eq(imm_hmm_set_end(&hmm, &end), 0);
@@ -134,7 +134,7 @@ static void dp_two_mutes(void)
   eq(imm_hmm_add_state(&hmm, &state0.super), 0);
   eq(imm_hmm_add_state(&hmm, &state1.super), 0);
 
-  eq(imm_hmm_set_trans(&hmm, &state0.super, &state1.super, log(0.5)), 0);
+  eq(imm_hmm_set_trans(&hmm, &state0.super, &state1.super, logf(0.5f)), 0);
 
   struct imm_dp dp;
 
@@ -154,9 +154,9 @@ static void dp_two_mutes(void)
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   eq(imm_path_nsteps(&prod.path), 2U);
-  eq(imm_path_step(&prod.path, 0)->seqlen, 0);
+  eq(imm_path_step(&prod.path, 0)->seqsize, 0);
   eq(imm_path_step(&prod.path, 0)->state_id, 0);
-  eq(imm_path_step(&prod.path, 1)->seqlen, 0);
+  eq(imm_path_step(&prod.path, 1)->seqsize, 0);
   eq(imm_path_step(&prod.path, 1)->state_id, 12);
 
   eq(imm_eseq_setup(&eseq, &ATT), 0);
