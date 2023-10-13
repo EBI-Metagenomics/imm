@@ -139,7 +139,7 @@ IMM_INLINE void imm_trellis_push(struct imm_trellis *x, float score,
 IMM_PURE int imm_trellis_state_idx_at(struct imm_trellis const *x,
                                       struct imm_node const *head)
 {
-  return (head - x->pool) % x->num_states;
+  return (int)((head - x->pool) % x->num_states);
 }
 
 IMM_PURE int imm_trellis_state_idx(struct imm_trellis const *x)

@@ -54,7 +54,7 @@ static void union_size(void)
   struct imm_abc abc = {0};
   eq(imm_abc_init(&abc, imm_str("ACT"), '*'), 0);
   char data[] = "ACAAAAAAAAC*AATT*G";
-  eq(imm_abc_union_size(&abc, imm_str(data)), 1U);
+  eq(imm_abc_union_size(&abc, imm_str(data)), 1);
 }
 
 static void get_lprob(void)

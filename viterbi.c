@@ -208,7 +208,8 @@ IMM_INLINE void set_state_score(struct imm_viterbi const *x, int row,
 {
   float score = bt->score;
   if (bt->src_idx != IMM_STATE_NULL_IDX)
-    imm_trellis_push(&x->task->trellis, score, bt->src_idx, bt->src_emissize);
+    imm_trellis_push(&x->task->trellis, score, (int16_t)bt->src_idx,
+                     (int8_t)bt->src_emissize);
   else x->task->trellis.head++;
 
   if (!safe_future) dst.max = (int_fast8_t)imm_min(dst.max, remain);
@@ -254,7 +255,6 @@ IMM_INLINE void on_row(struct imm_viterbi *x, int row, bool has_tardy_state,
                        bool safe_future, bool safe_past)
 {
   if (has_tardy_state)
-  // printf("    ...\n");
   {
     imm_trellis_seek(&x->task->trellis, row, x->tardy_state.state_idx);
     on_tardy_state(x, row, x->tardy_state, safe_future, safe_past);

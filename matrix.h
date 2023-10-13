@@ -27,18 +27,16 @@ void imm_matrix_dump(struct imm_matrix const *, FILE *restrict);
 IMM_PURE float imm_matrix_get_score(struct imm_matrix const *x,
                                     struct imm_cell y)
 {
-  int_fast8_t row = y.row % IMM_MATRIX_NROWS;
-  int_fast16_t col =
-      (int_fast16_t)(x->state_col[y.state_idx] + y.emission_size);
+  int row = y.row % IMM_MATRIX_NROWS;
+  int col = x->state_col[y.state_idx] + y.emission_size;
   return imm_matrixf_get(&x->score, row, col);
 }
 
 IMM_INLINE void imm_matrix_set_score(struct imm_matrix *x, struct imm_cell y,
                                      float score)
 {
-  int_fast8_t row = y.row % IMM_MATRIX_NROWS;
-  int_fast16_t col =
-      (int_fast16_t)(x->state_col[y.state_idx] + y.emission_size);
+  int row = y.row % IMM_MATRIX_NROWS;
+  int col = x->state_col[y.state_idx] + y.emission_size;
   imm_matrixf_set(&x->score, row, col, score);
 }
 
