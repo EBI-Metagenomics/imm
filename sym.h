@@ -6,7 +6,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-enum imm_sym_type : int
+enum imm_sym_type
 {
   IMM_SYM_NULL = 0,
   IMM_SYM_NORMAL = 1,

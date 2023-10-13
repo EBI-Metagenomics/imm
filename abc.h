@@ -7,7 +7,7 @@
 #define IMM_ABC_MAX_SIZE 31
 #define IMM_ABC_TYPEID_SIZE 10
 
-enum imm_abc_typeid : int
+enum imm_abc_typeid
 {
   IMM_NULL_ABC = 0,
   IMM_ABC = 1,
