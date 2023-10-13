@@ -5,7 +5,7 @@
 
 struct imm_str imm_str(char const *cstr)
 {
-  assert(strlen(cstr) <= UINT_MAX);
+  assert(strlen(cstr) <= INT_MAX);
   return (struct imm_str){(int)strlen(cstr), cstr};
 }
 

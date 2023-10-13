@@ -46,10 +46,10 @@ IMM_INLINE void set_matrix_cell_score(struct imm_viterbi const *x,
 
 IMM_PURE float get_matrix_cell_score(struct imm_viterbi const *x, int row,
                                      int_fast16_t src,
-                                     int_fast8_t emission_length)
+                                     int_fast8_t emission_size)
 {
-  imm_assume(row >= emission_length);
-  struct imm_cell cell = imm_cell(row - emission_length, src, emission_length);
+  imm_assume(row >= emission_size);
+  struct imm_cell cell = imm_cell(row - emission_size, src, emission_size);
   return imm_matrix_get_score(&x->task->matrix, cell);
 }
 
