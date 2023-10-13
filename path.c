@@ -29,10 +29,10 @@ int imm_path_add(struct imm_path *path, struct imm_step step)
     if ((rc = path_setup(path))) return rc;
   }
 
-  size_t count = (unsigned)path->nsteps + 1;
+  size_t count = (size_t)(path->nsteps + 1);
   size_t capacity = (size_t)path->capacity;
 
-  if (sizeof *path->steps * count > capacity)
+  if (sizeof(*path->steps) * count > capacity)
   {
     capacity <<= 1;
     assert(capacity >= sizeof *path->steps * count);
@@ -46,16 +46,16 @@ int imm_path_add(struct imm_path *path, struct imm_step step)
   return rc;
 }
 
-struct imm_step *imm_path_step(struct imm_path const *path, unsigned step)
+struct imm_step *imm_path_step(struct imm_path const *path, int step)
 {
-  int i = path->start + (int)step * path->dir;
+  int i = path->start + step * path->dir;
   int n = path->capacity;
-  return path->steps + (unsigned)(((i % n) + n) % n);
+  return path->steps + (((i % n) + n) % n);
 }
 
 void imm_path_add_unsafe(struct imm_path *path, struct imm_step step)
 {
-  *imm_path_step(path, (unsigned)path->nsteps++) = step;
+  *imm_path_step(path, path->nsteps++) = step;
 }
 
 void imm_path_cleanup(struct imm_path *x)
@@ -74,15 +74,12 @@ void imm_path_reset(struct imm_path *path)
   path->start = 0;
 }
 
-unsigned imm_path_nsteps(struct imm_path const *path)
-{
-  return (unsigned)path->nsteps;
-}
+int imm_path_nsteps(struct imm_path const *path) { return path->nsteps; }
 
 void imm_path_reverse(struct imm_path *path)
 {
   if (path->nsteps == 0) return;
-  int i = path->start + (int)path->nsteps * path->dir;
+  int i = path->start + path->nsteps * path->dir;
   int n = path->capacity;
   path->start = (((i % n) + n) % n) - 1;
   path->dir *= -1;
@@ -100,11 +97,11 @@ void imm_path_dump(struct imm_path const *x, imm_state_name *callb,
   char name[IMM_STATE_NAME_SIZE] = {0};
   if (!callb) callb = &imm_state_default_name;
   char const *sequence = imm_seq_data(seq);
-  for (unsigned i = 0; i < imm_path_nsteps(x); ++i)
+  for (int i = 0; i < imm_path_nsteps(x); ++i)
   {
     if (i > 0) fputc(',', fp);
-    unsigned state_id = imm_path_step(x, i)->state_id;
-    unsigned seqlen = imm_path_step(x, i)->seqlen;
+    int state_id = imm_path_step(x, i)->state_id;
+    int seqlen = imm_path_step(x, i)->seqsize;
     float score = imm_path_step(x, i)->score;
 
     fputc('(', fp);

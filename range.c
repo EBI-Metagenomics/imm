@@ -4,14 +4,14 @@
 #include "swap.h"
 #include <assert.h>
 
-struct imm_range imm_range(unsigned start, unsigned stop)
+struct imm_range imm_range(int start, int stop)
 {
   assert(start <= stop);
   imm_assume(start <= stop);
   return (struct imm_range){start, stop};
 }
 
-void imm_range_set(struct imm_range *x, unsigned start, unsigned stop)
+void imm_range_set(struct imm_range *x, int start, int stop)
 {
   assert(start <= stop);
   imm_assume(start <= stop);
@@ -19,7 +19,7 @@ void imm_range_set(struct imm_range *x, unsigned start, unsigned stop)
   x->stop = stop;
 }
 
-unsigned imm_range_size(struct imm_range x) { return x.stop - x.start; }
+int imm_range_size(struct imm_range x) { return x.stop - x.start; }
 
 bool imm_range_empty(struct imm_range x) { return x.stop <= x.start; }
 
@@ -57,5 +57,5 @@ void imm_range_subtract(struct imm_range x, struct imm_range y,
 
 void imm_range_dump(struct imm_range x, FILE *restrict fp)
 {
-  fprintf(fp, "range[%u, %u)", x.start, x.stop);
+  fprintf(fp, "range[%d, %d)", x.start, x.stop);
 }

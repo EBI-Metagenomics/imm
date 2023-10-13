@@ -7,20 +7,20 @@
 struct imm_cartes
 {
   char const *set;
-  unsigned set_size;
-  unsigned times;
-  unsigned iter_idx;
+  int set_size;
+  int times;
+  int iter_idx;
   size_t capacity;
   char *item;
-  unsigned nitems;
+  int nitems;
 };
 
 IMM_API void imm_cartes_init(struct imm_cartes *, char const *set,
-                             unsigned set_size, unsigned max_times);
+                             int set_size, int max_times);
 IMM_API void imm_cartes_cleanup(struct imm_cartes *);
 IMM_API char const *imm_cartes_next(struct imm_cartes *);
 IMM_API int imm_cartes_reset(struct imm_cartes *, char const *set,
-                             unsigned set_size, unsigned max_times);
-IMM_API void imm_cartes_setup(struct imm_cartes *, unsigned times);
+                             int set_size, int max_times);
+IMM_API void imm_cartes_setup(struct imm_cartes *, int times);
 
 #endif

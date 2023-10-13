@@ -6,13 +6,13 @@
 
 struct imm_cell
 {
-  unsigned row;
-  uint_fast16_t state_idx;
-  uint_fast8_t emission_size;
+  int row;
+  int_fast16_t state_idx;
+  int_fast8_t emission_size;
 };
 
-IMM_CONST struct imm_cell imm_cell(unsigned row, uint_fast16_t state_idx,
-                                   uint_fast8_t emissize)
+IMM_CONST struct imm_cell imm_cell(int row, int_fast16_t state_idx,
+                                   int_fast8_t emissize)
 {
   return (struct imm_cell){
       .row = row, .state_idx = state_idx, .emission_size = emissize};

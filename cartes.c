@@ -6,8 +6,8 @@
 #include <limits.h>
 #include <stdlib.h>
 
-void imm_cartes_init(struct imm_cartes *cartes, char const *set,
-                     unsigned set_size, unsigned max_times)
+void imm_cartes_init(struct imm_cartes *cartes, char const *set, int set_size,
+                     int max_times)
 {
   cartes->capacity = 0;
   cartes->item = NULL;
@@ -30,18 +30,18 @@ char const *imm_cartes_next(struct imm_cartes *cartes)
   if (cartes->iter_idx == cartes->nitems) return NULL;
 
   char *it = cartes->item;
-  unsigned idx = cartes->iter_idx++;
-  unsigned set_size = cartes->set_size;
+  int idx = cartes->iter_idx++;
+  int set_size = cartes->set_size;
 
-  for (unsigned i = 0; i < cartes->times; ++i)
+  for (int i = 0; i < cartes->times; ++i)
     it[i] =
         cartes->set[(idx % imm_ipow(set_size, i + 1)) / imm_ipow(set_size, i)];
 
   return it;
 }
 
-int imm_cartes_reset(struct imm_cartes *cartes, char const *set,
-                     unsigned set_size, unsigned max_times)
+int imm_cartes_reset(struct imm_cartes *cartes, char const *set, int set_size,
+                     int max_times)
 {
   cartes->set = set;
   cartes->set_size = set_size;
@@ -58,12 +58,12 @@ int imm_cartes_reset(struct imm_cartes *cartes, char const *set,
   return 0;
 }
 
-void imm_cartes_setup(struct imm_cartes *cartes, unsigned times)
+void imm_cartes_setup(struct imm_cartes *cartes, int times)
 {
   cartes->times = times;
   cartes->item[times] = '\0';
   cartes->iter_idx = 0;
-  unsigned long nitems = imm_ipow(cartes->set_size, times);
-  assert(nitems <= UINT_MAX);
-  cartes->nitems = (unsigned)nitems;
+  int long nitems = imm_ipow(cartes->set_size, times);
+  assert(nitems <= INT_MAX);
+  cartes->nitems = (int)nitems;
 }

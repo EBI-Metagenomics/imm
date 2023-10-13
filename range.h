@@ -7,13 +7,13 @@
 // Right-open interval: [start, stop)
 struct imm_range
 {
-  unsigned start;
-  unsigned stop;
+  int start;
+  int stop;
 };
 
-struct imm_range imm_range(unsigned start, unsigned stop);
-void imm_range_set(struct imm_range *, unsigned start, unsigned stop);
-unsigned imm_range_size(struct imm_range);
+struct imm_range imm_range(int start, int stop);
+void imm_range_set(struct imm_range *, int start, int stop);
+int imm_range_size(struct imm_range);
 bool imm_range_empty(struct imm_range);
 void imm_range_swap(struct imm_range *, struct imm_range *);
 struct imm_range imm_range_intersect(struct imm_range, struct imm_range);
