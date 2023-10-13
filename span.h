@@ -5,11 +5,11 @@
 
 struct imm_span
 {
-  unsigned min;
-  unsigned max;
+  int min;
+  int max;
 };
 
-IMM_CONST struct imm_span imm_span(unsigned min, unsigned max)
+IMM_CONST struct imm_span imm_span(int min, int max)
 {
   return (struct imm_span){min, max};
 }
