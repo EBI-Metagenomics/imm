@@ -57,7 +57,7 @@ int imm_state_table_reset(struct imm_state_table *x,
 
   for (int i = 0; i < cfg->nstates; ++i)
   {
-    x->ids[i] = (int16_t)imm_state_id(cfg->states[i]);
+    x->ids[i] = (uint16_t)imm_state_id(cfg->states[i]);
     x->span[i] = imm_zspan(imm_state_span(cfg->states[i]).min,
                            imm_state_span(cfg->states[i]).max);
   }

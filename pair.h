@@ -12,10 +12,10 @@ struct imm_pair
     {
       struct
       {
-        int16_t src;
-        int16_t dst;
+        uint16_t src;
+        uint16_t dst;
       };
-      int32_t key;
+      uint32_t key;
     };
   } id;
 

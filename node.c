@@ -3,7 +3,7 @@
 #include "state_table.h"
 #include <string.h>
 
-void imm_node_dump(struct imm_node const *x, int16_t *ids,
+void imm_node_dump(struct imm_node const *x, uint16_t *ids,
                    imm_state_name *callb, FILE *restrict fp)
 {
   char emis_size[16] = {0};

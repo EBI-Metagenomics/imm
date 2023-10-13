@@ -10,7 +10,7 @@
 
 struct imm_step
 {
-  int16_t state_id;
+  uint16_t state_id;
   int8_t seqsize;
   float score;
 };

@@ -13,7 +13,7 @@ struct imm_dp_cfg;
 struct imm_state_table
 {
   int nstates;
-  int16_t *ids;
+  uint16_t *ids;
   int16_t start_state_idx;
   int end_state_idx;
   int8_t *span;

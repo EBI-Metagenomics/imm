@@ -404,7 +404,7 @@ int imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
   if (!imm_expect_map_key(f, KEY_STATE_IDS)) goto cleanup;
   lip_read_1darray_size_type(f, &size.u, &type);
   st->nstates = size.i;
-  if (type != LIP_1DARRAY_INT16) goto cleanup;
+  if (type != LIP_1DARRAY_UINT16) goto cleanup;
   st->ids = imm_reallocf(st->ids, sizeof(*st->ids) * (unsigned)st->nstates);
   if (!st->ids && st->nstates > 0) goto cleanup;
   lip_read_1darray_int_data(f, ((unsigned)st->nstates), st->ids);
