@@ -15,7 +15,7 @@ imm_static_assert(IMM_NUCLT_SIZE == 4, "nuclt size expected to be four");
 struct codon_iter
 {
   struct imm_nuclt const *nuclt;
-  unsigned pos;
+  int pos;
 };
 
 static inline struct codon_iter codon_iter_begin(struct imm_nuclt const *nuclt)
@@ -25,7 +25,7 @@ static inline struct codon_iter codon_iter_begin(struct imm_nuclt const *nuclt)
 
 static inline struct imm_codon codon_iter_next(struct codon_iter *iter)
 {
-  unsigned n = IMM_NUCLT_SIZE;
+  int n = IMM_NUCLT_SIZE;
 
   struct imm_codon codon = {.nuclt = iter->nuclt,
                             .a = (iter->pos / (n * n)) % n,
@@ -38,18 +38,18 @@ static inline struct imm_codon codon_iter_next(struct codon_iter *iter)
 
 static inline bool codon_iter_end(struct codon_iter const iter)
 {
-  unsigned n = IMM_NUCLT_SIZE;
+  int n = IMM_NUCLT_SIZE;
   return iter.pos >= n * n * n;
 }
 
 static float marginalization(struct imm_codon_marg const *codonm,
                              struct imm_codon const *codon)
 {
-  unsigned const symbol_idx[IMM_NUCLT_SIZE] = {0, 1, 2, 3};
-  unsigned any = imm_abc_any_symbol_idx(&codonm->nuclt->super);
-  unsigned const *arr[3];
-  unsigned shape[3];
-  for (unsigned i = 0; i < 3; ++i)
+  int const symbol_idx[IMM_NUCLT_SIZE] = {0, 1, 2, 3};
+  int any = imm_abc_any_symbol_idx(&codonm->nuclt->super);
+  int const *arr[3];
+  int shape[3];
+  for (int i = 0; i < 3; ++i)
   {
     if (codon->idx[i] == any)
     {
@@ -66,11 +66,11 @@ static float marginalization(struct imm_codon_marg const *codonm,
   struct imm_codon t;
   t.nuclt = codon->nuclt;
   float lprob = imm_lprob_zero();
-  for (unsigned a = 0; a < shape[0]; ++a)
+  for (int a = 0; a < shape[0]; ++a)
   {
-    for (unsigned b = 0; b < shape[1]; ++b)
+    for (int b = 0; b < shape[1]; ++b)
     {
-      for (unsigned c = 0; c < shape[2]; ++c)
+      for (int c = 0; c < shape[2]; ++c)
       {
         t.a = arr[0][a];
         t.b = arr[1][b];
@@ -86,18 +86,18 @@ static float marginalization(struct imm_codon_marg const *codonm,
 static void set_marginal_lprobs(struct imm_codon_marg *codonm)
 {
   struct imm_abc const *abc = &codonm->nuclt->super;
-  unsigned any = imm_abc_any_symbol_idx(abc);
+  int any = imm_abc_any_symbol_idx(abc);
   assert(any == imm_nuclt_size(codonm->nuclt));
 
   struct imm_codon codon;
   codon.nuclt = codonm->nuclt;
 
-  unsigned size = IMM_NUCLT_SIZE + 1;
-  for (unsigned k = 0; k < 3; ++k)
+  int size = IMM_NUCLT_SIZE + 1;
+  for (int k = 0; k < 3; ++k)
   {
-    for (unsigned i = 0; i < size; ++i)
+    for (int i = 0; i < size; ++i)
     {
-      for (unsigned j = 0; j < size; ++j)
+      for (int j = 0; j < size; ++j)
       {
         codon.idx[k] = any;
         codon.idx[(k + 1) % 3] = i;

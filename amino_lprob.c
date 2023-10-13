@@ -6,7 +6,7 @@ struct imm_amino_lprob imm_amino_lprob(struct imm_amino const *amino,
 {
   struct imm_amino_lprob lprob;
   lprob.amino = amino;
-  for (unsigned i = 0; i < IMM_AMINO_SIZE; ++i)
+  for (int i = 0; i < IMM_AMINO_SIZE; ++i)
     lprob.lprobs[i] = lprobs[i];
   return lprob;
 }

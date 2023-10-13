@@ -9,9 +9,9 @@ struct imm_abc const *imm_state_abc(struct imm_state const *x)
   return x->abc;
 }
 
-unsigned imm_state_id(struct imm_state const *x) { return x->id; }
+int imm_state_id(struct imm_state const *x) { return x->id; }
 
-unsigned imm_state_idx(struct imm_state const *x) { return x->idx; }
+int imm_state_idx(struct imm_state const *x) { return x->idx; }
 
 float imm_state_lprob(struct imm_state const *x, struct imm_seq const *seq)
 {
@@ -33,7 +33,7 @@ void imm_state_detach(struct imm_state *x)
   cco_hash_del(&x->hnode);
 }
 
-void imm_state_init(struct imm_state *x, unsigned id, struct imm_abc const *abc,
+void imm_state_init(struct imm_state *x, int id, struct imm_abc const *abc,
                     struct imm_state_vtable vtable, struct imm_span span)
 {
   assert(id != IMM_STATE_NULL_ID);
@@ -48,8 +48,8 @@ void imm_state_init(struct imm_state *x, unsigned id, struct imm_abc const *abc,
   x->mark = 0;
 }
 
-char *imm_state_default_name(unsigned id, char *name)
+char *imm_state_default_name(int id, char *name)
 {
-  snprintf(name, IMM_STATE_NAME_SIZE, "%u", id);
+  snprintf(name, IMM_STATE_NAME_SIZE, "%d", id);
   return name;
 }

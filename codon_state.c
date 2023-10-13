@@ -18,7 +18,7 @@ static float lprob(struct imm_state const *state, struct imm_seq const *seq)
   return imm_codon_lprob_get(codonp, codon);
 }
 
-void imm_codon_state_init(struct imm_codon_state *state, unsigned id,
+void imm_codon_state_init(struct imm_codon_state *state, int id,
                           struct imm_codon_lprob const *codonp)
 {
   state->codonp = codonp;
