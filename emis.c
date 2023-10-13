@@ -43,44 +43,44 @@ void imm_emis_cleanup(struct imm_emis *x)
   }
 }
 
-static int realloc_offset(struct imm_emis *emis, unsigned nstates)
+static int realloc_offset(struct imm_emis *emis, int nstates)
 {
-  unsigned offsize = imm_emis_offset_size(nstates);
+  size_t offsize = (size_t)imm_emis_offset_size(nstates);
   emis->offset = imm_reallocf(emis->offset, sizeof(*emis->offset) * offsize);
   if (!emis->offset) return IMM_ENOMEM;
   return 0;
 }
 
-static int realloc_score(struct imm_emis *emis, unsigned nstates)
+static int realloc_score(struct imm_emis *emis, int nstates)
 {
-  unsigned score_size = imm_emis_score_size(emis, nstates);
+  size_t score_size = (size_t)imm_emis_score_size(emis, nstates);
   emis->score = imm_reallocf(emis->score, sizeof(*emis->score) * score_size);
   if (!emis->score && score_size > 0) return IMM_ENOMEM;
   return 0;
 }
 
 static void calc_offset(struct imm_emis *emis, struct imm_code const *code,
-                        unsigned nstates, struct imm_state **states)
+                        int nstates, struct imm_state **states)
 {
   emis->offset[0] = 0;
-  unsigned size = imm_code_size(code, imm_state_span(states[0]));
-  for (unsigned i = 1; i < nstates; ++i)
+  int size = imm_code_size(code, imm_state_span(states[0]));
+  for (int i = 1; i < nstates; ++i)
   {
-    assert(size <= UINT32_MAX);
-    emis->offset[i] = (uint32_t)size;
+    assert(size <= INT32_MAX);
+    emis->offset[i] = (int32_t)size;
     size += imm_code_size(code, imm_state_span(states[i]));
   }
-  assert(size <= UINT32_MAX);
-  emis->offset[nstates] = (uint32_t)size;
+  assert(size <= INT32_MAX);
+  emis->offset[nstates] = (int32_t)size;
 }
 
 static void calc_score(struct imm_emis *emis, struct imm_code const *code,
-                       unsigned nstates, struct imm_state **states)
+                       int nstates, struct imm_state **states)
 {
   struct imm_score_table score_table = {0};
   imm_score_table_init(&score_table, code);
 
-  for (unsigned i = 0; i < nstates; ++i)
+  for (int i = 0; i < nstates; ++i)
   {
     float *scores = emis->score + emis->offset[i];
     imm_score_table_scores(&score_table, states[i], scores);
@@ -90,7 +90,7 @@ static void calc_score(struct imm_emis *emis, struct imm_code const *code,
 }
 
 int imm_emis_reset(struct imm_emis *emis, struct imm_code const *code,
-                   struct imm_state **states, unsigned nstates)
+                   struct imm_state **states, int nstates)
 {
   int rc = 0;
   if ((rc = realloc_offset(emis, nstates))) goto cleanup;
@@ -106,22 +106,22 @@ cleanup:
   return rc;
 }
 
-unsigned imm_emis_score_size(struct imm_emis const *x, unsigned nstates)
+int imm_emis_score_size(struct imm_emis const *x, int nstates)
 {
   return x->offset[nstates];
 }
 
-unsigned imm_emis_offset_size(unsigned nstates) { return nstates + 1; }
+int imm_emis_offset_size(int nstates) { return nstates + 1; }
 
 void imm_emis_dump(struct imm_emis const *x, struct imm_state_table const *st,
                    FILE *restrict fp)
 {
-  for (unsigned i = 0; i < st->nstates; ++i)
+  for (int i = 0; i < st->nstates; ++i)
   {
-    unsigned size = 0;
+    int size = 0;
     float const *score = imm_emis_table(x, i, &size);
     fprintf(fp, "%s=", imm_state_table_name(st, i));
-    imm_dump_array_f32(size, score, fp);
+    imm_dump_array_f32((size_t)size, score, fp);
     fputc('\n', fp);
   }
 }

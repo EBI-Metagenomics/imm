@@ -6,9 +6,9 @@
 
 struct imm_ctrans
 {
-  float score;  /**< Transition score.  */
-  uint16_t src; /**< Source state.      */
-  uint16_t dst; /**< Destination state. */
+  float score; /**< Transition score.  */
+  int16_t src; /**< Source state.      */
+  int16_t dst; /**< Destination state. */
 };
 
 imm_static_assert(sizeof(struct imm_ctrans) == 8, "");

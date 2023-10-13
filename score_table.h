@@ -16,8 +16,8 @@ IMM_API void imm_score_table_init(struct imm_score_table *,
                                   struct imm_code const *);
 IMM_API void imm_score_table_cleanup(struct imm_score_table *);
 
-IMM_API unsigned imm_score_table_size(struct imm_score_table const *,
-                                      struct imm_state const *);
+IMM_API int imm_score_table_size(struct imm_score_table const *,
+                                 struct imm_state const *);
 IMM_API void imm_score_table_scores(struct imm_score_table *,
                                     struct imm_state const *, float *);
 

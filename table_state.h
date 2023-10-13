@@ -7,7 +7,7 @@
 
 struct imm_abc;
 
-typedef float(imm_table_state_callb)(unsigned size, char const *seq);
+typedef float(imm_table_state_callb)(int size, char const *seq);
 
 struct imm_table_state
 {
@@ -15,7 +15,7 @@ struct imm_table_state
   imm_table_state_callb *callback;
 };
 
-IMM_API void imm_table_state_init(struct imm_table_state *, unsigned id,
+IMM_API void imm_table_state_init(struct imm_table_state *, int id,
                                   struct imm_abc const *,
                                   imm_table_state_callb *, struct imm_span);
 
