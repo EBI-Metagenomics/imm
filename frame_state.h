@@ -21,7 +21,7 @@ struct imm_frame_state
   struct imm_frame_epsilon eps;
 };
 
-IMM_API void imm_frame_state_init(struct imm_frame_state *, unsigned id,
+IMM_API void imm_frame_state_init(struct imm_frame_state *, int id,
                                   struct imm_nuclt_lprob const *,
                                   struct imm_codon_marg const *, float epsilon,
                                   struct imm_span);

@@ -6,8 +6,8 @@
 // evaluated before any other by the Viterbi algorithm.
 struct tardy_state
 {
-  unsigned state_idx;
-  unsigned trans_start;
+  int state_idx;
+  int trans_start;
 };
 
 #endif

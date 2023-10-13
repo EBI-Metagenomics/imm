@@ -16,7 +16,7 @@ static float lprob15(struct imm_state const *state, struct imm_seq const *seq);
 static float lprob24(struct imm_state const *state, struct imm_seq const *seq);
 static float lprob33(struct imm_state const *state, struct imm_seq const *seq);
 
-void imm_frame_state_init(struct imm_frame_state *state, unsigned id,
+void imm_frame_state_init(struct imm_frame_state *state, int id,
                           struct imm_nuclt_lprob const *nucltp,
                           struct imm_codon_marg const *codonm, float epsilon,
                           struct imm_span span)
