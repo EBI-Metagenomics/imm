@@ -18,7 +18,7 @@ struct imm_task
   struct imm_matrix matrix;
   struct imm_code const *code;
   struct imm_eseq const *seq;
-  unsigned num_states;
+  int num_states;
   struct imm_trellis trellis;
 
   // Debugging purpose

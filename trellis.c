@@ -16,10 +16,12 @@ void imm_trellis_init(struct imm_trellis *x)
   x->pool = NULL;
 }
 
-int imm_trellis_setup(struct imm_trellis *x, unsigned seqsize, unsigned nstates)
+int imm_trellis_setup(struct imm_trellis *x, int seqsize, int nstates)
 {
-  unsigned num_stages = seqsize + 1;
-  size_t size = sizeof(struct imm_node) * (num_stages * nstates);
+  assert(nstates > 0);
+  int num_stages = seqsize + 1;
+  size_t size =
+      sizeof(struct imm_node) * ((size_t)num_stages * (size_t)nstates);
   if (!(x->pool = imm_reallocf(x->pool, size)))
   {
     imm_trellis_cleanup(x);
@@ -78,19 +80,19 @@ void imm_trellis_dump(struct imm_trellis const *x, FILE *restrict fp)
   assert(x->ids);
   assert(x->state_name);
   // HEADER
-  for (unsigned i = 0; i < x->num_states; ++i)
+  for (int i = 0; i < x->num_states; ++i)
   {
     if (i > 0) fputc(',', fp);
-    unsigned idx = imm_trellis_state_idx_at(x, imm_trellis_at(x, 0, i));
+    int idx = imm_trellis_state_idx_at(x, imm_trellis_at(x, 0, i));
     if (idx == IMM_STATE_NULL_IDX) fputs("?", fp);
     else fputs((*x->state_name)(x->ids[idx], name), fp);
   }
   fputc('\n', fp);
 
   // BODY
-  for (unsigned i = 0; i < x->num_stages; ++i)
+  for (int i = 0; i < x->num_stages; ++i)
   {
-    for (unsigned j = 0; j < x->num_states; ++j)
+    for (int j = 0; j < x->num_states; ++j)
     {
       if (j > 0) fputc(',', fp);
       imm_node_dump(imm_trellis_at(x, i, j), x->ids, x->state_name, fp);

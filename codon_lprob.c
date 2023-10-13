@@ -8,7 +8,7 @@ struct imm_codon_lprob imm_codon_lprob(struct imm_nuclt const *nuclt)
   struct imm_codon_lprob lprob;
   lprob.nuclt = nuclt;
 
-  unsigned i = 0;
+  int i = 0;
   for (; i < IMM_NUCLT_SIZE * IMM_NUCLT_SIZE * IMM_NUCLT_SIZE; ++i)
     lprob.lprobs[i] = imm_lprob_zero();
 

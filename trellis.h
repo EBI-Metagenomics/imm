@@ -85,15 +85,14 @@ struct imm_trellis
   uint16_t *ids;
   imm_state_name *state_name;
   size_t capacity;
-  unsigned num_stages;
-  unsigned num_states;
+  int num_stages;
+  int num_states;
   struct imm_node *head;
   struct imm_node *pool;
 };
 
 IMM_API void imm_trellis_init(struct imm_trellis *);
-IMM_API int imm_trellis_setup(struct imm_trellis *, unsigned seqsize,
-                              unsigned nstates);
+IMM_API int imm_trellis_setup(struct imm_trellis *, int seqsize, int nstates);
 IMM_API void imm_trellis_cleanup(struct imm_trellis *);
 IMM_API void imm_trellis_prepare(struct imm_trellis *);
 IMM_API void imm_trellis_set_ids(struct imm_trellis *, uint16_t *ids);
@@ -106,7 +105,7 @@ IMM_INLINE void imm_trellis_rewind(struct imm_trellis *x) { x->head = x->pool; }
 
 IMM_CONST size_t imm_trellis_size(struct imm_trellis const *x)
 {
-  return x->num_stages * x->num_states;
+  return (size_t)x->num_stages * (size_t)x->num_states;
 }
 
 IMM_PURE struct imm_node *imm_trellis_head(struct imm_trellis const *x)
@@ -115,13 +114,12 @@ IMM_PURE struct imm_node *imm_trellis_head(struct imm_trellis const *x)
 }
 
 IMM_PURE struct imm_node const *imm_trellis_at(struct imm_trellis const *x,
-                                               unsigned stage, unsigned state)
+                                               int stage, int state)
 {
   return x->pool + stage * x->num_states + state;
 }
 
-IMM_INLINE void imm_trellis_seek(struct imm_trellis *x, unsigned stage,
-                                 unsigned state)
+IMM_INLINE void imm_trellis_seek(struct imm_trellis *x, int stage, int state)
 {
   x->head = (struct imm_node *)imm_trellis_at(x, stage, state);
   assert(x->head >= x->pool && x->head < x->pool + imm_trellis_size(x));
@@ -130,7 +128,7 @@ IMM_INLINE void imm_trellis_seek(struct imm_trellis *x, unsigned stage,
 IMM_INLINE void imm_trellis_next(struct imm_trellis *x) { x->head++; }
 
 IMM_INLINE void imm_trellis_push(struct imm_trellis *x, float score,
-                                 uint16_t state_source, uint8_t emissize)
+                                 int16_t state_source, int8_t emissize)
 {
   x->head->score = score;
   x->head->state_source = state_source;
@@ -138,20 +136,21 @@ IMM_INLINE void imm_trellis_push(struct imm_trellis *x, float score,
   imm_trellis_next(x);
 }
 
-IMM_PURE unsigned imm_trellis_state_idx_at(struct imm_trellis const *x,
-                                           struct imm_node const *head)
+IMM_PURE int imm_trellis_state_idx_at(struct imm_trellis const *x,
+                                      struct imm_node const *head)
 {
   return (head - x->pool) % x->num_states;
 }
 
-IMM_PURE unsigned imm_trellis_state_idx(struct imm_trellis const *x)
+IMM_PURE int imm_trellis_state_idx(struct imm_trellis const *x)
 {
   return imm_trellis_state_idx_at(x, x->head);
 }
 
-IMM_PURE unsigned imm_trellis_stage_idx(struct imm_trellis const *x)
+IMM_PURE int imm_trellis_stage_idx(struct imm_trellis const *x)
 {
-  return (x->head - x->pool) / x->num_states;
+  assert(x->head >= x->pool);
+  return (int)((size_t)(x->head - x->pool) / (size_t)x->num_states);
 }
 
 #endif
