@@ -15,17 +15,17 @@
 #include <string.h>
 
 /* State IDs */
-#define START ((uint16_t)(0U << 11))
-#define B ((uint16_t)(1U << 11))
-#define M ((uint16_t)(2U << 11))
-#define I ((uint16_t)(3U << 11))
-#define D ((uint16_t)(4U << 11))
-#define E ((uint16_t)(5U << 11))
-#define J ((uint16_t)(6U << 11))
-#define END ((uint16_t)(7U << 11))
-#define N ((uint16_t)(8U << 11))
-#define NSTART ((uint16_t)(9U << 11))
-#define NEND ((uint16_t)(10U << 11))
+#define START (0 << 11)
+#define B (1 << 11)
+#define M (2 << 11)
+#define I (3 << 11)
+#define D (4 << 11)
+#define E (5 << 11)
+#define J (6 << 11)
+#define END (7 << 11)
+#define N (8 << 11)
+#define NSTART (9 << 11)
+#define NEND (10 << 11)
 
 #define SET_TRANS(hmm, a, b, v) imm_hmm_set_trans(&hmm, &a.super, &b.super, v)
 

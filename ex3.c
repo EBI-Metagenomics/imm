@@ -19,14 +19,14 @@
 #define ONE 0.0f
 
 /* State IDs */
-#define M_ID ((uint16_t)(0U << 12))
-#define S_ID ((uint16_t)(1U << 12))
-#define N_ID ((uint16_t)(2U << 12))
-#define B_ID ((uint16_t)(3U << 12))
-#define E_ID ((uint16_t)(4U << 12))
-#define C_ID ((uint16_t)(5U << 12))
-#define T_ID ((uint16_t)(6U << 12))
-#define J_ID ((uint16_t)(7U << 12))
+#define M_ID (0 << 12)
+#define S_ID (1 << 12)
+#define N_ID (2 << 12)
+#define B_ID (3 << 12)
+#define E_ID (4 << 12)
+#define C_ID (5 << 12)
+#define T_ID (6 << 12)
+#define J_ID (7 << 12)
 
 static float N_LPROBS[] = {ONE, ZERO, ZERO, ZERO};
 static float M_LPROBS[] = {ZERO, ONE, ZERO, ZERO};

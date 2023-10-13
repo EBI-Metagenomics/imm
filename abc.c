@@ -131,7 +131,7 @@ static int abc_pack(struct imm_abc const *x, struct lip_file *file)
   lip_write_cstr(file, x->symbols);
 
   lip_write_cstr(file, "idx");
-  lip_write_1darray_u8(file, imm_array_size(x->sym.idx), x->sym.idx);
+  lip_write_1darray_i8(file, imm_array_size(x->sym.idx), x->sym.idx);
 
   lip_write_cstr(file, "any_symbol_id");
   lip_write_int(file, x->any_symbol_id);
@@ -152,7 +152,7 @@ static int abc_unpack(struct imm_abc *x, struct lip_file *file)
   x->size = (int)strlen(x->symbols);
 
   if (!imm_expect_map_key(file, "idx")) return IMM_EIO;
-  if (!imm_expect_1darr_u8_type(file, imm_array_size(x->sym.idx), x->sym.idx))
+  if (!imm_expect_1darr_i8_type(file, imm_array_size(x->sym.idx), x->sym.idx))
     return IMM_EIO;
 
   if (!imm_expect_map_key(file, "any_symbol_id")) return IMM_EIO;

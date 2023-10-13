@@ -24,7 +24,7 @@ bool imm_expect_map_key(struct lip_file *x, char const *key)
   return strncmp(key, buf, size) == 0;
 }
 
-bool imm_expect_1darr_u8(struct lip_file *x, unsigned size, uint8_t *arr)
+bool imm_expect_1darr_i8(struct lip_file *x, unsigned size, int8_t *arr)
 {
   unsigned sz = 0;
   enum lip_1darray_type type = 0;
@@ -38,13 +38,13 @@ error:
   return false;
 }
 
-bool imm_expect_1darr_u8_type(struct lip_file *x, unsigned size, uint8_t *arr)
+bool imm_expect_1darr_i8_type(struct lip_file *x, unsigned size, int8_t *arr)
 {
   unsigned sz = 0;
   enum lip_1darray_type type = 0;
   lip_read_1darray_size_type(x, &sz, &type);
   if (size != sz) goto error;
-  if (type != LIP_1DARRAY_UINT8) goto error;
+  if (type != LIP_1DARRAY_INT8) goto error;
   lip_read_1darray_int_data(x, size, arr);
   return !x->error;
 

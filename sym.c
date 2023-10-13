@@ -16,7 +16,7 @@ int imm_sym_idx(struct imm_sym const *sym, int id) { return sym->idx[id]; }
 
 void imm_sym_set_idx(struct imm_sym *sym, int id, int idx)
 {
-  sym->idx[id] = (uint8_t)idx;
+  sym->idx[id] = (int8_t)idx;
 }
 
 bool imm_sym_valid_char(char c)

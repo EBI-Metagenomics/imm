@@ -16,8 +16,8 @@ enum imm_sym_type : int
 #define IMM_SYM_FIRST_CHAR '!'
 #define IMM_SYM_LAST_CHAR '~'
 
-#define IMM_SYM_NULL_ID UINT8_MAX
-#define IMM_SYM_NULL_IDX UINT8_MAX
+#define IMM_SYM_NULL_ID INT8_MAX
+#define IMM_SYM_NULL_IDX INT8_MAX
 
 #define IMM_SYM_ID(c) ((int)(c - IMM_SYM_FIRST_CHAR))
 #define IMM_SYM_CHAR(x) ((char)(x + IMM_SYM_FIRST_CHAR))
@@ -26,7 +26,7 @@ enum imm_sym_type : int
 
 struct imm_sym
 {
-  uint8_t idx[IMM_SYM_SIZE];
+  int8_t idx[IMM_SYM_SIZE];
 };
 
 // clang-format off
