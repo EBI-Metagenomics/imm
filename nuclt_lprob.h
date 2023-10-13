@@ -22,6 +22,6 @@ IMM_API int imm_nuclt_lprob_unpack(struct imm_nuclt_lprob *, struct lip_file *);
 IMM_API void imm_nuclt_lprob_dump(struct imm_nuclt_lprob const *,
                                   FILE *restrict);
 
-float imm__nuclt_lprob_get(struct imm_nuclt_lprob const *, unsigned idx);
+float imm__nuclt_lprob_get(struct imm_nuclt_lprob const *, int idx);
 
 #endif

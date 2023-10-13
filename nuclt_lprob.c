@@ -10,7 +10,7 @@ struct imm_nuclt_lprob imm_nuclt_lprob(struct imm_nuclt const *nuclt,
 {
   struct imm_nuclt_lprob lprob;
   lprob.nuclt = nuclt;
-  for (unsigned i = 0; i < IMM_NUCLT_SIZE; ++i)
+  for (int i = 0; i < IMM_NUCLT_SIZE; ++i)
     lprob.lprobs[i] = lprobs[i];
   return lprob;
 }
@@ -43,7 +43,7 @@ void imm_nuclt_lprob_dump(struct imm_nuclt_lprob const *x, FILE *restrict fp)
   imm_dump_array_f32(IMM_NUCLT_SIZE, x->lprobs, fp);
 }
 
-float imm__nuclt_lprob_get(struct imm_nuclt_lprob const *lprob, unsigned idx)
+float imm__nuclt_lprob_get(struct imm_nuclt_lprob const *lprob, int idx)
 {
   return lprob->lprobs[idx];
 }
