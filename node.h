@@ -11,8 +11,8 @@
 struct imm_node
 {
   float score;
-  uint16_t state_source;
-  uint8_t emission_size;
+  int16_t state_source;
+  int8_t emission_size;
 };
 
 struct imm_state_table;

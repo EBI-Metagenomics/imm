@@ -8,7 +8,7 @@ void imm_node_dump(struct imm_node const *x, uint16_t *ids,
 {
   char emis_size[16] = {0};
   if (x->emission_size == IMM_STATE_NULL_SEQLEN) strcpy(emis_size, "?");
-  else snprintf(emis_size, imm_array_size(emis_size), "%u", x->emission_size);
+  else snprintf(emis_size, imm_array_size(emis_size), "%d", x->emission_size);
 
   char name[IMM_STATE_NAME_SIZE] = {0};
   if (x->state_source == IMM_STATE_NULL_IDX) strcpy(name, "?");
