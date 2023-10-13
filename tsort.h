@@ -5,6 +5,6 @@
 
 struct imm_state;
 
-int imm_tsort(unsigned nstates, struct imm_state **states, unsigned start_idx);
+int imm_tsort(int nstates, struct imm_state **states, int start_idx);
 
 #endif

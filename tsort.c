@@ -29,23 +29,23 @@ static bool check_mute_visit(struct imm_state **states, struct imm_state *state)
   return false;
 }
 
-static bool check_mute_cycles(unsigned nstates, struct imm_state **states)
+static bool check_mute_cycles(int nstates, struct imm_state **states)
 {
-  for (unsigned i = 0; i < nstates; ++i)
+  for (int i = 0; i < nstates; ++i)
   {
     if (check_mute_visit(states, states[i])) return false;
   }
   return true;
 }
 
-static void clear_marks(unsigned nstates, struct imm_state **states)
+static void clear_marks(int nstates, struct imm_state **states)
 {
-  for (unsigned i = 0; i < nstates; ++i)
+  for (int i = 0; i < nstates; ++i)
     states[i]->mark = INITIAL_MARK;
 }
 
-static void visit(struct imm_state *state, struct imm_state **states,
-                  unsigned *end, struct imm_state **tmp)
+static void visit(struct imm_state *state, struct imm_state **states, int *end,
+                  struct imm_state **tmp)
 {
   if (state->mark == PERMANENT_MARK) return;
   if (state->mark == TEMPORARY_MARK) return;
@@ -61,7 +61,7 @@ static void visit(struct imm_state *state, struct imm_state **states,
   tmp[*end] = state;
 }
 
-int imm_tsort(unsigned nstates, struct imm_state **states, unsigned start_idx)
+int imm_tsort(int nstates, struct imm_state **states, int start_idx)
 {
   clear_marks(nstates, states);
 
@@ -69,19 +69,19 @@ int imm_tsort(unsigned nstates, struct imm_state **states, unsigned start_idx)
 
   clear_marks(nstates, states);
 
-  struct imm_state **tmp = malloc(sizeof(struct imm_state *) * nstates);
+  struct imm_state **tmp = malloc(sizeof(struct imm_state *) * (size_t)nstates);
   if (!tmp) return IMM_ENOMEM;
 
-  unsigned end = nstates;
+  int end = nstates;
   visit(states[start_idx], states, &end, tmp);
 
-  for (unsigned i = 0; i < start_idx; ++i)
+  for (int i = 0; i < start_idx; ++i)
     visit(states[i], states, &end, tmp);
 
-  for (unsigned i = start_idx + 1; i < nstates; ++i)
+  for (int i = start_idx + 1; i < nstates; ++i)
     visit(states[i], states, &end, tmp);
 
-  memcpy(states, tmp, sizeof(struct imm_state *) * nstates);
+  memcpy(states, tmp, sizeof(struct imm_state *) * (size_t)nstates);
   free(tmp);
 
   return 0;
