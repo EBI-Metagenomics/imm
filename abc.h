@@ -4,10 +4,10 @@
 #include "str.h"
 #include "sym.h"
 
-#define IMM_ABC_MAX_SIZE (31U)
+#define IMM_ABC_MAX_SIZE 31
 #define IMM_ABC_TYPEID_SIZE 10
 
-enum imm_abc_typeid
+enum imm_abc_typeid : int
 {
   IMM_NULL_ABC = 0,
   IMM_ABC = 1,
@@ -25,36 +25,37 @@ enum imm_abc_typeid
  */
 struct imm_abc
 {
-  enum imm_abc_typeid typeid;
-  unsigned size;
+  int typeid;
+  int size;
   char symbols[IMM_ABC_MAX_SIZE + 1];
   struct imm_sym sym;
-  unsigned any_symbol_id;
+  int any_symbol_id;
 };
 
 struct lip_file;
 
-IMM_API int imm_abc_init(struct imm_abc *, struct imm_str symbols,
-                         char any_symbol_id);
-IMM_API char imm_abc_any_symbol(struct imm_abc const *);
-IMM_API bool imm_abc_has_symbol_id(struct imm_abc const *, unsigned id);
-IMM_API bool imm_abc_has_symbol(struct imm_abc const *, char symbol);
-IMM_API unsigned imm_abc_size(struct imm_abc const *);
-IMM_API unsigned imm_abc_symbol_idx(struct imm_abc const *, char symbol);
-IMM_API unsigned imm_abc_any_symbol_id(struct imm_abc const *);
-IMM_API unsigned imm_abc_any_symbol_idx(struct imm_abc const *);
-IMM_API enum imm_sym_type imm_abc_symbol_type(struct imm_abc const *,
-                                              char symbol);
+// clang-format off
+IMM_API int         imm_abc_init(struct imm_abc *, struct imm_str symbols,
+                                 char any_symbol_id);
+IMM_API char        imm_abc_any_symbol(struct imm_abc const *);
+IMM_API bool        imm_abc_has_symbol_id(struct imm_abc const *, int id);
+IMM_API bool        imm_abc_has_symbol(struct imm_abc const *, char symbol);
+IMM_API int         imm_abc_size(struct imm_abc const *);
+IMM_API int         imm_abc_symbol_idx(struct imm_abc const *, char symbol);
+IMM_API int         imm_abc_any_symbol_id(struct imm_abc const *);
+IMM_API int         imm_abc_any_symbol_idx(struct imm_abc const *);
+IMM_API int         imm_abc_symbol_type(struct imm_abc const *, char symbol);
 IMM_API char const *imm_abc_symbols(struct imm_abc const *);
-IMM_API unsigned imm_abc_union_size(struct imm_abc const *, struct imm_str seq);
-IMM_API bool imm_abc_typeid_valid(unsigned typeid);
-IMM_API char const *imm_abc_typeid_name(enum imm_abc_typeid typeid);
-IMM_API int imm_abc_pack(struct imm_abc const *, struct lip_file *);
-IMM_API int imm_abc_unpack(struct imm_abc *, struct lip_file *);
+IMM_API int         imm_abc_union_size(struct imm_abc const *, struct imm_str seq);
+IMM_API bool        imm_abc_typeid_valid(int typeid);
+IMM_API char const *imm_abc_typeid_name(int typeid);
+IMM_API int         imm_abc_pack(struct imm_abc const *, struct lip_file *);
+IMM_API int         imm_abc_unpack(struct imm_abc *, struct lip_file *);
+// clang-format on
 
-unsigned imm__abc_symbol_idx(struct imm_abc const *, unsigned id);
-enum imm_sym_type imm__abc_symbol_type(struct imm_abc const *, unsigned id);
-int imm__abc_init(struct imm_abc *, unsigned len, char const *symbols,
-                  char any_symbol, enum imm_abc_typeid);
+int imm__abc_symbol_idx(struct imm_abc const *, int id);
+int imm__abc_symbol_type(struct imm_abc const *, int id);
+int imm__abc_init(struct imm_abc *, int len, char const *symbols,
+                  char any_symbol, int);
 
 #endif

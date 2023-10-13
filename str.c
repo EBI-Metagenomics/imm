@@ -6,7 +6,7 @@
 struct imm_str imm_str(char const *cstr)
 {
   assert(strlen(cstr) <= UINT_MAX);
-  return (struct imm_str){(unsigned)strlen(cstr), cstr};
+  return (struct imm_str){(int)strlen(cstr), cstr};
 }
 
 struct imm_str imm_str_slice(struct imm_str x, struct imm_range range)

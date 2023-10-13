@@ -5,7 +5,7 @@
 
 struct imm_seq imm_seq_unsafe(struct imm_str str, struct imm_abc const *abc)
 {
-  for (unsigned i = 0; i < str.size; ++i)
+  for (int i = 0; i < str.size; ++i)
   {
     char const any = imm_abc_any_symbol(abc);
     assert(imm_abc_has_symbol(abc, str.data[i]) || str.data[i] == any);
@@ -19,7 +19,7 @@ int imm_seq_init(struct imm_seq *x, struct imm_str str,
                  struct imm_abc const *abc)
 {
   char const any = imm_abc_any_symbol(abc);
-  for (unsigned i = 0; i < str.size; ++i)
+  for (int i = 0; i < str.size; ++i)
   {
     if (!(imm_abc_has_symbol(abc, str.data[i]) || str.data[i] == any))
       return IMM_EINVAL;
@@ -34,11 +34,11 @@ struct imm_abc const *imm_seq_abc(struct imm_seq const *seq)
   return seq->abc;
 }
 
-unsigned imm_seq_size(struct imm_seq const *seq) { return seq->str.size; }
+int imm_seq_size(struct imm_seq const *seq) { return seq->str.size; }
 
 char const *imm_seq_data(struct imm_seq const *seq) { return seq->str.data; }
 
-unsigned imm_seq_symbol_idx(struct imm_seq const *seq, unsigned i)
+int imm_seq_symbol_idx(struct imm_seq const *seq, int i)
 {
   return imm_abc_symbol_idx(seq->abc, seq->str.data[i]);
 }
