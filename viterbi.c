@@ -73,8 +73,8 @@ IMM_PURE int8_t state_zspan(struct imm_viterbi const *x, int state_idx)
 IMM_PURE struct state unwrap_state(struct imm_viterbi const *x, int state_idx)
 {
   int8_t span = state_zspan(x, state_idx);
-  imm_assume(imm_zspan_min(span) <= IMM_STATE_MAX_SEQLEN);
-  imm_assume(imm_zspan_max(span) <= IMM_STATE_MAX_SEQLEN);
+  imm_assume(imm_zspan_min(span) <= IMM_STATE_MAX_SEQSIZE);
+  imm_assume(imm_zspan_max(span) <= IMM_STATE_MAX_SEQSIZE);
   imm_assume(imm_zspan_min(span) <= imm_zspan_max(span));
   return (struct state){(int_fast16_t)state_idx, imm_zspan_min(span),
                         imm_zspan_max(span)};
@@ -131,7 +131,7 @@ struct step
   int_fast16_t src_idx;
   int_fast16_t src_trans;
   int_fast8_t src_emissize;
-  int_fast8_t src_seqlen_idx;
+  int_fast8_t src_seqsize_idx;
   float emis_score;
   float trans_score;
   float score;
@@ -139,9 +139,9 @@ struct step
 
 static inline struct step step_init(void)
 {
-  return (struct step){IMM_STATE_NULL_IDX,    IMM_TRANS_NULL_IDX,
-                       IMM_STATE_NULL_SEQLEN, IMM_STATE_NULL_SEQLEN,
-                       IMM_LPROB_ZERO,        IMM_LPROB_ZERO,
+  return (struct step){IMM_STATE_NULL_IDX,     IMM_TRANS_NULL_IDX,
+                       IMM_STATE_NULL_SEQSIZE, IMM_STATE_NULL_SEQSIZE,
+                       IMM_LPROB_ZERO,         IMM_LPROB_ZERO,
                        IMM_LPROB_ZERO};
 }
 
@@ -161,17 +161,17 @@ IMM_INLINE struct step best_step(struct imm_viterbi *x, int row,
 
     float score = IMM_LPROB_ZERO;
     int_fast8_t emissize = 0;
-    int_fast8_t seqlen_idx = 0;
+    int_fast8_t seqsize_idx = 0;
 
-    imm_assume(src.max <= IMM_STATE_MAX_SEQLEN);
-    UNROLL(IMM_STATE_MAX_SEQLEN + 1)
+    imm_assume(src.max <= IMM_STATE_MAX_SEQSIZE);
+    UNROLL(IMM_STATE_MAX_SEQSIZE + 1)
     for (int_fast8_t i = src.min; i <= src.max; ++i)
     {
       float v = get_matrix_cell_score(x, row, src.idx, i);
       if (score < v)
       {
         emissize = i;
-        seqlen_idx = i - src.min;
+        seqsize_idx = i - src.min;
         score = v;
       }
     }
@@ -182,7 +182,7 @@ IMM_INLINE struct step best_step(struct imm_viterbi *x, int row,
       step.src_idx = src.idx;
       step.src_trans = (int_fast16_t)trans;
       step.src_emissize = emissize;
-      step.src_seqlen_idx = seqlen_idx;
+      step.src_seqsize_idx = seqsize_idx;
       step.emis_score = score - x->curr_trans->score;
       step.trans_score = x->curr_trans->score;
       step.score = score;
@@ -213,9 +213,9 @@ IMM_INLINE void set_state_score(struct imm_viterbi const *x, int row,
 
   if (!safe_future) dst.max = (int_fast8_t)imm_min(dst.max, remain);
 
-  imm_assume(dst.max <= IMM_STATE_MAX_SEQLEN);
+  imm_assume(dst.max <= IMM_STATE_MAX_SEQSIZE);
 
-  UNROLL(IMM_STATE_MAX_SEQLEN + 1)
+  UNROLL(IMM_STATE_MAX_SEQSIZE + 1)
   for (int_fast8_t i = dst.min; i <= dst.max; ++i)
   {
     float emis_score = emission_score(x, dst, row, i);
@@ -224,11 +224,11 @@ IMM_INLINE void set_state_score(struct imm_viterbi const *x, int row,
   }
 }
 
-IMM_CONST int remains(int seqlen, int row, bool safe_future)
+IMM_CONST int remains(int seqsize, int row, bool safe_future)
 {
-  if (safe_future) return IMM_STATE_MAX_SEQLEN;
-  if (seqlen >= IMM_STATE_MAX_SEQLEN + row) return IMM_STATE_MAX_SEQLEN;
-  return seqlen - row;
+  if (safe_future) return IMM_STATE_MAX_SEQSIZE;
+  if (seqsize >= IMM_STATE_MAX_SEQSIZE + row) return IMM_STATE_MAX_SEQSIZE;
+  return seqsize - row;
 }
 
 IMM_INLINE void on_normal_state(struct imm_viterbi *x, int row,
@@ -254,7 +254,7 @@ IMM_INLINE void on_row(struct imm_viterbi *x, int row, bool has_tardy_state,
                        bool safe_future, bool safe_past)
 {
   if (has_tardy_state)
-      // printf("    ...\n");
+  // printf("    ...\n");
   {
     imm_trellis_seek(&x->task->trellis, row, x->tardy_state.state_idx);
     on_tardy_state(x, row, x->tardy_state, safe_future, safe_past);
@@ -280,7 +280,7 @@ IMM_INLINE void viterbi_generic(struct imm_viterbi *x, bool has_tardy_state)
   set_matrix_cell_score(x, imm_cell(0, (int_fast16_t)start_state_idx(x), 0), 0);
   imm_trellis_seek(&x->task->trellis, 0, start_state_idx(x));
   imm_trellis_push(&x->task->trellis, 0, IMM_STATE_NULL_IDX,
-                   IMM_STATE_NULL_SEQLEN);
+                   IMM_STATE_NULL_SEQSIZE);
 
   struct imm_dp_safety const *y = &x->safety;
 

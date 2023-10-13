@@ -6,9 +6,9 @@
 //   lowest row such that r >= max(max_seq) > 0 for every r in [row, seqsize].
 static struct imm_range safe_past(int seqsize)
 {
-  assert(IMM_STATE_MAX_SEQLEN > 0);
-  if (seqsize >= IMM_STATE_MAX_SEQLEN)
-    return imm_range(IMM_STATE_MAX_SEQLEN, seqsize + 1);
+  assert(IMM_STATE_MAX_SEQSIZE > 0);
+  if (seqsize >= IMM_STATE_MAX_SEQSIZE)
+    return imm_range(IMM_STATE_MAX_SEQSIZE, seqsize + 1);
   return imm_range(seqsize + 1, seqsize + 1);
 }
 
@@ -17,8 +17,8 @@ static struct imm_range safe_past(int seqsize)
 //   r in (0, row].
 static struct imm_range safe_future(int seqsize)
 {
-  if (seqsize >= IMM_STATE_MAX_SEQLEN)
-    return imm_range(1, seqsize - IMM_STATE_MAX_SEQLEN + 1);
+  if (seqsize >= IMM_STATE_MAX_SEQSIZE)
+    return imm_range(1, seqsize - IMM_STATE_MAX_SEQSIZE + 1);
   return imm_range(1, 1);
 }
 

@@ -21,7 +21,7 @@ int imm_eseq_size(struct imm_eseq const *eseq) { return eseq->data.rows - 1; }
 
 int imm_eseq_setup(struct imm_eseq *eseq, struct imm_seq const *seq)
 {
-  int ncols = IMM_STATE_MAX_SEQLEN + 1;
+  int ncols = IMM_STATE_MAX_SEQSIZE + 1;
   int rc = 0;
 
   if ((rc = imm_matrixu16_resize(&eseq->data, imm_seq_size(seq) + 1, ncols)))

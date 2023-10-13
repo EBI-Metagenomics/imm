@@ -27,7 +27,7 @@ IMM_INLINE void imm_node_invalidate(struct imm_node *x)
 {
   x->score = IMM_LPROB_NAN;
   x->state_source = IMM_STATE_NULL_IDX;
-  x->emission_size = IMM_STATE_NULL_SEQLEN;
+  x->emission_size = IMM_STATE_NULL_SEQSIZE;
 }
 
 #endif

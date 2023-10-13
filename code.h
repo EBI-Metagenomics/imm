@@ -12,8 +12,8 @@ struct imm_seq;
 
 struct imm_code
 {
-  int16_t offset[IMM_STATE_MAX_SEQLEN + 2];
-  int16_t stride[IMM_STATE_MAX_SEQLEN];
+  int16_t offset[IMM_STATE_MAX_SEQSIZE + 2];
+  int16_t stride[IMM_STATE_MAX_SEQSIZE];
   struct imm_abc const *abc;
 };
 

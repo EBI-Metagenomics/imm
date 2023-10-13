@@ -7,7 +7,7 @@ void imm_node_dump(struct imm_node const *x, int16_t *ids,
                    imm_state_name *callb, FILE *restrict fp)
 {
   char emis_size[16] = {0};
-  if (x->emission_size == IMM_STATE_NULL_SEQLEN) strcpy(emis_size, "?");
+  if (x->emission_size == IMM_STATE_NULL_SEQSIZE) strcpy(emis_size, "?");
   else snprintf(emis_size, imm_array_size(emis_size), "%d", x->emission_size);
 
   char name[IMM_STATE_NAME_SIZE] = {0};

@@ -11,8 +11,8 @@
 
 IMM_CONST int8_t imm_zspan(int min, int max)
 {
-  imm_assume(min <= IMM_STATE_MAX_SEQLEN);
-  imm_assume(max <= IMM_STATE_MAX_SEQLEN);
+  imm_assume(min <= IMM_STATE_MAX_SEQSIZE);
+  imm_assume(max <= IMM_STATE_MAX_SEQSIZE);
   return (int8_t)((min << 4) | max);
 }
 

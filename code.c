@@ -4,7 +4,7 @@
 
 static void calc_strides(int16_t *stride, int abc_size)
 {
-  int last = IMM_STATE_MAX_SEQLEN - 1;
+  int last = IMM_STATE_MAX_SEQSIZE - 1;
   stride[last] = 1;
   while (last > 0)
   {
@@ -19,7 +19,7 @@ static void calc_offsets(int16_t *offset, int abc_size)
   int i = 0;
   offset[i] = 0;
   /* +1 for sentinel */
-  while (i < IMM_STATE_MAX_SEQLEN + 1)
+  while (i < IMM_STATE_MAX_SEQSIZE + 1)
   {
     ++i;
     offset[i] = (int16_t)(offset[i - 1] * n + 1);
@@ -40,7 +40,7 @@ int imm_code_encode(struct imm_code const *code, struct imm_seq const *seq)
   for (int i = 0; i < size; ++i)
   {
     int j = imm_seq_symbol_idx(seq, i);
-    c += code->stride[IMM_STATE_MAX_SEQLEN - size + i] * j;
+    c += code->stride[IMM_STATE_MAX_SEQSIZE - size + i] * j;
   }
   return c;
 }

@@ -101,18 +101,18 @@ void imm_path_dump(struct imm_path const *x, imm_state_name *callb,
   {
     if (i > 0) fputc(',', fp);
     int state_id = imm_path_step(x, i)->state_id;
-    int seqlen = imm_path_step(x, i)->seqsize;
+    int seqsize = imm_path_step(x, i)->seqsize;
     float score = imm_path_step(x, i)->score;
 
     fputc('(', fp);
 
     fprintf(fp, "%s;", (*callb)(state_id, name));
-    fprintf(fp, "%.*s;", seqlen, sequence);
+    fprintf(fp, "%.*s;", seqsize, sequence);
     fprintf(fp, imm_fmt_get_f32(), score);
 
     fputc(')', fp);
 
-    sequence += seqlen;
+    sequence += seqsize;
   }
   fputc('\n', fp);
 }

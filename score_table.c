@@ -9,7 +9,7 @@ void imm_score_table_init(struct imm_score_table *x,
   x->code = code;
   struct imm_abc const *abc = code->abc;
   char const *set = abc->symbols;
-  imm_cartes_init(&x->cartes, set, abc->size, IMM_STATE_MAX_SEQLEN);
+  imm_cartes_init(&x->cartes, set, abc->size, IMM_STATE_MAX_SEQSIZE);
 }
 
 void imm_score_table_cleanup(struct imm_score_table *x)

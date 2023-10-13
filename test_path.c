@@ -4,18 +4,18 @@
 static void normal_path(void)
 {
   uint16_t state_ids[] = {42, 19};
-  uint8_t seqlens[] = {3, 5};
+  uint8_t sizes[] = {3, 5};
 
   struct imm_path path = imm_path();
 
-  imm_path_add(&path, imm_step(state_ids[0], seqlens[0], 0));
-  imm_path_add(&path, imm_step(state_ids[1], seqlens[1], 0));
+  imm_path_add(&path, imm_step(state_ids[0], sizes[0], 0));
+  imm_path_add(&path, imm_step(state_ids[1], sizes[1], 0));
 
   eq(imm_path_step(&path, 0)->state_id, state_ids[0]);
   eq(imm_path_step(&path, 1)->state_id, state_ids[1]);
 
-  eq(imm_path_step(&path, 0)->seqsize, seqlens[0]);
-  eq(imm_path_step(&path, 1)->seqsize, seqlens[1]);
+  eq(imm_path_step(&path, 0)->seqsize, sizes[0]);
+  eq(imm_path_step(&path, 1)->seqsize, sizes[1]);
 
   imm_path_cleanup(&path);
 }

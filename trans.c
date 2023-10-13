@@ -1,7 +1,6 @@
 #include "trans.h"
 
-void imm_trans_init(struct imm_trans *trans, int src, int dst,
-                    float lprob)
+void imm_trans_init(struct imm_trans *trans, int src, int dst, float lprob)
 {
   trans->pair = imm_pair(src, dst);
   trans->lprob = lprob;

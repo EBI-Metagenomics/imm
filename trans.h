@@ -18,7 +18,6 @@ struct imm_trans
   struct cco_hnode hnode;
 };
 
-void imm_trans_init(struct imm_trans *, int src, int dst,
-                    float lprob);
+void imm_trans_init(struct imm_trans *, int src, int dst, float lprob);
 
 #endif

@@ -69,7 +69,7 @@ static float read_result(struct imm_dp const *dp, struct imm_task *task,
   int end = dp->state_table.end_state_idx;
 
   int state = IMM_STATE_NULL_IDX;
-  int seqsize = IMM_STATE_NULL_SEQLEN;
+  int seqsize = IMM_STATE_NULL_SEQSIZE;
 
   int length = imm_eseq_size(task->seq);
   int max_seq = imm_zspan_max(imm_state_table_zspan(&dp->state_table, end));

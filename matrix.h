@@ -7,7 +7,7 @@
 #include "state.h"
 #include <stdio.h>
 
-#define IMM_MATRIX_NROWS (IMM_STATE_MAX_SEQLEN)
+#define IMM_MATRIX_NROWS (IMM_STATE_MAX_SEQSIZE)
 
 struct imm_state_table;
 
