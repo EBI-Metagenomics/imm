@@ -3,13 +3,11 @@
 #include "reallocf.h"
 #include <stdlib.h>
 
-int imm_matrixi16_init(struct imm_matrixi16 *x, int rows, int cols)
+void imm_matrixi16_init(struct imm_matrixi16 *x)
 {
-  x->data = malloc(sizeof(*x->data) * (size_t)(rows * cols));
-  if (!x->data) return IMM_ENOMEM;
-  x->rows = rows;
-  x->cols = cols;
-  return 0;
+  x->data = NULL;
+  x->rows = 0;
+  x->cols = 0;
 }
 
 void imm_matrixi16_empty(struct imm_matrixi16 *x)
@@ -32,8 +30,10 @@ void imm_matrixi16_cleanup(struct imm_matrixi16 *x)
 
 int imm_matrixi16_resize(struct imm_matrixi16 *x, int rows, int cols)
 {
-  x->data = imm_reallocf(x->data, sizeof(*x->data) * (size_t)(rows * cols));
-  if (!x->data && rows * cols > 0) return IMM_ENOMEM;
+  if (rows <= 0 || cols <= 0) return IMM_EINVAL;
+  size_t size = sizeof(*x->data) * ((size_t)rows * (size_t)cols);
+  x->data = imm_reallocf(x->data, size);
+  if (!x->data) return IMM_ENOMEM;
   x->rows = rows;
   x->cols = cols;
   return 0;

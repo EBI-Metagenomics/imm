@@ -3,7 +3,7 @@
 
 void imm_eseq_init(struct imm_eseq *eseq, struct imm_code const *code)
 {
-  imm_matrixi16_init(&eseq->data, 1, 1);
+  imm_matrixi16_init(&eseq->data);
   eseq->code = code;
 }
 

@@ -11,7 +11,7 @@ struct imm_matrixi16
   int cols;
 };
 
-int imm_matrixi16_init(struct imm_matrixi16 *, int rows, int cols);
+void imm_matrixi16_init(struct imm_matrixi16 *);
 void imm_matrixi16_empty(struct imm_matrixi16 *);
 void imm_matrixi16_set(struct imm_matrixi16 *, int r, int c, int16_t v);
 void imm_matrixi16_cleanup(struct imm_matrixi16 *);
