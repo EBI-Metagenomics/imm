@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20.2 FATAL_ERROR)
-project(imm VERSION 5.3.3 LANGUAGES C)
+project(imm VERSION 5.3.4 LANGUAGES C)
 
 include(cmake/sanitizers.cmake)
 include(cmake/warnings.cmake)
@@ -35,7 +35,6 @@ endif()
 target_include_directories(
   imm
   PUBLIC $<INSTALL_INTERFACE:include>
-         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
          $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
   PRIVATE ${PROJECT_SOURCE_DIR}
 )
