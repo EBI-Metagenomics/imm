@@ -302,7 +302,8 @@ int imm_dp_pack(struct imm_dp const *dp, struct lip_file *f)
   lip_write_1darray_float(f, size.u, dp->emis.score);
 
   lip_write_cstr(f, KEY_EMIS_OFFSET);
-  lip_write_1darray_int(f, imm_emis_offset_size(nstates), dp->emis.offset);
+  unsigned offset_size = (unsigned)imm_emis_offset_size(nstates);
+  lip_write_1darray_int(f, offset_size, dp->emis.offset);
 
   /* trans_table */
   size.i = imm_trans_table_transsize(ntrans);

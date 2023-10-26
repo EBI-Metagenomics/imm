@@ -3,13 +3,13 @@
 
 #include "compiler.h"
 
-#if __has_builtin(__builtin_assume)
+#if IMM_HAS_BUILTIN(__builtin_assume)
 #define imm_assume(x) __builtin_assume(x)
 #else
 #define imm_assume(x)                                                          \
   do                                                                           \
   {                                                                            \
-    if (!(x)) __builtin_unreachable();                                         \
+    if (!(x)) IMM_UNREACHABLE();                                               \
   } while (0);
 #endif
 

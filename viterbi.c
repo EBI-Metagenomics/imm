@@ -199,7 +199,7 @@ IMM_PURE float emission_score(struct imm_viterbi const *x, struct state state,
                               int row, int len)
 {
   int code = imm_eseq_get(x->task->seq, row, len, state.min);
-  return imm_emis_score(&x->dp->emis, state.idx, code);
+  return imm_emis_score(&x->dp->emis, (int)state.idx, code);
 }
 
 IMM_INLINE void set_state_score(struct imm_viterbi const *x, int row,
