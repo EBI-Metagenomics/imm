@@ -27,7 +27,7 @@
 #define NSTART (9 << 11)
 #define NEND (10 << 11)
 
-#define SET_TRANS(hmm, a, b, v) imm_hmm_set_trans(&hmm, &a.super, &b.super, v)
+#define SET_TRANS(hmm, a, b, v) imm_hmm_set_trans(hmm, &a.super, &b.super, v)
 
 #define SET_CODONP(codonp, codon, v) imm_codon_lprob_set(codonp, codon, v)
 
@@ -106,7 +106,7 @@ void imm_ex2_init(int core_size, struct imm_span span)
   struct imm_nuclt const *nuclt = &m->dna->super;
   struct imm_abc const *abc = &nuclt->super;
   imm_code_init(&m->code, abc);
-  imm_hmm_init(&m->hmm, &m->code);
+  m->hmm = imm_hmm_new(&m->code);
   m->core_size = core_size;
 
   float eps = 0.01f;
@@ -121,21 +121,21 @@ void imm_ex2_init(int core_size, struct imm_span span)
   m->null.n_marg = codonm(IMM_CODON(nuclt, "GTG"), logf(13.0));
 
   imm_mute_state_init(&m->start, START, abc);
-  imm_hmm_add_state(&m->hmm, &m->start.super);
-  imm_hmm_set_start(&m->hmm, &m->start);
+  imm_hmm_add_state(m->hmm, &m->start.super);
+  imm_hmm_set_start(m->hmm, &m->start);
 
   imm_mute_state_init(&m->end, END, abc);
-  imm_hmm_add_state(&m->hmm, &m->end.super);
-  imm_hmm_set_end(&m->hmm, &m->end);
+  imm_hmm_add_state(m->hmm, &m->end.super);
+  imm_hmm_set_end(m->hmm, &m->end);
 
   imm_frame_state_init(&m->b, B, &m->nucltp, &m->b_marg, eps, span);
-  imm_hmm_add_state(&m->hmm, &m->b.super);
+  imm_hmm_add_state(m->hmm, &m->b.super);
 
   imm_frame_state_init(&m->e, E, &m->nucltp, &m->e_marg, eps, span);
-  imm_hmm_add_state(&m->hmm, &m->e.super);
+  imm_hmm_add_state(m->hmm, &m->e.super);
 
   imm_frame_state_init(&m->j, J, &m->nucltp, &m->j_marg, eps, span);
-  imm_hmm_add_state(&m->hmm, &m->j.super);
+  imm_hmm_add_state(m->hmm, &m->j.super);
 
   SET_TRANS(m->hmm, m->start, m->b, logf(0.2f));
   SET_TRANS(m->hmm, m->b, m->b, logf(0.2f));
@@ -151,9 +151,9 @@ void imm_ex2_init(int core_size, struct imm_span span)
     imm_frame_state_init(m->i + k, I | k, &m->nucltp, &m->i_marg, eps, span);
     imm_mute_state_init(m->d + k, D | k, abc);
 
-    imm_hmm_add_state(&m->hmm, &m->m[k].super);
-    imm_hmm_add_state(&m->hmm, &m->i[k].super);
-    imm_hmm_add_state(&m->hmm, &m->d[k].super);
+    imm_hmm_add_state(m->hmm, &m->m[k].super);
+    imm_hmm_add_state(m->hmm, &m->i[k].super);
+    imm_hmm_add_state(m->hmm, &m->d[k].super);
 
     if (k == 0) SET_TRANS(m->hmm, m->b, m->m[0], logf(0.2f));
 
@@ -179,22 +179,28 @@ void imm_ex2_init(int core_size, struct imm_span span)
   }
 
   // Null one
-  imm_hmm_init(&m->null.hmm, &m->code);
+  m->null.hmm = imm_hmm_new(&m->code);
 
   imm_mute_state_init(&m->null.nstart, NSTART, abc);
   imm_mute_state_init(&m->null.nend, NEND, abc);
   imm_frame_state_init(&m->null.n, N, &m->nucltp, &m->null.n_marg, eps, span);
 
-  imm_hmm_add_state(&m->null.hmm, &m->null.nstart.super);
-  imm_hmm_add_state(&m->null.hmm, &m->null.n.super);
-  imm_hmm_add_state(&m->null.hmm, &m->null.nend.super);
+  imm_hmm_add_state(m->null.hmm, &m->null.nstart.super);
+  imm_hmm_add_state(m->null.hmm, &m->null.n.super);
+  imm_hmm_add_state(m->null.hmm, &m->null.nend.super);
 
-  imm_hmm_set_trans(&m->null.hmm, &m->null.nstart.super, &m->null.n.super, 0);
-  imm_hmm_set_trans(&m->null.hmm, &m->null.n.super, &m->null.nend.super, 0);
+  imm_hmm_set_trans(m->null.hmm, &m->null.nstart.super, &m->null.n.super, 0);
+  imm_hmm_set_trans(m->null.hmm, &m->null.n.super, &m->null.nend.super, 0);
   SET_TRANS(m->null.hmm, m->null.n, m->null.n, logf(0.2f));
 
-  imm_hmm_set_start(&m->null.hmm, &m->null.nstart);
-  imm_hmm_set_end(&m->null.hmm, &m->null.nend);
+  imm_hmm_set_start(m->null.hmm, &m->null.nstart);
+  imm_hmm_set_end(m->null.hmm, &m->null.nend);
+}
+
+void imm_ex2_cleanup(void)
+{
+  imm_hmm_del(imm_ex2.hmm);
+  imm_hmm_del(imm_ex2.null.hmm);
 }
 
 char const imm_ex2_seq[] = "AAAACGCGTGTCACGACAACGCGTACGTTTCGACGAGTACGACGCCCGGG"

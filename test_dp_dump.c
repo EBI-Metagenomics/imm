@@ -6,7 +6,7 @@ static void dp_dump_ex1(void)
 {
   imm_ex1_init(10);
   struct imm_dp dp;
-  eq(imm_hmm_init_dp(&imm_ex1.hmm, &dp), 0);
+  eq(imm_hmm_init_dp(imm_ex1.hmm, &dp), 0);
 
   FILE *fp = fopen("dp_ex1.dump", "wb");
   imm_dp_set_state_name(&dp, &imm_ex1_state_name);
@@ -15,6 +15,7 @@ static void dp_dump_ex1(void)
 
   imm_dp_cleanup(&dp);
   remove("dp_ex1.dump");
+  imm_ex1_cleanup();
 }
 
 static void dp_dump_ex1_path(void)
@@ -22,7 +23,7 @@ static void dp_dump_ex1_path(void)
   imm_ex1_init(10);
   struct imm_ex1 *m = &imm_ex1;
   struct imm_dp dp;
-  eq(imm_hmm_init_dp(&imm_ex1.hmm, &dp), 0);
+  eq(imm_hmm_init_dp(imm_ex1.hmm, &dp), 0);
 
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &m->code);
@@ -41,6 +42,7 @@ static void dp_dump_ex1_path(void)
   imm_task_del(task);
   imm_prod_cleanup(&prod);
   imm_dp_cleanup(&dp);
+  imm_ex1_cleanup();
 }
 
 int main(void)

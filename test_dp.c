@@ -26,49 +26,48 @@ static void dp_illegal(void)
 
   struct imm_mute_state state;
   imm_mute_state_init(&state, 3, &abc);
-  struct imm_hmm hmm;
-  imm_hmm_init(&hmm, &code);
+  struct imm_hmm *hmm = imm_hmm_new(&code);
 
   struct imm_dp dp;
-  eq(imm_hmm_init_dp(&hmm, &dp), IMM_ENOSTART);
+  eq(imm_hmm_init_dp(hmm, &dp), IMM_ENOSTART);
   imm_dp_cleanup(&dp);
 
-  eq(imm_hmm_add_state(&hmm, &state.super), 0);
-  eq(imm_hmm_init_dp(&hmm, &dp), IMM_ENOSTART);
+  eq(imm_hmm_add_state(hmm, &state.super), 0);
+  eq(imm_hmm_init_dp(hmm, &dp), IMM_ENOSTART);
   imm_dp_cleanup(&dp);
 
-  eq(imm_hmm_set_start(&hmm, &state), 0);
-  eq(imm_hmm_set_end(&hmm, &state), 0);
-  eq(imm_hmm_init_dp(&hmm, &dp), 0);
+  eq(imm_hmm_set_start(hmm, &state), 0);
+  eq(imm_hmm_set_end(hmm, &state), 0);
+  eq(imm_hmm_init_dp(hmm, &dp), 0);
   imm_dp_cleanup(&dp);
 
-  eq(imm_hmm_add_state(&hmm, &start.super), 0);
-  eq(imm_hmm_add_state(&hmm, &end.super), 0);
-  eq(imm_hmm_set_trans(&hmm, &start.super, &state.super, 0), 0);
-  eq(imm_hmm_set_trans(&hmm, &state.super, &state.super, logf(0.5f)), 0);
-  eq(imm_hmm_set_trans(&hmm, &state.super, &end.super, 0), 0);
-  eq(imm_hmm_set_start(&hmm, &start), 0);
-  eq(imm_hmm_set_end(&hmm, &end), 0);
-  eq(imm_hmm_init_dp(&hmm, &dp), IMM_EMUTECYLES);
+  eq(imm_hmm_add_state(hmm, &start.super), 0);
+  eq(imm_hmm_add_state(hmm, &end.super), 0);
+  eq(imm_hmm_set_trans(hmm, &start.super, &state.super, 0), 0);
+  eq(imm_hmm_set_trans(hmm, &state.super, &state.super, logf(0.5f)), 0);
+  eq(imm_hmm_set_trans(hmm, &state.super, &end.super, 0), 0);
+  eq(imm_hmm_set_start(hmm, &start), 0);
+  eq(imm_hmm_set_end(hmm, &end), 0);
+  eq(imm_hmm_init_dp(hmm, &dp), IMM_EMUTECYLES);
   imm_dp_cleanup(&dp);
+  imm_hmm_del(hmm);
 }
 
 static void dp_empty_path(void)
 {
   struct imm_mute_state state;
   imm_mute_state_init(&state, 3, &abc);
-  struct imm_hmm hmm;
-  imm_hmm_init(&hmm, &code);
+  struct imm_hmm *hmm = imm_hmm_new(&code);
   struct imm_prod prod = imm_prod();
 
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &code);
 
-  eq(imm_hmm_add_state(&hmm, &state.super), 0);
-  eq(imm_hmm_set_start(&hmm, &state), 0);
-  eq(imm_hmm_set_end(&hmm, &state), 0);
+  eq(imm_hmm_add_state(hmm, &state.super), 0);
+  eq(imm_hmm_set_start(hmm, &state), 0);
+  eq(imm_hmm_set_end(hmm, &state), 0);
   struct imm_dp dp;
-  eq(imm_hmm_init_dp(&hmm, &dp), 0);
+  eq(imm_hmm_init_dp(hmm, &dp), 0);
 
   struct imm_task *task = imm_task_new(&dp);
   eq(imm_eseq_setup(&eseq, &A), 0);
@@ -79,25 +78,25 @@ static void dp_empty_path(void)
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
   imm_dp_cleanup(&dp);
+  imm_hmm_del(hmm);
 }
 
 static void dp_one_mute(void)
 {
   struct imm_mute_state state;
   imm_mute_state_init(&state, 3, &abc);
-  struct imm_hmm hmm;
-  imm_hmm_init(&hmm, &code);
+  struct imm_hmm *hmm = imm_hmm_new(&code);
   struct imm_prod prod = imm_prod();
 
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &code);
 
-  eq(imm_hmm_add_state(&hmm, &state.super), 0);
+  eq(imm_hmm_add_state(hmm, &state.super), 0);
 
-  eq(imm_hmm_set_start(&hmm, &state), 0);
-  eq(imm_hmm_set_end(&hmm, &state), 0);
+  eq(imm_hmm_set_start(hmm, &state), 0);
+  eq(imm_hmm_set_end(hmm, &state), 0);
   struct imm_dp dp;
-  eq(imm_hmm_init_dp(&hmm, &dp), 0);
+  eq(imm_hmm_init_dp(hmm, &dp), 0);
 
   struct imm_task *task = imm_task_new(&dp);
   eq(imm_dp_viterbi(&dp, task, &prod), IMM_ENOSEQ);
@@ -116,6 +115,7 @@ static void dp_one_mute(void)
   imm_prod_cleanup(&prod);
   imm_task_del(task);
   imm_dp_cleanup(&dp);
+  imm_hmm_del(hmm);
 }
 
 static void dp_two_mutes(void)
@@ -124,27 +124,26 @@ static void dp_two_mutes(void)
   imm_mute_state_init(&state0, 0, &abc);
   struct imm_mute_state state1;
   imm_mute_state_init(&state1, 12, &abc);
-  struct imm_hmm hmm;
-  imm_hmm_init(&hmm, &code);
+  struct imm_hmm *hmm = imm_hmm_new(&code);
   struct imm_prod prod = imm_prod();
 
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &code);
 
-  eq(imm_hmm_add_state(&hmm, &state0.super), 0);
-  eq(imm_hmm_add_state(&hmm, &state1.super), 0);
+  eq(imm_hmm_add_state(hmm, &state0.super), 0);
+  eq(imm_hmm_add_state(hmm, &state1.super), 0);
 
-  eq(imm_hmm_set_trans(&hmm, &state0.super, &state1.super, logf(0.5f)), 0);
+  eq(imm_hmm_set_trans(hmm, &state0.super, &state1.super, logf(0.5f)), 0);
 
   struct imm_dp dp;
 
-  eq(imm_hmm_init_dp(&hmm, &dp), IMM_ENOSTART);
-  eq(imm_hmm_set_start(&hmm, &state0), 0);
+  eq(imm_hmm_init_dp(hmm, &dp), IMM_ENOSTART);
+  eq(imm_hmm_set_start(hmm, &state0), 0);
 
-  eq(imm_hmm_init_dp(&hmm, &dp), IMM_ENOEND);
-  eq(imm_hmm_set_end(&hmm, &state1), 0);
+  eq(imm_hmm_init_dp(hmm, &dp), IMM_ENOEND);
+  eq(imm_hmm_set_end(hmm, &state1), 0);
 
-  eq(imm_hmm_init_dp(&hmm, &dp), 0);
+  eq(imm_hmm_init_dp(hmm, &dp), 0);
 
   struct imm_task *task = imm_task_new(&dp);
 
@@ -168,6 +167,7 @@ static void dp_two_mutes(void)
   imm_prod_cleanup(&prod);
   imm_dp_cleanup(&dp);
   imm_task_del(task);
+  imm_hmm_del(hmm);
 }
 
 static void dp_io_example1(void)
@@ -176,7 +176,7 @@ static void dp_io_example1(void)
   imm_ex1_init(10);
   struct imm_ex1 *m = &imm_ex1;
   struct imm_dp dp;
-  eq(imm_hmm_init_dp(&imm_ex1.hmm, &dp), 0);
+  eq(imm_hmm_init_dp(imm_ex1.hmm, &dp), 0);
 
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &m->code);
@@ -212,7 +212,7 @@ static void dp_io_example2(void)
   imm_ex2_init(10, imm_span(1, 5));
   struct imm_ex2 *m = &imm_ex2;
   struct imm_dp dp;
-  imm_hmm_init_dp(&m->hmm, &dp);
+  imm_hmm_init_dp(m->hmm, &dp);
 
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &m->code);
@@ -250,6 +250,7 @@ static void dp_io_example2(void)
   imm_prod_cleanup(&prod);
   imm_task_del(task);
   imm_dp_cleanup(&dp);
+  imm_ex2_cleanup();
   remove("dp_frame.imm");
 }
 

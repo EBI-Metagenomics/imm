@@ -19,7 +19,7 @@
 
 static struct imm_abc const *abc = &imm_dna_iupac.super.super;
 static struct imm_code code = {0};
-static struct imm_hmm hmm = {0};
+static struct imm_hmm *hmm = NULL;
 static struct imm_eseq eseq = {0};
 static struct imm_prod prod = {0};
 
@@ -31,7 +31,7 @@ static struct imm_mute_state end = {0};
 static void setup(void)
 {
   imm_code_init(&code, abc);
-  imm_hmm_init(&hmm, &code);
+  hmm = imm_hmm_new(&code);
   imm_eseq_init(&eseq, &code);
   prod = imm_prod();
 }
@@ -40,6 +40,7 @@ static void cleanup(void)
 {
   imm_prod_cleanup(&prod);
   imm_eseq_cleanup(&eseq);
+  imm_hmm_del(hmm);
 }
 
 static char *state_name(int id, char *name)
@@ -68,21 +69,21 @@ static void states_sne(void)
   imm_normal_state_init(&normal, N, abc, (float[]){1, 0, 0, 0});
   imm_mute_state_init(&end, E, abc);
 
-  imm_hmm_add_state(&hmm, &start.super);
-  imm_hmm_add_state(&hmm, &normal.super);
-  imm_hmm_add_state(&hmm, &end.super);
+  imm_hmm_add_state(hmm, &start.super);
+  imm_hmm_add_state(hmm, &normal.super);
+  imm_hmm_add_state(hmm, &end.super);
 
-  imm_hmm_set_start(&hmm, &start);
-  imm_hmm_set_end(&hmm, &end);
+  imm_hmm_set_start(hmm, &start);
+  imm_hmm_set_end(hmm, &end);
 
-  imm_hmm_set_trans(&hmm, &start.super, &normal.super, 2);
-  imm_hmm_set_trans(&hmm, &normal.super, &normal.super, 3);
-  imm_hmm_set_trans(&hmm, &normal.super, &end.super, 4);
+  imm_hmm_set_trans(hmm, &start.super, &normal.super, 2);
+  imm_hmm_set_trans(hmm, &normal.super, &normal.super, 3);
+  imm_hmm_set_trans(hmm, &normal.super, &end.super, 4);
 
-  imm_hmm_dump(&hmm, &state_name, stdout);
+  imm_hmm_dump(hmm, &state_name, stdout);
 
   static struct imm_dp dp = {0};
-  imm_hmm_init_dp(&hmm, &dp);
+  imm_hmm_init_dp(hmm, &dp);
 
   struct imm_task *task = imm_task_new(&dp);
 
@@ -119,21 +120,21 @@ static void states_sne_no_solution(void)
       (float[]){1, IMM_LPROB_ZERO, IMM_LPROB_ZERO, IMM_LPROB_ZERO});
   imm_mute_state_init(&end, E, abc);
 
-  imm_hmm_add_state(&hmm, &start.super);
-  imm_hmm_add_state(&hmm, &normal.super);
-  imm_hmm_add_state(&hmm, &end.super);
+  imm_hmm_add_state(hmm, &start.super);
+  imm_hmm_add_state(hmm, &normal.super);
+  imm_hmm_add_state(hmm, &end.super);
 
-  imm_hmm_set_start(&hmm, &start);
-  imm_hmm_set_end(&hmm, &end);
+  imm_hmm_set_start(hmm, &start);
+  imm_hmm_set_end(hmm, &end);
 
-  imm_hmm_set_trans(&hmm, &start.super, &normal.super, 2);
-  imm_hmm_set_trans(&hmm, &normal.super, &normal.super, 3);
-  imm_hmm_set_trans(&hmm, &normal.super, &end.super, 4);
+  imm_hmm_set_trans(hmm, &start.super, &normal.super, 2);
+  imm_hmm_set_trans(hmm, &normal.super, &normal.super, 3);
+  imm_hmm_set_trans(hmm, &normal.super, &end.super, 4);
 
-  imm_hmm_dump(&hmm, &state_name, stdout);
+  imm_hmm_dump(hmm, &state_name, stdout);
 
   static struct imm_dp dp = {0};
-  imm_hmm_init_dp(&hmm, &dp);
+  imm_hmm_init_dp(hmm, &dp);
 
   struct imm_task *task = imm_task_new(&dp);
 
@@ -173,21 +174,21 @@ static void states_ste(void)
   imm_table_state_init(&table, T, abc, &table_lprob, imm_span(1, 2));
   imm_mute_state_init(&end, E, abc);
 
-  imm_hmm_add_state(&hmm, &start.super);
-  imm_hmm_add_state(&hmm, &table.super);
-  imm_hmm_add_state(&hmm, &end.super);
+  imm_hmm_add_state(hmm, &start.super);
+  imm_hmm_add_state(hmm, &table.super);
+  imm_hmm_add_state(hmm, &end.super);
 
-  imm_hmm_set_start(&hmm, &start);
-  imm_hmm_set_end(&hmm, &end);
+  imm_hmm_set_start(hmm, &start);
+  imm_hmm_set_end(hmm, &end);
 
-  imm_hmm_set_trans(&hmm, &start.super, &table.super, 2);
-  imm_hmm_set_trans(&hmm, &table.super, &table.super, 3);
-  imm_hmm_set_trans(&hmm, &table.super, &end.super, 4);
+  imm_hmm_set_trans(hmm, &start.super, &table.super, 2);
+  imm_hmm_set_trans(hmm, &table.super, &table.super, 3);
+  imm_hmm_set_trans(hmm, &table.super, &end.super, 4);
 
-  imm_hmm_dump(&hmm, &state_name, stdout);
+  imm_hmm_dump(hmm, &state_name, stdout);
 
   static struct imm_dp dp = {0};
-  imm_hmm_init_dp(&hmm, &dp);
+  imm_hmm_init_dp(hmm, &dp);
 
   struct imm_task *task = imm_task_new(&dp);
 
@@ -223,21 +224,21 @@ static void states_ste_2(void)
   imm_table_state_init(&table, T, abc, &table_lprob, imm_span(1, 2));
   imm_mute_state_init(&end, E, abc);
 
-  imm_hmm_add_state(&hmm, &start.super);
-  imm_hmm_add_state(&hmm, &table.super);
-  imm_hmm_add_state(&hmm, &end.super);
+  imm_hmm_add_state(hmm, &start.super);
+  imm_hmm_add_state(hmm, &table.super);
+  imm_hmm_add_state(hmm, &end.super);
 
-  imm_hmm_set_start(&hmm, &start);
-  imm_hmm_set_end(&hmm, &end);
+  imm_hmm_set_start(hmm, &start);
+  imm_hmm_set_end(hmm, &end);
 
-  imm_hmm_set_trans(&hmm, &start.super, &table.super, 2);
-  imm_hmm_set_trans(&hmm, &table.super, &table.super, 3);
-  imm_hmm_set_trans(&hmm, &table.super, &end.super, 4);
+  imm_hmm_set_trans(hmm, &start.super, &table.super, 2);
+  imm_hmm_set_trans(hmm, &table.super, &table.super, 3);
+  imm_hmm_set_trans(hmm, &table.super, &end.super, 4);
 
-  imm_hmm_dump(&hmm, &state_name, stdout);
+  imm_hmm_dump(hmm, &state_name, stdout);
 
   static struct imm_dp dp = {0};
-  imm_hmm_init_dp(&hmm, &dp);
+  imm_hmm_init_dp(hmm, &dp);
 
   struct imm_task *task = imm_task_new(&dp);
 

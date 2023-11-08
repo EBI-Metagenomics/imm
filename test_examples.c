@@ -14,7 +14,7 @@ static void example1_minimal(void)
 
   struct imm_ex1 *m = &imm_ex1;
   struct imm_dp dp;
-  imm_hmm_init_dp(&imm_ex1.hmm, &dp);
+  imm_hmm_init_dp(imm_ex1.hmm, &dp);
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
@@ -26,7 +26,7 @@ static void example1_minimal(void)
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, -22.5321312);
-  close(imm_hmm_loglik(&imm_ex1.hmm, &seq, &prod.path), -22.5321312);
+  close(imm_hmm_loglik(imm_ex1.hmm, &seq, &prod.path), -22.5321312);
   eq(imm_path_nsteps(&prod.path), 15);
   close(imm_path_score(&prod.path), -22.5321312);
 
@@ -42,7 +42,7 @@ static void example1_path(void)
 
   struct imm_ex1 *m = &imm_ex1;
   struct imm_dp dp;
-  imm_hmm_init_dp(&imm_ex1.hmm, &dp);
+  imm_hmm_init_dp(imm_ex1.hmm, &dp);
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
@@ -54,7 +54,7 @@ static void example1_path(void)
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, -49.892555);
-  close(imm_hmm_loglik(&imm_ex1.hmm, &seq, &prod.path), -49.892555);
+  close(imm_hmm_loglik(imm_ex1.hmm, &seq, &prod.path), -49.892555);
   eq(imm_path_nsteps(&prod.path), 32);
   close(imm_path_score(&prod.path), -49.892555);
 
@@ -72,7 +72,7 @@ static void example1_removed_states_path(void)
 
   struct imm_ex1 *m = &imm_ex1;
   struct imm_dp dp;
-  imm_hmm_init_dp(&imm_ex1.hmm, &dp);
+  imm_hmm_init_dp(imm_ex1.hmm, &dp);
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
@@ -98,7 +98,7 @@ static void example2_15(void)
 
   struct imm_ex2 *m = &imm_ex2;
   struct imm_dp dp;
-  imm_hmm_init_dp(&m->hmm, &dp);
+  imm_hmm_init_dp(m->hmm, &dp);
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
@@ -120,6 +120,7 @@ static void example2_15(void)
   imm_prod_cleanup(&prod);
   imm_task_del(task);
   imm_dp_cleanup(&dp);
+  imm_ex2_cleanup();
 }
 
 static void example2_24(void)
@@ -128,7 +129,7 @@ static void example2_24(void)
 
   struct imm_ex2 *m = &imm_ex2;
   struct imm_dp dp;
-  imm_hmm_init_dp(&m->hmm, &dp);
+  imm_hmm_init_dp(m->hmm, &dp);
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
@@ -150,6 +151,7 @@ static void example2_24(void)
   imm_prod_cleanup(&prod);
   imm_task_del(task);
   imm_dp_cleanup(&dp);
+  imm_ex2_cleanup();
 }
 
 static void example2_33(void)
@@ -158,7 +160,7 @@ static void example2_33(void)
 
   struct imm_ex2 *m = &imm_ex2;
   struct imm_dp dp;
-  imm_hmm_init_dp(&m->hmm, &dp);
+  imm_hmm_init_dp(m->hmm, &dp);
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
@@ -180,6 +182,7 @@ static void example2_33(void)
   imm_prod_cleanup(&prod);
   imm_task_del(task);
   imm_dp_cleanup(&dp);
+  imm_ex2_cleanup();
 }
 
 static void msv10(void)
@@ -188,7 +191,7 @@ static void msv10(void)
 
   struct imm_ex3 *m = &imm_ex3;
   struct imm_dp dp;
-  imm_hmm_init_dp(&imm_ex3.hmm, &dp);
+  imm_hmm_init_dp(imm_ex3.hmm, &dp);
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
@@ -201,12 +204,12 @@ static void msv10(void)
 
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   close(prod.loglik, -7072.540039);
-  // close(imm_path_score(&prod.path), -7072.540039);
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
   imm_prod_cleanup(&prod);
   imm_dp_cleanup(&dp);
+  imm_ex3_cleanup();
 }
 
 int main(void)

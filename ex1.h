@@ -20,7 +20,7 @@ struct imm_ex1
 {
   struct imm_abc abc;
   struct imm_code code;
-  struct imm_hmm hmm;
+  struct imm_hmm *hmm;
   int core_size;
   struct imm_mute_state start;
   struct imm_normal_state b;
@@ -32,7 +32,7 @@ struct imm_ex1
   struct imm_mute_state end;
   struct
   {
-    struct imm_hmm hmm;
+    struct imm_hmm *hmm;
     struct imm_mute_state nstart;
     struct imm_normal_state n;
     struct imm_mute_state nend;
@@ -40,6 +40,7 @@ struct imm_ex1
 };
 
 IMM_API void imm_ex1_init(int core_size);
+IMM_API void imm_ex1_cleanup(void);
 IMM_API void imm_ex1_remove_insertion_states(int core_size);
 IMM_API void imm_ex1_remove_deletion_states(int core_size);
 IMM_API char *imm_ex1_state_name(int id, char *name);

@@ -15,7 +15,7 @@ struct imm_ex2
 {
   struct imm_dna const *dna;
   struct imm_code code;
-  struct imm_hmm hmm;
+  struct imm_hmm *hmm;
   int core_size;
   struct imm_mute_state start;
   struct imm_frame_state b;
@@ -33,7 +33,7 @@ struct imm_ex2
   struct imm_codon_marg j_marg;
   struct
   {
-    struct imm_hmm hmm;
+    struct imm_hmm *hmm;
     struct imm_mute_state nstart;
     struct imm_frame_state n;
     struct imm_mute_state nend;
@@ -42,6 +42,7 @@ struct imm_ex2
 };
 
 void imm_ex2_init(int core_size, struct imm_span span);
+void imm_ex2_cleanup(void);
 
 extern struct imm_ex2 imm_ex2;
 extern char const imm_ex2_seq[];

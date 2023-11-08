@@ -90,6 +90,16 @@ static char *id_state_name(int id, char *name)
   return name;
 }
 
+struct imm_hmm *imm_hmm_new(struct imm_code const *code)
+{
+  struct imm_hmm *x = malloc(sizeof(*x));
+  x->code = code;
+  imm_hmm_reset(x);
+  return x;
+}
+
+void imm_hmm_del(struct imm_hmm const *x) { free((void *)x); }
+
 void imm_hmm_dump(struct imm_hmm const *hmm, imm_state_name *callb,
                   FILE *restrict fp)
 {

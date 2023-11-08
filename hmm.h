@@ -37,18 +37,15 @@ struct imm_hmm
   } transitions;
 };
 
+IMM_API struct imm_hmm *imm_hmm_new(struct imm_code const *);
+IMM_API void imm_hmm_del(struct imm_hmm const *);
+
 IMM_API void imm_hmm_dump(struct imm_hmm const *, imm_state_name *,
                           FILE *restrict);
 IMM_API int imm_hmm_add_state(struct imm_hmm *, struct imm_state *);
 IMM_API int imm_hmm_del_state(struct imm_hmm *, struct imm_state *);
 IMM_API int imm_hmm_init_dp(struct imm_hmm const *, struct imm_dp *);
 IMM_API void imm_hmm_reset(struct imm_hmm *);
-
-IMM_INLINE void imm_hmm_init(struct imm_hmm *x, struct imm_code const *code)
-{
-  x->code = code;
-  imm_hmm_reset(x);
-}
 
 IMM_API int imm_hmm_reset_dp(struct imm_hmm const *, struct imm_dp *);
 
