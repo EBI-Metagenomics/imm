@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 #define IMM_TRANS_NULL_IDX INT16_MAX
-#define IMM_TRANS_MAX_SIZE 17
+#define IMM_TRANS_MAX_SIZE 18
 
 struct imm_trans
 {
