@@ -167,7 +167,7 @@ static void frame_state_lposterior(void)
   int length = imm_abc_size(abc);
 
   struct imm_cartes codon_iter;
-  imm_cartes_init(&codon_iter, symbols, length, 3);
+  imm_cartes_init(&codon_iter, symbols, length);
   char const *codon_item = NULL;
 
   struct imm_codon_lprob codonp = imm_codon_lprob(nuclt);
@@ -178,7 +178,6 @@ static void frame_state_lposterior(void)
     struct imm_codon codon = IMM_CODON(nuclt, codon_item);
     imm_codon_lprob_set(&codonp, codon, logf(0.001f));
   }
-  imm_cartes_cleanup(&codon_iter);
 
   struct imm_codon codon = IMM_CODON(nuclt, "ATG");
   imm_codon_lprob_set(&codonp, codon, logf(0.8f));
@@ -193,7 +192,7 @@ static void frame_state_lposterior(void)
   struct imm_frame_state state;
   imm_frame_state_init(&state, 0, &nucltp, &codonm, 0.1f, imm_span(1, 5));
 
-  imm_cartes_init(&codon_iter, symbols, length, 3);
+  imm_cartes_init(&codon_iter, symbols, length);
   imm_cartes_setup(&codon_iter, 3);
 
   while ((codon_item = imm_cartes_next(&codon_iter)) != NULL)
@@ -204,7 +203,7 @@ static void frame_state_lposterior(void)
     for (uint16_t times = 1; times < 6; ++times)
     {
       struct imm_cartes seq_iter;
-      imm_cartes_init(&seq_iter, symbols, length, times);
+      imm_cartes_init(&seq_iter, symbols, length);
       imm_cartes_setup(&seq_iter, times);
       char const *seq = NULL;
 
@@ -215,11 +214,9 @@ static void frame_state_lposterior(void)
         lprob -= imm_codon_marg_lprob(&codonm, codon);
         total = imm_lprob_add(total, lprob);
       }
-      imm_cartes_cleanup(&seq_iter);
     }
     close((float)exp(total), 1.0);
   }
-  imm_cartes_cleanup(&codon_iter);
 }
 
 static void frame_state_decode(void)

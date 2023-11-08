@@ -33,7 +33,7 @@ static void setup_codonp(struct imm_codon_lprob *codonp)
   int length = imm_abc_size(abc);
 
   struct imm_cartes iter;
-  imm_cartes_init(&iter, symbols, length, 3);
+  imm_cartes_init(&iter, symbols, length);
   char const *item = NULL;
 
   imm_cartes_setup(&iter, 3);
@@ -42,7 +42,6 @@ static void setup_codonp(struct imm_codon_lprob *codonp)
     struct imm_codon codon = IMM_CODON(nuclt, item);
     imm_codon_lprob_set(codonp, codon, logf(0.001f));
   }
-  imm_cartes_cleanup(&iter);
 
   struct imm_codon codon = IMM_CODON(nuclt, "ATG");
   imm_codon_lprob_set(codonp, codon, logf(0.8f));
@@ -67,7 +66,7 @@ static void check_joint(struct imm_state const *state, struct imm_span span)
   int length = imm_abc_size(abc);
 
   struct imm_cartes iter;
-  imm_cartes_init(&iter, symbols, length, span.max);
+  imm_cartes_init(&iter, symbols, length);
   float total = imm_lprob_zero();
   for (int times = span.min; times <= span.max; ++times)
   {
@@ -81,7 +80,6 @@ static void check_joint(struct imm_state const *state, struct imm_span span)
     }
   }
   close(exp(total), 1.0);
-  imm_cartes_cleanup(&iter);
 }
 
 static void frame_state_joint15(void)

@@ -4,17 +4,19 @@
 #include "compiler.h"
 #include <assert.h>
 
-IMM_CONST long imm_ipow(long x, int e)
+IMM_CONST long imm_ipow(long const x, int const e)
 {
   assert(e >= 0);
-  long value = 1;
+  long r = 1;
+  long xx = x;
+  int ee = e;
   do
   {
-    if (e & 1) value *= x;
-    e >>= 1;
-    x *= x;
-  } while (e);
-  return value;
+    if (ee & 1) r *= xx;
+    ee >>= 1;
+    xx *= xx;
+  } while (ee);
+  return r;
 }
 
 #endif
