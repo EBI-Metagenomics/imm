@@ -11,7 +11,6 @@
 static void example1_minimal(void)
 {
   imm_ex1_init(3);
-
   struct imm_ex1 *m = &imm_ex1;
   struct imm_dp dp;
   imm_hmm_init_dp(imm_ex1.hmm, &dp);
@@ -34,6 +33,7 @@ static void example1_minimal(void)
   imm_task_del(task);
   imm_prod_cleanup(&prod);
   imm_dp_cleanup(&dp);
+  imm_ex1_cleanup();
 }
 
 static void example1_path(void)
@@ -62,6 +62,7 @@ static void example1_path(void)
   imm_task_del(task);
   imm_prod_cleanup(&prod);
   imm_dp_cleanup(&dp);
+  imm_ex1_cleanup();
 }
 
 static void example1_removed_states_path(void)
@@ -90,6 +91,7 @@ static void example1_removed_states_path(void)
   imm_task_del(task);
   imm_prod_cleanup(&prod);
   imm_dp_cleanup(&dp);
+  imm_ex1_cleanup();
 }
 
 static void example2_15(void)
