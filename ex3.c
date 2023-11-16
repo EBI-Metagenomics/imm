@@ -15,7 +15,7 @@
 #include <string.h>
 
 /* Log-probabilities */
-#define ZERO -INFINITY
+#define ZERO IMM_LPROB_ZERO
 #define ONE 0.0f
 
 /* State IDs */
