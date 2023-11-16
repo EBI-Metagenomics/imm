@@ -80,6 +80,7 @@ static void calc_score(struct imm_emis *emis, struct imm_code const *code,
   struct imm_score_table score_table = {0};
   imm_score_table_init(&score_table, code);
 
+#pragma omp parallel for
   for (int i = 0; i < nstates; ++i)
   {
     float *scores = emis->score + emis->offset[i];
