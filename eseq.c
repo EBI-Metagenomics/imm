@@ -1,6 +1,5 @@
 #include "eseq.h"
 #include "code.h"
-#include <assert.h>
 
 void imm_eseq_init(struct imm_eseq *eseq, struct imm_code const *code)
 {
@@ -44,7 +43,8 @@ int imm_eseq_setup(struct imm_eseq *eseq, struct imm_seq const *seq)
 
 struct imm_eseq imm_eseq_slice(struct imm_eseq const *x, struct imm_range r)
 {
-  assert(r.start + imm_range_size(r) + 1 <= x->data.rows);
+  // TODO: use our own assertion instead (to avoid #include <assert.h>)
+  // assert(r.start + imm_range_size(r) + 1 <= x->data.rows);
   int16_t *ptr = x->data.data + r.start * x->data.cols;
   struct imm_matrixi16 m = {ptr, imm_range_size(r) + 1, x->data.cols};
   return (struct imm_eseq){m, x->code};
