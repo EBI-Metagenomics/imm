@@ -3,8 +3,6 @@
 
 #include "compiler.h"
 #include "ipow.h"
-#include <assert.h>
-#include <limits.h>
 #include <stddef.h>
 
 #define IMM_CARTES_SIZE 32
@@ -35,13 +33,15 @@ IMM_INLINE void imm_cartes_setup(struct imm_cartes *x, int times)
   x->times = times;
   x->iter_idx = 0;
   long nitems = imm_ipow(x->set_size, times);
-  assert(nitems <= INT_MAX);
+  // TODO: use our own assertion instead (to avoid #include <assert.h>)
+  /* assert(nitems <= INT_MAX); */
   x->nitems = (int)nitems;
 }
 
 IMM_INLINE char const *imm_cartes_next(struct imm_cartes *x)
 {
-  assert(x->nitems > 0);
+  // TODO: use our own assertion instead (to avoid #include <assert.h>)
+  /* assert(x->nitems > 0); */
   if (x->iter_idx == x->nitems) return NULL;
 
   char *it = x->item;

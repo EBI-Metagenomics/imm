@@ -3,7 +3,6 @@
 
 #include "compiler.h"
 #include "state.h"
-#include <assert.h>
 #include <stdint.h>
 
 struct imm_abc;
@@ -23,7 +22,8 @@ IMM_API int imm_code_encode(struct imm_code const *, struct imm_seq const *);
 IMM_PURE int imm_code_translate(struct imm_code const *x, int value,
                                 int min_seq)
 {
-  assert(value >= x->offset[min_seq]);
+  // TODO: use our own assertion instead (to avoid #include <assert.h>)
+  /* assert(value >= x->offset[min_seq]); */
   return value - x->offset[min_seq];
 }
 

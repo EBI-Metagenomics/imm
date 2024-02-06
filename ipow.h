@@ -2,11 +2,11 @@
 #define IMM_IPOW_H
 
 #include "compiler.h"
-#include <assert.h>
 
 IMM_CONST long imm_ipow(long const x, int const e)
 {
-  assert(e >= 0);
+  // TODO: use our own assertion instead (to avoid #include <assert.h>)
+  // assert(e >= 0);
   long r = 1;
   long xx = x;
   int ee = e;

@@ -5,7 +5,6 @@
 #include "compiler.h"
 #include "range.h"
 #include "state.h"
-#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
 

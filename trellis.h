@@ -122,7 +122,8 @@ IMM_PURE struct imm_node const *imm_trellis_at(struct imm_trellis const *x,
 IMM_INLINE void imm_trellis_seek(struct imm_trellis *x, int stage, int state)
 {
   x->head = (struct imm_node *)imm_trellis_at(x, stage, state);
-  assert(x->head >= x->pool && x->head < x->pool + imm_trellis_size(x));
+  // TODO: use our own assertion instead (to avoid #include <assert.h>)
+  /* assert(x->head >= x->pool && x->head < x->pool + imm_trellis_size(x)); */
 }
 
 IMM_INLINE void imm_trellis_next(struct imm_trellis *x) { x->head++; }
