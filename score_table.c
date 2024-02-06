@@ -1,7 +1,6 @@
 #include "score_table.h"
 #include "abc.h"
 #include "code.h"
-#include <assert.h>
 
 void imm_score_table_init(struct imm_score_table *x,
                           struct imm_code const *code)
@@ -38,7 +37,8 @@ void imm_score_table_scores(struct imm_score_table const *x,
       struct imm_seq seq = imm_seq_unsafe((struct imm_str){size, item}, abc);
       int c = imm_code_translate(code, imm_code_encode(code, &seq), min);
       float score = imm_state_lprob(state, &seq);
-      assert(!imm_lprob_is_nan(score));
+      // TODO: use our own assertion instead (to avoid #include <assert.h>)
+      // assert(!imm_lprob_is_nan(score));
       scores[c] = score;
     }
   }
