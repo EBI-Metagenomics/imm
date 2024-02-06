@@ -6,13 +6,9 @@
 #include "dna.h"
 #include "frame_state.h"
 #include "hmm.h"
-#include "lprob.h"
 #include "mute_state.h"
 #include "normal_state.h"
-#include "state.h"
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
+#include <assert.h>
 
 /* State IDs */
 #define START (0 << 11)

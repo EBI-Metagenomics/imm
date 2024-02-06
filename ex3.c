@@ -1,16 +1,12 @@
 #include "ex3.h"
 #include "abc.h"
 #include "code.h"
-#include "codon_lprob.h"
-#include "codon_marg.h"
-#include "dna.h"
-#include "frame_state.h"
 #include "hmm.h"
 #include "lprob.h"
 #include "mute_state.h"
 #include "normal_state.h"
 #include "state.h"
-#include <stdint.h>
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 

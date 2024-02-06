@@ -1,5 +1,6 @@
 #include "eseq.h"
 #include "code.h"
+#include <assert.h>
 
 void imm_eseq_init(struct imm_eseq *eseq, struct imm_code const *code)
 {

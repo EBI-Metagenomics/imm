@@ -1,7 +1,7 @@
 #include "score_table.h"
 #include "abc.h"
 #include "code.h"
-#include "lprob.h"
+#include <assert.h>
 
 void imm_score_table_init(struct imm_score_table *x,
                           struct imm_code const *code)

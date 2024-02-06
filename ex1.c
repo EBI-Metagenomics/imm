@@ -2,11 +2,10 @@
 #include "abc.h"
 #include "code.h"
 #include "hmm.h"
-#include "lprob.h"
 #include "mute_state.h"
 #include "normal_state.h"
 #include "state.h"
-#include <stdint.h>
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
