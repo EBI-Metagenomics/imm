@@ -4,7 +4,6 @@
 #include "compiler.h"
 #include "state.h"
 #include "static_assert.h"
-#include <assert.h>
 #include <stdalign.h>
 #include <stdint.h>
 

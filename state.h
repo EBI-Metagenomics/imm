@@ -6,7 +6,6 @@
 #include "seq.h"
 #include "span.h"
 #include "state_vtable.h"
-#include <assert.h>
 
 #define IMM_STATE_NULL_ID INT16_MAX
 #define IMM_STATE_NULL_IDX INT16_MAX

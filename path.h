@@ -4,7 +4,6 @@
 #include "compiler.h"
 #include "state.h"
 #include "step.h"
-#include <stddef.h>
 #include <stdio.h>
 
 struct imm_path

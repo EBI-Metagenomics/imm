@@ -2,6 +2,7 @@
 #include "likely.h"
 #include "list.h"
 #include "lprob.h"
+#include <assert.h>
 #include <stdio.h>
 
 struct imm_abc const *imm_state_abc(struct imm_state const *x)
