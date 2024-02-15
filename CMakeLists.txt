@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20.2 FATAL_ERROR)
-project(imm VERSION 5.4.4 LANGUAGES C)
+project(imm VERSION 5.5.0 LANGUAGES C)
 
 include(cmake/sanitizers.cmake)
 include(cmake/warnings.cmake)

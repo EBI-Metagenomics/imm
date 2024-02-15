@@ -91,6 +91,13 @@ float imm_path_score(struct imm_path const *x)
   return imm_path_step(x, imm_path_nsteps(x) - 1)->score;
 }
 
+void imm_path_cut(struct imm_path *x, int step, int size)
+{
+  assert(step + size <= x->nsteps);
+  x->start = x->start + step * x->dir;
+  x->nsteps = size;
+}
+
 void imm_path_dump(struct imm_path const *x, imm_state_name *callb,
                    struct imm_seq const *seq, FILE *restrict fp)
 {
