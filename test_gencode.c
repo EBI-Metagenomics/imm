@@ -1,4 +1,3 @@
-#include "array_size.h"
 #include "gencode.h"
 #include "minctest.h"
 

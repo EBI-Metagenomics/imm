@@ -1,16 +1,16 @@
 #include "abc.h"
-#include <fcntl.h>
-#include <unistd.h>
-#include "lite_pack_io.h"
 #include "dp.h"
 #include "ex1.h"
 #include "ex2.h"
 #include "hmm.h"
+#include "lite_pack_io.h"
+#include "minctest.h"
 #include "mute_state.h"
 #include "normal_state.h"
 #include "prod.h"
 #include "task.h"
-#include "minctest.h"
+#include <fcntl.h>
+#include <unistd.h>
 
 static struct imm_abc abc;
 static struct imm_code code;
@@ -227,10 +227,10 @@ static void dp_io_example2(void)
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &m->code);
 
-  struct imm_abc const *abc = &m->dna->super.super;
+  struct imm_abc const *dna_abc = &m->dna->super.super;
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
-  struct imm_seq seq = imm_seq_unsafe(imm_str(imm_ex2_seq), abc);
+  struct imm_seq seq = imm_seq_unsafe(imm_str(imm_ex2_seq), dna_abc);
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
@@ -254,7 +254,7 @@ static void dp_io_example2(void)
 
   task = imm_task_new(&dp);
   prod = imm_prod();
-  seq = imm_seq_unsafe(imm_str(imm_ex2_seq), abc);
+  seq = imm_seq_unsafe(imm_str(imm_ex2_seq), dna_abc);
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);

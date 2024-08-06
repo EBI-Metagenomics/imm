@@ -3,14 +3,13 @@
 #include "dna.h"
 #include "dp.h"
 #include "eseq.h"
-#include "frame_state.h"
 #include "hmm.h"
+#include "minctest.h"
 #include "mute_state.h"
 #include "normal_state.h"
 #include "prod.h"
 #include "table_state.h"
 #include "task.h"
-#include "minctest.h"
 
 #define S 0
 #define N 1
@@ -58,8 +57,8 @@ static char *state_name(int id, char *name)
   {                                                                            \
     eq(imm_path_step(&PATH, IDX)->state_id, STATE_ID);                         \
     eq(imm_path_step(&PATH, IDX)->seqsize, SEQSIZE);                           \
-    near(imm_path_step(&PATH, IDX)->score, SCORE);                            \
-  } while (0);
+    near(imm_path_step(&PATH, IDX)->score, SCORE);                             \
+  } while (0)
 
 static void states_sne(void)
 {

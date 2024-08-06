@@ -4,18 +4,18 @@
 #include "frame_state.h"
 #include "hmm.h"
 #include "lprob.h"
+#include "minctest.h"
 #include "mute_state.h"
 #include "path.h"
 #include "prod.h"
 #include "task.h"
-#include "minctest.h"
 
-struct imm_nuclt const *nuclt;
-struct imm_abc const *abc;
+static struct imm_nuclt const *nuclt;
+static struct imm_abc const *abc;
 static struct imm_code code;
-struct imm_nuclt_lprob nucltp;
-struct imm_codon_lprob codonp;
-struct imm_codon_marg codonm;
+static struct imm_nuclt_lprob nucltp;
+static struct imm_codon_lprob codonp;
+static struct imm_codon_marg codonm;
 
 static void hmm_frame_state_0eps(void)
 {

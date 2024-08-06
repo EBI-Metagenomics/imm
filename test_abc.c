@@ -5,9 +5,9 @@
 #include "dna.h"
 #include "lite_pack_io.h"
 #include "lprob.h"
+#include "minctest.h"
 #include "rc.h"
 #include "rna.h"
-#include "minctest.h"
 #include <fcntl.h>
 #include <unistd.h>
 

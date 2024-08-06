@@ -60,12 +60,12 @@ static size_t lfails = 0;
   {                                                                            \
     const size_t ts = ltests;                                                  \
     const size_t fs = lfails;                                                  \
-    const clock_t start = clock();                                             \
+    const clock_t lstart = clock();                                             \
     printf("\t%s:\n", name);                                                   \
     test();                                                                    \
     printf("\t -- pass: %-20zu fail: %-20zu time: %ldms\n",                    \
            (ltests - ts) - (lfails - fs), lfails - fs,                         \
-           (long)((clock() - start) * 1000 / CLOCKS_PER_SEC));                 \
+           (long)((clock() - lstart) * 1000 / CLOCKS_PER_SEC));                 \
   } while (0)
 
 /* Assert a true statement. */
@@ -115,27 +115,29 @@ static size_t lfails = 0;
       _minctest_snprintf(_bufb_mt, sizeof(_bufb_mt), b);                       \
       printf("%s:%d (%s != %s)\n", __FILE__, __LINE__, _bufa_mt, _bufb_mt);    \
     }                                                                          \
-  } while (0);
+  } while (0)
 
 /* Assert two integers are equal. */
 #define _minctest_eq(a, b)                                                     \
-  ({                                                                           \
+  do                                                                           \
+  {                                                                            \
     __typeof__((a) + 0) _a = (a);                                              \
     __typeof__((b) + 0) _b = (b);                                              \
-    _minctest_eq_base((_a) == (_b), _a, _b)                                    \
-  })
+    _minctest_eq_base((_a) == (_b), _a, _b);                                   \
+  } while (0)
 
 /* Assert two floats are equal (Within LTEST_FLOAT_TOLERANCE). */
 #define _minctest_close(a, b)                                                  \
-  ({                                                                           \
+  do                                                                           \
+  {                                                                            \
     __typeof__(a) _a = (a);                                                    \
     __typeof__(b) _b = (b);                                                    \
     _minctest_eq_base(fabs((double)(_a) - (double)(_b)) <=                     \
                               LTEST_FLOAT_TOLERANCE &&                         \
                           fabs((double)(_a) - (double)(_b)) ==                 \
                               fabs((double)(_a) - (double)(_b)),               \
-                      (double)(_a), (double)(_b))                              \
-  })
+                      (double)(_a), (double)(_b));                             \
+  } while (0)
 
 /* Assert two strings are equal. */
 #define _minctest_cmp(a, b) _minctest_eq_base(strcmp(a, b) == 0, a, b)

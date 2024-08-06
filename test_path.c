@@ -1,5 +1,5 @@
-#include "path.h"
 #include "minctest.h"
+#include "path.h"
 
 static void normal_path(void)
 {

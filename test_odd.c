@@ -3,13 +3,13 @@
 #include "dp.h"
 #include "hmm.h"
 #include "lprob.h"
+#include "minctest.h"
 #include "mute_state.h"
 #include "normal_state.h"
 #include "path.h"
 #include "prod.h"
 #include "seq.h"
 #include "task.h"
-#include "minctest.h"
 
 static char *state_name(int id, char *name)
 {
@@ -28,8 +28,8 @@ static char *state_name(int id, char *name)
   {                                                                            \
     eq(imm_path_step(&PATH, IDX)->state_id, STATE_ID);                         \
     eq(imm_path_step(&PATH, IDX)->seqsize, SEQSIZE);                           \
-    near(imm_path_step(&PATH, IDX)->score, SCORE);                            \
-  } while (0);
+    near(imm_path_step(&PATH, IDX)->score, SCORE);                             \
+  } while (0)
 
 #define B 0
 #define X 1

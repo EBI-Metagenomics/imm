@@ -1,6 +1,6 @@
 #include "lprob.h"
-#include "rnd.h"
 #include "minctest.h"
+#include "rnd.h"
 
 static void rnd(void)
 {
@@ -14,7 +14,7 @@ static void rnd(void)
   near(arr[1], -1.05687606547);
 }
 
-int main()
+int main(void)
 {
   lrun("rnd", rnd);
   return lfails != 0;

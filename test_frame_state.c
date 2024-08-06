@@ -3,8 +3,8 @@
 #include "dna.h"
 #include "frame_state.h"
 #include "lprob.h"
-#include "span.h"
 #include "minctest.h"
+#include "span.h"
 
 static void run_frame_state1(float lprobs[], struct imm_span span)
 {
@@ -215,7 +215,7 @@ static void frame_state_lposterior(void)
         total = imm_lprob_add(total, lprob);
       }
     }
-    near((float)exp(total), 1.0);
+    near(expf(total), 1.0);
   }
 }
 

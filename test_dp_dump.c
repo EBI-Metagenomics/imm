@@ -1,6 +1,9 @@
+#include "dp.h"
+#include "eseq.h"
 #include "ex1.h"
-#include "imm.h"
 #include "minctest.h"
+#include "prod.h"
+#include "task.h"
 
 static void dp_dump_ex1(void)
 {

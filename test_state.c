@@ -1,9 +1,9 @@
 #include "abc.h"
 #include "lprob.h"
+#include "minctest.h"
 #include "mute_state.h"
 #include "normal_state.h"
 #include "state.h"
-#include "minctest.h"
 
 static void normal_state(void)
 {
@@ -41,7 +41,7 @@ static void mute_state(void)
   ok(imm_lprob_is_zero(imm_state_lprob(&state.super, &A)));
 }
 
-int main()
+int main(void)
 {
   lrun("normal_state", normal_state);
   lrun("mute_state", mute_state);

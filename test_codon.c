@@ -4,8 +4,8 @@
 #include "codon_state.h"
 #include "dna.h"
 #include "lprob.h"
-#include "seq.h"
 #include "minctest.h"
+#include "seq.h"
 
 static void codon_lprob(void)
 {
@@ -87,7 +87,7 @@ static void codon_state(void)
   ok(imm_lprob_is_nan(imm_state_lprob(s, &seq)));
 }
 
-int main()
+int main(void)
 {
   lrun("codon_lprob", codon_lprob);
   lrun("codonm_nonmarginal", codonm_nonmarginal);

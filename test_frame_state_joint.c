@@ -4,9 +4,9 @@
 #include "dna.h"
 #include "frame_state.h"
 #include "lprob.h"
+#include "minctest.h"
 #include "nuclt_lprob.h"
 #include "state.h"
-#include "minctest.h"
 
 static void setup_codonp(struct imm_codon_lprob *codonp);
 static struct imm_nuclt_lprob setup_nucltp(struct imm_nuclt const *);
@@ -79,7 +79,7 @@ static void check_joint(struct imm_state const *state, struct imm_span span)
       total = imm_lprob_add(total, imm_state_lprob(state, &tmp));
     }
   }
-  near(exp(total), 1.0);
+  near(expf(total), 1.0);
 }
 
 static void frame_state_joint15(void)

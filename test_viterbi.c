@@ -3,13 +3,12 @@
 #include "dp.h"
 #include "hmm.h"
 #include "lprob.h"
+#include "minctest.h"
 #include "mute_state.h"
 #include "normal_state.h"
 #include "prod.h"
 #include "seq.h"
 #include "task.h"
-#include "minctest.h"
-#include <stdlib.h>
 
 static struct imm_abc abc;
 static struct imm_code code;

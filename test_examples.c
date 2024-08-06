@@ -3,10 +3,10 @@
 #include "ex2.h"
 #include "ex3.h"
 #include "hmm.h"
+#include "minctest.h"
 #include "mute_state.h"
 #include "prod.h"
 #include "task.h"
-#include "minctest.h"
 
 static void example1_minimal(void)
 {
