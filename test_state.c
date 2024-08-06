@@ -19,7 +19,7 @@ static void normal_state(void)
   struct imm_normal_state state;
   imm_normal_state_init(&state, 0, &abc, lprobs);
 
-  eq(imm_state_id(&state.super), 0U);
+  eq(imm_state_id(&state.super), 0);
   near(imm_state_lprob(&state.super, &A), logf(0.25f));
   near(imm_state_lprob(&state.super, &C), logf(0.25f));
   near(imm_state_lprob(&state.super, &G), logf(0.5f));
@@ -36,7 +36,7 @@ static void mute_state(void)
   struct imm_mute_state state = {0};
   imm_mute_state_init(&state, 43, &abc);
 
-  eq(imm_state_id(&state.super), 43U);
+  eq(imm_state_id(&state.super), 43);
   near(imm_state_lprob(&state.super, &EMPTY), 0.0);
   ok(imm_lprob_is_zero(imm_state_lprob(&state.super, &A)));
 }

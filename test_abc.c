@@ -15,8 +15,8 @@ static void standard_usage(void)
 {
   struct imm_abc abc = {0};
   eq(imm_abc_init(&abc, imm_str("ACGT"), '*'), 0);
-  eq(imm_abc_symbol_idx(&abc, 'G'), 2U);
-  eq(imm_abc_size(&abc), 4U);
+  eq(imm_abc_symbol_idx(&abc, 'G'), 2);
+  eq(imm_abc_size(&abc), 4);
   ok(imm_abc_has_symbol(&abc, 'C'));
   ok(!imm_abc_has_symbol(&abc, 'L'));
   eq((int)imm_abc_symbol_type(&abc, 'A'), IMM_SYM_NORMAL);

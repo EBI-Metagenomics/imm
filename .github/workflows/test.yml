@@ -2,6 +2,11 @@ name: Test
 
 on: push
 
+env:
+  PREFIX: ${{github.workspace}}/deps
+  C_INCLUDE_PATH: ${{github.workspace}}/deps/include
+  LIBRARY_PATH: ${{github.workspace}}/deps/lib
+
 jobs:
   test:
     name: Test on ${{ matrix.os }} with build type ${{ matrix.build_type }}
@@ -21,14 +26,14 @@ jobs:
 
       - name: build & install lite-pack
         working-directory: ${{github.workspace}}/lip
-        run: make && make install PREFIX=${{github.workspace}}/deps
+        run: make && make install
 
       - name: build & install lite-pack-io
         working-directory: ${{github.workspace}}/lip/ext
-        run: make && make install PREFIX=${{github.workspace}}/deps C_INCLUDE_PATH=${{github.workspace}}/deps/include LIBRARY_PATH=${{github.workspace}}/deps/lib
+        run: make && make install
 
       - name: make
-        run: make C_INCLUDE_PATH=${{github.workspace}}/deps/include LIBRARY_PATH=${{github.workspace}}/deps/lib
+        run: make
 
       - name: make check
         run: make check

@@ -20,7 +20,7 @@ $(LIB): $(OBJ)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(TEST_TARGET): %: %.o $(LIB)
-	$(CC) $(CFLAGS) $< -L. -limm -llite_pack_io -llite_pack -o $@
+	$(CC) $(CFLAGS) $< -L. -limm -llite_pack_io -llite_pack -lm -o $@
 
 check: $(TEST_TARGET)
 	for test in $(TEST_TARGET); do ./$$test || exit 1; done
