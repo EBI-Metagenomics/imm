@@ -31,4 +31,4 @@ check: $(TEST_TARGET)
 
 .PHONY: all clean check
 clean:
-	rm -f $(OBJ) $(LIB) $(TEST_OBJ) $(TEST_TARGET)
+	rm -f $(OBJ) $(LIB) $(TEST_OBJ) $(TEST_TARGET) *.d
