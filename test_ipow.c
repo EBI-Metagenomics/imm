@@ -1,6 +1,6 @@
-#include "array_size.h"
-#include "ipow.h"
-#include "minctest.h"
+#include "imm_array_size.h"
+#include "imm_ipow.h"
+#include "imm_minctest.h"
 #include <stddef.h>
 
 static void standard_usage(void)

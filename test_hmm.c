@@ -1,7 +1,7 @@
-#include "abc.h"
-#include "hmm.h"
-#include "minctest.h"
-#include "mute_state.h"
+#include "imm_abc.h"
+#include "imm_hmm.h"
+#include "imm_minctest.h"
+#include "imm_mute_state.h"
 
 static struct imm_abc abc = {0};
 static struct imm_code code = {0};

@@ -1,13 +1,13 @@
-#include "abc.h"
-#include "abc_lprob.h"
-#include "amino.h"
-#include "amino_lprob.h"
-#include "dna.h"
+#include "imm_abc.h"
+#include "imm_abc_lprob.h"
+#include "imm_amino.h"
+#include "imm_amino_lprob.h"
+#include "imm_dna.h"
+#include "imm_lprob.h"
+#include "imm_minctest.h"
+#include "imm_rc.h"
+#include "imm_rna.h"
 #include "lite_pack_io.h"
-#include "lprob.h"
-#include "minctest.h"
-#include "rc.h"
-#include "rna.h"
 #include <fcntl.h>
 #include <unistd.h>
 

@@ -1,5 +1,5 @@
-#include "gencode.h"
-#include "minctest.h"
+#include "imm_gencode.h"
+#include "imm_minctest.h"
 
 static void gc_f(void)
 {

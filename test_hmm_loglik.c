@@ -1,10 +1,10 @@
-#include "abc.h"
-#include "hmm.h"
-#include "lprob.h"
-#include "mute_state.h"
-#include "normal_state.h"
-#include "path.h"
-#include "minctest.h"
+#include "imm_abc.h"
+#include "imm_hmm.h"
+#include "imm_lprob.h"
+#include "imm_mute_state.h"
+#include "imm_normal_state.h"
+#include "imm_path.h"
+#include "imm_minctest.h"
 
 static struct imm_abc abc = {0};
 static struct imm_code code = {0};

@@ -1,11 +1,11 @@
-#include "codon.h"
-#include "codon_lprob.h"
-#include "codon_marg.h"
-#include "codon_state.h"
-#include "dna.h"
-#include "lprob.h"
-#include "minctest.h"
-#include "seq.h"
+#include "imm_codon.h"
+#include "imm_codon_lprob.h"
+#include "imm_codon_marg.h"
+#include "imm_codon_state.h"
+#include "imm_dna.h"
+#include "imm_lprob.h"
+#include "imm_minctest.h"
+#include "imm_seq.h"
 
 static void codon_lprob(void)
 {

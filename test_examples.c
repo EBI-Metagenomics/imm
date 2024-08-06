@@ -1,12 +1,12 @@
-#include "dp.h"
-#include "ex1.h"
-#include "ex2.h"
-#include "ex3.h"
-#include "hmm.h"
-#include "minctest.h"
-#include "mute_state.h"
-#include "prod.h"
-#include "task.h"
+#include "imm_dp.h"
+#include "imm_ex1.h"
+#include "imm_ex2.h"
+#include "imm_ex3.h"
+#include "imm_hmm.h"
+#include "imm_minctest.h"
+#include "imm_mute_state.h"
+#include "imm_prod.h"
+#include "imm_task.h"
 
 static void example1_minimal(void)
 {

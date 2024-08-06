@@ -1,6 +1,6 @@
-#include "lprob.h"
-#include "minctest.h"
-#include "rnd.h"
+#include "imm_lprob.h"
+#include "imm_minctest.h"
+#include "imm_rnd.h"
 
 static void rnd(void)
 {

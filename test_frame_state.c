@@ -1,10 +1,10 @@
-#include "cartes.h"
-#include "codon_lprob.h"
-#include "dna.h"
-#include "frame_state.h"
-#include "lprob.h"
-#include "minctest.h"
-#include "span.h"
+#include "imm_cartes.h"
+#include "imm_codon_lprob.h"
+#include "imm_dna.h"
+#include "imm_frame_state.h"
+#include "imm_lprob.h"
+#include "imm_minctest.h"
+#include "imm_span.h"
 
 static void run_frame_state1(float lprobs[], struct imm_span span)
 {
