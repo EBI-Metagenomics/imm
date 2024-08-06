@@ -2,6 +2,7 @@ CC = gcc
 CFLAGS = -std=c11 -Wall -Wextra -O2 -MMD -MP
 SRC = $(filter-out $(wildcard test_*.c),$(wildcard *.c))
 OBJ = $(SRC:.c=.o)
+HDR = $(wildcard *.h)
 LIB = libimm.a
 PREFIX ?= /usr/local
 TEST_SRC = $(wildcard test_*.c)
@@ -24,11 +25,14 @@ $(TEST_TARGET): %: %.o $(LIB)
 check: $(TEST_TARGET)
 	for test in $(TEST_TARGET); do ./$$test || exit 1; done
 
-# install: $(LIB)
-# 	@mkdir -p $(PREFIX)/lib $(PREFIX)/include
-# 	install -m 0755 $(LIB) $(PREFIX)/lib/
-# 	install -m 0644 $(HDR) $(PREFIX)/include/
+install: $(LIB)
+	@mkdir -p $(PREFIX)/lib $(PREFIX)/include
+	install -m 0755 $(LIB) $(PREFIX)/lib/
+	install -m 0644 $(HDR) $(PREFIX)/include/
 
-.PHONY: all clean check
+uninstall:
+	rm -f $(PREFIX)/lib/$(LIB) $(HDR:%=$(PREFIX)/include/%)
+
+.PHONY: all clean check uninstall
 clean:
 	rm -f $(OBJ) $(LIB) $(TEST_OBJ) $(TEST_TARGET) *.d
