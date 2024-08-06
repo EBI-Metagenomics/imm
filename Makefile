@@ -25,7 +25,7 @@ $(TEST_TARGET): %: %.o $(LIB)
 check: $(TEST_TARGET)
 	for test in $(TEST_TARGET); do ./$$test || exit 1; done
 
-install: $(LIB)
+install: $(LIB) $(HDR)
 	@mkdir -p $(PREFIX)/lib $(PREFIX)/include
 	install -m 0755 $(LIB) $(PREFIX)/lib/
 	install -m 0644 $(HDR) $(PREFIX)/include/
