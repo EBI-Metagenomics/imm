@@ -24,10 +24,10 @@ static void example1_minimal(void)
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, -22.5321312);
-  close(imm_hmm_loglik(imm_ex1.hmm, &seq, &prod.path), -22.5321312);
+  near(prod.loglik, -22.5321312);
+  near(imm_hmm_loglik(imm_ex1.hmm, &seq, &prod.path), -22.5321312);
   eq(imm_path_nsteps(&prod.path), 15);
-  close(imm_path_score(&prod.path), -22.5321312);
+  near(imm_path_score(&prod.path), -22.5321312);
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
@@ -53,10 +53,10 @@ static void example1_path(void)
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, -49.892555);
-  close(imm_hmm_loglik(imm_ex1.hmm, &seq, &prod.path), -49.892555);
+  near(prod.loglik, -49.892555);
+  near(imm_hmm_loglik(imm_ex1.hmm, &seq, &prod.path), -49.892555);
   eq(imm_path_nsteps(&prod.path), 32);
-  close(imm_path_score(&prod.path), -49.892555);
+  near(imm_path_score(&prod.path), -49.892555);
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
@@ -84,8 +84,8 @@ static void example1_removed_states_path(void)
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, -19.313255);
-  close(imm_path_score(&prod.path), -19.313255);
+  near(prod.loglik, -19.313255);
+  near(imm_path_score(&prod.path), -19.313255);
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
@@ -115,8 +115,8 @@ static void example2_15(void)
   eq(imm_task_setup(task, &eseq), 0);
 
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, 41.929977);
-  close(imm_path_score(&prod.path), 41.929977);
+  near(prod.loglik, 41.929977);
+  near(imm_path_score(&prod.path), 41.929977);
 
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
@@ -146,8 +146,8 @@ static void example2_24(void)
   eq(imm_task_setup(task, &eseq), 0);
 
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, -84.087013);
-  close(imm_path_score(&prod.path), -84.087013);
+  near(prod.loglik, -84.087013);
+  near(imm_path_score(&prod.path), -84.087013);
 
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
@@ -205,7 +205,7 @@ static void msv10(void)
   eq(imm_task_setup(task, &eseq), 0);
 
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, -7072.540039);
+  near(prod.loglik, -7072.540039);
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);

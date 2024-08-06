@@ -58,7 +58,7 @@ static char *state_name(int id, char *name)
   {                                                                            \
     eq(imm_path_step(&PATH, IDX)->state_id, STATE_ID);                         \
     eq(imm_path_step(&PATH, IDX)->seqsize, SEQSIZE);                           \
-    close(imm_path_step(&PATH, IDX)->score, SCORE);                            \
+    near(imm_path_step(&PATH, IDX)->score, SCORE);                            \
   } while (0);
 
 static void states_sne(void)
@@ -94,9 +94,9 @@ static void states_sne(void)
 
   imm_dp_set_state_name(&dp, &state_name);
   imm_dp_viterbi(&dp, task, &prod);
-  close(prod.loglik, 7);
+  near(prod.loglik, 7);
   imm_path_dump(&prod.path, &state_name, &seq, stdout);
-  close(imm_path_score(&prod.path), 7);
+  near(imm_path_score(&prod.path), 7);
   imm_trellis_set_ids(&task->trellis, dp.state_table.ids);
   imm_trellis_set_state_name(&task->trellis, &state_name);
   imm_trellis_dump(&task->trellis, stdout);
@@ -199,9 +199,9 @@ static void states_ste(void)
 
   imm_dp_set_state_name(&dp, &state_name);
   imm_dp_viterbi(&dp, task, &prod);
-  close(prod.loglik, 34);
+  near(prod.loglik, 34);
   imm_path_dump(&prod.path, &state_name, &seq, stdout);
-  close(imm_path_score(&prod.path), 34);
+  near(imm_path_score(&prod.path), 34);
   imm_trellis_set_ids(&task->trellis, dp.state_table.ids);
   imm_trellis_set_state_name(&task->trellis, &state_name);
   imm_trellis_dump(&task->trellis, stdout);
@@ -249,9 +249,9 @@ static void states_ste_2(void)
 
   imm_dp_set_state_name(&dp, &state_name);
   imm_dp_viterbi(&dp, task, &prod);
-  close(prod.loglik, 47);
+  near(prod.loglik, 47);
   imm_path_dump(&prod.path, &state_name, &seq, stdout);
-  close(imm_path_score(&prod.path), 47);
+  near(imm_path_score(&prod.path), 47);
   imm_trellis_set_ids(&task->trellis, dp.state_table.ids);
   imm_trellis_set_state_name(&task->trellis, &state_name);
   imm_trellis_dump(&task->trellis, stdout);

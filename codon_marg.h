@@ -25,7 +25,8 @@ struct imm_codon_marg
   float lprobs[IMM_NUCLT_SIZE + 1][IMM_NUCLT_SIZE + 1][IMM_NUCLT_SIZE + 1];
 };
 
-struct lip_file;
+struct lio_writer;
+struct lio_reader;
 
 IMM_API struct imm_codon_marg imm_codon_marg(struct imm_codon_lprob *);
 
@@ -49,8 +50,8 @@ IMM_PURE float imm_codon_marg_lprob(struct imm_codon_marg const *x,
 }
 
 IMM_API int imm_codon_marg_pack(struct imm_codon_marg const *,
-                                struct lip_file *);
-IMM_API int imm_codon_marg_unpack(struct imm_codon_marg *, struct lip_file *);
+                                struct lio_writer *);
+IMM_API int imm_codon_marg_unpack(struct imm_codon_marg *, struct lio_reader *);
 IMM_API void imm_codon_marg_dump(struct imm_codon_marg const *, FILE *restrict);
 
 #endif

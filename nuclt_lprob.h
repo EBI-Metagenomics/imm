@@ -11,14 +11,15 @@ struct imm_nuclt_lprob
   float lprobs[IMM_NUCLT_SIZE];
 };
 
-struct lip_file;
+struct lio_writer;
+struct lio_reader;
 
 IMM_API struct imm_nuclt_lprob imm_nuclt_lprob(struct imm_nuclt const *,
                                                float const *lprobs);
 IMM_API float imm_nuclt_lprob_get(struct imm_nuclt_lprob const *, char symbol);
 IMM_API int imm_nuclt_lprob_pack(struct imm_nuclt_lprob const *,
-                                 struct lip_file *);
-IMM_API int imm_nuclt_lprob_unpack(struct imm_nuclt_lprob *, struct lip_file *);
+                                 struct lio_writer *);
+IMM_API int imm_nuclt_lprob_unpack(struct imm_nuclt_lprob *, struct lio_reader *);
 IMM_API void imm_nuclt_lprob_dump(struct imm_nuclt_lprob const *,
                                   FILE *restrict);
 

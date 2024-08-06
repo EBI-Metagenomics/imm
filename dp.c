@@ -2,28 +2,25 @@
 #include "clock.h"
 #include "dp_cfg.h"
 #include "emis.h"
-#include "ex1.h"
-#include "expect.h"
 #include "fmt.h"
 #include "likely.h"
-#include "lip/1darray/1darray.h"
-#include "lip/lip.h"
+#include "lite_pack.h"
+#include "lite_pack_io.h"
 #include "lprob.h"
 #include "matrix.h"
 #include "min.h"
 #include "prod.h"
 #include "reallocf.h"
-#include "span.h"
 #include "state.h"
 #include "state_table.h"
 #include "task.h"
-#include "trans.h"
 #include "trans_table.h"
 #include "viterbi.h"
 #include "zspan.h"
 #include <assert.h>
 #include <limits.h>
 #include <stdlib.h>
+#include <string.h>
 
 void imm_dp_init(struct imm_dp *dp, struct imm_code const *code)
 {
@@ -282,149 +279,170 @@ void imm_dp_dump_path(struct imm_dp const *x, struct imm_task const *t,
 #define KEY_STATE_END "state_end"
 #define KEY_STATE_SPAN "state_span"
 
-union size
+static int write_cstring(struct lio_writer *x, char const *string)
 {
-  int i;
-  unsigned u;
-};
+  uint32_t length = (uint32_t)strlen(string);
+  if (lio_write(x, lip_pack_string(lio_alloc(x), length))) return 1;
+  if (lio_writeb(x, length, string)) return 1;
+  return 0;
+}
 
-int imm_dp_pack(struct imm_dp const *dp, struct lip_file *f)
+int imm_dp_pack(struct imm_dp const *dp, struct lio_writer *f)
 {
-  union size size = {0};
+  unsigned size = 0;
   int nstates = dp->state_table.nstates;
   int ntrans = dp->trans_table.ntrans;
 
-  lip_write_map_size(f, 10);
+  if (lio_write(f, lip_pack_map(lio_alloc(f), 10))) return IMM_EIO;
 
   /* emission */
-  lip_write_cstr(f, KEY_EMIS_SCORE);
-  size.i = imm_emis_score_size(&dp->emis, nstates);
-  lip_write_1darray_float(f, size.u, dp->emis.score);
+  if (write_cstring(f, KEY_EMIS_SCORE)) return IMM_EIO;
+  size = (unsigned)imm_emis_score_size(&dp->emis, nstates);
+  if (lio_write(f, lip_pack_array(lio_alloc(f), size))) return IMM_EIO;
+  for (unsigned i = 0; i < size; ++i)
+    if (lio_write(f, lip_pack_float(lio_alloc(f), dp->emis.score[i]))) return IMM_EIO;
 
-  lip_write_cstr(f, KEY_EMIS_OFFSET);
+  if (write_cstring(f, KEY_EMIS_OFFSET)) return IMM_EIO;
   unsigned offset_size = (unsigned)imm_emis_offset_size(nstates);
-  lip_write_1darray_int(f, offset_size, dp->emis.offset);
+  if (lio_write(f, lip_pack_array(lio_alloc(f), offset_size))) return IMM_EIO;
+  for (unsigned i = 0; i < offset_size; ++i)
+    if (lio_write(f, lip_pack_int(lio_alloc(f), dp->emis.offset[i]))) return IMM_EIO;
 
   /* trans_table */
-  size.i = imm_trans_table_transsize(ntrans);
-  lip_write_cstr(f, KEY_TRANS_SCORE);
-  lip_write_1darray_size_type(f, size.u, LIP_1DARRAY_F32);
-  for (int i = 0; i < size.i; ++i)
-    lip_write_1darray_float_item(f, dp->trans_table.trans[i].score);
+  size = (unsigned)imm_trans_table_transsize(ntrans);
+  if (write_cstring(f, KEY_TRANS_SCORE)) return IMM_EIO;
+  if (lio_write(f, lip_pack_array(lio_alloc(f), size))) return IMM_EIO;
+  for (unsigned i = 0; i < size; ++i)
+    if (lio_write(f, lip_pack_float(lio_alloc(f), dp->trans_table.trans[i].score))) return IMM_EIO;
 
-  size.i = imm_trans_table_transsize(ntrans);
-  lip_write_cstr(f, KEY_TRANS_SRC);
-  lip_write_1darray_size_type(f, size.u, LIP_1DARRAY_INT16);
-  for (int i = 0; i < size.i; ++i)
-    lip_write_1darray_int_item(f, dp->trans_table.trans[i].src);
+  size = (unsigned)imm_trans_table_transsize(ntrans);
+  if (write_cstring(f, KEY_TRANS_SRC)) return IMM_EIO;
+  if (lio_write(f, lip_pack_array(lio_alloc(f), size))) return IMM_EIO;
+  for (unsigned i = 0; i < size; ++i)
+    if (lio_write(f, lip_pack_int(lio_alloc(f), dp->trans_table.trans[i].src))) return IMM_EIO;
 
-  size.i = imm_trans_table_transsize(ntrans);
-  lip_write_cstr(f, KEY_TRANS_DST);
-  lip_write_1darray_size_type(f, size.u, LIP_1DARRAY_INT16);
-  for (int i = 0; i < size.i; ++i)
-    lip_write_1darray_int_item(f, dp->trans_table.trans[i].dst);
+  size = (unsigned)imm_trans_table_transsize(ntrans);
+  if (write_cstring(f, KEY_TRANS_DST)) return IMM_EIO;
+  if (lio_write(f, lip_pack_array(lio_alloc(f), size))) return IMM_EIO;
+  for (unsigned i = 0; i < size; ++i)
+    if (lio_write(f, lip_pack_int(lio_alloc(f), dp->trans_table.trans[i].dst))) return IMM_EIO;
 
-  size.i = imm_trans_table_offsize(nstates);
-  lip_write_cstr(f, KEY_TRANS_OFFSET);
-  lip_write_1darray_int(f, size.u, dp->trans_table.offset);
+  size = imm_trans_table_offsize(nstates);
+  if (write_cstring(f, KEY_TRANS_OFFSET)) return IMM_EIO;
+  if (lio_write(f, lip_pack_array(lio_alloc(f), size))) return IMM_EIO;
+  for (unsigned i = 0; i < size; ++i)
+    if (lio_write(f, lip_pack_int(lio_alloc(f), dp->trans_table.offset[i]))) return IMM_EIO;
 
   /* state_table */
-  lip_write_cstr(f, KEY_STATE_IDS);
-  lip_write_1darray_int(f, ((unsigned)nstates), dp->state_table.ids);
-
-  lip_write_cstr(f, KEY_STATE_START);
-  lip_write_int(f, dp->state_table.start_state_idx);
-  lip_write_cstr(f, KEY_STATE_END);
-  lip_write_int(f, dp->state_table.end_state_idx);
-
-  lip_write_cstr(f, KEY_STATE_SPAN);
-  lip_write_1darray_size_type(f, (unsigned)nstates, LIP_1DARRAY_INT8);
+  if (write_cstring(f, KEY_STATE_IDS)) return IMM_EIO;
+  if (lio_write(f, lip_pack_array(lio_alloc(f), (uint32_t)nstates))) return IMM_EIO;
   for (int i = 0; i < nstates; ++i)
-    lip_write_1darray_int_item(f, dp->state_table.span[i]);
+    if (lio_write(f, lip_pack_int(lio_alloc(f), dp->state_table.ids[i]))) return IMM_EIO;
 
-  return f->error ? IMM_EIO : 0;
+  if (write_cstring(f, KEY_STATE_START)) return IMM_EIO;
+  if (lio_write(f, lip_pack_int(lio_alloc(f), dp->state_table.start_state_idx))) return IMM_EIO;
+  if (write_cstring(f, KEY_STATE_END)) return IMM_EIO;
+  if (lio_write(f, lip_pack_int(lio_alloc(f), dp->state_table.end_state_idx))) return IMM_EIO;
+
+  if (write_cstring(f, KEY_STATE_SPAN)) return IMM_EIO;
+  if (lio_write(f, lip_pack_array(lio_alloc(f), (unsigned)nstates))) return IMM_EIO;
+  for (int i = 0; i < nstates; ++i)
+    if (lio_write(f, lip_pack_int(lio_alloc(f), dp->state_table.span[i]))) return IMM_EIO;
+
+  if (lio_flush(f)) return IMM_EIO;
+
+  return 0;
 }
 
-int imm_dp_unpack(struct imm_dp *dp, struct lip_file *f)
+static int expect_key(struct lio_reader *x, char const *key)
 {
-  union size size = {0};
-  enum lip_1darray_type type = 0;
+  uint32_t size = 0;
+  unsigned char buf[16] = {0};
+
+  if (lio_free(x, lip_unpack_string(lio_read(x), &size))) return 1;
+  if ((size_t)size > sizeof(buf)) return 1;
+
+  if (lio_readb(x, size, buf)) return 1;
+  if (size != (uint32_t)strlen(key)) return 1;
+  return memcmp(key, buf, size) != 0;
+}
+
+int imm_dp_unpack(struct imm_dp *dp, struct lio_reader *f)
+{
+  uint32_t u32 = 0;
   struct imm_emis *e = &dp->emis;
   struct imm_trans_table *tt = &dp->trans_table;
   struct imm_state_table *st = &dp->state_table;
 
-  if (!imm_expect_map_size(f, 10)) return IMM_EIO;
+  if (lio_free(f, lip_unpack_map(lio_read(f), &u32))) return IMM_EIO;
+  if (u32 != 10) return IMM_EIO;
 
   /* emission */
-  if (!imm_expect_map_key(f, KEY_EMIS_SCORE)) goto cleanup;
-  lip_read_1darray_size_type(f, &size.u, &type);
-  if (type != LIP_1DARRAY_F32) goto cleanup;
-  e->score = imm_reallocf(e->score, sizeof(*e->score) * size.u);
-  if (!e->score && size.i > 0) goto cleanup;
-  lip_read_1darray_float_data(f, size.u, e->score);
+  if (expect_key(f, KEY_EMIS_SCORE)) goto cleanup;
+  if (lio_free(f, lip_unpack_array(lio_read(f), &u32))) goto cleanup;
+  e->score = imm_reallocf(e->score, sizeof(*e->score) * u32);
+  if (!e->score && u32 > 0) goto cleanup;
+  for (uint32_t i = 0; i < u32; i++)
+    if (lio_free(f, lip_unpack_float(lio_read(f), e->score + i))) goto cleanup;
 
-  if (!imm_expect_map_key(f, KEY_EMIS_OFFSET)) goto cleanup;
-  lip_read_1darray_size_type(f, &size.u, &type);
-  if (type != LIP_1DARRAY_INT32) goto cleanup;
-  e->offset = imm_reallocf(e->offset, sizeof(*e->offset) * size.u);
-  if (!e->offset && size.i > 0) goto cleanup;
-  lip_read_1darray_int_data(f, size.u, e->offset);
+  if (expect_key(f, KEY_EMIS_OFFSET)) goto cleanup;
+  if (lio_free(f, lip_unpack_array(lio_read(f), &u32))) goto cleanup;
+  e->offset = imm_reallocf(e->offset, sizeof(*e->offset) * u32);
+  if (!e->offset && u32 > 0) goto cleanup;
+  for (uint32_t i = 0; i < u32; i++)
+    if (lio_free(f, lip_unpack_int(lio_read(f), e->offset + i))) goto cleanup;
 
   /* trans_table */
-  if (!imm_expect_map_key(f, KEY_TRANS_SCORE)) goto cleanup;
-  lip_read_1darray_size_type(f, &size.u, &type);
-  if (type != LIP_1DARRAY_F32) goto cleanup;
-  tt->trans = imm_reallocf(tt->trans, sizeof(*tt->trans) * size.u);
-  if (!tt->trans && size.i > 0) goto cleanup;
-  tt->ntrans = size.i - 1;
-  for (int i = 0; i < size.i; ++i)
-    lip_read_1darray_float_item(f, &tt->trans[i].score);
+  if (expect_key(f, KEY_TRANS_SCORE)) goto cleanup;
+  if (lio_free(f, lip_unpack_array(lio_read(f), &u32))) goto cleanup;
+  tt->trans = imm_reallocf(tt->trans, sizeof(*tt->trans) * u32);
+  if (!tt->trans && u32 > 0) goto cleanup;
+  tt->ntrans = u32 - 1;
+  for (uint32_t i = 0; i < u32; i++)
+    if (lio_free(f, lip_unpack_float(lio_read(f), &tt->trans[i].score))) goto cleanup;
 
-  if (!imm_expect_map_key(f, KEY_TRANS_SRC)) goto cleanup;
-  lip_read_1darray_size_type(f, &size.u, &type);
-  if (type != LIP_1DARRAY_INT16) goto cleanup;
-  if (imm_trans_table_transsize(tt->ntrans) != size.i) goto cleanup;
-  for (int i = 0; i < size.i; ++i)
-    lip_read_1darray_int_item(f, &tt->trans[i].src);
+  if (expect_key(f, KEY_TRANS_SRC)) goto cleanup;
+  if (lio_free(f, lip_unpack_array(lio_read(f), &u32))) goto cleanup;
+  if ((uint32_t)imm_trans_table_transsize(tt->ntrans) != u32) goto cleanup;
+  for (uint32_t i = 0; i < u32; i++)
+    if (lio_free(f, lip_unpack_int(lio_read(f), &tt->trans[i].src))) goto cleanup;
 
-  if (!imm_expect_map_key(f, KEY_TRANS_DST)) goto cleanup;
-  lip_read_1darray_size_type(f, &size.u, &type);
-  if (type != LIP_1DARRAY_INT16) goto cleanup;
-  if (imm_trans_table_transsize(tt->ntrans) != size.i) goto cleanup;
-  for (int i = 0; i < size.i; ++i)
-    lip_read_1darray_int_item(f, &tt->trans[i].dst);
+  if (expect_key(f, KEY_TRANS_DST)) goto cleanup;
+  if (lio_free(f, lip_unpack_array(lio_read(f), &u32))) goto cleanup;
+  if ((uint32_t)imm_trans_table_transsize(tt->ntrans) != u32) goto cleanup;
+  for (uint32_t i = 0; i < u32; i++)
+    if (lio_free(f, lip_unpack_int(lio_read(f), &tt->trans[i].dst))) goto cleanup;
 
-  if (!imm_expect_map_key(f, KEY_TRANS_OFFSET)) goto cleanup;
-  lip_read_1darray_size_type(f, &size.u, &type);
-  if (type != LIP_1DARRAY_INT16) goto cleanup;
-  tt->offset = imm_reallocf(tt->offset, sizeof(*tt->offset) * size.u);
-  if (!tt->offset && size.i > 0) goto cleanup;
-  lip_read_1darray_int_data(f, size.u, tt->offset);
+  if (expect_key(f, KEY_TRANS_OFFSET)) goto cleanup;
+  if (lio_free(f, lip_unpack_array(lio_read(f), &u32))) goto cleanup;
+  tt->offset = imm_reallocf(tt->offset, sizeof(*tt->offset) * u32);
+  if (!tt->offset && u32 > 0) goto cleanup;
+  for (uint32_t i = 0; i < u32; i++)
+    if (lio_free(f, lip_unpack_int(lio_read(f), tt->offset + i))) goto cleanup;
 
   /* state_table */
-  if (!imm_expect_map_key(f, KEY_STATE_IDS)) goto cleanup;
-  lip_read_1darray_size_type(f, &size.u, &type);
-  st->nstates = size.i;
-  if (type != LIP_1DARRAY_UINT16) goto cleanup;
+  if (expect_key(f, KEY_STATE_IDS)) goto cleanup;
+  if (lio_free(f, lip_unpack_array(lio_read(f), &u32))) goto cleanup;
+  st->nstates = (uint32_t)u32;
   st->ids = imm_reallocf(st->ids, sizeof(*st->ids) * (unsigned)st->nstates);
   if (!st->ids && st->nstates > 0) goto cleanup;
-  lip_read_1darray_int_data(f, ((unsigned)st->nstates), st->ids);
+  for (uint32_t i = 0; i < u32; i++)
+    if (lio_free(f, lip_unpack_int(lio_read(f), st->ids + i))) goto cleanup;
 
-  if (!imm_expect_map_key(f, KEY_STATE_START)) goto cleanup;
-  lip_read_int(f, &dp->state_table.start_state_idx);
-  if (!imm_expect_map_key(f, KEY_STATE_END)) goto cleanup;
-  lip_read_int(f, &dp->state_table.end_state_idx);
+  if (expect_key(f, KEY_STATE_START)) goto cleanup;
+  if (lio_free(f, lip_unpack_int(lio_read(f), &dp->state_table.start_state_idx))) goto cleanup;
+  if (expect_key(f, KEY_STATE_END)) goto cleanup;
+  if (lio_free(f, lip_unpack_int(lio_read(f), &dp->state_table.end_state_idx))) goto cleanup;
 
-  if (!imm_expect_map_key(f, KEY_STATE_SPAN)) goto cleanup;
-  lip_read_1darray_size_type(f, &size.u, &type);
-  if (st->nstates != size.i) goto cleanup;
-  if (type != LIP_1DARRAY_INT8) goto cleanup;
-  st->span = imm_reallocf(st->span, sizeof(*st->span) * size.u);
-  if (!st->span && size.i > 0) goto cleanup;
-  for (int i = 0; i < size.i; ++i)
-    lip_read_1darray_int_item(f, (st->span + i));
+  if (expect_key(f, KEY_STATE_SPAN)) goto cleanup;
+  if (lio_free(f, lip_unpack_array(lio_read(f), &u32))) goto cleanup;
+  if ((uint32_t)st->nstates != u32) goto cleanup;
+  st->span = imm_reallocf(st->span, sizeof(*st->span) * u32);
+  if (!st->span && u32 > 0) goto cleanup;
+  for (uint32_t i = 0; i < u32; ++i)
+    if (lio_free(f, lip_unpack_int(lio_read(f), st->span + i))) goto cleanup;
 
-  if (!f->error) return 0;
+  return 0;
 
 cleanup:
   if (e)

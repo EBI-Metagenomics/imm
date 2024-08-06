@@ -1,9 +1,11 @@
 #include "abc.h"
+#include <fcntl.h>
+#include <unistd.h>
+#include "lite_pack_io.h"
 #include "dp.h"
 #include "ex1.h"
 #include "ex2.h"
 #include "hmm.h"
-#include "lip/file/file.h"
 #include "mute_state.h"
 #include "normal_state.h"
 #include "prod.h"
@@ -172,7 +174,9 @@ static void dp_two_mutes(void)
 
 static void dp_io_example1(void)
 {
-  struct lip_file file = {0};
+  struct lio_writer writer = {0};
+  struct lio_reader reader = {0};
+
   imm_ex1_init(10);
   struct imm_ex1 *m = &imm_ex1;
   struct imm_dp dp;
@@ -181,15 +185,19 @@ static void dp_io_example1(void)
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &m->code);
 
-  file.fp = fopen("dp_example1.imm", "wb");
-  eq(imm_dp_pack(&dp, &file), 0);
-  fclose(file.fp);
+  int fd = open("dp_example1.imm", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+  ok(fd != 0);
+  lio_writer_init(&writer, fd);
+  eq(imm_dp_pack(&dp, &writer), 0);
+  eq(close(fd), 0);
   imm_dp_cleanup(&dp);
 
   imm_dp_init(&dp, &m->code);
-  file.fp = fopen("dp_example1.imm", "rb");
-  eq(imm_dp_unpack(&dp, &file), 0);
-  fclose(file.fp);
+  fd = open("dp_example1.imm", O_RDONLY, 0644);
+  ok(fd != 0);
+  lio_reader_init(&reader, fd);
+  eq(imm_dp_unpack(&dp, &reader), 0);
+  eq(close(fd), 0);
 
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
@@ -197,7 +205,7 @@ static void dp_io_example1(void)
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, -41.845375);
+  near(prod.loglik, -41.845375);
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
@@ -208,7 +216,9 @@ static void dp_io_example1(void)
 
 static void dp_io_example2(void)
 {
-  struct lip_file file = {0};
+  struct lio_writer writer = {0};
+  struct lio_reader reader = {0};
+
   imm_ex2_init(10, imm_span(1, 5));
   struct imm_ex2 *m = &imm_ex2;
   struct imm_dp dp;
@@ -224,19 +234,23 @@ static void dp_io_example2(void)
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, 41.929977);
+  near(prod.loglik, 41.929977);
   imm_prod_cleanup(&prod);
   imm_task_del(task);
 
-  file.fp = fopen("dp_frame.imm", "wb");
-  eq(imm_dp_pack(&dp, &file), 0);
-  fclose(file.fp);
+  int fd = open("dp_frame.imm", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+  ok(fd != 0);
+  lio_writer_init(&writer, fd);
+  eq(imm_dp_pack(&dp, &writer), 0);
+  eq(close(fd), 0);
   imm_dp_cleanup(&dp);
 
   imm_dp_init(&dp, &m->code);
-  file.fp = fopen("dp_frame.imm", "rb");
-  eq(imm_dp_unpack(&dp, &file), 0);
-  fclose(file.fp);
+  fd = open("dp_frame.imm", O_RDONLY, 0644);
+  ok(fd != 0);
+  lio_reader_init(&reader, fd);
+  eq(imm_dp_unpack(&dp, &reader), 0);
+  eq(close(fd), 0);
 
   task = imm_task_new(&dp);
   prod = imm_prod();
@@ -244,7 +258,7 @@ static void dp_io_example2(void)
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, 41.929977);
+  near(prod.loglik, 41.929977);
 
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);

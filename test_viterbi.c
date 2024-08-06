@@ -91,11 +91,11 @@ static void profile1(void)
   eq(imm_eseq_setup(&eseq, &EMPTY_ab), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, (logf(0.1f) + logf(1.0f)));
+  near(prod.loglik, (logf(0.1f) + logf(1.0f)));
 
-  close(imm_hmm_loglik(hmm, &EMPTY_ab, &prod.path), logf(0.1f) + logf(1.0f));
+  near(imm_hmm_loglik(hmm, &EMPTY_ab, &prod.path), logf(0.1f) + logf(1.0f));
   eq(imm_path_nsteps(&prod.path), 3);
-  close(imm_path_score(&prod.path), logf(0.1f) + logf(1.0f));
+  near(imm_path_score(&prod.path), logf(0.1f) + logf(1.0f));
 
   imm_dp_cleanup(&dp);
   imm_hmm_set_end(hmm, &end);
@@ -106,11 +106,11 @@ static void profile1(void)
   eq(imm_eseq_setup(&eseq, &A_ab), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, des);
+  near(prod.loglik, des);
 
-  close(imm_hmm_loglik(hmm, &A_ab, &prod.path), des);
+  near(imm_hmm_loglik(hmm, &A_ab, &prod.path), des);
   eq(imm_path_nsteps(&prod.path), 3);
-  close(imm_path_score(&prod.path), des);
+  near(imm_path_score(&prod.path), des);
 
   imm_dp_cleanup(&dp);
   imm_hmm_set_end(hmm, &end);
@@ -121,31 +121,31 @@ static void profile1(void)
   eq(imm_eseq_setup(&eseq, &B_ab), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, des);
+  near(prod.loglik, des);
 
-  close(imm_hmm_loglik(hmm, &B_ab, &prod.path), des);
+  near(imm_hmm_loglik(hmm, &B_ab, &prod.path), des);
   eq(imm_path_nsteps(&prod.path), 3);
-  close(imm_path_score(&prod.path), des);
+  near(imm_path_score(&prod.path), des);
 
   des = logf(0.5f) + logf(0.4f) + logf(0.1f) + logf(0.5f);
   eq(imm_eseq_setup(&eseq, &AA_ab), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, des);
+  near(prod.loglik, des);
 
-  close(imm_hmm_loglik(hmm, &AA_ab, &prod.path), des);
+  near(imm_hmm_loglik(hmm, &AA_ab, &prod.path), des);
   eq(imm_path_nsteps(&prod.path), 4);
-  close(imm_path_score(&prod.path), des);
+  near(imm_path_score(&prod.path), des);
 
   des = logf(0.5f) + logf(0.4f) + logf(0.1f) + logf(0.2f) + 2 * logf(0.5f);
   eq(imm_eseq_setup(&eseq, &AAB_ab), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, des);
+  near(prod.loglik, des);
 
-  close(imm_hmm_loglik(hmm, &AAB_ab, &prod.path), des);
+  near(imm_hmm_loglik(hmm, &AAB_ab, &prod.path), des);
   eq(imm_path_nsteps(&prod.path), 5);
-  close(imm_path_score(&prod.path), des);
+  near(imm_path_score(&prod.path), des);
 
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
@@ -239,20 +239,20 @@ static void profile2(void)
   eq(imm_eseq_setup(&eseq, &C), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, logf(0.05f));
+  near(prod.loglik, logf(0.05f));
 
-  close(imm_hmm_loglik(hmm, &C, &prod.path), logf(0.05f));
+  near(imm_hmm_loglik(hmm, &C, &prod.path), logf(0.05f));
   eq(imm_path_nsteps(&prod.path), 3);
-  close(imm_path_score(&prod.path), logf(0.05f));
+  near(imm_path_score(&prod.path), logf(0.05f));
 
   eq(imm_eseq_setup(&eseq, &T), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, logf(0.05f));
+  near(prod.loglik, logf(0.05f));
 
-  close(imm_hmm_loglik(hmm, &T, &prod.path), logf(0.05f));
+  near(imm_hmm_loglik(hmm, &T, &prod.path), logf(0.05f));
   eq(imm_path_nsteps(&prod.path), 3);
-  close(imm_path_score(&prod.path), logf(0.05f));
+  near(imm_path_score(&prod.path), logf(0.05f));
 
   imm_dp_cleanup(&dp);
   imm_hmm_init_dp(hmm, &dp);
@@ -261,38 +261,38 @@ static void profile2(void)
   eq(imm_eseq_setup(&eseq, &A), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, logf(0.6f));
+  near(prod.loglik, logf(0.6f));
 
-  close(imm_hmm_loglik(hmm, &A, &prod.path), logf(0.6f));
+  near(imm_hmm_loglik(hmm, &A, &prod.path), logf(0.6f));
   eq(imm_path_nsteps(&prod.path), 3);
-  close(imm_path_score(&prod.path), logf(0.6f));
+  near(imm_path_score(&prod.path), logf(0.6f));
 
   eq(imm_eseq_setup(&eseq, &C), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, logf(0.05f));
+  near(prod.loglik, logf(0.05f));
 
-  close(imm_hmm_loglik(hmm, &C, &prod.path), logf(0.05f));
+  near(imm_hmm_loglik(hmm, &C, &prod.path), logf(0.05f));
   eq(imm_path_nsteps(&prod.path), 3);
-  close(imm_path_score(&prod.path), logf(0.05f));
+  near(imm_path_score(&prod.path), logf(0.05f));
 
   eq(imm_eseq_setup(&eseq, &G), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, logf(0.6f));
+  near(prod.loglik, logf(0.6f));
 
-  close(imm_hmm_loglik(hmm, &G, &prod.path), logf(0.6f));
+  near(imm_hmm_loglik(hmm, &G, &prod.path), logf(0.6f));
   eq(imm_path_nsteps(&prod.path), 3);
-  close(imm_path_score(&prod.path), logf(0.6f));
+  near(imm_path_score(&prod.path), logf(0.6f));
 
   eq(imm_eseq_setup(&eseq, &T), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, logf(0.05f));
+  near(prod.loglik, logf(0.05f));
 
-  close(imm_hmm_loglik(hmm, &T, &prod.path), logf(0.05f));
+  near(imm_hmm_loglik(hmm, &T, &prod.path), logf(0.05f));
   eq(imm_path_nsteps(&prod.path), 3);
-  close(imm_path_score(&prod.path), logf(0.05f));
+  near(imm_path_score(&prod.path), logf(0.05f));
 
   imm_dp_cleanup(&dp);
   imm_hmm_init_dp(hmm, &dp);
@@ -301,11 +301,11 @@ static void profile2(void)
   eq(imm_eseq_setup(&eseq, &A), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, logf(0.6f));
+  near(prod.loglik, logf(0.6f));
 
-  close(imm_hmm_loglik(hmm, &A, &prod.path), logf(0.6f));
+  near(imm_hmm_loglik(hmm, &A, &prod.path), logf(0.6f));
   eq(imm_path_nsteps(&prod.path), 3);
-  close(imm_path_score(&prod.path), logf(0.6f));
+  near(imm_path_score(&prod.path), logf(0.6f));
 
   imm_dp_cleanup(&dp);
   imm_hmm_init_dp(hmm, &dp);
@@ -314,11 +314,11 @@ static void profile2(void)
   eq(imm_eseq_setup(&eseq, &GA), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, 2 * logf(0.6f));
+  near(prod.loglik, 2 * logf(0.6f));
 
-  close(imm_hmm_loglik(hmm, &GA, &prod.path), 2 * logf(0.6f));
+  near(imm_hmm_loglik(hmm, &GA, &prod.path), 2 * logf(0.6f));
   eq(imm_path_nsteps(&prod.path), 4);
-  close(imm_path_score(&prod.path), 2 * logf(0.6f));
+  near(imm_path_score(&prod.path), 2 * logf(0.6f));
 
   imm_dp_cleanup(&dp);
   imm_hmm_init_dp(hmm, &dp);
@@ -333,22 +333,22 @@ static void profile2(void)
   eq(imm_eseq_setup(&eseq, &GTTTA), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, des);
+  near(prod.loglik, des);
 
-  close(imm_hmm_loglik(hmm, &GTTTA, &prod.path), des);
+  near(imm_hmm_loglik(hmm, &GTTTA, &prod.path), des);
   eq(imm_path_nsteps(&prod.path), 7);
-  close(imm_path_score(&prod.path), des);
+  near(imm_path_score(&prod.path), des);
 
   des = logf(0.6f) + logf(0.2f) + 3 * logf(0.7f) + 3 * logf(0.5f) + logf(0.6f) +
         logf(0.05f);
   eq(imm_eseq_setup(&eseq, &GTTTAC), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, des);
+  near(prod.loglik, des);
 
-  close(imm_hmm_loglik(hmm, &GTTTAC, &prod.path), des);
+  near(imm_hmm_loglik(hmm, &GTTTAC, &prod.path), des);
   eq(imm_path_nsteps(&prod.path), 8);
-  close(imm_path_score(&prod.path), des);
+  near(imm_path_score(&prod.path), des);
 
   imm_dp_cleanup(&dp);
   imm_hmm_init_dp(hmm, &dp);
@@ -363,11 +363,11 @@ static void profile2(void)
   eq(imm_eseq_setup(&eseq, &GTTTACA), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, des);
+  near(prod.loglik, des);
 
-  close(imm_hmm_loglik(hmm, &GTTTACA, &prod.path), des);
+  near(imm_hmm_loglik(hmm, &GTTTACA, &prod.path), des);
   eq(imm_path_nsteps(&prod.path), 9);
-  close(imm_path_score(&prod.path), des);
+  near(imm_path_score(&prod.path), des);
 
   imm_dp_cleanup(&dp);
   imm_hmm_init_dp(hmm, &dp);
@@ -378,11 +378,11 @@ static void profile2(void)
   eq(imm_eseq_setup(&eseq, &GTTTACA), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, des);
+  near(prod.loglik, des);
 
-  close(imm_hmm_loglik(hmm, &GTTTACA, &prod.path), des);
+  near(imm_hmm_loglik(hmm, &GTTTACA, &prod.path), des);
   eq(imm_path_nsteps(&prod.path), 9);
-  close(imm_path_score(&prod.path), des);
+  near(imm_path_score(&prod.path), des);
 
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);

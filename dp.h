@@ -24,7 +24,8 @@ struct imm_dp
   struct imm_state_table state_table;
 };
 
-struct lip_file;
+struct lio_writer;
+struct lio_reader;
 
 IMM_API void imm_dp_init(struct imm_dp *, struct imm_code const *);
 IMM_API int imm_dp_reset(struct imm_dp *, struct imm_dp_cfg const *);
@@ -44,8 +45,8 @@ IMM_API int imm_dp_change_trans(struct imm_dp *, int trans_idx, float lprob);
 IMM_API int imm_dp_viterbi(struct imm_dp const *, struct imm_task *task,
                            struct imm_prod *prod);
 
-IMM_API int imm_dp_pack(struct imm_dp const *, struct lip_file *);
-IMM_API int imm_dp_unpack(struct imm_dp *, struct lip_file *);
+IMM_API int imm_dp_pack(struct imm_dp const *, struct lio_writer *);
+IMM_API int imm_dp_unpack(struct imm_dp *, struct lio_reader *);
 
 IMM_API float imm_dp_emis_score(struct imm_dp const *, int state_id,
                                 struct imm_seq const *seq);

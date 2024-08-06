@@ -34,7 +34,7 @@ static void dp_dump_ex1_path(void)
   eq(imm_eseq_setup(&eseq, &seq), 0);
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  close(prod.loglik, -41.845375);
+  near(prod.loglik, -41.845375);
 
   imm_path_dump(&prod.path, &imm_ex1_state_name, &seq, stdout);
 

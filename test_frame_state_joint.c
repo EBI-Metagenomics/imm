@@ -79,7 +79,7 @@ static void check_joint(struct imm_state const *state, struct imm_span span)
       total = imm_lprob_add(total, imm_state_lprob(state, &tmp));
     }
   }
-  close(exp(total), 1.0);
+  near(exp(total), 1.0);
 }
 
 static void frame_state_joint15(void)

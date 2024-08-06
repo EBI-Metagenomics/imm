@@ -1,8 +1,8 @@
 #include "nuclt_lprob.h"
+#include "assert.h"
 #include "dump.h"
-#include "expect.h"
-#include "lip/1darray/1darray.h"
-#include "lip/lip.h"
+#include "lite_pack.h"
+#include "lite_pack_io.h"
 #include "rc.h"
 
 struct imm_nuclt_lprob imm_nuclt_lprob(struct imm_nuclt const *nuclt,
@@ -23,19 +23,25 @@ float imm_nuclt_lprob_get(struct imm_nuclt_lprob const *lprob, char symbol)
 }
 
 int imm_nuclt_lprob_pack(struct imm_nuclt_lprob const *nucltp,
-                         struct lip_file *file)
+                         struct lio_writer *f)
 {
-  lip_write_1darray_float(file, IMM_NUCLT_SIZE, nucltp->lprobs);
+  if (lio_write(f, lip_pack_array(lio_alloc(f), IMM_NUCLT_SIZE))) return IMM_EIO;
+  for (int i = 0; i < IMM_NUCLT_SIZE; ++i)
+    if (lio_write(f, lip_pack_float(lio_alloc(f), nucltp->lprobs[i]))) return IMM_EIO;
 
-  return file->error ? IMM_EIO : 0;
+  return 0;
 }
 
 int imm_nuclt_lprob_unpack(struct imm_nuclt_lprob *nucltp,
-                           struct lip_file *file)
+                           struct lio_reader *f)
 {
-  imm_expect_1darr_float_type(file, IMM_NUCLT_SIZE, nucltp->lprobs);
+  uint32_t u32 = 0;
+  if (lio_free(f, lip_unpack_array(lio_read(f), &u32))) return IMM_EIO;
+  if (u32 != (uint32_t)IMM_NUCLT_SIZE) return IMM_EIO;
+  for (int i = 0; i < IMM_NUCLT_SIZE; ++i)
+    if (lio_free(f, lip_unpack_float(lio_read(f), nucltp->lprobs + i))) return IMM_EIO;
 
-  return file->error ? IMM_EIO : 0;
+  return 0;
 }
 
 void imm_nuclt_lprob_dump(struct imm_nuclt_lprob const *x, FILE *restrict fp)

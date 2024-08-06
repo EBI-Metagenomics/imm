@@ -2,13 +2,13 @@
 #include "abc.h"
 #include "codon_lprob.h"
 #include "dump.h"
-#include "expect.h"
-#include "lip/1darray/1darray.h"
-#include "lip/lip.h"
+#include "lite_pack.h"
+#include "lite_pack_io.h"
 #include "lprob.h"
 #include "nuclt.h"
 #include "rc.h"
 #include "static_assert.h"
+#include <assert.h>
 
 imm_static_assert(IMM_NUCLT_SIZE == 4, "nuclt size expected to be four");
 
@@ -134,20 +134,24 @@ struct imm_codon_marg imm_codon_marg(struct imm_codon_lprob *codonp)
   ((IMM_NUCLT_SIZE + 1) * (IMM_NUCLT_SIZE + 1) * (IMM_NUCLT_SIZE + 1))
 
 int imm_codon_marg_pack(struct imm_codon_marg const *codonm,
-                        struct lip_file *file)
+                        struct lio_writer *f)
 {
-  lip_write_1darray_float(file, CODON_SIZE, &codonm->lprobs[0][0][0]);
+  if (lio_write(f, lip_pack_array(lio_alloc(f), CODON_SIZE))) return IMM_EIO;
+  for (int i = 0; i < CODON_SIZE; ++i)
+    if (lio_write(f, lip_pack_float(lio_alloc(f), codonm->lprobs[0][0][i]))) return IMM_EIO;
 
-  return file->error ? IMM_EIO : 0;
+  return 0;
 }
 
-int imm_codon_marg_unpack(struct imm_codon_marg *codonm, struct lip_file *file)
+int imm_codon_marg_unpack(struct imm_codon_marg *codonm, struct lio_reader *f)
 {
-  float *lprobs = &codonm->lprobs[0][0][0];
+  uint32_t u32 = 0;
+  if (lio_free(f, lip_unpack_array(lio_read(f), &u32))) return IMM_EIO;
+  if (u32 != (uint32_t)CODON_SIZE) return IMM_EIO;
+  for (int i = 0; i < CODON_SIZE; ++i)
+    if (lio_free(f, lip_unpack_float(lio_read(f), codonm->lprobs[0][0] + i))) return IMM_EIO;
 
-  if (!imm_expect_1darr_float_type(file, CODON_SIZE, lprobs)) return IMM_EIO;
-
-  return file->error ? IMM_EIO : 0;
+  return 0;
 }
 
 void imm_codon_marg_dump(struct imm_codon_marg const *x, FILE *restrict fp)

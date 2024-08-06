@@ -20,9 +20,9 @@ static void normal_state(void)
   imm_normal_state_init(&state, 0, &abc, lprobs);
 
   eq(imm_state_id(&state.super), 0U);
-  close(imm_state_lprob(&state.super, &A), logf(0.25f));
-  close(imm_state_lprob(&state.super, &C), logf(0.25f));
-  close(imm_state_lprob(&state.super, &G), logf(0.5f));
+  near(imm_state_lprob(&state.super, &A), logf(0.25f));
+  near(imm_state_lprob(&state.super, &C), logf(0.25f));
+  near(imm_state_lprob(&state.super, &G), logf(0.5f));
   ok(imm_lprob_is_zero(imm_state_lprob(&state.super, &T)));
 }
 
@@ -37,7 +37,7 @@ static void mute_state(void)
   imm_mute_state_init(&state, 43, &abc);
 
   eq(imm_state_id(&state.super), 43U);
-  close(imm_state_lprob(&state.super, &EMPTY), 0.0);
+  near(imm_state_lprob(&state.super, &EMPTY), 0.0);
   ok(imm_lprob_is_zero(imm_state_lprob(&state.super, &A)));
 }
 

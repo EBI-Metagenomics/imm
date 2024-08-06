@@ -32,7 +32,8 @@ struct imm_abc
   int any_symbol_id;
 };
 
-struct lip_file;
+struct lio_writer;
+struct lio_reader;
 
 // clang-format off
 IMM_API int         imm_abc_init(struct imm_abc *, struct imm_str symbols,
@@ -49,8 +50,8 @@ IMM_API char const *imm_abc_symbols(struct imm_abc const *);
 IMM_API int         imm_abc_union_size(struct imm_abc const *, struct imm_str seq);
 IMM_API bool        imm_abc_typeid_valid(int typeid);
 IMM_API char const *imm_abc_typeid_name(int typeid);
-IMM_API int         imm_abc_pack(struct imm_abc const *, struct lip_file *);
-IMM_API int         imm_abc_unpack(struct imm_abc *, struct lip_file *);
+IMM_API int         imm_abc_pack(struct imm_abc const *, struct lio_writer *);
+IMM_API int         imm_abc_unpack(struct imm_abc *, struct lio_reader *);
 // clang-format on
 
 int imm__abc_symbol_idx(struct imm_abc const *, int id);

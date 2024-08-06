@@ -28,7 +28,7 @@ static char *state_name(int id, char *name)
   {                                                                            \
     eq(imm_path_step(&PATH, IDX)->state_id, STATE_ID);                         \
     eq(imm_path_step(&PATH, IDX)->seqsize, SEQSIZE);                           \
-    close(imm_path_step(&PATH, IDX)->score, SCORE);                            \
+    near(imm_path_step(&PATH, IDX)->score, SCORE);                            \
   } while (0);
 
 #define B 0
@@ -92,8 +92,8 @@ static void odd1(void)
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   eq(imm_path_nsteps(&prod.path), 8);
-  close(imm_hmm_loglik(hmm, &seq, &prod.path), 12202.);
-  close(prod.loglik, 12202.);
+  near(imm_hmm_loglik(hmm, &seq, &prod.path), 12202.);
+  near(prod.loglik, 12202.);
   imm_dp_set_state_name(&dp, &state_name);
 
   ASSERT_SEQ(prod.path, 0, START, 0, 0);
@@ -171,9 +171,9 @@ static void odd2(void)
   eq(imm_task_setup(task, &eseq), 0);
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   eq(imm_path_nsteps(&prod.path), 9);
-  close(imm_path_score(&prod.path), 0);
-  close(imm_hmm_loglik(hmm, &seq, &prod.path), 0);
-  close(prod.loglik, 0);
+  near(imm_path_score(&prod.path), 0);
+  near(imm_hmm_loglik(hmm, &seq, &prod.path), 0);
+  near(prod.loglik, 0);
   imm_dp_set_state_name(&dp, &state_name);
 
   ASSERT_SEQ(prod.path, 0, START, 0, 0);

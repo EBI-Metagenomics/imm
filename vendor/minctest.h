@@ -141,7 +141,7 @@ static size_t lfails = 0;
 #define _minctest_cmp(a, b) _minctest_eq_base(strcmp(a, b) == 0, a, b)
 
 #define eq(a, b) _minctest_eq(a, b)
-#define close(a, b) _minctest_close(a, b)
+#define near(a, b) _minctest_close(a, b)
 #define ok(x) _minctest_ok(x)
 #define cmp(a, b) _minctest_cmp(a, b)
 
