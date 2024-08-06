@@ -10,8 +10,8 @@ struct imm_amino_lprob
   float lprobs[IMM_AMINO_SIZE];
 };
 
-IMM_API struct imm_amino_lprob imm_amino_lprob(struct imm_amino const *,
+struct imm_amino_lprob imm_amino_lprob(struct imm_amino const *,
                                                float const *lprobs);
-IMM_API float imm_amino_lprob_get(struct imm_amino_lprob const *, char symbol);
+float imm_amino_lprob_get(struct imm_amino_lprob const *, char symbol);
 
 #endif

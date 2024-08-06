@@ -10,7 +10,7 @@ struct imm_str
   char const *data;
 };
 
-IMM_API struct imm_str imm_str(char const *cstr);
-IMM_API struct imm_str imm_str_slice(struct imm_str, struct imm_range);
+struct imm_str imm_str(char const *cstr);
+struct imm_str imm_str_slice(struct imm_str, struct imm_range);
 
 #endif

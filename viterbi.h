@@ -20,8 +20,8 @@ struct imm_viterbi
   struct tardy_state tardy_state;
 };
 
-IMM_API void imm_viterbi_init(struct imm_viterbi *, struct imm_dp const *,
+void imm_viterbi_init(struct imm_viterbi *, struct imm_dp const *,
                               struct imm_task *);
-IMM_API void imm_viterbi_run(struct imm_viterbi *);
+void imm_viterbi_run(struct imm_viterbi *);
 
 #endif

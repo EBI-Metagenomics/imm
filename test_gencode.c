@@ -1,6 +1,6 @@
 #include "array_size.h"
 #include "gencode.h"
-#include "vendor/minctest.h"
+#include "minctest.h"
 
 static void gc_f(void)
 {

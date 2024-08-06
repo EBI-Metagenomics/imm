@@ -16,8 +16,8 @@ struct imm_code
   struct imm_abc const *abc;
 };
 
-IMM_API void imm_code_init(struct imm_code *, struct imm_abc const *);
-IMM_API int imm_code_encode(struct imm_code const *, struct imm_seq const *);
+void imm_code_init(struct imm_code *, struct imm_abc const *);
+int imm_code_encode(struct imm_code const *, struct imm_seq const *);
 
 IMM_PURE int imm_code_translate(struct imm_code const *x, int value,
                                 int min_seq)

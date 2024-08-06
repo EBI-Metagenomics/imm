@@ -36,7 +36,7 @@ IMM_INLINE float const *imm_emis_table(struct imm_emis const *x, int state,
   return &x->score[x->offset[state]];
 }
 
-IMM_API void imm_emis_dump(struct imm_emis const *,
+void imm_emis_dump(struct imm_emis const *,
                            struct imm_state_table const *, FILE *restrict);
 
 #endif

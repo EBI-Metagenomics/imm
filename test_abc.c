@@ -7,7 +7,7 @@
 #include "lprob.h"
 #include "rc.h"
 #include "rna.h"
-#include "vendor/minctest.h"
+#include "minctest.h"
 #include <fcntl.h>
 #include <unistd.h>
 

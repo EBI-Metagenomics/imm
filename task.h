@@ -28,12 +28,12 @@ struct imm_task
   } debug;
 };
 
-IMM_API struct imm_task *imm_task_new(struct imm_dp const *);
-IMM_API int imm_task_reset(struct imm_task *, struct imm_dp const *);
-IMM_API void imm_task_prepare(struct imm_task *);
-IMM_API int imm_task_setup(struct imm_task *, struct imm_eseq const *);
-IMM_API void imm_task_del(struct imm_task const *);
-IMM_API void imm_task_dump(struct imm_task const *, FILE *restrict);
-IMM_API void imm_task_debug_setup(struct imm_task *, char const *seq);
+struct imm_task *imm_task_new(struct imm_dp const *);
+int imm_task_reset(struct imm_task *, struct imm_dp const *);
+void imm_task_prepare(struct imm_task *);
+int imm_task_setup(struct imm_task *, struct imm_eseq const *);
+void imm_task_del(struct imm_task const *);
+void imm_task_dump(struct imm_task const *, FILE *restrict);
+void imm_task_debug_setup(struct imm_task *, char const *seq);
 
 #endif

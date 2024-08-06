@@ -27,36 +27,36 @@ struct imm_dp
 struct lio_writer;
 struct lio_reader;
 
-IMM_API void imm_dp_init(struct imm_dp *, struct imm_code const *);
-IMM_API int imm_dp_reset(struct imm_dp *, struct imm_dp_cfg const *);
-IMM_API void imm_dp_set_state_name(struct imm_dp *, imm_state_name *);
+void imm_dp_init(struct imm_dp *, struct imm_code const *);
+int imm_dp_reset(struct imm_dp *, struct imm_dp_cfg const *);
+void imm_dp_set_state_name(struct imm_dp *, imm_state_name *);
 
-IMM_API void imm_dp_cleanup(struct imm_dp *);
+void imm_dp_cleanup(struct imm_dp *);
 
-IMM_API void imm_dp_dump(struct imm_dp const *, FILE *restrict);
+void imm_dp_dump(struct imm_dp const *, FILE *restrict);
 
-IMM_API void imm_dp_dump_path(struct imm_dp const *, struct imm_task const *,
+void imm_dp_dump_path(struct imm_dp const *, struct imm_task const *,
                               struct imm_prod const *, struct imm_seq const *,
                               FILE *restrict);
 
-IMM_API int imm_dp_nstates(struct imm_dp const *);
-IMM_API int imm_dp_trans_idx(struct imm_dp *, int src_idx, int dst_idx);
-IMM_API int imm_dp_change_trans(struct imm_dp *, int trans_idx, float lprob);
-IMM_API int imm_dp_viterbi(struct imm_dp const *, struct imm_task *task,
+int imm_dp_nstates(struct imm_dp const *);
+int imm_dp_trans_idx(struct imm_dp *, int src_idx, int dst_idx);
+int imm_dp_change_trans(struct imm_dp *, int trans_idx, float lprob);
+int imm_dp_viterbi(struct imm_dp const *, struct imm_task *task,
                            struct imm_prod *prod);
 
-IMM_API int imm_dp_pack(struct imm_dp const *, struct lio_writer *);
-IMM_API int imm_dp_unpack(struct imm_dp *, struct lio_reader *);
+int imm_dp_pack(struct imm_dp const *, struct lio_writer *);
+int imm_dp_unpack(struct imm_dp *, struct lio_reader *);
 
-IMM_API float imm_dp_emis_score(struct imm_dp const *, int state_id,
+float imm_dp_emis_score(struct imm_dp const *, int state_id,
                                 struct imm_seq const *seq);
 
-IMM_API float const *imm_dp_emis_table(struct imm_dp const *dp, int state_id,
+float const *imm_dp_emis_table(struct imm_dp const *dp, int state_id,
                                        int *size);
 
-IMM_API float imm_dp_trans_score(struct imm_dp const *, int src, int dst);
+float imm_dp_trans_score(struct imm_dp const *, int src, int dst);
 
-IMM_API void imm_dp_write_dot(struct imm_dp const *, FILE *restrict,
+void imm_dp_write_dot(struct imm_dp const *, FILE *restrict,
                               imm_state_name *);
 
 #endif

@@ -30,13 +30,13 @@ struct imm_sym
 };
 
 // clang-format off
-IMM_API void imm_sym_init(struct imm_sym *);
-IMM_API int  imm_sym_id(char c);
-IMM_API char imm_sym_char(int id);
-IMM_API int  imm_sym_idx(struct imm_sym const *, int id);
-IMM_API void imm_sym_set_idx(struct imm_sym *, int id, int idx);
-IMM_API bool imm_sym_valid_char(char c);
-IMM_API bool imm_sym_valid_id(int id);
+void imm_sym_init(struct imm_sym *);
+int  imm_sym_id(char c);
+char imm_sym_char(int id);
+int  imm_sym_idx(struct imm_sym const *, int id);
+void imm_sym_set_idx(struct imm_sym *, int id, int idx);
+bool imm_sym_valid_char(char c);
+bool imm_sym_valid_id(int id);
 // clang-format on
 
 #endif

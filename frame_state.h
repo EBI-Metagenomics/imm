@@ -21,20 +21,20 @@ struct imm_frame_state
   struct imm_frame_epsilon eps;
 };
 
-IMM_API void imm_frame_state_init(struct imm_frame_state *, int id,
+void imm_frame_state_init(struct imm_frame_state *, int id,
                                   struct imm_nuclt_lprob const *,
                                   struct imm_codon_marg const *, float epsilon,
                                   struct imm_span);
 
-IMM_API float imm_frame_state_lposterior(struct imm_frame_state const *,
+float imm_frame_state_lposterior(struct imm_frame_state const *,
                                          struct imm_codon const *,
                                          struct imm_seq const *);
 
-IMM_API float imm_frame_state_decode(struct imm_frame_state const *,
+float imm_frame_state_decode(struct imm_frame_state const *,
                                      struct imm_seq const *,
                                      struct imm_codon *);
 
-IMM_API void imm_frame_state_dump(struct imm_frame_state const *,
+void imm_frame_state_dump(struct imm_frame_state const *,
                                   FILE *restrict);
 
 #endif

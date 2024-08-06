@@ -39,11 +39,11 @@ struct imm_ex1
   } null;
 };
 
-IMM_API void imm_ex1_init(int core_size);
-IMM_API void imm_ex1_cleanup(void);
-IMM_API void imm_ex1_remove_insertion_states(int core_size);
-IMM_API void imm_ex1_remove_deletion_states(int core_size);
-IMM_API char *imm_ex1_state_name(int id, char *name);
+void imm_ex1_init(int core_size);
+void imm_ex1_cleanup(void);
+void imm_ex1_remove_insertion_states(int core_size);
+void imm_ex1_remove_deletion_states(int core_size);
+char *imm_ex1_state_name(int id, char *name);
 
 extern struct imm_ex1 imm_ex1;
 

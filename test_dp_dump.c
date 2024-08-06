@@ -1,6 +1,6 @@
-#include "imm/ex1.h"
-#include "imm/imm.h"
-#include "vendor/minctest.h"
+#include "ex1.h"
+#include "imm.h"
+#include "minctest.h"
 
 static void dp_dump_ex1(void)
 {
@@ -36,7 +36,7 @@ static void dp_dump_ex1_path(void)
   eq(imm_dp_viterbi(&dp, task, &prod), 0);
   near(prod.loglik, -41.845375);
 
-  imm_path_dump(&prod.path, &imm_ex1_state_name, &seq, stdout);
+  imm_path_dump(&prod.path, &imm_ex1_state_name, &seq, fopen("/dev/null", "w"));
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
@@ -48,6 +48,6 @@ static void dp_dump_ex1_path(void)
 int main(void)
 {
   lrun("dp_dump_ex1", dp_dump_ex1);
-  lrun("dp_dump_ex1_path", dp_dump_ex1_path);
+  lrun("dp_dump_ex2_path", dp_dump_ex1_path);
   return lfails != 0;
 }

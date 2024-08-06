@@ -3,7 +3,7 @@
 #include "mute_state.h"
 #include "normal_state.h"
 #include "state.h"
-#include "vendor/minctest.h"
+#include "minctest.h"
 
 static void normal_state(void)
 {

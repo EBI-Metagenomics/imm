@@ -17,6 +17,6 @@ struct imm_step
 imm_static_assert(sizeof(struct imm_step) == 8, "struct pair must be packed");
 imm_static_assert(alignof(struct imm_step) == 4, "struct pair must align to 4");
 
-IMM_API struct imm_step imm_step(int state_id, int seqsize, float score);
+struct imm_step imm_step(int state_id, int seqsize, float score);
 
 #endif

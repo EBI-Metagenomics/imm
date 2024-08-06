@@ -36,22 +36,22 @@ struct lio_writer;
 struct lio_reader;
 
 // clang-format off
-IMM_API int         imm_abc_init(struct imm_abc *, struct imm_str symbols,
+int         imm_abc_init(struct imm_abc *, struct imm_str symbols,
                                  char any_symbol_id);
-IMM_API char        imm_abc_any_symbol(struct imm_abc const *);
-IMM_API bool        imm_abc_has_symbol_id(struct imm_abc const *, int id);
-IMM_API bool        imm_abc_has_symbol(struct imm_abc const *, char symbol);
-IMM_API int         imm_abc_size(struct imm_abc const *);
-IMM_API int         imm_abc_symbol_idx(struct imm_abc const *, char symbol);
-IMM_API int         imm_abc_any_symbol_id(struct imm_abc const *);
-IMM_API int         imm_abc_any_symbol_idx(struct imm_abc const *);
-IMM_API int         imm_abc_symbol_type(struct imm_abc const *, char symbol);
-IMM_API char const *imm_abc_symbols(struct imm_abc const *);
-IMM_API int         imm_abc_union_size(struct imm_abc const *, struct imm_str seq);
-IMM_API bool        imm_abc_typeid_valid(int typeid);
-IMM_API char const *imm_abc_typeid_name(int typeid);
-IMM_API int         imm_abc_pack(struct imm_abc const *, struct lio_writer *);
-IMM_API int         imm_abc_unpack(struct imm_abc *, struct lio_reader *);
+char        imm_abc_any_symbol(struct imm_abc const *);
+bool        imm_abc_has_symbol_id(struct imm_abc const *, int id);
+bool        imm_abc_has_symbol(struct imm_abc const *, char symbol);
+int         imm_abc_size(struct imm_abc const *);
+int         imm_abc_symbol_idx(struct imm_abc const *, char symbol);
+int         imm_abc_any_symbol_id(struct imm_abc const *);
+int         imm_abc_any_symbol_idx(struct imm_abc const *);
+int         imm_abc_symbol_type(struct imm_abc const *, char symbol);
+char const *imm_abc_symbols(struct imm_abc const *);
+int         imm_abc_union_size(struct imm_abc const *, struct imm_str seq);
+bool        imm_abc_typeid_valid(int typeid);
+char const *imm_abc_typeid_name(int typeid);
+int         imm_abc_pack(struct imm_abc const *, struct lio_writer *);
+int         imm_abc_unpack(struct imm_abc *, struct lio_reader *);
 // clang-format on
 
 int imm__abc_symbol_idx(struct imm_abc const *, int id);

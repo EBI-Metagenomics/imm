@@ -1,5 +1,5 @@
 #include "rnd.h"
-#include "vendor/xrandom.h"
+#include "xrandom.h"
 
 static inline struct xrandom to_xrandom(struct imm_rnd r)
 {

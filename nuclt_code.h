@@ -13,7 +13,7 @@ struct imm_nuclt_code
   struct imm_nuclt const *nuclt;
 };
 
-IMM_API extern struct imm_nuclt_code const imm_nuclt_code_empty;
+extern struct imm_nuclt_code const imm_nuclt_code_empty;
 
 static inline void imm_nuclt_code_init(struct imm_nuclt_code *code,
                                        struct imm_nuclt const *nuclt)

@@ -6,7 +6,7 @@
 #include "mute_state.h"
 #include "prod.h"
 #include "task.h"
-#include "vendor/minctest.h"
+#include "minctest.h"
 
 static char const seq10[] =
     "N"

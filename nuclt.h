@@ -13,8 +13,8 @@ struct imm_nuclt
   struct imm_abc super;
 };
 
-IMM_API int imm_nuclt_init(struct imm_nuclt *, char const symbols[],
+int imm_nuclt_init(struct imm_nuclt *, char const symbols[],
                            char any_symbol);
-IMM_API int imm_nuclt_size(struct imm_nuclt const *);
+int imm_nuclt_size(struct imm_nuclt const *);
 
 #endif

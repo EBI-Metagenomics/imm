@@ -28,7 +28,7 @@ struct imm_codon_marg
 struct lio_writer;
 struct lio_reader;
 
-IMM_API struct imm_codon_marg imm_codon_marg(struct imm_codon_lprob *);
+struct imm_codon_marg imm_codon_marg(struct imm_codon_lprob *);
 
 /**
  * Calculate any of the marginalization forms of
@@ -49,9 +49,9 @@ IMM_PURE float imm_codon_marg_lprob(struct imm_codon_marg const *x,
   return x->lprobs[codon.idx[0]][codon.idx[1]][codon.idx[2]];
 }
 
-IMM_API int imm_codon_marg_pack(struct imm_codon_marg const *,
+int imm_codon_marg_pack(struct imm_codon_marg const *,
                                 struct lio_writer *);
-IMM_API int imm_codon_marg_unpack(struct imm_codon_marg *, struct lio_reader *);
-IMM_API void imm_codon_marg_dump(struct imm_codon_marg const *, FILE *restrict);
+int imm_codon_marg_unpack(struct imm_codon_marg *, struct lio_reader *);
+void imm_codon_marg_dump(struct imm_codon_marg const *, FILE *restrict);
 
 #endif

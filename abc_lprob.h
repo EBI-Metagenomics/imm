@@ -11,8 +11,8 @@ struct imm_abc_lprob
   float const *lprobs;
 };
 
-IMM_API struct imm_abc_lprob imm_abc_lprob(struct imm_abc const *,
+struct imm_abc_lprob imm_abc_lprob(struct imm_abc const *,
                                            float const *lprobs);
-IMM_API float imm_abc_lprob_get(struct imm_abc_lprob const *, char symbol);
+float imm_abc_lprob_get(struct imm_abc_lprob const *, char symbol);
 
 #endif

@@ -26,11 +26,11 @@ struct imm_codon_lprob
 #define IMM_CODON_STRIDE(a, b, c)                                              \
   (a * IMM_NUCLT_SIZE * IMM_NUCLT_SIZE + b * IMM_NUCLT_SIZE + c)
 
-IMM_API struct imm_codon_lprob imm_codon_lprob(struct imm_nuclt const *);
-IMM_API float imm_codon_lprob_get(struct imm_codon_lprob const *,
+struct imm_codon_lprob imm_codon_lprob(struct imm_nuclt const *);
+float imm_codon_lprob_get(struct imm_codon_lprob const *,
                                   struct imm_codon);
-IMM_API void imm_codon_lprob_set(struct imm_codon_lprob *, struct imm_codon,
+void imm_codon_lprob_set(struct imm_codon_lprob *, struct imm_codon,
                                  float lprob);
-IMM_API void imm_codon_lprob_normalize(struct imm_codon_lprob *);
+void imm_codon_lprob_normalize(struct imm_codon_lprob *);
 
 #endif

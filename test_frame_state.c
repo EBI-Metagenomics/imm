@@ -4,7 +4,7 @@
 #include "frame_state.h"
 #include "lprob.h"
 #include "span.h"
-#include "vendor/minctest.h"
+#include "minctest.h"
 
 static void run_frame_state1(float lprobs[], struct imm_span span)
 {

@@ -8,7 +8,7 @@
 #include "path.h"
 #include "prod.h"
 #include "task.h"
-#include "vendor/minctest.h"
+#include "minctest.h"
 
 struct imm_nuclt const *nuclt;
 struct imm_abc const *abc;

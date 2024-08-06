@@ -9,7 +9,7 @@
 #include "prod.h"
 #include "seq.h"
 #include "task.h"
-#include "vendor/minctest.h"
+#include "minctest.h"
 
 static char *state_name(int id, char *name)
 {

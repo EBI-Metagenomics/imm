@@ -10,7 +10,7 @@
 #include "prod.h"
 #include "table_state.h"
 #include "task.h"
-#include "vendor/minctest.h"
+#include "minctest.h"
 
 #define S 0
 #define N 1
@@ -64,6 +64,7 @@ static char *state_name(int id, char *name)
 static void states_sne(void)
 {
   setup();
+  FILE *null = fopen("/dev/null", "w");
 
   imm_mute_state_init(&start, S, abc);
   imm_normal_state_init(&normal, N, abc, (float[]){1, 0, 0, 0});
@@ -80,7 +81,7 @@ static void states_sne(void)
   imm_hmm_set_trans(hmm, &normal.super, &normal.super, 3);
   imm_hmm_set_trans(hmm, &normal.super, &end.super, 4);
 
-  imm_hmm_dump(hmm, &state_name, stdout);
+  imm_hmm_dump(hmm, &state_name, null);
 
   static struct imm_dp dp = {0};
   imm_hmm_init_dp(hmm, &dp);
@@ -95,11 +96,11 @@ static void states_sne(void)
   imm_dp_set_state_name(&dp, &state_name);
   imm_dp_viterbi(&dp, task, &prod);
   near(prod.loglik, 7);
-  imm_path_dump(&prod.path, &state_name, &seq, stdout);
+  imm_path_dump(&prod.path, &state_name, &seq, null);
   near(imm_path_score(&prod.path), 7);
   imm_trellis_set_ids(&task->trellis, dp.state_table.ids);
   imm_trellis_set_state_name(&task->trellis, &state_name);
-  imm_trellis_dump(&task->trellis, stdout);
+  imm_trellis_dump(&task->trellis, null);
 
   ASSERT_SEQ(prod.path, 0, S, 0, 0);
   ASSERT_SEQ(prod.path, 1, N, 1, 2);
@@ -107,12 +108,14 @@ static void states_sne(void)
 
   imm_dp_cleanup(&dp);
   imm_task_del(task);
+  fclose(null);
   cleanup();
 }
 
 static void states_sne_no_solution(void)
 {
   setup();
+  FILE *null = fopen("/dev/null", "w");
 
   imm_mute_state_init(&start, S, abc);
   imm_normal_state_init(
@@ -131,7 +134,7 @@ static void states_sne_no_solution(void)
   imm_hmm_set_trans(hmm, &normal.super, &normal.super, 3);
   imm_hmm_set_trans(hmm, &normal.super, &end.super, 4);
 
-  imm_hmm_dump(hmm, &state_name, stdout);
+  imm_hmm_dump(hmm, &state_name, null);
 
   static struct imm_dp dp = {0};
   imm_hmm_init_dp(hmm, &dp);
@@ -146,16 +149,17 @@ static void states_sne_no_solution(void)
   imm_dp_set_state_name(&dp, &state_name);
   imm_dp_viterbi(&dp, task, &prod);
   ok(imm_lprob_is_nan(prod.loglik));
-  imm_path_dump(&prod.path, &state_name, &seq, stdout);
+  imm_path_dump(&prod.path, &state_name, &seq, null);
   ok(imm_lprob_is_nan(imm_path_score(&prod.path)));
   imm_trellis_set_ids(&task->trellis, dp.state_table.ids);
   imm_trellis_set_state_name(&task->trellis, &state_name);
-  imm_trellis_dump(&task->trellis, stdout);
+  imm_trellis_dump(&task->trellis, null);
 
   eq(imm_path_nsteps(&prod.path), 0);
 
   imm_dp_cleanup(&dp);
   imm_task_del(task);
+  fclose(null);
   cleanup();
 }
 
@@ -169,6 +173,7 @@ static float table_lprob(int size, char const *seq)
 static void states_ste(void)
 {
   setup();
+  FILE *null = fopen("/dev/null", "w");
 
   imm_mute_state_init(&start, S, abc);
   imm_table_state_init(&table, T, abc, &table_lprob, imm_span(1, 2));
@@ -185,7 +190,7 @@ static void states_ste(void)
   imm_hmm_set_trans(hmm, &table.super, &table.super, 3);
   imm_hmm_set_trans(hmm, &table.super, &end.super, 4);
 
-  imm_hmm_dump(hmm, &state_name, stdout);
+  imm_hmm_dump(hmm, &state_name, null);
 
   static struct imm_dp dp = {0};
   imm_hmm_init_dp(hmm, &dp);
@@ -200,11 +205,11 @@ static void states_ste(void)
   imm_dp_set_state_name(&dp, &state_name);
   imm_dp_viterbi(&dp, task, &prod);
   near(prod.loglik, 34);
-  imm_path_dump(&prod.path, &state_name, &seq, stdout);
+  imm_path_dump(&prod.path, &state_name, &seq, null);
   near(imm_path_score(&prod.path), 34);
   imm_trellis_set_ids(&task->trellis, dp.state_table.ids);
   imm_trellis_set_state_name(&task->trellis, &state_name);
-  imm_trellis_dump(&task->trellis, stdout);
+  imm_trellis_dump(&task->trellis, null);
 
   ASSERT_SEQ(prod.path, 0, S, 0, 0);
   ASSERT_SEQ(prod.path, 1, T, 1, 2);
@@ -213,12 +218,14 @@ static void states_ste(void)
 
   imm_dp_cleanup(&dp);
   imm_task_del(task);
+  fclose(null);
   cleanup();
 }
 
 static void states_ste_2(void)
 {
   setup();
+  FILE *null = fopen("/dev/null", "w");
 
   imm_mute_state_init(&start, S, abc);
   imm_table_state_init(&table, T, abc, &table_lprob, imm_span(1, 2));
@@ -235,7 +242,7 @@ static void states_ste_2(void)
   imm_hmm_set_trans(hmm, &table.super, &table.super, 3);
   imm_hmm_set_trans(hmm, &table.super, &end.super, 4);
 
-  imm_hmm_dump(hmm, &state_name, stdout);
+  imm_hmm_dump(hmm, &state_name, null);
 
   static struct imm_dp dp = {0};
   imm_hmm_init_dp(hmm, &dp);
@@ -250,11 +257,11 @@ static void states_ste_2(void)
   imm_dp_set_state_name(&dp, &state_name);
   imm_dp_viterbi(&dp, task, &prod);
   near(prod.loglik, 47);
-  imm_path_dump(&prod.path, &state_name, &seq, stdout);
+  imm_path_dump(&prod.path, &state_name, &seq, null);
   near(imm_path_score(&prod.path), 47);
   imm_trellis_set_ids(&task->trellis, dp.state_table.ids);
   imm_trellis_set_state_name(&task->trellis, &state_name);
-  imm_trellis_dump(&task->trellis, stdout);
+  imm_trellis_dump(&task->trellis, null);
 
   ASSERT_SEQ(prod.path, 0, S, 0, 0);
   ASSERT_SEQ(prod.path, 1, T, 1, 2);
@@ -264,6 +271,7 @@ static void states_ste_2(void)
 
   imm_dp_cleanup(&dp);
   imm_task_del(task);
+  fclose(null);
   cleanup();
 }
 

@@ -8,7 +8,7 @@
 #include "prod.h"
 #include "seq.h"
 #include "task.h"
-#include "vendor/minctest.h"
+#include "minctest.h"
 #include <stdlib.h>
 
 static struct imm_abc abc;

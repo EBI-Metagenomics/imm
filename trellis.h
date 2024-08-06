@@ -91,15 +91,15 @@ struct imm_trellis
   struct imm_node *pool;
 };
 
-IMM_API void imm_trellis_init(struct imm_trellis *);
-IMM_API int imm_trellis_setup(struct imm_trellis *, int seqsize, int nstates);
-IMM_API void imm_trellis_cleanup(struct imm_trellis *);
-IMM_API void imm_trellis_prepare(struct imm_trellis *);
-IMM_API void imm_trellis_set_ids(struct imm_trellis *, uint16_t *ids);
-IMM_API void imm_trellis_set_state_name(struct imm_trellis *, imm_state_name *);
+void imm_trellis_init(struct imm_trellis *);
+int imm_trellis_setup(struct imm_trellis *, int seqsize, int nstates);
+void imm_trellis_cleanup(struct imm_trellis *);
+void imm_trellis_prepare(struct imm_trellis *);
+void imm_trellis_set_ids(struct imm_trellis *, uint16_t *ids);
+void imm_trellis_set_state_name(struct imm_trellis *, imm_state_name *);
 
-IMM_API void imm_trellis_back(struct imm_trellis *);
-IMM_API void imm_trellis_dump(struct imm_trellis const *, FILE *restrict);
+void imm_trellis_back(struct imm_trellis *);
+void imm_trellis_dump(struct imm_trellis const *, FILE *restrict);
 
 IMM_INLINE void imm_trellis_rewind(struct imm_trellis *x) { x->head = x->pool; }
 

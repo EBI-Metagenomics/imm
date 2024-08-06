@@ -12,7 +12,7 @@ struct imm_codon_state
   struct imm_codon_lprob const *codonp;
 };
 
-IMM_API void imm_codon_state_init(struct imm_codon_state *, int id,
+void imm_codon_state_init(struct imm_codon_state *, int id,
                                   struct imm_codon_lprob const *);
 
 #endif

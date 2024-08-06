@@ -2,7 +2,7 @@
 #include "code.h"
 #include "hmm.h"
 #include "mute_state.h"
-#include "vendor/minctest.h"
+#include "minctest.h"
 
 static char *state_name(int id, char *name)
 {

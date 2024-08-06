@@ -15,7 +15,7 @@ struct imm_table_state
   imm_table_state_callb *callback;
 };
 
-IMM_API void imm_table_state_init(struct imm_table_state *, int id,
+void imm_table_state_init(struct imm_table_state *, int id,
                                   struct imm_abc const *,
                                   imm_table_state_callb *, struct imm_span);
 

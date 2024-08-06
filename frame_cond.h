@@ -16,13 +16,13 @@ struct imm_frame_cond
   struct imm_codon_marg const *codonm;
 };
 
-IMM_API struct imm_frame_cond imm_frame_cond(struct imm_frame_state const *);
-IMM_API float imm_frame_cond_decode(struct imm_frame_cond const *,
+struct imm_frame_cond imm_frame_cond(struct imm_frame_state const *);
+float imm_frame_cond_decode(struct imm_frame_cond const *,
                                     struct imm_seq const *, struct imm_codon *);
-IMM_API float imm_frame_cond_loglik(struct imm_frame_cond const *,
+float imm_frame_cond_loglik(struct imm_frame_cond const *,
                                     struct imm_codon const *,
                                     struct imm_seq const *);
-IMM_API float imm_frame_cond_lprob(struct imm_frame_cond const *,
+float imm_frame_cond_lprob(struct imm_frame_cond const *,
                                    struct imm_codon const *,
                                    struct imm_seq const *);
 

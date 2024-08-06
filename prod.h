@@ -14,8 +14,8 @@ struct imm_prod
   uint64_t mseconds;
 };
 
-IMM_API struct imm_prod imm_prod(void);
-IMM_API void imm_prod_cleanup(struct imm_prod *);
-IMM_API void imm_prod_reset(struct imm_prod *);
+struct imm_prod imm_prod(void);
+void imm_prod_cleanup(struct imm_prod *);
+void imm_prod_reset(struct imm_prod *);
 
 #endif

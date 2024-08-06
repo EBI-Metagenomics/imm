@@ -13,14 +13,14 @@
 
 struct imm_rnd;
 
-IMM_API float imm_lprob_add(float, float);
-IMM_API float imm_lprob_nan(void);
-IMM_API bool imm_lprob_is_nan(float);
-IMM_API bool imm_lprob_is_zero(float);
-IMM_API bool imm_lprob_is_finite(float);
-IMM_API void imm_lprob_normalize(int size, float *arr);
-IMM_API void imm_lprob_sample(struct imm_rnd *, int size, float *arr);
-IMM_API float imm_lprob_zero(void);
+float imm_lprob_add(float, float);
+float imm_lprob_nan(void);
+bool imm_lprob_is_nan(float);
+bool imm_lprob_is_zero(float);
+bool imm_lprob_is_finite(float);
+void imm_lprob_normalize(int size, float *arr);
+void imm_lprob_sample(struct imm_rnd *, int size, float *arr);
+float imm_lprob_zero(void);
 
 IMM_PURE float imm_lprob_sum(int size, float const *arr)
 {

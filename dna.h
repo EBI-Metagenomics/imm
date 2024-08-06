@@ -13,9 +13,9 @@ struct imm_dna
   struct imm_nuclt super;
 };
 
-IMM_API extern struct imm_dna const imm_dna_iupac;
+extern struct imm_dna const imm_dna_iupac;
 
-IMM_API int imm_dna_init(struct imm_dna *, char const *symbols,
+int imm_dna_init(struct imm_dna *, char const *symbols,
                          char any_symbol);
 
 #endif

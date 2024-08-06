@@ -11,12 +11,12 @@ struct imm_list
   struct imm_list *prev;
 };
 
-IMM_API void imm_list_init(struct imm_list *list);
-IMM_API void imm_list_add(struct imm_list *neu, struct imm_list *head);
-IMM_API void imm_list_del(struct imm_list *entry);
-IMM_API bool imm_list_is_head(struct imm_list const *list,
+void imm_list_init(struct imm_list *list);
+void imm_list_add(struct imm_list *neu, struct imm_list *head);
+void imm_list_del(struct imm_list *entry);
+bool imm_list_is_head(struct imm_list const *list,
                               struct imm_list const *head);
-IMM_API bool imm_list_empty(struct imm_list const *head);
+bool imm_list_empty(struct imm_list const *head);
 
 #define imm_list_for_each(pos, head)                                           \
   for (pos = (head)->next; !imm_list_is_head(pos, (head)); pos = pos->next)

@@ -10,7 +10,7 @@
 #include "normal_state.h"
 #include "prod.h"
 #include "task.h"
-#include "vendor/minctest.h"
+#include "minctest.h"
 
 static struct imm_abc abc;
 static struct imm_code code;
