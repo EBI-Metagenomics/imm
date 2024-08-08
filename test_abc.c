@@ -114,7 +114,6 @@ static void abc_io(void)
   aye(fd != 0);
   lio_wsetup(&writer, fd);
   aye(imm_abc_pack(&abc_out, &writer) == 0);
-  aye(lio_wrelease(&writer) == fd);
   aye(close(fd) == 0);
 
   struct imm_abc abc_in = {0};
@@ -123,7 +122,6 @@ static void abc_io(void)
   aye(fd != 0);
   lio_rsetup(&reader, fd);
   aye(imm_abc_unpack(&abc_in, &reader) == 0);
-  aye(lio_rrelease(&reader) == fd);
   aye(close(fd) == 0);
 
   aye(abc_in.any_symbol_id == abc_out.any_symbol_id);
@@ -144,7 +142,6 @@ static void amino_io(void)
   aye(fd != 0);
   lio_wsetup(&writer, fd);
   aye(imm_abc_pack((struct imm_abc const *)amino_out, &writer) == 0);
-  aye(lio_wrelease(&writer) == fd);
   aye(close(fd) == 0);
 
   struct imm_amino amino_in = {0};
@@ -153,7 +150,6 @@ static void amino_io(void)
   aye(fd != 0);
   lio_rsetup(&reader, fd);
   aye(imm_abc_unpack((struct imm_abc *)&amino_in, &reader) == 0);
-  aye(lio_rrelease(&reader) == fd);
   aye(close(fd) == 0);
 
   struct imm_abc const *out = &amino_out->super;
@@ -177,7 +173,6 @@ static void dna_io(void)
   aye(fd != 0);
   lio_wsetup(&writer, fd);
   aye(imm_abc_pack((struct imm_abc const *)dna_out, &writer) == 0);
-  aye(lio_wrelease(&writer) == fd);
   aye(close(fd) == 0);
 
   struct imm_dna dna_in = {0};
@@ -186,7 +181,6 @@ static void dna_io(void)
   aye(fd != 0);
   lio_rsetup(&reader, fd);
   aye(imm_abc_unpack((struct imm_abc *)&dna_in, &reader) == 0);
-  aye(lio_rrelease(&reader) == fd);
   aye(close(fd) == 0);
 
   struct imm_abc const *out = &dna_out->super.super;
@@ -210,7 +204,6 @@ static void rna_io(void)
   aye(fd != 0);
   lio_wsetup(&writer, fd);
   aye(imm_abc_pack((struct imm_abc const *)rna_out, &writer) == 0);
-  aye(lio_wrelease(&writer) == fd);
   aye(close(fd) == 0);
 
   struct imm_rna rna_in = {0};
@@ -219,7 +212,6 @@ static void rna_io(void)
   aye(fd != 0);
   lio_rsetup(&reader, fd);
   aye(imm_abc_unpack((struct imm_abc *)&rna_in, &reader) == 0);
-  aye(lio_rrelease(&reader) == fd);
   aye(close(fd) == 0);
 
   struct imm_abc const *out = &rna_out->super.super;

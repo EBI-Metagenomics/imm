@@ -190,7 +190,6 @@ static void dp_io_example1(void)
   aye(fd != 0);
   lio_wsetup(&writer, fd);
   aye(imm_dp_pack(&dp, &writer) == 0);
-  aye(lio_wrelease(&writer) == fd);
   aye(close(fd) == 0);
   imm_dp_cleanup(&dp);
 
@@ -199,7 +198,6 @@ static void dp_io_example1(void)
   aye(fd != 0);
   lio_rsetup(&reader, fd);
   aye(imm_dp_unpack(&dp, &reader) == 0);
-  aye(lio_rrelease(&reader) == fd);
   aye(close(fd) == 0);
 
   struct imm_task *task = imm_task_new(&dp);
@@ -245,7 +243,6 @@ static void dp_io_example2(void)
   aye(fd != 0);
   lio_wsetup(&writer, fd);
   aye(imm_dp_pack(&dp, &writer) == 0);
-  aye(lio_wrelease(&writer) == fd);
   aye(close(fd) == 0);
   imm_dp_cleanup(&dp);
 
@@ -254,7 +251,6 @@ static void dp_io_example2(void)
   aye(fd != 0);
   lio_rsetup(&reader, fd);
   aye(imm_dp_unpack(&dp, &reader) == 0);
-  aye(lio_rrelease(&reader) == fd);
   aye(close(fd) == 0);
 
   task = imm_task_new(&dp);
