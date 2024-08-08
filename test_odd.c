@@ -1,15 +1,16 @@
+#include "aye.h"
 #include "imm_abc.h"
 #include "imm_code.h"
 #include "imm_dp.h"
 #include "imm_hmm.h"
 #include "imm_lprob.h"
-#include "imm_minctest.h"
 #include "imm_mute_state.h"
 #include "imm_normal_state.h"
 #include "imm_path.h"
 #include "imm_prod.h"
 #include "imm_seq.h"
 #include "imm_task.h"
+#include "near.h"
 
 static char *state_name(int id, char *name)
 {
@@ -26,8 +27,8 @@ static char *state_name(int id, char *name)
 #define ASSERT_SEQ(PATH, IDX, STATE_ID, SEQSIZE, SCORE)                        \
   do                                                                           \
   {                                                                            \
-    eq(imm_path_step(&PATH, IDX)->state_id, STATE_ID);                         \
-    eq(imm_path_step(&PATH, IDX)->seqsize, SEQSIZE);                           \
+    aye(imm_path_step(&PATH, IDX)->state_id == STATE_ID);                      \
+    aye(imm_path_step(&PATH, IDX)->seqsize == SEQSIZE);                        \
     near(imm_path_step(&PATH, IDX)->score, SCORE);                             \
   } while (0)
 
@@ -41,7 +42,7 @@ static char *state_name(int id, char *name)
 static void odd1(void)
 {
   struct imm_abc abc = {0};
-  eq(imm_abc_init(&abc, imm_str("XJ"), '*'), 0);
+  aye(imm_abc_init(&abc, imm_str("XJ"), '*') == 0);
 
   struct imm_mute_state b = {0};
   imm_mute_state_init(&b, B, &abc);
@@ -65,33 +66,33 @@ static void odd1(void)
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &code);
 
-  eq(imm_hmm_add_state(hmm, &b.super), 0);
-  eq(imm_hmm_add_state(hmm, &x.super), 0);
-  eq(imm_hmm_add_state(hmm, &e.super), 0);
-  eq(imm_hmm_add_state(hmm, &start.super), 0);
-  eq(imm_hmm_add_state(hmm, &end.super), 0);
+  aye(imm_hmm_add_state(hmm, &b.super) == 0);
+  aye(imm_hmm_add_state(hmm, &x.super) == 0);
+  aye(imm_hmm_add_state(hmm, &e.super) == 0);
+  aye(imm_hmm_add_state(hmm, &start.super) == 0);
+  aye(imm_hmm_add_state(hmm, &end.super) == 0);
 
-  eq(imm_hmm_set_start(hmm, &b), 0);
-  eq(imm_hmm_set_trans(hmm, &b.super, &x.super, 100.), 0);
-  eq(imm_hmm_set_trans(hmm, &x.super, &e.super, 1000.), 0);
-  eq(imm_hmm_set_trans(hmm, &e.super, &b.super, 10000.), 0);
-  eq(imm_hmm_set_end(hmm, &e), 0);
-  eq(imm_hmm_set_trans(hmm, &start.super, &b.super, 0.), 0);
-  eq(imm_hmm_set_trans(hmm, &e.super, &end.super, 0.), 0);
+  aye(imm_hmm_set_start(hmm, &b) == 0);
+  aye(imm_hmm_set_trans(hmm, &b.super, &x.super, 100.) == 0);
+  aye(imm_hmm_set_trans(hmm, &x.super, &e.super, 1000.) == 0);
+  aye(imm_hmm_set_trans(hmm, &e.super, &b.super, 10000.) == 0);
+  aye(imm_hmm_set_end(hmm, &e) == 0);
+  aye(imm_hmm_set_trans(hmm, &start.super, &b.super, 0.) == 0);
+  aye(imm_hmm_set_trans(hmm, &e.super, &end.super, 0.) == 0);
 
-  eq(imm_hmm_set_start(hmm, &start), 0);
-  eq(imm_hmm_set_end(hmm, &end), 0);
+  aye(imm_hmm_set_start(hmm, &start) == 0);
+  aye(imm_hmm_set_end(hmm, &end) == 0);
 
   struct imm_dp dp = {0};
-  eq(imm_hmm_init_dp(hmm, &dp), 0);
+  aye(imm_hmm_init_dp(hmm, &dp) == 0);
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
   struct imm_seq seq = imm_seq_unsafe(imm_str("XX"), &abc);
-  eq(imm_eseq_setup(&eseq, &seq), 0);
-  eq(imm_task_setup(task, &eseq), 0);
-  eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  eq(imm_path_nsteps(&prod.path), 8);
+  aye(imm_eseq_setup(&eseq, &seq) == 0);
+  aye(imm_task_setup(task, &eseq) == 0);
+  aye(imm_dp_viterbi(&dp, task, &prod) == 0);
+  aye(imm_path_nsteps(&prod.path) == 8);
   near(imm_hmm_loglik(hmm, &seq, &prod.path), 12202.);
   near(prod.loglik, 12202.);
   imm_dp_set_state_name(&dp, &state_name);
@@ -115,7 +116,7 @@ static void odd1(void)
 static void odd2(void)
 {
   struct imm_abc abc = {0};
-  eq(imm_abc_init(&abc, imm_str("XJ"), '*'), 0);
+  aye(imm_abc_init(&abc, imm_str("XJ"), '*') == 0);
 
   struct imm_mute_state b = {0};
   imm_mute_state_init(&b, B, &abc);
@@ -142,35 +143,35 @@ static void odd2(void)
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &code);
 
-  eq(imm_hmm_add_state(hmm, &b.super), 0);
-  eq(imm_hmm_add_state(hmm, &x.super), 0);
-  eq(imm_hmm_add_state(hmm, &e.super), 0);
-  eq(imm_hmm_add_state(hmm, &j.super), 0);
-  eq(imm_hmm_add_state(hmm, &start.super), 0);
-  eq(imm_hmm_add_state(hmm, &end.super), 0);
+  aye(imm_hmm_add_state(hmm, &b.super) == 0);
+  aye(imm_hmm_add_state(hmm, &x.super) == 0);
+  aye(imm_hmm_add_state(hmm, &e.super) == 0);
+  aye(imm_hmm_add_state(hmm, &j.super) == 0);
+  aye(imm_hmm_add_state(hmm, &start.super) == 0);
+  aye(imm_hmm_add_state(hmm, &end.super) == 0);
 
-  eq(imm_hmm_set_trans(hmm, &b.super, &x.super, 0.), 0);
-  eq(imm_hmm_set_trans(hmm, &x.super, &e.super, 0.), 0);
-  eq(imm_hmm_set_trans(hmm, &e.super, &b.super, 0.), 0);
-  eq(imm_hmm_set_trans(hmm, &e.super, &j.super, 0.), 0);
-  eq(imm_hmm_set_trans(hmm, &j.super, &j.super, 0.), 0);
-  eq(imm_hmm_set_trans(hmm, &j.super, &b.super, 0.), 0);
-  eq(imm_hmm_set_trans(hmm, &start.super, &b.super, 0.), 0);
-  eq(imm_hmm_set_trans(hmm, &e.super, &end.super, 0.), 0);
+  aye(imm_hmm_set_trans(hmm, &b.super, &x.super, 0.) == 0);
+  aye(imm_hmm_set_trans(hmm, &x.super, &e.super, 0.) == 0);
+  aye(imm_hmm_set_trans(hmm, &e.super, &b.super, 0.) == 0);
+  aye(imm_hmm_set_trans(hmm, &e.super, &j.super, 0.) == 0);
+  aye(imm_hmm_set_trans(hmm, &j.super, &j.super, 0.) == 0);
+  aye(imm_hmm_set_trans(hmm, &j.super, &b.super, 0.) == 0);
+  aye(imm_hmm_set_trans(hmm, &start.super, &b.super, 0.) == 0);
+  aye(imm_hmm_set_trans(hmm, &e.super, &end.super, 0.) == 0);
 
-  eq(imm_hmm_set_start(hmm, &start), 0);
-  eq(imm_hmm_set_end(hmm, &end), 0);
+  aye(imm_hmm_set_start(hmm, &start) == 0);
+  aye(imm_hmm_set_end(hmm, &end) == 0);
 
   struct imm_dp dp = {0};
-  eq(imm_hmm_init_dp(hmm, &dp), 0);
+  aye(imm_hmm_init_dp(hmm, &dp) == 0);
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
 
   struct imm_seq seq = imm_seq_unsafe(imm_str("XJX"), &abc);
-  eq(imm_eseq_setup(&eseq, &seq), 0);
-  eq(imm_task_setup(task, &eseq), 0);
-  eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  eq(imm_path_nsteps(&prod.path), 9);
+  aye(imm_eseq_setup(&eseq, &seq) == 0);
+  aye(imm_task_setup(task, &eseq) == 0);
+  aye(imm_dp_viterbi(&dp, task, &prod) == 0);
+  aye(imm_path_nsteps(&prod.path) == 9);
   near(imm_path_score(&prod.path), 0);
   near(imm_hmm_loglik(hmm, &seq, &prod.path), 0);
   near(prod.loglik, 0);
@@ -195,7 +196,8 @@ static void odd2(void)
 
 int main(void)
 {
-  lrun("odd1", odd1);
-  lrun("odd2", odd2);
-  return lfails != 0;
+  aye_begin();
+  odd1();
+  odd2();
+  return aye_end();
 }

@@ -1,11 +1,12 @@
+#include "aye.h"
 #include "imm_gencode.h"
-#include "imm_minctest.h"
+#include <string.h>
 
 static void gc_f(void)
 {
   struct imm_gencode const *gc = imm_gencode_get(1);
-  cmp(gc->name1, "Standard");
-  cmp(gc->name2, "SGC0");
+  aye(!strcmp(gc->name1, "Standard"));
+  aye(!strcmp(gc->name2, "SGC0"));
 
   struct imm_nuclt const *nuclt = &imm_gencode_dna->super;
   struct imm_codon codons[2] = {IMM_CODON(nuclt, "TTT"),
@@ -16,9 +17,9 @@ static void gc_f(void)
   {
     if (imm_gencode_amino(gc, i) == 'F')
     {
-      eq(imm_gencode_codon(gc, i).a, codons[idx].a);
-      eq(imm_gencode_codon(gc, i).b, codons[idx].b);
-      eq(imm_gencode_codon(gc, i).c, codons[idx].c);
+      aye(imm_gencode_codon(gc, i).a == codons[idx].a);
+      aye(imm_gencode_codon(gc, i).b == codons[idx].b);
+      aye(imm_gencode_codon(gc, i).c == codons[idx].c);
       idx++;
     }
   }
@@ -27,8 +28,8 @@ static void gc_f(void)
 static void gc_l(void)
 {
   struct imm_gencode const *gc = imm_gencode_get(1);
-  cmp(gc->name1, "Standard");
-  cmp(gc->name2, "SGC0");
+  aye(!strcmp(gc->name1, "Standard"));
+  aye(!strcmp(gc->name2, "SGC0"));
 
   struct imm_nuclt const *nuclt = &imm_gencode_dna->super;
   struct imm_codon codons[6] = {
@@ -41,9 +42,9 @@ static void gc_l(void)
   {
     if (imm_gencode_amino(gc, i) == 'L')
     {
-      eq(imm_gencode_codon(gc, i).a, codons[idx].a);
-      eq(imm_gencode_codon(gc, i).b, codons[idx].b);
-      eq(imm_gencode_codon(gc, i).c, codons[idx].c);
+      aye(imm_gencode_codon(gc, i).a == codons[idx].a);
+      aye(imm_gencode_codon(gc, i).b == codons[idx].b);
+      aye(imm_gencode_codon(gc, i).c == codons[idx].c);
       idx++;
     }
   }
@@ -52,8 +53,8 @@ static void gc_l(void)
 static void gc_p(void)
 {
   struct imm_gencode const *gc = imm_gencode_get(1);
-  cmp(gc->name1, "Standard");
-  cmp(gc->name2, "SGC0");
+  aye(!strcmp(gc->name1, "Standard"));
+  aye(!strcmp(gc->name2, "SGC0"));
 
   struct imm_nuclt const *nuclt = &imm_gencode_dna->super;
   struct imm_codon codons[4] = {
@@ -65,9 +66,9 @@ static void gc_p(void)
   {
     if (imm_gencode_amino(gc, i) == 'P')
     {
-      eq(imm_gencode_codon(gc, i).a, codons[idx].a);
-      eq(imm_gencode_codon(gc, i).b, codons[idx].b);
-      eq(imm_gencode_codon(gc, i).c, codons[idx].c);
+      aye(imm_gencode_codon(gc, i).a == codons[idx].a);
+      aye(imm_gencode_codon(gc, i).b == codons[idx].b);
+      aye(imm_gencode_codon(gc, i).c == codons[idx].c);
       idx++;
     }
   }
@@ -76,18 +77,19 @@ static void gc_p(void)
 static void gc_decode(void)
 {
   struct imm_gencode const *gc = imm_gencode_get(1);
-  cmp(gc->name1, "Standard");
-  cmp(gc->name2, "SGC0");
+  aye(!strcmp(gc->name1, "Standard"));
+  aye(!strcmp(gc->name2, "SGC0"));
   struct imm_nuclt const *nuclt = &imm_gencode_dna->super;
-  eq(imm_gencode_decode(gc, IMM_CODON(nuclt, "CCG")), 'P');
-  eq(imm_gencode_decode(gc, IMM_CODON(nuclt, "TAG")), '*');
+  aye(imm_gencode_decode(gc, IMM_CODON(nuclt, "CCG")) == 'P');
+  aye(imm_gencode_decode(gc, IMM_CODON(nuclt, "TAG")) == '*');
 }
 
 int main(void)
 {
-  lrun("gc_f", gc_f);
-  lrun("gc_l", gc_l);
-  lrun("gc_p", gc_p);
-  lrun("gc_decode", gc_decode);
-  return lfails != 0;
+  aye_begin();
+  gc_f();
+  gc_l();
+  gc_p();
+  gc_decode();
+  return aye_end();
 }

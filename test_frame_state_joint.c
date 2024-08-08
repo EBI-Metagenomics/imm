@@ -1,12 +1,13 @@
+#include "aye.h"
 #include "imm_cartes.h"
 #include "imm_codon_lprob.h"
 #include "imm_codon_marg.h"
 #include "imm_dna.h"
 #include "imm_frame_state.h"
 #include "imm_lprob.h"
-#include "imm_minctest.h"
 #include "imm_nuclt_lprob.h"
 #include "imm_state.h"
+#include "near.h"
 
 static void setup_codonp(struct imm_codon_lprob *codonp);
 static struct imm_nuclt_lprob setup_nucltp(struct imm_nuclt const *);
@@ -120,8 +121,9 @@ static void frame_state_joint33(void)
 
 int main(void)
 {
-  lrun("frame_state_joint15", frame_state_joint15);
-  lrun("frame_state_joint24", frame_state_joint24);
-  lrun("frame_state_joint33", frame_state_joint33);
-  return lfails != 0;
+  aye_begin();
+  frame_state_joint15();
+  frame_state_joint24();
+  frame_state_joint33();
+  return aye_end();
 }

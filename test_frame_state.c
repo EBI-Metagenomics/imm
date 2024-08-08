@@ -1,10 +1,11 @@
+#include "aye.h"
 #include "imm_cartes.h"
 #include "imm_codon_lprob.h"
 #include "imm_dna.h"
 #include "imm_frame_state.h"
 #include "imm_lprob.h"
-#include "imm_minctest.h"
 #include "imm_span.h"
+#include "near.h"
 
 static void run_frame_state1(float lprobs[], struct imm_span span)
 {
@@ -26,19 +27,19 @@ static void run_frame_state1(float lprobs[], struct imm_span span)
   struct imm_state *s = &state.super;
 
   struct imm_seq seq = imm_seq_unsafe(imm_str("A"), abc);
-  near(imm_state_lprob(s, &seq), lprobs[0]);
+  aye(near(imm_state_lprob(s, &seq), lprobs[0]));
   seq = imm_seq_unsafe(imm_str("AT"), abc);
-  near(imm_state_lprob(s, &seq), lprobs[1]);
+  aye(near(imm_state_lprob(s, &seq), lprobs[1]));
   seq = imm_seq_unsafe(imm_str("ATA"), abc);
-  near(imm_state_lprob(s, &seq), lprobs[2]);
+  aye(near(imm_state_lprob(s, &seq), lprobs[2]));
   seq = imm_seq_unsafe(imm_str("ATG"), abc);
-  near(imm_state_lprob(s, &seq), lprobs[3]);
+  aye(near(imm_state_lprob(s, &seq), lprobs[3]));
   seq = imm_seq_unsafe(imm_str("ATT"), abc);
-  near(imm_state_lprob(s, &seq), lprobs[4]);
+  aye(near(imm_state_lprob(s, &seq), lprobs[4]));
   seq = imm_seq_unsafe(imm_str("ATTA"), abc);
-  near(imm_state_lprob(s, &seq), lprobs[5]);
+  aye(near(imm_state_lprob(s, &seq), lprobs[5]));
   seq = imm_seq_unsafe(imm_str("ATTAA"), abc);
-  near(imm_state_lprob(s, &seq), lprobs[6]);
+  aye(near(imm_state_lprob(s, &seq), lprobs[6]));
 }
 
 static void frame_state1(void)
@@ -70,32 +71,32 @@ static void frame_state2(void)
 
   struct imm_seq seq;
   seq = imm_seq_unsafe(imm_str("A"), abc);
-  near(imm_state_lprob(s, &seq), -5.9145034795);
+  aye(near(imm_state_lprob(s, &seq), -5.9145034795f));
   seq = imm_seq_unsafe(imm_str("C"), abc);
-  ok(imm_lprob_is_zero(imm_state_lprob(s, &seq)));
+  aye(imm_lprob_is_zero(imm_state_lprob(s, &seq)));
   seq = imm_seq_unsafe(imm_str("G"), abc);
-  near(imm_state_lprob(s, &seq), -6.0322865151);
+  aye(near(imm_state_lprob(s, &seq), -6.0322865151f));
   seq = imm_seq_unsafe(imm_str("T"), abc);
-  near(imm_state_lprob(s, &seq), -5.8091429638);
+  aye(near(imm_state_lprob(s, &seq), -5.8091429638f));
 
   seq = imm_seq_unsafe(imm_str("AT"), abc);
-  near(imm_state_lprob(s, &seq), -2.9159357400);
+  aye(near(imm_state_lprob(s, &seq), -2.9159357400f));
   seq = imm_seq_unsafe(imm_str("ATA"), abc);
-  near(imm_state_lprob(s, &seq), -7.8215183173);
+  aye(near(imm_state_lprob(s, &seq), -7.8215183173f));
   seq = imm_seq_unsafe(imm_str("ATG"), abc);
-  near(imm_state_lprob(s, &seq), -0.5344319144);
+  aye(near(imm_state_lprob(s, &seq), -0.5344319144f));
   seq = imm_seq_unsafe(imm_str("ATC"), abc);
-  near(imm_state_lprob(s, &seq), -7.1294800576);
+  aye(near(imm_state_lprob(s, &seq), -7.1294800576f));
   seq = imm_seq_unsafe(imm_str("ATT"), abc);
-  near(imm_state_lprob(s, &seq), -2.5751452135);
+  aye(near(imm_state_lprob(s, &seq), -2.5751452135f));
 
   seq = imm_seq_unsafe(imm_str("ATTA"), abc);
-  near(imm_state_lprob(s, &seq), -7.7896445735);
+  aye(near(imm_state_lprob(s, &seq), -7.7896445735f));
   seq = imm_seq_unsafe(imm_str("ACTG"), abc);
-  near(imm_state_lprob(s, &seq), -5.0366370866);
+  aye(near(imm_state_lprob(s, &seq), -5.0366370866f));
 
   seq = imm_seq_unsafe(imm_str("ATTAA"), abc);
-  near(imm_state_lprob(s, &seq), -13.9208710471);
+  aye(near(imm_state_lprob(s, &seq), -13.9208710471f));
 }
 
 static void frame_state3(void)
@@ -122,37 +123,37 @@ static void frame_state3(void)
 
   struct imm_seq seq;
   seq = imm_seq_unsafe(imm_str("A"), abc);
-  near(imm_state_lprob(s, &seq), -6.2822282596);
+  aye(near(imm_state_lprob(s, &seq), -6.2822282596f));
   seq = imm_seq_unsafe(imm_str("C"), abc);
-  near(imm_state_lprob(s, &seq), -7.0931584758);
+  aye(near(imm_state_lprob(s, &seq), -7.0931584758f));
   seq = imm_seq_unsafe(imm_str("G"), abc);
-  near(imm_state_lprob(s, &seq), -5.9945461872);
+  aye(near(imm_state_lprob(s, &seq), -5.9945461872f));
   seq = imm_seq_unsafe(imm_str("T"), abc);
-  near(imm_state_lprob(s, &seq), -5.8403955073);
+  aye(near(imm_state_lprob(s, &seq), -5.8403955073f));
   seq = imm_seq_unsafe(imm_str("AT"), abc);
-  near(imm_state_lprob(s, &seq), -3.2834143360);
+  aye(near(imm_state_lprob(s, &seq), -3.2834143360f));
   seq = imm_seq_unsafe(imm_str("CG"), abc);
-  near(imm_state_lprob(s, &seq), -9.3957435523);
+  aye(near(imm_state_lprob(s, &seq), -9.3957435523f));
   seq = imm_seq_unsafe(imm_str("ATA"), abc);
-  near(imm_state_lprob(s, &seq), -8.1891199599);
+  aye(near(imm_state_lprob(s, &seq), -8.1891199599f));
   seq = imm_seq_unsafe(imm_str("ATG"), abc);
-  near(imm_state_lprob(s, &seq), -0.9021561046);
+  aye(near(imm_state_lprob(s, &seq), -0.9021561046f));
   seq = imm_seq_unsafe(imm_str("ATT"), abc);
-  near(imm_state_lprob(s, &seq), -2.9428648052);
+  aye(near(imm_state_lprob(s, &seq), -2.9428648052f));
   seq = imm_seq_unsafe(imm_str("ATC"), abc);
-  near(imm_state_lprob(s, &seq), -7.3148113691);
+  aye(near(imm_state_lprob(s, &seq), -7.3148113691f));
   seq = imm_seq_unsafe(imm_str("GTC"), abc);
-  near(imm_state_lprob(s, &seq), -1.5951613416);
+  aye(near(imm_state_lprob(s, &seq), -1.5951613416f));
   seq = imm_seq_unsafe(imm_str("ATTA"), abc);
-  near(imm_state_lprob(s, &seq), -8.1573693536);
+  aye(near(imm_state_lprob(s, &seq), -8.1573693536f));
   seq = imm_seq_unsafe(imm_str("GTTC"), abc);
-  near(imm_state_lprob(s, &seq), -4.7116424205);
+  aye(near(imm_state_lprob(s, &seq), -4.7116424205f));
   seq = imm_seq_unsafe(imm_str("ACTG"), abc);
-  near(imm_state_lprob(s, &seq), -5.4043618667);
+  aye(near(imm_state_lprob(s, &seq), -5.4043618667f));
   seq = imm_seq_unsafe(imm_str("ATTAA"), abc);
-  near(imm_state_lprob(s, &seq), -14.2885958273);
+  aye(near(imm_state_lprob(s, &seq), -14.2885958273f));
   seq = imm_seq_unsafe(imm_str("GTCAA"), abc);
-  near(imm_state_lprob(s, &seq), -12.9023014661);
+  aye(near(imm_state_lprob(s, &seq), -12.9023014661f));
 }
 
 static void frame_state_lposterior(void)
@@ -215,7 +216,7 @@ static void frame_state_lposterior(void)
         total = imm_lprob_add(total, lprob);
       }
     }
-    near(expf(total), 1.0);
+    aye(near(expf(total), 1.0));
   }
 }
 
@@ -243,72 +244,73 @@ static void frame_state_decode(void)
 
   struct imm_seq seq;
   seq = imm_seq_unsafe(imm_str("ATG"), abc);
-  near(imm_frame_state_decode(&state, &seq, &codon), -0.9025667126);
-  ok(codon.a == imm_abc_symbol_idx(abc, 'A') &&
-     codon.b == imm_abc_symbol_idx(abc, 'T') &&
-     codon.c == imm_abc_symbol_idx(abc, 'G'));
+  aye(near(imm_frame_state_decode(&state, &seq, &codon), -0.9025667126f));
+  aye(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+      codon.b == imm_abc_symbol_idx(abc, 'T') &&
+      codon.c == imm_abc_symbol_idx(abc, 'G'));
 
   seq = imm_seq_unsafe(imm_str("ATGT"), abc);
-  near(imm_frame_state_decode(&state, &seq, &codon), -4.7105990700);
-  ok(codon.a == imm_abc_symbol_idx(abc, 'A') &&
-     codon.b == imm_abc_symbol_idx(abc, 'T') &&
-     codon.c == imm_abc_symbol_idx(abc, 'G'));
+  aye(near(imm_frame_state_decode(&state, &seq, &codon), -4.7105990700f));
+  aye(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+      codon.b == imm_abc_symbol_idx(abc, 'T') &&
+      codon.c == imm_abc_symbol_idx(abc, 'G'));
 
   seq = imm_seq_unsafe(imm_str("ATGA"), abc);
-  near(imm_frame_state_decode(&state, &seq, &codon), -6.0977143369);
-  ok(codon.a == imm_abc_symbol_idx(abc, 'A') &&
-     codon.b == imm_abc_symbol_idx(abc, 'T') &&
-     codon.c == imm_abc_symbol_idx(abc, 'G'));
+  aye(near(imm_frame_state_decode(&state, &seq, &codon), -6.0977143369f));
+  aye(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+      codon.b == imm_abc_symbol_idx(abc, 'T') &&
+      codon.c == imm_abc_symbol_idx(abc, 'G'));
 
   seq = imm_seq_unsafe(imm_str("ATGGT"), abc);
-  near(imm_frame_state_decode(&state, &seq, &codon), -9.0311004552);
-  ok(codon.a == imm_abc_symbol_idx(abc, 'A') &&
-     codon.b == imm_abc_symbol_idx(abc, 'T') &&
-     codon.c == imm_abc_symbol_idx(abc, 'G'));
+  aye(near(imm_frame_state_decode(&state, &seq, &codon), -9.0311004552f));
+  aye(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+      codon.b == imm_abc_symbol_idx(abc, 'T') &&
+      codon.c == imm_abc_symbol_idx(abc, 'G'));
 
   seq = imm_seq_unsafe(imm_str("ATT"), abc);
-  near(imm_frame_state_decode(&state, &seq, &codon), -2.9771014466);
-  ok(codon.a == imm_abc_symbol_idx(abc, 'A') &&
-     codon.b == imm_abc_symbol_idx(abc, 'T') &&
-     codon.c == imm_abc_symbol_idx(abc, 'T'));
+  aye(near(imm_frame_state_decode(&state, &seq, &codon), -2.9771014466f));
+  aye(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+      codon.b == imm_abc_symbol_idx(abc, 'T') &&
+      codon.c == imm_abc_symbol_idx(abc, 'T'));
 
   seq = imm_seq_unsafe(imm_str("ATC"), abc);
-  near(imm_frame_state_decode(&state, &seq, &codon), -7.7202251148);
-  ok(codon.a == imm_abc_symbol_idx(abc, 'A') &&
-     codon.b == imm_abc_symbol_idx(abc, 'T') &&
-     codon.c == imm_abc_symbol_idx(abc, 'G'));
+  aye(near(imm_frame_state_decode(&state, &seq, &codon), -7.7202251148f));
+  aye(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+      codon.b == imm_abc_symbol_idx(abc, 'T') &&
+      codon.c == imm_abc_symbol_idx(abc, 'G'));
 
   seq = imm_seq_unsafe(imm_str("TC"), abc);
-  near(imm_frame_state_decode(&state, &seq, &codon), -4.1990898725);
-  ok(codon.a == imm_abc_symbol_idx(abc, 'G') &&
-     codon.b == imm_abc_symbol_idx(abc, 'T') &&
-     codon.c == imm_abc_symbol_idx(abc, 'C'));
+  aye(near(imm_frame_state_decode(&state, &seq, &codon), -4.1990898725f));
+  aye(codon.a == imm_abc_symbol_idx(abc, 'G') &&
+      codon.b == imm_abc_symbol_idx(abc, 'T') &&
+      codon.c == imm_abc_symbol_idx(abc, 'C'));
 
   seq = imm_seq_unsafe(imm_str("A"), abc);
-  near(imm_frame_state_decode(&state, &seq, &codon), -6.4000112953);
-  ok(codon.a == imm_abc_symbol_idx(abc, 'A') &&
-     codon.b == imm_abc_symbol_idx(abc, 'T') &&
-     codon.c == imm_abc_symbol_idx(abc, 'G'));
+  aye(near(imm_frame_state_decode(&state, &seq, &codon), -6.4000112953f));
+  aye(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+      codon.b == imm_abc_symbol_idx(abc, 'T') &&
+      codon.c == imm_abc_symbol_idx(abc, 'G'));
 
   seq = imm_seq_unsafe(imm_str("AG"), abc);
-  near(imm_frame_state_decode(&state, &seq, &codon), -3.5071734613);
-  ok(codon.a == imm_abc_symbol_idx(abc, 'A') &&
-     codon.b == imm_abc_symbol_idx(abc, 'T') &&
-     codon.c == imm_abc_symbol_idx(abc, 'G'));
+  aye(near(imm_frame_state_decode(&state, &seq, &codon), -3.5071734613f));
+  aye(codon.a == imm_abc_symbol_idx(abc, 'A') &&
+      codon.b == imm_abc_symbol_idx(abc, 'T') &&
+      codon.c == imm_abc_symbol_idx(abc, 'G'));
 
   seq = imm_seq_unsafe(imm_str("GC"), abc);
-  near(imm_frame_state_decode(&state, &seq, &codon), -4.1997050678);
-  ok(codon.a == imm_abc_symbol_idx(abc, 'G') &&
-     codon.b == imm_abc_symbol_idx(abc, 'T') &&
-     codon.c == imm_abc_symbol_idx(abc, 'C'));
+  aye(near(imm_frame_state_decode(&state, &seq, &codon), -4.1997050678f));
+  aye(codon.a == imm_abc_symbol_idx(abc, 'G') &&
+      codon.b == imm_abc_symbol_idx(abc, 'T') &&
+      codon.c == imm_abc_symbol_idx(abc, 'C'));
 }
 
 int main(void)
 {
-  lrun("frame_state1", frame_state1);
-  lrun("frame_state2", frame_state2);
-  lrun("frame_state3", frame_state3);
-  lrun("frame_state_lposterior", frame_state_lposterior);
-  lrun("frame_state_decode", frame_state_decode);
-  return lfails != 0;
+  aye_begin();
+  frame_state1();
+  frame_state2();
+  frame_state3();
+  frame_state_lposterior();
+  frame_state_decode();
+  return aye_end();
 }

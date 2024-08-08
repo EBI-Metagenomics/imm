@@ -1,15 +1,17 @@
+#include "aye.h"
 #include "imm_abc.h"
 #include "imm_code.h"
 #include "imm_dna.h"
 #include "imm_dp.h"
 #include "imm_eseq.h"
 #include "imm_hmm.h"
-#include "imm_minctest.h"
 #include "imm_mute_state.h"
 #include "imm_normal_state.h"
 #include "imm_prod.h"
 #include "imm_table_state.h"
 #include "imm_task.h"
+#include "near.h"
+#include <string.h>
 
 #define S 0
 #define N 1
@@ -55,9 +57,9 @@ static char *state_name(int id, char *name)
 #define ASSERT_SEQ(PATH, IDX, STATE_ID, SEQSIZE, SCORE)                        \
   do                                                                           \
   {                                                                            \
-    eq(imm_path_step(&PATH, IDX)->state_id, STATE_ID);                         \
-    eq(imm_path_step(&PATH, IDX)->seqsize, SEQSIZE);                           \
-    near(imm_path_step(&PATH, IDX)->score, SCORE);                             \
+    aye(imm_path_step(&PATH, IDX)->state_id == STATE_ID);                      \
+    aye(imm_path_step(&PATH, IDX)->seqsize == SEQSIZE);                        \
+    aye(near(imm_path_step(&PATH, IDX)->score, SCORE));                        \
   } while (0)
 
 static void states_sne(void)
@@ -94,9 +96,9 @@ static void states_sne(void)
 
   imm_dp_set_state_name(&dp, &state_name);
   imm_dp_viterbi(&dp, task, &prod);
-  near(prod.loglik, 7);
+  aye(near(prod.loglik, 7));
   imm_path_dump(&prod.path, &state_name, &seq, null);
-  near(imm_path_score(&prod.path), 7);
+  aye(near(imm_path_score(&prod.path), 7));
   imm_trellis_set_ids(&task->trellis, dp.state_table.ids);
   imm_trellis_set_state_name(&task->trellis, &state_name);
   imm_trellis_dump(&task->trellis, null);
@@ -147,14 +149,14 @@ static void states_sne_no_solution(void)
 
   imm_dp_set_state_name(&dp, &state_name);
   imm_dp_viterbi(&dp, task, &prod);
-  ok(imm_lprob_is_nan(prod.loglik));
+  aye(imm_lprob_is_nan(prod.loglik));
   imm_path_dump(&prod.path, &state_name, &seq, null);
-  ok(imm_lprob_is_nan(imm_path_score(&prod.path)));
+  aye(imm_lprob_is_nan(imm_path_score(&prod.path)));
   imm_trellis_set_ids(&task->trellis, dp.state_table.ids);
   imm_trellis_set_state_name(&task->trellis, &state_name);
   imm_trellis_dump(&task->trellis, null);
 
-  eq(imm_path_nsteps(&prod.path), 0);
+  aye(imm_path_nsteps(&prod.path) == 0);
 
   imm_dp_cleanup(&dp);
   imm_task_del(task);
@@ -203,9 +205,9 @@ static void states_ste(void)
 
   imm_dp_set_state_name(&dp, &state_name);
   imm_dp_viterbi(&dp, task, &prod);
-  near(prod.loglik, 34);
+  aye(near(prod.loglik, 34));
   imm_path_dump(&prod.path, &state_name, &seq, null);
-  near(imm_path_score(&prod.path), 34);
+  aye(near(imm_path_score(&prod.path), 34));
   imm_trellis_set_ids(&task->trellis, dp.state_table.ids);
   imm_trellis_set_state_name(&task->trellis, &state_name);
   imm_trellis_dump(&task->trellis, null);
@@ -255,9 +257,9 @@ static void states_ste_2(void)
 
   imm_dp_set_state_name(&dp, &state_name);
   imm_dp_viterbi(&dp, task, &prod);
-  near(prod.loglik, 47);
+  aye(near(prod.loglik, 47));
   imm_path_dump(&prod.path, &state_name, &seq, null);
-  near(imm_path_score(&prod.path), 47);
+  aye(near(imm_path_score(&prod.path), 47));
   imm_trellis_set_ids(&task->trellis, dp.state_table.ids);
   imm_trellis_set_state_name(&task->trellis, &state_name);
   imm_trellis_dump(&task->trellis, null);
@@ -276,9 +278,10 @@ static void states_ste_2(void)
 
 int main(void)
 {
-  lrun("states_sne", states_sne);
-  lrun("states_sne_no_solution", states_sne_no_solution);
-  lrun("states_ste", states_ste);
-  lrun("states_ste_2", states_ste_2);
-  return lfails != 0;
+  aye_begin();
+  states_sne();
+  states_sne_no_solution();
+  states_ste();
+  states_ste_2();
+  return aye_end();
 }

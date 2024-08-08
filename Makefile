@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -std=c11 -Wall -Wextra -O2 -MMD -MP
 SRC = $(filter-out $(wildcard test_*.c),$(wildcard *.c))
 OBJ = $(SRC:.c=.o)
-HDR = $(wildcard *.h)
+HDR = $(wildcard imm_*.h)
 LIB = libimm.a
 PREFIX ?= /usr/local
 TEST_SRC = $(wildcard test_*.c)

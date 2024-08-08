@@ -1,14 +1,15 @@
+#include "aye.h"
 #include "imm_abc.h"
 #include "imm_dp.h"
 #include "imm_ex1.h"
 #include "imm_ex2.h"
 #include "imm_hmm.h"
-#include "imm_minctest.h"
 #include "imm_mute_state.h"
 #include "imm_normal_state.h"
 #include "imm_prod.h"
 #include "imm_task.h"
 #include "lite_pack_io.h"
+#include "near.h"
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -31,26 +32,26 @@ static void dp_illegal(void)
   struct imm_hmm *hmm = imm_hmm_new(&code);
 
   struct imm_dp dp;
-  eq(imm_hmm_init_dp(hmm, &dp), IMM_ENOSTART);
+  aye(imm_hmm_init_dp(hmm, &dp) == IMM_ENOSTART);
   imm_dp_cleanup(&dp);
 
-  eq(imm_hmm_add_state(hmm, &state.super), 0);
-  eq(imm_hmm_init_dp(hmm, &dp), IMM_ENOSTART);
+  aye(imm_hmm_add_state(hmm, &state.super) == 0);
+  aye(imm_hmm_init_dp(hmm, &dp) == IMM_ENOSTART);
   imm_dp_cleanup(&dp);
 
-  eq(imm_hmm_set_start(hmm, &state), 0);
-  eq(imm_hmm_set_end(hmm, &state), 0);
-  eq(imm_hmm_init_dp(hmm, &dp), 0);
+  aye(imm_hmm_set_start(hmm, &state) == 0);
+  aye(imm_hmm_set_end(hmm, &state) == 0);
+  aye(imm_hmm_init_dp(hmm, &dp) == 0);
   imm_dp_cleanup(&dp);
 
-  eq(imm_hmm_add_state(hmm, &start.super), 0);
-  eq(imm_hmm_add_state(hmm, &end.super), 0);
-  eq(imm_hmm_set_trans(hmm, &start.super, &state.super, 0), 0);
-  eq(imm_hmm_set_trans(hmm, &state.super, &state.super, logf(0.5f)), 0);
-  eq(imm_hmm_set_trans(hmm, &state.super, &end.super, 0), 0);
-  eq(imm_hmm_set_start(hmm, &start), 0);
-  eq(imm_hmm_set_end(hmm, &end), 0);
-  eq(imm_hmm_init_dp(hmm, &dp), IMM_EMUTECYLES);
+  aye(imm_hmm_add_state(hmm, &start.super) == 0);
+  aye(imm_hmm_add_state(hmm, &end.super) == 0);
+  aye(imm_hmm_set_trans(hmm, &start.super, &state.super, 0) == 0);
+  aye(imm_hmm_set_trans(hmm, &state.super, &state.super, logf(0.5f)) == 0);
+  aye(imm_hmm_set_trans(hmm, &state.super, &end.super, 0) == 0);
+  aye(imm_hmm_set_start(hmm, &start) == 0);
+  aye(imm_hmm_set_end(hmm, &end) == 0);
+  aye(imm_hmm_init_dp(hmm, &dp) == IMM_EMUTECYLES);
   imm_dp_cleanup(&dp);
   imm_hmm_del(hmm);
 }
@@ -65,17 +66,17 @@ static void dp_empty_path(void)
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &code);
 
-  eq(imm_hmm_add_state(hmm, &state.super), 0);
-  eq(imm_hmm_set_start(hmm, &state), 0);
-  eq(imm_hmm_set_end(hmm, &state), 0);
+  aye(imm_hmm_add_state(hmm, &state.super) == 0);
+  aye(imm_hmm_set_start(hmm, &state) == 0);
+  aye(imm_hmm_set_end(hmm, &state) == 0);
   struct imm_dp dp;
-  eq(imm_hmm_init_dp(hmm, &dp), 0);
+  aye(imm_hmm_init_dp(hmm, &dp) == 0);
 
   struct imm_task *task = imm_task_new(&dp);
-  eq(imm_eseq_setup(&eseq, &A), 0);
-  eq(imm_task_setup(task, &eseq), 0);
-  eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  eq(imm_path_nsteps(&prod.path), 0);
+  aye(imm_eseq_setup(&eseq, &A) == 0);
+  aye(imm_task_setup(task, &eseq) == 0);
+  aye(imm_dp_viterbi(&dp, task, &prod) == 0);
+  aye(imm_path_nsteps(&prod.path) == 0);
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
@@ -93,25 +94,25 @@ static void dp_one_mute(void)
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &code);
 
-  eq(imm_hmm_add_state(hmm, &state.super), 0);
+  aye(imm_hmm_add_state(hmm, &state.super) == 0);
 
-  eq(imm_hmm_set_start(hmm, &state), 0);
-  eq(imm_hmm_set_end(hmm, &state), 0);
+  aye(imm_hmm_set_start(hmm, &state) == 0);
+  aye(imm_hmm_set_end(hmm, &state) == 0);
   struct imm_dp dp;
-  eq(imm_hmm_init_dp(hmm, &dp), 0);
+  aye(imm_hmm_init_dp(hmm, &dp) == 0);
 
   struct imm_task *task = imm_task_new(&dp);
-  eq(imm_dp_viterbi(&dp, task, &prod), IMM_ENOSEQ);
+  aye(imm_dp_viterbi(&dp, task, &prod) == IMM_ENOSEQ);
 
-  eq(imm_eseq_setup(&eseq, &EMPTY), 0);
-  eq(imm_task_setup(task, &eseq), 0);
-  eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  eq(imm_path_nsteps(&prod.path), 1);
+  aye(imm_eseq_setup(&eseq, &EMPTY) == 0);
+  aye(imm_task_setup(task, &eseq) == 0);
+  aye(imm_dp_viterbi(&dp, task, &prod) == 0);
+  aye(imm_path_nsteps(&prod.path) == 1);
 
-  eq(imm_eseq_setup(&eseq, &ATT), 0);
-  eq(imm_task_setup(task, &eseq), 0);
-  eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  eq(imm_path_nsteps(&prod.path), 0);
+  aye(imm_eseq_setup(&eseq, &ATT) == 0);
+  aye(imm_task_setup(task, &eseq) == 0);
+  aye(imm_dp_viterbi(&dp, task, &prod) == 0);
+  aye(imm_path_nsteps(&prod.path) == 0);
 
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
@@ -132,38 +133,38 @@ static void dp_two_mutes(void)
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &code);
 
-  eq(imm_hmm_add_state(hmm, &state0.super), 0);
-  eq(imm_hmm_add_state(hmm, &state1.super), 0);
+  aye(imm_hmm_add_state(hmm, &state0.super) == 0);
+  aye(imm_hmm_add_state(hmm, &state1.super) == 0);
 
-  eq(imm_hmm_set_trans(hmm, &state0.super, &state1.super, logf(0.5f)), 0);
+  aye(imm_hmm_set_trans(hmm, &state0.super, &state1.super, logf(0.5f)) == 0);
 
   struct imm_dp dp;
 
-  eq(imm_hmm_init_dp(hmm, &dp), IMM_ENOSTART);
-  eq(imm_hmm_set_start(hmm, &state0), 0);
+  aye(imm_hmm_init_dp(hmm, &dp) == IMM_ENOSTART);
+  aye(imm_hmm_set_start(hmm, &state0) == 0);
 
-  eq(imm_hmm_init_dp(hmm, &dp), IMM_ENOEND);
-  eq(imm_hmm_set_end(hmm, &state1), 0);
+  aye(imm_hmm_init_dp(hmm, &dp) == IMM_ENOEND);
+  aye(imm_hmm_set_end(hmm, &state1) == 0);
 
-  eq(imm_hmm_init_dp(hmm, &dp), 0);
+  aye(imm_hmm_init_dp(hmm, &dp) == 0);
 
   struct imm_task *task = imm_task_new(&dp);
 
-  eq(imm_dp_viterbi(&dp, task, &prod), IMM_ENOSEQ);
+  aye(imm_dp_viterbi(&dp, task, &prod) == IMM_ENOSEQ);
 
-  eq(imm_eseq_setup(&eseq, &EMPTY), 0);
-  eq(imm_task_setup(task, &eseq), 0);
-  eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  eq(imm_path_nsteps(&prod.path), 2);
-  eq(imm_path_step(&prod.path, 0)->seqsize, 0);
-  eq(imm_path_step(&prod.path, 0)->state_id, 0);
-  eq(imm_path_step(&prod.path, 1)->seqsize, 0);
-  eq(imm_path_step(&prod.path, 1)->state_id, 12);
+  aye(imm_eseq_setup(&eseq, &EMPTY) == 0);
+  aye(imm_task_setup(task, &eseq) == 0);
+  aye(imm_dp_viterbi(&dp, task, &prod) == 0);
+  aye(imm_path_nsteps(&prod.path) == 2);
+  aye(imm_path_step(&prod.path, 0)->seqsize == 0);
+  aye(imm_path_step(&prod.path, 0)->state_id == 0);
+  aye(imm_path_step(&prod.path, 1)->seqsize == 0);
+  aye(imm_path_step(&prod.path, 1)->state_id == 12);
 
-  eq(imm_eseq_setup(&eseq, &ATT), 0);
-  eq(imm_task_setup(task, &eseq), 0);
-  eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  eq(imm_path_nsteps(&prod.path), 0);
+  aye(imm_eseq_setup(&eseq, &ATT) == 0);
+  aye(imm_task_setup(task, &eseq) == 0);
+  aye(imm_dp_viterbi(&dp, task, &prod) == 0);
+  aye(imm_path_nsteps(&prod.path) == 0);
 
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
@@ -180,32 +181,32 @@ static void dp_io_example1(void)
   imm_ex1_init(10);
   struct imm_ex1 *m = &imm_ex1;
   struct imm_dp dp;
-  eq(imm_hmm_init_dp(imm_ex1.hmm, &dp), 0);
+  aye(imm_hmm_init_dp(imm_ex1.hmm, &dp) == 0);
 
   struct imm_eseq eseq = {0};
   imm_eseq_init(&eseq, &m->code);
 
   int fd = open("dp_example1.imm", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-  ok(fd != 0);
+  aye(fd != 0);
   lio_writer_init(&writer, fd);
-  eq(imm_dp_pack(&dp, &writer), 0);
-  eq(close(fd), 0);
+  aye(imm_dp_pack(&dp, &writer) == 0);
+  aye(close(fd) == 0);
   imm_dp_cleanup(&dp);
 
   imm_dp_init(&dp, &m->code);
   fd = open("dp_example1.imm", O_RDONLY, 0644);
-  ok(fd != 0);
+  aye(fd != 0);
   lio_reader_init(&reader, fd);
-  eq(imm_dp_unpack(&dp, &reader), 0);
-  eq(close(fd), 0);
+  aye(imm_dp_unpack(&dp, &reader) == 0);
+  aye(close(fd) == 0);
 
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
   struct imm_seq seq = imm_seq_unsafe(imm_str("BMMMEJBMMME"), &m->abc);
-  eq(imm_eseq_setup(&eseq, &seq), 0);
-  eq(imm_task_setup(task, &eseq), 0);
-  eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  near(prod.loglik, -41.845375);
+  aye(imm_eseq_setup(&eseq, &seq) == 0);
+  aye(imm_task_setup(task, &eseq) == 0);
+  aye(imm_dp_viterbi(&dp, task, &prod) == 0);
+  near(prod.loglik, -41.845375f);
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
@@ -231,34 +232,34 @@ static void dp_io_example2(void)
   struct imm_task *task = imm_task_new(&dp);
   struct imm_prod prod = imm_prod();
   struct imm_seq seq = imm_seq_unsafe(imm_str(imm_ex2_seq), dna_abc);
-  eq(imm_eseq_setup(&eseq, &seq), 0);
-  eq(imm_task_setup(task, &eseq), 0);
-  eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  near(prod.loglik, 41.929977);
+  aye(imm_eseq_setup(&eseq, &seq) == 0);
+  aye(imm_task_setup(task, &eseq) == 0);
+  aye(imm_dp_viterbi(&dp, task, &prod) == 0);
+  near(prod.loglik, 41.929977f);
   imm_prod_cleanup(&prod);
   imm_task_del(task);
 
   int fd = open("dp_frame.imm", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-  ok(fd != 0);
+  aye(fd != 0);
   lio_writer_init(&writer, fd);
-  eq(imm_dp_pack(&dp, &writer), 0);
-  eq(close(fd), 0);
+  aye(imm_dp_pack(&dp, &writer) == 0);
+  aye(close(fd) == 0);
   imm_dp_cleanup(&dp);
 
   imm_dp_init(&dp, &m->code);
   fd = open("dp_frame.imm", O_RDONLY, 0644);
-  ok(fd != 0);
+  aye(fd != 0);
   lio_reader_init(&reader, fd);
-  eq(imm_dp_unpack(&dp, &reader), 0);
-  eq(close(fd), 0);
+  aye(imm_dp_unpack(&dp, &reader) == 0);
+  aye(close(fd) == 0);
 
   task = imm_task_new(&dp);
   prod = imm_prod();
   seq = imm_seq_unsafe(imm_str(imm_ex2_seq), dna_abc);
-  eq(imm_eseq_setup(&eseq, &seq), 0);
-  eq(imm_task_setup(task, &eseq), 0);
-  eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  near(prod.loglik, 41.929977);
+  aye(imm_eseq_setup(&eseq, &seq) == 0);
+  aye(imm_task_setup(task, &eseq) == 0);
+  aye(imm_dp_viterbi(&dp, task, &prod) == 0);
+  near(prod.loglik, 41.929977f);
 
   imm_eseq_cleanup(&eseq);
   imm_prod_cleanup(&prod);
@@ -270,18 +271,19 @@ static void dp_io_example2(void)
 
 int main(void)
 {
+  aye_begin();
   imm_abc_init(&abc, imm_str("ACGT"), '*');
   imm_code_init(&code, &abc);
   EMPTY = imm_seq_unsafe(imm_str(""), &abc);
   A = imm_seq_unsafe(imm_str("A"), &abc);
   ATT = imm_seq_unsafe(imm_str("ATT"), &abc);
 
-  lrun("dp_illegal", dp_illegal);
-  lrun("dp_empty_path", dp_empty_path);
-  lrun("dp_one_mute", dp_one_mute);
-  lrun("dp_two_mutes", dp_two_mutes);
-  lrun("dp_io_example1", dp_io_example1);
-  lrun("dp_io_example2", dp_io_example2);
+  dp_illegal();
+  dp_empty_path();
+  dp_one_mute();
+  dp_two_mutes();
+  dp_io_example1();
+  dp_io_example2();
 
-  return lfails != 0;
+  return aye_end();
 }

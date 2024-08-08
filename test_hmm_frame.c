@@ -1,14 +1,15 @@
+#include "aye.h"
 #include "imm_codon_lprob.h"
 #include "imm_dna.h"
 #include "imm_dp.h"
 #include "imm_frame_state.h"
 #include "imm_hmm.h"
 #include "imm_lprob.h"
-#include "imm_minctest.h"
 #include "imm_mute_state.h"
 #include "imm_path.h"
 #include "imm_prod.h"
 #include "imm_task.h"
+#include "near.h"
 
 static struct imm_nuclt const *nuclt;
 static struct imm_abc const *abc;
@@ -36,11 +37,11 @@ static void hmm_frame_state_0eps(void)
   imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 3, 0));
   struct imm_seq seq = imm_seq_unsafe(imm_str("ATT"), abc);
-  near(imm_hmm_loglik(hmm, &seq, &path), -2.3025850930);
+  aye(near(imm_hmm_loglik(hmm, &seq, &path), -2.3025850930f));
   seq = imm_seq_unsafe(imm_str("ATG"), abc);
-  near(imm_hmm_loglik(hmm, &seq, &path), -0.2231435513142097);
+  aye(near(imm_hmm_loglik(hmm, &seq, &path), -0.2231435513142097f));
   seq = imm_seq_unsafe(imm_str("AT"), abc);
-  ok(imm_lprob_is_nan(imm_hmm_loglik(hmm, &seq, &path)));
+  aye(imm_lprob_is_nan(imm_hmm_loglik(hmm, &seq, &path)));
 
   imm_path_cleanup(&path);
 
@@ -75,13 +76,13 @@ static void hmm_frame_state_len1(void)
   imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 1, 0));
   struct imm_seq seq = imm_seq_unsafe(imm_str("A"), abc);
-  near(imm_hmm_loglik(hmm, &seq, &path), -6.0198639951);
+  aye(near(imm_hmm_loglik(hmm, &seq, &path), -6.0198639951f));
 
   imm_path_reset(&path);
   imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 1, 0));
   seq = imm_seq_unsafe(imm_str("C"), abc);
-  near(imm_hmm_loglik(hmm, &seq, &path), -7.1184762838);
+  aye(near(imm_hmm_loglik(hmm, &seq, &path), -7.1184762838f));
 
   struct imm_dp dp;
   imm_hmm_init_dp(hmm, &dp);
@@ -89,18 +90,18 @@ static void hmm_frame_state_len1(void)
   struct imm_prod prod = imm_prod();
 
   seq = imm_seq_unsafe(imm_str("A"), abc);
-  eq(imm_eseq_setup(&eseq, &seq), 0);
-  eq(imm_task_setup(task, &eseq), 0);
-  eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  near(prod.loglik, -6.0198639951);
+  aye(imm_eseq_setup(&eseq, &seq) == 0);
+  aye(imm_task_setup(task, &eseq) == 0);
+  aye(imm_dp_viterbi(&dp, task, &prod) == 0);
+  aye(near(prod.loglik, -6.0198639951f));
 
   imm_hmm_reset_dp(hmm, &dp);
   imm_task_reset(task, &dp);
   seq = imm_seq_unsafe(imm_str("C"), abc);
-  eq(imm_eseq_setup(&eseq, &seq), 0);
-  eq(imm_task_setup(task, &eseq), 0);
-  eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  near(prod.loglik, -7.1184762838);
+  aye(imm_eseq_setup(&eseq, &seq) == 0);
+  aye(imm_task_setup(task, &eseq) == 0);
+  aye(imm_dp_viterbi(&dp, task, &prod) == 0);
+  aye(near(prod.loglik, -7.1184762838f));
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
@@ -139,25 +140,25 @@ static void hmm_frame_state_len2(void)
   imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 2, 0));
   struct imm_seq seq = imm_seq_unsafe(imm_str("AA"), abc);
-  near(imm_hmm_loglik(hmm, &seq, &path), -8.9102357365);
+  aye(near(imm_hmm_loglik(hmm, &seq, &path), -8.9102357365f));
 
   imm_path_reset(&path);
   imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 2, 0));
   seq = imm_seq_unsafe(imm_str("TG"), abc);
-  near(imm_hmm_loglik(hmm, &seq, &path), -3.2434246877);
+  aye(near(imm_hmm_loglik(hmm, &seq, &path), -3.2434246877f));
 
   imm_path_reset(&path);
   imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 2, 0));
   seq = imm_seq_unsafe(imm_str("CC"), abc);
-  near(imm_hmm_loglik(hmm, &seq, &path), -4.2250228758);
+  aye(near(imm_hmm_loglik(hmm, &seq, &path), -4.2250228758f));
 
   imm_path_reset(&path);
   imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 2, 0));
   seq = imm_seq_unsafe(imm_str("TT"), abc);
-  near(imm_hmm_loglik(hmm, &seq, &path), -5.3267168311);
+  aye(near(imm_hmm_loglik(hmm, &seq, &path), -5.3267168311f));
 
   struct imm_dp dp;
   imm_hmm_init_dp(hmm, &dp);
@@ -165,34 +166,34 @@ static void hmm_frame_state_len2(void)
   struct imm_prod prod = imm_prod();
 
   seq = imm_seq_unsafe(imm_str("AA"), abc);
-  eq(imm_eseq_setup(&eseq, &seq), 0);
-  eq(imm_task_setup(task, &eseq), 0);
-  eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  near(prod.loglik, -8.9102357365);
+  aye(imm_eseq_setup(&eseq, &seq) == 0);
+  aye(imm_task_setup(task, &eseq) == 0);
+  aye(imm_dp_viterbi(&dp, task, &prod) == 0);
+  aye(near(prod.loglik, -8.9102357365f));
 
   imm_hmm_reset_dp(hmm, &dp);
   imm_task_reset(task, &dp);
   seq = imm_seq_unsafe(imm_str("TG"), abc);
-  eq(imm_eseq_setup(&eseq, &seq), 0);
-  eq(imm_task_setup(task, &eseq), 0);
-  eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  near(prod.loglik, -3.2434246877);
+  aye(imm_eseq_setup(&eseq, &seq) == 0);
+  aye(imm_task_setup(task, &eseq) == 0);
+  aye(imm_dp_viterbi(&dp, task, &prod) == 0);
+  aye(near(prod.loglik, -3.2434246877f));
 
   imm_hmm_reset_dp(hmm, &dp);
   imm_task_reset(task, &dp);
   seq = imm_seq_unsafe(imm_str("CC"), abc);
-  eq(imm_eseq_setup(&eseq, &seq), 0);
-  eq(imm_task_setup(task, &eseq), 0);
-  eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  near(prod.loglik, -4.2250228758);
+  aye(imm_eseq_setup(&eseq, &seq) == 0);
+  aye(imm_task_setup(task, &eseq) == 0);
+  aye(imm_dp_viterbi(&dp, task, &prod) == 0);
+  aye(near(prod.loglik, -4.2250228758f));
 
   imm_hmm_reset_dp(hmm, &dp);
   imm_task_reset(task, &dp);
   seq = imm_seq_unsafe(imm_str("TT"), abc);
-  eq(imm_eseq_setup(&eseq, &seq), 0);
-  eq(imm_task_setup(task, &eseq), 0);
-  eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  near(prod.loglik, -5.3267168311);
+  aye(imm_eseq_setup(&eseq, &seq) == 0);
+  aye(imm_task_setup(task, &eseq) == 0);
+  aye(imm_dp_viterbi(&dp, task, &prod) == 0);
+  aye(near(prod.loglik, -5.3267168311f));
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
@@ -231,13 +232,13 @@ static void hmm_frame_state_len3(void)
   imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 3, 0));
   struct imm_seq seq = imm_seq_unsafe(imm_str("ATC"), abc);
-  near(imm_hmm_loglik(hmm, &seq, &path), -7.0123444607);
+  aye(near(imm_hmm_loglik(hmm, &seq, &path), -7.0123444607f));
 
   imm_path_reset(&path);
   imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 3, 0));
   seq = imm_seq_unsafe(imm_str("ATG"), abc);
-  near(imm_hmm_loglik(hmm, &seq, &path), -0.6397933781);
+  aye(near(imm_hmm_loglik(hmm, &seq, &path), -0.6397933781f));
 
   struct imm_dp dp;
   imm_hmm_init_dp(hmm, &dp);
@@ -245,18 +246,18 @@ static void hmm_frame_state_len3(void)
   struct imm_prod prod = imm_prod();
 
   seq = imm_seq_unsafe(imm_str("ATC"), abc);
-  eq(imm_eseq_setup(&eseq, &seq), 0);
-  eq(imm_task_setup(task, &eseq), 0);
-  eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  near(prod.loglik, -7.0123444607);
+  aye(imm_eseq_setup(&eseq, &seq) == 0);
+  aye(imm_task_setup(task, &eseq) == 0);
+  aye(imm_dp_viterbi(&dp, task, &prod) == 0);
+  aye(near(prod.loglik, -7.0123444607f));
 
   imm_hmm_reset_dp(hmm, &dp);
   imm_task_reset(task, &dp);
   seq = imm_seq_unsafe(imm_str("ATG"), abc);
-  eq(imm_eseq_setup(&eseq, &seq), 0);
-  eq(imm_task_setup(task, &eseq), 0);
-  eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  near(prod.loglik, -0.6397933781);
+  aye(imm_eseq_setup(&eseq, &seq) == 0);
+  aye(imm_task_setup(task, &eseq) == 0);
+  aye(imm_dp_viterbi(&dp, task, &prod) == 0);
+  aye(near(prod.loglik, -0.6397933781f));
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
@@ -295,7 +296,7 @@ static void hmm_frame_state_len4(void)
   imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 4, 0));
   struct imm_seq seq = imm_seq_unsafe(imm_str("ATCC"), abc);
-  near(imm_hmm_loglik(hmm, &seq, &path), -11.9829290512);
+  aye(near(imm_hmm_loglik(hmm, &seq, &path), -11.9829290512f));
 
   struct imm_dp dp;
   imm_hmm_init_dp(hmm, &dp);
@@ -303,10 +304,10 @@ static void hmm_frame_state_len4(void)
   struct imm_prod prod = imm_prod();
 
   seq = imm_seq_unsafe(imm_str("ATCC"), abc);
-  eq(imm_eseq_setup(&eseq, &seq), 0);
-  eq(imm_task_setup(task, &eseq), 0);
-  eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  near(prod.loglik, -11.9829290512);
+  aye(imm_eseq_setup(&eseq, &seq) == 0);
+  aye(imm_task_setup(task, &eseq) == 0);
+  aye(imm_dp_viterbi(&dp, task, &prod) == 0);
+  aye(near(prod.loglik, -11.9829290512f));
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
@@ -344,13 +345,13 @@ static void hmm_frame_state_len5(void)
   imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 5, 0));
   struct imm_seq seq = imm_seq_unsafe(imm_str("ACGTA"), abc);
-  ok(imm_lprob_is_zero(imm_hmm_loglik(hmm, &seq, &path)));
+  aye(imm_lprob_is_zero(imm_hmm_loglik(hmm, &seq, &path)));
 
   imm_path_reset(&path);
   imm_path_add(&path, imm_step(start.super.id, 0, 0));
   imm_path_add(&path, imm_step(state.super.id, 5, 0));
   seq = imm_seq_unsafe(imm_str("ACTAG"), abc);
-  near(imm_hmm_loglik(hmm, &seq, &path), -10.1142085574);
+  aye(near(imm_hmm_loglik(hmm, &seq, &path), -10.1142085574f));
 
   struct imm_dp dp;
   imm_hmm_init_dp(hmm, &dp);
@@ -358,18 +359,18 @@ static void hmm_frame_state_len5(void)
   struct imm_prod prod = imm_prod();
 
   seq = imm_seq_unsafe(imm_str("ACGTA"), abc);
-  eq(imm_eseq_setup(&eseq, &seq), 0);
-  eq(imm_task_setup(task, &eseq), 0);
-  eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  ok(imm_lprob_is_nan(prod.loglik));
+  aye(imm_eseq_setup(&eseq, &seq) == 0);
+  aye(imm_task_setup(task, &eseq) == 0);
+  aye(imm_dp_viterbi(&dp, task, &prod) == 0);
+  aye(imm_lprob_is_nan(prod.loglik));
 
   imm_hmm_reset_dp(hmm, &dp);
   imm_task_reset(task, &dp);
   seq = imm_seq_unsafe(imm_str("ACTAG"), abc);
-  eq(imm_eseq_setup(&eseq, &seq), 0);
-  eq(imm_task_setup(task, &eseq), 0);
-  eq(imm_dp_viterbi(&dp, task, &prod), 0);
-  near(prod.loglik, -10.1142085574);
+  aye(imm_eseq_setup(&eseq, &seq) == 0);
+  aye(imm_task_setup(task, &eseq) == 0);
+  aye(imm_dp_viterbi(&dp, task, &prod) == 0);
+  aye(near(prod.loglik, -10.1142085574f));
 
   imm_eseq_cleanup(&eseq);
   imm_task_del(task);
@@ -381,6 +382,7 @@ static void hmm_frame_state_len5(void)
 
 int main(void)
 {
+  aye_begin();
   nuclt = &imm_dna_iupac.super;
   abc = &nuclt->super;
   imm_code_init(&code, abc);
@@ -395,12 +397,12 @@ int main(void)
 
   codonm = imm_codon_marg(&codonp);
 
-  lrun("hmm_frame_state_0eps", hmm_frame_state_0eps);
-  lrun("hmm_frame_state_len1", hmm_frame_state_len1);
-  lrun("hmm_frame_state_len2", hmm_frame_state_len2);
-  lrun("hmm_frame_state_len3", hmm_frame_state_len3);
-  lrun("hmm_frame_state_len4", hmm_frame_state_len4);
-  lrun("hmm_frame_state_len5", hmm_frame_state_len5);
+  hmm_frame_state_0eps();
+  hmm_frame_state_len1();
+  hmm_frame_state_len2();
+  hmm_frame_state_len3();
+  hmm_frame_state_len4();
+  hmm_frame_state_len5();
 
-  return lfails != 0;
+  return aye_end();
 }
