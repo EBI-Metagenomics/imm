@@ -188,16 +188,18 @@ static void dp_io_example1(void)
 
   int fd = open("dp_example1.imm", O_WRONLY | O_CREAT | O_TRUNC, 0644);
   aye(fd != 0);
-  lio_writer_init(&writer, fd);
+  lio_wsetup(&writer, fd);
   aye(imm_dp_pack(&dp, &writer) == 0);
+  aye(lio_wrelease(&writer) == fd);
   aye(close(fd) == 0);
   imm_dp_cleanup(&dp);
 
   imm_dp_init(&dp, &m->code);
   fd = open("dp_example1.imm", O_RDONLY, 0644);
   aye(fd != 0);
-  lio_reader_init(&reader, fd);
+  lio_rsetup(&reader, fd);
   aye(imm_dp_unpack(&dp, &reader) == 0);
+  aye(lio_rrelease(&reader) == fd);
   aye(close(fd) == 0);
 
   struct imm_task *task = imm_task_new(&dp);
@@ -241,16 +243,18 @@ static void dp_io_example2(void)
 
   int fd = open("dp_frame.imm", O_WRONLY | O_CREAT | O_TRUNC, 0644);
   aye(fd != 0);
-  lio_writer_init(&writer, fd);
+  lio_wsetup(&writer, fd);
   aye(imm_dp_pack(&dp, &writer) == 0);
+  aye(lio_wrelease(&writer) == fd);
   aye(close(fd) == 0);
   imm_dp_cleanup(&dp);
 
   imm_dp_init(&dp, &m->code);
   fd = open("dp_frame.imm", O_RDONLY, 0644);
   aye(fd != 0);
-  lio_reader_init(&reader, fd);
+  lio_rsetup(&reader, fd);
   aye(imm_dp_unpack(&dp, &reader) == 0);
+  aye(lio_rrelease(&reader) == fd);
   aye(close(fd) == 0);
 
   task = imm_task_new(&dp);

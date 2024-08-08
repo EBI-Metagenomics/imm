@@ -112,16 +112,18 @@ static void abc_io(void)
 
   int fd = open("abc_io.imm", O_WRONLY | O_CREAT | O_TRUNC, 0644);
   aye(fd != 0);
-  lio_writer_init(&writer, fd);
+  lio_wsetup(&writer, fd);
   aye(imm_abc_pack(&abc_out, &writer) == 0);
+  aye(lio_wrelease(&writer) == fd);
   aye(close(fd) == 0);
 
   struct imm_abc abc_in = {0};
 
   fd = open("abc_io.imm", O_RDONLY, 0644);
   aye(fd != 0);
-  lio_reader_init(&reader, fd);
+  lio_rsetup(&reader, fd);
   aye(imm_abc_unpack(&abc_in, &reader) == 0);
+  aye(lio_rrelease(&reader) == fd);
   aye(close(fd) == 0);
 
   aye(abc_in.any_symbol_id == abc_out.any_symbol_id);
@@ -140,16 +142,18 @@ static void amino_io(void)
 
   int fd = open("amino.imm", O_WRONLY | O_CREAT | O_TRUNC, 0644);
   aye(fd != 0);
-  lio_writer_init(&writer, fd);
+  lio_wsetup(&writer, fd);
   aye(imm_abc_pack((struct imm_abc const *)amino_out, &writer) == 0);
+  aye(lio_wrelease(&writer) == fd);
   aye(close(fd) == 0);
 
   struct imm_amino amino_in = {0};
 
   fd = open("amino.imm", O_RDONLY, 0644);
   aye(fd != 0);
-  lio_reader_init(&reader, fd);
+  lio_rsetup(&reader, fd);
   aye(imm_abc_unpack((struct imm_abc *)&amino_in, &reader) == 0);
+  aye(lio_rrelease(&reader) == fd);
   aye(close(fd) == 0);
 
   struct imm_abc const *out = &amino_out->super;
@@ -171,16 +175,18 @@ static void dna_io(void)
 
   int fd = open("dna.imm", O_WRONLY | O_CREAT | O_TRUNC, 0644);
   aye(fd != 0);
-  lio_writer_init(&writer, fd);
+  lio_wsetup(&writer, fd);
   aye(imm_abc_pack((struct imm_abc const *)dna_out, &writer) == 0);
+  aye(lio_wrelease(&writer) == fd);
   aye(close(fd) == 0);
 
   struct imm_dna dna_in = {0};
 
   fd = open("dna.imm", O_RDONLY, 0644);
   aye(fd != 0);
-  lio_reader_init(&reader, fd);
+  lio_rsetup(&reader, fd);
   aye(imm_abc_unpack((struct imm_abc *)&dna_in, &reader) == 0);
+  aye(lio_rrelease(&reader) == fd);
   aye(close(fd) == 0);
 
   struct imm_abc const *out = &dna_out->super.super;
@@ -202,16 +208,18 @@ static void rna_io(void)
 
   int fd = open("rna.imm", O_WRONLY | O_CREAT | O_TRUNC, 0644);
   aye(fd != 0);
-  lio_writer_init(&writer, fd);
+  lio_wsetup(&writer, fd);
   aye(imm_abc_pack((struct imm_abc const *)rna_out, &writer) == 0);
+  aye(lio_wrelease(&writer) == fd);
   aye(close(fd) == 0);
 
   struct imm_rna rna_in = {0};
 
   fd = open("rna.imm", O_RDONLY, 0644);
   aye(fd != 0);
-  lio_reader_init(&reader, fd);
+  lio_rsetup(&reader, fd);
   aye(imm_abc_unpack((struct imm_abc *)&rna_in, &reader) == 0);
+  aye(lio_rrelease(&reader) == fd);
   aye(close(fd) == 0);
 
   struct imm_abc const *out = &rna_out->super.super;
