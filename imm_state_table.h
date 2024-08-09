@@ -15,7 +15,7 @@ struct imm_state_table
   int nstates;
   uint16_t *ids;
   int16_t start_state_idx;
-  int end_state_idx;
+  int16_t end_state_idx;
   int8_t *span;
 
   // Debugging purpose

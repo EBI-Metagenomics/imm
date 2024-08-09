@@ -1,11 +1,10 @@
 #include "imm_dp.h"
+#include "expect.h"
 #include "imm_clock.h"
 #include "imm_dp_cfg.h"
 #include "imm_emis.h"
 #include "imm_fmt.h"
 #include "imm_likely.h"
-#include "lite_pack.h"
-#include "lite_pack_io.h"
 #include "imm_lprob.h"
 #include "imm_matrix.h"
 #include "imm_min.h"
@@ -17,6 +16,9 @@
 #include "imm_trans_table.h"
 #include "imm_viterbi.h"
 #include "imm_zspan.h"
+#include "lite_pack_io.h"
+#include "read.h"
+#include "write.h"
 #include <assert.h>
 #include <limits.h>
 #include <stdlib.h>
@@ -143,7 +145,6 @@ int imm_dp_viterbi(struct imm_dp const *x, struct imm_task *task,
   imm_path_reset(&prod->path);
   int seqsize = imm_eseq_size(task->seq);
   unzip_path(&task->trellis, &x->state_table, seqsize, &prod->path);
-  return rc;
 
   prod->mseconds = (uint64_t)(imm_clock() - start);
 
@@ -222,7 +223,7 @@ void imm_dp_write_dot(struct imm_dp const *dp, FILE *restrict fp,
       (*name)(imm_state_table_id(&dp->state_table, dst), dst_name);
       fprintf(fp, "%s -> %s [label=", src_name, dst_name);
       fprintf(fp, imm_fmt_get_f32(),
-              imm_trans_table_score(&dp->trans_table, dst, t));
+              (double)imm_trans_table_score(&dp->trans_table, dst, t));
       fprintf(fp, "];\n");
     }
   }
@@ -260,7 +261,7 @@ void imm_dp_dump_path(struct imm_dp const *x, struct imm_task const *t,
     struct imm_range range = imm_range(begin, begin + step->seqsize);
     struct imm_seq subseq = imm_seq_slice(seq, range);
     fprintf(fp, "<%s,%.*s,%.4f>\n", imm_state_table_name(&x->state_table, idx),
-            subseq.str.size, subseq.str.data, score);
+            subseq.str.size, subseq.str.data, (double)score);
     begin += step->seqsize;
   }
 }
@@ -279,92 +280,71 @@ void imm_dp_dump_path(struct imm_dp const *x, struct imm_task const *t,
 #define KEY_STATE_END "state_end"
 #define KEY_STATE_SPAN "state_span"
 
-static int write_cstring(struct lio_writer *x, char const *string)
-{
-  uint32_t length = (uint32_t)strlen(string);
-  if (lio_write(x, lip_pack_string(lio_alloc(x), length))) return 1;
-  if (lio_writeb(x, length, string)) return 1;
-  return 0;
-}
-
 int imm_dp_pack(struct imm_dp const *dp, struct lio_writer *f)
 {
   unsigned size = 0;
   int nstates = dp->state_table.nstates;
   int ntrans = dp->trans_table.ntrans;
 
-  if (lio_write(f, lip_pack_map(lio_alloc(f), 10))) return IMM_EIO;
+  if (write_map(f, 10)) return IMM_EIO;
 
   /* emission */
   if (write_cstring(f, KEY_EMIS_SCORE)) return IMM_EIO;
   size = (unsigned)imm_emis_score_size(&dp->emis, nstates);
-  if (lio_write(f, lip_pack_array(lio_alloc(f), size))) return IMM_EIO;
+  if (write_array(f, size)) return IMM_EIO;
   for (unsigned i = 0; i < size; ++i)
-    if (lio_write(f, lip_pack_float(lio_alloc(f), dp->emis.score[i]))) return IMM_EIO;
+    if (write_float(f, dp->emis.score[i])) return IMM_EIO;
 
   if (write_cstring(f, KEY_EMIS_OFFSET)) return IMM_EIO;
   unsigned offset_size = (unsigned)imm_emis_offset_size(nstates);
-  if (lio_write(f, lip_pack_array(lio_alloc(f), offset_size))) return IMM_EIO;
+  if (write_array(f, offset_size)) return IMM_EIO;
   for (unsigned i = 0; i < offset_size; ++i)
-    if (lio_write(f, lip_pack_int(lio_alloc(f), dp->emis.offset[i]))) return IMM_EIO;
+    if (write_int(f, dp->emis.offset[i])) return IMM_EIO;
 
   /* trans_table */
   size = (unsigned)imm_trans_table_transsize(ntrans);
   if (write_cstring(f, KEY_TRANS_SCORE)) return IMM_EIO;
-  if (lio_write(f, lip_pack_array(lio_alloc(f), size))) return IMM_EIO;
+  if (write_array(f, size)) return IMM_EIO;
   for (unsigned i = 0; i < size; ++i)
-    if (lio_write(f, lip_pack_float(lio_alloc(f), dp->trans_table.trans[i].score))) return IMM_EIO;
+    if (write_float(f, dp->trans_table.trans[i].score)) return IMM_EIO;
 
   size = (unsigned)imm_trans_table_transsize(ntrans);
   if (write_cstring(f, KEY_TRANS_SRC)) return IMM_EIO;
-  if (lio_write(f, lip_pack_array(lio_alloc(f), size))) return IMM_EIO;
+  if (write_array(f, size)) return IMM_EIO;
   for (unsigned i = 0; i < size; ++i)
-    if (lio_write(f, lip_pack_int(lio_alloc(f), dp->trans_table.trans[i].src))) return IMM_EIO;
+    if (write_int(f, dp->trans_table.trans[i].src)) return IMM_EIO;
 
   size = (unsigned)imm_trans_table_transsize(ntrans);
   if (write_cstring(f, KEY_TRANS_DST)) return IMM_EIO;
-  if (lio_write(f, lip_pack_array(lio_alloc(f), size))) return IMM_EIO;
+  if (write_array(f, size)) return IMM_EIO;
   for (unsigned i = 0; i < size; ++i)
-    if (lio_write(f, lip_pack_int(lio_alloc(f), dp->trans_table.trans[i].dst))) return IMM_EIO;
+    if (write_int(f, dp->trans_table.trans[i].dst)) return IMM_EIO;
 
-  size = imm_trans_table_offsize(nstates);
+  size = (unsigned)imm_trans_table_offsize(nstates);
   if (write_cstring(f, KEY_TRANS_OFFSET)) return IMM_EIO;
-  if (lio_write(f, lip_pack_array(lio_alloc(f), size))) return IMM_EIO;
+  if (write_array(f, size)) return IMM_EIO;
   for (unsigned i = 0; i < size; ++i)
-    if (lio_write(f, lip_pack_int(lio_alloc(f), dp->trans_table.offset[i]))) return IMM_EIO;
+    if (write_int(f, dp->trans_table.offset[i])) return IMM_EIO;
 
   /* state_table */
   if (write_cstring(f, KEY_STATE_IDS)) return IMM_EIO;
-  if (lio_write(f, lip_pack_array(lio_alloc(f), (uint32_t)nstates))) return IMM_EIO;
+  if (write_array(f, (uint32_t)nstates)) return IMM_EIO;
   for (int i = 0; i < nstates; ++i)
-    if (lio_write(f, lip_pack_int(lio_alloc(f), dp->state_table.ids[i]))) return IMM_EIO;
+    if (write_int(f, dp->state_table.ids[i])) return IMM_EIO;
 
   if (write_cstring(f, KEY_STATE_START)) return IMM_EIO;
-  if (lio_write(f, lip_pack_int(lio_alloc(f), dp->state_table.start_state_idx))) return IMM_EIO;
+  if (write_int(f, dp->state_table.start_state_idx)) return IMM_EIO;
   if (write_cstring(f, KEY_STATE_END)) return IMM_EIO;
-  if (lio_write(f, lip_pack_int(lio_alloc(f), dp->state_table.end_state_idx))) return IMM_EIO;
+  if (write_int(f, dp->state_table.end_state_idx)) return IMM_EIO;
 
   if (write_cstring(f, KEY_STATE_SPAN)) return IMM_EIO;
-  if (lio_write(f, lip_pack_array(lio_alloc(f), (unsigned)nstates))) return IMM_EIO;
+  if (write_array(f, (uint32_t)nstates)) return IMM_EIO;
   for (int i = 0; i < nstates; ++i)
-    if (lio_write(f, lip_pack_int(lio_alloc(f), dp->state_table.span[i]))) return IMM_EIO;
+    if (write_int(f, dp->state_table.span[i])) return IMM_EIO;
 
   if (lio_flush(f)) return IMM_EIO;
 
   return 0;
-}
-
-static int expect_key(struct lio_reader *x, char const *key)
-{
-  uint32_t size = 0;
-  unsigned char buf[16] = {0};
-
-  if (lio_free(x, lip_unpack_string(lio_read(x), &size))) return 1;
-  if ((size_t)size > sizeof(buf)) return 1;
-
-  if (lio_readb(x, size, buf)) return 1;
-  if (size != (uint32_t)strlen(key)) return 1;
-  return memcmp(key, buf, size) != 0;
 }
 
 int imm_dp_unpack(struct imm_dp *dp, struct lio_reader *f)
@@ -374,73 +354,73 @@ int imm_dp_unpack(struct imm_dp *dp, struct lio_reader *f)
   struct imm_trans_table *tt = &dp->trans_table;
   struct imm_state_table *st = &dp->state_table;
 
-  if (lio_free(f, lip_unpack_map(lio_read(f), &u32))) return IMM_EIO;
+  if (read_map(f, &u32)) return IMM_EIO;
   if (u32 != 10) return IMM_EIO;
 
   /* emission */
   if (expect_key(f, KEY_EMIS_SCORE)) goto cleanup;
-  if (lio_free(f, lip_unpack_array(lio_read(f), &u32))) goto cleanup;
+  if (read_array(f, &u32)) goto cleanup;
   e->score = imm_reallocf(e->score, sizeof(*e->score) * u32);
   if (!e->score && u32 > 0) goto cleanup;
   for (uint32_t i = 0; i < u32; i++)
-    if (lio_free(f, lip_unpack_float(lio_read(f), e->score + i))) goto cleanup;
+    if (read_float(f, e->score + i)) goto cleanup;
 
   if (expect_key(f, KEY_EMIS_OFFSET)) goto cleanup;
-  if (lio_free(f, lip_unpack_array(lio_read(f), &u32))) goto cleanup;
+  if (read_array(f, &u32)) goto cleanup;
   e->offset = imm_reallocf(e->offset, sizeof(*e->offset) * u32);
   if (!e->offset && u32 > 0) goto cleanup;
   for (uint32_t i = 0; i < u32; i++)
-    if (lio_free(f, lip_unpack_int(lio_read(f), e->offset + i))) goto cleanup;
+    if (read_int(f, e->offset + i)) goto cleanup;
 
   /* trans_table */
   if (expect_key(f, KEY_TRANS_SCORE)) goto cleanup;
-  if (lio_free(f, lip_unpack_array(lio_read(f), &u32))) goto cleanup;
+  if (read_array(f, &u32)) goto cleanup;
   tt->trans = imm_reallocf(tt->trans, sizeof(*tt->trans) * u32);
   if (!tt->trans && u32 > 0) goto cleanup;
-  tt->ntrans = u32 - 1;
+  tt->ntrans = (int)u32 - 1;
   for (uint32_t i = 0; i < u32; i++)
-    if (lio_free(f, lip_unpack_float(lio_read(f), &tt->trans[i].score))) goto cleanup;
+    if (read_float(f, &tt->trans[i].score)) goto cleanup;
 
   if (expect_key(f, KEY_TRANS_SRC)) goto cleanup;
-  if (lio_free(f, lip_unpack_array(lio_read(f), &u32))) goto cleanup;
+  if (read_array(f, &u32)) goto cleanup;
   if ((uint32_t)imm_trans_table_transsize(tt->ntrans) != u32) goto cleanup;
   for (uint32_t i = 0; i < u32; i++)
-    if (lio_free(f, lip_unpack_int(lio_read(f), &tt->trans[i].src))) goto cleanup;
+    if (read_int(f, &tt->trans[i].src)) goto cleanup;
 
   if (expect_key(f, KEY_TRANS_DST)) goto cleanup;
-  if (lio_free(f, lip_unpack_array(lio_read(f), &u32))) goto cleanup;
+  if (read_array(f, &u32)) goto cleanup;
   if ((uint32_t)imm_trans_table_transsize(tt->ntrans) != u32) goto cleanup;
   for (uint32_t i = 0; i < u32; i++)
-    if (lio_free(f, lip_unpack_int(lio_read(f), &tt->trans[i].dst))) goto cleanup;
+    if (read_int(f, &tt->trans[i].dst)) goto cleanup;
 
   if (expect_key(f, KEY_TRANS_OFFSET)) goto cleanup;
-  if (lio_free(f, lip_unpack_array(lio_read(f), &u32))) goto cleanup;
+  if (read_array(f, &u32)) goto cleanup;
   tt->offset = imm_reallocf(tt->offset, sizeof(*tt->offset) * u32);
   if (!tt->offset && u32 > 0) goto cleanup;
   for (uint32_t i = 0; i < u32; i++)
-    if (lio_free(f, lip_unpack_int(lio_read(f), tt->offset + i))) goto cleanup;
+    if (read_int(f, tt->offset + i)) goto cleanup;
 
   /* state_table */
   if (expect_key(f, KEY_STATE_IDS)) goto cleanup;
-  if (lio_free(f, lip_unpack_array(lio_read(f), &u32))) goto cleanup;
-  st->nstates = (uint32_t)u32;
+  if (read_array(f, &u32)) goto cleanup;
+  st->nstates = (int)u32;
   st->ids = imm_reallocf(st->ids, sizeof(*st->ids) * (unsigned)st->nstates);
   if (!st->ids && st->nstates > 0) goto cleanup;
   for (uint32_t i = 0; i < u32; i++)
-    if (lio_free(f, lip_unpack_int(lio_read(f), st->ids + i))) goto cleanup;
+    if (read_int(f, st->ids + i)) goto cleanup;
 
   if (expect_key(f, KEY_STATE_START)) goto cleanup;
-  if (lio_free(f, lip_unpack_int(lio_read(f), &dp->state_table.start_state_idx))) goto cleanup;
+  if (read_int(f, &dp->state_table.start_state_idx)) goto cleanup;
   if (expect_key(f, KEY_STATE_END)) goto cleanup;
-  if (lio_free(f, lip_unpack_int(lio_read(f), &dp->state_table.end_state_idx))) goto cleanup;
+  if (read_int(f, &dp->state_table.end_state_idx)) goto cleanup;
 
   if (expect_key(f, KEY_STATE_SPAN)) goto cleanup;
-  if (lio_free(f, lip_unpack_array(lio_read(f), &u32))) goto cleanup;
+  if (read_array(f, &u32)) goto cleanup;
   if ((uint32_t)st->nstates != u32) goto cleanup;
   st->span = imm_reallocf(st->span, sizeof(*st->span) * u32);
   if (!st->span && u32 > 0) goto cleanup;
   for (uint32_t i = 0; i < u32; ++i)
-    if (lio_free(f, lip_unpack_int(lio_read(f), st->span + i))) goto cleanup;
+    if (read_int(f, st->span + i)) goto cleanup;
 
   return 0;
 

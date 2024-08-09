@@ -1,10 +1,12 @@
 #include "imm_abc.h"
+#include "expect.h"
 #include "imm_array_size.h"
 #include "imm_likely.h"
-#include "lite_pack_io.h"
-#include "lite_pack.h"
 #include "imm_rc.h"
 #include "imm_sym.h"
+#include "lite_pack_io.h"
+#include "read.h"
+#include "write.h"
 #include <assert.h>
 #include <string.h>
 
@@ -121,44 +123,23 @@ int imm__abc_init(struct imm_abc *x, int size, char const *symbols,
   return 0;
 }
 
-static int write_cstring(struct lio_writer *x, char const *string)
-{
-  uint32_t length = (uint32_t)strlen(string);
-  if (lio_write(x, lip_pack_string(lio_alloc(x), length))) return 1;
-  if (lio_writeb(x, length, string)) return 1;
-  return 0;
-}
-
-static int expect_key(struct lio_reader *x, char const *key)
-{
-  uint32_t size = 0;
-  unsigned char buf[16] = {0};
-
-  if (lio_free(x, lip_unpack_string(lio_read(x), &size))) return 1;
-  if ((size_t)size > sizeof(buf)) return 1;
-
-  if (lio_readb(x, size, buf)) return 1;
-  if (size != (uint32_t)strlen(key)) return 1;
-  return memcmp(key, buf, size) != 0;
-}
-
 int imm_abc_pack(struct imm_abc const *x, struct lio_writer *f)
 {
-  if (lio_write(f, lip_pack_map(lio_alloc(f), 4))) return IMM_EIO;
+  if (write_map(f, 4)) return IMM_EIO;
 
   if (write_cstring(f, "symbols")) return IMM_EIO;
   if (write_cstring(f, x->symbols)) return IMM_EIO;
 
   if (write_cstring(f, "idx")) return IMM_EIO;
-  if (lio_write(f, lip_pack_array(lio_alloc(f), imm_array_size(x->sym.idx)))) return IMM_EIO;
+  if (write_array(f, imm_array_size(x->sym.idx))) return IMM_EIO;
   for (size_t i = 0; i < imm_array_size(x->sym.idx); ++i)
-    if (lio_write(f, lip_pack_int(lio_alloc(f), x->sym.idx[i]))) return IMM_EIO;
+    if (write_int(f, x->sym.idx[i])) return IMM_EIO;
 
   if (write_cstring(f, "any_symbol_id")) return IMM_EIO;
-  if (lio_write(f, lip_pack_int(lio_alloc(f), x->any_symbol_id))) return IMM_EIO;
+  if (write_int(f, x->any_symbol_id)) return IMM_EIO;
 
   if (write_cstring(f, "typeid")) return IMM_EIO;
-  if (lio_write(f, lip_pack_int(lio_alloc(f), x->typeid))) return IMM_EIO;
+  if (write_int(f, x->typeid)) return IMM_EIO;
 
   if (lio_flush(f)) return IMM_EIO;
 
@@ -168,28 +149,25 @@ int imm_abc_pack(struct imm_abc const *x, struct lio_writer *f)
 int imm_abc_unpack(struct imm_abc *x, struct lio_reader *f)
 {
   uint32_t u32 = 0;
-  if (lio_free(f, lip_unpack_map(lio_read(f), &u32))) return IMM_EIO;
+  if (read_map(f, &u32)) return IMM_EIO;
   if (u32 != 4) return IMM_EIO;
 
   if (expect_key(f, "symbols")) return IMM_EIO;
-  if (lio_free(f, lip_unpack_string(lio_read(f), &u32))) return IMM_EIO;
-  if (u32 > IMM_ABC_MAX_SIZE) return IMM_EIO;
-  if (lio_readb(f, u32, (unsigned char *)x->symbols)) return IMM_EIO;
-  x->symbols[u32] = '\0';
+  if (read_cstring(f, IMM_ABC_MAX_SIZE + 1, x->symbols)) return IMM_EIO;
 
   x->size = (int)strlen(x->symbols);
 
   if (expect_key(f, "idx")) return IMM_EIO;
-  if (lio_free(f, lip_unpack_array(lio_read(f), &u32))) return IMM_EIO;
+  if (read_array(f, &u32)) return IMM_EIO;
   if ((size_t)u32 != imm_array_size(x->sym.idx)) return IMM_EIO;
   for (uint32_t i = 0; i < u32; i++)
-    if (lio_free(f, lip_unpack_int(lio_read(f), x->sym.idx + i))) return IMM_EIO;
+    if (read_int(f, x->sym.idx + i)) return IMM_EIO;
 
   if (expect_key(f, "any_symbol_id")) return IMM_EIO;
-  if (lio_free(f, lip_unpack_int(lio_read(f), &x->any_symbol_id))) return IMM_EIO;
+  if (read_int(f, &x->any_symbol_id)) return IMM_EIO;
 
   if (expect_key(f, "typeid")) return IMM_EIO;
-  if (lio_free(f, lip_unpack_int(lio_read(f), &x->typeid))) return IMM_EIO;
+  if (read_int(f, &x->typeid)) return IMM_EIO;
 
   if (!imm_abc_typeid_valid(x->typeid)) return IMM_EIO;
 
