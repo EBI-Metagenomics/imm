@@ -1,10 +1,10 @@
-CC = gcc
-CFLAGS = -std=c11 -Wall -Wextra -O2 -MMD -MP
+CC     ?= gcc
+CFLAGS ?= -std=c11 -Wall -Wextra -pedantic -O3 -MMD -MP
+PREFIX ?= /usr/local
 SRC = $(filter-out $(wildcard test_*.c),$(wildcard *.c))
 OBJ = $(SRC:.c=.o)
 HDR = $(wildcard imm_*.h)
 LIB = libimm.a
-PREFIX ?= /usr/local
 TEST_SRC = $(wildcard test_*.c)
 TEST_OBJ = $(TEST_SRC:.c=.o)
 TEST_TARGET = $(basename $(TEST_OBJ))
@@ -20,7 +20,7 @@ $(LIB): $(OBJ)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(TEST_TARGET): %: %.o $(LIB)
-	$(CC) $(CFLAGS) $< -L. -limm -llite_pack_io -llite_pack -lm -o $@
+	$(CC) $(CFLAGS) $< -L. -limm -llio -llite_pack -lm -o $@
 
 check: $(TEST_TARGET)
 	for test in $(TEST_TARGET); do ./$$test || exit 1; done

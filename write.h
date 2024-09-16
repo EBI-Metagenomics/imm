@@ -1,14 +1,40 @@
 #ifndef WRITE_H
 #define WRITE_H
 
+#include "lite_pack_io.h"
 #include <stdint.h>
+#include <string.h>
 
-struct lio_writer;
+static inline int write_cstring(struct lio_writer *x, char const *string)
+{
+  uint32_t length = (uint32_t)strlen(string);
+  if (lio_write(x, lip_pack_string(lio_alloc(x), length))) return 1;
+  if (lio_writeb(x, length, string)) return 1;
+  return 0;
+}
 
-int write_cstring(struct lio_writer *, char const *string);
-int write_float(struct lio_writer *, float data);
-int write_int(struct lio_writer *, int data);
-int write_array(struct lio_writer *, uint32_t size);
-int write_map(struct lio_writer *x, uint32_t size);
+static inline int write_float(struct lio_writer *x, float data)
+{
+  if (lio_write(x, lip_pack_float(lio_alloc(x), data))) return 1;
+  return 0;
+}
+
+static inline int write_int(struct lio_writer *x, int data)
+{
+  if (lio_write(x, lip_pack_int(lio_alloc(x), data))) return 1;
+  return 0;
+}
+
+static inline int write_array(struct lio_writer *x, uint32_t size)
+{
+  if (lio_write(x, lip_pack_array(lio_alloc(x), size))) return 1;
+  return 0;
+}
+
+static inline int write_map(struct lio_writer *x, uint32_t size)
+{
+  if (lio_write(x, lip_pack_map(lio_alloc(x), size))) return 1;
+  return 0;
+}
 
 #endif
