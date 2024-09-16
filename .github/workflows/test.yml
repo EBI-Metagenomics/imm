@@ -18,14 +18,14 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: clone lite-pack
-        run: git clone --depth 1 https://github.com/EBI-Metagenomics/lip.git ${{github.workspace}}/lip
+        run: git clone --depth 1 https://github.com/EBI-Metagenomics/lite-pack.git ${{github.workspace}}/lite-pack
 
       - name: build & install lite-pack
-        working-directory: ${{github.workspace}}/lip
+        working-directory: ${{github.workspace}}/lite-pack
         run: make && make install
 
       - name: build & install lite-pack-io
-        working-directory: ${{github.workspace}}/lip/ext
+        working-directory: ${{github.workspace}}/lite-pack/ext
         run: make && make install
 
       - name: make
