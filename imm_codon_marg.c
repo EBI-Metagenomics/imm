@@ -2,12 +2,12 @@
 #include "imm_abc.h"
 #include "imm_codon_lprob.h"
 #include "imm_dump.h"
-#include "lite_pack.h"
-#include "lite_pack_io.h"
 #include "imm_lprob.h"
 #include "imm_nuclt.h"
 #include "imm_rc.h"
 #include "imm_static_assert.h"
+#include "lio.h"
+#include "lite_pack.h"
 #include <assert.h>
 
 imm_static_assert(IMM_NUCLT_SIZE == 4, "nuclt size expected to be four");

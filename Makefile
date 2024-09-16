@@ -1,5 +1,5 @@
 CC     ?= gcc
-CFLAGS ?= -std=c11 -Wall -Wextra -pedantic -O3 -MMD -MP
+CFLAGS ?= -std=c11 -Wall -Wextra -O3 -MMD -MP
 PREFIX ?= /usr/local
 SRC = $(filter-out $(wildcard test_*.c),$(wildcard *.c))
 OBJ = $(SRC:.c=.o)

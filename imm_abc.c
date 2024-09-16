@@ -4,7 +4,7 @@
 #include "imm_likely.h"
 #include "imm_rc.h"
 #include "imm_sym.h"
-#include "lite_pack_io.h"
+#include "lio.h"
 #include "read.h"
 #include "write.h"
 #include <assert.h>

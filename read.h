@@ -1,8 +1,8 @@
 #ifndef READ_H
 #define READ_H
 
+#include "lio.h"
 #include <stdint.h>
-#include "lite_pack_io.h"
 
 static inline int read_map(struct lio_reader *x, uint32_t *size)
 {

@@ -1,7 +1,7 @@
 #ifndef WRITE_H
 #define WRITE_H
 
-#include "lite_pack_io.h"
+#include "lio.h"
 #include <stdint.h>
 #include <string.h>
 

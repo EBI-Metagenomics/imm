@@ -1,8 +1,8 @@
 #include "imm_nuclt_lprob.h"
 #include "imm_dump.h"
 #include "imm_rc.h"
+#include "lio.h"
 #include "lite_pack.h"
-#include "lite_pack_io.h"
 #include <assert.h>
 
 struct imm_nuclt_lprob imm_nuclt_lprob(struct imm_nuclt const *nuclt,

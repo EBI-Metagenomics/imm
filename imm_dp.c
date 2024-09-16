@@ -16,7 +16,7 @@
 #include "imm_trans_table.h"
 #include "imm_viterbi.h"
 #include "imm_zspan.h"
-#include "lite_pack_io.h"
+#include "lio.h"
 #include "read.h"
 #include "write.h"
 #include <assert.h>
