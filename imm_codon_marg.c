@@ -136,20 +136,22 @@ struct imm_codon_marg imm_codon_marg(struct imm_codon_lprob *codonp)
 int imm_codon_marg_pack(struct imm_codon_marg const *codonm,
                         struct lio_writer *f)
 {
+  float const *lprobs = &codonm->lprobs[0][0][0];
   if (lio_write(f, lip_pack_array(lio_alloc(f), CODON_SIZE))) return IMM_EIO;
   for (int i = 0; i < CODON_SIZE; ++i)
-    if (lio_write(f, lip_pack_float(lio_alloc(f), codonm->lprobs[0][0][i]))) return IMM_EIO;
+    if (lio_write(f, lip_pack_float(lio_alloc(f), lprobs[i]))) return IMM_EIO;
 
   return 0;
 }
 
 int imm_codon_marg_unpack(struct imm_codon_marg *codonm, struct lio_reader *f)
 {
+  float *lprobs = &codonm->lprobs[0][0][0];
   uint32_t u32 = 0;
   if (lio_free(f, lip_unpack_array(lio_read(f), &u32))) return IMM_EIO;
   if (u32 != (uint32_t)CODON_SIZE) return IMM_EIO;
   for (int i = 0; i < CODON_SIZE; ++i)
-    if (lio_free(f, lip_unpack_float(lio_read(f), codonm->lprobs[0][0] + i))) return IMM_EIO;
+    if (lio_free(f, lip_unpack_float(lio_read(f), lprobs + i))) return IMM_EIO;
 
   return 0;
 }
