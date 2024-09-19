@@ -1,4 +1,4 @@
-test_[^\.]*
+test_*[^\.]*
 
 compile_commands.json
 .cache/
