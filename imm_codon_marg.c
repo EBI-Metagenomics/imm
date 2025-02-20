@@ -148,10 +148,15 @@ int imm_codon_marg_unpack(struct imm_codon_marg *codonm, struct lio_reader *f)
 {
   float *lprobs = &codonm->lprobs[0][0][0];
   uint32_t u32 = 0;
-  if (lio_free(f, lip_unpack_array(lio_read(f), &u32))) return IMM_EIO;
+  unsigned char *buf = NULL;
+  if (lio_read(f, &buf)) return IMM_EIO;
+  if (lio_free(f, lip_unpack_array(buf, &u32))) return IMM_EIO;
   if (u32 != (uint32_t)CODON_SIZE) return IMM_EIO;
   for (int i = 0; i < CODON_SIZE; ++i)
-    if (lio_free(f, lip_unpack_float(lio_read(f), lprobs + i))) return IMM_EIO;
+  {
+    if (lio_read(f, &buf)) return IMM_EIO;
+    if (lio_free(f, lip_unpack_float(buf, lprobs + i))) return IMM_EIO;
+  }
 
   return 0;
 }

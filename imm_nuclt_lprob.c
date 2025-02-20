@@ -35,11 +35,16 @@ int imm_nuclt_lprob_pack(struct imm_nuclt_lprob const *nucltp,
 int imm_nuclt_lprob_unpack(struct imm_nuclt_lprob *nucltp,
                            struct lio_reader *f)
 {
+  unsigned char *buf = NULL;
   uint32_t u32 = 0;
-  if (lio_free(f, lip_unpack_array(lio_read(f), &u32))) return IMM_EIO;
+  if (lio_read(f, &buf)) return IMM_EIO;
+  if (lio_free(f, lip_unpack_array(buf, &u32))) return IMM_EIO;
   if (u32 != (uint32_t)IMM_NUCLT_SIZE) return IMM_EIO;
   for (int i = 0; i < IMM_NUCLT_SIZE; ++i)
-    if (lio_free(f, lip_unpack_float(lio_read(f), nucltp->lprobs + i))) return IMM_EIO;
+  {
+    if (lio_read(f, &buf)) return IMM_EIO;
+    if (lio_free(f, lip_unpack_float(buf, nucltp->lprobs + i))) return IMM_EIO;
+  }
 
   return 0;
 }
